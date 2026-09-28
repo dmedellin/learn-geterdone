@@ -1,0 +1,2902 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stacks, Queues, and the Two-Stack Queue | Lesson | Data Structures | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="A queue can be built from two stacks: push arrivals onto one, and when the other is empty, pour everything across. One dequeue then costs n, and the whole sequence still costs at most three per arrival, because each element is pushed once, moved once and popped once. The expensive dequeue does not go away; it is paid for in advance." />
+  <link rel="canonical" href="https://learn.geterdone.io/data-structures/stacks-queues-and-the-two-stack-queue/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Stacks, Queues, and the Two-Stack Queue | Lesson | Data Structures | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="A queue can be built from two stacks: push arrivals onto one, and when the other is empty, pour everything across. One dequeue then costs n, and the whole sequence still costs at most three per arrival, because each element is pushed once, moved once and popped once. The expensive dequeue does not go away; it is paid for in advance." />
+  <meta property="og:url" content="https://learn.geterdone.io/data-structures/stacks-queues-and-the-two-stack-queue/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Stacks, Queues, and the Two-Stack Queue | Lesson | Data Structures | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A queue can be built from two stacks: push arrivals onto one, and when the other is empty, pour everything across. One dequeue then costs n, and the whole sequence still costs at most three per arrival, because each element is pushed once, moved once and popped once. The expensive dequeue does not go away; it is paid for in advance." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/data-structures/stacks-queues-and-the-two-stack-queue/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Data Structures</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Stacks, Queues, and the Two-Stack Queue</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The stacks, queues and the amortised bound is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Data Structures &middot; The cost model</span>
+        <h1>Stacks, Queues, and the Two-Stack Queue</h1>
+        <p>A queue can be built from two stacks: push arrivals onto one, and when the other is empty, pour everything across. One dequeue then costs <span class="math">n</span>, and the whole sequence still costs at most three per arrival, because each element is pushed once, moved once and popped once. The expensive dequeue does not go away; it is paid for in advance.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">stack   push, pop at one end          queue   enqueue at one end, dequeue at the other
+
+two-stack queue:  enqueue → push on IN
+                  dequeue → if OUT empty, pop all of IN onto OUT; then pop OUT
+
+each element is pushed once, moved once, popped once   ⟹   total ≤ 3m
+EEEDDD:  costs 1 1 1 4 1 1 = 9        3m = 3 × 3 = 9
+credit   2 4 6 2 1 0                  never negative, which is the argument</div>
+        <div class="float-label" style="right:16px;bottom:16px;">The construction, and the three charges that pay for it</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The structure is four lines long and the analysis is the point. What is new is not the queue; it is that a bound over a sequence can be proved by charging each element in advance.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Restricting the positions is what makes the operations cheap</h3><p>A stack touches one end and a queue touches two, and that is the entire reason both are constant-time on every operation while a general sequence is not. Neither can answer &ldquo;what is at position <span class="math">7</span>&rdquo; at all. Cheapness here is bought by refusing questions, which is the trade this whole course is about.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Amortised means over the sequence, and the expensive step is still there</h3><p>In <span class="math">EEEDDD</span> the fourth operation costs <span class="math">4</span> while the other five cost <span class="math">1</span>. The amortised bound does not say that dequeue was fast. It says the six operations together cost <span class="math">9</span>, which is <span class="math">3</span> per arrival, and it is silent about which of them paid. A reader who cannot point at the expensive operation has read the bound as &ldquo;always fast&rdquo;.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Credit is an accounting device, not a mechanism</h3><p>Nothing in the code stores credit. The argument charges <span class="math">3</span> for each enqueue, spends <span class="math">1</span> on the push and banks <span class="math">2</span>; a dequeue spends from the bank. If the balance is never negative then the charges covered the real costs, so the real total is at most the charged total. The structure is unchanged; only the bookkeeping is new.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Two stacks, one queue, and an argument that pays in advance</h2></div><p>The construction, the sequence where one dequeue costs four, and why the total is nevertheless bounded by three per arrival.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Stack and queue</span><p>A <strong>stack</strong> supports <span class="math">push</span> and <span class="math">pop</span> at one end: the element removed is the one most recently added. A <strong>queue</strong> supports <span class="math">enqueue</span> at one end and <span class="math">dequeue</span> at the other: the element removed is the one least recently added. Neither supports access by position, and that restriction is what makes every operation on both of them cost <span class="math">1</span> on an array or on a list.</p></div><div class="defbox"><span class="label">Definition &middot; The two-stack queue</span><p>Keep two stacks, IN and OUT. To <strong>enqueue</strong>, push onto IN. To <strong>dequeue</strong>: if OUT is empty, pop every element of IN and push it onto OUT, which reverses the order; then pop OUT. Because a stack reverses and two reversals restore, the element that comes off OUT is the oldest one still in the queue.</p></div><p>Charge one for each push, each pop and each move. Then an enqueue costs <span class="math">1</span> always. A dequeue costs <span class="math">1</span> when OUT is not empty, and <span class="math">k + 1</span> when OUT is empty and IN holds <span class="math">k</span> elements &mdash; <span class="math">k</span> moves and then the pop. So the worst single dequeue costs as much as the number of elements in the queue, and that is a genuine <span class="math">Θ(n)</span> operation that a reader is entitled to be unhappy about.</p><div class="example"><span class="label">Example &middot; Three in, three out</span><p>The sequence <span class="math">E E E D D D</span> costs <span class="math">1, 1, 1, 4, 1, 1</span>, adding to <span class="math">9</span>. The <span class="math">4</span> is the first dequeue: three moves to pour IN into OUT, then one pop. The two dequeues after it cost <span class="math">1</span> each, because OUT already holds their elements. One operation out of six cost four times what the others did, and the sequence total is <span class="math">9</span> for three arrivals &mdash; exactly <span class="math">3</span> each.</p></div><h3>The accounting argument</h3><p>The technique is the accounting method of Discrete Mathematics&rsquo; &ldquo;Recursion Trees and Amortised Analysis&rdquo;, applied to a structure rather than to a loop. Give every enqueue a budget of <span class="math">3</span>: one for the push that happens now, one to pay for the move this element will make later, and one to pay for the pop that will finally remove it. Nothing else in the structure ever touches an element.</p><div class="thm"><span class="label">Theorem &middot; The two-stack queue costs at most 3 per enqueue</span><p>Over any sequence of operations containing <span class="math">m</span> enqueues, the total cost of the two-stack queue is at most <span class="math">3m</span>.</p><p>Every element enters exactly once, is moved from IN to OUT at most once, and is popped from OUT at most once &mdash; once it has been moved it is never pushed back, because elements only ever travel from IN to OUT. So the three units charged at its enqueue cover every operation performed on it, for ever. Summing over the <span class="math">m</span> elements gives <span class="math">3m</span>, and the real total cannot exceed the charged total.</p></div><div class="proof"><p>Formally, let the credit after an operation be the charged total so far minus the real total so far. An enqueue is charged <span class="math">3</span> and costs <span class="math">1</span>, so the credit rises by <span class="math">2</span>. A dequeue is charged <span class="math">0</span> and costs <span class="math">k + 1</span> or <span class="math">1</span>, so the credit falls by that much.</p><p>The credit is never negative. Each element of IN carries <span class="math">2</span> unspent units and each element of OUT carries <span class="math">1</span>, so before a dequeue that must pour <span class="math">k</span> elements across, the bank holds at least <span class="math">2k</span> &mdash; and the dequeue costs <span class="math">k + 1 ≤ 2k</span> for <span class="math">k ≥ 1</span>. A dequeue on a non-empty OUT costs <span class="math">1</span> and that element&rsquo;s own unspent unit pays for it.</p><p>Since the credit is the charged total minus the real total and it is never negative, the real total is at most the charged total, which is <span class="math">3m</span>. The lab prints the credit balance after every step for exactly this reason: if it ever went negative the argument would be wrong, and watching it stay non-negative is watching the proof run.</p><p><span class="qed">&#9633;</span></p></div><h3>What the measurement does and does not show</h3><p>On <span class="math">E E E D D D</span> the lab reports a total of <span class="math">9</span> and a bound of <span class="math">9</span>: the two agree, because every element that arrived was also served, so each one really did pay all three of its charges. On <span class="math">E D E D E D E D</span> the total is <span class="math">12</span> and the bound is <span class="math">12</span>, for the same reason. On the twelve-operation sequence <span class="math">E E D E E D E E D D D D</span> the total is <span class="math">18</span> with one dequeue costing <span class="math">5</span>, and the bound is again <span class="math">18</span>.</p><p>That the two keep coinciding is informative and it is not the theorem. A sequence that enqueues and never dequeues costs <span class="math">m</span> against a bound of <span class="math">3m</span>, so the bound is loose there; the coincidence above happens when the queue is drained. What no sequence can do is establish the bound, because the bound quantifies over sequences and a run is one sequence. Type in a pattern that makes the expensive dequeue as expensive as you can &mdash; the cumulative line will approach the <span class="math">3m</span> line and, by the argument above, never cross it.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Stacks, queues and the amortised bound</h2></div><p>Every element crosses once, so every element costs three</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>A queue from two stacks</strong><span>one expensive dequeue, and the credit that already paid for it</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>cost so far</span><span class="tone-amber"><i class="legend-swatch"></i>3m</span><span class="tone-green"><i class="legend-swatch"></i>credit</span></div>
+      </div>
+      <div class="lab-stage" id="tsStage" tabindex="0" role="region" aria-label="The in stack and the out stack after the chosen step."><svg id="tsStacks" style="min-width:520px" viewBox="0 0 520 192" role="img" aria-label="The in stack and the out stack after the chosen step."></svg></div>
+      <div class="lab-stage" id="tsPlotStage" tabindex="0" role="region" aria-label="Cumulative cost against the 3m line, with the credit balance after each operation."><svg id="tsPlot" style="min-width:520px" viewBox="0 0 520 220" role="img" aria-label="Cumulative cost against the 3m line, with the credit balance after each operation."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tsTable"></table></div>
+      <div class="status-banner" id="tsStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Type a sequence and watch the credit balance</h3>
+          <p><span class="math">E</span> enqueues and <span class="math">D</span> dequeues. Both stacks are drawn, the per-operation cost and the running total are counted, and the cumulative cost is plotted against the <span class="math">3m</span> line the argument promises. The credit balance is the proof made visible: it must never go negative, and the expensive dequeue is the step where it drops.</p>
+        <div class="field" id="tsPresetField">
+          <label for="tsPreset">Worked sequence</label>
+          <select id="tsPreset"><option value="fill-then-drain" selected>three in, three out</option><option value="alternating">one in, one out, repeatedly</option><option value="bulk-then-drain">six in, six out</option><option value="refill-between">refills between the drains</option></select>
+        </div>
+        <div class="field" id="tsSeqField">
+          <label for="tsSeq">Your own sequence (e enqueues, d dequeues)</label>
+          <input id="tsSeq" type="text" value="EEEDDD" inputmode="text" autocomplete="off" />
+        </div>
+        <div id="tsStepRow">
+          <div class="range-row"><label class="small-copy" for="tsStep" id="tsStepLab">show the stacks after</label><span class="range-value" id="tsStepOut">&mdash;</span></div>
+          <input id="tsStep" type="range" min="0" max="27" step="1" value="3" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Operations</span><strong id="tsOps">&mdash;</strong></div>
+          <div class="kpi"><span>Total cost</span><strong id="tsTotal">&mdash;</strong></div>
+          <div class="kpi"><span>The 3m bound</span><strong id="tsBound">&mdash;</strong></div>
+          <div class="kpi"><span>Worst single step</span><strong id="tsWorst">&mdash;</strong></div>
+          <div class="kpi"><span>Cost per operation</span><strong id="tsAvg">&mdash;</strong></div>
+          <div class="kpi"><span>Credit balance</span><strong id="tsCredit">&mdash;</strong></div>
+        </div>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Running and bounding a queue sequence</h2></div><p>Cost it first, then account for it. Doing the accounting first is how a bound gets asserted rather than proved.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Track both stacks, not just the queue</h3><p>Write IN and OUT side by side and update them. The state of the queue alone cannot tell you what the next dequeue costs, because the cost depends entirely on whether OUT happens to be empty.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Cost each operation as it happens</h3><p>Enqueue <span class="math">1</span>. Dequeue <span class="math">1</span> if OUT is non-empty, <span class="math">k + 1</span> if it is empty and IN holds <span class="math">k</span>. Keep a running total in its own column, and mark the operations that poured &mdash; those are the only interesting ones.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the expensive operation and say how expensive</h3><p>There is one in almost every sequence, and the point of the exercise is that you can name it and quote its cost. An amortised bound you cannot point at the expensive step of has been read as a worst case.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Charge 3 per enqueue and check the balance</h3><p>Add a credit column: <span class="math">+2</span> on each enqueue, minus the real cost on each dequeue. If it is ever negative the charge was too small. If it never is, the total is at most <span class="math">3m</span>, and you have proved something about the whole sequence rather than measured one.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Cost and guarantee</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>E E E D D D, counted and then accounted for</h3><p>Six operations, three arrivals. The first column is what the structure did; the last is the argument that bounds it.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">step  op        IN        OUT       cost   total   credit   3m
+
+  1   E 1       [1]       []           1       1        2    3
+  2   E 2       [1 2]     []           1       2        4    6
+  3   E 3       [1 2 3]   []           1       3        6    9
+  4   D  →1     []        [3 2]        4       7        2    9
+        pour 3 across, then pop 1
+  5   D  →2     []        [3]          1       8        1    9
+  6   D  →3     []        []           1       9        0    9
+
+served in order   1, 2, 3          the queue order, from two stacks
+total 9   =   3m   =   3 × 3       credit ended at 0, never negative</div><p>Step 4 is the lesson. It cost <span class="math">4</span> where every other step cost <span class="math">1</span>, and it did so because OUT was empty and IN held three elements: three moves and a pop. Nothing about the amortised bound makes that step cheap. What the bound says is that the six steps together cost <span class="math">9</span>, and they did.</p><p>The credit column is where the <span class="math">3</span> comes from. Each enqueue banked <span class="math">2</span> after paying for its own push, so <span class="math">6</span> was in the bank when the expensive dequeue arrived; it spent <span class="math">4</span> and left <span class="math">2</span>, and the two cheap dequeues spent the rest. The balance reached <span class="math">0</span> and never went below, which is precisely the condition the theorem needs.</p><p>For a faded rehearsal, take <span class="math">E E D E E D E E D D D D</span>. The supplied first move is that the dequeue at step 3 pours two elements and costs <span class="math">3</span>, and the dequeue at step 6 finds OUT non-empty and costs <span class="math">1</span>. Carry the table to the end, find the one dequeue that costs <span class="math">5</span>, and check that the total is <span class="math">18</span> against a bound of <span class="math">3 × 6</span>. Then say, in one sentence, why running a second sequence would not make the bound any more established than running the first.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading amortised as a promise about every operation</strong><span>It is a promise about the total. The expensive dequeue in <span class="math">E E E D D D</span> costs four times its neighbours and is not an exception to the bound; it is what the bound was designed to absorb. Anyone who needs a guarantee on each individual operation &mdash; an interactive system, a real-time deadline &mdash; is asking a question the amortised bound does not answer, and needs a worst-case structure instead.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding the bound is proved because the run stayed under it</strong><span>The cumulative line sits under the <span class="math">3m</span> line for every sequence you can type, and typing sequences is not what establishes that. The argument does, by charging every element in advance and observing that the charges cover everything that will ever happen to it. The lab shows the credit balance so that you can watch the argument hold, not so that you can confirm it by sampling.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the credit is stored somewhere</strong><span>There is no credit field, no counter and no cost in the structure for maintaining one. The bank is a device in the proof. A reader who looks for where the credit lives has mistaken an accounting argument for an implementation, and will then wonder why the structure does not slow down as the balance grows.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can point at the expensive operation in a sequence and still state the constant bound without flinching.</strong><p>You should be able to run an enqueue/dequeue sequence keeping both stacks, quote the cost of the dequeue that pours, carry a credit column that never goes negative, and explain why <span class="math">3</span> is the right charge per arrival in terms of what happens to one element over its whole life in the structure.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Stacks and queues serve in arrival order and refuse every other question. The next structure answers exactly one more: which element is smallest, at any moment. &ldquo;Priority Queues and Binary Heaps&rdquo; gets it in <span class="math">O(log n)</span> with no pointers at all, by storing a tree in an array and keeping one inequality true at every node.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../arrays-linked-lists-and-the-cost-model/" rel="prev"><span>Lesson</span><strong>Arrays, Linked Lists, and the Cost Model</strong></a>
+      <a class="lesson-link next" href="../priority-queues-and-binary-heaps/" rel="next"><span>Lesson</span><strong>Priority Queues and Binary Heaps</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="data-structures/stacks-queues-and-the-two-stack-queue" data-lesson-title="Stacks, Queues, and the Two-Stack Queue" data-course-title="Data Structures">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Data Structures.</strong> Every count on this course is produced by executing the operation sequence on the structure drawn beside it. Expected chain lengths and load factors are exact fractions; <span class="math">Σ ⌈n/2ʰ⁺¹⌉·h</span> is evaluated exactly. Two numbers are approximations and say so: linear probing's <span class="math">½(1 + 1/(1−α)²)</span>, which is Knuth's and which the lab refuses to quote at all above <span class="math">α = 0.98</span>, and the <span class="math">2 ln n</span> expected depth of a random search tree, which is asymptotic and is printed beside the height and the mean depth that were measured.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A two-stack queue holds <span class=\"math\">6<\/span> elements, all of them in IN. What does the next dequeue cost?", "a": ["<span class=\"math\">1<\/span>", "<span class=\"math\">6<\/span>", "<span class=\"math\">7<\/span>", "<span class=\"math\">18<\/span>"], "c": 2, "why": "Six moves to pour IN into OUT, then one pop: <span class=\"math\">k + 1<\/span> = <span class=\"math\">7<\/span>. <span class=\"math\">1<\/span> is what it costs when OUT is already non-empty, which is not this case. <span class=\"math\">6<\/span> is the pour with the pop forgotten. <span class=\"math\">18<\/span> is <span class=\"math\">3m<\/span>, the bound on the whole sequence, which is not a cost of any single operation."}, {"q": "&ldquo;Dequeue is amortised <span class=\"math\">O(1)<\/span>.&rdquo; Which of these does that claim rule out?", "a": ["A single dequeue costing <span class=\"math\">\u0398(n)<\/span>", "A sequence of <span class=\"math\">m<\/span> enqueues and <span class=\"math\">m<\/span> dequeues costing <span class=\"math\">\u0398(m log m)<\/span>", "Two consecutive dequeues both costing more than <span class=\"math\">1<\/span>", "The queue ever holding more than a constant number of elements"], "c": 1, "why": "An amortised bound is a statement about the total: <span class=\"math\">m<\/span> enqueues and the dequeues that drain them cost <span class=\"math\">\u0398(m)<\/span>, so <span class=\"math\">\u0398(m log m)<\/span> is excluded. A single <span class=\"math\">\u0398(n)<\/span> dequeue is not excluded &mdash; the sequence in this lesson contains one. Two expensive dequeues in a row are not excluded either; they are just both paid for. And the bound says nothing at all about how many elements the queue holds."}, {"q": "In the credit argument, why is <span class=\"math\">3<\/span> the charge per enqueue rather than <span class=\"math\">2<\/span>?", "a": ["Because there are three operations in the structure", "Because each element is pushed once, moved once and popped once", "Because the queue has two stacks and one pointer", "Because a dequeue can cost up to three times what an enqueue costs"], "c": 1, "why": "The charge counts the operations an element will ever be involved in: the push onto IN, the move to OUT, and the pop off OUT. Three units cover all of them for ever, because an element never travels back. The number is not about the interface, the number of stacks, or a ratio between operation costs &mdash; a dequeue can cost <span class=\"math\">n + 1<\/span>, which is unbounded relative to an enqueue."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* --- the functions the growth and witness modes compare --------------- */
+  /* [label, f, rank]. rank = [tier, degree, log power], compared in that
+     order: tier 0 is n^degree · (log n)^power, tier 1 exponential, tier 2
+     factorial. f = O(g) exactly when rank(f) ≤ rank(g). */
+  var FUNCS = [
+    ['1', function (n) { return 1; }, [0, 0, 0]],
+    ['log₂ n', function (n) { return Math.log2(n); }, [0, 0, 1]],
+    ['n', function (n) { return n; }, [0, 1, 0]],
+    ['n log₂ n', function (n) { return n * Math.log2(n); }, [0, 1, 1]],
+    ['n²', function (n) { return n * n; }, [0, 2, 0]],
+    ['n³', function (n) { return n * n * n; }, [0, 3, 0]],
+    ['2ⁿ', function (n) { return Math.pow(2, n); }, [1, 0, 0]],
+    ['n!', function (n) { var f = 1; for (var i = 2; i <= n; i += 1) f *= i; return f; }, [2, 0, 0]],
+    ['3n² + 5n + 100', function (n) { return 3 * n * n + 5 * n + 100; }, [0, 2, 0]],
+    ['100n', function (n) { return 100 * n; }, [0, 1, 0]]
+  ];
+  function rankLE(r, s) {
+    for (var i = 0; i < 3; i += 1) { if (r[i] < s[i]) return true; if (r[i] > s[i]) return false; }
+    return true;
+  }
+  function bigO(fi, gi) { return rankLE(FUNCS[fi][2], FUNCS[gi][2]); }
+  function className(rank) {
+    if (rank[0] === 2) return 'factorial';
+    if (rank[0] === 1) return 'exponential';
+    var d = rank[1], l = rank[2];
+    if (d === 0) return l ? 'logarithmic' : 'constant';
+    var base = d === 1 ? 'linear' : d === 2 ? 'quadratic' : d === 3 ? 'cubic' : 'degree ' + d;
+    return l ? base + ' times a log' : base;
+  }
+  var CHECKPOINTS = [1000, 10000, 1000000, 1000000000];
+  function holdsAt(f, g, C, n) {
+    var fv = f(n), gv = C * g(n);
+    if (!isFinite(fv) && !isFinite(gv)) return true;   /* both overflow: no evidence either way */
+    return fv <= gv + 1e-9;
+  }
+  /* The grid search, run only when bigO says the relation is true. The pair
+     it returns held on every n from k to 4N and at every checkpoint. */
+  function witnessSearch(fi, gi, N) {
+    var f = FUNCS[fi][1], g = FUNCS[gi][1];
+    var Cs = [1, 2, 3, 4, 5, 10, 20, 50, 100, 1000];
+    for (var ci = 0; ci < Cs.length; ci += 1) {
+      for (var k = 1; k <= 40; k += 1) {
+        var ok = true;
+        for (var n = k; n <= 4 * N && ok; n += 1) if (!holdsAt(f, g, Cs[ci], n)) ok = false;
+        for (var c = 0; c < CHECKPOINTS.length && ok; c += 1) if (!holdsAt(f, g, Cs[ci], CHECKPOINTS[c])) ok = false;
+        if (ok) return { C: Cs[ci], k: k };
+      }
+    }
+    return null;
+  }
+  function ratioAt(fi, gi, n) {
+    var fv = FUNCS[fi][1](n), gv = FUNCS[gi][1](n);
+    if (!isFinite(fv) || !isFinite(gv) || gv === 0) return null;
+    return fv / gv;
+  }
+
+  /* --- counted algorithms. Each RUNS and increments a counter. ----------- */
+  function makeArray(n, kind) {
+    var a = [];
+    for (var i = 0; i < n; i += 1) a.push(i + 1);
+    if (kind === 'reverse') a.reverse();
+    else if (kind === 'shuffle') {
+      /* A fixed permutation, generated by a deterministic step so two readers
+         at the same n see the same array and the same counts. */
+      var out = [];
+      var idx = 0;
+      while (a.length) { idx = (idx + 7) % a.length; out.push(a.splice(idx, 1)[0]); }
+      a = out;
+    }
+    return a;
+  }
+  function linearSearch(a, target) {
+    var c = 0;
+    for (var i = 0; i < a.length; i += 1) { c += 1; if (a[i] === target) return c; }
+    return c;
+  }
+  function binarySearch(a, target) {
+    var lo = 0, hi = a.length - 1, c = 0;
+    while (lo <= hi) {
+      c += 1;
+      var mid = (lo + hi) >> 1;
+      if (a[mid] === target) return c;
+      if (a[mid] < target) lo = mid + 1; else hi = mid - 1;
+    }
+    return c;
+  }
+  function binaryWorst(n) {
+    var a = makeArray(n, 'sorted'), worst = 0;
+    for (var t = 1; t <= n; t += 1) worst = Math.max(worst, binarySearch(a, t));
+    return worst;
+  }
+  function bubbleSort(a) {
+    var arr = a.slice(), c = 0;
+    for (var i = 0; i < arr.length; i += 1)
+      for (var j = 0; j + 1 < arr.length - i; j += 1) {
+        c += 1;
+        if (arr[j] > arr[j + 1]) { var t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t; }
+      }
+    return c;
+  }
+  function insertionSort(a) {
+    var arr = a.slice(), c = 0;
+    for (var i = 1; i < arr.length; i += 1) {
+      var key = arr[i], j = i - 1;
+      while (j >= 0) { c += 1; if (arr[j] <= key) break; arr[j + 1] = arr[j]; j -= 1; }
+      arr[j + 1] = key;
+    }
+    return c;
+  }
+  function mergeSort(a) {
+    var c = 0;
+    function sort(arr) {
+      if (arr.length <= 1) return arr;
+      var mid = arr.length >> 1;
+      var L = sort(arr.slice(0, mid)), R = sort(arr.slice(mid)), out = [], i = 0, j = 0;
+      while (i < L.length && j < R.length) { c += 1; out.push(L[i] <= R[j] ? L[i++] : R[j++]); }
+      while (i < L.length) out.push(L[i++]);
+      while (j < R.length) out.push(R[j++]);
+      return out;
+    }
+    sort(a.slice());
+    return c;
+  }
+  function ilog2(n) { var t = 0; while (n >= 2) { n = Math.floor(n / 2); t += 1; } return t; }
+
+  /* Lesson 5's four loop nests, each run with a counter, beside the sum that
+     predicts it. None of them looks at data, so the counts are exact. */
+  function countNests(n) {
+    var A = 0, B = 0, C = 0, D = 0, i, j, k;
+    for (i = 1; i <= n; i += 1) for (j = 1; j <= n; j += 1) for (k = 1; k <= n; k += 1) A += 1;
+    for (i = 1; i <= n; i += 1) for (j = i; j <= n; j += 1) B += 1;
+    for (i = 1; i <= n; i += 1) { j = n; while (j > 1) { j = Math.floor(j / 2); C += 1; } }
+    for (i = 1; i <= n; i += 1) for (j = 1; j <= i; j += 1) for (k = 1; k <= j; k += 1) D += 1;
+    return { A: A, B: B, C: C, D: D,
+      predA: n * n * n, predB: n * (n + 1) / 2, predC: n * ilog2(n), predD: n * (n + 1) * (n + 2) / 6 };
+  }
+
+  /* Lesson 2's worked example: POWER(x, n) by repeated squaring, with the
+     invariant result · base^m = xⁿ evaluated exactly after every iteration. */
+  function powerTrace(x, n) {
+    var X = BigInt(x), target = X ** BigInt(n);
+    var result = BigInt(1), base = X, m = n, rows = [], squarings = 0, mults = 0;
+    rows.push({ step: 0, m: m, result: result, base: base, ok: result * base ** BigInt(m) === target });
+    while (m > 0) {
+      if (m % 2 === 1) { result = result * base; mults += 1; }
+      base = base * base; squarings += 1;
+      m = Math.floor(m / 2);
+      rows.push({ step: rows.length, m: m, result: result, base: base, ok: result * base ** BigInt(m) === target });
+    }
+    return { rows: rows, squarings: squarings, mults: mults, value: result, target: target, naive: n - 1,
+      binary: n.toString(2) };
+  }
+
+  /* Lesson 8's dynamic array: n insertions from capacity 1, every element
+     copied when the array grows. policy: 'double', 'half' (×1.5), 'one' (+1). */
+  function dynamicArray(n, policy) {
+    var cap = 1, size = 0, copies = 0, events = [], worst = 0, worstAt = 1, cumulative = [];
+    for (var i = 1; i <= n; i += 1) {
+      var cost = 1;
+      if (size === cap) {
+        var next = policy === 'one' ? cap + 1 : policy === 'half' ? Math.max(cap + 1, Math.floor(cap * 3 / 2)) : cap * 2;
+        events.push({ at: i, from: cap, to: next, copies: size });
+        copies += size; cost += size; cap = next;
+      }
+      size += 1;
+      if (cost > worst) { worst = cost; worstAt = i; }
+      cumulative.push(copies + i);
+    }
+    return { events: events, copies: copies, total: n + copies, worst: worst, worstAt: worstAt,
+      amortised: (n + copies) / n, cumulative: cumulative, capacity: cap };
+  }
+
+  /* The master theorem, cases numbered as course 3 lesson 11 numbers them:
+     1 root dominates, 2 balanced, 3 leaves dominate. */
+  function masterCase(a, b, d) {
+    var crit = Math.log(a) / Math.log(b);
+    var which = Math.abs(crit - d) < 1e-9 ? 2 : (crit > d ? 3 : 1);
+    function pow(e) { return e === 0 ? '1' : e === 1 ? 'n' : 'n^' + e; }
+    var result;
+    if (which === 1) result = 'Θ(' + pow(d) + ')';
+    else if (which === 2) result = d === 0 ? 'Θ(log n)' : 'Θ(' + pow(d) + ' log n)';
+    else if (Math.abs(crit - Math.round(crit)) < 1e-9) result = 'Θ(' + pow(Math.round(crit)) + ')';
+    else result = 'Θ(n^log_' + b + ' ' + a + ') ≈ Θ(n^' + crit.toFixed(3) + ')';
+    var label = which === 1 ? 'case 1 (a < b^d, the root dominates)'
+      : which === 2 ? 'case 2 (a = b^d, balanced)' : 'case 3 (a > b^d, the leaves dominate)';
+    return { crit: crit, which: which, result: result, label: label };
+  }
+
+  /* Coin change: greedy and exact DP, run against each other. */
+  function greedyCoins(coins, amount) {
+    var left = amount, used = 0, picks = [];
+    var sorted = coins.slice().sort(function (x, y) { return y - x; });
+    sorted.forEach(function (c) {
+      while (left >= c) { left -= c; used += 1; picks.push(c); }
+    });
+    return left === 0 ? { count: used, picks: picks } : { count: Infinity, picks: [] };
+  }
+  function dpCoins(coins, amount) {
+    var best = new Array(amount + 1).fill(Infinity), from = new Array(amount + 1).fill(-1);
+    best[0] = 0;
+    for (var v = 1; v <= amount; v += 1) {
+      coins.forEach(function (c) {
+        if (c <= v && best[v - c] + 1 < best[v]) { best[v] = best[v - c] + 1; from[v] = c; }
+      });
+    }
+    var picks = [], cur = amount;
+    while (cur > 0 && from[cur] !== -1) { picks.push(from[cur]); cur -= from[cur]; }
+    return { count: best[amount], picks: picks, table: best };
+  }
+  function greedyFailures(coins, upto) {
+    var out = [];
+    for (var a = 1; a <= upto; a += 1) if (greedyCoins(coins, a).count !== dpCoins(coins, a).count) out.push(a);
+    return out;
+  }
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* Measured against predicted, drawn.
+
+     This is `drawSeries` from algorithms.py, lifted out of `algorithm_lab` and
+     given the element as an argument. The original assigned to `plot`, an
+     element it had closed over, so it could not be called from another lab, and
+     could not be called from a test at all. Here the function that BUILDS the
+     markup and the function that installs it are separate: seriesSvg returns a
+     string and touches nothing, drawSeries hands that string to an element.
+     Every assertion mathcheck makes about a drawing is an assertion about the
+     string.
+
+     A series is { label, values, colour, dashed, points }. `dashed` is for a
+     predicted bound and `points` marks the measured samples, because the whole
+     figure on this path is one measured curve against one predicted one, and
+     two solid lines of different colours do not say which is which.
+
+     The geometry is the shipped one -- x from 26 to 496, baseline at 200, 180
+     tall -- so a page that swaps this in for the old helper draws the same
+     picture. */
+  var SERIES_BOX = { left: 26, right: 496, base: 200, top: 14 };
+
+  function seriesMax(series) {
+    var m = 0;
+    series.forEach(function (s) {
+      s.values.forEach(function (v) { if (isFinite(v) && v > m) m = v; });
+    });
+    return m > 0 ? m : 1;
+  }
+
+  /* The scale, returned as functions so a kit can place its own annotations on
+     the same axes rather than guessing at them. */
+  function seriesScale(series, xs, opts) {
+    opts = opts || {};
+    var box = opts.box || SERIES_BOX;
+    var maxY = opts.maxY || seriesMax(series);
+    var log = !!opts.log;
+    var span = box.base - box.top;
+    return {
+      box: box, maxY: maxY, log: log, n: xs.length,
+      x: function (i) {
+        return box.left + (i / Math.max(1, xs.length - 1)) * (box.right - box.left);
+      },
+      y: function (v) {
+        if (!isFinite(v)) return box.top - 8;          /* off the top, deliberately */
+        if (log) {
+          var lv = Math.log10(Math.max(v, 1)), lm = Math.log10(Math.max(maxY, 10));
+          return box.base - (lv / lm) * span;
+        }
+        return box.base - (v / maxY) * span;
+      }
+    };
+  }
+
+  function seriesPath(sc, values) {
+    return values.map(function (v, i) {
+      return (i ? 'L' : 'M') + sc.x(i).toFixed(1) + ' ' + sc.y(v).toFixed(1);
+    }).join(' ');
+  }
+
+  /* Endpoint labels, separated so two curves that end close together are both
+     readable. Lifted with the shipped helper's logic intact: sort by where the
+     curve ends, push each down to clear the one above, then pull the tail back
+     up so the last one stays inside the box. */
+  function seriesLabelRows(series, sc) {
+    var rows = series.map(function (ser, i) {
+      var last = ser.values[ser.values.length - 1];
+      return { series: ser, order: i,
+               baseline: Math.max(20, Math.min(sc.box.base - 12, sc.y(last) - 6)) };
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    rows.forEach(function (r, i) {
+      if (i) r.baseline = Math.max(r.baseline, rows[i - 1].baseline + 18);
+    });
+    for (var i = rows.length - 1; i >= 0; i -= 1) {
+      rows[i].baseline = Math.min(rows[i].baseline,
+        i === rows.length - 1 ? sc.box.base - 12 : rows[i + 1].baseline - 18);
+    }
+    return rows;
+  }
+
+  function seriesSvg(series, xs, opts) {
+    opts = opts || {};
+    var sc = seriesScale(series, xs, opts), b = sc.box;
+    var s = '<line x1="' + b.left + '" y1="' + b.base + '" x2="' + (b.right + 4) + '" y2="' + b.base
+          + '" stroke="var(--line-strong)" />'
+          + '<line x1="' + b.left + '" y1="' + b.top + '" x2="' + b.left + '" y2="' + b.base
+          + '" stroke="var(--line-strong)" />';
+    series.forEach(function (ser) {
+      s += '<path d="' + seriesPath(sc, ser.values) + '" fill="none" stroke="' + ser.colour
+        + '" stroke-width="' + (ser.dashed ? 2 : 2.4) + '" opacity="0.9"'
+        + (ser.dashed ? ' stroke-dasharray="6 4"' : '') + ' />';
+      if (ser.points) {
+        ser.values.forEach(function (v, i) {
+          if (!isFinite(v)) return;
+          s += '<circle cx="' + sc.x(i).toFixed(1) + '" cy="' + sc.y(v).toFixed(1)
+            + '" r="2.6" fill="' + ser.colour + '" />';
+        });
+      }
+    });
+    seriesLabelRows(series, sc).forEach(function (row) {
+      s += '<text x="' + (sc.x(xs.length - 1) - 6).toFixed(1) + '" y="' + row.baseline.toFixed(1)
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + row.series.colour
+        + '">' + row.series.label + '</text>';
+    });
+    var tag = opts.xlabel === undefined ? 'n' : opts.xlabel;
+    s += '<text x="' + b.left + '" y="' + (b.base + 16) + '" font-size="12" fill="var(--muted)">'
+      + tag + ' = ' + xs[0] + '</text>';
+    s += '<text x="' + (b.right + 4) + '" y="' + (b.base + 16)
+      + '" text-anchor="end" font-size="12" fill="var(--muted)">' + tag + ' = ' + xs[xs.length - 1] + '</text>';
+    if (sc.log) s += '<text x="' + (b.left + 4) + '" y="' + (b.top + 10)
+      + '" font-size="12" fill="var(--muted)">log scale</text>';
+    return s;
+  }
+
+  /* The element is the FIRST argument and may be null, which is what makes the
+     helper shared. Returns the markup either way. */
+  function drawSeries(el, series, xs, opts) {
+    var s = seriesSvg(series, xs, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Sample a predicted curve on the same x values as a measured one. The curve
+     is a drawing: it is evaluated at double precision and nothing is decided
+     from it. */
+  function predicted(xs, f) { return xs.map(function (n) { return f(n); }); }
+
+  /* A tree renderer, shared for the same reason the graph one is: six kinds of
+     tree are drawn on this path -- search trees, AVL and treaps, Huffman codes,
+     tries, DP subproblem trees, branch-and-bound search trees -- and every one
+     of them was about to be a helper closed over its own lab's element.
+
+     It is generic over the node type: `kids(node)` returns the children (nulls
+     included, so a BST's missing left child still leaves a gap where it
+     belongs) and `label(node)` returns what goes in the circle. x is the
+     in-order position, y is the depth, which is the layout that makes a search
+     tree's in-order sequence readable straight off the drawing. */
+  function treeLayout(root, kids, label, opts) {
+    opts = opts || {};
+    var nodes = [], links = [], next = 0, maxDepth = 0;
+    (function place(node, depth, parent) {
+      if (!node) { next += opts.gaps === false ? 0 : 0.5; return null; }
+      var children = kids(node) || [];
+      var left = children.length ? place(children[0], depth + 1, null) : null;
+      var me = { node: node, label: label(node), depth: depth, order: next, id: nodes.length };
+      next += 1;
+      nodes.push(me);
+      if (left) links.push({ from: me.id, to: left.id, side: 0 });
+      for (var k = 1; k < children.length; k += 1) {
+        var c = place(children[k], depth + 1, null);
+        if (c) links.push({ from: me.id, to: c.id, side: k });
+      }
+      if (depth > maxDepth) maxDepth = depth;
+      return me;
+    })(root, 0, null);
+    var w = opts.width === undefined ? 460 : opts.width;
+    var h = opts.height === undefined ? 210 : opts.height;
+    var cols = Math.max(1, next - 1), rows = Math.max(1, maxDepth);
+    nodes.forEach(function (n) {
+      n.x = 26 + (n.order / cols) * (w - 52);
+      n.y = 22 + (n.depth / rows) * (h - 44);
+    });
+    return { nodes: nodes, links: links, depth: maxDepth, count: nodes.length };
+  }
+  function treeSvg(layout, opts) {
+    opts = opts || {};
+    var hi = {};
+    (opts.highlight || []).forEach(function (i) { hi[i] = true; });
+    var s = '', r = opts.radius === undefined ? 14 : opts.radius;
+    layout.links.forEach(function (l) {
+      var a = layout.nodes[l.from], b = layout.nodes[l.to];
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="'
+        + (hi[l.to] ? 'var(--cyan)' : 'var(--line-strong)') + '" stroke-width="'
+        + (hi[l.to] ? 3 : 1.6) + '" />';
+    });
+    layout.nodes.forEach(function (n) {
+      var fill = opts.fill ? opts.fill(n) : (hi[n.id] ? 'var(--cyan)' : 'var(--panel-3)');
+      s += '<circle cx="' + n.x.toFixed(1) + '" cy="' + n.y.toFixed(1) + '" r="' + r
+        + '" fill="' + fill + '" stroke="var(--line-strong)" stroke-width="1.8" />';
+      s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="'
+        + (hi[n.id] ? 'var(--on-accent)' : 'var(--text)') + '">' + n.label + '</text>';
+      if (opts.note) {
+        var note = opts.note(n);
+        if (note) s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y - r - 4).toFixed(1)
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + note + '</text>';
+      }
+    });
+    return s;
+  }
+  function drawTree(el, root, kids, label, opts) {
+    var s = treeSvg(treeLayout(root, kids, label, opts), opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Course 1's cost model, in the word RAM the lesson states: an array index
+     costs 1 and reaching the i-th node of a list costs i + 1 hops. Every cost
+     here is that model executed, not a complexity class quoted, which is why
+     the table can disagree with the reader's expectation and be right.
+
+     One vocabulary of operations serves all four modes, and a structure that
+     cannot do an operation returns null rather than a large number. "Not
+     supported" and "expensive" are different answers and a lab that conflated
+     them would teach that a stack is a slow array. */
+  var SEQ_OPS = ['index', 'search', 'insertFront', 'insertEnd', 'deleteAt', 'min'];
+  var SEQ_STRUCTURES = {
+    array: {
+      label: 'dynamic array',
+      index: function (n, at) { return 1; },
+      search: function (n, at) { return n; },                    /* worst case: scan */
+      insertFront: function (n, at) { return n + 1; },           /* shift every element */
+      insertEnd: function (n, at) { return 1; },                 /* amortised; see ALGO_JS.dynamicArray */
+      deleteAt: function (n, at) { return n - at; },
+      min: function (n, at) { return n; }
+    },
+    sortedArray: {
+      label: 'sorted array',
+      index: function (n, at) { return 1; },
+      search: function (n, at) { return ilog2(n) + 1; },         /* binary search */
+      insertFront: null,                                          /* position is not the caller's to choose */
+      insertEnd: null,
+      deleteAt: function (n, at) { return n - at; },
+      min: function (n, at) { return 1; }                        /* it is at the front */
+    },
+    list: {
+      label: 'doubly-linked list',
+      index: function (n, at) { return at + 1; },
+      search: function (n, at) { return n; },
+      insertFront: function (n, at) { return 1; },
+      insertEnd: function (n, at) { return 1; },                 /* a tail pointer */
+      deleteAt: function (n, at) { return at + 2; },             /* walk, then splice */
+      min: function (n, at) { return n; }
+    },
+    stack: {
+      label: 'stack',
+      index: null, search: null,
+      insertFront: null,
+      insertEnd: function (n, at) { return 1; },                 /* push */
+      deleteAt: null,
+      min: null
+    },
+    queue: {
+      label: 'queue (two stacks)',
+      index: null, search: null,
+      insertFront: null,
+      insertEnd: function (n, at) { return 1; },
+      deleteAt: null,
+      min: null
+    }
+  };
+
+  /* One operation sequence on one representation. ops are
+     { op, at, key }; `at` is a 0-based position and defaults to the middle,
+     which is the position the lesson's worked example uses. */
+  function seqRun(ops, rep, n0) {
+    var spec = SEQ_STRUCTURES[rep];
+    if (!spec) throw new Error('unknown representation: ' + rep);
+    var n = n0 === undefined ? 8 : n0, c = counter(), trace = [], total = 0;
+    ops.forEach(function (o, i) {
+      var at = o.at === undefined ? Math.floor(n / 2) : o.at;
+      var f = spec[o.op];
+      if (f === null || f === undefined) {
+        trace.push({ at: i, op: o.op, cost: null, n: n, supported: false });
+        return;
+      }
+      var cost = f(n, Math.min(at, Math.max(0, n - 1)));
+      total += cost;
+      if (o.op === 'index' || o.op === 'search' || o.op === 'min') c.reads += cost;
+      else if (rep === 'list') c.hops += cost;
+      else c.moves += cost;
+      if (o.op.indexOf('insert') === 0) n += 1;
+      if (o.op === 'deleteAt') n -= 1;
+      trace.push({ at: i, op: o.op, cost: cost, n: n, supported: true });
+    });
+    return runOf({ total: total, size: n, label: spec.label }, usedCounts(c), trace);
+  }
+  function sortedArrayRun(ops, n0) { return seqRun(ops, 'sortedArray', n0); }
+
+  /* The whole mix on all five, ranked, with "not supported" kept as its own
+     answer. `mix` is { op: repetitions }. */
+  function workloadRun(mix, n) {
+    var ops = [];
+    Object.keys(mix).forEach(function (op) {
+      for (var i = 0; i < mix[op]; i += 1) ops.push({ op: op });
+    });
+    var rows = Object.keys(SEQ_STRUCTURES).map(function (rep) {
+      var r = seqRun(ops, rep, n);
+      var missing = ops.filter(function (o) { return !SEQ_STRUCTURES[rep][o.op]; })
+                       .map(function (o) { return o.op; });
+      var uniq = missing.filter(function (m, i) { return missing.indexOf(m) === i; });
+      return { rep: rep, label: SEQ_STRUCTURES[rep].label, total: r.result.total,
+               unsupported: uniq, usable: uniq.length === 0 };
+    });
+    var ranked = rows.filter(function (r) { return r.usable; })
+                     .sort(function (a, b) { return a.total - b.total; });
+    return runOf({ rows: rows, ranked: ranked, best: ranked.length ? ranked[0].rep : null },
+                 { calls: ops.length }, []);
+  }
+
+  /* A queue from two stacks, and the CREDIT argument that bounds it.
+
+     The unit of cost is one element touched: a push is 1, a transfer from the
+     in stack to the out stack is 1, a pop is 1. So an element costs exactly 3
+     over its whole life, no matter how the operations interleave, and the total
+     is at most 3m for m enqueues -- which is the bound, evaluated rather than
+     asserted. Each enqueue is charged 3 and spends 1, leaving 2 on the element
+     to pay for its own transfer and its own pop; the balance in the trace is
+     that bank, and the claim the lesson makes is that it never goes negative.
+
+     Counting a transfer as 2 (a pop and a push) would be just as defensible and
+     would make the bound 4m. The lesson states the 3, so this counts the 3. */
+  function twoStackRun(ops) {
+    var inS = [], outS = [], c = counter(), trace = [], total = 0, credits = 0, m = 0, out = [];
+    ops.forEach(function (o, i) {
+      var cost = 0, moved = 0, took = null;
+      if (o.op === 'enqueue') {
+        inS.push(o.key); cost = 1; c.pushes += 1; m += 1;
+        credits += 3 - cost;
+      } else {
+        if (!outS.length) {
+          while (inS.length) { outS.push(inS.pop()); moved += 1; c.moves += 1; }
+          cost += moved;
+        }
+        if (outS.length) { took = outS.pop(); out.push(took); cost += 1; c.pops += 1; }
+        credits -= cost;
+      }
+      total += cost;
+      trace.push({ at: i, op: o.op, key: o.key, took: took, cost: cost, moved: moved,
+                   total: total, credits: credits, bound: 3 * m });
+    });
+    return runOf({ total: total, bound: 3 * m, enqueues: m, order: out,
+                   withinBound: total <= 3 * m,
+                   creditsNeverNegative: trace.every(function (t) { return t.credits >= 0; }) },
+                 usedCounts(c), trace);
+  }
+
+  /* Union-find, with the two improvements as independent switches, because the
+     lesson's point is that either one alone is already good and the pair is
+     what makes the bound flat. `rules` is { rank: bool, compress: bool }.
+     Hops are counted per find, which is the figure the panel plots against
+     the 2^r bound on a rank-r tree. */
+  function unionFindRun(ops, rules, n) {
+    rules = rules || {};
+    var parent = [], rank = [], size = [], c = counter(), trace = [], i;
+    var worstFind = 0;
+    for (i = 0; i < n; i += 1) { parent.push(i); rank.push(0); size.push(1); }
+    function findWith(x) {
+      var hops = 0, root = x;
+      while (parent[root] !== root) { root = parent[root]; hops += 1; }
+      /* The longest walk ANY ONE find makes, counted here because a union
+         performs two of them and a caller cannot see either from the trace:
+         a union row reports ra.hops + rb.hops, a SUM of two separate walks
+         and not a walk any single find ever took. */
+      if (hops > worstFind) worstFind = hops;
+      if (rules.compress) {
+        var cur = x;
+        while (parent[cur] !== cur) { var next = parent[cur]; parent[cur] = root; cur = next; c.writes += 1; }
+      }
+      c.hops += hops; c.finds += 1;
+      return { root: root, hops: hops };
+    }
+    ops.forEach(function (o, k) {
+      if (o.op === 'find') {
+        var f = findWith(o.a);
+        trace.push({ at: k, op: 'find', a: o.a, root: f.root, hops: f.hops, parent: parent.slice() });
+        return;
+      }
+      var ra = findWith(o.a), rb = findWith(o.b);
+      if (ra.root === rb.root) {
+        trace.push({ at: k, op: 'union', a: o.a, b: o.b, merged: false,
+                     hops: ra.hops + rb.hops, parent: parent.slice() });
+        return;
+      }
+      var x = ra.root, y = rb.root;
+      if (rules.rank && rank[x] > rank[y]) { var t = x; x = y; y = t; }
+      parent[x] = y; size[y] += size[x]; c.unions += 1; c.writes += 1;
+      if (rules.rank && rank[x] === rank[y]) rank[y] += 1;
+      else if (!rules.rank) rank[y] = Math.max(rank[y], rank[x] + 1);
+      trace.push({ at: k, op: 'union', a: o.a, b: o.b, merged: true, root: y,
+                   hops: ra.hops + rb.hops, parent: parent.slice() });
+    });
+    var maxRank = 0, maxSize = 0;
+    for (i = 0; i < n; i += 1) {
+      if (parent[i] === i) { maxRank = Math.max(maxRank, rank[i]); maxSize = Math.max(maxSize, size[i]); }
+    }
+    /* Two different worsts, and they are not interchangeable.
+       worstHops is the largest TRACE ROW -- for a union that is the sum of its
+       two finds, so it can exceed every individual walk.
+       worstFind is the longest walk a single find made, which is the figure a
+       "worst single find" label is claiming and the one the log2 bound is
+       about. They coincide on a find-only sequence, which is why the two were
+       confused. */
+    var worst = 0;
+    trace.forEach(function (t) { if (t.hops > worst) worst = t.hops; });
+    return runOf({ parent: parent, rank: rank, maxRank: maxRank, maxSize: maxSize,
+                   bound: Math.pow(2, maxRank), worstHops: worst, worstFind: worstFind,
+                   rankBoundHolds: maxSize >= Math.pow(2, maxRank) },
+                 usedCounts(c), trace);
+  }
+
+  /* ===================== an operation sequence, from a pattern ==============
+
+     The sequence is the reader's input, so it is expanded here rather than
+     stored: `at` is read off the CURRENT size, so moving the position slider or
+     changing n moves every cost with it. A delete on an empty list is dropped
+     rather than counted as free, which is the difference between "cheap" and
+     "did not happen". */
+  function seqAt(n, pct) {
+    if (n <= 1) return 0;
+    return Math.max(0, Math.min(n - 1, Math.round((pct / 100) * (n - 1))));
+  }
+  function seqExpand(pattern, reps, n0, pct) {
+    var ops = [], size = n0, r, i, op;
+    for (r = 0; r < reps; r += 1) {
+      for (i = 0; i < pattern.length; i += 1) {
+        op = pattern[i];
+        if (op === 'deleteAt' && size <= 1) continue;
+        ops.push({ op: op, at: seqAt(size, pct) });
+        if (op.indexOf('insert') === 0) size += 1;
+        if (op === 'deleteAt') size -= 1;
+      }
+    }
+    return ops;
+  }
+
+  /* ===================== two representations, one sequence =================
+
+     Both runs come from `seqRun`, which is the shared engine; this only pairs
+     them, so the table is a comparison rather than two tables the reader has to
+     align by eye. `decidedBy` is the operation KIND whose two columns differ
+     most in total, which is the answer to "which operation decided it" -- the
+     question the lesson asks and a total cannot answer. */
+  function seqCompare(ops, n0) {
+    var A = seqRun(ops, 'array', n0), L = seqRun(ops, 'list', n0);
+    var rows = [], ac = 0, lc = 0, byOp = {}, order = [], i, a, l, k;
+    for (i = 0; i < ops.length; i += 1) {
+      a = A.trace[i]; l = L.trace[i];
+      ac += a.cost; lc += l.cost;
+      rows.push({ at: i, op: ops[i].op, index: ops[i].at, size: a.n,
+                  array: a.cost, list: l.cost,
+                  arrayTotal: ac, listTotal: lc, gap: a.cost - l.cost });
+      k = ops[i].op;
+      if (!byOp[k]) { byOp[k] = { op: k, count: 0, array: 0, list: 0 }; order.push(k); }
+      byOp[k].count += 1; byOp[k].array += a.cost; byOp[k].list += l.cost;
+    }
+    var kinds = order.map(function (key) { return byOp[key]; });
+    var ranked = kinds.slice().sort(function (x, y) {
+      return Math.abs(y.array - y.list) - Math.abs(x.array - x.list);
+    });
+    return { rows: rows, array: A, list: L, kinds: kinds,
+             arrayTotal: ac, listTotal: lc,
+             winner: ac === lc ? 'tie' : (ac < lc ? 'array' : 'list'),
+             decidedBy: ranked.length ? ranked[0] : null,
+             ratio: (ac && lc) ? R(BigInt(ac), BigInt(lc)) : null };
+  }
+  function seqCumulative(rows, which) {
+    return rows.map(function (r) { return which === 'array' ? r.arrayTotal : r.listTotal; });
+  }
+
+  /* ========================= the two-stack queue ===========================
+
+     Reading the reader's sequence. One letter is one operation and the keys are
+     numbered in enqueue order, so what the drawing shows is the reader's own
+     string. A character that means nothing is REPORTED rather than ignored
+     silently: a typo that quietly shortens the sequence would change every
+     count on the panel with no sign that it had. */
+  function twoStackParse(text, cap) {
+    var ops = [], bad = [], key = 1, i, ch;
+    for (i = 0; i < text.length; i += 1) {
+      ch = text.charAt(i);
+      if (ch === ' ' || ch === ',' || ch === '\t' || ch === '.') continue;
+      if (ch === 'e' || ch === 'E' || ch === '+') { ops.push({ op: 'enqueue', key: key }); key += 1; }
+      else if (ch === 'd' || ch === 'D' || ch === '-') ops.push({ op: 'dequeue' });
+      else if (bad.indexOf(ch) < 0) bad.push(ch);
+    }
+    var over = ops.length > cap;
+    return { ops: over ? ops.slice(0, cap) : ops, ignored: bad, truncated: over };
+  }
+
+  /* The two stacks at a step, DERIVED from the trace rather than replayed.
+
+     `twoStackRun` records what each operation cost and whether it transferred,
+     and that is enough: a transfer moves everything then on the in stack, so
+     after the last transfer at or before this step, the elements enqueued
+     BEFORE it and not yet dequeued are the out stack, and those enqueued after
+     it are the in stack. Replaying the loop here instead would be a second
+     implementation of the structure, free to drift from the one being counted. */
+  function twoStackState(run, upto) {
+    var enq = [], popped = 0, lastTransfer = -1, i, t;
+    for (i = 0; i <= upto && i < run.trace.length; i += 1) {
+      t = run.trace[i];
+      if (t.op === 'enqueue') enq.push({ key: t.key, at: i });
+      if (t.moved) lastTransfer = i;
+      if (t.took !== null && t.took !== undefined) popped += 1;
+    }
+    var live = enq.slice(popped);
+    return {
+      outStack: live.filter(function (e) { return e.at < lastTransfer; }),
+      inStack: live.filter(function (e) { return e.at > lastTransfer; }),
+      served: popped, lastTransfer: lastTransfer
+    };
+  }
+
+  /* Both stacks, drawn. The in stack grows upward from the left, the out stack
+     from the right, and the arrow between them is the transfer that costs. */
+  function stacksSvg(state, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 520 : opts.width;
+    var h = opts.height === undefined ? 192 : opts.height;
+    var cell = 22, base = h - 30, s = '';
+    function column(items, x, colour, name, tip) {
+      var i, y, txt;
+      s += '<text x="' + x + '" y="' + (base + 18) + '" text-anchor="middle" font-size="11" '
+        + 'fill="var(--muted)">' + name + '</text>';
+      s += '<line x1="' + (x - 30) + '" y1="' + base + '" x2="' + (x + 30) + '" y2="' + base
+        + '" stroke="var(--line-strong)" stroke-width="2" />';
+      for (i = 0; i < items.length; i += 1) {
+        y = base - (i + 1) * cell;
+        s += '<rect x="' + (x - 26) + '" y="' + (y + 2) + '" width="52" height="' + (cell - 4)
+          + '" rx="4" fill="' + colour + '" opacity="0.34" stroke="var(--line-strong)" />';
+        txt = String(items[i].key === undefined ? items[i] : items[i].key);
+        s += '<text x="' + x + '" y="' + (y + cell - 7) + '" text-anchor="middle" font-size="11" '
+          + 'font-weight="700" fill="var(--text)">' + txt + '</text>';
+      }
+      if (!items.length) {
+        s += '<text x="' + x + '" y="' + (base - 10) + '" text-anchor="middle" font-size="11" '
+          + 'fill="var(--muted)">empty</text>';
+      }
+      if (tip) {
+        s += '<text x="' + x + '" y="' + (base - items.length * cell - 8) + '" text-anchor="middle" '
+          + 'font-size="10" fill="var(--muted)">' + tip + '</text>';
+      }
+    }
+    column(state.inStack, w * 0.28, 'var(--cyan)', 'in', 'newest on top');
+    column(state.outStack, w * 0.72, 'var(--amber)', 'out', 'next to leave on top');
+    s += '<path d="M' + (w * 0.28 + 44) + ' ' + (base - 52) + ' L' + (w * 0.72 - 44) + ' '
+      + (base - 52) + '" stroke="var(--line-strong)" stroke-width="1.6" stroke-dasharray="5 4" '
+      + 'fill="none" />';
+    s += '<polygon points="' + (w * 0.72 - 44) + ',' + (base - 52) + ' ' + (w * 0.72 - 53) + ','
+      + (base - 56) + ' ' + (w * 0.72 - 53) + ',' + (base - 48)
+      + '" fill="var(--line-strong)" />';
+    s += '<text x="' + (w / 2) + '" y="' + (base - 58) + '" text-anchor="middle" font-size="11" '
+      + 'fill="var(--muted)">every element crosses once, and pays once</text>';
+    return s;
+  }
+  function drawStacks(el, state, opts) {
+    var s = stacksSvg(state, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* ============================== union-find ===============================
+
+     The three sequences the lesson asks for. `chain` is the misconception made
+     concrete: with no rank rule every union links the first root under the
+     second, so unioning 0-1, 1-2, 2-3 ... builds a path, and the find at the
+     end walks all of it. */
+  function ufSequence(pattern, n) {
+    var ops = [], i, step;
+    if (pattern === 'chain') {
+      for (i = 0; i + 1 < n; i += 1) ops.push({ op: 'union', a: i, b: i + 1 });
+    } else if (pattern === 'pairs') {
+      for (step = 1; step < n; step *= 2) {
+        for (i = 0; i + step < n; i += 2 * step) ops.push({ op: 'union', a: i, b: i + step });
+      }
+    } else if (pattern === 'star') {
+      for (i = 1; i < n; i += 1) ops.push({ op: 'union', a: i, b: 0 });
+    } else {
+      throw new Error('unknown union sequence: ' + pattern);
+    }
+    for (i = 0; i < n; i += 1) ops.push({ op: 'find', a: i });
+    return ops;
+  }
+  /* All four combinations on ONE sequence. The lesson's claim is that either
+     rule alone is already good and the pair is what flattens the forest, and a
+     claim about four cases is checked by running four cases. */
+  function ufAllRules(ops, n) {
+    var combos = [{ rank: false, compress: false }, { rank: true, compress: false },
+                  { rank: false, compress: true }, { rank: true, compress: true }];
+    return combos.map(function (rules) {
+      var run = unionFindRun(ops, rules, n);
+      return { rank: rules.rank, compress: rules.compress, run: run,
+               hops: run.counts.hops || 0, worst: run.result.worstFind,
+               worstRow: run.result.worstHops,
+               maxRank: run.result.maxRank, bound: run.result.bound,
+               maxSize: run.result.maxSize, holds: run.result.rankBoundHolds };
+    });
+  }
+
+  /* Hops PER FIND, which is the figure the panel plots -- a total cannot show
+     that the first find after a union walks further than the rest, and under
+     path compression that the second find of the same element walks one. Read
+     off the trace the engine already keeps. */
+  function ufFindHops(run) {
+    return run.trace.filter(function (t) { return t.op === 'find'; })
+                    .map(function (t) { return t.hops; });
+  }
+
+  /* The forest as trees. TREEDRAW_JS is generic over the node type, so the node
+     is { i } and `kids` reads the parent array -- the same renderer the search
+     trees use, with no second layout written here. */
+  function ufNodes(parent) {
+    var nodes = parent.map(function (p, i) { return { i: i, p: p }; });
+    return {
+      nodes: nodes,
+      roots: nodes.filter(function (nd) { return nd.p === nd.i; }),
+      kids: function (nd) {
+        var out = [], j;
+        for (j = 0; j < parent.length; j += 1) if (parent[j] === nd.i && j !== nd.i) out.push(nodes[j]);
+        return out;
+      }
+    };
+  }
+  function ufTreeSizes(parent) {
+    var size = parent.map(function () { return 0; }), i, r, guard;
+    for (i = 0; i < parent.length; i += 1) {
+      r = i; guard = 0;
+      while (parent[r] !== r && guard <= parent.length) { r = parent[r]; guard += 1; }
+      size[r] += 1;
+    }
+    return size;
+  }
+  /* Each tree gets width in proportion to the number of elements in it, and
+     every tree is scaled to the SAME depth -- otherwise a two-node set would be
+     drawn as tall as the path the lesson is warning about, which is the one
+     thing the picture is for. */
+  function forestLayout(parent, opts) {
+    opts = opts || {};
+    var width = opts.width === undefined ? 620 : opts.width;
+    var height = opts.height === undefined ? 176 : opts.height;
+    var t = ufNodes(parent), sizes = ufTreeSizes(parent), total = 0;
+    t.roots.forEach(function (r) { total += sizes[r.i]; });
+    if (!total) total = 1;
+    var layouts = [], xoff = 0, maxDepth = 0;
+    t.roots.forEach(function (root) {
+      var w = Math.max(58, (sizes[root.i] / total) * width);
+      var L = treeLayout(root, t.kids, function (nd) { return String(nd.i); },
+                         { width: w, height: height });
+      L.nodes.forEach(function (nd) { nd.x += xoff; });
+      if (L.depth > maxDepth) maxDepth = L.depth;
+      L.root = root.i;
+      layouts.push(L);
+      xoff += w;
+    });
+    var rows = Math.max(1, maxDepth);
+    layouts.forEach(function (L) {
+      L.nodes.forEach(function (nd) { nd.y = 22 + (nd.depth / rows) * (height - 44); });
+    });
+    return { layouts: layouts, depth: maxDepth, span: xoff, trees: t.roots.length };
+  }
+  /* The radius follows the depth when the caller does not fix it: a path of
+     sixteen elements and a flat star of sixteen are the two pictures this mode
+     exists to put side by side, and one circle size cannot draw both. */
+  function forestSvg(parent, opts) {
+    opts = opts || {};
+    var f = forestLayout(parent, opts), s = '';
+    var h = opts.height === undefined ? 176 : opts.height;
+    var r = opts.radius;
+    if (r === undefined) {
+      r = Math.max(6, Math.min(14, Math.floor((h - 44) / (2 * Math.max(1, f.depth)))));
+    }
+    var o = { highlight: opts.highlight, fill: opts.fill, note: opts.note, radius: r };
+    f.layouts.forEach(function (L) { s += treeSvg(L, o); });
+    return s;
+  }
+  function drawForest(el, parent, opts) {
+    var s = forestSvg(parent, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* ============================== the workload =============================
+
+     `workloadRun` returns a row per structure with the operations it cannot
+     answer kept as their own field. The bars draw only the structures that can
+     answer the whole mix; the rest get the list of what they refuse, because a
+     short bar and a refusal are different answers and drawing them alike is the
+     misconception the lesson names. */
+  function workloadMix(counts) {
+    var mix = {};
+    Object.keys(counts).forEach(function (k) { if (counts[k] > 0) mix[k] = counts[k]; });
+    return mix;
+  }
+  function workloadBarsSvg(rows, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 520 : opts.width;
+    var top = 18, rowH = 30, left = 128, max = 1, s = '';
+    rows.forEach(function (r) { if (r.usable && r.total > max) max = r.total; });
+    rows.forEach(function (r, i) {
+      var y = top + i * rowH;
+      s += '<text x="4" y="' + (y + 14) + '" font-size="11" fill="var(--text)">' + r.label + '</text>';
+      if (r.usable) {
+        var len = Math.max(2, (r.total / max) * (w - left - 66));
+        s += '<rect x="' + left + '" y="' + (y + 3) + '" width="' + len.toFixed(1)
+          + '" height="16" rx="4" fill="var(--cyan)" opacity="'
+          + (r.best ? '0.72' : '0.36') + '" />';
+        s += '<text x="' + (left + len + 6).toFixed(1) + '" y="' + (y + 16)
+          + '" font-size="11" font-weight="700" fill="var(--text)">' + r.total + '</text>';
+      } else {
+        s += '<text x="' + left + '" y="' + (y + 16) + '" font-size="11" fill="var(--red)">'
+          + 'cannot answer ' + r.unsupported.join(', ') + '</text>';
+      }
+    });
+    s += '<text x="4" y="' + (top + rows.length * rowH + 12) + '" font-size="11" fill="var(--muted)">'
+      + 'bar length is the total cost of the whole mix, counted by running it</text>';
+    return s;
+  }
+  function drawWorkloadBars(el, rows, opts) {
+    var s = workloadBarsSvg(rows, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  /* The ranking, with the winner marked so the drawing and the table agree by
+     construction rather than by both being written the same way twice. */
+  function workloadRanked(mix, n) {
+    var run = workloadRun(mix, n);
+    var rows = run.result.rows.map(function (r) {
+      return { rep: r.rep, label: r.label, total: r.total, usable: r.usable,
+               unsupported: r.unsupported, best: r.rep === run.result.best };
+    });
+    return { rows: rows, ranked: run.result.ranked, best: run.result.best, ops: run.counts.calls };
+  }
+  var SEQ_OP_NAMES = {
+    index: 'index', search: 'search', insertFront: 'insert at the front',
+    insertEnd: 'insert at the end', deleteAt: 'delete at a position', min: 'minimum'
+  };
+  function seqOpName(op) { return SEQ_OP_NAMES[op] || op; }
+  /* "a, b or c" -- a list a sentence can contain, which "a or b or c or d" is not. */
+  function capitalise(text) { return text.charAt(0).toUpperCase() + text.slice(1); }
+  function andList(items) {
+    if (items.length <= 1) return items.join('');
+    return items.slice(0, -1).join(', ') + ' or ' + items[items.length - 1];
+  }
+  var PRESETS = [{"key": "fill-then-drain", "label": "three in, three out", "text": "EEEDDD", "step": 3}, {"key": "alternating", "label": "one in, one out, repeatedly", "text": "EDEDEDED", "step": 4}, {"key": "bulk-then-drain", "label": "six in, six out", "text": "EEEEEEDDDDDD", "step": 6}, {"key": "refill-between", "label": "refills between the drains", "text": "EEDEEDEEDDDD", "step": 5}];
+
+  var stage = document.getElementById('tsStacks');
+  var plot = document.getElementById('tsPlot');
+  var table = document.getElementById('tsTable');
+  var status = document.getElementById('tsStatus');
+  var sel = document.getElementById('tsPreset');
+  var box = document.getElementById('tsSeq');
+  var CAP = 28;
+
+  function preset() {
+    for (var i = 0; i < PRESETS.length; i += 1) if (PRESETS[i].key === sel.value) return PRESETS[i];
+    throw new Error('twostack: no preset named ' + sel.value);
+  }
+  function applyPreset() {
+    var p = preset();
+    box.value = p.text;
+    document.getElementById('tsStep').value = p.step;
+  }
+
+  function redraw() {
+    var parsed = twoStackParse(box.value || '', CAP);
+    var run = twoStackRun(parsed.ops);
+    var last = Math.max(0, parsed.ops.length - 1);
+    var stepIn = +document.getElementById('tsStep').value;
+    var step = Math.min(stepIn, last);
+    document.getElementById('tsStepOut').textContent = parsed.ops.length
+      ? ('after step ' + (step + 1) + ' of ' + parsed.ops.length) : 'nothing to run';
+
+    var state = twoStackState(run, step);
+    drawStacks(stage, state, {});
+
+    var xs = parsed.ops.map(function (o, i) { return i + 1; });
+    var totals = run.trace.map(function (t) { return t.total; });
+    var bound = run.trace.map(function (t) { return t.bound; });
+    var credits = run.trace.map(function (t) { return t.credits; });
+    drawSeries(plot, [
+      { label: 'cost so far', values: totals, colour: 'var(--cyan)', points: true },
+      { label: '3m', values: bound, colour: 'var(--amber)', dashed: true },
+      { label: 'credit in the bank', values: credits, colour: 'var(--green)' }
+    ], xs.length ? xs : [0], { xlabel: 'operation' });
+
+    var h = '<thead><tr><th>step</th><th>operation</th><th>element</th><th>moved</th>'
+          + '<th>cost</th><th>cost so far</th><th>3m</th><th>credit</th></tr></thead><tbody>';
+    run.trace.forEach(function (t, i) {
+      h += '<tr' + (i === step ? ' class="tone-cyan"' : '') + '><td>' + (i + 1) + '</td><td>'
+        + t.op + '</td><td>' + (t.op === 'enqueue' ? t.key : (t.took === null ? '&mdash;' : t.took))
+        + '</td><td>' + t.moved + '</td><td>' + t.cost + '</td><td>' + t.total + '</td><td>'
+        + t.bound + '</td><td' + (t.credits < 0 ? ' class="tone-red"' : '') + '>' + t.credits
+        + '</td></tr>';
+    });
+    table.innerHTML = h + '</tbody>';
+
+    var worst = 0, worstAt = 0;
+    run.trace.forEach(function (t, i) { if (t.cost > worst) { worst = t.cost; worstAt = i + 1; } });
+    var amortised = run.result.total && parsed.ops.length
+      ? R(BigInt(run.result.total), BigInt(parsed.ops.length)) : null;
+    document.getElementById('tsOps').textContent = parsed.ops.length;
+    document.getElementById('tsTotal').textContent = run.result.total;
+    document.getElementById('tsBound').textContent = run.result.bound;
+    document.getElementById('tsWorst').textContent = parsed.ops.length
+      ? (worst + ' at step ' + worstAt) : '—';
+    document.getElementById('tsAvg').textContent = amortised ? Rtext(amortised) : '—';
+    document.getElementById('tsCredit').textContent = run.result.creditsNeverNegative
+      ? 'never negative' : 'went negative';
+
+    var msg = '';
+    if (parsed.ignored.length) {
+      msg += '<span class="tone-red">Ignored ' + parsed.ignored.join(' ')
+        + '</span> &mdash; e adds an element and d removes one. ';
+    }
+    if (parsed.truncated) msg += 'Only the first ' + CAP + ' operations are run. ';
+    if (!parsed.ops.length) {
+      status.innerHTML = msg + 'Type a sequence of e and d to run it.';
+      return;
+    }
+    msg += 'The ' + parsed.ops.length + ' operations cost <strong>' + run.result.total
+      + '</strong> in all, against the <strong>' + run.result.bound + '</strong> the credit '
+      + 'argument allows for ' + run.result.enqueues + ' enqueues &mdash; '
+      + (run.result.withinBound ? 'inside it' : 'OUTSIDE it, which would refute the bound')
+      + '. The expensive step is step <strong>' + worstAt + '</strong>, costing <strong>'
+      + worst + '</strong>: that is the transfer, and it is real. '
+      + '<span class="tone-red">Amortised does not mean each dequeue is fast.</span> '
+      + 'Charge every enqueue 3, spend 1 on the push, and the element carries 2 into the bank; '
+      + 'the transfer and the pop each spend 1 of its own. The credit column is that bank, and it '
+      + (run.result.creditsNeverNegative ? 'never goes negative, which is the proof.'
+                                         : 'went negative, which would break the argument.');
+    status.innerHTML = msg;
+  }
+
+  document.getElementById('tsStep').addEventListener('input', redraw);
+  box.addEventListener('input', redraw);
+  sel.addEventListener('change', function () { applyPreset(); redraw(); });
+  redraw(); window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "data-structures/stacks-queues-and-the-two-stack-queue";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

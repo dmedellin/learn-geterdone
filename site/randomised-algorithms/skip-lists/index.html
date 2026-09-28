@@ -1,0 +1,2853 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Skip Lists | Lesson | Randomised Algorithms | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="A skip list is a sorted linked list with express lanes above it. Each element picks its top lane when it is inserted, by flipping a coin until it comes up tails, and nothing is ever rebalanced. On the lab&#x27;s opening tape, 10 of 16 keys reach at least the first express lane, the tallest reaches the fifth, and a search costs 77/16 hops on average with a worst case of 8 — against a reference curve of 2 log₂ n = 8.000, which is not a count." />
+  <link rel="canonical" href="https://learn.geterdone.io/randomised-algorithms/skip-lists/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Skip Lists | Lesson | Randomised Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="A skip list is a sorted linked list with express lanes above it. Each element picks its top lane when it is inserted, by flipping a coin until it comes up tails, and nothing is ever rebalanced. On the lab&#x27;s opening tape, 10 of 16 keys reach at least the first express lane, the tallest reaches the fifth, and a search costs 77/16 hops on average with a worst case of 8 — against a reference curve of 2 log₂ n = 8.000, which is not a count." />
+  <meta property="og:url" content="https://learn.geterdone.io/randomised-algorithms/skip-lists/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Skip Lists | Lesson | Randomised Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A skip list is a sorted linked list with express lanes above it. Each element picks its top lane when it is inserted, by flipping a coin until it comes up tails, and nothing is ever rebalanced. On the lab&#x27;s opening tape, 10 of 16 keys reach at least the first express lane, the tallest reaches the fifth, and a search costs 77/16 hops on average with a worst case of 8 — against a reference curve of 2 log₂ n = 8.000, which is not a count." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/randomised-algorithms/skip-lists/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Randomised Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Skip Lists</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The skip lists: randomness instead of rebalancing is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Randomised Algorithms &middot; Randomness inside the structure</span>
+        <h1>Skip Lists</h1>
+        <p>A skip list is a sorted linked list with express lanes above it. Each element picks its top lane when it is inserted, by flipping a coin until it comes up tails, and nothing is ever rebalanced. On the lab's opening tape, 10 of 16 keys reach at least the first express lane, the tallest reaches the fifth, and a search costs <span class="math">77/16</span> hops on average with a worst case of 8 &mdash; against a reference curve of <span class="math">2 log₂ n = 8.000</span>, which is not a count.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">level 0 is the whole sorted list; level k+1 holds about half of level k
+each key&#x27;s top level is the run of heads at its place on the tape
+search: go right while the next key is not past the target, else drop a level
+16 keys, one tape: 10 promoted, tallest L4, mean hops 77/16, worst 8
+2 log₂ n = 8.000 is a REFERENCE CURVE, not a count and not a bound
+nothing is rebuilt: every level decision is local and permanent</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One coin per element, and the hops that follow</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the structure is never repaired. The other two are how a level is chosen and what the printed reference curve is for.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Express lanes, each about half the one below</h3><p>Level 0 is the sorted list of every key. A key appears at level <span class="math">k + 1</span> with probability a half, independently, so level <span class="math">k</span> holds about <span class="math">n/2ᵏ⁺¹</span> keys and the levels form a geometric cascade. A search starts at the top left, moves right while the next key does not overshoot the target, and drops a level when it does. Each drop roughly halves the interval that remains to be searched.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A level is chosen once, locally, and never revisited</h3><p>When a key is inserted it flips a coin until it comes up tails; the number of heads is its top level. That decision involves no other key, no global counter and no rebalancing, and it is never changed. The lab shows this directly: change <span class="math">n</span> and the existing keys' levels do not move, because each one was decided from that key's own place on the tape.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The printed curve is a reference, not a count and not a bound</h3><p>The expected search cost is <span class="math">O(log n)</span>, and the panel draws <span class="math">2 log₂ n</span> as a dashed curve beside the hops it counted. That curve is sampled at double precision, no verdict is read off it, and at sixteen keys on this tape it reads <span class="math">8.000</span> where the counted mean is <span class="math">77/16 = 4.813</span>. The counted number is the one this page computed.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>A structure with no invariant to maintain</h2></div><p>The levels, the search, the counted hops, and the reference curve that is labelled rather than quoted.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; A skip list</span><p>A <strong>skip list</strong> on a sorted set of keys is a sequence of linked lists <span class="math">L₀ ⊇ L₁ ⊇ L₂ ⊇ …</span>. <span class="math">L₀</span> contains every key. Each key in <span class="math">Lₖ</span> appears in <span class="math">Lₖ₊₁</span> with probability <span class="math">1/2</span>, independently of every other key. A key's <strong>level</strong> is the highest list it appears in.</p></div><p>Equivalently, and this is how the lab builds it: each key reads the coin tape at its own position and takes the length of the run of heads there as its level. The tape is the reader's, chosen by a seed, so the structure is reproducible without being fixed &mdash; and the coins come from the prime-modulus stream, because the low bit of a power-of-two-modulus generator is not a coin and a structure built from one would have levels that repeat on a short cycle.</p><div class="defbox"><span class="label">Definition &middot; The search</span><p>To find a target, start at the leftmost node of the highest level. Repeatedly: if the next node at this level exists and its key is not greater than the target, move to it; otherwise drop one level. Stop at level 0. Each move and each drop is a <strong>hop</strong>, and the hops are what the lab counts.</p></div><div class="example"><span class="label">Example &middot; Sixteen keys from one tape</span><p>Keys <span class="math">10</span> to <span class="math">160</span>. The tape gives levels <span class="math">1, 1, 2, 0, 0, 4, 0, 1, 0, 0, 1, 4, 1, 0, 1, 1</span>, so 10 of the 16 keys reach at least level 1 and two reach level 4. Searching for key 120, which is at level 4, takes 2 hops; searching for key 100, which is at level 0 and is the second of two consecutive level-0 keys, takes 8. The mean over all sixteen searches is <span class="math">77/16 = 4.813</span> and the worst is 8.</p></div><p>Those two searches are the lesson in miniature. Key 120 is one of the two tallest nodes, so the top-level walk reaches it in two hops. Key 100 has level 0 and must be reached by descending all the way and walking, so it costs 8. Same structure, same tape, a factor of four between two lookups &mdash; and the mean of the sixteen is a fraction, because a mean of integers is.</p><h3>The level table, and where the halving is visible</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation"> level   keys whose top level is this   keys present at this level   n/2^(k+1)
+   L0                 6                            16                 8.00
+   L1                 7                            10                 4.00
+   L2                 1                             3                 2.00
+   L3                 0                             2                 1.00
+   L4                 2                             2                 0.50</div><p>The right-hand column is what the geometric cascade predicts and the middle column is what this tape produced. They are in the same neighbourhood and they are not equal: 10 keys present at level 1 against a predicted 8, and 2 at level 4 against a predicted <span class="math">0.5</span>. Level 3 is the row worth staring at &mdash; no key has 3 as its top level, and two keys are nevertheless present there, because a key at level 4 appears at every level below it.</p><p>That distinction between &ldquo;top level is <span class="math">k</span>&rdquo; and &ldquo;present at level <span class="math">k</span>&rdquo; is the commonest confusion in reading a skip list, and it is why the panel prints both columns. The first is a partition of the keys and adds to <span class="math">n</span>; the second is a nested family and decreases as <span class="math">k</span> grows.</p><h3>What is guaranteed, and what the dashed curve is doing</h3><p>The expected number of levels is <span class="math">O(log n)</span> and the expected search cost is <span class="math">O(log n)</span> as well: at each level the walk passes a constant number of nodes in expectation before dropping, because the probability that the next node is present one level up is a half. This course does not prove a concentration result around that expectation &mdash; the tail bound needed is a Chernoff bound and this course excludes it &mdash; so what is available is an expectation and the counts on screen.</p><p>So the panel draws <span class="math">2 log₂ n</span> as a dashed reference and labels it. At sixteen keys it reads <span class="math">8.000</span> and the counted mean is <span class="math">4.813</span>; at eight keys it reads <span class="math">6.000</span> and a different tape counted <span class="math">3.250</span>. The curve is not a bound, not an asymptote that has been proved here, and not a prediction; it is a familiar shape to read the counted points against, and the panel says so in those terms.</p><p>The search cost is also a random variable in the same way a treap's depth is, and for the same reason: the coins belong to the structure. A worst case of 8 hops on sixteen keys is this tape's worst case, and another tape gives another. Nothing here bounds it, and the honest statement is the one the panel makes &mdash; the mean is <span class="math">77/16</span>, the worst observed is 8, and both are counts on the structure drawn above them.</p><h3>The trade against a balanced tree</h3><p>An AVL tree guarantees a height, always, and pays with a stored height per node, a case analysis over four rotation shapes, and a rebalancing pass on every insertion and deletion. A skip list guarantees an expectation, and pays with nothing at all: an insertion writes a few pointers at the levels the coin chose, and no other node is touched. There is no global structure to maintain, which is the whole point of the design.</p><p>That absence is also what makes a skip list easy to get right and easy to make concurrent, and it is what makes its worst case unbounded. Which of those matters more is a question about the system rather than about the structure &mdash; the same question Universal Hashing asked about whether anyone can choose your keys.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Skip lists: randomness instead of rebalancing</h2></div><p>Each key picks its own level from a coin, and nothing is ever rebuilt</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Express lanes from a coin tape</strong><span>hops counted, against a reference curve that is not a count</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the search path</span><span class="tone-amber"><i class="legend-swatch"></i>2 log2 n, a reference curve</span></div>
+      </div>
+      <div class="lab-stage" id="tsStage" tabindex="0" role="region" aria-label="The skip list, one row per level, with the search path."><svg id="tsList" style="min-width:660px" viewBox="0 0 660 250" role="img" aria-label="The skip list, one row per level, with the search path."></svg></div>
+      <div class="lab-stage" id="tsPlotStage" tabindex="0" role="region" aria-label="Mean hops counted at growing n against the 2 log2 n reference."><svg id="tsPlot" style="min-width:520px" viewBox="0 0 520 224" role="img" aria-label="Mean hops counted at growing n against the 2 log2 n reference."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tsTable"></table></div>
+      <div class="status-banner" id="tsStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Fix the tape, then count the hops a search takes</h3>
+          <p>Every level is the run of heads at that key's place on the tape, chosen once and never revisited, and every hop is counted by walking the list. The dashed <span class="math">2 log₂ n</span> beside the counted points is a reference curve: it is sampled at double precision and no verdict on this page is read off it.</p>
+        <div class="field" id="tsPresetField">
+          <label for="tsPreset">Worked example</label>
+          <select id="tsPreset"><option value="sixteen" selected>sixteen keys from one coin tape</option><option value="eight">eight keys, so every level is readable</option><option value="thirty">thirty keys</option></select>
+        </div>
+        <div id="tsNRow">
+          <div class="range-row"><label class="small-copy" for="tsN" id="tsNLab">keys n</label><span class="range-value" id="tsNOut">&mdash;</span></div>
+          <input id="tsN" type="range" min="4" max="32" step="1" value="16" />
+        </div>
+        <div id="tsSeedRow">
+          <div class="range-row"><label class="small-copy" for="tsSeed" id="tsSeedLab">coin tape seed</label><span class="range-value" id="tsSeedOut">&mdash;</span></div>
+          <input id="tsSeed" type="range" min="1" max="40" step="1" value="1" />
+        </div>
+        <div id="tsTargetRow">
+          <div class="range-row"><label class="small-copy" for="tsTarget" id="tsTargetLab">search for the key at position</label><span class="range-value" id="tsTargetOut">&mdash;</span></div>
+          <input id="tsTarget" type="range" min="1" max="32" step="1" value="12" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Tallest level</span><strong id="tsMax">&mdash;</strong></div>
+          <div class="kpi"><span>Mean hops</span><strong id="tsMean">&mdash;</strong></div>
+          <div class="kpi"><span>Worst search</span><strong id="tsWorst">&mdash;</strong></div>
+          <div class="kpi"><span>Hops for this search</span><strong id="tsThis">&mdash;</strong></div>
+          <div class="kpi"><span>2 log2 n</span><strong id="tsRef">&mdash;</strong></div>
+          <div class="kpi"><span>Keys above the bottom list</span><strong id="tsPromoted">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="tsHint" style="margin:0;">The tape is the reader's: a key's level is the run of heads at its place on it, chosen once at insertion and never revisited. The low bit of a power-of-two-modulus generator is not a coin, so the tape comes from the prime-modulus stream where it is one.</p>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a randomised structure by walking it</h2></div><p>Count the hops. Then ask what the count is a count of.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the level of each key from the tape, not from the drawing</h3><p>A key's level is the run of heads at its position. That is the only input to the shape, and it means the structure can be rebuilt from the seed alone &mdash; which is what makes every number on the page reproducible.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Separate “top level is k” from “present at level k”</h3><p>The first partitions the keys and adds to <span class="math">n</span>; the second is nested and decreases. The panel prints both, and the level-3 row of the opening tape has 0 in the first column and 2 in the second.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Search two keys that differ in level</h3><p>A tall key is found from the top in a couple of hops; a level-0 key behind a tall one costs the descent and the walk. On the opening tape those are 2 hops and 8, and the spread is what the mean is a mean of.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the dashed curve as a shape, not a value</h3><p><span class="math">2 log₂ n</span> reads <span class="math">8.000</span> at sixteen keys where the counted mean is <span class="math">4.813</span>. It is there to show the counted points growing like a logarithm. Nothing on the page is decided by it and the panel says so.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Levels, hops, and reference curves</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Sixteen keys, one tape, sixteen searches</h3><p>Keys <span class="math">10</span> through <span class="math">160</span>, levels from the tape, and the cost of finding each one. The mean of the last column is the panel's headline figure.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">key     10  20  30  40  50  60  70  80  90 100 110 120 130 140 150 160
+level    1   1   2   0   0   4   0   1   0   0   1   4   1   0   1   1
+hops     4   5   3   6   7   1   6   5   7   8   6   2   3   5   4   5
+
+  promoted above level 0     10 of 16
+  tallest level              L4, reached by keys 60 and 120
+  mean hops   = 77/16 = 4.8125     worst = 8, for key 100
+  2 log2 16   = 8.000              a reference curve
+
+  cheapest search: key 60, at L4, one hop
+  dearest search:  key 100, at L0, eight hops</div><p>Key 60 costs one hop and key 100 costs eight, and both are in the same structure. The mean <span class="math">77/16</span> is an exact fraction because it is the average of sixteen integers, and it is not the cost of any search: no lookup costs <span class="math">4.8125</span> hops. That is the same distinction as everywhere else on this course, arriving here as an average over queries rather than over seeds.</p><p>The counted mean sits well below the dashed <span class="math">8.000</span>. Do not read that as the structure beating its bound &mdash; <span class="math">2 log₂ n</span> is not a bound, and at <span class="math">n = 8</span> on another tape the counted mean was <span class="math">3.250</span> against a reference of <span class="math">6.000</span>. The curve is a shape, the points are counts, and the panel keeps them in different colours for that reason.</p><p>For a faded rehearsal, move the tape seed and predict what happens to the level column before the page redraws. The supplied first move is this: each key's level is read from its own position on the tape, so a new tape gives new levels for every key at once. Say whether the number promoted above level 0 should stay near half of 16, then check several seeds &mdash; and then say why changing <span class="math">n</span> instead leaves the existing keys' levels alone.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the counted mean against the dashed curve as a pass or a fail</strong><span><span class="math">77/16 = 4.813</span> against <span class="math">2 log₂ 16 = 8.000</span> is not the structure beating a bound, because the curve is not a bound. It is a familiar logarithmic shape drawn so that the counted points can be seen growing like one. The panel colours it differently and labels it for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing a key&#x27;s top level with the levels it occupies</strong><span>A level-4 key is present at five levels. The partition column and the presence column answer different questions and only the first adds to <span class="math">n</span>; on the opening tape they differ most visibly at level 3, where the first is 0 and the second is 2.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a bound on the worst search</strong><span>There is none. The worst search on the opening tape costs 8 hops on sixteen keys, another tape gives another number, and nothing in the structure prevents a tape that promotes nothing at all. If a worst case must be bounded, the structure to use is one that enforces an invariant.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a skip list from a coin tape and count a search by walking it.</strong><p>You should be able to read each key's level off the tape, describe the search as move-right-or-drop, count its hops, distinguish top level from presence at a level, and say what the dashed curve is and is not.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The last two lessons of this course spend randomness on space rather than on shape. A Bloom filter answers set membership in a few bits per key by accepting a false positive rate it can compute exactly, and &ldquo;The Count-Min Sketch&rdquo; estimates frequencies in a fixed grid of counters with a guarantee that is Markov's inequality applied once per row.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../treaps/" rel="prev"><span>Lesson</span><strong>Treaps</strong></a>
+      <a class="lesson-link next" href="../bloom-filters/" rel="next"><span>Lesson</span><strong>Bloom Filters</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="randomised-algorithms/skip-lists" data-lesson-title="Skip Lists" data-course-title="Randomised Algorithms">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Randomised Algorithms.</strong> Every probability, expectation, variance, tail and bound on this course is an exact ratio of two integers held as BigInt, and the decimals beside them are long division of those integers rather than floating point. The distributions are enumerated, not sampled: every tape of a shuffle, every execution of a randomised quicksort by recursion over subproblem sizes, every contraction order by recursion over contraction states, every base from 2 to <span class="math">n − 2</span>, every assignment of a formula, and every bipartition when a minimum cut is checked. Where a sample appears it is labelled a measurement, it names the number of seeds it ran, and the exact quantity it estimates is printed in the same row &mdash; no page here prints one without the other. Three quantities are genuinely approximate and each is labelled where it is printed: <span class="math">2 ln n</span> as an asymptote for the mean depth of a randomly built search tree, <span class="math">2 log₂ n</span> as a reference curve for a skip list's hops, and a Bloom filter's rate under the independent-hash idealisation, which is printed beside the exact rate so the gap between them is visible. Two more are quoted and established nowhere in this library: the maximum load of <span class="math">n</span> keys in <span class="math">n</span> bins with one choice and with two. They are labelled STATED, NOT PROVED in those words, because their proofs need Chernoff bounds and this course excludes them.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "The level table shows 0 keys whose top level is 3 and 2 keys present at level 3. How can both be true?", "a": ["One of the two columns is a measurement and the other a prediction", "A key at level 4 appears at every level below it, so it is present at level 3 without level 3 being its top", "The table has an off-by-one error", "Level 3 is empty and the 2 is the prediction <span class=\"math\">n/2\u2074<\/span>"], "c": 1, "why": "The lists are nested: <span class=\"math\">L\u2080 \u2287 L\u2081 \u2287 L\u2082 \u2287 \u2026<\/span>, so the two keys at level 4 are present at levels 3, 2, 1 and 0 as well. The first column partitions the keys by their top level and adds to <span class=\"math\">n<\/span>; the second counts presence and decreases with the level."}, {"q": "What is the standing of <span class=\"math\">2 log\u2082 n<\/span> on this page?", "a": ["A proved upper bound on the hops", "The expected number of hops, derived in this lesson", "A reference curve, sampled at double precision, from which nothing is decided", "A measurement averaged over the tapes the panel ran"], "c": 2, "why": "The panel labels it as a reference curve and draws it dashed. The expected search cost is <span class=\"math\">O(log n)<\/span>; this page does not derive a constant and does not prove a concentration result, because the tail bound that would need is a Chernoff bound and this course excludes them. The counted mean at sixteen keys is <span class=\"math\">77/16<\/span>, well below the curve's <span class=\"math\">8.000<\/span>."}, {"q": "How is a key's level decided?", "a": ["By a global counter that keeps each level half the size of the one below", "By flipping a coin at insertion until it comes up tails, with no reference to any other key", "By rebalancing after every insertion", "By its position in the sorted order"], "c": 1, "why": "The decision is local, made once, and never revisited \u2014 which is why nothing is ever rebuilt. The lab reads the run of heads at that key's place on the tape. Change <span class=\"math\">n<\/span> and the existing keys' levels do not move, which is the observable consequence of the decision being local."}, {"q": "Compared with an AVL tree, what does a skip list give up?", "a": ["The search property", "A height guarantee that holds always: a skip list's cost is an expectation and nothing bounds its worst case", "Ordered traversal", "Logarithmic expected search cost"], "c": 1, "why": "An AVL tree enforces a rule on every insertion and gets a height bound that holds for every input. A skip list enforces nothing and gets an expectation, with the bad cases unlikely rather than impossible. In exchange an insertion touches only a few pointers and no other node is disturbed."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* A rational as a decimal string, by BigInt long division.
+
+     algebra_core's Rdec goes through Rnum, which is Number(a.n) / Number(a.d),
+     and several quantities on this path do not survive that: the exact Bloom
+     rate at m = 1000, n = 100, k = 7 is a fraction whose denominator is
+     1000^700, so both halves become Infinity and the page prints NaN. Karger's
+     exact success probability and the all-distinct product in ballsExact have
+     the same shape. So the decimal is produced by dividing the BigInts, which
+     works at any size, and it ROUNDS HALF UP at the last place kept -- the only
+     rounding in this block, and it is a rounding of the PRINTING, not of the
+     number: Rtext still gives the exact fraction and the lesson prints both
+     where the fraction is short enough to read.
+
+     The System Design kits each carry their own copy of this function. This is
+     the Algorithms path's one copy, and it is deliberately the same name and
+     the same behaviour, so a reader moving between subjects reads one format. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* A rational too small to read as a decimal, as "1 in N" -- which is how a
+     false-positive rate and a failure probability are quoted in practice. */
+  function RoneIn(a) {
+    if (Rzero(a)) return 'never';
+    var inv = Rinv(a);
+    return '1 in ' + Rfixed(inv, inv.d === 1n ? 0 : 1);
+  }
+
+  /* Measured against predicted, drawn.
+
+     This is `drawSeries` from algorithms.py, lifted out of `algorithm_lab` and
+     given the element as an argument. The original assigned to `plot`, an
+     element it had closed over, so it could not be called from another lab, and
+     could not be called from a test at all. Here the function that BUILDS the
+     markup and the function that installs it are separate: seriesSvg returns a
+     string and touches nothing, drawSeries hands that string to an element.
+     Every assertion mathcheck makes about a drawing is an assertion about the
+     string.
+
+     A series is { label, values, colour, dashed, points }. `dashed` is for a
+     predicted bound and `points` marks the measured samples, because the whole
+     figure on this path is one measured curve against one predicted one, and
+     two solid lines of different colours do not say which is which.
+
+     The geometry is the shipped one -- x from 26 to 496, baseline at 200, 180
+     tall -- so a page that swaps this in for the old helper draws the same
+     picture. */
+  var SERIES_BOX = { left: 26, right: 496, base: 200, top: 14 };
+
+  function seriesMax(series) {
+    var m = 0;
+    series.forEach(function (s) {
+      s.values.forEach(function (v) { if (isFinite(v) && v > m) m = v; });
+    });
+    return m > 0 ? m : 1;
+  }
+
+  /* The scale, returned as functions so a kit can place its own annotations on
+     the same axes rather than guessing at them. */
+  function seriesScale(series, xs, opts) {
+    opts = opts || {};
+    var box = opts.box || SERIES_BOX;
+    var maxY = opts.maxY || seriesMax(series);
+    var log = !!opts.log;
+    var span = box.base - box.top;
+    return {
+      box: box, maxY: maxY, log: log, n: xs.length,
+      x: function (i) {
+        return box.left + (i / Math.max(1, xs.length - 1)) * (box.right - box.left);
+      },
+      y: function (v) {
+        if (!isFinite(v)) return box.top - 8;          /* off the top, deliberately */
+        if (log) {
+          var lv = Math.log10(Math.max(v, 1)), lm = Math.log10(Math.max(maxY, 10));
+          return box.base - (lv / lm) * span;
+        }
+        return box.base - (v / maxY) * span;
+      }
+    };
+  }
+
+  function seriesPath(sc, values) {
+    return values.map(function (v, i) {
+      return (i ? 'L' : 'M') + sc.x(i).toFixed(1) + ' ' + sc.y(v).toFixed(1);
+    }).join(' ');
+  }
+
+  /* Endpoint labels, separated so two curves that end close together are both
+     readable. Lifted with the shipped helper's logic intact: sort by where the
+     curve ends, push each down to clear the one above, then pull the tail back
+     up so the last one stays inside the box. */
+  function seriesLabelRows(series, sc) {
+    var rows = series.map(function (ser, i) {
+      var last = ser.values[ser.values.length - 1];
+      return { series: ser, order: i,
+               baseline: Math.max(20, Math.min(sc.box.base - 12, sc.y(last) - 6)) };
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    rows.forEach(function (r, i) {
+      if (i) r.baseline = Math.max(r.baseline, rows[i - 1].baseline + 18);
+    });
+    for (var i = rows.length - 1; i >= 0; i -= 1) {
+      rows[i].baseline = Math.min(rows[i].baseline,
+        i === rows.length - 1 ? sc.box.base - 12 : rows[i + 1].baseline - 18);
+    }
+    return rows;
+  }
+
+  function seriesSvg(series, xs, opts) {
+    opts = opts || {};
+    var sc = seriesScale(series, xs, opts), b = sc.box;
+    var s = '<line x1="' + b.left + '" y1="' + b.base + '" x2="' + (b.right + 4) + '" y2="' + b.base
+          + '" stroke="var(--line-strong)" />'
+          + '<line x1="' + b.left + '" y1="' + b.top + '" x2="' + b.left + '" y2="' + b.base
+          + '" stroke="var(--line-strong)" />';
+    series.forEach(function (ser) {
+      s += '<path d="' + seriesPath(sc, ser.values) + '" fill="none" stroke="' + ser.colour
+        + '" stroke-width="' + (ser.dashed ? 2 : 2.4) + '" opacity="0.9"'
+        + (ser.dashed ? ' stroke-dasharray="6 4"' : '') + ' />';
+      if (ser.points) {
+        ser.values.forEach(function (v, i) {
+          if (!isFinite(v)) return;
+          s += '<circle cx="' + sc.x(i).toFixed(1) + '" cy="' + sc.y(v).toFixed(1)
+            + '" r="2.6" fill="' + ser.colour + '" />';
+        });
+      }
+    });
+    seriesLabelRows(series, sc).forEach(function (row) {
+      s += '<text x="' + (sc.x(xs.length - 1) - 6).toFixed(1) + '" y="' + row.baseline.toFixed(1)
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + row.series.colour
+        + '">' + row.series.label + '</text>';
+    });
+    var tag = opts.xlabel === undefined ? 'n' : opts.xlabel;
+    s += '<text x="' + b.left + '" y="' + (b.base + 16) + '" font-size="12" fill="var(--muted)">'
+      + tag + ' = ' + xs[0] + '</text>';
+    s += '<text x="' + (b.right + 4) + '" y="' + (b.base + 16)
+      + '" text-anchor="end" font-size="12" fill="var(--muted)">' + tag + ' = ' + xs[xs.length - 1] + '</text>';
+    if (sc.log) s += '<text x="' + (b.left + 4) + '" y="' + (b.top + 10)
+      + '" font-size="12" fill="var(--muted)">log scale</text>';
+    return s;
+  }
+
+  /* The element is the FIRST argument and may be null, which is what makes the
+     helper shared. Returns the markup either way. */
+  function drawSeries(el, series, xs, opts) {
+    var s = seriesSvg(series, xs, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Sample a predicted curve on the same x values as a measured one. The curve
+     is a drawing: it is evaluated at double precision and nothing is decided
+     from it. */
+  function predicted(xs, f) { return xs.map(function (n) { return f(n); }); }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* The seeded input five modes need -- sortkit's `quick` and `expected`,
+     tree's `orders` and `skiplist`, random's `karger` -- and the two traps that
+     come with it. Built on sysdesign_core.STREAM_JS's lcgStream, which is
+     reused exactly as it ships; only the parameters and the seed handling are
+     here.
+
+     ALGO_JS.makeArray's 'shuffle' cannot serve. It is ONE fixed permutation,
+     produced by idx = (idx + 7) % length, and it takes no seed -- which is
+     right for the Discrete Mathematics lesson that wanted two readers to see
+     the same array, and useless for a mode whose whole content is what happens
+     over many different inputs.
+
+     TRAP ONE: THE MODULUS. Every draw here is consumed as x % n -- a pivot
+     index, a vertex to contract, a coin. lcgStream takes its modulus as a
+     parameter, and under the glibc parameters the rest of this library uses
+     (1103515245, 12345, 2^31) the modulus is a power of two, so the low bits
+     are a short cycle: x % 4 runs 0, 1, 2, 3, 0, 1, 2, 3 forever, and 1200 keys
+     dealt into 4, 8 or 16 bins come out perfectly level. Measured on this path
+     today, not imagined. So the parameters here are MINSTD -- a = 16807, c = 0,
+     m = 2^31 - 1, which is PRIME, so no bit of the state is worse than any
+     other. A draw consumed as x/m uses the high bits and would have been fine
+     either way; a draw consumed as x % n would not.
+
+     TRAP TWO: THE SEED. An LCG's k-th value is an affine function of its seed,
+     and under a purely multiplicative one it is literally seed * (a^k mod m).
+     So consecutive seeds -- which is exactly what a slider hands out -- produce
+     correlated streams, and a mode that asks the reader to reseed and compare
+     would be comparing a straight line. The seed is therefore run through the
+     splitmix64 finaliser before it becomes the state: multiply, xor-shift,
+     multiply, xor-shift, which is nonlinear over the integers and breaks the
+     affinity. shard.py's shardSeedState is the same function for the same
+     reason; this is the Algorithms path's copy of it. */
+  function algoMultiplier() { return 16807; }
+  function algoModulus() { return 2147483647; }
+  function algoSeedState(seed) {
+    var mask = 0xFFFFFFFFFFFFFFFFn;
+    var x = (BigInt(seed) + 1n) * 0x9E3779B97F4A7C15n & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % BigInt(algoModulus() - 1)) + 1;    /* never the fixed point 0 */
+  }
+  function algoStream(seed, count) {
+    return lcgStream(algoMultiplier(), 0, algoModulus(), algoSeedState(seed), count);
+  }
+  /* Exact rationals in (0, 1) over the modulus, for anything that compares a
+     draw against a probability rather than indexing with it. */
+  function algoUniform(seed, count) {
+    var m = BigInt(algoModulus());
+    return algoStream(seed, count).map(function (x) { return R(BigInt(x), m); });
+  }
+  /* A uniformly random permutation of 0..n-1 from one stream, by Fisher-Yates
+     taking draw i modulo the shrinking suffix. */
+  function algoPermutation(n, seed) {
+    var draws = algoStream(seed, n), a = [], i;
+    for (i = 0; i < n; i += 1) a.push(i);
+    for (i = n - 1; i > 0; i -= 1) {
+      var j = draws[n - 1 - i] % (i + 1), t = a[i];
+      a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  /* A tape of coin flips. The low bit of a prime-modulus stream is a coin; the
+     low bit of a power-of-two modulus is not, which is trap one again. */
+  function algoCoins(seed, count) {
+    return algoStream(seed, count).map(function (x) { return x % 2; });
+  }
+
+  /* A tree renderer, shared for the same reason the graph one is: six kinds of
+     tree are drawn on this path -- search trees, AVL and treaps, Huffman codes,
+     tries, DP subproblem trees, branch-and-bound search trees -- and every one
+     of them was about to be a helper closed over its own lab's element.
+
+     It is generic over the node type: `kids(node)` returns the children (nulls
+     included, so a BST's missing left child still leaves a gap where it
+     belongs) and `label(node)` returns what goes in the circle. x is the
+     in-order position, y is the depth, which is the layout that makes a search
+     tree's in-order sequence readable straight off the drawing. */
+  function treeLayout(root, kids, label, opts) {
+    opts = opts || {};
+    var nodes = [], links = [], next = 0, maxDepth = 0;
+    (function place(node, depth, parent) {
+      if (!node) { next += opts.gaps === false ? 0 : 0.5; return null; }
+      var children = kids(node) || [];
+      var left = children.length ? place(children[0], depth + 1, null) : null;
+      var me = { node: node, label: label(node), depth: depth, order: next, id: nodes.length };
+      next += 1;
+      nodes.push(me);
+      if (left) links.push({ from: me.id, to: left.id, side: 0 });
+      for (var k = 1; k < children.length; k += 1) {
+        var c = place(children[k], depth + 1, null);
+        if (c) links.push({ from: me.id, to: c.id, side: k });
+      }
+      if (depth > maxDepth) maxDepth = depth;
+      return me;
+    })(root, 0, null);
+    var w = opts.width === undefined ? 460 : opts.width;
+    var h = opts.height === undefined ? 210 : opts.height;
+    var cols = Math.max(1, next - 1), rows = Math.max(1, maxDepth);
+    nodes.forEach(function (n) {
+      n.x = 26 + (n.order / cols) * (w - 52);
+      n.y = 22 + (n.depth / rows) * (h - 44);
+    });
+    return { nodes: nodes, links: links, depth: maxDepth, count: nodes.length };
+  }
+  function treeSvg(layout, opts) {
+    opts = opts || {};
+    var hi = {};
+    (opts.highlight || []).forEach(function (i) { hi[i] = true; });
+    var s = '', r = opts.radius === undefined ? 14 : opts.radius;
+    layout.links.forEach(function (l) {
+      var a = layout.nodes[l.from], b = layout.nodes[l.to];
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="'
+        + (hi[l.to] ? 'var(--cyan)' : 'var(--line-strong)') + '" stroke-width="'
+        + (hi[l.to] ? 3 : 1.6) + '" />';
+    });
+    layout.nodes.forEach(function (n) {
+      var fill = opts.fill ? opts.fill(n) : (hi[n.id] ? 'var(--cyan)' : 'var(--panel-3)');
+      s += '<circle cx="' + n.x.toFixed(1) + '" cy="' + n.y.toFixed(1) + '" r="' + r
+        + '" fill="' + fill + '" stroke="var(--line-strong)" stroke-width="1.8" />';
+      s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="'
+        + (hi[n.id] ? 'var(--on-accent)' : 'var(--text)') + '">' + n.label + '</text>';
+      if (opts.note) {
+        var note = opts.note(n);
+        if (note) s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y - r - 4).toFixed(1)
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + note + '</text>';
+      }
+    });
+    return s;
+  }
+  function drawTree(el, root, kids, label, opts) {
+    var s = treeSvg(treeLayout(root, kids, label, opts), opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Search trees. A node is { key, l, r, size, height, priority }; an empty
+     subtree is null. Every routine returns a NEW tree rather than mutating the
+     one it was given, so a mode can draw before and after without keeping its
+     own copy, and so a trace step can hold the actual tree it describes.
+
+     The one approximation in this block is randomBstDepthApprox, and it is one
+     of the four the path's footer names. */
+  function bstNode(key) { return { key: key, l: null, r: null, size: 1, height: 0, priority: 0 }; }
+  function bstCopy(t) {
+    if (!t) return null;
+    return { key: t.key, l: bstCopy(t.l), r: bstCopy(t.r), size: t.size,
+             height: t.height, priority: t.priority };
+  }
+  function bstFix(t) {
+    if (!t) return null;
+    t.size = 1 + (t.l ? t.l.size : 0) + (t.r ? t.r.size : 0);
+    t.height = 1 + Math.max(t.l ? t.l.height : -1, t.r ? t.r.height : -1);
+    return t;
+  }
+  function bstKids(t) { return [t.l, t.r]; }
+  function bstInorder(t) {
+    var out = [];
+    (function walk(n) { if (!n) return; walk(n.l); out.push(n.key); walk(n.r); })(t);
+    return out;
+  }
+  function bstHeight(t) { return t ? t.height : -1; }
+  function bstDepths(t) {
+    var out = [];
+    (function walk(n, d) { if (!n) return; out.push(d); walk(n.l, d + 1); walk(n.r, d + 1); })(t, 0);
+    return out;
+  }
+
+  /* THE GLOBAL CHECK AND THE LOCAL ONE, which is why bstValid takes bounds.
+     Checking only that each node sits between its two children passes trees
+     that are not search trees at all -- the classic wrong answer -- so both
+     verdicts are returned and the lesson shows an instance where they differ. */
+  function bstValid(t, lo, hi) {
+    if (!t) return true;
+    if (lo !== null && lo !== undefined && t.key <= lo) return false;
+    if (hi !== null && hi !== undefined && t.key >= hi) return false;
+    return bstValid(t.l, lo, t.key) && bstValid(t.r, t.key, hi);
+  }
+  function bstLocallyValid(t) {
+    if (!t) return true;
+    if (t.l && t.l.key >= t.key) return false;
+    if (t.r && t.r.key <= t.key) return false;
+    return bstLocallyValid(t.l) && bstLocallyValid(t.r);
+  }
+
+  function bstInsert(root, key, c) {
+    var made = false;
+    function go(t) {
+      if (!t) { made = true; if (c) c.writes += 1; return bstNode(key); }
+      if (c) c.compares += 1;
+      if (key < t.key) t.l = go(t.l);
+      else if (key > t.key) t.r = go(t.r);
+      else return t;
+      return bstFix(t);
+    }
+    var out = go(root);
+    return { root: bstFix(out), inserted: made };
+  }
+  function bstSearch(root, key, c) {
+    var path = [], t = root;
+    while (t) {
+      path.push(t.key);
+      if (c) c.compares += 1;
+      if (key === t.key) return { found: true, path: path };
+      t = key < t.key ? t.l : t.r;
+    }
+    return { found: false, path: path };
+  }
+  /* Deletion, with the two-child case the lesson animates: the node's key is
+     replaced by its in-order SUCCESSOR -- the minimum of the right subtree --
+     and that successor, which has no left child by construction, is deleted
+     from there. `replaced` is what the animation steps through. */
+  function bstDelete(root, key, c) {
+    var replaced = null, removed = false;
+    function minOf(t) { while (t.l) t = t.l; return t; }
+    function go(t) {
+      if (!t) return null;
+      if (c) c.compares += 1;
+      if (key < t.key) { t.l = go(t.l); return bstFix(t); }
+      if (key > t.key) { t.r = go(t.r); return bstFix(t); }
+      removed = true;
+      if (!t.l) return t.r;
+      if (!t.r) return t.l;
+      var s = minOf(t.r);
+      replaced = { from: t.key, to: s.key };
+      t.key = s.key;
+      var k = key; key = s.key;
+      t.r = go(t.r);
+      key = k;
+      return bstFix(t);
+    }
+    var out = go(root);
+    return { root: out, removed: removed, replaced: replaced };
+  }
+
+  /* One operation sequence, with the tree after each step. ops are
+     { op: 'insert' | 'delete' | 'search', key }. */
+  function bstRun(ops) {
+    var root = null, c = counter(), trace = [];
+    ops.forEach(function (o, i) {
+      var note = null;
+      if (o.op === 'insert') { var r = bstInsert(root, o.key, c); root = r.root; note = r.inserted ? 'inserted' : 'already present'; }
+      else if (o.op === 'delete') { var d = bstDelete(root, o.key, c); root = d.root; note = d.replaced ? ('successor ' + d.replaced.to + ' moved up') : (d.removed ? 'removed' : 'absent'); }
+      else { var s = bstSearch(root, o.key, c); note = s.found ? ('found via ' + s.path.join(' -> ')) : 'not found'; }
+      trace.push({ at: i, op: o.op, key: o.key, note: note, tree: bstCopy(root),
+                   inorder: bstInorder(root), valid: bstValid(root, null, null) });
+    });
+    return runOf({ root: root, inorder: bstInorder(root), height: bstHeight(root),
+                   valid: bstValid(root, null, null), locallyValid: bstLocallyValid(root) },
+                 usedCounts(c), trace);
+  }
+
+  /* Height and mean depth under one insertion order. The panel plots the mean
+     against 2 ln n, which is an ASYMPTOTIC statement about a uniformly random
+     order and is drawn as a labelled reference curve, never as the answer. */
+  function bstFromOrder(order) {
+    var root = null, c = counter();
+    order.forEach(function (k) { root = bstInsert(root, k, c).root; });
+    var depths = bstDepths(root), total = depths.reduce(function (a, b) { return a + b; }, 0);
+    return runOf({ root: root, height: bstHeight(root), depths: depths,
+                   meanDepth: R(BigInt(total), BigInt(depths.length || 1)) },
+                 usedCounts(c), []);
+  }
+  /* 2 ln n -- APPROXIMATE, and one of the four this path's footer names. It is
+     the asymptotic mean root-to-node depth of a tree built from a uniformly
+     random insertion order. At n = 15 it reads 5.42 against a true mean nearer
+     4.6: the arithmetic is a double and correct to ~1e-15, and the STATEMENT is
+     an asymptote, which is a different kind of wrong from a rounding. */
+  function randomBstDepthApprox(n) { return n > 0 ? 2 * logApprox(n) : 0; }
+
+  /* Rotation. dir 'right' lifts the left child, dir 'left' lifts the right one.
+     The in-order sequence is unchanged by construction and the panel checks it,
+     because "a rotation preserves the search order" is the claim on which every
+     balanced tree rests. */
+  function rotate(t, dir) {
+    if (!t) return null;
+    var out;
+    if (dir === 'right') {
+      if (!t.l) return t;
+      out = t.l; t.l = out.r; out.r = t;
+    } else {
+      if (!t.r) return t;
+      out = t.r; t.r = out.l; out.l = t;
+    }
+    bstFix(t); bstFix(out);
+    return out;
+  }
+  /* N(h): the fewest nodes an AVL tree of height h can hold, N(h) = N(h-1) +
+     N(h-2) + 1. The table is the bound on an AVL tree's height, and it is a
+     recurrence evaluated, not a log quoted. */
+  function minAvlNodes(h) {
+    var rows = [{ h: 0, n: 1 }, { h: 1, n: 2 }];
+    for (var k = 2; k <= h; k += 1) rows.push({ h: k, n: rows[k - 1].n + rows[k - 2].n + 1 });
+    return { rows: rows.slice(0, Math.max(1, h + 1)), n: rows[Math.min(h, rows.length - 1)].n };
+  }
+  function bstBalance(t) { return t ? bstHeight(t.l) - bstHeight(t.r) : 0; }
+  /* AVL insertion, with the case NAMED at each rebalance -- LL, LR, RR, RL --
+     because the case is what the reader has to learn to recognise. */
+  function avlInsert(keys) {
+    var c = counter(), trace = [], root = null;
+    function fixUp(t, key) {
+      bstFix(t);
+      var bal = bstBalance(t), which = null;
+      if (bal > 1 && key < t.l.key) { which = 'LL'; t = rotate(t, 'right'); }
+      else if (bal < -1 && key > t.r.key) { which = 'RR'; t = rotate(t, 'left'); }
+      else if (bal > 1) { which = 'LR'; t.l = rotate(t.l, 'left'); t = rotate(t, 'right'); }
+      else if (bal < -1) { which = 'RL'; t.r = rotate(t.r, 'right'); t = rotate(t, 'left'); }
+      if (which) { c.swaps += 1; trace.push({ at: trace.length, key: key, rebalance: which, root: t.key }); }
+      return t;
+    }
+    keys.forEach(function (key) {
+      root = (function go(t) {
+        if (!t) { c.writes += 1; return bstNode(key); }
+        c.compares += 1;
+        if (key < t.key) t.l = go(t.l);
+        else if (key > t.key) t.r = go(t.r);
+        else return t;
+        return fixUp(t, key);
+      })(root);
+    });
+    var plain = bstFromOrder(keys);
+    return runOf({ root: root, height: bstHeight(root), inorder: bstInorder(root),
+                   plainHeight: plain.result.height, rebalances: trace.length,
+                   minNodesForHeight: minAvlNodes(bstHeight(root)).n },
+                 usedCounts(c), trace);
+  }
+
+  /* An order-statistic tree: every node carries the size of its subtree, so
+     rank, select and a range count are walks rather than scans. The walk is
+     traced because the subtraction at each right turn is the step readers get
+     wrong. */
+  function augmentWalk(root, query) {
+    var c = counter(), trace = [], t = root, result = null;
+    if (query.op === 'select') {
+      var i = query.i;
+      while (t) {
+        var left = t.l ? t.l.size : 0;
+        c.compares += 1;
+        trace.push({ at: trace.length, node: t.key, leftSize: left, want: i });
+        if (i === left + 1) { result = t.key; break; }
+        if (i <= left) t = t.l;
+        else { i -= left + 1; t = t.r; }
+      }
+    } else if (query.op === 'rank') {
+      var rank = 0;
+      while (t) {
+        var l2 = t.l ? t.l.size : 0;
+        c.compares += 1;
+        trace.push({ at: trace.length, node: t.key, leftSize: l2, running: rank });
+        if (query.key === t.key) { rank += l2 + 1; result = rank; break; }
+        if (query.key < t.key) t = t.l;
+        else { rank += l2 + 1; t = t.r; }
+      }
+    } else {
+      /* rangeCount(lo, hi) as TWO WALKS and not a scan: the keys at most hi
+         minus the keys below lo, each counted by adding a subtree size at every
+         right turn. Scanning the in-order list would give the same number and
+         would not be the lesson, which is that the augmentation makes this
+         O(height). */
+      var hiCount = bstCountAtMost(root, query.hi, c, trace);
+      var loCount = bstCountBelow(root, query.lo, c, trace);
+      result = hiCount - loCount;
+    }
+    return runOf({ value: result }, usedCounts(c), trace);
+  }
+  function bstCountAtMost(root, key, c, trace) {
+    var n = 0, t = root;
+    while (t) {
+      var l = t.l ? t.l.size : 0;
+      if (c) c.compares += 1;
+      if (trace) trace.push({ at: trace.length, node: t.key, leftSize: l, running: n, want: '<= ' + key });
+      if (key < t.key) t = t.l;
+      else { n += l + 1; t = t.r; }
+    }
+    return n;
+  }
+  function bstCountBelow(root, key, c, trace) {
+    var n = 0, t = root;
+    while (t) {
+      var l = t.l ? t.l.size : 0;
+      if (c) c.compares += 1;
+      if (trace) trace.push({ at: trace.length, node: t.key, leftSize: l, running: n, want: '< ' + key });
+      if (key <= t.key) t = t.l;
+      else { n += l + 1; t = t.r; }
+    }
+    return n;
+  }
+
+  /* A treap: a search tree on the keys and a heap on the priorities. Two
+     insertion orders of the same (key, priority) set give the SAME tree, which
+     is the mode's point, so the rotations are counted and the shape returned. */
+  function treapInsert(keys, priorities) {
+    var c = counter(), trace = [], root = null;
+    keys.forEach(function (key, i) {
+      var pri = priorities[i];
+      root = (function go(t) {
+        if (!t) { var n = bstNode(key); n.priority = pri; c.writes += 1; return n; }
+        c.compares += 1;
+        if (key < t.key) {
+          t.l = go(t.l);
+          if (t.l.priority < t.priority) {
+            t = rotate(t, 'right'); c.swaps += 1;
+            trace.push({ at: trace.length, key: key, rotation: 'right', root: t.key });
+          }
+        } else if (key > t.key) {
+          t.r = go(t.r);
+          if (t.r.priority < t.priority) {
+            t = rotate(t, 'left'); c.swaps += 1;
+            trace.push({ at: trace.length, key: key, rotation: 'left', root: t.key });
+          }
+        }
+        return bstFix(t);
+      })(root);
+    });
+    var depths = bstDepths(root), total = depths.reduce(function (a, b) { return a + b; }, 0);
+    return runOf({ root: root, height: bstHeight(root), inorder: bstInorder(root),
+                   meanDepth: R(BigInt(total), BigInt(depths.length || 1)),
+                   heapOrdered: (function ok(t) {
+                     if (!t) return true;
+                     if (t.l && t.l.priority < t.priority) return false;
+                     if (t.r && t.r.priority < t.priority) return false;
+                     return ok(t.l) && ok(t.r);
+                   })(root) },
+                 usedCounts(c), trace);
+  }
+
+  /* A skip list from a COIN TAPE, so the levels are the reader's seed rather
+     than a hidden random source. A key's level is the run of heads at its place
+     on the tape; the search drops a level whenever the next node overshoots,
+     and the hops are what the panel plots against 2 log2 n. */
+  function skipBuild(keys, tape) {
+    var levels = [], c = counter(), at = 0, maxLevel = 0;
+    keys.forEach(function () {
+      var lvl = 0;
+      while (at < tape.length && tape[at] === 1 && lvl < 8) { lvl += 1; at += 1; }
+      at += 1;
+      levels.push(lvl);
+      if (lvl > maxLevel) maxLevel = lvl;
+    });
+    var sorted = keys.map(function (k, i) { return { key: k, level: levels[i] }; })
+                     .sort(function (a, b) { return a.key - b.key; });
+    function search(target) {
+      var lvl = maxLevel, i = -1, hops = 0, path = [];
+      while (lvl >= 0) {
+        var j = i + 1;
+        while (j < sorted.length) {
+          if (sorted[j].level < lvl) { j += 1; continue; }
+          hops += 1;
+          if (sorted[j].key > target) break;
+          path.push({ level: lvl, key: sorted[j].key });
+          i = j;
+          if (sorted[j].key === target) return { hops: hops, found: true, path: path };
+          j += 1;
+        }
+        lvl -= 1;
+      }
+      return { hops: hops, found: i >= 0 && sorted[i].key === target, path: path };
+    }
+    var totalHops = 0, worst = 0;
+    sorted.forEach(function (e) {
+      var r = search(e.key);
+      totalHops += r.hops; c.hops += r.hops;
+      if (r.hops > worst) worst = r.hops;
+    });
+    return runOf({ levels: levels, sorted: sorted, maxLevel: maxLevel, worstHops: worst,
+                   meanHops: R(BigInt(totalHops), BigInt(sorted.length || 1)),
+                   search: search },
+                 usedCounts(c), []);
+  }
+
+  /* ===================== what the reader typed ============================= */
+  function treeParseKeys(text, cap) {
+    var out = [], seen = {}, ignored = [], truncated = false;
+    (String(text === undefined || text === null ? '' : text).match(/-?\d+/g) || [])
+      .forEach(function (token) {
+        var v = parseInt(token, 10);
+        if (!isFinite(v) || v < 0) { ignored.push(token); return; }
+        if (seen[v]) return;
+        seen[v] = true;
+        if (out.length < cap) out.push(v); else truncated = true;
+      });
+    return { keys: out, ignored: ignored, truncated: truncated };
+  }
+  /* insert, delete and search in one line: 40 inserts, -40 deletes, ?40 looks
+     up. Keys are non-negative, so the minus sign is free to mean something. */
+  function treeParseOps(text, cap) {
+    var ops = [], ignored = [], truncated = false;
+    (String(text === undefined || text === null ? '' : text).match(/[+?-]?\d+/g) || [])
+      .forEach(function (token) {
+        var op = 'insert', body = token;
+        if (token.charAt(0) === '-') { op = 'delete'; body = token.slice(1); }
+        else if (token.charAt(0) === '?') { op = 'search'; body = token.slice(1); }
+        else if (token.charAt(0) === '+') { body = token.slice(1); }
+        var v = parseInt(body, 10);
+        if (!isFinite(v) || v < 0) { ignored.push(token); return; }
+        if (ops.length < cap) ops.push({ op: op, key: v }); else truncated = true;
+      });
+    return { ops: ops, ignored: ignored, truncated: truncated };
+  }
+
+  /* ===================== insertion orders ==================================
+
+     The SAME KEY SET in four orders, which is the whole content of the shape
+     lesson: the keys do not decide the tree, the order does.
+
+       sorted      1, 2, 3, ...        a path of height n - 1
+       reversed    n, n-1, ...         the same path, mirrored
+       shuffled    a uniformly random permutation from the reader's seed, by
+                   Fisher-Yates over SEEDED_JS
+       bisect      the middle, then the middle of each half: the order that
+                   gives the SHORTEST possible tree, so the reader has both ends
+                   of the range rather than only the bad one */
+  function insertOrder(kind, n, seed) {
+    var keys = [], i;
+    for (i = 1; i <= n; i += 1) keys.push(i * 10);
+    if (kind === 'sorted') return keys;
+    if (kind === 'reversed') return keys.slice().reverse();
+    if (kind === 'bisect') {
+      var out = [];
+      (function half(lo, hi) {
+        if (lo > hi) return;
+        var mid = Math.floor((lo + hi) / 2);
+        out.push(keys[mid]);
+        half(lo, mid - 1);
+        half(mid + 1, hi);
+      })(0, keys.length - 1);
+      return out;
+    }
+    var perm = algoPermutation(n, seed);
+    return perm.map(function (p) { return keys[p]; });
+  }
+
+  /* ===================== rotation at a chosen node =========================
+
+     rotate() rotates at the node it is handed. A panel that lets the reader
+     pick any node has to put the result back under that node's parent, which
+     is what this does, on a COPY -- so the before picture survives to be drawn
+     beside the after one.
+
+     `rotated` is false when the rotation was impossible: rotate() returns the
+     node unchanged when the child it would lift is missing, and a panel that
+     could not tell that from a real rotation would report "in-order unchanged"
+     as though something had happened. */
+  function rotateAt(root, key, dir) {
+    var copy = bstCopy(root), possible = false, found = false;
+    function go(t) {
+      if (!t) return null;
+      if (t.key === key) {
+        found = true;
+        possible = dir === 'right' ? !!t.l : !!t.r;
+        return rotate(t, dir);
+      }
+      if (key < t.key) t.l = go(t.l); else t.r = go(t.r);
+      return bstFix(t);
+    }
+    var out = go(copy);
+    return { root: bstFix(out), rotated: possible, found: found };
+  }
+
+  /* ===================== the counterexample to the local check =============
+
+     Every node sits between its two children -- 10 is below 20, 30 is above it,
+     25 is above 10 -- and the tree is not a search tree, because 25 is in 20's
+     LEFT subtree. bstValid carries the bounds down and says so; bstLocallyValid
+     checks only parent against child and does not. Built here rather than
+     stored, so both verdicts are computed in the reader's browser. */
+  function localOnlyTree() {
+    var root = bstNode(20), left = bstNode(10), right = bstNode(30), rogue = bstNode(25);
+    left.r = rogue;
+    root.l = left;
+    root.r = right;
+    bstFix(rogue); bstFix(left); bstFix(right); bstFix(root);
+    return root;
+  }
+
+  /* ===================== sizes, checked rather than trusted ================
+
+     "Augmentation is free" is the misconception, and a rotation is where it
+     stops being free. So the panel recomputes every subtree size from the tree
+     it is looking at and compares: an attribute that goes stale through a
+     rotation shows up here as a false, not as a wrong answer three queries
+     later. */
+  function sizesValid(t) {
+    if (!t) return true;
+    if (t.size !== 1 + (t.l ? t.l.size : 0) + (t.r ? t.r.size : 0)) return false;
+    return sizesValid(t.l) && sizesValid(t.r);
+  }
+  /* A tree as a string, so two trees can be compared for SHAPE rather than for
+     height. Two treaps on the same (key, priority) set are the same tree, and
+     equal heights would be much weaker evidence for that than equal shapes. */
+  function treeShape(t) {
+    if (!t) return '.';
+    return '(' + t.key + ' ' + treeShape(t.l) + ' ' + treeShape(t.r) + ')';
+  }
+  /* The tallest an AVL tree with n nodes can be: the largest h whose minimum
+     node count N(h) still fits inside n. A search over the recurrence, not a
+     logarithm. */
+  function avlHeightBound(n) {
+    var rows = minAvlNodes(28).rows, best = 0;
+    for (var i = 0; i < rows.length; i += 1) if (rows[i].n <= n) best = rows[i].h;
+    return best;
+  }
+
+  /* ===================== priorities for a treap ============================
+
+     Ranked rather than taken raw, so no two keys share a priority: a tie would
+     leave the treap shape undetermined and the mode's whole claim -- two
+     insertion orders of the same (key, priority) set give the same tree -- would
+     be false for a reason that has nothing to do with treaps. */
+  function treapPriorities(keys, seed) {
+    var draws = algoStream(seed, keys.length);
+    var idx = keys.map(function (_k, i) { return i; });
+    idx.sort(function (a, b) { return draws[a] - draws[b] || a - b; });
+    var map = {};
+    idx.forEach(function (i, rank) { map[keys[i]] = rank + 1; });
+    return map;
+  }
+  function prioritiesFor(order, map) {
+    return order.map(function (k) { return map[k]; });
+  }
+
+  /* ===================== the two reference curves ==========================
+
+     Neither is a count and the panels say so on the row where each appears.
+     2 ln n is one of the four approximations this path names: an ASYMPTOTE for
+     the mean depth of a tree built from a uniformly random order, which is
+     about 15% wrong about any particular small tree. 2 log2 n is a reference
+     curve for a skip list's expected hops, sampled at double precision; no
+     verdict is read off it. */
+  function hopsReference(n) { return n > 1 ? 2 * Math.log2(n) : 1; }
+
+  /* ===================== the drawings ======================================
+
+     drawBst is the only adapter between TREEDRAW_JS and a {key, l, r, size,
+     height, priority} node, and it is four lines: which children, what label,
+     which nodes to highlight, what note rides above each circle. Everything
+     that draws a tree on this kit goes through it. */
+  function bstLayout(root, opts) {
+    opts = opts || {};
+    return treeLayout(root, bstKids, function (t) { return String(t.key); },
+                      { width: opts.width === undefined ? 660 : opts.width,
+                        height: opts.height === undefined ? 210 : opts.height });
+  }
+  function bstSvg(root, opts) {
+    opts = opts || {};
+    var layout = bstLayout(root, opts), marked = [];
+    if (opts.mark) {
+      layout.nodes.forEach(function (nd) { if (opts.mark(nd.node)) marked.push(nd.id); });
+    }
+    var radius = opts.radius === undefined
+      ? Math.max(6, Math.min(14, Math.floor(96 / (layout.depth + 1)))) : opts.radius;
+    return treeSvg(layout, {
+      highlight: marked, radius: radius,
+      note: opts.note ? function (nd) { return opts.note(nd.node); } : null
+    });
+  }
+  function drawBst(el, root, opts) {
+    var s = root ? bstSvg(root, opts) : '<text x="20" y="40" font-size="12" '
+      + 'fill="var(--muted)">the tree is empty</text>';
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  /* A skip list: one row per level, a node drawn where its key sits in sorted
+     order, and the search path picked out. The express lanes are the lesson, so
+     the row a node is missing from matters as much as the rows it is in. */
+  function skipListSvg(sorted, maxLevel, path) {
+    var n = sorted.length, colW = n > 1 ? (596 / (n - 1)) : 0;
+    var rowH = Math.max(16, Math.min(34, Math.floor(196 / (maxLevel + 1))));
+    var onPath = {};
+    (path || []).forEach(function (p) { onPath[p.level + ':' + p.key] = true; });
+    var s = '', lvl, i;
+    for (lvl = maxLevel; lvl >= 0; lvl -= 1) {
+      var y = 22 + (maxLevel - lvl) * rowH, prevX = null;
+      s += '<text x="0" y="' + (y + 4) + '" font-size="10" fill="var(--muted)">L' + lvl + '</text>';
+      for (i = 0; i < n; i += 1) {
+        if (sorted[i].level < lvl) continue;
+        var x = 34 + i * colW;
+        if (prevX !== null) s += '<line x1="' + prevX.toFixed(1) + '" y1="' + y + '" x2="'
+          + x.toFixed(1) + '" y2="' + y + '" stroke="var(--line-strong)" stroke-width="1.4" />';
+        var hot = onPath[lvl + ':' + sorted[i].key];
+        s += '<circle cx="' + x.toFixed(1) + '" cy="' + y + '" r="' + (rowH >= 24 ? 8 : 6)
+          + '" fill="var(' + (hot ? '--cyan' : '--panel-3')
+          + ')" stroke="var(--line-strong)" stroke-width="1.4" />';
+        prevX = x;
+      }
+    }
+    var base = 22 + maxLevel * rowH + 20;
+    for (i = 0; i < n; i += 1) {
+      if (n <= 20 || i % 2 === 0) {
+        s += '<text x="' + (34 + i * colW).toFixed(1) + '" y="' + base
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + sorted[i].key + '</text>';
+      }
+    }
+    return s;
+  }
+  function drawSkipList(el, sorted, maxLevel, path) {
+    var s = skipListSvg(sorted, maxLevel, path);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  var PRESETS = [{"key": "sixteen", "label": "sixteen keys from one coin tape", "n": 16, "seed": 1, "target": 12}, {"key": "eight", "label": "eight keys, so every level is readable", "n": 8, "seed": 6, "target": 6}, {"key": "thirty", "label": "thirty keys", "n": 30, "seed": 6, "target": 20}];
+
+  var stage = document.getElementById('tsList');
+  var plot = document.getElementById('tsPlot');
+  var table = document.getElementById('tsTable');
+  var status = document.getElementById('tsStatus');
+  var preset = document.getElementById('tsPreset');
+  var SWEEP = [4, 8, 12, 16, 24, 32];
+
+  function presetOf() {
+    for (var i = 0; i < PRESETS.length; i += 1) if (PRESETS[i].key === preset.value) return PRESETS[i];
+    throw new Error('skiplist: no preset named ' + preset.value);
+  }
+  function applyPreset() {
+    var p = presetOf();
+    document.getElementById('tsN').value = p.n;
+    document.getElementById('tsSeed').value = p.seed;
+    document.getElementById('tsTarget').value = p.target;
+  }
+  function build(n, seed) {
+    var keys = insertOrder('sorted', n, seed);
+    return skipBuild(keys, algoCoins(seed, 8 * n + 16));
+  }
+
+  function redraw() {
+    var n = +document.getElementById('tsN').value;
+    var seed = +document.getElementById('tsSeed').value;
+    var run = build(n, seed);
+    var r = run.result;
+    var idx = Math.max(1, Math.min(+document.getElementById('tsTarget').value, n));
+    var target = r.sorted[idx - 1].key;
+    document.getElementById('tsNOut').textContent = n + ' keys';
+    document.getElementById('tsSeedOut').textContent = 'tape seed ' + seed;
+    document.getElementById('tsTargetOut').textContent = 'search for ' + target;
+
+    var found = r.search(target);
+    drawSkipList(stage, r.sorted, r.maxLevel, found.path);
+
+    var ref = hopsReference(n);
+    document.getElementById('tsMax').textContent = 'L' + r.maxLevel;
+    document.getElementById('tsMean').textContent = Rtext(r.meanHops) + ' = '
+      + Rfixed(r.meanHops, 3) + ' — counted';
+    document.getElementById('tsWorst').textContent = r.worstHops + ' — counted';
+    document.getElementById('tsRef').textContent = ref.toFixed(3) + ' — a reference curve';
+    document.getElementById('tsThis').textContent = found.hops + ' — counted';
+    document.getElementById('tsPromoted').textContent = r.levels.filter(function (l) {
+      return l > 0;
+    }).length + ' of ' + n;
+
+    drawSeries(plot, [
+      { label: 'hops counted', colour: 'var(--cyan)', points: true,
+        values: SWEEP.map(function (k) { return Rnum(build(k, seed).result.meanHops); }) },
+      { label: '2 log2 n', colour: 'var(--amber)', dashed: true,
+        values: predicted(SWEEP, hopsReference) }
+    ], SWEEP, { xlabel: 'n' });
+
+    var dist = {};
+    r.levels.forEach(function (l) { dist[l] = (dist[l] || 0) + 1; });
+    var rows = '';
+    for (var lvl = 0; lvl <= r.maxLevel; lvl += 1) {
+      var half = n / Math.pow(2, lvl + 1);
+      rows += '<tr' + (lvl === r.maxLevel ? ' class="tone-cyan"' : '') + '><td>L' + lvl
+        + '</td><td>' + (dist[lvl] || 0) + '</td><td>'
+        + r.sorted.filter(function (e) { return e.level >= lvl; }).length + '</td><td>'
+        + half.toFixed(2) + '</td></tr>';
+    }
+    table.innerHTML = '<thead><tr><th>level</th><th>keys whose top level is this</th>'
+      + '<th>keys present at this level</th><th>n / 2^(level+1)</th></tr></thead><tbody>'
+      + rows + '</tbody>';
+
+    status.innerHTML = 'The coin tape promoted <strong>' + r.levels.filter(function (l) {
+      return l > 0;
+    }).length + '</strong> of the ' + n + ' keys above the bottom list, and the tallest reached '
+      + '<strong>L' + r.maxLevel + '</strong>. Searching for ' + target + ' took <strong>'
+      + found.hops + '</strong> hop' + (found.hops === 1 ? '' : 's') + '; over all ' + n
+      + ' searches the mean is <strong>'
+      + Rtext(r.meanHops) + '</strong> = ' + Rfixed(r.meanHops, 3) + ' and the worst is '
+      + r.worstHops + '. <span class="tone-amber">2 log&#8322; n reads ' + ref.toFixed(3)
+      + ', and it is a reference curve rather than a count</span> &mdash; it is sampled at double '
+      + 'precision, nothing is decided from it, and the hops beside it were counted by walking '
+      + 'the list. <span class="tone-cyan">Each key chose its own level once, when it was '
+      + 'inserted, from the run of heads at its place on the tape.</span> Nothing is ever '
+      + 'rebuilt: there is no global structure to maintain, which is the whole trade against a '
+      + 'balanced tree. Change the seed and the levels change; change n and they do not move, '
+      + 'because each is local.';
+  }
+
+  preset.addEventListener('change', function () { applyPreset(); redraw(); });
+  ['tsN', 'tsSeed', 'tsTarget'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', redraw);
+  });
+  redraw(); window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "randomised-algorithms/skip-lists";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

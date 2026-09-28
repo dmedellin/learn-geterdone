@@ -1,0 +1,2890 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Warm-Up and the Initial Transient | Lesson | Simulation and Variance Reduction | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="A run that begins with an empty system spends its first slots somewhere the steady state is not, and every average taken from slot zero carries that as a bias — a wrongness in the expectation, which no number of replications removes. Carrying the whole distribution forward one slot at a time makes the bias exact rather than anecdotal, and a longer run only dilutes it while discarding a warm-up removes it." />
+  <link rel="canonical" href="https://learn.geterdone.io/simulation-and-variance-reduction/warm-up-and-the-initial-transient/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Warm-Up and the Initial Transient | Lesson | Simulation and Variance Reduction | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="A run that begins with an empty system spends its first slots somewhere the steady state is not, and every average taken from slot zero carries that as a bias — a wrongness in the expectation, which no number of replications removes. Carrying the whole distribution forward one slot at a time makes the bias exact rather than anecdotal, and a longer run only dilutes it while discarding a warm-up removes it." />
+  <meta property="og:url" content="https://learn.geterdone.io/simulation-and-variance-reduction/warm-up-and-the-initial-transient/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Warm-Up and the Initial Transient | Lesson | Simulation and Variance Reduction | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A run that begins with an empty system spends its first slots somewhere the steady state is not, and every average taken from slot zero carries that as a bias — a wrongness in the expectation, which no number of replications removes. Carrying the whole distribution forward one slot at a time makes the bias exact rather than anecdotal, and a longer run only dilutes it while discarding a warm-up removes it." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/simulation-and-variance-reduction/warm-up-and-the-initial-transient/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Simulation and Variance Reduction</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Warm-Up and the Initial Transient</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The warm-up and the initial transient is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Simulation and Variance Reduction &middot; Running a system</span>
+        <h1>Warm-Up and the Initial Transient</h1>
+        <p>A run that begins with an empty system spends its first slots somewhere the steady state is not, and every average taken from slot zero carries that as a <strong>bias</strong> &mdash; a wrongness in the expectation, which no number of replications removes. Carrying the whole distribution forward one slot at a time makes the bias exact rather than anecdotal, and a longer run only dilutes it while discarding a warm-up removes it.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">E[N₀], E[N₁], …  =  0,  2/5,  3/5,  37/50,  17/20, …    climbing toward 12/5
+expected average over slots 0 to 399      2.2443   (exact, to 4 places)
+expected average over slots 100 to 399    2.3717   (exact, to 4 places)
+stationary mean                           12/5 = 2.4
+bias is in the EXPECTATION: replications shrink the variance and not this
+a longer run dilutes the transient;  discarding it deletes the transient</div>
+        <div class="float-label" style="right:16px;bottom:16px;">The transient as theory, and the two averages it separates</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas. The first is the distinction the whole page turns on, the second makes it computable, and the third is the fix that is usually reached for and is the wrong one.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Bias and variance are different problems with different cures</h3><p>Variance is how much the estimate moves when you reseed, and replications shrink it. Bias is where the estimate is aimed, and replications do nothing to it whatever: a thousand runs all started empty give a thousand estimates of the same wrong number, with a beautifully small standard error around it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The transient is computable, not just visible</h3><p>Starting from an empty system, the distribution of the number in system at slot <span class="math">t</span> can be carried forward exactly, one slot at a time. For this queue the expected occupancy runs <span class="math">0</span>, <span class="math">2/5</span>, <span class="math">3/5</span>, <span class="math">37/50</span>, <span class="math">17/20</span>, … toward the stationary <span class="math">12/5</span>, and those are fractions rather than measurements. The bias is then a statement about numbers you can print.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Diluting a fixed error is much slower than deleting it</h3><p>The transient is a fixed quantity of wrongness at the front of the run, so its share of the average falls like <span class="math">1/T</span>. Quadrupling the run length from <span class="math">100</span> slots to <span class="math">400</span> divides the remaining bias by about <span class="math">3.5</span>; throwing away the first quarter of the four-hundred-slot run divides it by about <span class="math">5.5</span>. Deleting wins, and it wins on a quarter of the compute.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Where a run starts, and what that costs its average</h2></div><p>Why the beginning of a run is not a sample of the thing being estimated, how much that is worth in numbers, and what actually removes it.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Initial transient</span><p>The <strong>initial transient</strong> is the part of a run during which the state distribution is still visibly moving away from the initial condition and toward the steady-state distribution. It is not a period of &ldquo;noise&rdquo;: the process is behaving correctly throughout, and it is simply not yet behaving like the system the long-run average describes.</p></div><div class="defbox"><span class="label">Definition &middot; Bias of an estimator</span><p>An estimator <span class="math">T</span> of a quantity <span class="math">θ</span> has <strong>bias</strong> <span class="math">E[T] − θ</span>. Bias is a property of the estimator, not of a run: it does not shrink with replications, it does not show up in a standard error, and an interval built on that standard error is centred in the wrong place.</p></div><p>That is the whole reason this page exists. Every technique after it attacks variance, and all of them are worthless on an estimator aimed at the wrong number. A narrow interval around a biased estimate is worse than a wide one, because it is more convincing.</p><h3>The transient, as arithmetic</h3><p>The number in system at the end of a slot is a Markov chain: from state <span class="math">n</span> a departure happens first with probability <span class="math">q</span>, then an arrival with probability <span class="math">p</span>, so the chain steps to <span class="math">n − 1</span>, <span class="math">n</span> or <span class="math">n + 1</span>, and from <span class="math">0</span> only to <span class="math">0</span> or <span class="math">1</span>. Starting from the point mass at zero and pushing the whole distribution forward one slot at a time gives <span class="math">E[Nₜ]</span> exactly, for every <span class="math">t</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">  p = 2/5,  q = 1/2,  started empty
+
+  E[N₀] = 0
+  E[N₁] = 2/5
+  E[N₂] = 3/5
+  E[N₃] = 37/50
+  E[N₄] = 17/20
+     …
+  E[N₅₀]  ≈ 2.0332        E[N₁₀₀] ≈ 2.2633
+  E[N₃₉₉] ≈ 2.3982        stationary  12/5 = 2.4
+
+  expected time average over slots   0 to 399:   2.2443
+  expected time average over slots 100 to 399:   2.3717</div><p>Both of those averages are exact fractions shown to four places, not rounded numbers &mdash; they are averages of finitely many rationals. The bias of the naive estimator is <span class="math">2.2443 − 2.4</span>, about <span class="math">−0.1557</span>; the bias after discarding a hundred slots is about <span class="math">−0.0283</span>. The discard removes roughly four fifths of what was there, and it does so in theory, before any run has been made.</p><div class="thm"><span class="label">Theorem &middot; A longer run dilutes; a discard deletes</span><p>Let <span class="math">B</span> be the total excess or shortfall contributed by the transient. Averaging over <span class="math">T</span> slots contributes <span class="math">B/T</span> to the estimate, which falls like <span class="math">1/T</span>. Averaging over slots <span class="math">w</span> to <span class="math">T</span> instead removes the part of <span class="math">B</span> that lay before <span class="math">w</span> outright. Lengthening the run is therefore a <span class="math">1/T</span> effect and discarding is not.</p></div><p>The numbers say the same thing. At <span class="math">100</span> slots the expected average is <span class="math">1.8624</span>, a shortfall of <span class="math">0.5376</span>; at <span class="math">400</span> slots it is <span class="math">2.2443</span>, a shortfall of <span class="math">0.1557</span>. Four times the run divided the remaining bias by about <span class="math">3.5</span>. Discarding the first hundred of those four hundred slots takes the shortfall to <span class="math">0.0283</span> &mdash; a further factor of about <span class="math">5.5</span>, bought with a quarter of the data rather than with four times the compute.</p><h3>One run, and what it actually did</h3><div class="example"><span class="label">Example &middot; Four hundred slots at seed 0</span><p>The average over every slot is <span class="math">169/80 = 2.1125</span>; the average over the three hundred slots after a warm-up of one hundred is <span class="math">361/150 ≈ 2.4067</span>. The discard moved the estimate up by about <span class="math">0.2942</span>, which is the direction the theory says and rather more than the theory's <span class="math">0.1274</span> &mdash; because one run is an observation of the expectation and not the expectation.</p></div><p>Reseed and the sign can change. The same settings at seed 1 give <span class="math">1.3075</span> from slot zero and <span class="math">1.2367</span> after the discard: the discard moved the estimate <em>down</em>, on a run that spent its whole length below the steady state. That is not a counterexample to the bias; it is what a single observation of a quantity with a standard error looks like, and it is exactly why the exact transient is printed beside the run rather than the run being left to make the argument.</p><h3>Batch means: replications out of one run</h3><div class="defbox"><span class="label">Definition &middot; Batch means</span><p>Discard the warm-up, split what remains into <span class="math">b</span> equal <strong>batches</strong>, and take the mean of each. A batch mean is far closer to independent of its neighbour than one slot is of the next, so the <span class="math">b</span> batch means can be treated as replications: their average is the estimate and their sample variance is what an interval is built from.</p></div><p>On the run at seed 0 the four batches of seventy-five slots give means <span class="math">34/25</span>, <span class="math">116/75</span>, <span class="math">19/25</span> and <span class="math">149/25</span> &mdash; that is <span class="math">1.36</span>, <span class="math">1.55</span>, <span class="math">0.76</span> and <span class="math">5.96</span>. Their average is <span class="math">361/150</span>, within <span class="math">0.007</span> of the exact <span class="math">12/5</span>, and their sample variance is <span class="math">10733/1875 ≈ 5.72</span>. The point estimate could hardly be better and the four numbers behind it say the run has established almost nothing. Printing the second fact beside the first is the whole job.</p><p>That spread is also a warning about the batches themselves. A batch mean is only nearly independent of its neighbour if the batch is long compared with how fast the system forgets its state, and seventy-five slots of a queue running at <span class="math">4/5</span> utilisation is not obviously long enough. The remedy is fewer, longer batches, and the diagnostic is to watch the batch variance as the batch count falls.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Warm-up and the initial transient</h2></div><p>Every average taken from an empty start is biased, and a longer run only dilutes it</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>A run that starts empty is not sampling the steady state</strong><span>the transient shaded, the exact expectation drawn over the trace, and the two averages</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the number in system</span><span class="tone-green"><i class="legend-swatch"></i>the exact expectation at each slot</span><span class="tone-amber"><i class="legend-swatch"></i>the warm-up discarded</span><span class="tone-purple"><i class="legend-swatch"></i>the stationary mean</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="wuTrace" viewBox="0 0 660 250" role="img" aria-label="The number in system against the slot index, the discarded warm-up shaded, and the exact expected occupancy drawn over it."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wuTable"></table></div>
+      <div class="status-banner" id="wuStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Drag the warm-up, and watch the bias leave the average</h3>
+          <p>The green curve is not a fit to the trace: it is the exact expected occupancy at each slot, carried forward from an empty system one slot at a time. Two averages are printed &mdash; over every slot, and over the slots after the discard &mdash; and beside each of them the exact expected value it is an estimate of, so the bias is visible as theory rather than as a story about noise. Reseed and watch the run's two numbers swap order while the two exact ones do not move.</p>
+        <div class="field">
+          <label for="wuChain">Configuration</label>
+          <select id="wuChain"><option value="base" selected>p = 2/5, q = 1/2</option><option value="faster">p = 2/5, q = 3/5</option><option value="busier">p = 1/2, q = 3/5</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="wuW">Warm-up discarded</label><span class="range-value" id="wuWOut">100</span></div>
+          <input id="wuW" type="range" min="0" max="200" step="10" value="100" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="wuB">Batches</label><span class="range-value" id="wuBOut">4</span></div>
+          <input id="wuB" type="range" min="2" max="10" step="1" value="4" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="wuSlots">Slots in the run</label><span class="range-value" id="wuSlotsOut">400</span></div>
+          <input id="wuSlots" type="range" min="100" max="400" step="50" value="400" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="wuSeed">Seed</label><span class="range-value" id="wuSeedOut">0</span></div>
+          <input id="wuSeed" type="range" min="0" max="40" step="1" value="0" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Average from the start</span><strong id="wuNaive">&mdash;</strong></div>
+          <div class="kpi"><span>Average after the warm-up</span><strong id="wuKept">&mdash;</strong></div>
+          <div class="kpi"><span>What the discard changed</span><strong id="wuBias">&mdash;</strong></div>
+          <div class="kpi"><span>Expected average from the start</span><strong id="wuTheory0">&mdash;</strong></div>
+          <div class="kpi"><span>Expected average after it</span><strong id="wuTheoryW">&mdash;</strong></div>
+          <div class="kpi"><span>Stationary mean</span><strong id="wuStat">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="wuHint" style="margin:0;">The green curve is not a fit to the trace. It is the exact expected occupancy at each slot, computed by carrying the whole distribution forward from an empty system one slot at a time, so the bias is visible as theory and not only as noise.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Getting the beginning out of the answer</h2></div><p>Five steps, and the fourth one is the check that most warm-up procedures skip.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide what the initial condition is, and admit that it is one</h3><p>An empty system is a choice, not a neutral default, and it is the choice that biases a queueing average downward. Starting in a typical state, if you have one, is a legitimate alternative and it moves the bias rather than removing it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Plot the quantity against time and look for the shape</h3><p>Not for the noise &mdash; for the drift. A trace that climbs for two hundred slots and then wanders is showing you a transient and then a steady state, and the elbow is roughly where the warm-up should end.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Discard, and say how much you discarded</h3><p>&ldquo;The first hundred of four hundred slots&rdquo; is a reportable procedure. A discard chosen after seeing which choice gave the nicest answer is a procedure that will not survive a second seed, and it is not honest to report only its output.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check that the estimate has stopped moving as the warm-up grows</h3><p>Increase the discard and watch the kept average. If it is still drifting, the warm-up is too short. If it has settled but the variance is climbing, you are throwing away data you needed, and the fix is a longer run rather than a longer discard.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Build the interval from batch means, not from slots</h3><p>Consecutive slots of a queue are strongly dependent, so the sample variance over slots understates the spread badly. Batch means are the standard repair and they come with their own condition: the batches must be long enough for their means to be nearly independent.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Bias, dilution and batches</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Four hundred slots, a hundred discarded, four batches</h3><p>The panel's opening state: <span class="math">p = 2/5</span>, <span class="math">q = 1/2</span>, four hundred slots, a warm-up of one hundred, four batches, seed 0. The exact column is computed from the chain and does not depend on the seed at all.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">exact, from the chain started empty
+   E[N₀..N₄]     0,  2/5,  3/5,  37/50,  17/20
+   stationary    12/5 = 2.4
+   E[average over slots   0..399]   2.2443     shortfall 0.1557
+   E[average over slots 100..399]   2.3717     shortfall 0.0283
+
+this run, seed 0
+   average from slot 0        169/80  = 2.1125
+   average after the warm-up  361/150 ≈ 2.4067
+   the discard moved it up by          0.2942
+
+batch means, four batches of 75 slots each
+   slots 100..174     34/25  = 1.36
+   slots 175..249    116/75  ≈ 1.5467
+   slots 250..324     19/25  = 0.76
+   slots 325..399    149/25  = 5.96
+   mean of the four  361/150 ≈ 2.4067
+   their variance  10733/1875 ≈ 5.72
+
+the estimate is 0.007 from the exact 12/5
+and the four numbers behind it range from 0.76 to 5.96</div><p>The two exact averages are the spine of the page. <span class="math">2.2443</span> and <span class="math">2.3717</span> are what the estimator is <em>aimed</em> at with and without the discard, and both are exact fractions shown to four places. Against the stationary <span class="math">2.4</span> they say the naive estimator is short by about <span class="math">0.16</span> in expectation and the discarded one by about <span class="math">0.03</span>, before a single seed has been chosen.</p><p>The run then does its own thing, as runs do. It moved by <span class="math">0.2942</span> where the theory says <span class="math">0.1274</span>, and at seed 1 it moves the other way entirely. Neither observation argues against the theory and neither confirms it; what confirms it is that the exact column does not move when the seed does.</p><p>For a faded rehearsal, drag the warm-up from <span class="math">100</span> to <span class="math">0</span> and then to <span class="math">200</span>. The supplied first move is that at a warm-up of zero the two averages are the same number by definition and the exact expected average reads <span class="math">2.2443</span>. Say what you expect the exact figure to be at a warm-up of <span class="math">200</span>, whether it can ever exceed <span class="math">12/5</span>, and what happens to the batch variance when only two hundred slots are left to split four ways.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging from slot zero because that is where the run starts</strong><span>It is the default in every implementation and it is wrong for every queueing average. On the measured chain the naive estimator is aimed at <span class="math">2.2443</span> where the answer is <span class="math">2.4</span>, and no care about the generator, the sampler or the number of replications touches that gap by a single digit.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Fixing the bias by running longer</strong><span>It works, in the sense that <span class="math">1/T</span> tends to zero, and it is the expensive way round. Four times the run length bought a factor of about <span class="math">3.5</span> on the remaining bias here; a quarter of that run thrown away bought a factor of about <span class="math">5.5</span>. Doing both is better than either, and doing only the first is the common choice because it needs no decision.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Building an interval from the slots of one run</strong><span>Consecutive slots of a busy queue are strongly dependent, so the sample variance over four hundred slots is far smaller than the variance of the average it is supposed to describe, and the resulting interval is confidently narrow and wrong. Batch means are the repair, and they are only a repair if the batches are long enough to have nearly forgotten each other.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an average taken from slot zero reads as a biased estimator rather than as the obvious one.</strong><p>You should be able to say what distinguishes bias from variance and which techniques touch which, read the exact expected occupancy of a chain started empty and turn it into the expected average over a window, compare a longer run against a discard on the numbers rather than by intuition, form batch means from one run and state the condition under which they may be treated as replications, and say why a single run moving the wrong way is not evidence against any of it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Bias is dealt with. Everything after this page attacks the other half of the problem &mdash; the width &mdash; and all four techniques do it the same way, by moving a covariance rather than by buying draws. &ldquo;Common Random Numbers&rdquo; takes the first and simplest of them: feed two systems the same stream, and read what happens to the variance of their difference.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../discrete-event-simulation-of-a-queue/" rel="prev"><span>Lesson</span><strong>Discrete-Event Simulation of a Queue</strong></a>
+      <a class="lesson-link next" href="../common-random-numbers/" rel="next"><span>Lesson</span><strong>Common Random Numbers</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="simulation-and-variance-reduction/warm-up-and-the-initial-transient" data-lesson-title="Warm-Up and the Initial Transient" data-course-title="Simulation and Variance Reduction">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Simulation and Variance Reduction.</strong> Every draw, count, frequency, sample mean, sample variance, covariance, coverage count, transient expectation and variance ratio on this course is an exact fraction, because the stream is integers and the sampled values are rational: a sample mean over two hundred draws prints as <span class="math">413/200</span> and a coverage as <span class="math">40</span> of <span class="math">40</span>. Three quantities here are not rational in general &mdash; the standard error <span class="math">√(s²/n)</span>, the Chebyshev half-width <span class="math">k·SE</span> built on it, and <span class="math">ρ</span> &mdash; and each is carried as an exact surd and printed with its decimal labelled <em>rounded</em>; where the radicand happens to be a perfect square the exact form is a fraction and nothing is rounded at all. Every other decimal on these pages says &ldquo;exact, shown to <span class="math">N</span> places&rdquo; instead, and the distinction is load-bearing rather than fussy: a reader who has seen the word used loosely cannot tell which three figures really are approximate. Note that <span class="math">ρ²</span> is a ratio of exact rationals even where <span class="math">ρ</span> is not, which is why the reduction factor <span class="math">1 − ρ²</span> needs no rounding and is the figure this course reports. What none of this can do is make a run into a proof: every answer here arrives with an error bar, and the model it came from is still only as true as what it left out.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A thousand independent replications, each started from an empty system, are averaged. What happens to the start-up bias?", "a": ["It falls like <span class=\"math\">1/1000<\/span>", "It falls like <span class=\"math\">1/\u221a1000<\/span>", "It is unchanged", "It is removed, because the replications are independent"], "c": 2, "why": "Bias is a property of the estimator's expectation, and averaging unbiased-in-nothing copies of the same biased estimator leaves the expectation exactly where it was. What the thousand replications do is shrink the standard error, which produces a narrow interval centred in the wrong place."}, {"q": "Which does more for the bias: quadrupling the run length, or discarding the first quarter of the run?", "a": ["Quadrupling, because it collects four times the data", "Discarding, because the transient is deleted rather than diluted", "They are equivalent, since both change the averaging window by a factor of four", "Neither, because the bias is a property of the model"], "c": 1, "why": "Diluting a fixed error over a longer window is a <span class=\"math\">1/T<\/span> effect; deleting the slots it lives in removes it. On the measured chain, quadrupling <span class=\"math\">100<\/span> slots to <span class=\"math\">400<\/span> divides the remaining shortfall by about <span class=\"math\">3.5<\/span>, and discarding a quarter of the four-hundred-slot run divides it by about <span class=\"math\">5.5<\/span> &mdash; at a quarter of the cost."}, {"q": "One run gives <span class=\"math\">1.3075<\/span> from slot zero and <span class=\"math\">1.2367<\/span> after a warm-up discard, so the discard moved the estimate down. What does that show?", "a": ["That the warm-up was too long", "That the bias for this model is upward, not downward", "Nothing about the bias: one run is an observation of an expectation, and the exact column is what states the bias", "That the run has a bug, since the discard must raise the average"], "c": 2, "why": "The bias is a statement about <span class=\"math\">E[estimator]<\/span>, and it is stated on the page by two exact figures that do not depend on the seed. A single run can move either way and often does; the panel prints the exact expected averages precisely so that one run is not asked to carry the argument."}, {"q": "Four batch means come out as <span class=\"math\">1.36<\/span>, <span class=\"math\">1.55<\/span>, <span class=\"math\">0.76<\/span> and <span class=\"math\">5.96<\/span>, averaging <span class=\"math\">2.4067<\/span> against an exact <span class=\"math\">2.4<\/span>. What should be reported?", "a": ["<span class=\"math\">2.4067<\/span>, since it is within <span class=\"math\">0.007<\/span> of the truth", "<span class=\"math\">2.4067<\/span> together with the batch variance, which says the run has established very little", "The median batch mean, which is more robust to the outlier", "Nothing, since one batch is clearly an outlier and should be dropped"], "c": 1, "why": "&ldquo;Within <span class=\"math\">0.007<\/span> of the truth&rdquo; is only knowable here because the exact answer happens to be available, which is the situation a real simulation is never in. The batch variance of about <span class=\"math\">5.72<\/span> is the information the run actually produced, and dropping the large batch would be discarding the evidence that the system has long busy periods."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* ============================================================== printing
+
+     Reader text reaches innerHTML and this course's readers type < and > all
+     day, so it is escaped once, at the boundary.  Written here rather than
+     borrowed from algebra_systems.FORMAT_JS because taking that block for six
+     one-line helpers would put 1.3 KB gzipped on all nine pages of this course
+     to save forty lines on one of them. */
+  function simEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function simTd(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function simTdl(t, cls) { return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function simTh(t) { return '<th>' + t + '</th>'; }
+  function simTr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function simHead(cells) { return '<thead>' + simTr(cells.map(simTh)) + '</thead>'; }
+  function simChip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  function simTick(ok) { return simChip(ok ? 'holds' : 'fails', ok ? 'ok' : 'no'); }
+
+  /* A rational as a fraction when a reader can read it and a labelled decimal
+     when the exact form has run to twenty digits.  Rshort makes that cut on
+     DIGITS; this only adds the word, because an unlabelled decimal on a page
+     that promises exactness is the one thing worse than a fraction nobody can
+     read. */
+  function simNum(a, places) {
+    if (a === null || a === undefined) return '&mdash;';
+    var exact = Rtext(a);
+    if (exact.length <= 19) return exact;
+    /* "shown to N places" rather than "rounded": these numbers ARE exact -- a
+       ratio of two whole numbers -- and only their printed form is cut short.
+       "(rounded)" is reserved for the three quantities on this course that are
+       genuinely irrational, and saying it of a rational is the kind of small
+       untruth that makes a reader distrust the ones that are true. */
+    var pl = places === undefined ? 5 : places;
+    return Rfixed(a, pl) + ' (exact, shown to ' + pl + ' places)';
+  }
+  /* Reader input that might be nonsense.  A bad value becomes a sentence in the
+     status banner rather than an exception. */
+  function simReadInt(text, lo, hi) {
+    var s = String(text).trim();
+    if (!/^[0-9]+$/.test(s)) return null;
+    var v = BigInt(s);
+    if (v < BigInt(lo) || v > BigInt(hi)) return null;
+    return v;
+  }
+
+  /* ========================================================= pixels, and only
+
+     Nothing downstream reads these back: an exact rational becomes an x or a y
+     here, and every number that is REPORTED stays on the exact side. */
+  function simPx(r) { return Number(r.n) / Number(r.d); }
+  function simAt(v, lo, hi, a, b) { return a + (v - lo) * (b - a) / (hi - lo || 1); }
+  function simEl(tag, attrs, inner) {
+    var s = '<' + tag, k;
+    for (k in attrs) {
+      if (Object.prototype.hasOwnProperty.call(attrs, k) && attrs[k] !== null && attrs[k] !== undefined) {
+        s += ' ' + k + '="' + attrs[k] + '"';
+      }
+    }
+    return inner === undefined ? s + ' />' : s + '>' + inner + '</' + tag + '>';
+  }
+  function simLabel(x, y, text, tone, anchor, size) {
+    return simEl('text', { x: x, y: y, 'font-size': size || 10, 'text-anchor': anchor || 'start',
+                           fill: 'var(--' + (tone || 'muted') + ')' }, text);
+  }
+
+  /* ==================================================== THE STREAM, ONCE
+
+     MINSTD: a = 16807, c = 0, m = 2^31 - 1, prime.  The module docstring says
+     why this kit does not use a power-of-two modulus; the short version is that
+     this kit REDUCES, and the low bits of a power-of-two modulus are a cycle
+     rather than a sample.
+
+     The seed never becomes the state.  An LCG's k-th value is affine in its
+     seed, so seeds 1, 2, 3 produce three points on a straight line rather than
+     three samples of anything, and six of these nine modes ask the reader to
+     reseed.  The finaliser is splitmix64 -- multiply, xor-shift, multiply,
+     xor-shift -- which is nonlinear over the integers and breaks the affinity. */
+  function simMultiplier() { return 16807; }
+  function simModulus() { return 2147483647; }
+  function simSeedState(seed) {
+    var mask = 0xFFFFFFFFFFFFFFFFn;
+    var x = (BigInt(seed) + 1n) * 0x9E3779B97F4A7C15n & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % BigInt(simModulus() - 1)) + 1;      /* never the fixed point 0 */
+  }
+  function simStream(seed, count) {
+    return lcgStream(simMultiplier(), 0, simModulus(), simSeedState(seed), count);
+  }
+  /* Uniform rationals in (0, 1), exact fractions over the modulus.  The modulus
+     is odd, so U is never exactly 1/2 and no comparison in this kit has to
+     decide a tie it cannot decide. */
+  function simUniform(seed, count) {
+    var m = BigInt(simModulus());
+    return simStream(seed, count).map(function (x) { return R(BigInt(x), m); });
+  }
+  /* Inverse-transform sampling over a whole seeded run.
+
+     This is the SAME rule sampleFromPmf applies -- the first value whose
+     cumulative probability reaches U -- carried out on the integers the stream
+     produces rather than on the fraction x/m.  U < F(k) is x d < n m when
+     F(k) = n/d, and that comparison is exact in whole numbers and allocates
+     nothing, where the rational form builds a fraction and runs a gcd per draw
+     per candidate.  Measured: a mode that draws forty thousand values went from
+     nine hundred milliseconds to a hundred and forty, which is the difference
+     between a slider and a stall.
+
+     THE TWO PATHS ARE HELD TOGETHER RATHER THAN TRUSTED.  Every row this kit
+     PRINTS is sampleFromPmf's own answer, and scripts/mathcheck.js requires the
+     two to agree draw for draw over a full run on every table the kit ships --
+     because a fast path that disagreed with the definition would quietly be a
+     different lesson.  Doubles are used only where both sides of the comparison
+     are integers inside their exact range; past that the same comparison runs in
+     BigInt, and `safe` is where that is decided rather than assumed. */
+  function simDraws(pairs, seed, count) {
+    var M = simModulus(), Mb = BigInt(M), raw = simStream(seed, count);
+    var cum = simCumulative(pairs), i, j, k;
+    var LIMIT = 9007199254740991;
+    var safe = true, bigN = [], bigD = [], numN = [], numD = [];
+    for (i = 0; i < cum.length; i += 1) {
+      bigN.push(cum[i].hi.n); bigD.push(cum[i].hi.d);
+      numN.push(Number(cum[i].hi.n)); numD.push(Number(cum[i].hi.d));
+      if (Number(cum[i].hi.d) * M > LIMIT) safe = false;
+    }
+    var last = cum.length - 1, out = [];
+    for (j = 0; j < count; j += 1) {
+      var v = cum[last].value;
+      if (safe) {
+        for (k = 0; k < cum.length; k += 1) {
+          if (raw[j] * numD[k] < numN[k] * M) { v = cum[k].value; break; }
+        }
+      } else {
+        var xb = BigInt(raw[j]);
+        for (k = 0; k < cum.length; k += 1) {
+          if (xb * bigD[k] < bigN[k] * Mb) { v = cum[k].value; break; }
+        }
+      }
+      out.push(v);
+    }
+    return out;
+  }
+  /* The empirical frequency of every value of a pmf, as an exact fraction of
+     the number of draws, beside the theoretical probability. */
+  function simFrequencies(pairs, draws) {
+    var counts = {}, i, out = [], n = draws.length;
+    for (i = 0; i < draws.length; i += 1) {
+      var key = Rtext(draws[i]);
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    for (i = 0; i < pairs.length; i += 1) {
+      var c = counts[Rtext(pairs[i][0])] || 0;
+      out.push({ value: pairs[i][0], count: c, p: pairs[i][1],
+                 empirical: n ? R(BigInt(c), BigInt(n)) : R0,
+                 expected: Rmul(pairs[i][1], R(BigInt(n), 1n)) });
+    }
+    return out;
+  }
+  /* The exact mean and variance OF A PMF -- the numbers every estimate on this
+     course is measured against, and the reason it is a measurement rather than
+     a demonstration. */
+  function simPmfMean(pairs) {
+    var m = R0, i;
+    for (i = 0; i < pairs.length; i += 1) m = Radd(m, Rmul(pairs[i][0], pairs[i][1]));
+    return m;
+  }
+  function simPmfVar(pairs) {
+    var m = simPmfMean(pairs), v = R0, i;
+    for (i = 0; i < pairs.length; i += 1) {
+      var d = Rsub(pairs[i][0], m);
+      v = Radd(v, Rmul(pairs[i][1], Rmul(d, d)));
+    }
+    return v;
+  }
+  /* The cumulative table.  It is not a helper: it IS the sampler, and the first
+     lesson's whole claim is that there is nothing else in the box. */
+  function simCumulative(pairs) {
+    var cum = R0, out = [], i;
+    for (i = 0; i < pairs.length; i += 1) {
+      var lo = cum;
+      cum = Radd(cum, pairs[i][1]);
+      out.push({ value: pairs[i][0], p: pairs[i][1], lo: lo, hi: cum });
+    }
+    return out;
+  }
+  /* The running mean after each draw, which is what a reader watches settle --
+     and, the lesson's misconception, what a slow process ALSO looks like. */
+  function simRunningMean(xs) {
+    var s = R0, out = [], i;
+    for (i = 0; i < xs.length; i += 1) {
+      s = Radd(s, xs[i]);
+      out.push(Rdiv(s, R(BigInt(i + 1), 1n)));
+    }
+    return out;
+  }
+
+  /* Simulation output analysis, exactly.
+
+     A simulation's numbers come from a SEEDED stream, so they are data and not
+     noise, and every statistic of them is a ratio of integers.  Keeping them
+     that way is what lets a page say "these two estimators have variances in
+     the ratio 47/3" rather than showing two decimals a reader cannot check.
+
+     Streams are NOT new and nothing here re-implements one: lcgStream,
+     streamUniform and sampleFromPmf all ship in sysdesign_core.STREAM_JS, and
+     inverse-transform sampling is the simulation course's own first lesson.
+     number.py's lcgRun is a CYCLE DETECTOR and is the wrong tool, but its
+     hullDobell(a, c, m) is the right one for the full-period certificate the
+     lesson prints beside the stream. */
+
+  function sampleMean(xs) {
+    if (!xs.length) return null;
+    var s = R0, k;
+    for (k = 0; k < xs.length; k += 1) s = Radd(s, xs[k]);
+    return Rdiv(s, R(BigInt(xs.length), 1n));
+  }
+  /* n - 1 in the denominator, and the lesson says why: the sample mean is
+     already fitted to the data, so one degree of freedom has been spent. */
+  function sampleVar(xs) {
+    var n = xs.length;
+    if (n < 2) return null;
+    var m = sampleMean(xs), s = R0, k;
+    for (k = 0; k < n; k += 1) { var d = Rsub(xs[k], m); s = Radd(s, Rmul(d, d)); }
+    return Rdiv(s, R(BigInt(n - 1), 1n));
+  }
+  function sampleCov(xs, ys) {
+    var n = xs.length;
+    if (n < 2 || ys.length !== n) return null;
+    var mx = sampleMean(xs), my = sampleMean(ys), s = R0, k;
+    for (k = 0; k < n; k += 1) s = Radd(s, Rmul(Rsub(xs[k], mx), Rsub(ys[k], my)));
+    return Rdiv(s, R(BigInt(n - 1), 1n));
+  }
+  /* RHO SQUARED, NOT RHO.  rho is a covariance over a product of two square
+     roots and is irrational at almost any data; rho^2 is a ratio of rationals
+     and is the number every variance-reduction claim is actually about.  Only
+     rho^2 is ever printed on this path. */
+  function rhoSquared(xs, ys) {
+    var c = sampleCov(xs, ys), vx = sampleVar(xs), vy = sampleVar(ys);
+    if (c === null || Rzero(vx) || Rzero(vy)) return null;
+    return Rdiv(Rmul(c, c), Rmul(vx, vy));
+  }
+
+  /* Chebyshev coverage, counted by comparing SQUARES.
+
+     (xbar - mu)^2 >= k^2 * var  is the same statement as |xbar - mu| >= k*sd,
+     and the first one takes no square root, so the count is exact.  The bound
+     it is measured against is 1 - 1/k^2, also exact. */
+  function chebyshevCover(reps, mu, k, variance) {
+    var kk = Rmul(k, k), thresh = Rmul(kk, variance), rows = [], inside = 0, j;
+    for (j = 0; j < reps.length; j += 1) {
+      var d = Rsub(reps[j], mu), dd = Rmul(d, d), out = Rcmp(dd, thresh) >= 0;
+      if (!out) inside += 1;
+      rows.push({ rep: j, value: reps[j], squared: dd, outside: out,
+                  why: Rtext(dd) + (out ? ' &gt;= ' : ' &lt; ') + Rtext(thresh) });
+    }
+    return { rows: rows, inside: inside, outside: reps.length - inside,
+             coverage: Rdiv(R(BigInt(inside), 1n), R(BigInt(reps.length), 1n)),
+             bound: Rsub(R1, Rinv(kk)), threshold: thresh,
+             holds: Rcmp(Rdiv(R(BigInt(inside), 1n), R(BigInt(reps.length), 1n)), Rsub(R1, Rinv(kk))) >= 0 };
+  }
+
+  /* A single-server FIFO event calendar, as a list of per-event snapshots.
+
+     The calendar is the lesson, not the averages: a reader who has watched the
+     next-event clock JUMP over the idle time understands why a simulation is
+     not a loop over seconds, and a reader shown only the mean wait does not. */
+  function desRun(arrivals, services) {
+    var n = arrivals.length, i;
+    var starts = [], departs = [], free = R0;
+    for (i = 0; i < n; i += 1) {
+      var s = Rcmp(arrivals[i], free) > 0 ? arrivals[i] : free;
+      starts.push(s); free = Radd(s, services[i]); departs.push(free);
+    }
+    var evs = [];
+    for (i = 0; i < n; i += 1) {
+      evs.push({ t: arrivals[i], kind: 'arrival', who: i });
+      evs.push({ t: departs[i], kind: 'departure', who: i });
+    }
+    evs.sort(function (a, b) {
+      var c = Rcmp(a.t, b.t);
+      if (c !== 0) return c;
+      if (a.kind !== b.kind) return a.kind === 'departure' ? -1 : 1;
+      return a.who - b.who;
+    });
+    var inSystem = 0, events = [];
+    for (i = 0; i < evs.length; i += 1) {
+      inSystem += evs[i].kind === 'arrival' ? 1 : -1;
+      events.push({ t: evs[i].t, kind: evs[i].kind, who: evs[i].who, inSystem: inSystem,
+                    calendarAfter: evs.slice(i + 1).map(function (e) {
+                      return { t: e.t, kind: e.kind, who: e.who }; }) });
+    }
+    var waits = [], sojourn = [];
+    for (i = 0; i < n; i += 1) {
+      waits.push(Rsub(starts[i], arrivals[i]));
+      sojourn.push(Rsub(departs[i], arrivals[i]));
+    }
+    var busy = R0;
+    for (i = 0; i < n; i += 1) busy = Radd(busy, services[i]);
+    return { events: events, starts: starts, departs: departs, waits: waits,
+             sojourn: sojourn, meanWait: sampleMean(waits), meanSojourn: sampleMean(sojourn),
+             busy: busy, horizon: departs.length ? departs[n - 1] : R0,
+             utilisation: departs.length && !Rzero(departs[n - 1]) ? Rdiv(busy, departs[n - 1]) : null };
+  }
+
+  /* Warm-up discard and batch means.  The discard is the honest half: an
+     average over a run that started empty is an average of a system that was
+     never in steady state, and the fix is to throw the beginning away and SAY
+     how much. */
+  function batchMeans(xs, w, b) {
+    var kept = xs.slice(w), size = Math.floor(kept.length / b), out = [], k;
+    if (size < 1) return { discarded: w, batches: [], means: [], size: 0,
+                           why: 'after discarding ' + w + ' observations there are not enough left for ' + b + ' batches' };
+    var batches = [];
+    for (k = 0; k < b; k += 1) {
+      var part = kept.slice(k * size, (k + 1) * size);
+      batches.push(part); out.push(sampleMean(part));
+    }
+    return { discarded: w, kept: kept, batches: batches, means: out, size: size,
+             grand: sampleMean(out), variance: sampleVar(out),
+             naive: sampleMean(xs),
+             why: 'the first ' + w + ' observations are thrown away and the rest split into '
+               + b + ' batches of ' + size + '; a batch mean is much closer to independent than an observation is' };
+  }
+
+  /* The control-variate variance as an EXACT QUADRATIC in b.
+
+     Var(X - b(C - mu_C)) = Var X - 2b Cov(X,C) + b^2 Var C, and b* = Cov/Var C
+     is its vertex.  Returning the quadratic rather than only its minimum is
+     what lets a reader drag b and watch the parabola, which is the mode. */
+  function controlB(xs, cs) {
+    var vx = sampleVar(xs), vc = sampleVar(cs), cov = sampleCov(xs, cs);
+    if (vx === null || vc === null || Rzero(vc)) return { quadratic: null, bStar: null, varAt: null };
+    var quad = [vx, Rneg(Rmul(R(2n, 1n), cov)), vc];     /* c0 + c1 b + c2 b^2 */
+    var bStar = Rdiv(cov, vc);
+    return { quadratic: quad, bStar: bStar, varAt: controlVarAt(quad, bStar),
+             varRaw: vx, cov: cov, varC: vc, rho2: rhoSquared(xs, cs),
+             reduction: Rzero(vx) ? null : Rdiv(Rsub(vx, controlVarAt(quad, bStar)), vx) };
+  }
+  function controlVarAt(quad, b) {
+    return Radd(quad[0], Radd(Rmul(quad[1], b), Rmul(quad[2], Rmul(b, b))));
+  }
+
+  /* Importance sampling, with the refusal that makes it honest.
+
+     The likelihood ratio p/q is undefined wherever q puts no mass and p does,
+     and an estimator that quietly skips those outcomes is biased in a way no
+     variance figure reveals.  So this REFUSES rather than returning a number.
+
+     `p` and `q` are [value, rational] pairs over the same values, in the same
+     order; `indicator` is a function of the value. */
+  function importanceRun(p, q, indicator) {
+    var k, rows = [], theta = R0, second = R0, refuse = null;
+    for (k = 0; k < p.length; k += 1) {
+      if (Rzero(q[k][1]) && !Rzero(p[k][1])) {
+        refuse = { value: p[k][0],
+                   why: 'q puts no mass on ' + Rtext(p[k][0]) + ' and p puts ' + Rtext(p[k][1])
+                     + ' there; the likelihood ratio is undefined and an estimator that skips the outcome is biased, so there is no answer to give' };
+        break;
+      }
+    }
+    if (refuse) return { refused: true, why: refuse.why, at: refuse.value, rows: [],
+                         estimate: null, varCrude: null, varIS: null, ratio: null };
+    for (k = 0; k < p.length; k += 1) {
+      var ind = indicator(p[k][0]) ? R1 : R0;
+      var w = Rzero(q[k][1]) ? R0 : Rdiv(p[k][1], q[k][1]);
+      theta = Radd(theta, Rmul(p[k][1], ind));
+      if (!Rzero(ind)) second = Radd(second, Rmul(q[k][1], Rmul(Rmul(w, w), ind)));
+      rows.push({ value: p[k][0], p: p[k][1], q: q[k][1], w: w, indicator: !Rzero(ind),
+                  contribution: Rmul(q[k][1], Rmul(w, ind)) });
+    }
+    var varCrude = Rmul(theta, Rsub(R1, theta));
+    var varIS = Rsub(second, Rmul(theta, theta));
+    return { refused: false, rows: rows, estimate: theta,
+             varCrude: varCrude, varIS: varIS,
+             ratio: Rzero(varIS) ? null : Rdiv(varCrude, varIS),
+             why: 'both estimators are unbiased for ' + Rtext(theta)
+               + '; the whole difference is the variance' };
+  }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* Little's Law from a trace, which is how this library proves it: the area
+     under the number-in-system curve is both the integral of N and the sum of
+     the customers' times, so L = lambda*W is an identity about averages and
+     needs no model at all.
+
+     Arrivals and departures are integer slot indices, paired by index. */
+  function littleFromTrace(arrivals, departures) {
+    var n = arrivals.length, i, horizon = 0;
+    for (i = 0; i < n; i += 1) if (departures[i] > horizon) horizon = departures[i];
+    var area = 0, totalTime = 0;
+    for (i = 0; i < n; i += 1) {
+      var w = departures[i] - arrivals[i];
+      totalTime += w;          /* sum of times in system */
+      area += w;               /* which IS the area under N(t) */
+    }
+    var T = R(BigInt(horizon), 1n);
+    return {
+      horizon: horizon,
+      L: Rdiv(R(BigInt(area), 1n), T),
+      lambda: Rdiv(R(BigInt(n), 1n), T),
+      W: Rdiv(R(BigInt(totalTime), 1n), R(BigInt(n), 1n)),
+      area: area
+    };
+  }
+
+  /* N(t) as a step function, for drawing the curve the area is under. */
+  function occupancyTrace(arrivals, departures, horizon) {
+    var out = [], t, i;
+    for (t = 0; t < horizon; t += 1) {
+      var c = 0;
+      for (i = 0; i < arrivals.length; i += 1) {
+        if (arrivals[i] <= t && departures[i] > t) c += 1;
+      }
+      out.push(c);
+    }
+    return out;
+  }
+
+  /* The discrete-time queue: Bernoulli arrivals (p per slot), geometric service
+     (q per slot), late arrival with departure first.
+
+     This exists because a slotted simulation is NOT M/M/1 at finite slot size,
+     and a lesson that checks the continuous formula against the simulation is
+     checking it against a different model. At p = 2/5, q = 1/2 the exact mean
+     here is 12/5, while rho/(1 - rho) at rho = p/q = 4/5 is 4 -- the continuous
+     formula overstates it by 5/3. The two agree only as the slot shrinks, and
+     the convergence panel is the lesson.
+
+     pi_1/pi_0 = p/(q(1-p)); pi_{n+1}/pi_n = p(1-q)/(q(1-p)) for n >= 1. */
+  function geoGeo1(p, q) {
+    var one = R(1n, 1n);
+    var ratio = Rdiv(Rmul(p, Rsub(one, q)), Rmul(q, Rsub(one, p)));
+    var first = Rdiv(p, Rmul(q, Rsub(one, p)));
+    if (Rcmp(ratio, one) >= 0) return { ratio: ratio, stable: false };
+    var tail = Rdiv(one, Rsub(one, ratio));
+    var p0 = Rinv(Radd(one, Rmul(first, tail)));
+    /* sum_{n>=1} n r^{n-1} = 1/(1-r)^2 */
+    var L = Rmul(p0, Rmul(first, Rmul(tail, tail)));
+    return { ratio: ratio, stable: true, p0: p0, L: L, rho: Rdiv(p, q) };
+  }
+
+  /* THE SLOTTED QUEUE, SIMULATED.
+
+     The model is the one the previous course solved exactly: Bernoulli arrivals
+     with probability p per slot, geometric service with parameter q, single
+     server, first in first out.  Both distributions are sampled by inverse
+     transform from the seeded stream, so the run is reproducible from its seed
+     and every quantity it produces is a fraction.
+
+     ONE STREAM, TWO PURPOSES, AT FIXED OFFSETS.  Slot t's arrival test reads
+     draw t, and the i-th arrival's service reads draw T + i.  The offsets are
+     fixed rather than consumed in order because common random numbers is a whole
+     lesson of this course: two configurations differing only in q must see the
+     SAME arrivals, and they only do if the arrival draws sit at indices that do
+     not depend on how many service draws have been taken.  Consuming one stream
+     in event order would silently decorrelate the two runs, and the mode built
+     to measure that correlation would report a smaller one than it should.
+
+     The service duration is a geometric variate on {1, 2, ...}: the smallest s
+     with 1 - (1-q)^s > U.  The tail is carried as a running product, so the
+     inverse transform costs one multiplication per slot of service rather than a
+     power per candidate.
+
+     ARITHMETIC IN WHOLE NUMBERS, FOR THE SAME REASON simDraws USES IT.  The
+     arrival test is U < p, which is x pd < pn m, and both sides are integers far
+     inside a double's exact range for any arrival probability a lesson states;
+     the service test is (1 - q)^s < 1 - U, which is (qd - qn)^s m < (m - x) qd^s,
+     and that one needs BigInt because qd^s outgrows a double at about the
+     twentieth slot of service.  Neither is an approximation of the rational
+     comparison -- they are the rational comparison, cross-multiplied.  Measured:
+     the comparison mode's widest setting went from nine hundred milliseconds to
+     a hundred and forty. */
+  function simService(x, M, qn, qd) {
+    var fail = qd - qn, num = fail, den = qd, rest = M - x, s = 1;
+    while (num * M >= rest * den && s < 4000) { num *= fail; den *= qd; s += 1; }
+    return s;
+  }
+  function simSlotRun(p, q, T, seed) {
+    var raw = simStream(seed, 2 * T), M = simModulus(), Mb = BigInt(M);
+    var pn = Number(p.n), pd = Number(p.d);
+    var arrivals = [], services = [], t;
+    for (t = 0; t < T; t += 1) {
+      if (raw[t] * pd < pn * M) {
+        arrivals.push(t);
+        services.push(simService(BigInt(raw[T + services.length]), Mb, q.n, q.d));
+      }
+    }
+    /* First in, first out on a single server: service starts when the server is
+       free and the customer has arrived, whichever is later. */
+    var free = 0, starts = [], departs = [], i, area = 0;
+    for (i = 0; i < arrivals.length; i += 1) {
+      var st = arrivals[i] > free ? arrivals[i] : free;
+      starts.push(st); free = st + services[i]; departs.push(free);
+      area += departs[i] - arrivals[i];
+    }
+    /* THE AREA IS THE ESTIMATE.  Customer i is in the system over the slots
+       [arrival, departure), so the sum of those lengths is both the integral of
+       N(t) and the sum of the customers' times -- which is Little's Law as an
+       identity about averages rather than as a model, and is exactly what
+       littleFromTrace computes from the same two arrays. */
+    return { arrivals: arrivals, services: services, starts: starts, departs: departs,
+             T: T, area: area, count: arrivals.length,
+             L: R(BigInt(area), BigInt(T)),
+             lambda: R(BigInt(arrivals.length), BigInt(T)),
+             busy: services.reduce(function (a, b) { return a + b; }, 0) };
+  }
+  /* The occupancy over a window of slots, and the time-average over it.  The
+     window is what the warm-up lesson moves: an average from slot 0 is an
+     average of a system that was never in steady state. */
+  function simWindowAverage(run, w, T) {
+    var occ = occupancyTrace(run.arrivals, run.departs, T), s = 0, t;
+    for (t = w; t < T; t += 1) s += occ[t];
+    return { occupancy: occ, from: w, to: T,
+             average: T > w ? R(BigInt(s), BigInt(T - w)) : null,
+             naive: T > 0 ? R(BigInt(occ.reduce(function (a, b) { return a + b; }, 0)), BigInt(T)) : null };
+  }
+  /* The first k customers of a run, as a run.
+
+     THIS IS NOT AN OPTIMISATION, IT IS A BOUND ON A QUADRATIC.  desRun returns
+     the complete pending calendar with every snapshot, which is what makes
+     rendering event i a pure function of i -- and also what makes the whole
+     structure quadratic in the number of events.  A four-thousand-slot run has
+     three thousand events and would build four and a half million calendar
+     entries to show a reader twenty.  The head of a first-in-first-out run on a
+     single server is exact: customer j's start and departure depend only on
+     customers before j, so the first k rows of the truncated run are the first k
+     rows of the whole one, and the long-run average is computed from the full
+     arrays without going near desRun. */
+  function simRunHead(run, k) {
+    var n = Math.min(k, run.arrivals.length);
+    return { arrivals: run.arrivals.slice(0, n), services: run.services.slice(0, n),
+             starts: run.starts.slice(0, n), departs: run.departs.slice(0, n),
+             T: run.T, count: n };
+  }
+  /* The calendar, as desRun's per-event snapshots, plus the queue contents each
+     snapshot implies: who holds the server and who is queued behind them.
+
+     THE ACTIVE SET IS WALKED, NOT RECOMPUTED FROM THE CLOCK.  The obvious
+     implementation asks, at clock t, which customers satisfy arrival <= t <
+     departure -- and it disagrees with desRun's own count whenever two events
+     share an instant.  A departure at t is taken before an arrival at t, so
+     immediately after the departure event desRun has the arriving customer NOT
+     yet in the system while the clock test already includes them: the table then
+     says three in system and lists two.  That defect was in this block until
+     mathcheck compared the two.  Walking the same event list desRun returns, one
+     event at a time, makes the count and the contents the same object by
+     construction rather than by agreement.
+
+     The head of the active set is the one in service, because the server is
+     first in first out and never idle while anyone is present: the earliest
+     still-present customer either started when it arrived to an empty server or
+     started the instant its predecessor left. */
+  function simCalendar(run, limit) {
+    var des = desRun(run.arrivals.map(function (t) { return R(BigInt(t), 1n); }),
+                     run.services.map(function (s) { return R(BigInt(s), 1n); }));
+    var events = des.events.slice(0, limit === undefined ? des.events.length : limit);
+    var active = [], out = [], i, at;
+    for (i = 0; i < events.length; i += 1) {
+      var ev = events[i];
+      if (ev.kind === 'arrival') {
+        active.push(ev.who);
+      } else {
+        at = active.indexOf(ev.who);
+        if (at >= 0) active.splice(at, 1);
+      }
+      out.push({ index: i, t: ev.t, kind: ev.kind, who: ev.who, inSystem: ev.inSystem,
+                 serving: active.length ? active[0] : null,
+                 waiting: active.slice(1),
+                 pending: ev.calendarAfter.slice(0, 4),
+                 pendingMore: Math.max(0, ev.calendarAfter.length - 4) });
+    }
+    return { events: out, total: des.events.length, des: des };
+  }
+
+  /* pi_0 P^t, EXACTLY, for the slotted chain -- which is what turns the warm-up
+     lesson from "the start looks low" into a statement with numbers behind it.
+
+     THE CHAIN.  N_t is the number in system at the end of slot t.  Within a slot
+     a departure happens first, with probability q when someone is in service,
+     and then an arrival, with probability p.  So from state n the chain steps to
+     n - 1, n or n + 1, and from 0 only to 0 or 1.  At p = 2/5 and q = 1/2 that
+     gives E[N_0] = 0, E[N_1] = 2/5, E[N_2] = 3/5, E[N_3] = 37/50 and
+     E[N_4] = 17/20, climbing toward the stationary 12/5 -- and those five
+     fractions are the check that the convention here is the convention geoGeo1
+     solved, rather than a neighbouring one that differs by a slot.
+
+     WHY THE VECTOR IS INTEGERS OVER A COMMON DENOMINATOR.  The obvious
+     implementation carries pi_t as rationals and calls R() once per entry per
+     step, and R() runs a gcd.  After four hundred steps the denominators are
+     eight hundred digits wide and those gcds cost more than everything else on
+     the page put together.  Held as BigInt numerators over a single power of the
+     step denominator, a step is multiply-and-add with no gcd at all, and the two
+     window averages the lesson prints are accumulated in the same integers with
+     exactly one gcd between them.
+
+     AND WHY THE FLOAT FOR THE DRAWING IS A LONG DIVISION.  Number(n)/Number(d)
+     on an eight-hundred-digit fraction is Infinity/Infinity, which is NaN -- and
+     a NaN y coordinate draws a curve with holes in it and reports nothing wrong.
+     That defect was in this block until it was measured: E[N_399] came back NaN
+     while every printed figure beside it was right.  `values` is the exact
+     numerator long-divided by the exact denominator in BigInt and then scaled
+     down, so it is a correctly rounded six-place decimal of the exact value at
+     every t, and it is used for pixels and for nothing else.
+
+     THE CAP IS NAMED, NOT HIDDEN.  The chain can reach state t after t steps, so
+     an untruncated vector grows without bound.  The state space is capped and the
+     weight that would leave the top stays at the top, which makes this the exact
+     transient of the CAPPED chain; `capNum` over `dens` is the probability
+     sitting on the cap, and every page that draws this curve prints it, because a
+     truncation a reader cannot see is a truncation they cannot discount. */
+  var SIM_TRANSIENT_SCALE = 1000000n;
+
+  function simTransient(p, q, T, cap) {
+    var d = p.d * q.d / bgcd(p.d, q.d);
+    var a = p.n * (d / p.d), b = q.n * (d / q.d), D = d * d;
+    var nu = [1n], den = 1n, nums = [], dens = [], values = [], capNum = [], t, i;
+    for (t = 0; t <= T; t += 1) {
+      var sum = 0n;
+      for (i = 0; i < nu.length; i += 1) sum += BigInt(i) * nu[i];
+      nums.push(sum); dens.push(den);
+      values.push(Number((sum * SIM_TRANSIENT_SCALE) / den) / Number(SIM_TRANSIENT_SCALE));
+      capNum.push(nu.length > cap ? nu[cap] : 0n);
+      if (t === T) break;
+      var len = Math.min(nu.length + 1, cap + 1), next = new Array(len).fill(0n);
+      for (i = 0; i < nu.length; i += 1) {
+        var wt = nu[i];
+        if (wt === 0n) continue;
+        if (i === 0) {
+          next[0] += wt * (d - a) * d;
+          if (1 < len) next[1] += wt * a * d; else next[0] += wt * a * d;
+        } else {
+          next[i - 1] += wt * b * (d - a);
+          next[i] += wt * (b * a + (d - b) * (d - a));
+          if (i + 1 < len) next[i + 1] += wt * (d - b) * a; else next[i] += wt * (d - b) * a;
+        }
+      }
+      nu = next; den *= D;
+    }
+    return { nums: nums, dens: dens, values: values, capNum: capNum, cap: cap, D: D, T: T };
+  }
+  /* E[N_t] as a fraction.  Reduced -- which costs a gcd -- because this is the
+     form a reader reads, and it is only ever asked for at the small t where the
+     fraction is short enough to read.  Past that, `simTransientRaw` hands back the
+     same number unreduced, which Rfixed long-divides without caring. */
+  function simTransientExact(tr, t) { return R(tr.nums[t], tr.dens[t]); }
+  function simTransientRaw(tr, t) { return { n: tr.nums[t], d: tr.dens[t] }; }
+  function simTransientCapMass(tr, t) { return { n: tr.capNum[t], d: tr.dens[t] }; }
+
+  /* The EXPECTED time-average over a window of slots: the average of the exact
+     E[N_t] over the window, which is the number a run of that window is an
+     estimate of.  The bias a warm-up removes is the gap between this over
+     [0, T) and the stationary mean, and it is theory rather than noise.
+
+     Summed in the integers.  The terms have denominators D^from up to D^(to-1),
+     so scaling each by the power of D that is missing puts them all over the
+     largest one, and the whole sum is then a single fraction -- one gcd for a
+     four-hundred-term exact average, against four hundred of them. */
+  function simExpectedAverage(tr, from, to) {
+    if (to <= from || to > tr.nums.length) return null;
+    var acc = 0n, f = 1n, Db = BigInt(tr.D), t;
+    for (t = to - 1; t >= from; t -= 1) { acc += tr.nums[t] * f; f *= Db; }
+    return R(acc, tr.dens[to - 1] * BigInt(to - from));
+  }
+
+  /* THE SHARED FIGURE: several series, a band, a shaded span, rules and marks,
+     with exact values turned into pixels at the last moment.  Six modes draw on
+     it -- a running mean with a narrowing ribbon, replication means inside a
+     Chebyshev band, an occupancy trace with its transient shaded, a variance
+     parabola with its vertex, a weight trace -- so the shapes are declared here
+     once and nothing closes over a document element. */
+  function simPlot(spec) {
+    var w = spec.width || 660, h = spec.height || 230;
+    var L = spec.left || 48, Rm = 14, T = 14, B = 28, i, k;
+    var xs = [], ys = [];
+    for (i = 0; i < (spec.series || []).length; i += 1) {
+      for (k = 0; k < spec.series[i].pts.length; k += 1) {
+        xs.push(spec.series[i].pts[k][0]); ys.push(spec.series[i].pts[k][1]);
+      }
+    }
+    for (i = 0; i < (spec.bands || []).length; i += 1) {
+      for (k = 0; k < spec.bands[i].pts.length; k += 1) {
+        xs.push(spec.bands[i].pts[k][0]);
+        ys.push(spec.bands[i].pts[k][1]); ys.push(spec.bands[i].pts[k][2]);
+      }
+    }
+    for (i = 0; i < (spec.rules || []).length; i += 1) ys.push(spec.rules[i].y);
+    for (i = 0; i < (spec.marks || []).length; i += 1) { xs.push(spec.marks[i].x); ys.push(spec.marks[i].y); }
+    if (!xs.length) return { svg: simLabel(L, h / 2, 'nothing to draw yet', 'muted'), height: h };
+    var x0 = spec.x0 !== undefined ? spec.x0 : Math.min.apply(null, xs);
+    var x1 = spec.x1 !== undefined ? spec.x1 : Math.max.apply(null, xs);
+    var y0 = spec.y0 !== undefined ? spec.y0 : Math.min.apply(null, ys);
+    var y1 = spec.y1 !== undefined ? spec.y1 : Math.max.apply(null, ys);
+    if (!(x1 > x0)) x1 = x0 + 1;
+    if (!(y1 > y0)) y1 = y0 + 1;
+    var pad = (y1 - y0) * 0.06;
+    y0 -= pad; y1 += pad;
+    var px = function (v) { return simAt(v, x0, x1, L, w - Rm); };
+    var py = function (v) { return simAt(v, y0, y1, h - B, T); };
+    var s = '';
+    /* The shaded span goes down first: it is a region of the x axis (a warm-up
+       discarded, a batch), and everything else has to read on top of it. */
+    for (i = 0; i < (spec.spans || []).length; i += 1) {
+      var sp = spec.spans[i];
+      s += simEl('rect', { x: px(sp.x0), y: T, width: Math.max(0.5, px(sp.x1) - px(sp.x0)), height: h - B - T,
+                           fill: 'var(--' + (sp.tone || 'amber') + ')', 'fill-opacity': sp.opacity || '0.13' });
+      if (sp.label) s += simLabel(px(sp.x0) + 4, T + 11, sp.label, sp.tone || 'amber', 'start', 9);
+    }
+    for (i = 0; i < 4; i += 1) {
+      var gy = y0 + ((y1 - y0) * i) / 3;
+      s += simEl('line', { x1: L, y1: py(gy), x2: w - Rm, y2: py(gy), stroke: 'var(--line)', 'stroke-width': 0.6 });
+      s += simLabel(L - 5, py(gy) + 3, (spec.fmtY ? spec.fmtY(gy) : gy.toFixed(2)), 'muted', 'end', 9);
+    }
+    s += simEl('line', { x1: L, y1: h - B, x2: w - Rm, y2: h - B, stroke: 'var(--line-strong)', 'stroke-width': 1 })
+       + simEl('line', { x1: L, y1: T, x2: L, y2: h - B, stroke: 'var(--line-strong)', 'stroke-width': 1 });
+    /* The band: a ribbon between two y values at each x, as one polygon, so a
+       +-SE ribbon narrowing with n reads as a shape and not as two lines. */
+    for (i = 0; i < (spec.bands || []).length; i += 1) {
+      var bd = spec.bands[i], up = [], down = [];
+      for (k = 0; k < bd.pts.length; k += 1) {
+        up.push(px(bd.pts[k][0]) + ',' + py(bd.pts[k][2]));
+        down.push(px(bd.pts[k][0]) + ',' + py(bd.pts[k][1]));
+      }
+      down.reverse();
+      s += simEl('polygon', { points: up.concat(down).join(' '), fill: 'var(--' + (bd.tone || 'cyan') + ')',
+                              'fill-opacity': bd.opacity || '0.15' });
+    }
+    for (i = 0; i < (spec.rules || []).length; i += 1) {
+      var ru = spec.rules[i];
+      s += simEl('line', { x1: L, y1: py(ru.y), x2: w - Rm, y2: py(ru.y), stroke: 'var(--' + (ru.tone || 'green') + ')',
+                           'stroke-width': 1.3, 'stroke-dasharray': ru.solid ? null : '6 4' });
+      if (ru.label) s += simLabel(w - Rm - 2, py(ru.y) - 4, ru.label, ru.tone || 'green', 'end', 9.5);
+    }
+    for (i = 0; i < (spec.series || []).length; i += 1) {
+      var ser = spec.series[i], pts = ser.pts, d = '';
+      for (k = 0; k < pts.length; k += 1) {
+        if (k === 0) d += 'M' + px(pts[k][0]) + ' ' + py(pts[k][1]);
+        else if (ser.step) d += 'L' + px(pts[k][0]) + ' ' + py(pts[k - 1][1]) + 'L' + px(pts[k][0]) + ' ' + py(pts[k][1]);
+        else d += 'L' + px(pts[k][0]) + ' ' + py(pts[k][1]);
+      }
+      s += simEl('path', { d: d, fill: 'none', stroke: 'var(--' + ser.tone + ')',
+                           'stroke-width': ser.thin ? 1 : 1.8, 'stroke-dasharray': ser.dashed ? '5 3' : null });
+      if (ser.dots) {
+        for (k = 0; k < pts.length; k += 1) {
+          s += simEl('circle', { cx: px(pts[k][0]), cy: py(pts[k][1]), r: ser.r || 2.6,
+                                 fill: 'var(--' + ser.tone + ')' });
+        }
+      }
+      if (ser.label && pts.length) {
+        s += simLabel(px(pts[pts.length - 1][0]) - 2, py(pts[pts.length - 1][1]) - 6, ser.label, ser.tone, 'end', 9.5);
+      }
+    }
+    for (i = 0; i < (spec.marks || []).length; i += 1) {
+      var mk = spec.marks[i];
+      s += simEl('circle', { cx: px(mk.x), cy: py(mk.y), r: mk.r || 4, fill: 'var(--' + (mk.tone || 'purple') + ')',
+                             'fill-opacity': mk.hollow ? '0.25' : '1',
+                             stroke: 'var(--' + (mk.tone || 'purple') + ')', 'stroke-width': 1.2 });
+      if (mk.label) s += simLabel(px(mk.x) + 7, py(mk.y) - 6, mk.label, mk.tone || 'purple', 'start', 9.5);
+    }
+    for (i = 0; i < (spec.drops || []).length; i += 1) {
+      var dr = spec.drops[i];
+      s += simEl('line', { x1: px(dr.x), y1: T, x2: px(dr.x), y2: h - B, stroke: 'var(--' + (dr.tone || 'amber') + ')',
+                           'stroke-width': 1, 'stroke-dasharray': '3 3' });
+      if (dr.label) s += simLabel(px(dr.x) + 3, T + 10, dr.label, dr.tone || 'amber', 'start', 9);
+    }
+    s += simLabel(L, h - 8, (spec.fmtX ? spec.fmtX(x0) : String(x0)), 'muted', 'start', 9);
+    s += simLabel(w - Rm, h - 8, spec.xLabel || '', 'text', 'end', 10);
+    return { svg: s, height: h, x0: x0, x1: x1, y0: y0, y1: y1 };
+  }
+
+  /* THE SHARED BARS: two or three variances whose ORDER is the lesson, drawn so
+     that "this one is a quarter of that one" is visible rather than read out of
+     a table. */
+  function simBars(items, spec) {
+    var w = (spec || {}).width || 660, rowH = 30, L = (spec || {}).left || 168, Rm = 108, i;
+    var top = null;
+    for (i = 0; i < items.length; i += 1) {
+      var v = Math.abs(simPx(items[i].value));
+      if (top === null || v > top) top = v;
+    }
+    if (!top) top = 1;
+    var s = '';
+    for (i = 0; i < items.length; i += 1) {
+      var y = 8 + i * rowH, len = (Math.abs(simPx(items[i].value)) / top) * (w - L - Rm);
+      s += simLabel(L - 8, y + 14, items[i].label, items[i].tone, 'end', 10);
+      s += simEl('rect', { x: L, y: y + 4, width: Math.max(1, len), height: 14, rx: 2,
+                           fill: 'var(--' + items[i].tone + ')', 'fill-opacity': '0.75' });
+      s += simLabel(L + len + 6, y + 15, items[i].text || simNum(items[i].value, 4), items[i].tone, 'start', 10);
+    }
+    return { svg: s, height: 14 + items.length * rowH };
+  }
+  var CHAINS = {"base": [[2, 5], [1, 2]], "faster": [[2, 5], [3, 5]], "busier": [[1, 2], [3, 5]]};
+
+  function chainOf(name) {
+    var c = CHAINS[name];
+    return { p: R(BigInt(c[0][0]), BigInt(c[0][1])), q: R(BigInt(c[1][0]), BigInt(c[1][1])) };
+  }
+  var CAP = 64;
+
+  var chainSel = document.getElementById('wuChain'), wS = document.getElementById('wuW');
+  var bS = document.getElementById('wuB'), slotsS = document.getElementById('wuSlots');
+  var seedS = document.getElementById('wuSeed');
+  var svg = document.getElementById('wuTrace'), table = document.getElementById('wuTable');
+  var status = document.getElementById('wuStatus');
+
+  /* The transient is a pure function of the chain, the horizon and the cap, and
+     it is the one expensive thing on this page -- four hundred steps over
+     forty-nine states, on numerators that reach eight hundred digits. Three of
+     the five controls (the warm-up, the batch count, the seed) do not change it,
+     and a reader drags the warm-up. So it is computed once per (chain, horizon)
+     and kept, which is memoisation of a pure function rather than caching of a
+     result that could go stale. */
+  var cached = null, cachedKey = '';
+  function transientFor(ch, slots) {
+    var key = chainSel.value + '/' + slots;
+    if (key !== cachedKey) { cached = simTransient(ch.p, ch.q, slots, CAP); cachedKey = key; }
+    return cached;
+  }
+
+  function redraw() {
+    var ch = chainOf(chainSel.value), slots = +slotsS.value, seed = +seedS.value, b = +bS.value;
+    var w = Math.min(+wS.value, slots - b);
+    if (w < 0) w = 0;
+    document.getElementById('wuWOut').textContent = w + ' slots';
+    document.getElementById('wuBOut').textContent = b;
+    document.getElementById('wuSlotsOut').textContent = slots;
+    document.getElementById('wuSeedOut').textContent = seed;
+
+    var run = simSlotRun(ch.p, ch.q, slots, seed);
+    var win = simWindowAverage(run, w, slots);
+    var occ = win.occupancy.map(function (v) { return R(BigInt(v), 1n); });
+    var bm = batchMeans(occ, w, b);
+    var exact = geoGeo1(ch.p, ch.q);
+    var tr = transientFor(ch, slots);
+    var theory0 = simExpectedAverage(tr, 0, slots);
+    var theoryW = simExpectedAverage(tr, w, slots);
+
+    /* tr.values is the exact expectation long-divided to six places, and it is
+       used HERE and nowhere else -- a y coordinate is a pixel. Everything the
+       status line and the table report comes off the exact side. */
+    var pts = [], curve = [], t, every = Math.max(1, Math.floor(slots / 260));
+    for (t = 0; t < slots; t += 1) {
+      if (t % every !== 0 && t !== slots - 1) continue;
+      pts.push([t, win.occupancy[t]]);
+      curve.push([t, tr.values[t]]);
+    }
+    svg.innerHTML = simPlot({
+      width: 660, height: 250,
+      series: [{ pts: pts, tone: 'cyan', step: true, thin: true },
+               { pts: curve, tone: 'green' }],
+      spans: w > 0 ? [{ x0: 0, x1: w, tone: 'amber', label: 'discarded: ' + w + ' slots' }] : [],
+      rules: [{ y: simPx(exact.L), tone: 'purple', label: 'stationary ' + Rtext(exact.L) }],
+      xLabel: 'slot', y0: 0, x0: 0, x1: slots - 1
+    }).svg;
+
+    var rows = '', i;
+    for (i = 0; i < bm.means.length; i += 1) {
+      rows += simTr([simTd(String(i + 1)),
+                     simTd((w + i * bm.size) + ' to ' + (w + (i + 1) * bm.size - 1)),
+                     simTd(String(bm.size)),
+                     simTd('<strong>' + Rtext(bm.means[i]) + '</strong>')]);
+    }
+    rows += simTr([simTdl('the mean of the batch means'), simTd(''), simTd(''),
+                   simTd(bm.grand === undefined || bm.grand === null ? '—' : Rtext(bm.grand))], 'focus');
+    rows += simTr([simTdl('their sample variance, which is what an interval on this run would be built from'),
+                   simTd(''), simTd(''),
+                   simTd(bm.variance === undefined || bm.variance === null ? 'needs two batches' : simNum(bm.variance, 6))]);
+    rows += simTr([simTdl('the average over every slot, warm-up included'), simTd(''), simTd(''),
+                   simTd(Rtext(bm.naive))]);
+    table.innerHTML = '<caption>Batch means out of one run: the warm-up is thrown away and what is left is '
+      + 'split into equal batches. A batch mean is much closer to independent of its neighbours than one '
+      + 'slot is of the next, which is what makes replications out of a single run possible at all.</caption>'
+      + simHead(['batch', 'slots', 'size', 'batch mean'])
+      + '<tbody>' + rows + '</tbody>';
+
+    var bias = win.average === null ? null : Rsub(bm.naive, win.average);
+    document.getElementById('wuNaive').textContent = Rshort(bm.naive, 4);
+    document.getElementById('wuKept').textContent = win.average === null ? '—' : Rshort(win.average, 4);
+    /* SIGNED, and signed the way the reader is looking at it: how far the
+       discard MOVED the average, not how far the naive one sat from it. The
+       same number with the opposite sign under a label reading "bias" is a
+       figure nobody can act on. */
+    document.getElementById('wuBias').textContent = bias === null
+      ? '—' : (Rsign(bias) < 0 ? '+' : '') + Rfixed(Rneg(bias), 4);
+    /* Exact fractions, shown short -- not rounded. The distinction is kept
+       everywhere on this course because three quantities here genuinely ARE
+       rounded, and a reader who has seen the word used loosely cannot tell
+       which three. */
+    document.getElementById('wuTheory0').textContent =
+      theory0 === null ? '—' : Rfixed(theory0, 4) + ' (exact, to 4 places)';
+    document.getElementById('wuTheoryW').textContent =
+      theoryW === null ? '—' : Rfixed(theoryW, 4) + ' (exact, to 4 places)';
+    document.getElementById('wuStat').textContent = Rtext(exact.L);
+
+    var firstFive = [0, 1, 2, 3, 4].map(function (k) { return Rtext(simTransientExact(tr, k)); }).join(', ');
+    status.innerHTML = 'Started empty, the chain has exact expected occupancy '
+      + firstFive + ' over its first slots, climbing toward the stationary <strong>' + Rtext(exact.L)
+      + '</strong>. Those are fractions, not measurements: the whole distribution is carried forward one '
+      + 'slot at a time from an empty system. So the expected time-average over all ' + slots
+      + ' slots is <strong>' + (theory0 === null ? '—' : Rfixed(theory0, 4))
+      + '</strong> — an exact fraction, shown to four places — and over the ' + (slots - w)
+      + ' slots after the warm-up it is <strong>' + (theoryW === null ? '—' : Rfixed(theoryW, 4))
+      + '</strong> — the bias is downward, because the queue began with nothing in it, and the discard is '
+      + 'what removes it.'
+      + '<br />This run gave ' + Rshort(bm.naive, 4) + ' from slot zero against '
+      + (win.average === null ? '—' : Rshort(win.average, 4)) + ' after the discard, a difference of '
+      + (bias === null ? '—' : Rfixed(Rneg(bias), 4)) + '. '
+      + (bias !== null && Rsign(bias) < 0
+          ? 'So this run moved the way the theory says, and the discard recovered part of the gap to '
+            + Rtext(exact.L) + '.'
+          : 'So this run moved the OTHER way, which a single run of a queue this slow to mix does perfectly '
+            + 'often — reseed and watch it change sign. The bias is a statement about the expectation, and '
+            + 'the two exact figures above are where it is visible; one run is an estimate of them and '
+            + 'carries the standard error to prove it.')
+      + ' Averaging from the beginning is the default and it is wrong, and it is the one mistake here that '
+      + 'no amount of care about the generator can fix.'
+      + '<br />A longer run does not cure the bias, it dilutes it. The transient is a fixed quantity of '
+      + 'wrongness at the front, so its share of the average falls like one over the run length — which is '
+      + 'far slower than deleting it. Quadrupling a hundred slots to four hundred moves the expected average '
+      + 'much less than throwing the first quarter away does.'
+      + '<br />The exact curve is computed over ' + (CAP + 1) + ' states, because the chain can in principle '
+      + 'reach any number in system and a vector cannot be unbounded. The probability sitting on the top '
+      + 'state at the last slot is ' + Rfixed(simTransientCapMass(tr, slots - 1), 12)
+      + ', so the truncation is stated rather than '
+      + 'assumed away — and it is the reason this is the exact transient of a capped chain rather than of an '
+      + 'unbounded one.';
+  }
+
+  chainSel.addEventListener('change', redraw);
+  [wS, bS, slotsS, seedS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "simulation-and-variance-reduction/warm-up-and-the-initial-transient";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,3506 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Greedy for Every Weighting | Lesson | Greedy Algorithms and Matroids | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="Rado and Edmonds: greedy is optimal for every weight function exactly when the family of feasible sets is a matroid. Both directions matter and the second is the one with teeth — a family that is not a matroid always has a weighting on which greedy loses. The lab does not quote that; it searches {1, 2, 3}ⁿ and returns the first weighting that works, which on the three-element non-matroid is the thirteenth of twenty-seven." />
+  <link rel="canonical" href="https://learn.geterdone.io/greedy-and-matroids/greedy-for-every-weighting/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Greedy for Every Weighting | Lesson | Greedy Algorithms and Matroids | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="Rado and Edmonds: greedy is optimal for every weight function exactly when the family of feasible sets is a matroid. Both directions matter and the second is the one with teeth — a family that is not a matroid always has a weighting on which greedy loses. The lab does not quote that; it searches {1, 2, 3}ⁿ and returns the first weighting that works, which on the three-element non-matroid is the thirteenth of twenty-seven." />
+  <meta property="og:url" content="https://learn.geterdone.io/greedy-and-matroids/greedy-for-every-weighting/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Greedy for Every Weighting | Lesson | Greedy Algorithms and Matroids | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Rado and Edmonds: greedy is optimal for every weight function exactly when the family of feasible sets is a matroid. Both directions matter and the second is the one with teeth — a family that is not a matroid always has a weighting on which greedy loses. The lab does not quote that; it searches {1, 2, 3}ⁿ and returns the first weighting that works, which on the three-element non-matroid is the thirteenth of twenty-seven." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/greedy-and-matroids/greedy-for-every-weighting/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Greedy Algorithms and Matroids</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Greedy for Every Weighting</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The what makes greedy work, exactly is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Greedy Algorithms and Matroids &middot; Matroids</span>
+        <h1>Greedy for Every Weighting</h1>
+        <p>Rado and Edmonds: greedy is optimal for every weight function exactly when the family of feasible sets is a matroid. Both directions matter and the second is the one with teeth &mdash; a family that is not a matroid always has a weighting on which greedy loses. The lab does not quote that; it searches <span class="math">{1, 2, 3}ⁿ</span> and returns the first weighting that works, which on the three-element non-matroid is the thirteenth of twenty-seven.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">Rado–Edmonds: greedy optimal for EVERY weighting  ⟺  the family is a matroid
+matchings of a path: not a matroid, and the 13th of the 27 weightings beats greedy
+weights 1 2 2 → greedy takes the middle edge for 2; {ends} is worth 3
+uniform, graphic, partition: all 243 weightings tried, greedy optimal on every one
+the shipped weights 2 3 2 already beat greedy: 3 against 4
+one weighting where greedy wins is not the theorem; every weighting is</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One theorem, two directions, and a search instead of an assertion</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas: what quantifying over weightings changes, why the converse is the useful half, and why a search that stops at the first counterexample is the right thing for a panel and the wrong thing for a check.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The quantifier is over weightings, and it is the whole statement</h3><p>Greedy can be optimal on a non-matroid for a particular weighting, and often is. On the matchings of a path with weights <span class="math">3 1 3</span> the ends are heaviest, greedy takes both, and it is optimal. The theorem is not about a weighting; it says the family is a matroid exactly when <em>no</em> weighting defeats greedy. A single successful run tells you about that run.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The converse is what makes the condition useful</h3><p>&ldquo;Matroid implies greedy works&rdquo; licenses an algorithm. &ldquo;Greedy works for all weightings implies matroid&rdquo; is what lets you rule a problem out: show that the feasible sets have two maximal sets of different sizes and you have proved that some weighting defeats every greedy rule of this shape, without having to find it. The lab then finds it anyway, because a counterexample you can read is worth more than one you know exists.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A first counterexample and a full sweep answer different questions</h3><p><span class="math">beatingWeights</span> walks <span class="math">{1, 2, 3}ⁿ</span> in a fixed order and stops at the first weighting where greedy loses, reporting how many it tried. That is right for a reader: it makes the counterexample reproducible. It is wrong as a check, because stopping early cannot establish that a matroid has none &mdash; for that the whole space has to be walked, and on five elements that is 243 weightings.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The theorem, and the weighting the lab goes and finds</h2></div><p>Both directions with proofs, the counterexample search, and the reason the number thirteen on this page is a fact about a walk order rather than about matroids.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Greedy on an independence system</span><p>Given an independence system <span class="math">(E, I)</span> and non-negative weights <span class="math">w</span>, sort <span class="math">E</span> in decreasing weight and walk it once, adding each element when the set so far plus that element is still independent. The result is a maximal independent set; the question is whether it is a maximum-weight one.</p></div><div class="thm"><span class="label">Theorem &middot; Rado and Edmonds</span><p>Let <span class="math">(E, I)</span> be an independence system. Greedy returns a maximum-weight independent set for every non-negative weight function <span class="math">w</span> if and only if <span class="math">(E, I)</span> is a matroid.</p></div><div class="proof"><p>Suppose first that <span class="math">(E, I)</span> is a matroid and let <span class="math">G</span> be greedy's answer and <span class="math">O</span> a maximum-weight independent set. Both are bases, so they have the same size <span class="math">r</span>. List each in decreasing weight, <span class="math">g₁ ≥ g₂ ≥ … ≥ g_r</span> and <span class="math">o₁ ≥ o₂ ≥ … ≥ o_r</span>. The claim is that <span class="math">w(gᵢ) ≥ w(oᵢ)</span> for every <span class="math">i</span>, which gives <span class="math">w(G) ≥ w(O)</span> at once.</p><p>Suppose not, and take the least <span class="math">i</span> with <span class="math">w(gᵢ) &lt; w(oᵢ)</span>. Let <span class="math">A = {g₁, …, g_(i−1)}</span> and <span class="math">B = {o₁, …, oᵢ}</span>, both independent by downward closure, with <span class="math">|A| &lt; |B|</span>. By the exchange property some <span class="math">x</span> in <span class="math">B \ A</span> has <span class="math">A ∪ {x}</span> independent, and <span class="math">w(x) ≥ w(oᵢ) &gt; w(gᵢ)</span>. But greedy, having chosen <span class="math">A</span>, would have reached <span class="math">x</span> before <span class="math">gᵢ</span> and taken it. Contradiction.</p><p>For the converse, suppose the exchange property fails for some independent <span class="math">A</span> and <span class="math">B</span> with <span class="math">|A| &lt; |B|</span>, chosen with <span class="math">|A|</span> as large as possible among failures, and write <span class="math">a = |A|</span>. Give every element of <span class="math">A</span> weight <span class="math">a + 2</span>, every element of <span class="math">B \ A</span> weight <span class="math">a + 1</span>, and everything else weight 0. Greedy takes all of <span class="math">A</span> first, then can add nothing from <span class="math">B \ A</span> by assumption, so it collects at most <span class="math">a(a + 2)</span> from the weighted elements; <span class="math">B</span> alone is worth at least <span class="math">(a + 1)²</span>, which is larger. So greedy is not optimal for that weighting.</p><p><span class="qed">&#9633;</span></p></div><p>The converse is constructive, which is worth noticing: it does not merely assert that a bad weighting exists, it builds one out of the failing pair. On the matchings of a path with <span class="math">A = {B}</span> and <span class="math">B = {A, C}</span>, that recipe gives the middle edge weight 3 and the two ends weight 2 each, and greedy takes the middle for 3 against 4.</p><p>Which is exactly the weighting the lab ships as that family's default: <span class="math">2 3 2</span>. Greedy takes the middle edge, worth 3, and the best independent set is the pair of ends, worth 4. So the reader meets a counterexample before reading the proof that guarantees one, and the panel reports the gap as a measurement rather than as an illustration.</p><h3>The search, and the number thirteen</h3><p>The panel then does something the proof does not: it walks every weighting in <span class="math">{1, 2, 3}ⁿ</span> in a fixed order and stops at the first one on which greedy is beaten. On the three-element family that space has 27 weightings, and the search stops after 13 of them, at <span class="math">1 2 2</span>. Greedy takes the middle edge for 2; the two ends are worth 3 together.</p><p>Thirteen is a fact about the enumeration order and nothing else. It is not a measure of how badly the family fails, not a property of matroids, and not stable under relabelling the elements. What is a fact about the family is that the search terminates at all, which the converse guarantees for every non-matroid, and that its answer is a concrete triple a reader can type back into the weights box.</p><h3>The other direction, swept rather than sampled</h3><p>On each of the three families that are matroids the panel walks the whole space: all <span class="math">3⁵ = 243</span> weightings in <span class="math">{1, 2, 3}⁵</span>, with greedy compared against the best member of the family on each. None of the 243 beats greedy on the uniform family, none on the graphic family, none on the partition family. The panel reports that it tried all of them, because &ldquo;no counterexample found&rdquo; and &ldquo;the whole space was searched&rdquo; are different sentences and only the second is worth printing.</p><p>It is still a sample. <span class="math">{1, 2, 3}ⁿ</span> is 243 of the infinitely many weight functions on five elements, and a family could in principle survive all of them and fail on <span class="math">{1, 2, 4}</span>. The theorem is what rules that out, and the sweep is what would catch an implementation that had drifted away from the theorem. Neither replaces the other.</p><p>One detail of the sweep is worth a sentence because it decides a tie. With weights <span class="math">1 2 2</span> the two heaviest elements are tied, and greedy takes the middle edge rather than an end. Change the order in which ties are broken and greedy would take an end, then the other end, and reach 3 &mdash; the optimum. A counterexample to a greedy rule can depend on the tie-break, and the panel's is fixed, stated by the trace it prints, and part of the algorithm rather than an accident of it.</p><p>Measured on this page: 27 weightings in the space for the matchings family, 13 tried before one beat greedy, <span class="math">1 2 2</span>, giving 2 against 3; 243 weightings each for the three matroids, all tried, none beating greedy. Proved on this page: greedy is optimal for every non-negative weight function exactly when the family is a matroid. The sweep is 243 points and the theorem is every point, and this is the page on the course where that gap is smallest and still absolute.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>What makes greedy work, exactly</h2></div><p>The exchange property on every pair, and the weighting that beats greedy when it fails</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>The exchange property, tested on every pair</strong><span>greedy is optimal for every weighting exactly when it holds</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>greedy took it</span><span class="tone-amber"><i class="legend-swatch"></i>in the best set instead</span><span class="tone-red"><i class="legend-swatch"></i>a pair the exchange property fails on</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="mtPlot" viewBox="0 0 520 200" role="img" aria-label="The ground set drawn as a graph where the family is a graph's, and as a row of elements otherwise."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mtFamily"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mtRun"></table></div>
+      <div class="status-banner" id="mtStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>The family that is not a matroid, and the weighting that proves it</h3>
+          <p>The panel searches for a weighting on which greedy loses and prints the one it finds, how many of the space it tried, and what the two answers are worth. Switch to any of the other three families and it reports instead that the whole space was tried and greedy won everywhere.</p>
+        <div class="field">
+          <label for="mtPreset">Family</label>
+          <select id="mtPreset"><option value="uniform">uniform: any two of five</option><option value="graphic">graphic: the forests of a four-vertex graph</option><option value="partition">partition: at most one from each group</option><option value="matchings" selected>NOT a matroid: the matchings of a path</option></select>
+        </div>
+        <div class="field">
+          <label for="mtSpec">Its parameter: a rank, an edge list, or a group per element</label>
+          <input id="mtSpec" type="text" value="1-2, 2-3, 3-4" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="mtWeights">A weight per element</label>
+          <input id="mtWeights" type="text" value="2 3 2" inputmode="text" autocomplete="off">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Ground set</span><strong id="mtN">&mdash;</strong></div>
+          <div class="kpi"><span>Independent sets</span><strong id="mtFam">&mdash;</strong></div>
+          <div class="kpi"><span>Rank</span><strong id="mtRank">&mdash;</strong></div>
+          <div class="kpi"><span>Exchange pairs tested</span><strong id="mtPairs">&mdash;</strong></div>
+          <div class="kpi"><span>It is a matroid</span><strong id="mtIs">&mdash;</strong></div>
+          <div class="kpi"><span>Greedy = optimum, these weights</span><strong id="mtGreedy">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="mtHint" style="margin:0;">A family of &ldquo;independent&rdquo; sets is given here by a membership test, because that is the definition; the family is then listed by running the test on all 2<sup>n</sup> subsets. The exchange property says that if one independent set is smaller than another, some element of the larger can join it. The page tests every ordered pair, and then searches weightings until it finds one where greedy loses &mdash; which, by Rado and Edmonds, exists exactly when the property fails.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Using the theorem in both directions</h2></div><p>Four steps. The first two decide the question; the last two are what make the answer usable by someone else.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Identify the family of feasible sets, separately from the objective</h3><p>The theorem is about <span class="math">(E, I)</span>. Weights are a separate input and the whole content of the statement is that they do not matter when the family is a matroid. A problem description that mixes the two &mdash; &ldquo;pick the heaviest non-conflicting set&rdquo; &mdash; hides the object being tested.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Test the exchange property, and stop if it passes</h3><p>A matroid needs no further argument: greedy is optimal for every weighting, including ones nobody will ever supply. This is the direction that licenses an algorithm, and it is the reason the previous page's pair test is worth running.</p></article><article class="card concept-card"><div class="icon">3</div><h3>If it fails, build the counterexample from the failing pair</h3><p>The converse's recipe is explicit: weight <span class="math">A</span> at <span class="math">|A| + 2</span>, weight <span class="math">B \ A</span> at <span class="math">|A| + 1</span>, weight everything else 0. On the matchings of a path that gives <span class="math">2 3 2</span>, which is the family's shipped weighting and beats greedy by 3 to 4.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Report the weighting, not the existence of one</h3><p>&ldquo;Some weighting defeats greedy&rdquo; is a citation. &ldquo;Weights 1, 2, 2 give greedy 2 where the optimum is 3&rdquo; is a counterexample a reader can check in ten seconds. The panel prints the second and prints how much of the space it had to look at to get there.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Quantifiers, converses, and what a search reports</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Both sides of the theorem on the three-edge path</h3><p>The family: subsets of <span class="math">A = 1-2</span>, <span class="math">B = 2-3</span>, <span class="math">C = 3-4</span> with no two edges sharing a vertex. Independent sets: <span class="math">{}</span>, <span class="math">{A}</span>, <span class="math">{B}</span>, <span class="math">{C}</span>, <span class="math">{A,C}</span>. The exchange property fails on <span class="math">{B}</span> against <span class="math">{A,C}</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">THE RECIPE FROM THE PROOF       A = {B}, so |A| = 1
+   weight of B        |A| + 2  =  3
+   weight of A and C  |A| + 1  =  2
+   giving weights      2 3 2   - the family&#x27;s shipped default
+   greedy   takes B (3), then A rejected, C rejected      total 3
+   best     {A,C}                                         total 4
+
+THE SEARCH OVER {1,2,3}^3       27 weightings in a fixed order
+   stops after 13 of them, at weights  1 2 2
+   greedy   takes B (2), then C rejected, A rejected      total 2
+   best     {A,C}  =  1 + 2                               total 3
+
+THE SAME SEARCH ON THE THREE MATROIDS      3^5  =  243 each
+   uniform     all 243 tried, greedy optimal on every one
+   graphic     all 243 tried, greedy optimal on every one
+   partition   all 243 tried, greedy optimal on every one
+
+a weighting where greedy WINS on the matchings   3 1 3
+   greedy takes A (3), then C (3), B rejected             total 6 = best</div><p>The last line is the one to keep. Greedy is optimal on the non-matroid for the weighting <span class="math">3 1 3</span>, and for many others: of the 27 weightings in the search space, the walk had to pass twelve before finding a failure. A reader who typed one weighting and saw greedy win would have evidence for the wrong conclusion, and that is the entire reason the theorem quantifies.</p><p>Notice also that the two counterexamples differ. The proof's recipe produces <span class="math">2 3 2</span> and a gap of 3 against 4; the search produces <span class="math">1 2 2</span> and a gap of 2 against 3. Both are valid and neither is canonical: what the theorem guarantees is that the set of bad weightings is nonempty, not that it has a distinguished member.</p><p>For a faded rehearsal, apply the recipe to the matchings of a four-edge path, <span class="math">1-2, 2-3, 3-4, 4-5</span>. The supplied first move is to find a failing pair: <span class="math">{B, D}</span> is maximal with two elements, and <span class="math">{A, C}</span> extends &mdash; look for a pair where the smaller side cannot be grown. Write down the weighting the recipe gives, predict greedy's answer and the optimum, then check both in the panel by typing the edge list and the weights.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Testing greedy on the weighting you happen to have</strong><span>This is the course's hazard in its purest form. The theorem is a statement about all weightings, and on the shipped non-matroid twelve weightings in a row let greedy win. Any conclusion drawn from one weighting is a conclusion about one weighting, and the panel's search exists to make that vivid rather than to be clever.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the thirteen as meaningful</strong><span>It is the position of the first failure in a fixed walk order and nothing more. Neither the number of bad weightings, nor the size of the gap, nor any property of the family can be read off it, and relabelling the ground set moves it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the 243-weighting sweep is itself a sample</strong><span>It is the whole of <span class="math">{1, 2, 3}⁵</span> and it is not the whole of the weight functions on five elements. The reason a matroid can be trusted on a weighting nobody tried is the proof, not the sweep &mdash; and the sweep's job is to catch an implementation that has stopped agreeing with the proof.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can decide, for a problem stated in words, whether some greedy rule is guaranteed to solve it, and produce the counterexample when the answer is no.</strong><p>You should be able to state the theorem with its quantifier in the right place, reproduce the exchange argument that proves the forward direction, build a bad weighting from a failing pair using the converse's recipe, and explain why a weighting on which greedy wins over a non-matroid is not evidence of anything.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The three remaining pages step outside matroids entirely. Each is an algorithm whose guarantee is real, is proved, and is not the guarantee a reader expects: a matching that is stable and systematically favours one side, a policy that is optimal and cannot be implemented, and a rule with no guarantee at all until a second arm is bolted onto it.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../independence-systems-and-matroids/" rel="prev"><span>Lesson</span><strong>Independence Systems and Matroids</strong></a>
+      <a class="lesson-link next" href="../stable-matching-and-who-it-favours/" rel="next"><span>Lesson</span><strong>Stable Matching, and Who It Favours</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="greedy-and-matroids/greedy-for-every-weighting" data-lesson-title="Greedy for Every Weighting" data-course-title="Greedy Algorithms and Matroids">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Greedy Algorithms and Matroids.</strong> Every verdict on this course was computed twice: once by running the greedy rule, and once by a search that does not know what the rule is. The optima are exact &mdash; the best of every subset, every full binary tree on <span class="math">n</span> leaves against every assignment of the weights to its leaves, every one of the <span class="math">n!</span> matchings, every eviction decision a cache of that size could make, every weighting in <span class="math">{1, 2, 3}ⁿ</span>. Two quantities are genuinely fractional and both are printed as fractions first: a Huffman code's expected length, and the fractional knapsack's optimum. A decimal beside a fraction on these pages is a rounding of the printing at a stated number of places, and the fraction next to it is the number. Where a search would be too large the panel refuses and says so rather than printing a figure it cannot stand behind, and where a panel's own caption disagrees with the table above it, the lesson names the caption.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Greedy on the matchings of a path with weights <span class=\"math\">3 1 3<\/span> returns the optimum. What does that show?", "a": ["That the family is a matroid after all", "That the exchange test was wrong", "That greedy can be optimal on a particular weighting over a family that is not a matroid, which is why the theorem quantifies over all weightings", "That the weights must be distinct for the theorem to apply"], "c": 2, "why": "The theorem says greedy is optimal for <em>every<\/em> weighting exactly when the family is a matroid. One successful weighting is consistent with the family failing, and here twelve of the twenty-seven weightings in the search space pass before one fails."}, {"q": "The panel reports that it found a beating weighting after trying 13 of the 27. What is 13 a fact about?", "a": ["How badly the family fails the exchange property", "The enumeration order of the search, and nothing else", "The rank of the family", "The number of independent sets"], "c": 1, "why": "<span class=\"math\">beatingWeights<\/span> walks the space in a fixed order and stops at the first failure. Relabel the elements and the count changes. What is a fact about the family is that the walk terminates, which the converse of the theorem guarantees for every non-matroid."}, {"q": "Why does the panel walk all 243 weightings on a matroid rather than stopping when none of the first few fails?", "a": ["Because 243 is small enough that stopping saves nothing", "Because <span class=\"math\">no counterexample found so far<\/span> and <span class=\"math\">the whole space was searched<\/span> are different claims and only the second is worth reporting", "Because the exchange test needs the same walk", "Because greedy's answer changes with the weighting"], "c": 1, "why": "An early stop on a matroid would report an absence of evidence. Walking the whole space lets the panel say it tried every weighting in the space, which is a stronger and checkable sentence &mdash; and still a sentence about 243 of infinitely many weight functions."}, {"q": "Which direction of the theorem lets you rule out every greedy rule of this shape for a problem, before writing any code?", "a": ["Matroid implies greedy optimal", "Greedy optimal for every weighting implies matroid, used in contrapositive: a family that is not a matroid has a weighting that defeats greedy", "Both directions equally", "Neither; ruling out requires an explicit counterexample"], "c": 1, "why": "Exhibiting two maximal independent sets of different sizes refutes the exchange property, and the converse then guarantees a bad weighting exists. The proof even builds one, so an explicit counterexample is available &mdash; but the ruling-out does not wait for it."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* A rational as a decimal string, by BigInt long division.
+
+     algebra_core's Rdec goes through Rnum, which is Number(a.n) / Number(a.d),
+     and several quantities on this path do not survive that: the exact Bloom
+     rate at m = 1000, n = 100, k = 7 is a fraction whose denominator is
+     1000^700, so both halves become Infinity and the page prints NaN. Karger's
+     exact success probability and the all-distinct product in ballsExact have
+     the same shape. So the decimal is produced by dividing the BigInts, which
+     works at any size, and it ROUNDS HALF UP at the last place kept -- the only
+     rounding in this block, and it is a rounding of the PRINTING, not of the
+     number: Rtext still gives the exact fraction and the lesson prints both
+     where the fraction is short enough to read.
+
+     The System Design kits each carry their own copy of this function. This is
+     the Algorithms path's one copy, and it is deliberately the same name and
+     the same behaviour, so a reader moving between subjects reads one format. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* A rational too small to read as a decimal, as "1 in N" -- which is how a
+     false-positive rate and a failure probability are quoted in practice. */
+  function RoneIn(a) {
+    if (Rzero(a)) return 'never';
+    var inv = Rinv(a);
+    return '1 in ' + Rfixed(inv, inv.d === 1n ? 0 : 1);
+  }
+
+  /* Brute force, with the instance cap as a parameter and a REFUSAL above it.
+
+     Nearly every mode in courses 4, 9 and the reduction course compares an
+     algorithm against the true optimum, and the true optimum is an exhaustive
+     search. A silent slow path is the wrong shape for that: at n = 22 a subset
+     enumeration is forty seconds of a frozen tab, and the reader's conclusion
+     is that the lesson is broken rather than that the instance is too big --
+     which is itself the lesson of the course. So every routine here throws, the
+     kit catches, and the panel says how big an instance it can answer for.
+
+     Only the oracles MORE THAN ONE kit needs live here; a single-kit oracle
+     lives in its own block and calls `oracleCap`, so the refusal is spelled
+     once and a kit does not ship eight enumerations to use one.
+
+         bruteOptimal            subsets, cap 16     greedy, coping
+         knapsackBrute           items,   cap 12     greedy, coping
+         tspBrute                cities,  cap 8      reduction, coping
+         satBrute                vars,    cap 16     reduction, coping
+         independentSetBrute     vertices,cap 16     reduction, coping
+         vertexCoverBrute        vertices,cap 16     reduction, coping
+         hamiltonBrute           vertices,cap 8      reduction
+
+     The caps are the design's, and they are not arbitrary: 2^16 = 65 536
+     assignments and 8! = 40 320 tours are each a few milliseconds, and the next
+     step up is a second. */
+  function oracleCap(what, size, cap) {
+    if (size > cap) {
+      throw new Error(what + ': ' + size + ' exceeds the exhaustive cap of ' + cap);
+    }
+    return size;
+  }
+  /* Every subset of {0..n-1} as a bitmask, in increasing mask order so the
+     first optimum found is the lexicographically smallest -- a tie broken the
+     same way twice is a tie a reader can reproduce. */
+  function forEachSubset(n, fn) {
+    var total = 1 << n;
+    for (var mask = 0; mask < total; mask += 1) fn(mask);
+  }
+  function maskMembers(mask, n) {
+    var out = [];
+    for (var i = 0; i < n; i += 1) if (mask & (1 << i)) out.push(i);
+    return out;
+  }
+  function popcount(mask) { var c = 0; while (mask) { mask &= mask - 1; c += 1; } return c; }
+
+  /* The generic one: `objective(members)` returns null for an infeasible set
+     and a number to MAXIMISE otherwise. Counts the subsets examined, because
+     "2^n of them" is the figure the panel prints beside the greedy run's n. */
+  function bruteOptimal(items, objective, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('bruteOptimal', items.length, cap);
+    var best = null, bestSet = [], examined = 0, feasible = 0;
+    forEachSubset(items.length, function (mask) {
+      var members = maskMembers(mask, items.length);
+      examined += 1;
+      var v = objective(members);
+      if (v === null || v === undefined) return;
+      feasible += 1;
+      if (best === null || v > best) { best = v; bestSet = members; }
+    });
+    return runOf({ value: best, members: bestSet },
+                 { nodes: examined, calls: feasible }, []);
+  }
+
+  /* 0/1 knapsack, exactly. items are { w, v }. */
+  function knapsackBrute(items, W, cap) {
+    cap = cap === undefined ? 12 : cap;
+    oracleCap('knapsackBrute', items.length, cap);
+    var best = 0, bestSet = [], examined = 0;
+    forEachSubset(items.length, function (mask) {
+      var members = maskMembers(mask, items.length), wt = 0, val = 0;
+      examined += 1;
+      for (var i = 0; i < members.length; i += 1) { wt += items[members[i]].w; val += items[members[i]].v; }
+      if (wt <= W && val > best) { best = val; bestSet = members; }
+    });
+    return runOf({ value: best, members: bestSet }, { nodes: examined }, []);
+  }
+
+  /* The shortest tour visiting every city once and returning to 0. D may be
+     asymmetric; nothing here assumes the triangle inequality, which is what
+     lets `coping.tsp` break its own 2-approximation on a non-metric instance. */
+  function tspBrute(D, budget, cap) {
+    cap = cap === undefined ? 8 : cap;
+    var n = D.length;
+    oracleCap('tspBrute', n, cap);
+    var best = null, bestTour = null, examined = 0;
+    var used = new Array(n).fill(false), tour = [0];
+    used[0] = true;
+    (function walk(at, len) {
+      if (tour.length === n) {
+        examined += 1;
+        var total = len + D[at][0];
+        if (best === null || total < best) { best = total; bestTour = tour.slice(); }
+        return;
+      }
+      for (var v = 1; v < n; v += 1) {
+        if (used[v]) continue;
+        used[v] = true; tour.push(v);
+        walk(v, len + D[at][v]);
+        tour.pop(); used[v] = false;
+      }
+    })(0, 0);
+    return runOf({ length: best, tour: bestTour,
+                   withinBudget: budget === undefined ? null : (best !== null && best <= budget) },
+                 { nodes: examined }, []);
+  }
+
+  /* CNF: { n, clauses: [[lit, ...]] }, a literal being a signed 1-based
+     variable index -- 3 is x3, -3 is NOT x3. An assignment is an array of
+     booleans indexed from 0. */
+  function satEval(formula, assign) {
+    var sat = 0;
+    for (var c = 0; c < formula.clauses.length; c += 1) {
+      var cl = formula.clauses[c], ok = false;
+      for (var k = 0; k < cl.length; k += 1) {
+        var lit = cl[k], v = assign[Math.abs(lit) - 1];
+        if (lit > 0 ? v : !v) { ok = true; break; }
+      }
+      if (ok) sat += 1;
+    }
+    return sat;
+  }
+  function maskAssign(mask, n) {
+    var a = [];
+    for (var i = 0; i < n; i += 1) a.push(!!(mask & (1 << i)));
+    return a;
+  }
+  function satBrute(formula, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('satBrute', formula.n, cap);
+    var models = [], examined = 0, first = null;
+    forEachSubset(formula.n, function (mask) {
+      examined += 1;
+      var a = maskAssign(mask, formula.n);
+      if (satEval(formula, a) === formula.clauses.length) {
+        models.push(mask);
+        if (first === null) first = a;
+      }
+    });
+    return runOf({ satisfiable: models.length > 0, model: first, models: models.length },
+                 { nodes: examined }, []);
+  }
+
+  /* Independent sets and vertex covers on a DIGRAPH_JS graph, read
+     undirected -- both problems ignore direction, and the reduction course
+     needs them to agree with each other on the same instance, which is the
+     complement identity |S| + |C| = V it is there to show. */
+  function dgAdjacency(G) {
+    var adj = [], i;
+    for (i = 0; i < G.n; i += 1) adj.push(new Array(G.n).fill(false));
+    G.arcs.forEach(function (a) { if (a.u !== a.v) { adj[a.u][a.v] = true; adj[a.v][a.u] = true; } });
+    return adj;
+  }
+  function independentSetBrute(G, k, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('independentSetBrute', G.n, cap);
+    var adj = dgAdjacency(G), best = [], examined = 0, atK = null;
+    forEachSubset(G.n, function (mask) {
+      examined += 1;
+      var m = maskMembers(mask, G.n), ok = true, i, j;
+      for (i = 0; ok && i < m.length; i += 1)
+        for (j = i + 1; j < m.length; j += 1) if (adj[m[i]][m[j]]) { ok = false; break; }
+      if (!ok) return;
+      if (m.length > best.length) best = m;
+      if (k !== undefined && m.length >= k && atK === null) atK = m;
+    });
+    return runOf({ size: best.length, members: best, atLeastK: atK },
+                 { nodes: examined }, []);
+  }
+  /* The largest set of MUTUALLY ADJACENT vertices -- written separately rather
+     than as "an independent set in the complement", because the point of the
+     complement lesson is that those two answers agree, and a check in which one
+     routine is defined as the other checks nothing. GRAPH_JS.cliqueNumber()
+     answers the same question a third way, and mathcheck asserts all three. */
+  function cliqueBrute(G, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('cliqueBrute', G.n, cap);
+    var adj = dgAdjacency(G), best = [], examined = 0;
+    forEachSubset(G.n, function (mask) {
+      examined += 1;
+      var m = maskMembers(mask, G.n);
+      if (m.length <= best.length) return;
+      var ok = true, i, j;
+      for (i = 0; ok && i < m.length; i += 1)
+        for (j = i + 1; j < m.length; j += 1) if (!adj[m[i]][m[j]]) { ok = false; break; }
+      if (ok) best = m;
+    });
+    return runOf({ size: best.length, members: best }, { nodes: examined }, []);
+  }
+  function vertexCoverBrute(G, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('vertexCoverBrute', G.n, cap);
+    var adj = dgAdjacency(G), best = null, examined = 0;
+    forEachSubset(G.n, function (mask) {
+      examined += 1;
+      if (best !== null && popcount(mask) >= best.length) return;
+      var m = maskMembers(mask, G.n), inSet = new Array(G.n).fill(false), ok = true;
+      m.forEach(function (v) { inSet[v] = true; });
+      for (var i = 0; ok && i < G.arcs.length; i += 1) {
+        var a = G.arcs[i];
+        if (a.u !== a.v && !inSet[a.u] && !inSet[a.v]) ok = false;
+      }
+      if (ok && (best === null || m.length < best.length)) best = m;
+    });
+    return runOf({ size: best ? best.length : 0, members: best || [] }, { nodes: examined }, []);
+  }
+
+  /* A Hamilton path and circuit on a digraph, by exhaustive search -- the
+     directed case GRAPH_JS.hamilton cannot answer. On an undirected graph the
+     two must agree, and mathcheck asserts that they do. */
+  function hamiltonBrute(G, cap) {
+    cap = cap === undefined ? 8 : cap;
+    oracleCap('hamiltonBrute', G.n, cap);
+    var adj = [], i;
+    for (i = 0; i < G.n; i += 1) adj.push(new Array(G.n).fill(false));
+    G.arcs.forEach(function (a) {
+      adj[a.u][a.v] = true;
+      if (!G.directed) adj[a.v][a.u] = true;
+    });
+    var path = null, circuit = null, examined = 0;
+    var used = new Array(G.n).fill(false), cur = [];
+    (function walk() {
+      if (cur.length === G.n) {
+        examined += 1;
+        if (!path) path = cur.slice();
+        if (adj[cur[cur.length - 1]][cur[0]] && !circuit) circuit = cur.slice();
+        return;
+      }
+      for (var v = 0; v < G.n; v += 1) {
+        if (used[v]) continue;
+        if (cur.length && !adj[cur[cur.length - 1]][v]) continue;
+        used[v] = true; cur.push(v);
+        walk();
+        cur.pop(); used[v] = false;
+        if (path && circuit) return;
+      }
+    })();
+    return runOf({ path: path, circuit: circuit }, { nodes: examined }, []);
+  }
+
+  /* A tree renderer, shared for the same reason the graph one is: six kinds of
+     tree are drawn on this path -- search trees, AVL and treaps, Huffman codes,
+     tries, DP subproblem trees, branch-and-bound search trees -- and every one
+     of them was about to be a helper closed over its own lab's element.
+
+     It is generic over the node type: `kids(node)` returns the children (nulls
+     included, so a BST's missing left child still leaves a gap where it
+     belongs) and `label(node)` returns what goes in the circle. x is the
+     in-order position, y is the depth, which is the layout that makes a search
+     tree's in-order sequence readable straight off the drawing. */
+  function treeLayout(root, kids, label, opts) {
+    opts = opts || {};
+    var nodes = [], links = [], next = 0, maxDepth = 0;
+    (function place(node, depth, parent) {
+      if (!node) { next += opts.gaps === false ? 0 : 0.5; return null; }
+      var children = kids(node) || [];
+      var left = children.length ? place(children[0], depth + 1, null) : null;
+      var me = { node: node, label: label(node), depth: depth, order: next, id: nodes.length };
+      next += 1;
+      nodes.push(me);
+      if (left) links.push({ from: me.id, to: left.id, side: 0 });
+      for (var k = 1; k < children.length; k += 1) {
+        var c = place(children[k], depth + 1, null);
+        if (c) links.push({ from: me.id, to: c.id, side: k });
+      }
+      if (depth > maxDepth) maxDepth = depth;
+      return me;
+    })(root, 0, null);
+    var w = opts.width === undefined ? 460 : opts.width;
+    var h = opts.height === undefined ? 210 : opts.height;
+    var cols = Math.max(1, next - 1), rows = Math.max(1, maxDepth);
+    nodes.forEach(function (n) {
+      n.x = 26 + (n.order / cols) * (w - 52);
+      n.y = 22 + (n.depth / rows) * (h - 44);
+    });
+    return { nodes: nodes, links: links, depth: maxDepth, count: nodes.length };
+  }
+  function treeSvg(layout, opts) {
+    opts = opts || {};
+    var hi = {};
+    (opts.highlight || []).forEach(function (i) { hi[i] = true; });
+    var s = '', r = opts.radius === undefined ? 14 : opts.radius;
+    layout.links.forEach(function (l) {
+      var a = layout.nodes[l.from], b = layout.nodes[l.to];
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="'
+        + (hi[l.to] ? 'var(--cyan)' : 'var(--line-strong)') + '" stroke-width="'
+        + (hi[l.to] ? 3 : 1.6) + '" />';
+    });
+    layout.nodes.forEach(function (n) {
+      var fill = opts.fill ? opts.fill(n) : (hi[n.id] ? 'var(--cyan)' : 'var(--panel-3)');
+      s += '<circle cx="' + n.x.toFixed(1) + '" cy="' + n.y.toFixed(1) + '" r="' + r
+        + '" fill="' + fill + '" stroke="var(--line-strong)" stroke-width="1.8" />';
+      s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="'
+        + (hi[n.id] ? 'var(--on-accent)' : 'var(--text)') + '">' + n.label + '</text>';
+      if (opts.note) {
+        var note = opts.note(n);
+        if (note) s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y - r - 4).toFixed(1)
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + note + '</text>';
+      }
+    });
+    return s;
+  }
+  function drawTree(el, root, kids, label, opts) {
+    var s = treeSvg(treeLayout(root, kids, label, opts), opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Replay a reference trace through a cache of k slots.
+
+     Farthest-in-future is here rather than in the kit because it is the BOUND
+     the whole replacement lesson rests on -- no online policy beats it -- and a
+     bound that cannot be tested in isolation is a bound nobody has checked.
+     Returns hits, misses and the exact hit rate. */
+  function replayPolicy(trace, k, policy) {
+    var cache = [], hits = 0, i, j;
+    for (i = 0; i < trace.length; i += 1) {
+      var key = trace[i], at = cache.indexOf(key);
+      if (at >= 0) {
+        hits += 1;
+        if (policy === 'lru') { cache.splice(at, 1); cache.push(key); }
+        continue;
+      }
+      if (cache.length < k) { cache.push(key); continue; }
+      var victim = 0;
+      if (policy === 'lru' || policy === 'fifo') {
+        victim = 0;                       /* both evict the front; LRU refreshes on hit */
+      } else if (policy === 'opt') {
+        /* evict whichever cached key is next used farthest ahead, or never */
+        var best = -1;
+        for (j = 0; j < cache.length; j += 1) {
+          var next = trace.indexOf(cache[j], i + 1);
+          if (next === -1) { victim = j; best = Infinity; break; }
+          if (next > best) { best = next; victim = j; }
+        }
+      }
+      cache.splice(victim, 1);
+      cache.push(key);
+    }
+    return {
+      hits: hits, misses: trace.length - hits,
+      rate: R(BigInt(hits), BigInt(trace.length))
+    };
+  }
+
+  /* Greedy algorithms, each run beside the optimum it claims to reach.
+
+     The kit's whole method is that "greedy is optimal here" is checked and not
+     asserted, so every mode has a brute-force arm -- ORACLE_JS's bruteOptimal
+     and knapsackBrute, and this block's allFullBinaryTrees and
+     independenceEnumerate, which only this kit needs.
+
+     `caching` has no code here at all: sysdesign_core.replayPolicy(trace, k,
+     policy) already implements FIFO, LRU and farthest-in-future on a reference
+     trace and returns the exact hit rate, and its own comment says
+     farthest-in-future belongs in a core because it is the BOUND the lesson
+     rests on. It is reused as it ships. */
+
+  /* Interval scheduling. Intervals are { s, f, label }. */
+  var INTERVAL_RULES = {
+    earliestFinish: function (a, b) { return a.f - b.f || a.s - b.s; },
+    earliestStart: function (a, b) { return a.s - b.s || a.f - b.f; },
+    shortest: function (a, b) { return (a.f - a.s) - (b.f - b.s) || a.s - b.s; },
+    fewestConflicts: null
+  };
+  function conflictCount(items, x) {
+    var n = 0;
+    items.forEach(function (y) { if (y !== x && y.s < x.f && x.s < y.f) n += 1; });
+    return n;
+  }
+  function greedyIntervals(items, rule) {
+    var order = items.slice(), c = counter(), chosen = [], trace = [];
+    if (rule === 'fewestConflicts') {
+      order.sort(function (a, b) { return conflictCount(items, a) - conflictCount(items, b) || a.s - b.s; });
+    } else {
+      var cmp = INTERVAL_RULES[rule];
+      if (!cmp) throw new Error('unknown rule: ' + rule);
+      order.sort(cmp);
+    }
+    var lastFinish = -Infinity;
+    order.forEach(function (x) {
+      c.compares += 1;
+      var ok = x.s >= lastFinish;
+      if (ok) { chosen.push(x); lastFinish = x.f; }
+      trace.push({ at: trace.length, item: x, taken: ok, finishSoFar: lastFinish });
+    });
+    return { chosen: chosen, trace: trace, counts: usedCounts(c) };
+  }
+  /* STAYS AHEAD, step by step: g_i is the finish time of greedy's i-th
+     interval, o_i the optimum's, and the claim is g_i <= o_i for every i. The
+     optimum comes from ORACLE_JS.bruteOptimal over every subset, so the wrong
+     rules can be shown FALLING BEHIND at a named step rather than merely
+     ending smaller. */
+  function greedyTrace(items, rule) {
+    var g = greedyIntervals(items, rule);
+    var opt = bruteOptimal(items, function (members) {
+      var sel = members.map(function (i) { return items[i]; })
+                       .sort(function (a, b) { return a.s - b.s; });
+      for (var i = 1; i < sel.length; i += 1) if (sel[i].s < sel[i - 1].f) return null;
+      return sel.length;
+    });
+    var best = opt.result.members.map(function (i) { return items[i]; })
+                                 .sort(function (a, b) { return a.f - b.f; });
+    var rows = [], fellBehind = null;
+    for (var i = 0; i < Math.max(g.chosen.length, best.length); i += 1) {
+      var gi = i < g.chosen.length ? g.chosen[i].f : null;
+      var oi = i < best.length ? best[i].f : null;
+      var ahead = gi !== null && oi !== null ? gi <= oi : null;
+      if (ahead === false && fellBehind === null) fellBehind = i;
+      rows.push({ i: i + 1, g: gi, o: oi, ahead: ahead });
+    }
+    return runOf({ chosen: g.chosen, optimum: opt.result.value, optimal: best,
+                   size: g.chosen.length, matchesOptimum: g.chosen.length === opt.result.value,
+                   rows: rows, fellBehindAt: fellBehind },
+                 g.counts, g.trace);
+  }
+
+  /* Interval partitioning: the depth is the most intervals live at any one
+     point, and the claim is that the greedy by start time uses exactly that
+     many rooms -- so the lab prints the point that attains the depth, which is
+     the certificate that no fewer will do. */
+  function depthOf(intervals) {
+    var points = [], best = 0, at = null;
+    intervals.forEach(function (x) { points.push(x.s); });
+    points.sort(function (a, b) { return a - b; });
+    points.forEach(function (t) {
+      var live = intervals.filter(function (x) { return x.s <= t && t < x.f; });
+      if (live.length > best) { best = live.length; at = t; }
+    });
+    return { depth: best, at: at };
+  }
+  function partitionRooms(intervals, order) {
+    var list = intervals.slice(), c = counter(), rooms = [], trace = [];
+    list.sort(order === 'finish' ? function (a, b) { return a.f - b.f; }
+                                 : function (a, b) { return a.s - b.s; });
+    list.forEach(function (x) {
+      var put = -1;
+      for (var r = 0; r < rooms.length; r += 1) {
+        c.compares += 1;
+        if (rooms[r][rooms[r].length - 1].f <= x.s) { put = r; break; }
+      }
+      if (put === -1) { rooms.push([x]); put = rooms.length - 1; }
+      else rooms[put].push(x);
+      trace.push({ at: trace.length, item: x, room: put + 1, rooms: rooms.length });
+    });
+    var d = depthOf(intervals);
+    return runOf({ rooms: rooms, used: rooms.length, depth: d.depth, at: d.at,
+                   optimal: rooms.length === d.depth }, usedCounts(c), trace);
+  }
+
+  /* Huffman. The merge sequence IS the lesson, so it is the trace; the tree is
+     built from it and the expected codeword length is an exact rational. */
+  function huffmanBuild(freqs) {
+    var c = counter(), nodes = freqs.map(function (f, i) {
+      return { symbol: f.symbol === undefined ? String(i) : f.symbol, weight: f.weight, l: null, r: null };
+    });
+    var live = nodes.slice(), trace = [];
+    while (live.length > 1) {
+      live.sort(function (a, b) { return a.weight - b.weight || String(a.symbol).localeCompare(String(b.symbol)); });
+      c.compares += live.length;
+      var x = live.shift(), y = live.shift();
+      var merged = { symbol: null, weight: x.weight + y.weight, l: x, r: y };
+      trace.push({ at: trace.length, took: [x.symbol, y.symbol], weights: [x.weight, y.weight],
+                   made: merged.weight, remaining: live.length + 1 });
+      live.push(merged);
+      c.calls += 1;
+    }
+    var root = live[0] || null, codes = {};
+    (function walk(n, prefix) {
+      if (!n) return;
+      if (!n.l && !n.r) { codes[n.symbol] = prefix || '0'; return; }
+      walk(n.l, prefix + '0');
+      walk(n.r, prefix + '1');
+    })(root, '');
+    return runOf({ root: root, codes: codes }, usedCounts(c), trace);
+  }
+  function huffKids(n) { return [n.l, n.r]; }
+  /* Expected codeword length as an exact fraction, and the fixed-length code
+     it is compared against -- which is ceil(log2 of the alphabet) bits. */
+  function codeCost(codes, freqs) {
+    var total = 0n, bits = 0n;
+    freqs.forEach(function (f) {
+      var sym = f.symbol === undefined ? null : f.symbol;
+      var code = codes[sym];
+      total += BigInt(f.weight);
+      bits += BigInt(f.weight) * BigInt(code ? code.length : 0);
+    });
+    var fixed = Math.max(1, Math.ceil(Math.log2(Math.max(2, freqs.length))));
+    return { bits: bits, total: total, expected: R(bits, total),
+             fixed: R(BigInt(fixed), 1n),
+             saving: Rsub(R(BigInt(fixed), 1n), R(bits, total)) };
+  }
+  /* EVERY full binary tree on n leaves, so Huffman's can be shown at the
+     minimum rather than asserted to be. Catalan(n-1) of them: 14 at n = 5,
+     42 at n = 6, 132 at n = 7 -- and the shapes stop being readable long
+     before the count stops being computable, so the cap is 5 leaves. */
+  function allFullBinaryTrees(n, cap) {
+    cap = cap === undefined ? 5 : cap;
+    oracleCap('allFullBinaryTrees', n, cap);
+    function shapes(k) {
+      if (k === 1) return [{ leaf: true }];
+      var out = [];
+      for (var i = 1; i < k; i += 1) {
+        shapes(i).forEach(function (L) {
+          shapes(k - i).forEach(function (Rt) { out.push({ leaf: false, l: L, r: Rt }); });
+        });
+      }
+      return out;
+    }
+    return shapes(n);
+  }
+  /* Cost a shape against a weight assignment, over every assignment of the
+     weights to its leaves -- which is what makes "Huffman is optimal" a
+     statement the page can check. */
+  function shapeCost(shape, weights) {
+    var depths = [];
+    (function walk(n, d) {
+      if (n.leaf) { depths.push(d); return; }
+      walk(n.l, d + 1); walk(n.r, d + 1);
+    })(shape, 0);
+    depths.sort(function (a, b) { return b - a; });
+    var w = weights.slice().sort(function (a, b) { return a - b; });
+    var total = 0n;
+    for (var i = 0; i < depths.length; i += 1) total += BigInt(depths[i]) * BigInt(w[i]);
+    return total;                    /* heaviest weight on the shallowest leaf */
+  }
+
+  /* Fractional knapsack, exactly: sort by value density -- a RATIO, so the
+     comparison is Rcmp on fractions and not a float -- take whole items while
+     they fit, then the fraction of the next that does. The optimum is a
+     rational and the 0/1 optimum beside it is ORACLE_JS.knapsackBrute. */
+  function fractionalKnapsack(items, W) {
+    var order = items.map(function (it, i) { return { i: i, w: it.w, v: it.v, d: R(BigInt(it.v), BigInt(it.w)) }; });
+    order.sort(function (a, b) { return -Rcmp(a.d, b.d) || a.i - b.i; });
+    var left = W, value = R(0n, 1n), picks = [], c = counter();
+    order.forEach(function (it) {
+      c.compares += 1;
+      if (left <= 0) return;
+      if (it.w <= left) {
+        left -= it.w; value = Radd(value, R(BigInt(it.v), 1n));
+        picks.push({ i: it.i, take: R(1n, 1n) });
+      } else {
+        var frac = R(BigInt(left), BigInt(it.w));
+        value = Radd(value, Rmul(frac, R(BigInt(it.v), 1n)));
+        picks.push({ i: it.i, take: frac });
+        left = 0;
+      }
+    });
+    var whole = knapsackBrute(items, W);
+    return runOf({ value: value, picks: picks, order: order,
+                   integralValue: whole.result.value, integralPicks: whole.result.members,
+                   gap: Rsub(value, R(BigInt(whole.result.value), 1n)) },
+                 usedCounts(c), []);
+  }
+
+  /* Matroids. A family is given by an INDEPENDENCE ORACLE -- a function on a
+     subset -- because that is the definition, and enumerating the family from
+     the oracle is what lets the exchange property be tested pair by pair
+     instead of assumed. |E| <= 10 is 1024 subsets. */
+  function independenceEnumerate(ground, oracle, cap) {
+    cap = cap === undefined ? 10 : cap;
+    oracleCap('independenceEnumerate', ground.length, cap);
+    var family = [], examined = 0;
+    forEachSubset(ground.length, function (mask) {
+      examined += 1;
+      var m = maskMembers(mask, ground.length);
+      if (oracle(m)) family.push(m);
+    });
+    var bases = [], maxSize = 0;
+    family.forEach(function (s) { if (s.length > maxSize) maxSize = s.length; });
+    family.forEach(function (s) { if (s.length === maxSize) bases.push(s); });
+    return runOf({ family: family, bases: bases, rank: maxSize },
+                 { nodes: examined }, []);
+  }
+  /* The exchange property, tested on EVERY ordered pair of the family: if
+     |A| < |B| then some element of B - A can join A. The failures are returned,
+     because the mode's second arm is a family that is not a matroid and the
+     failing pair is the reason. */
+  function exchangeTest(family) {
+    var failures = [], tested = 0;
+    var key = family.map(function (s) { return s.join(','); });
+    family.forEach(function (A, ai) {
+      family.forEach(function (B, bi) {
+        if (A.length >= B.length) return;
+        tested += 1;
+        var ok = B.some(function (x) {
+          if (A.indexOf(x) !== -1) return false;
+          return key.indexOf(A.concat([x]).sort(function (p, q) { return p - q; }).join(',')) !== -1;
+        });
+        if (!ok) failures.push({ A: A, B: B });
+      });
+    });
+    return { tested: tested, failures: failures, isMatroid: failures.length === 0 };
+  }
+  /* Greedy over the family by weight, and the optimum over the same family.
+     They are equal exactly when the family is a matroid, which is the mode. */
+  function matroidGreedy(family, weights, ground) {
+    var c = counter(), order = ground.map(function (_, i) { return i; })
+      .sort(function (a, b) { return weights[b] - weights[a] || a - b; });
+    var key = {};
+    family.forEach(function (s) { key[s.join(',')] = true; });
+    var chosen = [], trace = [];
+    order.forEach(function (x) {
+      c.compares += 1;
+      var next = chosen.concat([x]).sort(function (p, q) { return p - q; });
+      var ok = !!key[next.join(',')];
+      if (ok) chosen = next;
+      trace.push({ at: trace.length, element: x, weight: weights[x], taken: ok });
+    });
+    var greedyValue = chosen.reduce(function (t, x) { return t + weights[x]; }, 0);
+    var best = null, bestSet = null;
+    family.forEach(function (s) {
+      var v = s.reduce(function (t, x) { return t + weights[x]; }, 0);
+      if (best === null || v > best) { best = v; bestSet = s; }
+    });
+    return runOf({ chosen: chosen, value: greedyValue, optimum: best, optimal: bestSet,
+                   matches: greedyValue === best }, usedCounts(c), trace);
+  }
+
+  /* Gale-Shapley. prefsA[i] and prefsB[j] are full ranking arrays. The mode's
+     content is the proposal sequence and the EMPTY blocking-pair list, plus
+     each side's average rank under the two runs -- proposers do better, which
+     is the asymmetry readers do not expect. */
+  function galeShapley(prefsA, prefsB) {
+    var n = prefsA.length, c = counter(), trace = [];
+    var next = new Array(n).fill(0), matchB = new Array(n).fill(-1), matchA = new Array(n).fill(-1);
+    var rankB = prefsB.map(function (row) {
+      var r = new Array(n).fill(0);
+      row.forEach(function (a, k) { r[a] = k; });
+      return r;
+    });
+    var free = [];
+    for (var i = 0; i < n; i += 1) free.push(i);
+    var guard = 0;
+    while (free.length && guard < n * n + n) {
+      guard += 1;
+      var a = free.shift(), b = prefsA[a][next[a]];
+      next[a] += 1; c.calls += 1;
+      if (matchB[b] === -1) {
+        matchB[b] = a; matchA[a] = b;
+        trace.push({ at: trace.length, proposer: a, to: b, outcome: 'accepted' });
+      } else {
+        var rival = matchB[b];
+        c.compares += 1;
+        if (rankB[b][a] < rankB[b][rival]) {
+          matchB[b] = a; matchA[a] = b; matchA[rival] = -1; free.push(rival);
+          trace.push({ at: trace.length, proposer: a, to: b, outcome: 'accepted, ' + rival + ' rejected' });
+        } else {
+          free.push(a);
+          trace.push({ at: trace.length, proposer: a, to: b, outcome: 'rejected' });
+        }
+      }
+    }
+    var ranks = { proposers: 0, receivers: 0 };
+    for (i = 0; i < n; i += 1) {
+      ranks.proposers += prefsA[i].indexOf(matchA[i]) + 1;
+      ranks.receivers += rankB[i][matchB[i]] + 1;
+    }
+    return runOf({ matchA: matchA, matchB: matchB, proposals: c.calls,
+                   meanProposerRank: R(BigInt(ranks.proposers), BigInt(n)),
+                   meanReceiverRank: R(BigInt(ranks.receivers), BigInt(n)) },
+                 usedCounts(c), trace);
+  }
+  /* Every pair that would rather have each other than their partners. On a
+     Gale-Shapley matching this list is empty, and printing the empty list is
+     the lesson -- an assertion of stability is not one. */
+  function blockingPairs(matchA, prefsA, prefsB) {
+    var n = prefsA.length, out = [], matchB = new Array(n).fill(-1);
+    matchA.forEach(function (b, a) { if (b >= 0) matchB[b] = a; });
+    for (var a = 0; a < n; a += 1) {
+      for (var b = 0; b < n; b += 1) {
+        if (matchA[a] === b) continue;
+        var aPrefers = prefsA[a].indexOf(b) < prefsA[a].indexOf(matchA[a]);
+        var bPrefers = prefsB[b].indexOf(a) < prefsB[b].indexOf(matchB[b]);
+        if (aPrefers && bPrefers) out.push([a, b]);
+      }
+    }
+    return { pairs: out, stable: out.length === 0 };
+  }
+
+  /* =================================================== what a reader types
+
+     An interval is `s-f`: two integers, the half-open span [s, f). Labels are
+     A, B, C ... in the order typed and they are what every table and every
+     drawing names, so one interval can be followed through four different
+     orderings of the same instance. */
+  function gyLabel(i) { return String.fromCharCode(65 + (i % 26)); }
+
+  function gyParseIntervals(text, cap) {
+    cap = cap === undefined ? 9 : cap;
+    var items = [], bad = null;
+    String(text).split(',').forEach(function (piece) {
+      var t = piece.replace(/\s+/g, '');
+      if (!t || bad) return;
+      var m = /^(\d+)-(\d+)$/.exec(t);
+      if (!m) { bad = 'an interval is written start-finish, as 3-8; "' + t + '" is not'; return; }
+      var s = parseInt(m[1], 10), f = parseInt(m[2], 10);
+      if (!(f > s)) { bad = t + ' does not finish after it starts'; return; }
+      if (items.length >= cap) {
+        bad = 'this mode tries every subset, so it takes at most ' + cap + ' intervals';
+        return;
+      }
+      items.push({ s: s, f: f, label: gyLabel(items.length) });
+    });
+    if (!bad && !items.length) bad = 'no intervals were read';
+    return { items: items, bad: bad };
+  }
+
+  function gyParseFreqs(text, cap) {
+    cap = cap === undefined ? 8 : cap;
+    var out = [], bad = null, seen = {};
+    String(text).split(',').forEach(function (piece) {
+      var t = piece.replace(/\s+/g, '');
+      if (!t || bad) return;
+      var m = /^([A-Za-z0-9_]+):(\d+)$/.exec(t);
+      if (!m) { bad = 'a symbol is written name:weight, as a:45; "' + t + '" is not'; return; }
+      var w = parseInt(m[2], 10);
+      if (w <= 0) { bad = 'the weight of ' + m[1] + ' has to be positive'; return; }
+      if (seen[m[1]]) { bad = m[1] + ' appears twice'; return; }
+      if (out.length >= cap) { bad = 'at most ' + cap + ' symbols, so the tree stays readable'; return; }
+      seen[m[1]] = true;
+      out.push({ symbol: m[1], weight: w });
+    });
+    if (!bad && out.length < 2) bad = 'a code needs at least two symbols';
+    return { freqs: out, bad: bad };
+  }
+
+  function gyParseItems(text, cap) {
+    cap = cap === undefined ? 10 : cap;
+    var out = [], bad = null;
+    String(text).split(',').forEach(function (piece) {
+      var t = piece.replace(/\s+/g, '');
+      if (!t || bad) return;
+      var m = /^(\d+)\/(\d+)$/.exec(t);
+      if (!m) { bad = 'an item is written weight/value, as 20/100; "' + t + '" is not'; return; }
+      var w = parseInt(m[1], 10), v = parseInt(m[2], 10);
+      if (w <= 0) { bad = 'an item of weight 0 has no density, and would be free'; return; }
+      if (out.length >= cap) {
+        bad = 'at most ' + cap + ' items, because the optimum here is the best of 2^n subsets';
+        return;
+      }
+      out.push({ w: w, v: v, label: gyLabel(out.length) });
+    });
+    if (!bad && !out.length) bad = 'no items were read';
+    return { items: out, bad: bad };
+  }
+
+  /* Preference rows, one per line, semicolon separated, 1-based. A row that is
+     not a ranking of ALL the partners is refused rather than padded: a partial
+     ranking is a different problem with a different theorem. */
+  function gyParsePrefs(text) {
+    var rows = [], bad = null;
+    String(text).split(';').forEach(function (piece) {
+      var t = piece.trim();
+      if (!t || bad) return;
+      var nums = t.split(/[\s,]+/).map(function (x) { return parseInt(x, 10); });
+      if (nums.some(function (x) { return !isFinite(x); })) {
+        bad = '"' + t + '" is not a list of numbers';
+        return;
+      }
+      rows.push(nums.map(function (x) { return x - 1; }));
+    });
+    if (bad) return { rows: null, bad: bad };
+    if (rows.length < 2) return { rows: null, bad: 'at least two rows are needed' };
+    var n = rows.length;
+    for (var i = 0; i < n; i += 1) {
+      var sorted = rows[i].slice().sort(function (a, b) { return a - b; });
+      if (sorted.length !== n || sorted.some(function (x, k) { return x !== k; })) {
+        return { rows: null, bad: 'row ' + (i + 1) + ' is not a ranking of all ' + n + ' partners' };
+      }
+    }
+    return { rows: rows, bad: null };
+  }
+
+  function gyParseTrace(text, cap) {
+    cap = cap === undefined ? 20 : cap;
+    var out = [], bad = null;
+    String(text).split(/[\s,]+/).forEach(function (t) {
+      if (!t || bad) return;
+      var v = parseInt(t, 10);
+      if (!isFinite(v) || String(v) !== t || v < 1 || v > 20) {
+        bad = '"' + t + '" is not a page number between 1 and 20';
+        return;
+      }
+      if (out.length >= cap) {
+        bad = 'at most ' + cap + ' references, because every eviction decision is searched';
+        return;
+      }
+      out.push(v);
+    });
+    if (!bad && !out.length) bad = 'no references were read';
+    return { trace: out, bad: bad };
+  }
+
+  /* Every permutation of a list, used by three oracles below. */
+  function gyPermute(list, fn) {
+    var n = list.length, cur = [], used = [];
+    for (var i = 0; i < n; i += 1) used.push(false);
+    (function step() {
+      if (cur.length === n) { fn(cur); return; }
+      for (var k = 0; k < n; k += 1) {
+        if (used[k]) continue;
+        used[k] = true; cur.push(list[k]);
+        step();
+        cur.pop(); used[k] = false;
+      }
+    })();
+  }
+
+  /* ================================================== intervals: scheduling
+
+     A selection's SIZE is what every rule is judged on, and a size means
+     nothing until the selection is known to be feasible. So nothing here
+     prints a size it has not first run through this. */
+  function intervalsDisjoint(sel) {
+    var a = sel.slice().sort(function (x, y) { return x.s - y.s || x.f - y.f; });
+    for (var i = 1; i < a.length; i += 1) if (a[i].s < a[i - 1].f) return false;
+    return true;
+  }
+  function gyByFinish(a, b) { return a.f - b.f || a.s - b.s; }
+  function gyNames(sel) { return sel.map(function (x) { return x.label; }).join(' '); }
+
+  /* The optimum, over every subset. bruteOptimal maximises an objective that
+     returns null for an infeasible set, and the feasibility test it is handed
+     is the same one the panel uses on greedy's answer. */
+  function intervalOptimum(items) {
+    return bruteOptimal(items, function (members) {
+      var sel = members.map(function (i) { return items[i]; });
+      return intervalsDisjoint(sel) ? sel.length : null;
+    });
+  }
+  var GY_RULES = ['earliestFinish', 'earliestStart', 'shortest', 'fewestConflicts'];
+  function ruleReport(items) {
+    var opt = intervalOptimum(items), rows = [];
+    GY_RULES.forEach(function (rule) {
+      var run = greedyIntervals(items, rule);
+      rows.push({ rule: rule, chosen: run.chosen, size: run.chosen.length,
+                  feasible: intervalsDisjoint(run.chosen),
+                  optimal: run.chosen.length === opt.result.value,
+                  short: opt.result.value - run.chosen.length,
+                  compares: run.counts.compares || 0 });
+    });
+    return { rows: rows, optimum: opt.result.value,
+             best: opt.result.members.map(function (i) { return items[i]; }).sort(gyByFinish),
+             subsets: opt.counts.nodes, feasibleSets: opt.counts.calls };
+  }
+
+  /* THE EXCHANGE ARGUMENT, EXECUTED.
+
+     The textbook proof takes an optimal solution, sorted by finish time, and
+     replaces its i-th interval by greedy's i-th, arguing that the result is
+     still feasible and still the same size. That argument is two checkable
+     properties, so this performs the swaps and checks both after every one of
+     them. Under the earliest-finish rule every swap survives and the optimum
+     is transformed into greedy's own answer. Under a rule that is wrong the
+     chain breaks -- either the set stops being feasible, or greedy's choice
+     was already further down the list and the swap loses an interval -- and
+     the step it breaks at is the step the proof cannot take. */
+  function exchangeChain(items, rule) {
+    var g = greedyIntervals(items, rule).chosen.slice().sort(gyByFinish);
+    var opt = intervalOptimum(items);
+    var start = opt.result.members.map(function (i) { return items[i]; }).sort(gyByFinish);
+    var cur = start.slice(), steps = [], matched = 0;
+    for (var i = 0; i < g.length && i < cur.length; i += 1) {
+      var out = cur[i], dup = false;
+      if (out !== g[i]) {
+        cur = cur.slice();
+        cur[i] = g[i];
+        var j = cur.indexOf(g[i], i + 1);
+        if (j > i) { cur.splice(j, 1); dup = true; }
+      } else {
+        out = null;
+      }
+      steps.push({ step: i + 1, into: g[i], out: out, duplicate: dup,
+                   set: cur.slice(), feasible: intervalsDisjoint(cur),
+                   size: cur.length, kept: cur.length === start.length });
+    }
+    for (i = 0; i < g.length && i < cur.length; i += 1) if (cur[i] === g[i]) matched += 1;
+    var survived = steps.length > 0 && steps.every(function (s) { return s.feasible && s.kept; });
+    return { start: start, steps: steps, end: cur, survived: survived, matched: matched,
+             greedy: g, optimum: opt.result.value, size: cur.length };
+  }
+
+  /* ================================================ partitioning into rooms
+
+     depthOf samples the START instants, which is right because the number of
+     live intervals can only go up at a start; this sweeps the same instants
+     and lists WHICH intervals are alive at the one that attains the maximum.
+     That list is the certificate: those intervals pairwise overlap, so no
+     schedule of any kind uses fewer rooms than there are of them. */
+  function liveAt(items, t) {
+    return items.filter(function (x) { return x.s <= t && t < x.f; });
+  }
+  function roomsValid(rooms, items) {
+    var seen = [], disjoint = true;
+    rooms.forEach(function (r) {
+      if (!intervalsDisjoint(r)) disjoint = false;
+      r.forEach(function (x) { seen.push(x); });
+    });
+    var covers = seen.length === items.length
+      && items.every(function (x) { return seen.indexOf(x) !== -1; });
+    return { disjoint: disjoint, covers: covers, ok: disjoint && covers, placed: seen.length };
+  }
+  /* Those live intervals pairwise overlap, which is what makes them a lower
+     bound rather than a coincidence. Checked, because "they all contain the
+     same instant" is the reason and the panel should be showing the reason. */
+  function mutuallyOverlapping(sel) {
+    for (var i = 0; i < sel.length; i += 1)
+      for (var j = i + 1; j < sel.length; j += 1)
+        if (!(sel[i].s < sel[j].f && sel[j].s < sel[i].f)) return false;
+    return true;
+  }
+
+  /* ================================================================ Huffman */
+  function codesPrefixFree(codes) {
+    var list = Object.keys(codes).map(function (k) { return codes[k]; });
+    for (var i = 0; i < list.length; i += 1)
+      for (var j = 0; j < list.length; j += 1)
+        if (i !== j && list[j].indexOf(list[i]) === 0) return false;
+    return true;
+  }
+  function encodeSyms(codes, syms) {
+    var out = '';
+    for (var i = 0; i < syms.length; i += 1) {
+      if (codes[syms[i]] === undefined) return null;
+      out += codes[syms[i]];
+    }
+    return out;
+  }
+  /* Decoding takes the first codeword the buffer matches, which is only
+     unambiguous BECAUSE the code is prefix-free. So the round trip is the
+     property itself, run: a code that is short and wrong fails here. */
+  function decodeBits(codes, bits) {
+    var inv = {}, out = [], buf = '';
+    Object.keys(codes).forEach(function (s) { inv[codes[s]] = s; });
+    for (var i = 0; i < bits.length; i += 1) {
+      buf += bits.charAt(i);
+      if (inv[buf] !== undefined) { out.push(inv[buf]); buf = ''; }
+    }
+    return buf.length ? null : out;
+  }
+  /* The minimum total bits over every full binary tree on n leaves AND every
+     assignment of the weights to its leaves. Catalan(n-1) shapes times n!
+     assignments: 42 x 720 at six leaves, which is the cap. */
+  function huffmanBruteBits(weights, cap) {
+    cap = cap === undefined ? 6 : cap;
+    oracleCap('huffmanBruteBits', weights.length, cap);
+    var shapes = allFullBinaryTrees(weights.length, cap), best = null, tried = 0, bestDepths = null;
+    shapes.forEach(function (shape) {
+      var depths = [];
+      (function walk(nd, d) {
+        if (nd.leaf) { depths.push(d); return; }
+        walk(nd.l, d + 1); walk(nd.r, d + 1);
+      })(shape, 0);
+      gyPermute(weights, function (perm) {
+        tried += 1;
+        var t = 0n;
+        for (var i = 0; i < depths.length; i += 1) t += BigInt(depths[i]) * BigInt(perm[i]);
+        if (best === null || t < best) { best = t; bestDepths = depths.slice(); }
+      });
+    });
+    return { bits: best, shapes: shapes.length, assignments: tried, depths: bestDepths };
+  }
+  /* The fixed-length code the saving is measured against, and the two
+     totals, so the panel never divides two numbers it did not print. */
+  function codeLengths(codes) {
+    var out = {};
+    Object.keys(codes).forEach(function (s) { out[s] = codes[s].length; });
+    return out;
+  }
+
+  /* ============================================================== knapsack */
+  var GY_KNAP_RULES = {
+    density: function (a, b) {
+      return -Rcmp(R(BigInt(a.v), BigInt(a.w)), R(BigInt(b.v), BigInt(b.w))) || a.i - b.i;
+    },
+    value: function (a, b) { return b.v - a.v || a.i - b.i; },
+    light: function (a, b) { return a.w - b.w || a.i - b.i; }
+  };
+  /* 0/1 greedy: sort, then take each item if it still fits. The density
+     comparison is Rcmp on exact fractions and never v/w as a double, because
+     two items whose densities differ in the fifteenth place would otherwise
+     be ordered by rounding error. */
+  function greedyKnapsack01(items, W, rule) {
+    var cmp = GY_KNAP_RULES[rule];
+    if (!cmp) throw new Error('unknown rule: ' + rule);
+    var order = items.map(function (it, i) {
+      return { i: i, w: it.w, v: it.v, label: it.label === undefined ? gyLabel(i) : it.label,
+               d: R(BigInt(it.v), BigInt(it.w)) };
+    });
+    order.sort(cmp);
+    var c = counter(), left = W, value = 0, picks = [], trace = [];
+    order.forEach(function (it) {
+      c.compares += 1;
+      var fits = it.w <= left;
+      if (fits) { left -= it.w; value += it.v; picks.push(it.i); }
+      trace.push({ at: trace.length, item: it, taken: fits, left: left });
+    });
+    picks.sort(function (a, b) { return a - b; });
+    return runOf({ value: value, weight: W - left, left: left, picks: picks, order: order },
+                 usedCounts(c), trace);
+  }
+  /* The weight and value of a set of indices, so a reported value is checked
+     against the items rather than accumulated and trusted. */
+  function packValue(items, picks) {
+    var w = 0, v = 0;
+    picks.forEach(function (i) { w += items[i].w; v += items[i].v; });
+    return { w: w, v: v };
+  }
+  /* Density greedy alone has no guarantee at all: skip one heavy, valuable
+     item and the ratio is unbounded. The better of (density greedy, the most
+     valuable single item that fits) does: its value is at least half the
+     optimum, on every instance. Both halves are computed. */
+  function halfGuarantee(items, W) {
+    var g = greedyKnapsack01(items, W, 'density');
+    var best = 0, at = -1;
+    items.forEach(function (it, i) { if (it.w <= W && it.v > best) { best = it.v; at = i; } });
+    var took = g.result.value >= best ? 'greedy' : 'single';
+    return { greedy: g.result.value, single: best, at: at,
+             value: Math.max(g.result.value, best), took: took };
+  }
+  function gyRatio(got, opt) {
+    return opt === 0 ? R(1n, 1n) : R(BigInt(got), BigInt(opt));
+  }
+
+  /* ============================================================== matroids
+
+     A family is given by a membership test on a subset, because that is the
+     definition. independenceEnumerate turns the oracle into the family, and
+     exchangeTest then tries every ordered pair. Four families ship and which
+     of them are matroids is a verdict the page computes. */
+  function uniformOracle(k) { return function (m) { return m.length <= k; }; }
+  function partitionOracle(groups, caps) {
+    return function (m) {
+      var n = [], i;
+      for (i = 0; i < caps.length; i += 1) n.push(0);
+      for (i = 0; i < m.length; i += 1) n[groups[m[i]]] += 1;
+      for (i = 0; i < caps.length; i += 1) if (n[i] > caps[i]) return false;
+      return true;
+    };
+  }
+  /* The graphic matroid: a set of edges is independent when it holds no cycle.
+     Union-find is written out because the content of the mode is that Kruskal
+     IS this greedy and not an algorithm that resembles it. */
+  function forestOracle(edges, vertices) {
+    return function (m) {
+      var p = [], i;
+      for (i = 0; i < vertices; i += 1) p.push(i);
+      function find(a) { while (p[a] !== a) { p[a] = p[p[a]]; a = p[a]; } return a; }
+      for (i = 0; i < m.length; i += 1) {
+        var a = find(edges[m[i]][0]), b = find(edges[m[i]][1]);
+        if (a === b) return false;
+        p[a] = b;
+      }
+      return true;
+    };
+  }
+  /* And one that is NOT a matroid: the matchings of a graph. On a path of
+     three edges {A}, {C} and {A,C} are independent and {B} cannot be grown at
+     all, which is the smallest failure of the exchange property there is. */
+  function matchingOracle(edges) {
+    return function (m) {
+      var used = {};
+      for (var i = 0; i < m.length; i += 1) {
+        var e = edges[m[i]];
+        if (used[e[0]] || used[e[1]]) return false;
+        used[e[0]] = true; used[e[1]] = true;
+      }
+      return true;
+    };
+  }
+  /* Greedy needs the family to be downward closed before it needs it to be a
+     matroid, and those are two conditions rather than one. */
+  function downwardClosed(family) {
+    var key = {}, bad = [];
+    family.forEach(function (s) { key[s.join(',')] = true; });
+    family.forEach(function (s) {
+      s.forEach(function (x) {
+        var sub = s.filter(function (y) { return y !== x; });
+        if (!key[sub.join(',')]) bad.push({ set: s, drop: x });
+      });
+    });
+    return { ok: bad.length === 0, failures: bad };
+  }
+  /* THE WEIGHTING THAT BEATS GREEDY, found rather than quoted.
+
+     Rado and Edmonds: greedy is optimal for EVERY weighting exactly when the
+     family is a matroid. So on a family that is not one, a weighting must
+     exist where greedy loses, and this walks {1,2,3}^n in a fixed order until
+     it finds the first -- which makes the counterexample reproducible instead
+     of hand-picked. On a matroid it walks the whole space and returns null,
+     which is the other half of the theorem checked on this instance. */
+  function beatingWeights(family, ground, cap) {
+    cap = cap === undefined ? 7 : cap;
+    oracleCap('beatingWeights', ground.length, cap);
+    var n = ground.length, total = Math.pow(3, n), tried = 0;
+    for (var code = 0; code < total; code += 1) {
+      var w = [], t = code, i;
+      for (i = 0; i < n; i += 1) { w.push((t % 3) + 1); t = Math.floor(t / 3); }
+      tried += 1;
+      var run = matroidGreedy(family, w, ground);
+      if (!run.result.matches) {
+        return { weights: w, greedy: run.result.value, optimum: run.result.optimum,
+                 chosen: run.result.chosen, best: run.result.optimal, tried: tried,
+                 total: total };
+      }
+    }
+    return { weights: null, tried: tried, total: total };
+  }
+  /* A selection is independent, checked against the ORACLE and not against
+     the enumerated family, so a family built wrongly cannot hide inside a
+     membership test of its own making. */
+  function isIndependent(oracle, set) {
+    return oracle(set.slice().sort(function (a, b) { return a - b; }));
+  }
+
+  /* ======================================================= stable matching
+
+     Every perfect matching, filtered by the blocking-pair test the panel uses
+     on Gale-Shapley's own answer. n! of them, capped at 6, and from the stable
+     ones each proposer's best and worst ACHIEVABLE partner -- which is a fact
+     about the instance, computed without running the algorithm at all. */
+  function everyStableMatching(prefsA, prefsB, cap) {
+    cap = cap === undefined ? 6 : cap;
+    var n = prefsA.length, i;
+    oracleCap('everyStableMatching', n, cap);
+    var all = 0, stable = [], idx = [];
+    for (i = 0; i < n; i += 1) idx.push(i);
+    gyPermute(idx, function (perm) {
+      all += 1;
+      if (blockingPairs(perm, prefsA, prefsB).stable) stable.push(perm.slice());
+    });
+    var bestRank = [], worstRank = [];
+    for (i = 0; i < n; i += 1) {
+      var ranks = stable.map(function (m) { return prefsA[i].indexOf(m[i]); });
+      bestRank.push(ranks.length ? Math.min.apply(null, ranks) : null);
+      worstRank.push(ranks.length ? Math.max.apply(null, ranks) : null);
+    }
+    return { matchings: all, stable: stable, bestRank: bestRank, worstRank: worstRank };
+  }
+  /* Did this matching give EVERY proposer their best achievable partner? The
+     theorem says Gale-Shapley's does; the panel checks it row by row. */
+  function proposerOptimal(matchA, prefsA, every) {
+    var rows = [];
+    for (var i = 0; i < matchA.length; i += 1) {
+      rows.push({ a: i, got: prefsA[i].indexOf(matchA[i]),
+                  best: every.bestRank[i], worst: every.worstRank[i] });
+    }
+    return { rows: rows, optimal: rows.every(function (r) { return r.got === r.best; }) };
+  }
+  /* The same run with the two sides swapped, which is the asymmetry the mode
+     exists for: the receivers propose, and every rank moves the other way. */
+  function meanRank(matchA, prefs) {
+    var t = 0;
+    for (var i = 0; i < matchA.length; i += 1) t += prefs[i].indexOf(matchA[i]) + 1;
+    return R(BigInt(t), BigInt(matchA.length));
+  }
+  function invertMatch(matchA, n) {
+    var out = [];
+    for (var i = 0; i < n; i += 1) out.push(-1);
+    matchA.forEach(function (b, a) { if (b >= 0) out[b] = a; });
+    return out;
+  }
+
+  /* ================================================================ caching
+
+     THE BOUND, COMPUTED. Farthest-in-future is optimal among offline
+     demand-paging policies, and every lesson says so. This searches every
+     eviction decision -- memoised on (position, the set in the cache), which
+     is what keeps it finishing -- and returns the largest hit count any such
+     policy could reach. replayPolicy's 'opt' arm is then a number to compare
+     against rather than a number to trust.
+
+     DEMAND PAGING is the model, stated because it is a real restriction: a
+     miss always loads the page, and a policy that could decline to cache it
+     is a different problem. replayPolicy loads on every miss too, so the
+     comparison is like for like. */
+  function everyEviction(trace, k, cap) {
+    cap = cap === undefined ? 18 : cap;
+    oracleCap('everyEviction', trace.length, cap);
+    var memo = {}, states = 0;
+    function best(i, cache) {
+      if (i === trace.length) return 0;
+      var key = i + '|' + cache.join(',');
+      if (memo[key] !== undefined) return memo[key];
+      states += 1;
+      var page = trace[i], out, j;
+      if (cache.indexOf(page) !== -1) {
+        out = 1 + best(i + 1, cache);
+      } else if (cache.length < k) {
+        out = best(i + 1, cache.concat([page]).sort(function (a, b) { return a - b; }));
+      } else {
+        out = 0;
+        for (j = 0; j < cache.length; j += 1) {
+          var next = cache.slice();
+          next.splice(j, 1);
+          next = next.concat([page]).sort(function (a, b) { return a - b; });
+          var v = best(i + 1, next);
+          if (v > out) out = v;
+        }
+      }
+      memo[key] = out;
+      return out;
+    }
+    var hits = best(0, []);
+    return { hits: hits, misses: trace.length - hits, states: states,
+             rate: R(BigInt(hits), BigInt(trace.length)) };
+  }
+  /* Belady's anomaly: FIFO with a BIGGER cache can get FEWER hits. Swept
+     rather than described, because a reader told that it happens assumes it is
+     rare, and a reader shown the row does not. */
+  function beladySweep(trace, kmax, policy) {
+    var rows = [], anomalies = [];
+    for (var k = 1; k <= kmax; k += 1) {
+      var r = replayPolicy(trace, k, policy);
+      rows.push({ k: k, hits: r.hits, misses: r.misses, rate: r.rate });
+      if (k > 1 && r.hits < rows[k - 2].hits) {
+        anomalies.push({ from: k - 1, to: k, lost: rows[k - 2].hits - r.hits });
+      }
+    }
+    return { rows: rows, anomalies: anomalies };
+  }
+  /* The reference trace with a hit/miss mark per position, replayed by the
+     same routine the rates come from, so the picture and the number cannot
+     disagree. */
+  function replayMarks(trace, k, policy) {
+    var marks = [];
+    for (var i = 1; i <= trace.length; i += 1) {
+      var here = replayPolicy(trace.slice(0, i), k, policy);
+      var before = i > 1 ? replayPolicy(trace.slice(0, i - 1), k, policy).hits : 0;
+      marks.push(here.hits > before);
+    }
+    return marks;
+  }
+
+  /* ============================================================== drawings
+
+     Every builder returns a string and touches no element; the installer takes
+     the element first and may be handed null. That is the rule algo_core's
+     three drawing blocks exist to state. */
+  function gyScale(items, width, left) {
+    var lo = Infinity, hi = -Infinity;
+    items.forEach(function (x) { if (x.s < lo) lo = x.s; if (x.f > hi) hi = x.f; });
+    if (!isFinite(lo)) { lo = 0; hi = 1; }
+    if (hi <= lo) hi = lo + 1;
+    return { lo: lo, hi: hi,
+             x: function (t) { return left + ((t - lo) / (hi - lo)) * (width - left - 18); } };
+  }
+  function intervalsSvg(items, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 660 : opts.width;
+    var sc = gyScale(opts.span || items, w, 34);
+    var rowH = opts.rowH === undefined ? 24 : opts.rowH;
+    var pick = {}, mark = {};
+    (opts.chosen || []).forEach(function (x) { pick[x.label] = true; });
+    (opts.mark || []).forEach(function (x) { mark[x.label] = true; });
+    var s = '';
+    items.forEach(function (x, i) {
+      var y = 14 + i * rowH, x0 = sc.x(x.s), x1 = sc.x(x.f);
+      var on = pick[x.label], amber = !on && mark[x.label];
+      s += '<rect x="' + x0.toFixed(1) + '" y="' + y + '" width="'
+        + Math.max(4, x1 - x0).toFixed(1) + '" height="' + (rowH - 7) + '" rx="3" fill="'
+        + (on ? 'var(--cyan)' : (amber ? 'var(--amber)' : 'var(--panel-3)'))
+        + '" stroke="var(--line-strong)" stroke-width="1.2" />'
+        + '<text x="10" y="' + (y + rowH - 12) + '" font-size="11" font-weight="800" fill="'
+        + (on ? 'var(--cyan)' : 'var(--muted)') + '">' + x.label + '</text>'
+        + '<text x="' + (x0 + 5).toFixed(1) + '" y="' + (y + rowH - 12)
+        + '" font-size="10" fill="' + (on || amber ? 'var(--on-accent)' : 'var(--muted)')
+        + '">' + x.s + ' to ' + x.f + '</text>';
+    });
+    if (opts.at !== null && opts.at !== undefined) {
+      var xv = sc.x(opts.at);
+      s += '<line x1="' + xv.toFixed(1) + '" y1="6" x2="' + xv.toFixed(1) + '" y2="'
+        + (14 + items.length * rowH) + '" stroke="var(--red)" stroke-width="2" '
+        + 'stroke-dasharray="4 3" />'
+        + '<text x="' + (xv + 4).toFixed(1) + '" y="' + (14 + items.length * rowH + 11)
+        + '" font-size="10" fill="var(--red)">t = ' + opts.at + '</text>';
+    }
+    return s;
+  }
+  function drawIntervals(el, items, opts) {
+    var s = intervalsSvg(items, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  function roomsSvg(rooms, all, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 660 : opts.width;
+    var sc = gyScale(all, w, 54), rowH = opts.rowH === undefined ? 26 : opts.rowH;
+    var s = '';
+    rooms.forEach(function (room, r) {
+      var y = 14 + r * rowH;
+      s += '<text x="8" y="' + (y + rowH - 13) + '" font-size="10" fill="var(--muted)">room '
+        + (r + 1) + '</text>';
+      room.forEach(function (x) {
+        var x0 = sc.x(x.s), x1 = sc.x(x.f);
+        s += '<rect x="' + x0.toFixed(1) + '" y="' + y + '" width="'
+          + Math.max(4, x1 - x0).toFixed(1) + '" height="' + (rowH - 8)
+          + '" rx="3" fill="var(--cyan)" stroke="var(--line-strong)" stroke-width="1.2" />'
+          + '<text x="' + (x0 + 5).toFixed(1) + '" y="' + (y + rowH - 14)
+          + '" font-size="10" font-weight="800" fill="var(--on-accent)">' + x.label + '</text>';
+      });
+    });
+    if (opts.at !== null && opts.at !== undefined) {
+      var xv = sc.x(opts.at);
+      s += '<line x1="' + xv.toFixed(1) + '" y1="6" x2="' + xv.toFixed(1) + '" y2="'
+        + (14 + rooms.length * rowH) + '" stroke="var(--red)" stroke-width="2" '
+        + 'stroke-dasharray="4 3" />';
+    }
+    return s;
+  }
+  function edgesSvg(edges, vertices, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 300 : opts.width;
+    var h = opts.height === undefined ? 170 : opts.height;
+    var cx = w / 2, cy = h / 2, rad = Math.min(cx, cy) - 26, pts = [], i;
+    for (i = 0; i < vertices; i += 1) {
+      var ang = -Math.PI / 2 + (2 * Math.PI * i) / Math.max(1, vertices);
+      pts.push({ x: cx + rad * Math.cos(ang), y: cy + rad * Math.sin(ang) });
+    }
+    var on = {};
+    (opts.highlight || []).forEach(function (e) { on[e] = true; });
+    var s = '';
+    edges.forEach(function (e, k) {
+      var a = pts[e[0]], b = pts[e[1]];
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="' + (on[k] ? 'var(--cyan)' : 'var(--line-strong)')
+        + '" stroke-width="' + (on[k] ? 3.4 : 1.6) + '" />'
+        + '<text x="' + ((a.x + b.x) / 2).toFixed(1) + '" y="' + ((a.y + b.y) / 2 - 4).toFixed(1)
+        + '" text-anchor="middle" font-size="10" font-weight="800" fill="'
+        + (on[k] ? 'var(--cyan)' : 'var(--muted)') + '">' + gyLabel(k)
+        + (opts.weights ? ' ' + opts.weights[k] : '') + '</text>';
+    });
+    pts.forEach(function (p, v) {
+      s += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1)
+        + '" r="12" fill="var(--panel-3)" stroke="var(--line-strong)" stroke-width="1.6" />'
+        + '<text x="' + p.x.toFixed(1) + '" y="' + (p.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="var(--text)">'
+        + (v + 1) + '</text>';
+    });
+    return s;
+  }
+  function matchSvg(matchA, n, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 300 : opts.width;
+    var h = opts.height === undefined ? 190 : opts.height;
+    var step = opts.step === undefined
+      ? Math.min(30, Math.max(14, (h - 34) / Math.max(1, n - 1))) : opts.step;
+    var lx = 56, rx = w - 56, s = '', i;
+    for (i = 0; i < n; i += 1) {
+      var y = 20 + i * step;
+      if (matchA[i] >= 0) {
+        s += '<line x1="' + lx + '" y1="' + y + '" x2="' + rx + '" y2="'
+          + (20 + matchA[i] * step) + '" stroke="var(--cyan)" stroke-width="2.4" />';
+      }
+    }
+    for (i = 0; i < n; i += 1) {
+      var yy = 20 + i * step;
+      s += '<circle cx="' + lx + '" cy="' + yy + '" r="11" fill="var(--panel-3)" '
+        + 'stroke="var(--line-strong)" stroke-width="1.6" />'
+        + '<text x="' + lx + '" y="' + (yy + 4) + '" text-anchor="middle" font-size="11" '
+        + 'font-weight="800" fill="var(--text)">' + (i + 1) + '</text>'
+        + '<circle cx="' + rx + '" cy="' + yy + '" r="11" fill="var(--panel-3)" '
+        + 'stroke="var(--line-strong)" stroke-width="1.6" />'
+        + '<text x="' + rx + '" y="' + (yy + 4) + '" text-anchor="middle" font-size="11" '
+        + 'font-weight="800" fill="var(--text)">' + (i + 1) + '</text>';
+    }
+    s += '<text x="' + lx + '" y="10" text-anchor="middle" font-size="10" fill="var(--muted)">'
+      + (opts.leftLabel || 'proposers') + '</text>'
+      + '<text x="' + rx + '" y="10" text-anchor="middle" font-size="10" fill="var(--muted)">'
+      + (opts.rightLabel || 'receivers') + '</text>';
+    return s;
+  }
+  function traceSvg(trace, marks, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 660 : opts.width;
+    var cell = Math.max(16, Math.min(34, Math.floor((w - 24) / Math.max(1, trace.length))));
+    var s = '';
+    trace.forEach(function (p, i) {
+      var x = 12 + i * cell, hit = marks[i];
+      s += '<rect x="' + x + '" y="14" width="' + (cell - 3) + '" height="30" rx="4" fill="'
+        + (hit ? 'var(--cyan)' : 'var(--panel-3)') + '" stroke="var(--line-strong)" '
+        + 'stroke-width="1.3" />'
+        + '<text x="' + (x + (cell - 3) / 2).toFixed(1) + '" y="34" text-anchor="middle" '
+        + 'font-size="11" font-weight="800" fill="' + (hit ? 'var(--on-accent)' : 'var(--text)')
+        + '">' + p + '</text>'
+        + '<text x="' + (x + (cell - 3) / 2).toFixed(1) + '" y="58" text-anchor="middle" '
+        + 'font-size="9" fill="' + (hit ? 'var(--cyan)' : 'var(--muted)') + '">'
+        + (hit ? 'hit' : 'miss') + '</text>';
+    });
+    return s;
+  }
+  /* Nothing on this page is a claim about greedy algorithms in general.
+     Every verdict below is about the instance on screen, and every one of
+     them was computed twice: once by running the rule, and once by an
+     exhaustive search that does not know what the rule is. Where the two
+     disagree the panel prints both and names the subset that beats the
+     rule. Where the search is too big to run, the page says so and
+     refuses rather than printing a number it cannot stand behind. */
+  var MTP = {
+    'uniform': { kind: 'uniform', spec: '2', weights: '9 7 5 3 1', note: 'the rank is 2 and every pair is a basis, which is the simplest matroid there is and the one every proof is sanity-checked on' },
+    'graphic': { kind: 'graphic', spec: '1-2, 2-3, 3-1, 3-4, 1-4', weights: '8 6 5 4 2', note: 'greedy over this family IS Kruskal\'s algorithm, and the bases are the spanning trees' },
+    'partition': { kind: 'partition', spec: '1 1 2 2 3', weights: '7 6 5 4 3', note: 'three groups, one element each, so the rank is 3 and the greedy answer is the heaviest element of each group' },
+    'matchings': { kind: 'matching', spec: '1-2, 2-3, 3-4', weights: '2 3 2', note: 'the middle edge alone cannot be grown, while the two ends together can, which is the exchange property failing at the smallest possible instance' }
+  };
+
+  var presetIn = document.getElementById('mtPreset'), specIn = document.getElementById('mtSpec');
+  var wIn = document.getElementById('mtWeights');
+  var plot = document.getElementById('mtPlot');
+  var famT = document.getElementById('mtFamily'), runT = document.getElementById('mtRun');
+  var status = document.getElementById('mtStatus');
+  var KPIS = ['mtN', 'mtFam', 'mtRank', 'mtPairs', 'mtIs', 'mtGreedy'];
+
+  function blank(why) {
+    plot.innerHTML = ''; famT.innerHTML = ''; runT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span>';
+  }
+
+  /* An edge list, `1-2, 2-3`, 1-based, for the two graph families. */
+  function readEdges(text) {
+    var edges = [], bad = null, top = 0;
+    String(text).split(',').forEach(function (piece) {
+      var t = piece.replace(/\s+/g, '');
+      if (!t || bad) return;
+      var m = /^(\d+)-(\d+)$/.exec(t);
+      if (!m) { bad = 'an edge is written 1-2; "' + t + '" is not'; return; }
+      var a = parseInt(m[1], 10) - 1, b = parseInt(m[2], 10) - 1;
+      if (a === b) { bad = 'a loop is in no forest and no matching'; return; }
+      if (edges.length >= 6) {
+        bad = 'at most 6 edges: every subset is listed and then every ORDERED PAIR of the '
+            + 'family is tested, which is quadratic in a family that is itself exponential';
+        return;
+      }
+      top = Math.max(top, a + 1, b + 1);
+      edges.push([a, b]);
+    });
+    if (!bad && !edges.length) bad = 'no edges were read';
+    return { edges: edges, vertices: top, bad: bad };
+  }
+  function readInts(text) {
+    var out = [], bad = null;
+    String(text).split(/[\s,]+/).forEach(function (t) {
+      if (!t || bad) return;
+      var v = parseInt(t, 10);
+      if (!isFinite(v)) { bad = '"' + t + '" is not a whole number'; return; }
+      out.push(v);
+    });
+    if (!bad && !out.length) bad = 'nothing was read';
+    return { values: out, bad: bad };
+  }
+
+  function build(kind, spec) {
+    if (kind === 'uniform') {
+      var k = parseInt(spec, 10);
+      if (!isFinite(k) || k < 0) return { bad: 'the rank has to be a whole number' };
+      return { ground: [0, 1, 2, 3, 4], oracle: uniformOracle(k), edges: null,
+               describe: 'every subset of size at most ' + k };
+    }
+    if (kind === 'partition') {
+      var g = readInts(spec);
+      if (g.bad) return { bad: g.bad };
+      var groups = g.values.map(function (v) { return v - 1; });
+      var caps = [];
+      groups.forEach(function (v) { while (caps.length <= v) caps.push(1); });
+      if (groups.some(function (v) { return v < 0; })) return { bad: 'groups are numbered from 1' };
+      return { ground: groups.map(function (_, i) { return i; }),
+               oracle: partitionOracle(groups, caps), edges: null, groups: groups,
+               describe: 'at most one element from each of the ' + caps.length + ' groups' };
+    }
+    var e = readEdges(spec);
+    if (e.bad) return { bad: e.bad };
+    if (kind === 'graphic') {
+      return { ground: e.edges.map(function (_, i) { return i; }),
+               oracle: forestOracle(e.edges, e.vertices), edges: e.edges, vertices: e.vertices,
+               describe: 'the edge sets that contain no cycle' };
+    }
+    return { ground: e.edges.map(function (_, i) { return i; }),
+             oracle: matchingOracle(e.edges), edges: e.edges, vertices: e.vertices,
+             describe: 'the edge sets no two of which share a vertex' };
+  }
+
+  function redraw() {
+    var p = MTP[presetIn.value];
+    var kind = p ? p.kind : 'uniform';
+    var fam = build(kind, specIn.value);
+    if (fam.bad) { blank(fam.bad); return; }
+    /* One guard for all four families rather than three: everything below
+       enumerates 2^n subsets and then every ordered pair of what survives, and
+       independenceEnumerate throws above ten. Refusing here, by name, is the
+       difference between a panel that says why and a panel that is blank. */
+    if (fam.ground.length > 6) {
+      blank('this mode lists every subset and then tests every ordered pair of the family, so '
+            + 'it takes at most 6 elements and was given ' + fam.ground.length);
+      return;
+    }
+    var wr = readInts(wIn.value);
+    if (wr.bad) { blank(wr.bad); return; }
+    var weights = wr.values;
+    if (weights.length !== fam.ground.length) {
+      blank('there are ' + fam.ground.length + ' elements and ' + weights.length + ' weights');
+      return;
+    }
+
+    var enumerated = independenceEnumerate(fam.ground, fam.oracle);
+    var family = enumerated.result.family;
+    var closed = downwardClosed(family);
+    var ex = exchangeTest(family);
+    var run = matroidGreedy(family, weights, fam.ground);
+    var beat = null, why = '';
+    try { beat = beatingWeights(family, fam.ground); } catch (err) { why = String(err.message); }
+
+    document.getElementById('mtN').textContent = String(fam.ground.length);
+    document.getElementById('mtFam').textContent = String(family.length);
+    document.getElementById('mtRank').textContent = String(enumerated.result.rank);
+    document.getElementById('mtPairs').textContent = String(ex.tested);
+    document.getElementById('mtIs').textContent = ex.isMatroid ? 'yes' : 'no';
+    document.getElementById('mtGreedy').textContent = run.result.matches ? 'yes' : 'NO';
+
+    if (fam.edges) {
+      plot.innerHTML = edgesSvg(fam.edges, fam.vertices,
+                                { width: 500, height: 190, highlight: run.result.chosen,
+                                  weights: weights });
+    } else {
+      var bars = fam.ground.map(function (_, i) { return { s: i, f: i + 1, label: gyLabel(i) }; });
+      plot.innerHTML = intervalsSvg(bars, {
+        width: 500, rowH: 22,
+        chosen: bars.filter(function (b, i) { return run.result.chosen.indexOf(i) !== -1; })
+      });
+    }
+
+    var rows = '';
+    var shown = family.slice().sort(function (a, b) { return a.length - b.length; });
+    shown.slice(0, 14).forEach(function (s) {
+      rows += '<tr><td>{' + s.map(gyLabel).join(', ') + '}</td><td>' + s.length + '</td>'
+        + '<td>' + (isIndependent(fam.oracle, s) ? 'the oracle agrees' : 'ORACLE DISAGREES')
+        + '</td></tr>';
+    });
+    if (shown.length > 14) {
+      rows += '<tr><td>…</td><td colspan="2">' + (shown.length - 14) + ' more</td></tr>';
+    }
+    ex.failures.slice(0, 4).forEach(function (f) {
+      rows += '<tr class="tone-red"><td>{' + f.A.map(gyLabel).join(', ') + '}</td>'
+        + '<td>{' + f.B.map(gyLabel).join(', ') + '}</td>'
+        + '<td>nothing in the second can join the first</td></tr>';
+    });
+    famT.innerHTML = '<thead><tr><th>independent set</th><th>size</th><th>check</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody>';
+
+    var rrows = '';
+    run.trace.forEach(function (st) {
+      rrows += '<tr class="' + (st.taken ? 'tone-cyan' : '') + '"><th class="rowhead">'
+        + gyLabel(st.element) + '</th><td>' + st.weight + '</td><td>'
+        + (st.taken ? 'added' : 'would break independence') + '</td></tr>';
+    });
+    rrows += '<tr class="tone-cyan"><th class="rowhead">greedy</th><td>' + run.result.value
+      + '</td><td>{' + run.result.chosen.map(gyLabel).join(', ') + '}</td></tr>';
+    rrows += '<tr class="tone-amber"><th class="rowhead">best in the family</th><td>'
+      + run.result.optimum + '</td><td>{'
+      + (run.result.optimal || []).map(gyLabel).join(', ') + '}</td></tr>';
+    runT.innerHTML = '<thead><tr><th>element</th><th>weight</th><th>greedy</th></tr></thead>'
+      + '<tbody>' + rrows + '</tbody>';
+
+    var note = p ? p.note : '';
+    status.innerHTML = 'The family is ' + fam.describe + ': <strong>' + family.length
+      + '</strong> of the ' + enumerated.counts.nodes + ' subsets pass the test, the rank is '
+      + enumerated.result.rank + ', and it '
+      + (closed.ok ? 'is downward closed — dropping an element from an independent set leaves '
+                     + 'one, which greedy needs before anything else'
+                   : '<span class="tone-red">is not downward closed</span>')
+      + '. The exchange property was tested on all <strong>' + ex.tested
+      + '</strong> ordered pairs and '
+      + (ex.isMatroid
+          ? 'held on every one, so this is a <span class="tone-cyan">matroid</span>.'
+          : 'failed on <span class="tone-red">' + ex.failures.length + '</span> of them, so it '
+            + 'is <span class="tone-red">not</span> a matroid.')
+      + ' On the weights typed, greedy gets ' + run.result.value + ' and the best member of the '
+      + 'family is worth ' + run.result.optimum + '. '
+      + (beat === null
+          ? '<span class="tone-amber">The search over weightings was refused: ' + why + '.</span>'
+          : (beat.weights
+              ? 'Searching ' + beat.tried + ' of the ' + beat.total + ' weightings in {1,2,3}^'
+                + fam.ground.length + ' found one where greedy loses: weights '
+                + beat.weights.join(' ') + ' give greedy ' + beat.greedy + ' against '
+                + beat.optimum + '. That is the half of Rado and Edmonds that bites — a family '
+                + 'that is not a matroid always has such a weighting, and here it is.'
+              : 'All ' + beat.total + ' weightings in {1,2,3}^' + fam.ground.length
+                + ' were tried and greedy matched the optimum on every one of them, which is '
+                + 'what the exchange property buys.'))
+      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+  }
+
+  presetIn.addEventListener('change', function () {
+    var p = MTP[presetIn.value];
+    if (p) { specIn.value = p.spec; wIn.value = p.weights; }
+    redraw();
+  });
+  [specIn, wIn].forEach(function (el) {
+    el.addEventListener('input', redraw);
+    el.addEventListener('change', redraw);
+  });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "greedy-and-matroids/greedy-for-every-weighting";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

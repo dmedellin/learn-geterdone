@@ -1,0 +1,2323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A Rolling Hash, and a Collision You Can Read | Lesson | Strings and Pattern Matching | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="Rabin–Karp hashes the pattern once and each window in constant time from the window before, so the scan is n arithmetic steps. Equal hashes are not a match: on the lab&#x27;s opening text 7 windows hash to 36 and only 4 of them are occurrences. The other three are printed with their characters so they can be checked by eye, and the verification that separates them is not an optimisation that can be skipped — it is the only reason the answer is right." />
+  <link rel="canonical" href="https://learn.geterdone.io/strings-and-pattern-matching/a-rolling-hash-and-its-collisions/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="A Rolling Hash, and a Collision You Can Read | Lesson | Strings and Pattern Matching | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="Rabin–Karp hashes the pattern once and each window in constant time from the window before, so the scan is n arithmetic steps. Equal hashes are not a match: on the lab&#x27;s opening text 7 windows hash to 36 and only 4 of them are occurrences. The other three are printed with their characters so they can be checked by eye, and the verification that separates them is not an optimisation that can be skipped — it is the only reason the answer is right." />
+  <meta property="og:url" content="https://learn.geterdone.io/strings-and-pattern-matching/a-rolling-hash-and-its-collisions/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="A Rolling Hash, and a Collision You Can Read | Lesson | Strings and Pattern Matching | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Rabin–Karp hashes the pattern once and each window in constant time from the window before, so the scan is n arithmetic steps. Equal hashes are not a match: on the lab&#x27;s opening text 7 windows hash to 36 and only 4 of them are occurrences. The other three are printed with their characters so they can be checked by eye, and the verification that separates them is not an optimisation that can be skipped — it is the only reason the answer is right." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/strings-and-pattern-matching/a-rolling-hash-and-its-collisions/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Strings and Pattern Matching</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">A Rolling Hash, and a Collision You Can Read</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The a rolling hash, and a collision you can read off the page is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Strings and Pattern Matching &middot; Hashing, and the verification</span>
+        <h1>A Rolling Hash, and a Collision You Can Read</h1>
+        <p>Rabin&ndash;Karp hashes the pattern once and each window in constant time from the window before, so the scan is <span class="math">n</span> arithmetic steps. Equal hashes are not a match: on the lab's opening text 7 windows hash to 36 and only 4 of them are occurrences. The other three are printed with their characters so they can be checked by eye, and the verification that separates them is not an optimisation that can be skipped &mdash; it is the only reason the answer is right.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">hash of a window: its characters as digits in base b, taken modulo m
+roll forward: drop the leading digit, shift, add the trailing one
+base 256, modulus 41:  the pattern ain hashes to 36
+41 windows, 7 hash equal to 36, 4 are matches, 3 are collisions
+the collisions are at offsets 33, 36 and 38:  &#x27; th&#x27;, &#x27;e p&#x27;, &#x27;pla&#x27;
+21 characters compared verifying, 9 of them spent on the collisions</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One number per window, and the three windows that share the pattern&#x27;s</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the hash decides nothing on its own. The other two are how the roll works and why the arithmetic is exact rather than machine-dependent.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A hash equal is a candidate, and a candidate must be verified</h3><p>The scan compares numbers, and equal numbers mean the characters might be equal. On the opening text 7 of the 41 windows hash to 36, the pattern's value, and 3 of those are not <span class="math">ain</span> at all: the panel lists them with their characters, at offsets 33, 36 and 38. Every one of the 7 costs <span class="math">m = 3</span> character comparisons to settle, so 21 comparisons are spent on verification of which 9 establish nothing but a false alarm. Removing the verification does not make the algorithm faster, it makes it wrong.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The roll is the one value on the page derived from another value</h3><p>Every other number in this kit is computed from the input. The next window's hash is computed from the current one: subtract the leading character's contribution, multiply by the base, add the trailing character, and reduce. That makes it the only place where an error can accumulate silently rather than being recomputed away, so the panel recomputes every window's hash from scratch and requires the two to agree &mdash; on this text the disagreement count is 0.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The arithmetic is exact, so the collisions are the same everywhere</h3><p>The hashes are computed in arbitrary-precision integers, not in machine doubles. That matters more than it looks on a page whose subject is that two particular windows collide: if the modulus arithmetic overflowed or rounded, the collision would be a property of the reader's browser rather than of the text, and the three offsets printed above would not be checkable by hand. They are, and the worked example below does check one.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>One number per window, rolled forward, and what equality does not prove</h2></div><p>The hash, the roll and its correctness, the collisions on this text listed exactly, and the cost of settling them.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The window hash</span><p>Fix a base <span class="math">b</span> and a modulus <span class="math">q</span>. For a string <span class="math">w</span> of length <span class="math">m</span> the <strong>hash</strong> is the value of <span class="math">w</span> read as an <span class="math">m</span>-digit number in base <span class="math">b</span>, taken modulo <span class="math">q</span>: <span class="math">H(w) = (w[0] b^(m−1) + w[1] b^(m−2) + ... + w[m−1]) mod q</span>, where each character contributes its code point.</p></div><div class="thm"><span class="label">Theorem &middot; The roll is correct</span><p>Let <span class="math">w = t[s..s+m−1]</span> and <span class="math">w' = t[s+1..s+m]</span>. Then <span class="math">H(w') = (b (H(w) − t[s] b^(m−1)) + t[s+m]) mod q</span>, so each successive hash costs a constant number of arithmetic operations once <span class="math">b^(m−1) mod q</span> is known.</p></div><div class="proof"><p>Write <span class="math">H(w)</span> without the reduction as <span class="math">S = sum over i of t[s+i] b^(m−1−i)</span>. Subtracting <span class="math">t[s] b^(m−1)</span> removes the leading term, leaving <span class="math">sum over i &ge; 1 of t[s+i] b^(m−1−i)</span>.</p><p>Multiplying by <span class="math">b</span> raises every remaining exponent by one, giving <span class="math">sum over i &ge; 1 of t[s+i] b^(m−i)</span>, which is the first <span class="math">m − 1</span> terms of <span class="math">w'</span>'s expansion. Adding <span class="math">t[s+m] b^0</span> completes it.</p><p>Reduction modulo <span class="math">q</span> commutes with addition and multiplication, so performing it at each step gives the same residue as performing it at the end. The cost is one multiplication, one subtraction, one addition and one reduction, independent of <span class="math">m</span>.</p><p><span class="qed">&#9633;</span></p></div><p>So the scan is <span class="math">n</span> steps of constant arithmetic plus <span class="math">m</span> character comparisons for each candidate. The panel counts the second part and prints it as characters compared verifying, because that is the part whose size depends on the text.</p><div class="example"><span class="label">Example &middot; Seven candidates, four matches, three collisions</span><p>The lab opens on <span class="math">the rain in spain stays mainly in the plain</span> and the pattern <span class="math">ain</span>, at base 256 and modulus 41. The pattern hashes to 36. Of the 41 windows, 7 hash to 36. Four are the real occurrences, at offsets 5, 14, 25 and 40. The other three are at offsets 33, 36 and 38, and their characters are the space followed by <span class="math">th</span>, then <span class="math">e</span> space <span class="math">p</span>, then <span class="math">pla</span>. None of those is <span class="math">ain</span> and all of them hash to 36.</p></div><p>The panel prints those three in a table with their hashes beside the pattern's, so that a reader can copy one out and check it. The worked example below does exactly that for the first of them, in five lines of arithmetic.</p><h3>What the collisions cost, and what the cost does not depend on</h3><p>Each of the 7 candidates costs <span class="math">m = 3</span> character comparisons to settle, whether it turns out to be a match or not, so the verification bill is 21 comparisons. Nine of those &mdash; three collisions at three characters each &mdash; produce nothing. The panel reports both numbers, as characters compared verifying and wasted on collisions.</p><p>Nothing in the algorithm notices the waste. A collision is indistinguishable from a match until the characters are compared, which is why the comparison is unconditional and why an implementation that trusted the hash would be wrong on this very text, at three offsets, silently.</p><h3>Exact arithmetic, and why it is not a detail here</h3><p>At base 256 a three-character window is a number up to <span class="math">256^3</span>, about 16.7 million, which fits a double comfortably. At twelve characters it does not, and a rounded intermediate would change which windows collide. The kit computes every hash in arbitrary-precision integers, so the three offsets above are the same three on every machine, and a reader who checks one by hand and disagrees has found a bug rather than a rounding difference.</p><p>The same choice is what makes the panel's independent recomputation meaningful. Each window's rolled hash is compared with the same window hashed from its characters, and the count of disagreements is printed; on this text it is 0. If the arithmetic were approximate that check would be comparing two approximations and could pass while both were wrong.</p><h3>Where the cost actually goes</h3><p>Rabin&ndash;Karp's attraction is that the scan is arithmetic rather than comparison, so the work per window does not depend on <span class="math">m</span>. Its exposure is that the number of candidates does depend on the modulus, and the modulus is a choice. Three collisions on 41 windows is a 7 per cent false-alarm rate on this text at this modulus, and the sibling lesson &ldquo;Choosing a Modulus, and What the Sweep Says&rdquo; runs the same text at every prime under 200 to show what that rate does as the choice moves.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A rolling hash, and a collision you can read off the page</h2></div><p>Equal hashes are not a match, and the verification is not optional</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>A rolling hash, and the collisions it actually produces</strong><span>hashes equal, characters not</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a real match</span><span class="tone-red"><i class="legend-swatch"></i>a hash collision that is not a match</span><span class="tone-muted"><i class="legend-swatch"></i>the hash did not match</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="raBars" viewBox="0 0 660 150" role="img" aria-label="One bar per window, its height the window's hash, with the pattern's hash drawn across."></svg></div>
+      <p class="tt" id="raStrip" style="margin:8px 0 0;word-break:break-all;line-height:1.7;"></p>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="raWindows"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="raSweep"></table></div>
+      <div class="status-banner" id="raStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Pick a base and a modulus, and read the collisions off the table</h3>
+          <p>Every bar is one window and its height is that window's hash, with the pattern's value drawn across. The upper table lists every window whose hash matched, marked as a real match or a collision, and every hash is an arbitrary-precision integer so the collisions are the same on every machine.</p>
+        <div class="field">
+          <label for="raPreset">Worked example</label>
+          <select id="raPreset"><option value="english" selected>prose, base 256, and a modulus that collides</option><option value="dna">four bases, base 4, modulus 13</option><option value="binary">two letters, base 2, modulus 11</option><option value="abra">a repetitive text with a short pattern</option><option value="clean">the same prose at a modulus large enough</option></select>
+        </div>
+        <div class="field">
+          <label for="raText">The text</label>
+          <input id="raText" type="text" value="" inputmode="text" autocomplete="off" spellcheck="false" placeholder="the rain in spain stays mainly in the plain">
+        </div>
+        <div class="field">
+          <label for="raPattern">The pattern</label>
+          <input id="raPattern" type="text" value="" inputmode="text" autocomplete="off" spellcheck="false" placeholder="ain">
+        </div>
+        <div class="field">
+          <label for="raBase">The base</label>
+          <select id="raBase"><option value="2">2</option><option value="4">4</option><option value="10">10</option><option value="31">31</option><option value="128">128</option><option value="256" selected>256</option></select>
+        </div>
+        <div class="field">
+          <label for="raMod">The modulus</label>
+          <select id="raMod"><option value="7">7</option><option value="11">11</option><option value="13">13</option><option value="17">17</option><option value="19">19</option><option value="23">23</option><option value="29">29</option><option value="31">31</option><option value="37">37</option><option value="41" selected>41</option><option value="53">53</option><option value="67">67</option><option value="97">97</option><option value="101">101</option><option value="1009">1009</option><option value="10007">10007</option><option value="1000003">1000003</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Windows</span><strong id="raWin">&mdash;</strong></div>
+          <div class="kpi"><span>Hashes equal to the pattern's</span><strong id="raEqual">&mdash;</strong></div>
+          <div class="kpi"><span>Real matches</span><strong id="raHits">&mdash;</strong></div>
+          <div class="kpi"><span>Collisions</span><strong id="raSpur">&mdash;</strong></div>
+          <div class="kpi"><span>Characters compared verifying</span><strong id="raComp">&mdash;</strong></div>
+          <div class="kpi"><span>Wasted on collisions</span><strong id="raWaste">&mdash;</strong></div>
+          <div class="kpi"><span>Primes under 200 that collide</span><strong id="raBad">&mdash;</strong></div>
+          <div class="kpi"><span>Largest of them</span><strong id="raLast">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="raHint" style="margin:0;">The hash of a window is its characters read as digits in the chosen base, taken modulo the chosen modulus, and the next window is computed from this one by removing the leading digit and appending the trailing one. Equal hashes are NOT a match: the algorithm must compare the characters, and the count of times it had to is on the page. Lower the modulus until the collisions appear, then raise it and watch them go — and notice that they do not go monotonically.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Hashing a window, rolling it, and never believing it</h2></div><p>Compute one hash by hand, roll it once, and check a collision. Three short calculations settle what the page is about.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute the pattern&#x27;s hash first, and keep it</h3><p><span class="math">ain</span> is 97, 105, 110 in code points, so at base 256 it is <span class="math">97 × 65536 + 105 × 256 + 110 = 6383982</span>, and <span class="math">6383982 mod 41 = 36</span>. Every comparison on the page is against that one number.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Roll one window by hand</h3><p>From the window at offset 0 to the window at offset 1: subtract the leading character's contribution, multiply by the base, add the new trailing character, reduce. Doing it once makes it obvious that the cost does not grow with <span class="math">m</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Verify a candidate before recording it</h3><p>Compare the <span class="math">m</span> characters. This is not a defensive extra; the panel's table has three rows where the hash agreed and the characters did not, and skipping the comparison would report all three as matches.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check a collision by hand, at least once</h3><p>Take offset 33, the window consisting of a space and <span class="math">th</span>, and compute its hash from its three code points. Getting 36 is the moment the page stops being an assertion about hashing and becomes a fact about this text.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Hashes, rolls, and what equality establishes</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>One collision, checked from its characters</h3><p>The text is <span class="math">the rain in spain stays mainly in the plain</span>, the pattern is <span class="math">ain</span>, the base is 256 and the modulus is 41. Code points: space is 32, <span class="math">a</span> is 97, <span class="math">e</span> is 101, <span class="math">h</span> is 104, <span class="math">i</span> is 105, <span class="math">l</span> is 108, <span class="math">n</span> is 110, <span class="math">p</span> is 112, <span class="math">t</span> is 116.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the pattern   a i n     97, 105, 110
+  97 x 65536 + 105 x 256 + 110            = 6383982
+  6383982 mod 41                          = 36
+
+offset 33     &#x27; t h&#x27;    32, 116, 104
+  32 x 65536 + 116 x 256 + 104            = 2126952
+  2126952 mod 41                          = 36        SAME
+  compare characters:  &#x27; &#x27; vs &#x27;a&#x27;         FAIL         a collision
+
+windows                                   = 41
+hashes equal to 36                        = 7
+real matches   offsets 5, 14, 25, 40      = 4
+collisions     offsets 33, 36, 38         = 3
+characters compared verifying  7 x 3      = 21
+wasted on the collisions       3 x 3      =  9
+rolled hashes disagreeing with a fresh one =  0</div><p>Two three-character strings with nothing in common produced the same residue, and the only reason the algorithm did not report the space and <span class="math">th</span> as an occurrence of <span class="math">ain</span> is the comparison on the line below. That line is not an optimisation guard; it is where the correctness lives.</p><p>For a faded rehearsal, check offset 38, whose characters are <span class="math">pla</span> &mdash; 112, 108, 97. The supplied first move is the base expansion: <span class="math">112 × 65536 + 108 × 256 + 97</span>. Reduce it modulo 41 and confirm 36, then say how many of the three collisions you would have caught by comparing only the first character.</p><p>Then change the modulus to 1000003 and count again. The candidates fall from 7 to 4 and the verification bill from 21 to 12; the matches do not move. Say why the match count cannot move however the modulus changes, and what that tells you about which of the two counters is measuring the algorithm and which is measuring the choice.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the verification an optimisation that can be skipped</strong><span>It is the correctness argument. Without it the algorithm reports 7 positions on this text, of which 3 are wrong, and the failure is silent because a hash gives no signal of its own reliability. Every claim the page makes about the method's speed is a claim about the method with the comparison in it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a low collision count as a property of the hash function</strong><span>Three on 41 windows is a property of this text, this base and this modulus together. The sibling lesson runs the same text and base at 46 different moduli and gets collision counts from 0 to 18, which is what it looks like when a number depends on a choice rather than on the algorithm.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming a collision must share characters with the pattern</strong><span>A residue is a residue. Offset 33 is a space followed by <span class="math">th</span> and hashes to the same 36 as <span class="math">ain</span>; they agree in no position. Checking only the first character would separate all three here and would not in general, which is why the comparison is over all <span class="math">m</span>.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can hash a window by hand, roll it once, and verify one collision from its code points.</strong><p>You should be able to state the hash as a base expansion modulo <span class="math">q</span>, prove the roll correct, say why its cost is independent of <span class="math">m</span>, explain why equal hashes are one-sided evidence, compute a collision's residue from its characters, and say what the independent recomputation is protecting.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Three collisions on 41 windows is one modulus's worth of evidence. &ldquo;Choosing a Modulus, and What the Sweep Says&rdquo; keeps this text and this base and runs every prime under 200, which turns &ldquo;collisions are rare&rdquo; into a count &mdash; and shows that the count does not fall as the modulus rises.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../the-text-where-nothing-is-skipped/" rel="prev"><span>Lesson</span><strong>The Text Where Nothing Is Skipped</strong></a>
+      <a class="lesson-link next" href="../choosing-a-modulus/" rel="next"><span>Lesson</span><strong>Choosing a Modulus, and What the Sweep Says</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="strings-and-pattern-matching/a-rolling-hash-and-its-collisions" data-lesson-title="A Rolling Hash, and a Collision You Can Read" data-course-title="Strings and Pattern Matching">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Strings and Pattern Matching.</strong> Every count on this course is produced by running the matcher in your browser on the text in the box, and every count is a character comparison, an arithmetic step or a table lookup actually made. Comparison counts, alignment counts, shifts, characters skipped, table cells, trie nodes, collision counts and distinct-substring counts are exact integers; the ratios &mdash; comparisons per alignment, comparisons per character, average shift and table cells per text character &mdash; are exact fractions with a decimal printed beside them rather than instead of them. Every hash is an arbitrary-precision integer, so the three colliding windows the rolling-hash page lists are the same three on every machine and can be checked by hand from their code points. Six routines that report match positions are checked on every keystroke against comparing the whole substring at every offset; the failure function is checked against the longest border found by trying every length; the suffix array against sorting the suffixes as whole strings, and the LCP array against comparing each adjacent pair character by character; the prefix query against filtering the word list; and one Aho&ndash;Corasick pass word by word against scanning the text separately for each word. One quantity on this course is an average over a distribution rather than a measurement or a bound &mdash; Horspool's expected comparisons on a uniformly random text &mdash; and the page that names it says so and says what it therefore cannot promise about the input on screen.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Seven windows hash to 36 and four are matches. What may the algorithm conclude from a hash of 36?", "a": ["That the window is an occurrence", "That the window might be an occurrence, and the m characters must be compared to find out", "That the window shares its first character with the pattern", "That the modulus is too small for this text"], "c": 1, "why": "A hash maps many strings to one residue, so equality is a candidate and nothing more. The three collisions here share no character at all with <span class=\"math\">ain<\/span> in the same position &mdash; offset 33 begins with a space &mdash; so nothing weaker than the full comparison will separate them."}, {"q": "Why does the lab recompute every window's hash from its characters as well as rolling it?", "a": ["To make the page slower and more convincing", "Because the roll is the only value derived from a previous value, so an error there would accumulate silently", "Because rolling is only valid for short patterns", "Because the modulus can change between windows"], "c": 1, "why": "Everything else on the page is computed from the input and so cannot drift. The roll carries a number forward, which is exactly the shape of error that no later step would notice, so the page pays for an independent recomputation and prints the disagreement count &mdash; 0 on this text."}, {"q": "What does the roll cost per window, and why?", "a": ["m operations, one per character of the window", "A constant number of operations, because the leading term is removed and the trailing one added", "log m operations, by repeated squaring", "One operation, since the modulus makes the arithmetic trivial"], "c": 1, "why": "Subtract the leading character's contribution, multiply by the base, add the trailing character, reduce: four operations regardless of <span class=\"math\">m<\/span>, once <span class=\"math\">b^(m\u22121) mod q<\/span> is precomputed. That independence from <span class=\"math\">m<\/span> is the whole point of a rolling hash."}, {"q": "An implementation drops the character comparison and reports every window whose hash equals the pattern's. What happens on this text?", "a": ["Nothing: the hashes are exact, so equality is reliable", "It reports 7 occurrences instead of 4, and nothing in the run signals the error", "It misses matches, because hashing can fail in both directions", "It reports 4, because collisions are rare at base 256"], "c": 1, "why": "Three of the seven candidates are not occurrences, and the algorithm has no other way to tell. It cannot miss a match &mdash; equal strings always hash equal &mdash; so the error is one-sided and shows up as extra positions that no counter or status line would flag."}];
+
+  (function () {
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* String matching. Every count is a character comparison actually made, and
+     the hashes are BigInt so a rolling hash is the same number on every
+     machine -- a lesson whose subject is that two windows collide cannot have
+     the collision depend on the reader's browser. */
+
+  function naiveRun(t, p) {
+    var c = counter(), trace = [], hits = [];
+    for (var i = 0; i + p.length <= t.length; i += 1) {
+      var k = 0;
+      while (k < p.length) { c.compares += 1; if (t[i + k] !== p[k]) break; k += 1; }
+      if (k === p.length) hits.push(i);
+      trace.push({ at: i, compares: k === p.length ? k : k + 1, matched: k, hit: k === p.length });
+    }
+    return runOf({ hits: hits, alignments: trace.length }, usedCounts(c), trace);
+  }
+  /* The expected characters compared per alignment over a uniform alphabet of
+     size sigma: sum_{k>=1} k * (1/sigma)^(k-1) * ((sigma-1)/sigma) = sigma /
+     (sigma - 1), exactly. Which is why naive matching is fast on ordinary text
+     and quadratic only on the contrived pair the mode builds in one click. */
+  function expectedPerAlignment(sigma) {
+    return R(BigInt(sigma), BigInt(sigma - 1));
+  }
+  function naiveWorstPair(m, n, letter) {
+    var a = letter || 'a';
+    return { text: new Array(n + 1).join(a), pattern: new Array(m).join(a) + 'b' };
+  }
+
+  /* Rabin-Karp, with every window's hash exact. A HIT IS NOT A MATCH: the
+     lesson's whole content is that an equal hash must be verified, so spurious
+     hits are counted separately from real ones. */
+  function rollingHash(t, p, b, mod) {
+    var B = BigInt(b), M = BigInt(mod), c = counter(), trace = [];
+    function hash(s) {
+      var h = 0n;
+      for (var i = 0; i < s.length; i += 1) h = (h * B + BigInt(s.charCodeAt(i))) % M;
+      return h;
+    }
+    var m = p.length, target = hash(p), high = 1n;
+    for (var i = 1; i < m; i += 1) high = (high * B) % M;
+    var h = m <= t.length ? hash(t.slice(0, m)) : null;
+    var hits = [], spurious = 0, verified = 0;
+    for (var s = 0; s + m <= t.length; s += 1) {
+      if (s > 0) {
+        h = (h - BigInt(t.charCodeAt(s - 1)) * high % M + M) % M;
+        h = (h * B + BigInt(t.charCodeAt(s + m - 1))) % M;
+      }
+      var equal = h === target, real = false;
+      if (equal) {
+        verified += 1;
+        real = t.slice(s, s + m) === p;
+        c.compares += m;
+        if (real) hits.push(s); else spurious += 1;
+      }
+      trace.push({ at: s, hash: h, equal: equal, match: real });
+    }
+    return runOf({ hits: hits, target: target, spurious: spurious, verifications: verified,
+                   base: b, modulus: mod }, usedCounts(c), trace);
+  }
+
+  /* KMP's failure function: fail[k] is the length of the longest proper border
+     of the first k characters. The inner loop's total iterations are bounded by
+     2m, and the panel plots them against it, because "amortised" is the claim
+     and a count is the only honest evidence for it. */
+  function failureFn(p) {
+    var c = counter(), fail = new Array(p.length + 1).fill(0), k = 0, inner = 0;
+    fail[0] = -1;
+    for (var i = 1; i < p.length; i += 1) {
+      while (k > 0 && p[i] !== p[k]) { k = fail[k] > 0 ? fail[k] : 0; inner += 1; c.compares += 1; if (k === 0) break; }
+      c.compares += 1;
+      if (p[i] === p[k]) k += 1; else k = 0;
+      fail[i + 1] = k;
+    }
+    var chain = [];
+    var at = p.length;
+    while (at > 0) { chain.push(at); at = fail[at] > 0 ? fail[at] : 0; }
+    return runOf({ fail: fail, borders: chain, inner: inner, bound: 2 * p.length },
+                 usedCounts(c), []);
+  }
+  function kmpRun(t, p) {
+    var f = failureFn(p).result.fail, c = counter(), trace = [], hits = [], k = 0;
+    for (var i = 0; i < t.length; i += 1) {
+      while (k > 0 && t[i] !== p[k]) { k = Math.max(0, f[k]); c.compares += 1; }
+      c.compares += 1;
+      if (t[i] === p[k]) k += 1;
+      trace.push({ at: i, matched: k, text: i });
+      if (k === p.length) { hits.push(i - p.length + 1); k = Math.max(0, f[k]); }
+    }
+    var naive = naiveRun(t, p);
+    return runOf({ hits: hits, naiveCompares: naive.counts.compares || 0,
+                   textPointerMonotone: true, bound: 2 * t.length },
+                 usedCounts(c), trace);
+  }
+
+  /* Horspool: the shift table is the LAST occurrence of each character in the
+     pattern's first m-1 positions, so a mismatch jumps rather than sliding by
+     one. Characters skipped is the figure. */
+  function horspoolRun(t, p) {
+    var c = counter(), shift = {}, m = p.length, i;
+    for (i = 0; i < m - 1; i += 1) shift[p[i]] = m - 1 - i;
+    var hits = [], trace = [], s = 0, skipped = 0;
+    while (s + m <= t.length) {
+      var k = m - 1;
+      while (k >= 0) { c.compares += 1; if (t[s + k] !== p[k]) break; k -= 1; }
+      if (k < 0) hits.push(s);
+      var step = shift[t[s + m - 1]] === undefined ? m : shift[t[s + m - 1]];
+      trace.push({ at: s, matchedFromRight: m - 1 - k, shift: step });
+      skipped += step - 1;
+      s += step;
+    }
+    var kmp = kmpRun(t, p);
+    return runOf({ hits: hits, table: shift, skipped: skipped,
+                   kmpCompares: kmp.counts.compares || 0 }, usedCounts(c), trace);
+  }
+
+  /* A trie. `slots` counts the array cells an array-per-node implementation
+     would allocate, beside the `nodes` a map-per-node one uses -- the space
+     question the lesson asks, answered with two numbers rather than a word. */
+  function trieBuild(words, sigma) {
+    var root = { ch: '', kids: {}, end: false, id: 0 }, nodes = [root], c = counter();
+    words.forEach(function (w) {
+      var at = root;
+      for (var i = 0; i < w.length; i += 1) {
+        if (!at.kids[w[i]]) {
+          var made = { ch: w[i], kids: {}, end: false, id: nodes.length };
+          nodes.push(made); at.kids[w[i]] = made; c.writes += 1;
+        }
+        at = at.kids[w[i]];
+        c.reads += 1;
+      }
+      at.end = true;
+    });
+    return { root: root, nodes: nodes, count: nodes.length,
+             slots: nodes.length * (sigma || 26),
+             counts: usedCounts(c) };
+  }
+  function trieKids(n) {
+    return Object.keys(n.kids).sort().map(function (k) { return n.kids[k]; });
+  }
+  function triePrefix(trie, prefix) {
+    var at = trie.root;
+    for (var i = 0; i < prefix.length; i += 1) {
+      at = at.kids[prefix[i]];
+      if (!at) return [];
+    }
+    var out = [];
+    (function walk(n, acc) {
+      if (n.end) out.push(acc);
+      trieKids(n).forEach(function (k) { walk(k, acc + k.ch); });
+    })(at, prefix);
+    return out;
+  }
+  /* Aho-Corasick failure links by BFS, then ONE pass over the text reporting
+     every match of every pattern -- against k separate KMP runs, which is the
+     comparison the mode draws. */
+  function ahoLinks(trie) {
+    var root = trie.root, queue = [];
+    root.fail = root; root.out = [];
+    trieKids(root).forEach(function (k) { k.fail = root; queue.push(k); });
+    while (queue.length) {
+      var v = queue.shift();
+      v.out = (v.end ? [v] : []).concat(v.fail.out || []);
+      trieKids(v).forEach(function (k) {
+        var f = v.fail;
+        while (f !== root && !f.kids[k.ch]) f = f.fail;
+        k.fail = (f.kids[k.ch] && f.kids[k.ch] !== k) ? f.kids[k.ch] : root;
+        queue.push(k);
+      });
+    }
+    return trie;
+  }
+  function ahoRun(t, trie) {
+    var root = trie.root, at = root, c = counter(), hits = [], trace = [];
+    for (var i = 0; i < t.length; i += 1) {
+      while (at !== root && !at.kids[t[i]]) { at = at.fail; c.compares += 1; }
+      c.compares += 1;
+      if (at.kids[t[i]]) at = at.kids[t[i]];
+      (at.out || []).forEach(function (n) { hits.push({ at: i, node: n.id }); });
+      trace.push({ at: i, state: at.id, outputs: (at.out || []).length });
+    }
+    return runOf({ hits: hits, states: trie.count }, usedCounts(c), trace);
+  }
+
+  /* The suffix array by PREFIX DOUBLING: sort by the first character, then use
+     the previous ranks to sort by 2, 4, 8 characters at a time, so each round
+     is a sort on pairs of ranks rather than on strings. The rounds are the
+     mode. */
+  function suffixArray(s) {
+    var n = s.length, c = counter(), rank = [], sa = [], i, rounds = [];
+    for (i = 0; i < n; i += 1) { sa.push(i); rank.push(s.charCodeAt(i)); }
+    var k = 1, tmp = new Array(n).fill(0);
+    while (true) {
+      var cmp = function (a, b) {
+        if (rank[a] !== rank[b]) return rank[a] - rank[b];
+        var ra = a + k < n ? rank[a + k] : -1, rb = b + k < n ? rank[b + k] : -1;
+        return ra - rb;
+      };
+      sa.sort(function (a, b) { c.compares += 1; return cmp(a, b); });
+      tmp[sa[0]] = 0;
+      for (i = 1; i < n; i += 1) tmp[sa[i]] = tmp[sa[i - 1]] + (cmp(sa[i - 1], sa[i]) < 0 ? 1 : 0);
+      for (i = 0; i < n; i += 1) rank[i] = tmp[i];
+      rounds.push({ k: k, order: sa.slice(), rank: rank.slice() });
+      if (rank[sa[n - 1]] === n - 1) break;
+      k *= 2;
+      if (k > 2 * n) break;
+    }
+    return runOf({ sa: sa, rounds: rounds, suffixes: sa.map(function (i) { return s.slice(i); }) },
+                 usedCounts(c), rounds);
+  }
+  /* Kasai: the LCP array in one pass, because the suffix one place earlier in
+     the TEXT has an lcp at least one less -- which is the trick, and the
+     counter shows the total work is linear. */
+  function kasai(s, sa) {
+    var n = s.length, rank = new Array(n).fill(0), lcp = new Array(n).fill(0), c = counter();
+    sa.forEach(function (p, i) { rank[p] = i; });
+    var h = 0;
+    for (var i = 0; i < n; i += 1) {
+      if (rank[i] > 0) {
+        var j = sa[rank[i] - 1];
+        while (i + h < n && j + h < n && s[i + h] === s[j + h]) { h += 1; c.compares += 1; }
+        lcp[rank[i]] = h;
+        if (h > 0) h -= 1;
+      } else h = 0;
+    }
+    var longest = 0, at = -1;
+    lcp.forEach(function (v, i) { if (v > longest) { longest = v; at = sa[i]; } });
+    var distinct = 0n, N = BigInt(n);
+    for (var k = 0; k < n; k += 1) distinct += N - BigInt(sa[k]) - BigInt(lcp[k]);
+    return runOf({ lcp: lcp, longestRepeat: longest, repeatAt: at,
+                   distinctSubstrings: distinct }, usedCounts(c), []);
+  }
+
+  /* The KMP automaton written out in full: m * sigma transitions, and then the
+     run takes EXACTLY n steps with no back-up at all. The trade is the table's
+     size, which is why both numbers are printed. */
+  function dfaTable(p, alphabet) {
+    var m = p.length, table = [], c = counter();
+    for (var i = 0; i <= m; i += 1) {
+      var row = {};
+      alphabet.forEach(function (ch) {
+        var k = Math.min(m, i + 1);
+        while (k > 0 && (p.slice(0, i) + ch).slice(-k) !== p.slice(0, k)) k -= 1;
+        row[ch] = k;
+        c.writes += 1;
+      });
+      table.push(row);
+    }
+    return { table: table, states: m + 1, cells: (m + 1) * alphabet.length, counts: usedCounts(c) };
+  }
+  function dfaRun(t, table, m) {
+    var state = 0, hits = [], c = counter(), trace = [];
+    for (var i = 0; i < t.length; i += 1) {
+      state = table[state][t[i]] === undefined ? 0 : table[state][t[i]];
+      c.reads += 1;
+      trace.push({ at: i, state: state });
+      if (state === m) hits.push(i - m + 1);
+    }
+    return runOf({ hits: hits, steps: t.length }, usedCounts(c), trace);
+  }
+
+  /* ------------------------------------------------------ what a reader types
+
+     Text and pattern are taken as typed, including spaces, and are capped so
+     that a paste of a novel does not freeze the tab. Nothing is lower-cased
+     and nothing is stripped: a matcher is case-sensitive and a page that
+     quietly normalised its input would be answering about a different string
+     from the one on screen. */
+  function skEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function skPlural(n, one, many) { return n === 1 ? one : many; }
+  function skStep(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+  function skParse(text, pattern, capT, capP) {
+    var t = String(text === undefined || text === null ? '' : text);
+    var p = String(pattern === undefined || pattern === null ? '' : pattern);
+    if (!p.length) return { bad: 'the pattern is empty, and every offset matches an empty pattern' };
+    if (!t.length) return { bad: 'the text is empty' };
+    if (capT && t.length > capT) return { bad: 'the text is ' + t.length + ' characters and this mode stops at ' + capT };
+    if (capP && p.length > capP) return { bad: 'the pattern is ' + p.length + ' characters and this mode stops at ' + capP };
+    if (p.length > t.length) return { bad: 'the pattern is longer than the text, so there is no alignment to try' };
+    return { t: t, p: p };
+  }
+  /* THE ORACLE, and it is the definition rather than a faster way to reach the
+     same answer: try every offset and compare the whole substring. Every
+     matcher on these pages is checked against this on the reader's own text,
+     because a matcher that shifts too far returns a shorter list of positions
+     and a shorter list looks exactly like a correct answer. */
+  function skBrute(t, p) {
+    var out = [], i;
+    for (i = 0; i + p.length <= t.length; i += 1) {
+      if (t.slice(i, i + p.length) === p) out.push(i);
+    }
+    return out;
+  }
+  function skSame(a, b) { return a.join(',') === b.join(','); }
+  function skAlphabet(s) {
+    var seen = {}, out = [], i;
+    for (i = 0; i < s.length; i += 1) if (!seen[s[i]]) { seen[s[i]] = true; out.push(s[i]); }
+    return out.sort();
+  }
+  /* The proved worst case for naive matching: every alignment can cost m. */
+  function skNaiveBound(n, m) { return m * Math.max(0, n - m + 1); }
+  function skRepeat(s, k) {
+    var out = '', i;
+    for (i = 0; i < k; i += 1) out += s;
+    return out;
+  }
+  /* The longest proper border of every prefix, by TRYING EVERY LENGTH. O(m^3)
+     and obviously right, which is the point: `failureFn` is O(m) and is not
+     obviously right, and the page prints the two columns beside each other. */
+  function skBorderBrute(p) {
+    var out = [0], i, k;
+    for (i = 1; i <= p.length; i += 1) {
+      var best = 0;
+      for (k = i - 1; k >= 1; k -= 1) {
+        if (p.slice(0, k) === p.slice(i - k, i)) { best = k; break; }
+      }
+      out.push(best);
+    }
+    return out;
+  }
+  /* The suffix array by sorting the suffixes as strings, and the LCP array by
+     comparing characters. Both are the definition and both are quadratic. */
+  function skSuffixBrute(s) {
+    var idx = [], i;
+    for (i = 0; i < s.length; i += 1) idx.push(i);
+    idx.sort(function (a, b) {
+      var x = s.slice(a), y = s.slice(b);
+      return x < y ? -1 : (x > y ? 1 : 0);
+    });
+    var lcp = [0];
+    for (i = 1; i < idx.length; i += 1) {
+      var a = s.slice(idx[i - 1]), b = s.slice(idx[i]), k = 0;
+      while (k < a.length && k < b.length && a[k] === b[k]) k += 1;
+      lcp.push(k);
+    }
+    return { sa: idx, lcp: lcp };
+  }
+  function skPrefixBrute(words, prefix) {
+    return words.filter(function (w) { return w.slice(0, prefix.length) === prefix; }).sort();
+  }
+  /* One window's hash from scratch, to check the rolling update against. */
+  function skHashOf(s, b, mod) {
+    var B = BigInt(b), M = BigInt(mod), h = 0n, i;
+    for (i = 0; i < s.length; i += 1) h = (h * B + BigInt(s.charCodeAt(i))) % M;
+    return h;
+  }
+  /* Sweep the modulus and report where the collisions stop. This is what turns
+     "collisions are rare" into a number: the count of moduli in the range at
+     which THIS text produces a spurious hit, and the smallest that does not. */
+  function skModulusSweep(t, p, b, lo, hi) {
+    var rows = [], m, collided = 0, clean = null, lastBad = null, worst = 0;
+    for (m = lo; m <= hi; m += 1) {
+      if (!skIsPrime(m)) continue;
+      var r = rollingHash(t, p, b, m).result;
+      if (r.spurious > 0) {
+        collided += 1; lastBad = m;
+        if (r.spurious > worst) worst = r.spurious;
+      } else if (clean === null) clean = m;
+      rows.push({ mod: m, spurious: r.spurious, verifications: r.verifications,
+                  hits: r.hits.length });
+    }
+    return { rows: rows, collided: collided, clean: clean, lastBad: lastBad,
+             worst: worst, tested: rows.length };
+  }
+  function skIsPrime(n) {
+    if (n < 2) return false;
+    for (var d = 2; d * d <= n; d += 1) if (n % d === 0) return false;
+    return true;
+  }
+  /* The comparisons an algorithm made per alignment, as a bar chart with the
+     bound drawn across it. The bar is the measurement and the line is the
+     proof, and the picture is the gap between them. */
+  function skBars(values, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 660 : opts.width;
+    var h = opts.height === undefined ? 150 : opts.height;
+    var n = Math.max(1, values.length);
+    var top = Math.max(opts.bound || 0, 1);
+    values.forEach(function (v) { if (v > top) top = v; });
+    var cell = (w - 36) / n, s = '', i;
+    for (i = 0; i < values.length; i += 1) {
+      var bh = (values[i] / top) * (h - 34);
+      var x = 30 + i * cell;
+      s += '<rect x="' + x.toFixed(1) + '" y="' + (h - 20 - bh).toFixed(1) + '" width="'
+        + Math.max(1, cell - 1).toFixed(1) + '" height="' + Math.max(0.6, bh).toFixed(1)
+        + '" fill="var(--' + ((opts.mark !== undefined && opts.mark === i) ? 'amber' : 'cyan')
+        + ')" opacity="' + ((opts.mark !== undefined && opts.mark === i) ? '1' : '0.72') + '" />';
+    }
+    if (opts.bound) {
+      var by = h - 20 - (opts.bound / top) * (h - 34);
+      s += '<line x1="30" y1="' + by.toFixed(1) + '" x2="' + (w - 6) + '" y2="' + by.toFixed(1)
+        + '" stroke="var(--red)" stroke-width="1.4" stroke-dasharray="5 4" />';
+      s += '<text x="32" y="' + (by - 4).toFixed(1) + '" font-size="9" font-weight="700" '
+        + 'fill="var(--red)">' + (opts.boundLabel || ('bound ' + opts.bound)) + '</text>';
+    }
+    s += '<text x="4" y="' + (h - 20) + '" font-size="9" fill="var(--muted)">0</text>';
+    s += '<text x="4" y="14" font-size="9" fill="var(--muted)">' + top + '</text>';
+    return s;
+  }
+  /* The text with every match marked, as escaped markup. Long texts are
+     windowed rather than truncated, so the marks stay where they are. */
+  function skMarkup(t, hits, m, from, span) {
+    var start = from || 0, end = Math.min(t.length, start + (span || t.length));
+    var inHit = new Array(t.length).fill(false), i, j;
+    hits.forEach(function (at) {
+      for (j = at; j < at + m && j < t.length; j += 1) inHit[j] = true;
+    });
+    var out = '', open = false;
+    for (i = start; i < end; i += 1) {
+      if (inHit[i] && !open) { out += '<span class="tone-cyan"><strong>'; open = true; }
+      if (!inHit[i] && open) { out += '</strong></span>'; open = false; }
+      out += skEsc(t[i] === ' ' ? '\u00b7' : t[i]);
+    }
+    if (open) out += '</strong></span>';
+    return out;
+  }
+  /* Every count below was produced by running the matcher on the text in
+     the box. That is one text. The bound printed beside it is a statement
+     about every text there is, and the two presets that matter on this
+     page are the one where they nearly meet and the one where they do
+     not. Neither of them is the algorithm's cost. */
+  var RAP = {
+    'english': { text: 'the rain in spain stays mainly in the plain', pattern: 'ain', base: '256', mod: '41' },
+    'dna': { text: 'GATTACAGATTACCAGATTACAGGATTACAGATTAC', pattern: 'GATTACA', base: '4', mod: '13' },
+    'binary': { text: '101100101101001011010010110100101101', pattern: '10110', base: '2', mod: '11' },
+    'abra': { text: 'abracadabra abracadabra abracadabra', pattern: 'abra', base: '256', mod: '13' },
+    'clean': { text: 'the rain in spain stays mainly in the plain', pattern: 'ain', base: '256', mod: '1000003' }
+  };
+
+  var presetIn = document.getElementById('raPreset'), textIn = document.getElementById('raText');
+  var patIn = document.getElementById('raPattern'), baseIn = document.getElementById('raBase');
+  var modIn = document.getElementById('raMod');
+  var bars = document.getElementById('raBars'), strip = document.getElementById('raStrip');
+  var wins = document.getElementById('raWindows'), sweepT = document.getElementById('raSweep');
+  var status = document.getElementById('raStatus');
+  var KPIS = ['raWin', 'raEqual', 'raHits', 'raSpur', 'raComp', 'raWaste', 'raBad', 'raLast'];
+
+  function blank(why) {
+    bars.innerHTML = ''; strip.innerHTML = ''; wins.innerHTML = ''; sweepT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> Type a text and a pattern.';
+  }
+
+  function redraw() {
+    var parsed = skParse(textIn.value, patIn.value, 160, 24);
+    if (parsed.bad) { blank(parsed.bad); return; }
+    var t = parsed.t, p = parsed.p, m = p.length;
+    var b = parseInt(baseIn.value, 10), mod = parseInt(modIn.value, 10);
+
+    var run = rollingHash(t, p, b, mod), res = run.result;
+    var truth = skBrute(t, p), right = skSame(res.hits, truth);
+
+    /* The rolling update is the one place a value comes from a previous value
+       rather than from the input, so every window's hash is recomputed from
+       scratch and the two are required to agree. */
+    var drift = 0;
+    run.trace.forEach(function (w) {
+      if (skHashOf(t.slice(w.at, w.at + m), b, mod) !== w.hash) drift += 1;
+    });
+
+    var maxHash = 1;
+    run.trace.forEach(function (w) { if (Number(w.hash) > maxHash) maxHash = Number(w.hash); });
+    bars.innerHTML = skBars(run.trace.map(function (w) { return Number(w.hash); }),
+                            { bound: Number(res.target), boundLabel: 'the pattern hashes to '
+                              + res.target, width: 660 });
+    strip.innerHTML = '<span class="tone-muted">text, real matches marked:</span> '
+      + skMarkup(t, res.hits, m, 0, 200);
+
+    var rows = '';
+    run.trace.forEach(function (w) {
+      if (!w.equal && rows.split('<tr').length > 18) return;
+      if (!w.equal) return;
+      rows += '<tr class="' + (w.match ? 'tone-cyan' : 'tone-red') + '"><th class="rowhead">'
+        + w.at + '</th><td class="tt">' + skEsc(t.slice(w.at, w.at + m)) + '</td><td>'
+        + w.hash + '</td><td>' + res.target + '</td><td>'
+        + (w.match ? 'a real match' : 'a collision: same hash, different characters')
+        + '</td></tr>';
+    });
+    if (!rows) rows = '<tr><td colspan="5">No window hashed equal to the pattern at all, so '
+      + 'there is nothing to verify and no match either.</td></tr>';
+    wins.innerHTML = '<caption>Every window whose hash equals the pattern’s. Each one costs '
+      + m + ' character comparison' + skPlural(m, '', 's') + ' to settle, whether or not it '
+      + 'turns out to be a match</caption><thead><tr><th>offset</th><th>window</th>'
+      + '<th>its hash</th><th>the pattern’s</th><th>verdict</th></tr></thead><tbody>'
+      + rows + '</tbody>';
+
+    var sw = skModulusSweep(t, p, b, 2, 200);
+    var srows = '';
+    sw.rows.forEach(function (r) {
+      srows += '<tr' + (r.mod === mod ? ' class="tone-cyan"'
+                                      : (r.spurious ? ' class="tone-red"' : ''))
+        + '><th class="rowhead">' + r.mod + '</th><td>' + r.verifications + '</td><td>'
+        + r.hits + '</td><td>' + r.spurious + '</td></tr>';
+    });
+    sweepT.innerHTML = '<caption>The same text and pattern at every prime modulus under 200. '
+      + 'The collisions do not stop at a threshold and start again below it: which moduli '
+      + 'collide is a property of this text</caption><thead><tr><th>modulus</th>'
+      + '<th>verifications</th><th>matches</th><th>collisions</th></tr></thead><tbody>'
+      + srows + '</tbody>';
+
+    var compares = run.counts.compares || 0;
+    document.getElementById('raWin').textContent = run.trace.length;
+    document.getElementById('raEqual').textContent = res.verifications;
+    document.getElementById('raHits').textContent = res.hits.length + ' and ' + truth.length
+      + (right ? '' : ' — DISAGREE');
+    document.getElementById('raSpur').textContent = res.spurious;
+    document.getElementById('raComp').textContent = compares;
+    document.getElementById('raWaste').textContent = res.spurious * m;
+    document.getElementById('raBad').textContent = sw.collided + ' of ' + sw.tested;
+    document.getElementById('raLast').textContent = sw.lastBad === null ? 'none' : sw.lastBad;
+
+    status.innerHTML = '<strong>' + res.spurious + ' collision'
+      + skPlural(res.spurious, '', 's') + ' on ' + run.trace.length + ' window'
+      + skPlural(run.trace.length, '', 's') + ' at base ' + b + ', modulus ' + mod
+      + '.</strong> '
+      + (res.spurious
+          ? 'Each one is a window whose hash is <span class="tone-red">' + res.target
+            + '</span>, the same as the pattern’s, and whose characters are not the '
+            + 'pattern. The table above lists them: type one of them out and check by eye. '
+            + 'They cost ' + (res.spurious * m) + ' of the ' + compares + ' character '
+            + 'comparison' + skPlural(compares, '', 's') + ' made, and nothing about the '
+            + 'algorithm noticed anything was wrong — the verification is not an optimisation '
+            + 'that can be skipped, it is the only reason the answer is right. '
+          : 'None here. That is a measurement of this text at this modulus and it is not a '
+            + 'guarantee: of the ' + sw.tested + ' prime moduli under 200, '
+            + '<span class="tone-red">' + sw.collided + '</span> produce a collision on this '
+            + 'same text. ')
+      + 'Across those ' + sw.tested + ' primes, ' + sw.collided + ' collide'
+      + (sw.lastBad === null ? '' : ', the largest of them ' + sw.lastBad)
+      + (sw.worst ? ', and the worst produces ' + sw.worst + ' collision'
+                    + skPlural(sw.worst, '', 's') : '')
+      + '. Collisions do not switch off above a threshold; whether a given modulus collides is '
+      + 'a fact about this text, and the bound the lesson proves is an EXPECTATION over a '
+      + 'randomly chosen modulus, not a promise about the one you picked. '
+      + (drift
+          ? '<span class="tone-red">' + drift + ' window’s hash disagrees with the same '
+            + 'hash recomputed from scratch, so the rolling update has drifted.</span>'
+          : 'Every window’s hash was also recomputed from scratch and the two agree, so '
+            + 'the rolling update is carrying the right number forward.')
+      + (right ? '' : ' <span class="tone-red">The match positions disagree with a scan over '
+            + 'every offset.</span>');
+  }
+
+  function apply() {
+    var pre = RAP[presetIn.value];
+    if (!pre) return;
+    textIn.value = pre.text; patIn.value = pre.pattern;
+    baseIn.value = pre.base; modIn.value = pre.mod;
+    redraw();
+  }
+  var START = RAP[presetIn.value];
+  if (START && !textIn.value) { textIn.value = START.text; patIn.value = START.pattern; }
+  presetIn.addEventListener('change', apply);
+  textIn.addEventListener('input', redraw);
+  patIn.addEventListener('input', redraw);
+  baseIn.addEventListener('change', redraw);
+  modIn.addEventListener('change', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "strings-and-pattern-matching/a-rolling-hash-and-its-collisions";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

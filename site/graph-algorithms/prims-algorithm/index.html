@@ -1,0 +1,3356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prim&#x27;s Algorithm | Lesson | Graph Algorithms | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="Fix the cut in advance: one side is the tree built so far, the other is everything else. The lightest edge across that boundary is safe by the cut property, so the algorithm is a loop that finds it and adds it. A heap keyed on edge weight finds it, and the interesting consequence is that entries in the heap go out of date and must be discarded when they surface." />
+  <link rel="canonical" href="https://learn.geterdone.io/graph-algorithms/prims-algorithm/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Prim&#x27;s Algorithm | Lesson | Graph Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="Fix the cut in advance: one side is the tree built so far, the other is everything else. The lightest edge across that boundary is safe by the cut property, so the algorithm is a loop that finds it and adds it. A heap keyed on edge weight finds it, and the interesting consequence is that entries in the heap go out of date and must be discarded when they surface." />
+  <meta property="og:url" content="https://learn.geterdone.io/graph-algorithms/prims-algorithm/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Prim&#x27;s Algorithm | Lesson | Graph Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Fix the cut in advance: one side is the tree built so far, the other is everything else. The lightest edge across that boundary is safe by the cut property, so the algorithm is a loop that finds it and adds it. A heap keyed on edge weight finds it, and the interesting consequence is that entries in the heap go out of date and must be discarded when they surface." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/graph-algorithms/prims-algorithm/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Graph Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Prim&#x27;s Algorithm</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The prim's algorithm, with the heap on screen is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Graph Algorithms &middot; Minimum spanning trees</span>
+        <h1>Prim&#x27;s Algorithm</h1>
+        <p>Fix the cut in advance: one side is the tree built so far, the other is everything else. The lightest edge across that boundary is safe by the cut property, so the algorithm is a loop that finds it and adds it. A heap keyed on edge weight finds it, and the interesting consequence is that entries in the heap go out of date and must be discarded when they surface.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">S = the vertices already in the tree; the cut is its boundary
+repeat V - 1 times: take the lightest edge leaving S, add its far end to S
+heap holds candidate edges; a pop whose ends are BOTH in S is stale, skip it
+same tree as the sorted method, reached in a different order
+the answer does not depend on the starting vertex; the work does</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One growing side, and the heap that finds its lightest exit</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is the stale entry. The cut and the correctness are the sorted method's, restated with the choice of cut made in advance.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The cut is chosen first, and never changes shape</h3><p><span class="math">S</span> starts as the single starting vertex and grows by one vertex each step. At every step the algorithm takes a lightest edge crossing the cut between <span class="math">S</span> and the rest, which is exactly the hypothesis of the cut property, so every edge it takes is safe. Where the sorted method leaves the cut implicit in its proof, this algorithm maintains it explicitly, which is the only real difference between them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A heap entry can go out of date, and the fix is to check on the way out</h3><p>Candidate edges are pushed as their tail joins <span class="math">S</span>. An edge pushed while its far end was outside may have that end brought into <span class="math">S</span> by a different edge before it surfaces, and then it crosses nothing. Rather than find and delete it &mdash; which a binary heap cannot do cheaply &mdash; the algorithm pops it and discards it. On the lab's opening graph that happens exactly once, to the edge between 1 and 2 at weight 4, and the panel labels the row rather than hiding it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The answer is fixed, the work is not</h3><p>Starting the same graph at different vertices gives the same tree of weight 19 every time, and different amounts of work: 12 key comparisons from vertex 1, 14 from vertex 2, 24 from vertex 4 and 15 from vertex 7. That is a measurement of the heap's behaviour on one graph from four starts, and it is the clearest small example on this course of a count that moves while the answer does not.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>One boundary, one heap, and the entries that expire</h2></div><p>The algorithm, the correctness it inherits, what a stale entry is, and the reference column that is not a verdict.</p></div>
+      <article class="card card-pad prose"><h3>The algorithm</h3><ol><li>Put the starting vertex in <span class="math">S</span> and push every edge at it onto a heap keyed by weight.</li><li>Pop the lightest entry. If both its ends are already in <span class="math">S</span>, discard it and pop again.</li><li>Otherwise take the edge, put its far end <span class="math">u</span> into <span class="math">S</span>, and push every edge at <span class="math">u</span> whose far end is not yet in <span class="math">S</span>.</li><li>Stop when <span class="math">V - 1</span> edges have been taken, or when the heap empties first &mdash; in which case the graph was not connected.</li></ol><p>Correctness is the cut property applied once per step, with <span class="math">S</span> as the side. The edge taken is by construction a lightest edge crossing that cut, so it lies in some minimum spanning tree extending what has been built. That is the same induction the sorted method uses; only the choice of cut differs.</p><div class="example"><span class="label">Example &middot; Seven vertices, seven pops, one of them stale</span><p>The lab opens on <span class="math">1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2</span>, starting at vertex 1. The pops come out <span class="math">1-3</span> at 3 adding vertex 3, <span class="math">2-3</span> at 2 adding vertex 2, then <span class="math">1-2</span> at 4 with both ends already in <span class="math">S</span> &mdash; discarded &mdash; then <span class="math">2-4</span> at 5 adding 4, <span class="math">4-5</span> at 1 adding 5, <span class="math">5-6</span> at 6 adding 6, and <span class="math">6-7</span> at 2 adding 7. Six edges, weight 19, the same tree the sorted method built. The counters read 9 pushes, 7 pops and 12 key comparisons.</p></div><p>The pop order is worth a second look, because it is not sorted. <span class="math">1-3</span> at weight 3 comes out before <span class="math">2-3</span> at weight 2, and <span class="math">2-4</span> at 5 before <span class="math">4-5</span> at 1. The heap returns the lightest entry it HOLDS, and an edge is only held once its tail has joined the tree &mdash; <span class="math">4-5</span> was not a candidate until 4 was in. That is the whole difference from the sorted method, which considers every edge in one global order.</p><h3>Stale entries, and why they are tolerated</h3><p>Nine edges were pushed and seven popped. The two never popped are the two the loop stopped before reaching, and one of the seven was stale. A heap has no cheap way to find and remove an entry that is no longer wanted, so the standard answer is to leave it and test on the way out. The cost is that the heap may hold up to <span class="math">E</span> entries rather than <span class="math">V</span>, which is where the <span class="math">E log V</span> term in the usual bound comes from.</p><p>The lab's lazy preset was built to fill the heap with such entries, and measuring it is instructive: on <span class="math">1-2 1, 1-3 1, 1-4 1, 2-3 9, 2-4 9, 3-4 9, 1-5 2, 2-5 3, 3-5 4</span> the run pushes 9 entries, pops 4, and discards none of them. The heavy edges do become stale, but the four light edges at vertex 1 are enough to finish the tree, and the loop stops before any stale entry reaches the top. Staleness costs memory here and no pops at all &mdash; which is a different thing from what the preset's name suggests, and the count is what settles it.</p><h3>The reference column, and what may not be read off it</h3><p>The panel prints a column labelled as <span class="math">E</span> times <span class="math">log₂ V</span> for reference. It is computed as the number of edges times the integer part of the base-two logarithm of the number of vertices, so on the opening graph it is 9 times 2, which is 18. The measured comparison count is 12. Those two numbers are not the same kind of thing and the panel says so: the first is a count of something that happened on one graph from one starting vertex, and the second is a scale for what the heap operations would cost in the worst case.</p><p>Specifically, 12 being below 18 is not evidence that the algorithm beats its bound, and 24 from vertex 4 being above it is not evidence that it fails one. The reference is a number to compare growth against across several graphs, and the lab's other presets are there to be swept: a star on six vertices gives 12 comparisons against a reference of 10, and the nine-edge graph on five vertices gives 18 against 18. No verdict is printed beside the column, deliberately.</p><h3>Against the other algorithm</h3><p>Both algorithms are run on whatever graph you type and the two weights are printed together. On the opening graph both give 19. On the ties preset <span class="math">1-2 2, 1-3 2, 2-3 2, 3-4 1</span> both give 5, and here they take the same three edges in different orders: one starts with the edge of weight 1 because it sorted first, the other reaches it last because its tail only joined the tree at the end. Equal weight, equal edge set, different schedule &mdash; and on a graph with a genuine choice between tied edges, the edge sets can differ too.</p><p>The measured counts, beside the bound. From vertex 1: 9 pushes, 7 pops, 12 comparisons, weight 19. From vertex 4: 9 pushes, 7 pops, 24 comparisons, weight 19. The bound is <span class="math">O(E log V)</span> on every graph from every start, and it comes from at most <span class="math">E</span> pushes and at most <span class="math">E</span> pops, each costing <span class="math">O(log V)</span> comparisons on a heap holding at most <span class="math">E &lt; V²</span> entries. Four starting vertices on one graph is not a bound, and the spread between 12 and 24 is exactly the reason to say so.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Prim&#x27;s algorithm, with the heap on screen</h2></div><p>Lazy deletion instead of decrease-key, so a pop can bring back an edge with nowhere to go</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Grow one tree, always across its own boundary</strong><span>the heap holds the candidates, and the stale ones are skipped on the way out</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the tree so far</span><span class="tone-purple"><i class="legend-swatch"></i>waiting in the heap</span><span class="tone-red"><i class="legend-swatch"></i>popped with both ends already in</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="pmPlot" viewBox="0 0 660 300" role="img" aria-label="The graph, with the edges the tree has taken up to this step drawn heavy."></svg><svg id="pmHeap" viewBox="0 0 660 120" role="img" aria-label="The heap's keys at this step, in array order, with the root on the left."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="pmSteps"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="pmCompare"></table></div>
+      <div class="status-banner" id="pmStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Type the graph and step the heap</h3>
+          <p>Every pop is a row: what came out, whether it was used, and the heap's keys afterwards. The same graph is run through the sorted method as well, so the two answers sit side by side, and the starting vertex can be moved to watch the counts change while the weight does not.</p>
+        <div class="field">
+          <label for="pmPreset">Worked example</label>
+          <select id="pmPreset"><option value="classic" selected>seven vertices, nine edges, weight 2 on two of them</option><option value="lazy">a graph that fills the heap with stale entries</option><option value="tie">four edges, three of them of equal weight</option><option value="star">a star: five edges, all at vertex 1</option></select>
+        </div>
+        <div class="field">
+          <label for="pmSpec">Edges with weights, as one&minus;other w</label>
+          <input id="pmSpec" type="text" value="" inputmode="text" autocomplete="off" placeholder="1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="pmStart">Grow the tree from</label><span class="range-value" id="pmStartOut">1</span></div>
+          <input id="pmStart" type="range" min="1" max="12" step="1" value="1" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="pmStep">Step</label><span class="range-value" id="pmStepOut">40</span></div>
+          <input id="pmStep" type="range" min="1" max="40" step="1" value="40" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Weight of the tree</span><strong id="pmWeight">&mdash;</strong></div>
+          <div class="kpi"><span>Edges in it</span><strong id="pmEdges">&mdash;</strong></div>
+          <div class="kpi"><span>Heap pushes and pops</span><strong id="pmOps">&mdash;</strong></div>
+          <div class="kpi"><span>Key comparisons in the heap</span><strong id="pmCmp">&mdash;</strong></div>
+          <div class="kpi"><span>E times log2 V, for reference</span><strong id="pmBound">&mdash;</strong></div>
+          <div class="kpi"><span>Same weight as the sorted method</span><strong id="pmAgree">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="pmHint" style="margin:0;">The heap holds candidate <em>edges</em>, not vertices, and a better edge to a vertex is pushed as a second entry rather than found and lowered &mdash; so a pop can come back with an edge whose two ends are both in the tree already, and it is discarded. That is lazy deletion, and the operation counts beside <span class="tt">E log V</span> are what it costs.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Growing one tree</h2></div><p>Maintain the boundary, and test every pop before you use it.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Keep S explicit, as a flag per vertex</h3><p>The whole algorithm is a question about the boundary of <span class="math">S</span>, and the boundary is cheap to maintain only if membership is a constant-time test. Recomputing which vertices are in the tree from the edge list each step is the change that turns this into a quadratic algorithm without anything looking wrong.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Test both ends on the way out, not on the way in</h3><p>An entry is valid when pushed and may expire before it surfaces. Checking at push time is not enough and deleting from the middle of a heap is not cheap, so the check belongs at the pop. Count the discarded pops: they are real work and they belong in any measurement you report.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the pop order as the algorithm&#x27;s order, not as sorted order</h3><p>The heap returns the lightest edge it currently holds, and it only holds edges whose tails have joined. A heavier edge coming out before a lighter one is normal and is not a defect in the heap; it means the lighter one was not yet a candidate.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Move the starting vertex before quoting a count</h3><p>The tree does not change and the work does. On the lab's opening graph the comparison count runs from 12 to 24 over four starts. A single measurement presented as the algorithm's cost is a measurement of one start on one graph.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Boundaries, heaps and stale entries</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Seven pops from vertex 1, one of them wasted</h3><p>The graph is <span class="math">1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2</span> and the tree starts at vertex 1.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">push at start   1-2 (4), 1-3 (3)                 S = {1}
+
+pop    w   both ends in S?   action              S afterwards
+1-3    3        no           take, add 3         {1, 3}
+                             push 2-3 (2), 3-4 (7)
+2-3    2        no           take, add 2         {1, 2, 3}
+                             push 2-4 (5)
+1-2    4       YES           STALE, discard      unchanged
+2-4    5        no           take, add 4         {1, 2, 3, 4}
+                             push 4-5 (1)
+4-5    1        no           take, add 5         {1, 2, 3, 4, 5}
+                             push 5-6 (6), 5-7 (8)
+5-6    6        no           take, add 6         {1, ..., 6}
+                             push 6-7 (2)
+6-7    2        no           take, add 7         all seven; stop
+
+tree    1-3, 2-3, 2-4, 4-5, 5-6, 6-7        weight 19
+counts  9 pushes, 7 pops, 12 key comparisons
+the sorted method on the same graph           weight 19
+E times the integer part of log2 V, for reference        18</div><p>The stale pop is the third row, and it is worth being precise about why <span class="math">1-2</span> expired. It was pushed at the start, when 2 was outside the tree. By the time it reached the top, 2 had been brought in by <span class="math">2-3</span> at weight 2 &mdash; a lighter edge that did not exist as a candidate until 3 joined. Nothing went wrong; the entry simply stopped describing a crossing edge.</p><p>Two entries were never popped at all: <span class="math">3-4</span> at 7 and <span class="math">5-7</span> at 8 were still in the heap when the sixth edge was taken and the loop stopped. Those are the same two edges the sorted method rejected, reached by a completely different route, and it is a good check on a hand-run that the two methods disagree about nothing but order.</p><p>For a faded rehearsal, start the same graph at vertex 4 and predict the first three pops before running it. The supplied first move is this: the edges at 4 are <span class="math">2-4</span> at 5, <span class="math">3-4</span> at 7 and <span class="math">4-5</span> at 1, so the first pop is <span class="math">4-5</span>. Say what the next two are, whether any pop is stale from this start, and what the final weight is.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keying the heap on the wrong quantity</strong><span>The key is the edge's weight, full stop. The other algorithm on this path that looks like this one keys on the distance from a source, which is a running total rather than a single edge, and swapping the two gives a wrong answer that is hard to see: both produce a spanning tree, and only one of them is minimum.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the pops to come out in sorted order</strong><span>They come out in the order the heap holds them, and an edge is only held once its tail has joined the tree. On the lab's opening graph weight 3 comes out before weight 2 and weight 5 before weight 1. A reader who reads the pop column as a sorted list will conclude the heap is broken.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the reference column as a bound the run must respect</strong><span>It is <span class="math">E</span> times an integer logarithm, printed so that the measured counts can be watched against a scale as the graph grows. On one graph the same algorithm produced 12 comparisons from one start and 24 from another, either side of a reference of 18. No verdict is printed beside it, and none should be inferred.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can step the heap by hand, spot the stale pop, and say what changes when the start moves.</strong><p>You should be able to maintain <span class="math">S</span> and the candidate heap, take the lightest crossing edge each step, recognise and discard an expired entry, name the cut that makes each taken edge safe, and separate the counts that move with the starting vertex from the weight that does not.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> &ldquo;Relaxation and Dijkstra&rsquo;s Schedule&rdquo; is this algorithm with one word changed. Replace the key &ldquo;weight of this edge&rdquo; with &ldquo;distance from the source through this edge&rdquo; and the same loop computes shortest paths instead of a minimum tree &mdash; and the arithmetic in the key is what makes the second one break on a negative weight while the first does not.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../kruskals-algorithm/" rel="prev"><span>Lesson</span><strong>Kruskal&#x27;s Algorithm</strong></a>
+      <a class="lesson-link next" href="../relaxation-and-dijkstras-schedule/" rel="next"><span>Lesson</span><strong>Relaxation and Dijkstra&#x27;s Schedule</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="graph-algorithms/prims-algorithm" data-lesson-title="Prim&#x27;s Algorithm" data-course-title="Graph Algorithms">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Graph Algorithms.</strong> Every count on this course is produced by running the algorithm on the graph you typed. Distances, weights, low-links, cut capacities, matching sizes and component counts are integers, and no page here rounds anything. Three claims are checked against an independently written implementation from another Subject &mdash; bridges against delete-and-recount, the minimum tree against a second method, and the distances against a Dijkstra that knows nothing about this representation &mdash; and where a reader's graph has two edges between the same pair, that check declines rather than answering about a different graph. Four more are checked against a complete enumeration at a cap the page states: every spanning tree, every topological order, every cut, every subset of the pairs. Two columns are labelled for reference and carry no verdict: <span class="math">E</span> times the integer part of <span class="math">log₂ V</span>, on the two pages that print it.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A pop returns an edge whose two ends are both already in the tree. What should happen?", "a": ["Add it anyway; it is the lightest available", "Discard it and pop again", "Stop: the tree is complete", "Push it back with its weight increased"], "c": 1, "why": "The entry has expired: its far end joined the tree by another edge, so it crosses nothing and adding it would close a cycle. Discarding at the pop is the standard handling, because removing an arbitrary entry from a binary heap is not cheap. The heap being non-empty says nothing about the tree being complete."}, {"q": "Starting the same graph at four different vertices gives weight 19 every time and comparison counts of 12, 14, 24 and 15. What is established?", "a": ["That the heap implementation is inconsistent", "That the minimum spanning tree is unique on this graph", "That the work depends on the start while the answer does not, on this graph", "That starting at vertex 1 is optimal in general"], "c": 2, "why": "Four measurements on one graph show the counts moving and the weight not. That the weight cannot move is a theorem &mdash; the algorithm returns a minimum tree from any start &mdash; but uniqueness of the tree is a different claim needing the enumeration, and one graph says nothing about which start is best in general."}, {"q": "The reference column reads 18 and the measured comparison count reads 12. What may be concluded?", "a": ["The algorithm beat its bound on this run", "Nothing about a bound: one is a count on one input, the other is a scale", "The bound is wrong for this graph", "The heap is smaller than it should be"], "c": 1, "why": "The column is <span class=\"math\">E<\/span> times the integer part of <span class=\"math\">log\u2082 V<\/span>, printed for comparison as the graph changes, and no verdict is read off it. A count below it is not a refutation of anything and a count above it &mdash; 24, from another starting vertex on the same graph &mdash; is not a failure either."}, {"q": "Nine edges are pushed and seven popped on a seven-vertex graph. Why do two entries never come out?", "a": ["They were deleted from the heap when they expired", "The loop stopped after <span class=\"math\">V - 1<\/span> edges were taken, leaving them behind", "They were never pushed, since both ends were already in the tree", "The heap discards its two largest entries automatically"], "c": 1, "why": "Six edges complete a spanning tree of seven vertices, and the loop halts there with whatever the heap still holds. Expired entries are not deleted &mdash; they are discarded on the way out, and one of the seven pops was exactly that."}];
+
+  (function () {
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* THE REPRESENTATION, and why it is an arc LIST and not a matrix.
+
+     `GRAPH_JS` is a symmetric 0/1 matrix whose weight is a function of the
+     endpoints. Four courses here need something it cannot express, and each of
+     the four is a different failure of the same choice:
+
+       direction    link(M,i,j) writes M[i][j] AND M[j][i]; edges() scans i<j.
+                    A tree edge and a back edge are the same entry, so DFS edge
+                    classification, topological order and SCCs have nothing to
+                    read.
+       sign         w(i,j) = ((7i+13j) mod 9) + 1 is never negative and never
+                    the reader's. Bellman-Ford's whole subject is the weight
+                    the reader makes negative.
+       capacity     there is no second number on an edge at all.
+       multiplicity a matrix holds one entry per pair, and a flow network holds
+                    u->v and v->u at once, a gadget's vertex split produces two
+                    arcs between the same pair, and a residual graph is built
+                    by pairing each arc with its reverse.
+
+     So: an ARC LIST with an index built on demand. An arc is
+     { u, v, w, cap } and its id is its position in G.arcs. Identity is the
+     point -- the residual network names an arc's reverse by id, which a triple
+     [i, j, w] cannot do once two arcs share endpoints -- and the honest E that
+     every "operations against E log V" panel prints is G.arcs.length.
+
+     G = { n, directed, arcs: [{u, v, w, cap}] }. `directed: false` means each
+     arc is traversable both ways but STORED ONCE, so |E| is arcs.length and
+     Kruskal iterates arcs rather than half a matrix.
+
+     WEIGHTS ARE NUMBERS, NOT BIGINT, AND THAT IS EXACT. Every weight is an
+     integer the reader typed and every distance is a sum of at most n of them:
+     at this path's caps (n <= 16, |w| <= 9999) no quantity here exceeds 160000,
+     which a double holds exactly, and integer addition of exactly-held integers
+     is exact. BigInt would buy nothing and would make the unreachable sentinel
+     awkward -- which is `null`, not Infinity, because `Infinity + w` compares
+     as reachable and that defect is how a Bellman-Ford lab reports a path
+     through a vertex it never reached.
+
+     An arc id is stable for the life of the graph. dgRemove is the one
+     exception and it says so; nothing that keeps ids across a call (flow,
+     residual, augmenting) ever edits. */
+
+  function dgNew(n, directed) {
+    return { n: n, directed: directed === undefined ? true : !!directed, arcs: [] };
+  }
+  function dgAdd(G, u, v, w, cap) {
+    G.arcs.push({ u: u, v: v, w: w === undefined ? 1 : w, cap: cap === undefined ? 0 : cap });
+    return G.arcs.length - 1;
+  }
+  function dgSetWeight(G, id, w) { G.arcs[id].w = w; return G; }
+  function dgSetCap(G, id, cap) { G.arcs[id].cap = cap; return G; }
+  /* Splices, so ids after `id` shift down by one. The only mutator that does. */
+  function dgRemove(G, id) { G.arcs.splice(id, 1); return G; }
+  function dgCopy(G) {
+    return { n: G.n, directed: G.directed,
+             arcs: G.arcs.map(function (a) { return { u: a.u, v: a.v, w: a.w, cap: a.cap }; }) };
+  }
+
+  /* out[v] and inn[v] are arrays of arc ids. On an undirected graph an arc is
+     in both lists of both endpoints, which is what "traversable both ways,
+     stored once" means. */
+  function dgIndex(G) {
+    var out = [], inn = [], i;
+    for (i = 0; i < G.n; i += 1) { out.push([]); inn.push([]); }
+    for (i = 0; i < G.arcs.length; i += 1) {
+      var a = G.arcs[i];
+      out[a.u].push(i); inn[a.v].push(i);
+      if (!G.directed) { out[a.v].push(i); inn[a.u].push(i); }
+    }
+    return { out: out, inn: inn };
+  }
+  /* The endpoint reached from `from` along arc id. */
+  function dgOther(G, id, from) {
+    var a = G.arcs[id];
+    return a.u === from ? a.v : a.u;
+  }
+  /* Neighbours as {id, to, w, cap, forward}, in arc order -- deterministic, so
+     two readers at the same graph see the same traversal. */
+  function dgOut(G, v, idx) {
+    idx = idx || dgIndex(G);
+    return idx.out[v].map(function (id) {
+      var a = G.arcs[id];
+      return { id: id, to: dgOther(G, id, v), w: a.w, cap: a.cap, forward: a.u === v };
+    });
+  }
+  function dgOutdeg(G, v, idx) { return (idx || dgIndex(G)).out[v].length; }
+  function dgIndeg(G, v, idx) { return (idx || dgIndex(G)).inn[v].length; }
+  function dgFind(G, u, v) {
+    for (var i = 0; i < G.arcs.length; i += 1) {
+      var a = G.arcs[i];
+      if (a.u === u && a.v === v) return i;
+      if (!G.directed && a.u === v && a.v === u) return i;
+    }
+    return -1;
+  }
+  /* Every arc flipped: Kosaraju's second pass, and nothing else. */
+  function dgReverse(G) {
+    var H = dgNew(G.n, G.directed);
+    G.arcs.forEach(function (a) { dgAdd(H, a.v, a.u, a.w, a.cap); });
+    return H;
+  }
+  /* The weight matrix Floyd-Warshall fills: null off the graph, 0 on the
+     diagonal, the LIGHTEST arc where several run between the same pair. */
+  function dgWeightMatrix(G) {
+    var W = [], i, j;
+    for (i = 0; i < G.n; i += 1) { W.push([]); for (j = 0; j < G.n; j += 1) W[i].push(i === j ? 0 : null); }
+    G.arcs.forEach(function (a) {
+      if (W[a.u][a.v] === null || a.w < W[a.u][a.v]) W[a.u][a.v] = a.w;
+      if (!G.directed && (W[a.v][a.u] === null || a.w < W[a.v][a.u])) W[a.v][a.u] = a.w;
+    });
+    return W;
+  }
+  /* THE ADAPTER, both ways.
+
+     dgFromMatrix reads a GRAPH_JS adjacency matrix -- any of its eight presets,
+     or a lesson's own example through PRESETS.lesson -- into this
+     representation, so a lesson can open on a graph the reader already met in
+     Discrete Mathematics. `wfn(i, j)` is GRAPH_JS's `weight` when the formula
+     weights are wanted and the reader's own function when they are not.
+     `directed: true` orients each edge i -> j with i < j, which is the
+     orientation the DFS-classification lesson opens on.
+
+     dgToMatrix goes the other way, and exists for exactly one reason: it hands
+     a graph built here to GRAPH_JS's brute-force routines, so `cuts()`,
+     `kruskal()`, `dijkstra()` and `hamilton()` can answer the same question by
+     a different route and the two answers can be asserted equal. */
+  function dgFromMatrix(M, n, wfn, directed) {
+    var G = dgNew(n, directed), i, j;
+    for (i = 0; i < n; i += 1) for (j = i + 1; j < n; j += 1) {
+      if (M[i][j]) dgAdd(G, i, j, wfn ? wfn(i, j) : 1, 0);
+    }
+    return G;
+  }
+  function dgToMatrix(G) {
+    var M = [], i, j;
+    for (i = 0; i < G.n; i += 1) { M.push([]); for (j = 0; j < G.n; j += 1) M[i].push(0); }
+    G.arcs.forEach(function (a) { if (a.u !== a.v) { M[a.u][a.v] = 1; M[a.v][a.u] = 1; } });
+    return M;
+  }
+  /* A lesson's worked example, in the 1-BASED labels the prose uses, exactly as
+     GRAPH_JS.lessonFrom takes them: [u, v] or [u, v, w] or [u, v, w, cap]. */
+  function dgFromLesson(n, list, directed) {
+    var G = dgNew(n, directed);
+    (list || []).forEach(function (e) {
+      dgAdd(G, e[0] - 1, e[1] - 1, e.length > 2 ? e[2] : 1, e.length > 3 ? e[3] : 0);
+    });
+    return G;
+  }
+  /* Undirected components, by arc traversal. Used by the spanning-tree oracle
+     and by every "is it still connected" question. */
+  function dgComponents(G, skipArc) {
+    var idx = dgIndex(G), seen = new Array(G.n).fill(false), comps = [], s;
+    for (s = 0; s < G.n; s += 1) {
+      if (seen[s]) continue;
+      var stack = [s], comp = [];
+      seen[s] = true;
+      while (stack.length) {
+        var v = stack.pop();
+        comp.push(v);
+        idx.out[v].concat(idx.inn[v]).forEach(function (id) {
+          if (skipArc !== undefined && id === skipArc) return;
+          var u = dgOther(G, id, v);
+          if (!seen[u]) { seen[u] = true; stack.push(u); }
+        });
+      }
+      comps.push(comp.sort(function (a, b) { return a - b; }));
+    }
+    return comps;
+  }
+
+  /* ------------------------------------------------------- the drawing.
+
+     GRAPH_JS's renderer is `positions`, `draw` and `paintMatrix` inside
+     `graph_lab`, closed over the gPlot and gMatrix elements. Six modes across
+     two kits here draw a graph, so this is the single largest piece of shared
+     UI the Subject needs, and it is built the way SERIES_JS is: the function
+     that makes the markup takes a graph and returns a string, and the function
+     that installs it takes the element first.
+
+     Two things the undirected renderer never had to do. An arc needs an
+     ARROWHEAD, placed at the node's rim rather than its centre, or the reader
+     cannot see which way a back edge points. And ANTIPARALLEL arcs -- which a
+     residual network has at every augmentation -- must both be visible, so
+     when u->v and v->u both exist each is bowed to its own side. Drawn
+     straight they would lie on top of each other and the reverse arc, which is
+     the entire idea of the residual network, would be invisible. */
+  var DG_R = 17;
+  function dgLayout(n, opts) {
+    opts = opts || {};
+    var cx = opts.cx === undefined ? 230 : opts.cx, cy = opts.cy === undefined ? 150 : opts.cy;
+    var rad = opts.radius === undefined ? 105 : opts.radius, pts = [];
+    for (var i = 0; i < n; i += 1) {
+      var ang = -Math.PI / 2 + (2 * Math.PI * i) / n;
+      pts.push([cx + rad * Math.cos(ang), cy + rad * Math.sin(ang)]);
+    }
+    return pts;
+  }
+  /* Left column / right column, for a bipartite matching or a flow network
+     where source and sink belong at the ends. */
+  function dgLayered(n, layers, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 460 : opts.width, h = opts.height === undefined ? 280 : opts.height;
+    var cols = [], pts = new Array(n), i;
+    layers.forEach(function (L, k) { cols[k] = L; });
+    cols.forEach(function (L, k) {
+      L.forEach(function (v, j) {
+        pts[v] = [30 + (cols.length === 1 ? w / 2 : (k / (cols.length - 1)) * (w - 60)),
+                  30 + (L.length === 1 ? (h - 60) / 2 : (j / (L.length - 1)) * (h - 60))];
+      });
+    });
+    for (i = 0; i < n; i += 1) if (!pts[i]) pts[i] = [30, 30];
+    return pts;
+  }
+  var DG_PALETTE = ['var(--cyan)', 'var(--purple)', 'var(--amber)', 'var(--green)',
+                    'var(--red)', 'var(--blue)'];
+
+  function dgArrow(x1, y1, x2, y2, colour) {
+    var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / len, uy = dy / len;
+    var tipx = x2 - ux * DG_R, tipy = y2 - uy * DG_R;
+    var bx = tipx - ux * 9, by = tipy - uy * 9;
+    return '<polygon points="' + tipx.toFixed(1) + ',' + tipy.toFixed(1) + ' '
+      + (bx - uy * 4.2).toFixed(1) + ',' + (by + ux * 4.2).toFixed(1) + ' '
+      + (bx + uy * 4.2).toFixed(1) + ',' + (by - ux * 4.2).toFixed(1)
+      + '" fill="' + colour + '" />';
+  }
+
+  /* opts: { points, highlight: [arc ids], colours: [per vertex], labels,
+             label: 'w' | 'cap' | 'flow' | 'none', flow: [per arc] } */
+  function dgSvg(G, opts) {
+    opts = opts || {};
+    var pts = opts.points || dgLayout(G.n, opts);
+    var hi = {};
+    (opts.highlight || []).forEach(function (id) { hi[id] = true; });
+    var mode = opts.label === undefined ? (G.arcs.some(function (a) { return a.cap; }) ? 'cap' : 'w') : opts.label;
+    var pairs = {}, s = '';
+    G.arcs.forEach(function (a) { pairs[a.u + '>' + a.v] = true; });
+    G.arcs.forEach(function (a, id) {
+      var p = pts[a.u], q = pts[a.v];
+      var on = hi[id], colour = on ? 'var(--cyan)' : 'var(--line-strong)';
+      /* bow when the reverse arc exists too, so neither hides the other */
+      var bow = G.directed && pairs[a.v + '>' + a.u] ? 1 : 0;
+      var mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+      if (bow) {
+        var dx = q[0] - p[0], dy = q[1] - p[1], L = Math.sqrt(dx * dx + dy * dy) || 1;
+        mx -= (dy / L) * 22; my += (dx / L) * 22;
+        s += '<path d="M' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ' Q' + mx.toFixed(1) + ' '
+          + my.toFixed(1) + ' ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + '" fill="none" stroke="'
+          + colour + '" stroke-width="' + (on ? 3.4 : 1.8) + '" />';
+      } else {
+        s += '<line x1="' + p[0].toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + q[0].toFixed(1)
+          + '" y2="' + q[1].toFixed(1) + '" stroke="' + colour + '" stroke-width="'
+          + (on ? 3.4 : 1.8) + '" />';
+      }
+      if (G.directed) {
+        var fromx = bow ? mx : p[0], fromy = bow ? my : p[1];
+        s += dgArrow(fromx, fromy, q[0], q[1], colour);
+      }
+      if (mode !== 'none') {
+        var text = mode === 'cap' ? String(a.cap)
+          : mode === 'flow' ? ((opts.flow ? opts.flow[id] : 0) + '/' + a.cap)
+          : String(a.w);
+        var lx = bow ? (p[0] + 2 * mx + q[0]) / 4 : mx, ly = bow ? (p[1] + 2 * my + q[1]) / 4 : my;
+        s += '<circle cx="' + lx.toFixed(1) + '" cy="' + ly.toFixed(1)
+          + '" r="' + (text.length > 3 ? 12 : 9) + '" fill="var(--panel-solid)" stroke="var(--line)" />';
+        s += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1)
+          + '" text-anchor="middle" font-size="10" font-weight="700" fill="'
+          + (on ? 'var(--cyan)' : 'var(--muted)') + '">' + text + '</text>';
+      }
+    });
+    for (var i = 0; i < G.n; i += 1) {
+      var c = opts.colours && opts.colours[i] !== undefined && opts.colours[i] !== -1
+        ? DG_PALETTE[opts.colours[i] % DG_PALETTE.length] : 'var(--panel-3)';
+      s += '<circle cx="' + pts[i][0].toFixed(1) + '" cy="' + pts[i][1].toFixed(1) + '" r="' + DG_R
+        + '" fill="' + c + '" stroke="var(--line-strong)" stroke-width="2" />';
+      var label = opts.labels && opts.labels[i] !== undefined ? opts.labels[i] : (i + 1);
+      s += '<text x="' + pts[i][0].toFixed(1) + '" y="' + (pts[i][1] + 5).toFixed(1)
+        + '" text-anchor="middle" font-size="13" font-weight="800" fill="'
+        + (opts.colours && opts.colours[i] !== undefined && opts.colours[i] !== -1
+            ? 'var(--on-accent)' : 'var(--text)') + '">' + label + '</text>';
+    }
+    return s;
+  }
+  function drawGraph(el, G, opts) {
+    var s = dgSvg(G, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* A matrix as a table, for the adjacency, the Floyd tables and the DP grids.
+     cell(i, j, v) may return a string, so a lesson can put its own mark in a
+     cell without a second painter. */
+  function matrixHtml(M, opts) {
+    opts = opts || {};
+    var head = opts.cols || M[0].map(function (_, j) { return j + 1; });
+    var side = opts.rows || M.map(function (_, i) { return i + 1; });
+    var h = (opts.caption ? '<caption>' + opts.caption + '</caption>' : '') + '<thead><tr><th></th>';
+    head.forEach(function (c) { h += '<th>' + c + '</th>'; });
+    h += '</tr></thead><tbody>';
+    M.forEach(function (row, i) {
+      h += '<tr><th class="rowhead">' + side[i] + '</th>';
+      row.forEach(function (v, j) {
+        var text = opts.cell ? opts.cell(i, j, v) : (v === null ? '&mdash;' : String(v));
+        h += '<td class="' + (opts.on && opts.on(i, j, v) ? 'on' : '') + '" data-i="' + i
+          + '" data-j="' + j + '">' + text + '</td>';
+      });
+      h += '</tr>';
+    });
+    return h + '</tbody>';
+  }
+  function paintMatrix(el, M, opts) {
+    var h = matrixHtml(M, opts);
+    if (el) el.innerHTML = h;
+    return h;
+  }
+
+  /* Traversal, trees and shortest paths on a DIGRAPH_JS graph.
+
+     Four of these answer a question GRAPH_JS already answers by brute force,
+     and that is deliberate: `lowLink` against `cuts()`, which deletes each edge
+     and recounts components; `kruskalRun` against `kruskal()`; `relaxRun`
+     against `dijkstra()`; and the tour oracles against `hamilton()`. Where two
+     routines answer the same question, mathcheck asserts they agree -- which is
+     worth more than either test alone, because the two are written from
+     different definitions.
+
+     An arc is excluded from a traversal by ID, not by endpoint. On a multigraph
+     -- which this representation allows and GRAPH_JS's matrix cannot -- "do not
+     go back the way you came" is a statement about the arc, and a lowlink that
+     compared endpoints would call a genuine parallel edge a bridge. */
+
+  function dfsTimes(G, roots) {
+    var idx = dgIndex(G), c = counter(), n = G.n;
+    var d = new Array(n).fill(0), f = new Array(n).fill(0), parent = new Array(n).fill(-1);
+    var colour = new Array(n).fill('white'), order = [], time = 0, forest = [];
+    function visit(v) {
+      c.calls += 1;
+      time += 1; d[v] = time; colour[v] = 'grey'; order.push(v);
+      idx.out[v].forEach(function (id) {
+        var u = dgOther(G, id, v);
+        c.reads += 1;
+        if (colour[u] === 'white') { parent[u] = v; visit(u); }
+      });
+      colour[v] = 'black';
+      time += 1; f[v] = time;
+    }
+    var starts = roots && roots.length ? roots : (function () {
+      var a = [];
+      for (var i = 0; i < n; i += 1) a.push(i);
+      return a;
+    })();
+    starts.forEach(function (s) { if (colour[s] === 'white') { forest.push(s); visit(s); } });
+    return runOf({ d: d, f: f, parent: parent, order: order, roots: forest },
+                 usedCounts(c), []);
+  }
+  /* Every arc classified from the discovery and finish times, which is the
+     definition the lesson gives: tree if the arc is the one that discovered its
+     head; back if the head is a grey ancestor (d[u] < d[v] < f[v] < f[u]);
+     forward if the head is a finished descendant; cross otherwise. */
+  function classifyEdges(G, times) {
+    var d = times.d, f = times.f, parent = times.parent;
+    return G.arcs.map(function (a, id) {
+      var u = a.u, v = a.v, kind;
+      if (parent[v] === u && d[v] > d[u]) kind = 'tree';
+      else if (d[v] <= d[u] && f[u] <= f[v]) kind = 'back';
+      else if (d[u] < d[v] && f[v] < f[u]) kind = 'forward';
+      else kind = 'cross';
+      return { id: id, u: u, v: v, kind: kind };
+    });
+  }
+  function edgeKindCounts(list) {
+    var out = { tree: 0, back: 0, forward: 0, cross: 0 };
+    list.forEach(function (e) { out[e.kind] += 1; });
+    return out;
+  }
+
+  /* Topological order two ways. The DFS one is the reverse of the finishing
+     order; Kahn's is the in-degree queue. They can differ and both be right,
+     which is the lesson -- and if there is a cycle neither exists, so the DFS
+     arm returns the back edge as the certificate. */
+  function topoDfs(G) {
+    var t = dfsTimes(G);
+    var kinds = classifyEdges(G, t.result);
+    var back = kinds.filter(function (e) { return e.kind === 'back'; });
+    var order = G.arcs.length >= 0 ? (function () {
+      var vs = [];
+      for (var i = 0; i < G.n; i += 1) vs.push(i);
+      return vs.sort(function (a, b) { return t.result.f[b] - t.result.f[a]; });
+    })() : [];
+    return runOf({ order: back.length ? null : order, backEdge: back.length ? back[0] : null,
+                   acyclic: back.length === 0, finish: t.result.f },
+                 t.counts, []);
+  }
+  function topoKahn(G) {
+    var idx = dgIndex(G), c = counter(), indeg = new Array(G.n).fill(0), i;
+    G.arcs.forEach(function (a) { indeg[a.v] += 1; });
+    var start = indeg.slice(), queue = [], order = [], trace = [];
+    for (i = 0; i < G.n; i += 1) if (!indeg[i]) queue.push(i);
+    while (queue.length) {
+      queue.sort(function (a, b) { return a - b; });    /* deterministic ties */
+      var v = queue.shift();
+      order.push(v); c.pops += 1;
+      trace.push({ at: trace.length, took: v, indeg: indeg.slice(), queue: queue.slice() });
+      idx.out[v].forEach(function (id) {
+        var u = dgOther(G, id, v);
+        indeg[u] -= 1; c.reads += 1;
+        if (!indeg[u]) { queue.push(u); c.pushes += 1; }
+      });
+    }
+    return runOf({ order: order.length === G.n ? order : null, indegree: start,
+                   acyclic: order.length === G.n, stuckAt: order.length },
+                 usedCounts(c), trace);
+  }
+
+  /* Tarjan's low-link, on the UNDIRECTED reading of the graph: bridges and cut
+     vertices in one pass, against GRAPH_JS.cuts()'s delete-and-recount. */
+  function lowLink(G) {
+    var idx = dgIndex(G), c = counter(), n = G.n;
+    var d = new Array(n).fill(-1), low = new Array(n).fill(-1), parentArc = new Array(n).fill(-1);
+    var time = 0, bridges = [], cutVertices = [], trace = [];
+    function visit(v, fromArc) {
+      c.calls += 1;
+      time += 1; d[v] = time; low[v] = time;
+      var children = 0, isCut = false;
+      idx.out[v].concat(idx.inn[v]).forEach(function (id) {
+        if (id === fromArc) return;               /* by ARC, not by endpoint */
+        var u = dgOther(G, id, v);
+        if (u === v) return;
+        c.reads += 1;
+        if (d[u] === -1) {
+          children += 1;
+          parentArc[u] = id;
+          visit(u, id);
+          if (low[u] < low[v]) low[v] = low[u];
+          if (low[u] > d[v]) bridges.push({ id: id, u: v, v: u });
+          if (fromArc !== -1 && low[u] >= d[v]) isCut = true;
+        } else if (d[u] < low[v]) low[v] = d[u];
+      });
+      if (fromArc === -1 && children > 1) isCut = true;
+      if (isCut) cutVertices.push(v);
+      trace.push({ at: trace.length, v: v, d: d[v], low: low[v] });
+    }
+    for (var s = 0; s < n; s += 1) if (d[s] === -1) visit(s, -1);
+    return runOf({ d: d, low: low, bridges: bridges,
+                   cutVertices: cutVertices.sort(function (a, b) { return a - b; }) },
+                 usedCounts(c), trace);
+  }
+
+  /* Kosaraju: finishing order on G, then components on the reverse. Both passes
+     are returned because the mode steps through them, and so is the
+     condensation, which is the acyclic graph the lesson says always results. */
+  function kosaraju(G) {
+    var c = counter(), first = dfsTimes(G), n = G.n, i;
+    var order = [];
+    for (i = 0; i < n; i += 1) order.push(i);
+    order.sort(function (a, b) { return first.result.f[b] - first.result.f[a]; });
+    var Gr = dgReverse(G), idx = dgIndex(Gr);
+    var comp = new Array(n).fill(-1), comps = [];
+    order.forEach(function (s) {
+      if (comp[s] !== -1) return;
+      var id = comps.length, stack = [s], members = [];
+      comp[s] = id;
+      while (stack.length) {
+        var v = stack.pop();
+        members.push(v); c.calls += 1;
+        idx.out[v].forEach(function (aid) {
+          var u = dgOther(Gr, aid, v);
+          c.reads += 1;
+          if (comp[u] === -1) { comp[u] = id; stack.push(u); }
+        });
+      }
+      comps.push(members.sort(function (a, b) { return a - b; }));
+    });
+    var cond = dgNew(comps.length, true), seen = {};
+    G.arcs.forEach(function (a) {
+      if (comp[a.u] === comp[a.v]) return;
+      var key = comp[a.u] + '>' + comp[a.v];
+      if (seen[key]) return;
+      seen[key] = true;
+      dgAdd(cond, comp[a.u], comp[a.v], 1, 0);
+    });
+    return runOf({ components: comps, componentOf: comp, order: order, condensation: cond,
+                   condensationAcyclic: topoDfs(cond).result.acyclic },
+                 usedCounts(c), []);
+  }
+
+  /* The cut property, checked rather than asserted: the arcs crossing (S, V-S)
+     and the lightest of them, which must be in every minimum spanning tree. */
+  function crossingEdges(G, S) {
+    var inS = new Array(G.n).fill(false);
+    S.forEach(function (v) { inS[v] = true; });
+    var crossing = [];
+    G.arcs.forEach(function (a, id) {
+      if (inS[a.u] !== inS[a.v]) crossing.push({ id: id, u: a.u, v: a.v, w: a.w });
+    });
+    var lightest = null;
+    crossing.forEach(function (e) { if (!lightest || e.w < lightest.w) lightest = e; });
+    return { crossing: crossing, lightest: lightest };
+  }
+  /* EVERY spanning tree, so the cut property's "in every MST" can be checked by
+     looking at every one of them. V <= 7 -- C(21, 6) is 54 264 subsets at V = 7
+     and 735 471 at V = 8, which is where the tab stops being interactive. */
+  function allSpanningTrees(G, cap) {
+    cap = cap === undefined ? 7 : cap;
+    oracleCap('allSpanningTrees', G.n, cap);
+    var m = G.arcs.length, need = G.n - 1, trees = [], examined = 0;
+    var chosen = [];
+    (function pick(start) {
+      if (chosen.length === need) {
+        examined += 1;
+        var H = dgNew(G.n, false);
+        chosen.forEach(function (id) { dgAdd(H, G.arcs[id].u, G.arcs[id].v, G.arcs[id].w, 0); });
+        if (dgComponents(H).length === 1) {
+          trees.push({ arcs: chosen.slice(),
+                       weight: chosen.reduce(function (t, id) { return t + G.arcs[id].w; }, 0) });
+        }
+        return;
+      }
+      for (var id = start; id < m; id += 1) {
+        if (m - id < need - chosen.length) break;
+        chosen.push(id);
+        pick(id + 1);
+        chosen.pop();
+      }
+    })(0);
+    var best = null;
+    trees.forEach(function (t) { if (best === null || t.weight < best) best = t.weight; });
+    return runOf({ trees: trees, count: trees.length, minWeight: best },
+                 { nodes: examined }, []);
+  }
+
+  /* A binary heap keyed on a number, for the two mode panels that show the heap
+     contents. Lazy: a decrease-key is a second push, and the stale entry is
+     skipped on the way out, which is what a real implementation does and what
+     makes "operations against E log V" the right comparison. */
+  function pqNew() { return { items: [] }; }
+  function pqPush(q, key, v, c) {
+    q.items.push({ key: key, v: v });
+    var i = q.items.length - 1;
+    while (i > 0) {
+      var p = (i - 1) >> 1;
+      if (c) c.compares += 1;
+      if (q.items[i].key >= q.items[p].key) break;
+      var t = q.items[i]; q.items[i] = q.items[p]; q.items[p] = t;
+      i = p;
+    }
+    if (c) c.pushes += 1;
+  }
+  function pqPop(q, c) {
+    if (!q.items.length) return null;
+    var top = q.items[0], last = q.items.pop();
+    if (q.items.length) {
+      q.items[0] = last;
+      var i = 0;
+      while (true) {
+        var l = 2 * i + 1, r = l + 1, best = i;
+        if (l < q.items.length) { if (c) c.compares += 1; if (q.items[l].key < q.items[best].key) best = l; }
+        if (r < q.items.length) { if (c) c.compares += 1; if (q.items[r].key < q.items[best].key) best = r; }
+        if (best === i) break;
+        var t = q.items[i]; q.items[i] = q.items[best]; q.items[best] = t;
+        i = best;
+      }
+    }
+    if (c) c.pops += 1;
+    return top;
+  }
+
+  function primRun(G, start) {
+    var idx = dgIndex(G), c = counter(), s = start || 0;
+    var inTree = new Array(G.n).fill(false), q = pqNew(), chosen = [], total = 0, trace = [];
+    inTree[s] = true;
+    idx.out[s].forEach(function (id) { pqPush(q, G.arcs[id].w, id, c); });
+    while (q.items.length && chosen.length < G.n - 1) {
+      var top = pqPop(q, c);
+      var a = G.arcs[top.v];
+      var u = inTree[a.u] ? a.v : a.u;
+      if (inTree[a.u] && inTree[a.v]) {
+        trace.push({ at: trace.length, arc: top.v, w: top.key, taken: false, reason: 'both ends already in the tree' });
+        continue;
+      }
+      inTree[u] = true;
+      chosen.push(top.v); total += top.key;
+      trace.push({ at: trace.length, arc: top.v, w: top.key, taken: true, added: u,
+                   heap: q.items.map(function (it) { return it.key; }) });
+      idx.out[u].forEach(function (id) {
+        var other = dgOther(G, id, u);
+        if (!inTree[other]) pqPush(q, G.arcs[id].w, id, c);
+      });
+    }
+    return runOf({ arcs: chosen, weight: total, spanning: chosen.length === G.n - 1,
+                   bound: G.arcs.length * ilog2(Math.max(2, G.n)) },
+                 usedCounts(c), trace);
+  }
+
+  /* Kruskal with the union-find state per edge and the REASON an edge was
+     rejected, which is the panel's content. Checked against GRAPH_JS.kruskal()
+     on the same weights. */
+  function kruskalRun(G) {
+    var c = counter(), order = G.arcs.map(function (a, id) { return id; }).sort(function (x, y) {
+      var a = G.arcs[x], b = G.arcs[y];
+      return a.w - b.w || a.u - b.u || a.v - b.v;
+    });
+    var parent = [], i;
+    for (i = 0; i < G.n; i += 1) parent.push(i);
+    function find(x) { var hops = 0; while (parent[x] !== x) { x = parent[x]; hops += 1; } c.hops += hops; c.finds += 1; return x; }
+    var chosen = [], total = 0, trace = [];
+    order.forEach(function (id) {
+      var a = G.arcs[id], ra = find(a.u), rb = find(a.v);
+      if (ra === rb) {
+        trace.push({ at: trace.length, arc: id, w: a.w, taken: false,
+                     reason: 'both ends are already connected', parent: parent.slice() });
+        return;
+      }
+      parent[ra] = rb; c.unions += 1;
+      chosen.push(id); total += a.w;
+      trace.push({ at: trace.length, arc: id, w: a.w, taken: true, parent: parent.slice() });
+    });
+    return runOf({ arcs: chosen, weight: total, order: order,
+                   spanning: chosen.length === G.n - 1 }, usedCounts(c), trace);
+  }
+
+  /* Dijkstra, with the relaxation SCHEDULE as a parameter, because the mode's
+     content is that the schedule changes the work and not the answer:
+     'heap' takes the closest unfinished vertex, 'scan' takes the lowest index,
+     'insertion' relaxes arcs in arc order over and over. All three must reach
+     the same distances on a non-negative graph. */
+  function relaxRun(G, source, schedule) {
+    var idx = dgIndex(G), c = counter(), n = G.n;
+    var dist = new Array(n).fill(null), parent = new Array(n).fill(-1), done = new Array(n).fill(false);
+    var trace = [], negative = G.arcs.some(function (a) { return a.w < 0; });
+    dist[source] = 0;
+    if (schedule === 'insertion') {
+      var changed = true, round = 0;
+      while (changed && round <= n) {
+        changed = false; round += 1;
+        G.arcs.forEach(function (a, id) {
+          var ends = G.directed ? [[a.u, a.v]] : [[a.u, a.v], [a.v, a.u]];
+          ends.forEach(function (e) {
+            if (dist[e[0]] === null) return;
+            c.relaxations += 1;
+            if (dist[e[1]] === null || dist[e[0]] + a.w < dist[e[1]]) {
+              dist[e[1]] = dist[e[0]] + a.w; parent[e[1]] = e[0]; changed = true;
+              trace.push({ at: trace.length, round: round, arc: id, to: e[1], dist: dist.slice() });
+            }
+          });
+        });
+      }
+      return runOf({ dist: dist, parent: parent, negativeWeights: negative, rounds: round },
+                   usedCounts(c), trace);
+    }
+    var q = pqNew();
+    pqPush(q, 0, source, c);
+    for (var it = 0; it < 4 * n + 4 * G.arcs.length; it += 1) {
+      var v = -1;
+      if (schedule === 'scan') {
+        for (var k = 0; k < n; k += 1) {
+          c.reads += 1;
+          if (!done[k] && dist[k] !== null && (v === -1 || dist[k] < dist[v])) v = k;
+        }
+        if (v === -1) break;
+      } else {
+        var top = pqPop(q, c);
+        if (!top) break;
+        if (done[top.v]) continue;
+        v = top.v;
+      }
+      done[v] = true;
+      trace.push({ at: trace.length, settled: v, d: dist[v], dist: dist.slice() });
+      idx.out[v].forEach(function (id) {
+        var a = G.arcs[id], u = dgOther(G, id, v);
+        c.relaxations += 1;
+        if (dist[u] === null || dist[v] + a.w < dist[u]) {
+          dist[u] = dist[v] + a.w; parent[u] = v;
+          if (schedule !== 'scan') pqPush(q, dist[u], u, c);
+        }
+      });
+    }
+    return runOf({ dist: dist, parent: parent, settled: done, negativeWeights: negative },
+                 usedCounts(c), trace);
+  }
+
+  /* Bellman-Ford, round by round, which is the table the mode steps through.
+     Round i holds every shortest path of at most i arcs, so the round a label
+     stops changing is the number of arcs on its shortest path -- and a label
+     that still improves in round n is the negative-cycle certificate, returned
+     as the cycle itself rather than as a boolean. */
+  function bellmanFordRounds(G, source) {
+    var c = counter(), n = G.n;
+    var dist = new Array(n).fill(null), parent = new Array(n).fill(-1);
+    var rounds = [], finalAt = new Array(n).fill(-1);
+    dist[source] = 0; finalAt[source] = 0;
+    for (var i = 1; i <= n; i += 1) {
+      var changed = [];
+      G.arcs.forEach(function (a, id) {
+        var ends = G.directed ? [[a.u, a.v]] : [[a.u, a.v], [a.v, a.u]];
+        ends.forEach(function (e) {
+          if (dist[e[0]] === null) return;
+          c.relaxations += 1;
+          if (dist[e[1]] === null || dist[e[0]] + a.w < dist[e[1]]) {
+            dist[e[1]] = dist[e[0]] + a.w; parent[e[1]] = e[0];
+            changed.push(e[1]); finalAt[e[1]] = i;
+          }
+        });
+      });
+      rounds.push({ round: i, dist: dist.slice(), changed: changed.slice() });
+      if (!changed.length && i < n) break;
+    }
+    var last = rounds[rounds.length - 1];
+    var cycle = null;
+    if (rounds.length === n && last.changed.length) {
+      /* Walk the parent pointers back n times from a vertex that still moved:
+         that lands inside the cycle, and following it round closes it. */
+      var v = last.changed[0];
+      for (var k = 0; k < n; k += 1) v = parent[v];
+      var loop = [v], at = parent[v];
+      while (at !== v && at !== -1 && loop.length <= n + 1) { loop.push(at); at = parent[at]; }
+      loop.push(v);
+      cycle = loop.reverse();
+    }
+    return runOf({ dist: dist, parent: parent, rounds: rounds, finalAt: finalAt,
+                   negativeCycle: cycle },
+                 usedCounts(c), rounds);
+  }
+
+  /* One pass in topological order, which is all a DAG needs -- and with the
+     sign flipped it is the LONGEST path, which no algorithm here can do on a
+     general graph. Slack is the difference between the earliest and the latest
+     a vertex can be scheduled, which is the critical-path reading of it. */
+  function dagRelax(G, source, sign) {
+    var topo = topoDfs(G);
+    if (!topo.result.order) return runOf({ dist: null, acyclic: false }, {}, []);
+    var s = sign === undefined ? 1 : sign, idx = dgIndex(G), c = counter();
+    var dist = new Array(G.n).fill(null), parent = new Array(G.n).fill(-1), trace = [];
+    dist[source] = 0;
+    topo.result.order.forEach(function (v) {
+      if (dist[v] === null) return;
+      idx.out[v].forEach(function (id) {
+        var a = G.arcs[id], u = dgOther(G, id, v);
+        c.relaxations += 1;
+        if (dist[u] === null || s * (dist[v] + a.w) < s * dist[u]) {
+          dist[u] = dist[v] + a.w; parent[u] = v;
+          trace.push({ at: trace.length, from: v, to: u, dist: dist.slice() });
+        }
+      });
+    });
+    /* Latest start, and the slack that comes out of it. The backward pass needs
+       three things the forward pass does not, and the first version of this
+       function had all three wrong -- which is recorded here rather than
+       quietly corrected, because each one produces a number that LOOKS like
+       slack.
+
+       It must be SEEDED at the far end and nowhere else. Starting every vertex
+       at its own earliest time makes the pass unable to move a vertex later
+       than it already is, and a vertex off the extreme path then reports no
+       slack at all.
+
+       Its extremum depends on the sign, and OPPOSITELY to the forward pass.
+       Write back(v) for the extreme distance from v on to the far end: under
+       the longest reading back(v) = max over successors of w + back(u), so
+       latest(v) = MIN over successors of latest(u) - w; under the shortest
+       reading back(v) is a min, so latest(v) is a MAX. Taking the forward
+       pass's extremum here reports slack on a vertex that lies on every
+       critical path.
+
+       And the difference has to be taken in the direction the reading makes
+       non-negative: latest - dist under the longest reading, dist - latest
+       under the shortest one, which is s * (dist - latest) in both. Slack is
+       then 0 exactly when the vertex lies on an extreme path to the far end,
+       and never negative.
+
+       `extreme` is the far end: the largest distance under either sign, because
+       the longest path is computed by negating the weights rather than by
+       reversing the comparison on this array. A vertex that cannot reach the
+       far end has no deadline of its own, so its latest and its slack are
+       null rather than a number. */
+    var extreme = null;
+    dist.forEach(function (d, v) { if (d !== null && (extreme === null || d > dist[extreme])) extreme = v; });
+    var latest = new Array(G.n).fill(null);
+    if (extreme !== null) latest[extreme] = dist[extreme];
+    var order = topo.result.order.slice().reverse();
+    order.forEach(function (v) {
+      idx.out[v].forEach(function (id) {
+        var a = G.arcs[id], u = dgOther(G, id, v);
+        if (latest[u] === null) return;
+        var cand = latest[u] - a.w;
+        if (latest[v] === null || s * cand > s * latest[v]) latest[v] = cand;
+      });
+    });
+    var slack = dist.map(function (d, v) {
+      return d === null || latest[v] === null ? null : s * (d - latest[v]);
+    });
+    return runOf({ dist: dist, parent: parent, latest: latest, slack: slack,
+                   acyclic: true, extreme: extreme, order: topo.result.order },
+                 usedCounts(c), trace);
+  }
+
+  /* Floyd-Warshall, with the matrix kept after every k so the mode can step
+     through them, and next[] for the path. The k loop OUTSIDE is the whole
+     content: it says "paths whose interior lies in {0..k}", and writing the
+     loops in any other order computes something else that often looks right. */
+  function floydSteps(W) {
+    var n = W.length, c = counter(), i, j, k;
+    var D = W.map(function (r) { return r.slice(); });
+    var next = [];
+    for (i = 0; i < n; i += 1) {
+      next.push([]);
+      for (j = 0; j < n; j += 1) next[i].push(D[i][j] === null ? null : j);
+    }
+    var steps = [];
+    for (k = 0; k < n; k += 1) {
+      for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1) {
+        c.relaxations += 1;
+        if (D[i][k] === null || D[k][j] === null) continue;
+        var via = D[i][k] + D[k][j];
+        if (D[i][j] === null || via < D[i][j]) { D[i][j] = via; next[i][j] = next[i][k]; }
+      }
+      steps.push({ k: k, matrix: D.map(function (r) { return r.slice(); }) });
+    }
+    var negative = [];
+    for (i = 0; i < n; i += 1) if (D[i][i] !== null && D[i][i] < 0) negative.push(i);
+    return runOf({ dist: D, next: next, steps: steps, negativeCycleAt: negative },
+                 usedCounts(c), steps);
+  }
+  function floydPath(next, i, j) {
+    if (next[i][j] === null) return null;
+    var path = [i];
+    while (i !== j) { i = next[i][j]; path.push(i); if (path.length > next.length + 1) return null; }
+    return path;
+  }
+
+  /* --- the functions the growth and witness modes compare --------------- */
+  /* [label, f, rank]. rank = [tier, degree, log power], compared in that
+     order: tier 0 is n^degree · (log n)^power, tier 1 exponential, tier 2
+     factorial. f = O(g) exactly when rank(f) ≤ rank(g). */
+  var FUNCS = [
+    ['1', function (n) { return 1; }, [0, 0, 0]],
+    ['log₂ n', function (n) { return Math.log2(n); }, [0, 0, 1]],
+    ['n', function (n) { return n; }, [0, 1, 0]],
+    ['n log₂ n', function (n) { return n * Math.log2(n); }, [0, 1, 1]],
+    ['n²', function (n) { return n * n; }, [0, 2, 0]],
+    ['n³', function (n) { return n * n * n; }, [0, 3, 0]],
+    ['2ⁿ', function (n) { return Math.pow(2, n); }, [1, 0, 0]],
+    ['n!', function (n) { var f = 1; for (var i = 2; i <= n; i += 1) f *= i; return f; }, [2, 0, 0]],
+    ['3n² + 5n + 100', function (n) { return 3 * n * n + 5 * n + 100; }, [0, 2, 0]],
+    ['100n', function (n) { return 100 * n; }, [0, 1, 0]]
+  ];
+  function rankLE(r, s) {
+    for (var i = 0; i < 3; i += 1) { if (r[i] < s[i]) return true; if (r[i] > s[i]) return false; }
+    return true;
+  }
+  function bigO(fi, gi) { return rankLE(FUNCS[fi][2], FUNCS[gi][2]); }
+  function className(rank) {
+    if (rank[0] === 2) return 'factorial';
+    if (rank[0] === 1) return 'exponential';
+    var d = rank[1], l = rank[2];
+    if (d === 0) return l ? 'logarithmic' : 'constant';
+    var base = d === 1 ? 'linear' : d === 2 ? 'quadratic' : d === 3 ? 'cubic' : 'degree ' + d;
+    return l ? base + ' times a log' : base;
+  }
+  var CHECKPOINTS = [1000, 10000, 1000000, 1000000000];
+  function holdsAt(f, g, C, n) {
+    var fv = f(n), gv = C * g(n);
+    if (!isFinite(fv) && !isFinite(gv)) return true;   /* both overflow: no evidence either way */
+    return fv <= gv + 1e-9;
+  }
+  /* The grid search, run only when bigO says the relation is true. The pair
+     it returns held on every n from k to 4N and at every checkpoint. */
+  function witnessSearch(fi, gi, N) {
+    var f = FUNCS[fi][1], g = FUNCS[gi][1];
+    var Cs = [1, 2, 3, 4, 5, 10, 20, 50, 100, 1000];
+    for (var ci = 0; ci < Cs.length; ci += 1) {
+      for (var k = 1; k <= 40; k += 1) {
+        var ok = true;
+        for (var n = k; n <= 4 * N && ok; n += 1) if (!holdsAt(f, g, Cs[ci], n)) ok = false;
+        for (var c = 0; c < CHECKPOINTS.length && ok; c += 1) if (!holdsAt(f, g, Cs[ci], CHECKPOINTS[c])) ok = false;
+        if (ok) return { C: Cs[ci], k: k };
+      }
+    }
+    return null;
+  }
+  function ratioAt(fi, gi, n) {
+    var fv = FUNCS[fi][1](n), gv = FUNCS[gi][1](n);
+    if (!isFinite(fv) || !isFinite(gv) || gv === 0) return null;
+    return fv / gv;
+  }
+
+  /* --- counted algorithms. Each RUNS and increments a counter. ----------- */
+  function makeArray(n, kind) {
+    var a = [];
+    for (var i = 0; i < n; i += 1) a.push(i + 1);
+    if (kind === 'reverse') a.reverse();
+    else if (kind === 'shuffle') {
+      /* A fixed permutation, generated by a deterministic step so two readers
+         at the same n see the same array and the same counts. */
+      var out = [];
+      var idx = 0;
+      while (a.length) { idx = (idx + 7) % a.length; out.push(a.splice(idx, 1)[0]); }
+      a = out;
+    }
+    return a;
+  }
+  function linearSearch(a, target) {
+    var c = 0;
+    for (var i = 0; i < a.length; i += 1) { c += 1; if (a[i] === target) return c; }
+    return c;
+  }
+  function binarySearch(a, target) {
+    var lo = 0, hi = a.length - 1, c = 0;
+    while (lo <= hi) {
+      c += 1;
+      var mid = (lo + hi) >> 1;
+      if (a[mid] === target) return c;
+      if (a[mid] < target) lo = mid + 1; else hi = mid - 1;
+    }
+    return c;
+  }
+  function binaryWorst(n) {
+    var a = makeArray(n, 'sorted'), worst = 0;
+    for (var t = 1; t <= n; t += 1) worst = Math.max(worst, binarySearch(a, t));
+    return worst;
+  }
+  function bubbleSort(a) {
+    var arr = a.slice(), c = 0;
+    for (var i = 0; i < arr.length; i += 1)
+      for (var j = 0; j + 1 < arr.length - i; j += 1) {
+        c += 1;
+        if (arr[j] > arr[j + 1]) { var t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t; }
+      }
+    return c;
+  }
+  function insertionSort(a) {
+    var arr = a.slice(), c = 0;
+    for (var i = 1; i < arr.length; i += 1) {
+      var key = arr[i], j = i - 1;
+      while (j >= 0) { c += 1; if (arr[j] <= key) break; arr[j + 1] = arr[j]; j -= 1; }
+      arr[j + 1] = key;
+    }
+    return c;
+  }
+  function mergeSort(a) {
+    var c = 0;
+    function sort(arr) {
+      if (arr.length <= 1) return arr;
+      var mid = arr.length >> 1;
+      var L = sort(arr.slice(0, mid)), R = sort(arr.slice(mid)), out = [], i = 0, j = 0;
+      while (i < L.length && j < R.length) { c += 1; out.push(L[i] <= R[j] ? L[i++] : R[j++]); }
+      while (i < L.length) out.push(L[i++]);
+      while (j < R.length) out.push(R[j++]);
+      return out;
+    }
+    sort(a.slice());
+    return c;
+  }
+  function ilog2(n) { var t = 0; while (n >= 2) { n = Math.floor(n / 2); t += 1; } return t; }
+
+  /* Lesson 5's four loop nests, each run with a counter, beside the sum that
+     predicts it. None of them looks at data, so the counts are exact. */
+  function countNests(n) {
+    var A = 0, B = 0, C = 0, D = 0, i, j, k;
+    for (i = 1; i <= n; i += 1) for (j = 1; j <= n; j += 1) for (k = 1; k <= n; k += 1) A += 1;
+    for (i = 1; i <= n; i += 1) for (j = i; j <= n; j += 1) B += 1;
+    for (i = 1; i <= n; i += 1) { j = n; while (j > 1) { j = Math.floor(j / 2); C += 1; } }
+    for (i = 1; i <= n; i += 1) for (j = 1; j <= i; j += 1) for (k = 1; k <= j; k += 1) D += 1;
+    return { A: A, B: B, C: C, D: D,
+      predA: n * n * n, predB: n * (n + 1) / 2, predC: n * ilog2(n), predD: n * (n + 1) * (n + 2) / 6 };
+  }
+
+  /* Lesson 2's worked example: POWER(x, n) by repeated squaring, with the
+     invariant result · base^m = xⁿ evaluated exactly after every iteration. */
+  function powerTrace(x, n) {
+    var X = BigInt(x), target = X ** BigInt(n);
+    var result = BigInt(1), base = X, m = n, rows = [], squarings = 0, mults = 0;
+    rows.push({ step: 0, m: m, result: result, base: base, ok: result * base ** BigInt(m) === target });
+    while (m > 0) {
+      if (m % 2 === 1) { result = result * base; mults += 1; }
+      base = base * base; squarings += 1;
+      m = Math.floor(m / 2);
+      rows.push({ step: rows.length, m: m, result: result, base: base, ok: result * base ** BigInt(m) === target });
+    }
+    return { rows: rows, squarings: squarings, mults: mults, value: result, target: target, naive: n - 1,
+      binary: n.toString(2) };
+  }
+
+  /* Lesson 8's dynamic array: n insertions from capacity 1, every element
+     copied when the array grows. policy: 'double', 'half' (×1.5), 'one' (+1). */
+  function dynamicArray(n, policy) {
+    var cap = 1, size = 0, copies = 0, events = [], worst = 0, worstAt = 1, cumulative = [];
+    for (var i = 1; i <= n; i += 1) {
+      var cost = 1;
+      if (size === cap) {
+        var next = policy === 'one' ? cap + 1 : policy === 'half' ? Math.max(cap + 1, Math.floor(cap * 3 / 2)) : cap * 2;
+        events.push({ at: i, from: cap, to: next, copies: size });
+        copies += size; cost += size; cap = next;
+      }
+      size += 1;
+      if (cost > worst) { worst = cost; worstAt = i; }
+      cumulative.push(copies + i);
+    }
+    return { events: events, copies: copies, total: n + copies, worst: worst, worstAt: worstAt,
+      amortised: (n + copies) / n, cumulative: cumulative, capacity: cap };
+  }
+
+  /* The master theorem, cases numbered as course 3 lesson 11 numbers them:
+     1 root dominates, 2 balanced, 3 leaves dominate. */
+  function masterCase(a, b, d) {
+    var crit = Math.log(a) / Math.log(b);
+    var which = Math.abs(crit - d) < 1e-9 ? 2 : (crit > d ? 3 : 1);
+    function pow(e) { return e === 0 ? '1' : e === 1 ? 'n' : 'n^' + e; }
+    var result;
+    if (which === 1) result = 'Θ(' + pow(d) + ')';
+    else if (which === 2) result = d === 0 ? 'Θ(log n)' : 'Θ(' + pow(d) + ' log n)';
+    else if (Math.abs(crit - Math.round(crit)) < 1e-9) result = 'Θ(' + pow(Math.round(crit)) + ')';
+    else result = 'Θ(n^log_' + b + ' ' + a + ') ≈ Θ(n^' + crit.toFixed(3) + ')';
+    var label = which === 1 ? 'case 1 (a < b^d, the root dominates)'
+      : which === 2 ? 'case 2 (a = b^d, balanced)' : 'case 3 (a > b^d, the leaves dominate)';
+    return { crit: crit, which: which, result: result, label: label };
+  }
+
+  /* Coin change: greedy and exact DP, run against each other. */
+  function greedyCoins(coins, amount) {
+    var left = amount, used = 0, picks = [];
+    var sorted = coins.slice().sort(function (x, y) { return y - x; });
+    sorted.forEach(function (c) {
+      while (left >= c) { left -= c; used += 1; picks.push(c); }
+    });
+    return left === 0 ? { count: used, picks: picks } : { count: Infinity, picks: [] };
+  }
+  function dpCoins(coins, amount) {
+    var best = new Array(amount + 1).fill(Infinity), from = new Array(amount + 1).fill(-1);
+    best[0] = 0;
+    for (var v = 1; v <= amount; v += 1) {
+      coins.forEach(function (c) {
+        if (c <= v && best[v - c] + 1 < best[v]) { best[v] = best[v - c] + 1; from[v] = c; }
+      });
+    }
+    var picks = [], cur = amount;
+    while (cur > 0 && from[cur] !== -1) { picks.push(from[cur]); cur -= from[cur]; }
+    return { count: best[amount], picks: picks, table: best };
+  }
+  function greedyFailures(coins, upto) {
+    var out = [];
+    for (var a = 1; a <= upto; a += 1) if (greedyCoins(coins, a).count !== dpCoins(coins, a).count) out.push(a);
+    return out;
+  }
+
+  /* ------------------------------------------------------ what a reader types
+
+     One clause is `u>v w` or `u-v w`, 1-based, the weight optional. The
+     SEPARATOR IS NOT WHAT DECIDES DIRECTION: the mode does, and it passes
+     `directed` in, because a reader who types a hyphen into the strongly-
+     connected-components editor means an arc and should get one rather than a
+     parse error. What the separator does is let the undirected modes be typed
+     the way their prose reads. */
+  var GK_MAXN = 12;          /* twelve labels is what the ring drawing can hold */
+  var GK_MAXARCS = 26;
+
+  function gkClauses(text) {
+    var parts = String(text).split(/[,;\n]+/), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (s) out.push(s);
+    }
+    return out;
+  }
+  function gkParse(text, directed, maxN) {
+    maxN = maxN === undefined ? GK_MAXN : maxN;
+    var cl = gkClauses(text), raw = [], n = 0, i;
+    if (!cl.length) return { bad: 'write at least one arc' };
+    if (cl.length > GK_MAXARCS) return { bad: 'that is more than ' + GK_MAXARCS + ' arcs' };
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^(\d+)\s*(?:>|-|to)\s*(\d+)(?:[\s:]+(-?\d+))?$/.exec(cl[i]);
+      if (!m) return { bad: 'cannot read "' + cl[i] + '"' };
+      var u = parseInt(m[1], 10), v = parseInt(m[2], 10);
+      var w = m[3] === undefined ? 1 : parseInt(m[3], 10);
+      if (u < 1 || v < 1) return { bad: 'labels start at 1, and "' + cl[i] + '" does not' };
+      if (u > maxN || v > maxN) return { bad: 'label ' + Math.max(u, v) + ' is past ' + maxN };
+      if (u === v) return { bad: 'a loop at ' + u + ': none of these algorithms is about one' };
+      if (w < -999 || w > 999) return { bad: 'keep the weight between -999 and 999' };
+      raw.push([u, v, w]);
+      if (u > n) n = u;
+      if (v > n) n = v;
+    }
+    if (n < 2) return { bad: 'two vertices is the smallest graph worth drawing' };
+    var G = dgNew(n, directed);
+    for (i = 0; i < raw.length; i += 1) dgAdd(G, raw[i][0] - 1, raw[i][1] - 1, raw[i][2], 0);
+    return { G: G, n: n, arcs: G.arcs.length };
+  }
+  /* A vertex set, as the reader writes it: "1, 2, 5". Out-of-range labels are
+     reported rather than dropped, because a cut whose set silently lost a
+     vertex is a cut the reader did not ask about. */
+  function gkParseSet(text, n) {
+    var parts = gkClauses(text), out = [], seen = {}, i;
+    for (i = 0; i < parts.length; i += 1) {
+      var v = parseInt(parts[i], 10);
+      if (!isFinite(v)) return { bad: 'cannot read "' + parts[i] + '" as a vertex' };
+      if (v < 1 || v > n) return { bad: 'this graph has no vertex ' + v };
+      if (!seen[v]) { seen[v] = true; out.push(v - 1); }
+    }
+    return { set: out.sort(function (a, b) { return a - b; }) };
+  }
+  function gkLabels(n) {
+    var out = [], i;
+    for (i = 0; i < n; i += 1) out.push(i + 1);
+    return out;
+  }
+  function gkNames(list) {
+    return (list || []).map(function (v) { return v + 1; }).join(', ');
+  }
+  function gkArcName(a) { return (a.u + 1) + ' → ' + (a.v + 1); }
+  function gkEdgeName(a) { return (a.u + 1) + ' – ' + (a.v + 1); }
+
+  /* ----------------------------------------------- handing a graph to GRAPH_JS
+
+     `dgToMatrix` loses two things and the modes that use it say which. A matrix
+     holds one entry per pair, so PARALLEL arcs vanish; and GRAPH_JS reads its
+     weights through `weight(i, j)`, which consults LESSON keyed on the
+     unordered pair, so two arcs between one pair cannot carry two weights.
+     gkOracleReady reports both before anything is compared. */
+  function gkParallelPairs(G) {
+    var seen = {}, dup = [];
+    G.arcs.forEach(function (a) {
+      var k = Math.min(a.u, a.v) + '-' + Math.max(a.u, a.v);
+      if (seen[k] && dup.indexOf(k) === -1) dup.push(k);
+      seen[k] = true;
+    });
+    return dup;
+  }
+  function gkOracleReady(G) {
+    var dup = gkParallelPairs(G);
+    return { ok: dup.length === 0, parallel: dup,
+             why: dup.length
+               ? 'a matrix holds one entry per pair, so it cannot hold '
+                 + dup.length + ' parallel pair' + (dup.length === 1 ? '' : 's')
+               : null };
+  }
+  /* The 1-based triples GRAPH_JS.lessonFrom takes, so its `weight(i, j)`
+     answers with the reader's number instead of ((7i + 13j) mod 9) + 1. */
+  function gkLessonList(G) {
+    return G.arcs.map(function (a) { return [a.u + 1, a.v + 1, a.w]; });
+  }
+
+  /* -------------------------------------------- the parenthesis theorem, run
+
+     `v is a descendant of u` is computed by WALKING THE PARENT POINTERS, which
+     is the definition, and `[d(v), f(v)] subset of [d(u), f(u)]` is computed
+     from the timestamps. The theorem is that those two agree on every ordered
+     pair, so the page compares them pair by pair rather than restating it. A
+     third count matters as much: the number of pairs whose intervals OVERLAP
+     without nesting, which the theorem says is zero. */
+  function gkAncestors(times) {
+    var n = times.d.length, anc = [], v, at;
+    for (v = 0; v < n; v += 1) anc.push(new Array(n).fill(false));
+    for (v = 0; v < n; v += 1) {
+      at = times.parent[v];
+      while (at !== -1 && at !== undefined) { anc[at][v] = true; at = times.parent[at]; }
+    }
+    return anc;
+  }
+  function parenthesisCheck(times) {
+    var anc = gkAncestors(times), n = times.d.length, u, v;
+    /* The DESCENT check runs over ordered pairs, because "u contains v" and
+       "v contains u" are different statements and each has to match its own
+       ancestor entry. The SHAPE count runs over unordered pairs, because
+       nesting and disjointness are properties of a PAIR of intervals: counted
+       over ordered pairs the two are double-counted unevenly -- one nesting
+       appears once and one disjointness twice -- and the three numbers then add
+       up to nothing the reader can check. Here they add to exactly C(n, 2). */
+    var violations = [];
+    for (u = 0; u < n; u += 1) for (v = 0; v < n; v += 1) {
+      if (u === v) continue;
+      var inside = times.d[u] < times.d[v] && times.f[v] < times.f[u];
+      if (inside !== anc[u][v]) violations.push({ u: u, v: v, nested: inside, descendant: anc[u][v] });
+    }
+    var nested = 0, disjoint = 0, overlapping = 0;
+    for (u = 0; u < n; u += 1) for (v = u + 1; v < n; v += 1) {
+      var uv = times.d[u] < times.d[v] && times.f[v] < times.f[u];
+      var vu = times.d[v] < times.d[u] && times.f[u] < times.f[v];
+      var apart = times.f[u] < times.d[v] || times.f[v] < times.d[u];
+      if (uv || vu) nested += 1;
+      else if (apart) disjoint += 1;
+      else overlapping += 1;
+    }
+    return { nested: nested, disjoint: disjoint, overlapping: overlapping,
+             pairs: (n * (n - 1)) / 2, violations: violations,
+             holds: violations.length === 0 && overlapping === 0, ancestor: anc };
+  }
+
+  /* ------------------------------------------- the same arcs read undirected
+
+     The misconception is that an undirected graph has cross edges. It has only
+     tree and back edges, and this computes the classification rather than
+     asserting it: an undirected edge is met from whichever end DFS reached
+     FIRST, so it is classified from that end -- tree when that end is the
+     parent, back when the other end lies inside its interval, and cross
+     otherwise. The count of the third is the figure, and it is zero. */
+  function gkUndirectedKinds(G, roots) {
+    var H = dgNew(G.n, false);
+    G.arcs.forEach(function (a) { dgAdd(H, a.u, a.v, a.w, 0); });
+    var t = dfsTimes(H, roots).result;
+    var counts = { tree: 0, back: 0, forward: 0, cross: 0 }, list = [];
+    H.arcs.forEach(function (a, id) {
+      var first = t.d[a.u] <= t.d[a.v] ? a.u : a.v, other = first === a.u ? a.v : a.u;
+      var kind;
+      if (t.parent[other] === first) kind = 'tree';
+      else if (t.d[first] < t.d[other] && t.f[other] < t.f[first]) kind = 'back';
+      else kind = 'cross';
+      counts[kind] += 1;
+      list.push({ id: id, u: first, v: other, kind: kind });
+    });
+    return { counts: counts, edges: list, times: t };
+  }
+
+  /* ------------------------------------------------ every topological order
+
+     "The topological order is unique" is answered with a number, so the number
+     has to be produced: every order is enumerated by taking every in-degree-
+     zero vertex at every step. The cap is the usual refusal -- 8 vertices with
+     no arcs is 40 320 orders, which is instant, and 9 is 362 880, which is
+     where the tab stops being interactive. Only the first few are kept for the
+     panel; all of them are counted. */
+  function topoAllOrders(G, cap, keep) {
+    cap = cap === undefined ? 8 : cap;
+    keep = keep === undefined ? 6 : keep;
+    oracleCap('topoAllOrders', G.n, cap);
+    var idx = dgIndex(G), indeg = new Array(G.n).fill(0);
+    G.arcs.forEach(function (a) { indeg[a.v] += 1; });
+    var used = new Array(G.n).fill(false), cur = [], shown = [], total = 0, steps = 0;
+    (function walk() {
+      if (cur.length === G.n) {
+        total += 1;
+        if (shown.length < keep) shown.push(cur.slice());
+        return;
+      }
+      for (var v = 0; v < G.n; v += 1) {
+        if (used[v] || indeg[v] > 0) continue;
+        steps += 1;
+        used[v] = true; cur.push(v);
+        idx.out[v].forEach(function (id) { indeg[dgOther(G, id, v)] -= 1; });
+        walk();
+        idx.out[v].forEach(function (id) { indeg[dgOther(G, id, v)] += 1; });
+        cur.pop(); used[v] = false;
+      }
+    })();
+    return runOf({ count: total, orders: shown, unique: total === 1 },
+                 { nodes: steps }, []);
+  }
+
+  /* An order is valid when EVERY arc points forward along it. Both arms of the
+     topological mode are checked this way rather than trusted: two orders that
+     differ can both be right, and the only thing that makes either right is
+     this test. */
+  function gkValidOrder(G, order) {
+    if (!order || order.length !== G.n) return false;
+    var pos = new Array(G.n).fill(-1);
+    order.forEach(function (v, i) { pos[v] = i; });
+    for (var i = 0; i < G.arcs.length; i += 1) {
+      if (pos[G.arcs[i].u] >= pos[G.arcs[i].v]) return false;
+    }
+    return true;
+  }
+
+  /* ------------------------------ strongly connected components, by definition
+
+     u and v are in one component iff each reaches the other. That is a
+     traversal from every vertex and a pairwise test, which is O(V(V + E)) and
+     has nothing in common with Kosaraju's two passes -- which is exactly why
+     it is worth running beside them. */
+  function sccBrute(G) {
+    var idx = dgIndex(G), reach = [], s, v, u;
+    for (s = 0; s < G.n; s += 1) {
+      var seen = new Array(G.n).fill(false), stack = [s];
+      seen[s] = true;
+      while (stack.length) {
+        var at = stack.pop();
+        idx.out[at].forEach(function (id) {
+          var to = dgOther(G, id, at);
+          if (!seen[to]) { seen[to] = true; stack.push(to); }
+        });
+      }
+      reach.push(seen);
+    }
+    var comp = new Array(G.n).fill(-1), comps = [];
+    for (v = 0; v < G.n; v += 1) {
+      if (comp[v] !== -1) continue;
+      var id = comps.length, members = [];
+      for (u = 0; u < G.n; u += 1) if (reach[v][u] && reach[u][v]) { comp[u] = id; members.push(u); }
+      comps.push(members);
+    }
+    return { components: comps, componentOf: comp, reaches: reach };
+  }
+  /* Two component lists agree when they induce the same PARTITION; the names
+     the two algorithms give the parts are their own business. */
+  function samePartition(a, b) {
+    var key = function (list) {
+      return list.map(function (c) { return c.slice().sort(function (x, y) { return x - y; }).join('.'); })
+        .sort().join('|');
+    };
+    return key(a) === key(b);
+  }
+
+  /* --------------------------------------- the cut property, against every tree
+
+     The lemma says the lightest arc across a cut is in SOME minimum spanning
+     tree. That is checked by listing every spanning tree, keeping the minimum-
+     weight ones and looking. `inEvery` is the stronger statement and it is
+     reported separately, because it holds exactly when that arc is strictly
+     lightest across the cut -- and a reader who conflates the two has the
+     uniqueness question wrong as well. */
+  function cutVerdict(G, S, cap) {
+    var cross = crossingEdges(G, S), all = allSpanningTrees(G, cap);
+    var min = all.result.minWeight;
+    var msts = all.result.trees.filter(function (t) { return t.weight === min; });
+    var e = cross.lightest;
+    var ties = e ? cross.crossing.filter(function (x) { return x.w === e.w; }).length : 0;
+    /* How many of the minimum trees each arc appears in. Zero is the CYCLE
+       property on screen: an arc in no minimum tree, which for a strictly
+       heaviest arc on a cycle is exactly what the second lemma says. */
+    var perArc = G.arcs.map(function (_a, id) {
+      return msts.filter(function (t) { return t.arcs.indexOf(id) !== -1; }).length;
+    });
+    return {
+      crossing: cross.crossing, lightest: e, ties: ties, perArc: perArc,
+      trees: all.result.count, allTrees: all.result.trees,
+      minWeight: min, msts: msts.length, mstList: msts,
+      unique: msts.length === 1, examined: all.counts.nodes,
+      inSome: e ? msts.some(function (t) { return t.arcs.indexOf(e.id) !== -1; }) : null,
+      inEvery: e ? msts.every(function (t) { return t.arcs.indexOf(e.id) !== -1; }) : null
+    };
+  }
+  /* The misconception: "the MST is the set of each vertex's lightest edge."
+     Each such edge IS in a minimum tree -- take the cut separating that vertex
+     from the rest -- and the set is usually not a spanning tree at all, which
+     is a fact about sizes and is therefore computed. */
+  function lightestPerVertex(G) {
+    var idx = dgIndex(G), picked = {}, ids = [], v;
+    for (v = 0; v < G.n; v += 1) {
+      var best = -1;
+      idx.out[v].concat(idx.inn[v]).forEach(function (id) {
+        if (best === -1 || G.arcs[id].w < G.arcs[best].w) best = id;
+      });
+      if (best !== -1 && !picked[best]) { picked[best] = true; ids.push(best); }
+    }
+    ids.sort(function (a, b) { return a - b; });
+    var H = dgNew(G.n, false);
+    ids.forEach(function (id) { dgAdd(H, G.arcs[id].u, G.arcs[id].v, G.arcs[id].w, 0); });
+    return { arcs: ids, weight: ids.reduce(function (t, id) { return t + G.arcs[id].w; }, 0),
+             pieces: dgComponents(H).length, spans: ids.length === G.n - 1 };
+  }
+
+  /* --------------------------------------------- the upper-bound invariant
+
+     d[v] is never below delta(s, v), at any point in any schedule. The truth is
+     produced by Bellman-Ford, which is a different algorithm from any schedule
+     this mode runs, and every step of the trace is tested against it -- so the
+     invariant is checked rather than described. */
+  function relaxInvariant(G, source, run) {
+    var truth = bellmanFordRounds(G, source).result.dist, bad = [];
+    (run.trace || []).forEach(function (step, k) {
+      (step.dist || []).forEach(function (d, v) {
+        if (d === null) return;
+        if (truth[v] === null || d < truth[v]) bad.push({ step: k, v: v, d: d, delta: truth[v] });
+      });
+    });
+    var final = run.result.dist, wrong = [];
+    final.forEach(function (d, v) {
+      var want = truth[v];
+      if ((d === null) !== (want === null) || (d !== null && d !== want)) wrong.push(v);
+    });
+    return { truth: truth, violations: bad, holds: bad.length === 0,
+             exact: wrong.length === 0, wrong: wrong };
+  }
+  /* E log V as a REFERENCE, not a verdict: `ilog2` is an integer logarithm and
+     the product is compared with a measured count of heap operations by eye,
+     in a column that says which of the two is a proof. */
+  function gkHeapBound(G) { return G.arcs.length * ilog2(Math.max(2, G.n)); }
+
+  /* Every weight negated. The longest-path claim is "negate and run the same
+     pass", and the reason it holds only on a DAG is what the negated graph
+     looks like when there is a cycle: a cycle of positive total becomes one of
+     negative total, and no shortest walk exists. Building it is how the page
+     shows that rather than saying it. */
+  function gkNegate(G) {
+    var H = dgCopy(G);
+    H.arcs.forEach(function (a) { a.w = -a.w; });
+    return H;
+  }
+  /* The number of ARCS on the path a parent array records, which is the figure
+     Bellman-Ford's round count is compared against: a label settles in round k
+     exactly when its shortest path uses k arcs. */
+  function gkArcsOnPath(parent, source, v) {
+    var path = gkPathTo(parent, source, v);
+    return path === null ? null : path.length - 1;
+  }
+
+  /* A path from a parent array, as labels, or null when v was never reached. */
+  function gkPathTo(parent, source, v) {
+    var path = [v], at = v, guard = 0;
+    while (at !== source) {
+      at = parent[at];
+      if (at === -1 || at === undefined || guard > parent.length + 1) return null;
+      path.push(at);
+      guard += 1;
+    }
+    return path.reverse();
+  }
+  function gkPathText(path) {
+    return path === null ? 'not reached' : path.map(function (v) { return v + 1; }).join(' → ');
+  }
+  function gkDistText(d) { return d === null ? 'not reached' : String(d); }
+  /* A distance array compared with GRAPH_JS.dijkstra's, whose sentinel is
+     Infinity where this one is null. Comparing them requires saying so once. */
+  function gkSameDistances(mine, theirs) {
+    if (mine.length !== theirs.length) return false;
+    for (var v = 0; v < mine.length; v += 1) {
+      var a = mine[v] === null ? Infinity : mine[v];
+      if (a !== theirs[v]) return false;
+    }
+    return true;
+  }
+  function gkPlural(n, one, many) { return n === 1 ? one : many; }
+  /* The reader's chosen root FIRST and then every other vertex, so a graph in
+     several pieces is still traversed whole. `dfsTimes([r])` alone would leave
+     every vertex outside r's piece at d = f = 0, which is not a timestamp and
+     would be painted as one. */
+  function gkRootsFrom(root, n) {
+    var out = [root], i;
+    for (i = 0; i < n; i += 1) if (i !== root) out.push(i);
+    return out;
+  }
+  /* A step index a control hands in, clamped into a trace that may have got
+     shorter since it was set. Every mode keeps its step in one variable and
+     clamps it on every redraw, which is what makes a second redraw safe. */
+  function gkStep(want, length) {
+    if (!length) return 0;
+    var k = parseInt(want, 10);
+    if (!isFinite(k) || k < 0) k = 0;
+    return Math.min(k, length - 1);
+  }
+  /* Every number below came from running the algorithm on the graph on
+     screen. That is one graph. A lemma is a statement about all of them,
+     and this kit never reads one off a single run: where a page prints a
+     claim about every graph it either enumerates the whole space at a cap
+     it states, or it names the proof the lesson gives. */
+  var PMP = {
+    'classic': { spec: '1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2', start: '1' },
+    'lazy': { spec: '1-2 1, 1-3 1, 1-4 1, 2-3 9, 2-4 9, 3-4 9, 1-5 2, 2-5 3, 3-5 4', start: '1' },
+    'tie': { spec: '1-2 2, 1-3 2, 2-3 2, 3-4 1', start: '1' },
+    'star': { spec: '1-2 5, 1-3 4, 1-4 3, 1-5 2, 1-6 1', start: '1' }
+  };
+
+  var presetIn = document.getElementById('pmPreset'), specIn = document.getElementById('pmSpec');
+  var startIn = document.getElementById('pmStart'), startOut = document.getElementById('pmStartOut');
+  var stepIn = document.getElementById('pmStep'), stepOut = document.getElementById('pmStepOut');
+  var plot = document.getElementById('pmPlot'), heapPlot = document.getElementById('pmHeap');
+  var stepsT = document.getElementById('pmSteps'), cmpT = document.getElementById('pmCompare');
+  var status = document.getElementById('pmStatus');
+  var KPIS = ['pmWeight', 'pmEdges', 'pmOps', 'pmCmp', 'pmBound', 'pmAgree'];
+
+  function blank(why) {
+    plot.innerHTML = ''; heapPlot.innerHTML = ''; stepsT.innerHTML = ''; cmpT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> An edge is '
+      + '<span class="tt">1-2 4</span>: two labels and a weight.';
+  }
+
+  /* The heap as its ARRAY, root first, because the array is the structure: a
+     drawing of a triangle of circles would hide that a push walks up from the
+     end and a pop swaps the end into the front. */
+  function heapCells(keys) {
+    if (!keys || !keys.length) {
+      return '<text x="28" y="60" font-size="12" fill="var(--muted)">the heap is empty</text>';
+    }
+    var w = Math.max(18, Math.min(46, Math.floor(600 / keys.length))), s = '', i;
+    for (i = 0; i < keys.length; i += 1) {
+      var x = 28 + i * w;
+      s += '<rect x="' + x + '" y="34" width="' + (w - 4) + '" height="42" rx="4" fill="var(--purple)" '
+        + 'opacity="' + (i === 0 ? '0.9' : '0.22') + '" stroke="var(--purple)" />';
+      s += '<text x="' + (x + (w - 4) / 2) + '" y="60" text-anchor="middle" font-size="13" '
+        + 'font-weight="700" fill="var(--' + (i === 0 ? 'on-accent' : 'text') + ')">' + keys[i]
+        + '</text>';
+      s += '<text x="' + (x + (w - 4) / 2) + '" y="90" text-anchor="middle" font-size="9" '
+        + 'fill="var(--muted)">' + i + '</text>';
+    }
+    s += '<text x="28" y="22" font-size="11" fill="var(--purple)">' + keys.length
+      + ' entr' + gkPlural(keys.length, 'y', 'ies') + ' in the heap; the root is the next pop</text>';
+    return s;
+  }
+
+  function redraw() {
+    var parsed = gkParse(specIn.value, false);
+    if (parsed.bad) { blank(parsed.bad); return; }
+    var G = parsed.G, n = parsed.n;
+    startIn.max = n;
+    var start = gkStep(parseInt(startIn.value, 10) - 1, n);
+    startOut.textContent = String(start + 1);
+
+    var run = primRun(G, start), res = run.result;
+    var trace = run.trace;
+    stepIn.max = Math.max(1, trace.length);
+    var k = gkStep(parseInt(stepIn.value, 10) - 1, trace.length);
+    stepOut.textContent = trace.length ? (k + 1) + ' of ' + trace.length : 'nothing to step';
+
+    var takenSoFar = [], lastHeap = null, inTree = new Array(n).fill(false);
+    inTree[start] = true;
+    trace.forEach(function (st, i) {
+      if (i > k) return;
+      if (st.taken) { takenSoFar.push(st.arc); inTree[st.added] = true; }
+      if (st.heap) lastHeap = st.heap;
+    });
+
+    var colours = new Array(n);
+    for (var v = 0; v < n; v += 1) colours[v] = inTree[v] ? 0 : -1;
+    plot.innerHTML = dgSvg(G, { points: dgLayout(n, { cx: 330, cy: 150, radius: 118 }),
+                                highlight: takenSoFar, label: 'w', colours: colours });
+    heapPlot.innerHTML = heapCells(lastHeap);
+
+    var rows = '';
+    trace.forEach(function (st, i) {
+      var a = G.arcs[st.arc];
+      rows += '<tr class="' + (i === k ? 'tone-cyan' : (st.taken ? '' : 'tone-red')) + '">'
+        + '<th class="rowhead">' + (i + 1) + '</th><td>' + gkEdgeName(a) + '</td><td>' + st.w
+        + '</td><td>' + (st.taken ? 'taken, bringing in ' + (st.added + 1) : 'discarded')
+        + '</td><td>' + (st.taken
+            ? 'the lightest edge across the tree’s own boundary, which the cut property puts '
+              + 'in a minimum tree'
+            : st.reason) + '</td><td>'
+        + (st.heap ? st.heap.join(' ') : 'unchanged') + '</td></tr>';
+    });
+    stepsT.innerHTML = '<caption>Every pop, in order: what came out of the heap and what happened '
+      + 'to it</caption><thead><tr><th>pop</th><th>edge</th><th>weight</th><th>outcome</th>'
+      + '<th>why</th><th>heap keys after</th></tr></thead><tbody>' + rows + '</tbody>';
+
+    /* The independent answer: the same graph run through the sorted, union-find
+       method, which never builds a heap and never grows one tree. */
+    var kr = kruskalRun(G);
+    var same = kr.result.weight === res.weight;
+    var sameSet = kr.result.arcs.slice().sort(function (a, b) { return a - b; }).join(',')
+      === res.arcs.slice().sort(function (a, b) { return a - b; }).join(',');
+    cmpT.innerHTML = '<caption>The same graph, two schedules for the same two lemmas</caption>'
+      + '<thead><tr><th>method</th><th>weight</th><th>edges</th><th>what it counted</th>'
+      + '</tr></thead><tbody>'
+      + '<tr><th class="rowhead">growing one tree with a heap</th><td class="tone-cyan">'
+      + res.weight + '</td><td>' + res.arcs.map(function (id) { return gkEdgeName(G.arcs[id]); })
+        .join(', ') + '</td><td>' + (run.counts.pushes || 0) + ' pushes, '
+      + (run.counts.pops || 0) + ' pops, ' + (run.counts.compares || 0) + ' comparisons</td></tr>'
+      + '<tr><th class="rowhead">sorting the edges and asking a find</th><td class="tone-cyan">'
+      + kr.result.weight + '</td><td>' + kr.result.arcs.map(function (id) { return gkEdgeName(G.arcs[id]); })
+        .join(', ') + '</td><td>' + (kr.counts.finds || 0) + ' finds, '
+      + (kr.counts.unions || 0) + ' unions</td></tr></tbody>';
+
+    document.getElementById('pmWeight').textContent = res.weight
+      + (res.spanning ? '' : ' — not spanning');
+    document.getElementById('pmEdges').textContent = res.arcs.length + ' of ' + (n - 1);
+    document.getElementById('pmOps').textContent = (run.counts.pushes || 0) + ' and '
+      + (run.counts.pops || 0);
+    document.getElementById('pmCmp').textContent = run.counts.compares || 0;
+    document.getElementById('pmBound').textContent = res.bound;
+    document.getElementById('pmAgree').textContent = same
+      ? (sameSet ? 'same weight, same edges' : 'same weight, different edges') : 'no — report it';
+
+    var stale = trace.filter(function (st) { return !st.taken; }).length;
+    status.innerHTML = '<strong>Weight ' + res.weight + '</strong> on ' + res.arcs.length
+      + ' edge' + gkPlural(res.arcs.length, '', 's') + ', from ' + (run.counts.pops || 0)
+      + ' pops of which <span class="tone-red">' + stale + '</span> came back with both ends '
+      + 'already in the tree and were discarded. '
+      + 'The heap cost <span class="tone-purple">' + (run.counts.compares || 0)
+      + '</span> key comparisons, against <span class="tone-amber">' + res.bound
+      + '</span> for E log' + '₂' + ' V on this graph &mdash; and those two numbers are not the '
+      + 'same kind of thing: the first is a measurement on one graph and the second is a bound on '
+      + 'all of them, drawn here so the shape can be seen rather than the constant. '
+      + (same
+          ? (sameSet
+              ? 'Sorting the edges and asking a find instead produced <span class="tone-green">the '
+                + 'same tree</span>, edge for edge: with these weights the minimum tree is unique '
+                + 'and a schedule cannot change it.'
+              : 'Sorting the edges instead produced a <span class="tone-amber">different set of '
+                + 'edges at the same weight ' + res.weight + '</span>. Both are minimum trees; the '
+                + 'weights tie, so the tree is not unique and the two schedules broke the tie '
+                + 'differently.')
+          : '<span class="tone-red">The two methods disagree on the weight, which cannot happen '
+            + 'on a connected graph.</span>');
+  }
+
+  function apply() {
+    var p = PMP[presetIn.value];
+    if (!p) return;
+    specIn.value = p.spec; startIn.value = p.start; stepIn.value = stepIn.max;
+    redraw();
+  }
+  var START = PMP[presetIn.value];
+  if (START && !specIn.value) { specIn.value = START.spec; startIn.value = START.start; }
+  presetIn.addEventListener('change', apply);
+  specIn.addEventListener('input', redraw);
+  startIn.addEventListener('input', redraw);
+  stepIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "graph-algorithms/prims-algorithm";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

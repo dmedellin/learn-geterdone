@@ -1,0 +1,3097 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finite Buffers, Blocking and the Admitted Rate | Lesson | Markov Chains, Decisions and Queues | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="Stop the chain at K and the truncation is no longer an approximation — it is the model. An arrival that finds the system full is lost, so ρ ≥ 1 stops being a stability condition: a queue that cannot grow cannot run away, and it has a perfectly good distribution at any load. Two consequences follow. The rate that actually gets in is λ(1 − π_K) rather than λ, and that is the rate Little&#x27;s Law needs; dividing by λ instead is the standard error in a finite-queue calculation and it is always too small. Both divisions are printed, labelled, side by side." />
+  <link rel="canonical" href="https://learn.geterdone.io/markov-chains-decisions-and-queues/finite-buffers-blocking-and-the-admitted-rate/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Finite Buffers, Blocking and the Admitted Rate | Lesson | Markov Chains, Decisions and Queues | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="Stop the chain at K and the truncation is no longer an approximation — it is the model. An arrival that finds the system full is lost, so ρ ≥ 1 stops being a stability condition: a queue that cannot grow cannot run away, and it has a perfectly good distribution at any load. Two consequences follow. The rate that actually gets in is λ(1 − π_K) rather than λ, and that is the rate Little&#x27;s Law needs; dividing by λ instead is the standard error in a finite-queue calculation and it is always too small. Both divisions are printed, labelled, side by side." />
+  <meta property="og:url" content="https://learn.geterdone.io/markov-chains-decisions-and-queues/finite-buffers-blocking-and-the-admitted-rate/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Finite Buffers, Blocking and the Admitted Rate | Lesson | Markov Chains, Decisions and Queues | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Stop the chain at K and the truncation is no longer an approximation — it is the model. An arrival that finds the system full is lost, so ρ ≥ 1 stops being a stability condition: a queue that cannot grow cannot run away, and it has a perfectly good distribution at any load. Two consequences follow. The rate that actually gets in is λ(1 − π_K) rather than λ, and that is the rate Little&#x27;s Law needs; dividing by λ instead is the standard error in a finite-queue calculation and it is always too small. Both divisions are printed, labelled, side by side." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/markov-chains-decisions-and-queues/finite-buffers-blocking-and-the-admitted-rate/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Markov Chains, Decisions and Queues</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Finite Buffers, Blocking and the Admitted Rate</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The a queue with a wall, and the rate that actually gets in is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Markov Chains, Decisions and Queues &middot; The named queues</span>
+        <h1>Finite Buffers, Blocking and the Admitted Rate</h1>
+        <p>Stop the chain at <span class="math">K</span> and the truncation is no longer an approximation &mdash; it is the model. An arrival that finds the system full is lost, so <strong><span class="math">ρ ≥ 1</span> stops being a stability condition</strong>: a queue that cannot grow cannot run away, and it has a perfectly good distribution at any load. Two consequences follow. The rate that actually gets in is <span class="math">λ(1 − π_K)</span> rather than <span class="math">λ</span>, and that is the rate Little's Law needs; dividing by <span class="math">λ</span> instead is the standard error in a finite-queue calculation and it is always too small. Both divisions are printed, labelled, side by side.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">a chain stopped at K: no arc out of the top state, and an arrival that finds it full is lost
+ρ = λ/μ is no longer a stability condition — a queue with a wall cannot run away
+blocking = π_K       admitted rate = λ(1 − π_K)       and that is what L = λW needs
+λ = 6, μ = 5, K = 5:  ρ = 6/5, blocking 25.0588%, admitted 4.496471 of 6
+L = 3.021172,  W = L/admitted = 0.671899,  L/λ = 0.503529 — too small by 1 − π_K
+balking instead:  λₙ = λ/(n+1), and no closed form covers it at all</div>
+        <div class="float-label" style="right:16px;bottom:16px;">A wall instead of a stability condition, and the two numbers people call W</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas. The first removes a condition, the second adds a rate, and the third is the case that shows why this course builds queues from a cut rather than from a table.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Truncation here is the model, not an approximation of one</h3><p>The chain genuinely stops at <span class="math">K</span> because the system genuinely has <span class="math">K + 1</span> places. Nothing is being thrown away and no error term is owed. That also means <span class="math">ρ ≥ 1</span> is not a problem: at <span class="math">λ = 6</span> and <span class="math">μ = 5</span> the distribution exists, it is simply weighted towards the top, and <span class="math">25.0588%</span> of the time the system is full.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The admitted rate is not the arrival rate</h3><p>Arrivals that find the system full are lost, so the long-run rate of admissions is <span class="math">λ(1 − π_K)</span>. That is the rate Little's Law needs, because <span class="math">L = λW</span> counts customers who were in the system, and a blocked arrival never was. On the worked example the admitted rate is <span class="math">4.496471</span> against an arrival rate of <span class="math">6</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The balking chain is what a table of formulas cannot cover</h3><p>Let an arrival join a queue of length <span class="math">n</span> with probability <span class="math">1/(n + 1)</span>, so <span class="math">λₙ = λ/(n + 1)</span>. The closed form for a blocking queue assumes a constant arrival rate and does not apply. The cut equation never assumed one, so it handles the case without changing &mdash; which is the whole reason this material started from the cut.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>A queue with a wall, and the rate that actually gets in</h2></div><p>What a hard limit does to the stability condition, the two divisions Little's Law invites, the closed form agreeing exactly, and the chain no closed form covers.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The M/M/1/K chain, and a balking chain</span><p><strong>M/M/1/K</strong>: constant rates on states <span class="math">0</span> to <span class="math">K</span>, with no arrival out of state <span class="math">K</span>. An arrival finding the system full is <strong>blocked</strong> and lost. The <strong>blocking probability</strong> is <span class="math">π_K</span> and the <strong>admitted rate</strong> is <span class="math">λ(1 − π_K)</span>.</p><p><strong>Balking</strong>: the same service but <span class="math">λₙ = λ/(n + 1)</span>, so an arrival who finds <span class="math">n</span> already waiting joins with probability <span class="math">1/(n + 1)</span>. The rates now depend on the state, which is the one thing a closed form cannot absorb.</p></div><p>The chain is built by the same function with the same two lists, stopped at <span class="math">K</span>. Nothing in the machinery is aware that the truncation has changed meaning; what changes is what you are entitled to say about the answer. On an unbounded queue the finite chain's figures come with an error term; here they come with none.</p><h3>Stability stops being a question</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">λ = 6, μ = 5, K = 5        ρ = 6/5, which is at least 1 and does not matter
+
+   weights   1, 6/5, 36/25, 216/125, 1296/625, 7776/3125
+   π  =  3125/31031,  3750/31031,  4500/31031,
+         5400/31031,  6480/31031,  7776/31031
+
+   blocking  π₅ = 7776/31031 = 25.0588%
+   sysdesign_core.mm1k(6, 5, 5) gives 7776/31031 and L = 93750/31031
+   the two routes agree EXACTLY, fraction for fraction
+
+   L                          93750/31031  =  3.021172
+   admitted rate  λ(1 − π₅) = 139530/31031 =  4.496471   of 6
+   W  = L / admitted        =  3125/4651   =  0.671899
+   L / λ                    = 15625/31031  =  0.503529   ✗
+
+   the ratio of the two:  1 − π₅ = 23255/31031 = 0.749412</div><p>The distribution rises with <span class="math">n</span> rather than falling, because every ratio is <span class="math">6/5</span>. On an unbounded chain that is a queue with no stationary distribution at all; here it is a system that is usually nearly full, and the numbers are the exact answers for that system. Nothing about <span class="math">ρ</span> needs checking before trusting them.</p><h3>The two numbers people call W</h3><p><span class="math">W</span> is <span class="math">L</span> divided by a rate, and there are two candidates. Divide by the admitted rate and you get the mean time in the system of the customers who got in: <span class="math">0.671899</span>. Divide by <span class="math">λ</span> and you get <span class="math">0.503529</span>, which is too small by a factor of exactly <span class="math">1 − π_K</span>, because it credits the system with serving customers it never admitted. The lab prints both, one green and one red, in the same row of the same table.</p><p>The error is always in the same direction and it grows with the blocking, so it is worst exactly where the system is most stressed and the answer matters most. At <span class="math">K = 1</span> on these rates the blocking is <span class="math">54.545%</span> and the wrong division is out by a factor of more than two; at <span class="math">K = 12</span> on a load of four fifths the blocking is <span class="math">1.4543%</span> and it is out by about one and a half per cent. There is no regime in which it is right and the system is interesting.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">λ = 6, μ = 5: capacity against blocking, and the two divisions
+
+     K     blocking    admitted     L        W = L/admitted   L/λ  ✗
+     1      54.545%     2.72727   0.54545      0.20000       0.09091
+     2      39.560%     3.62637   1.12088      0.30909       0.18681
+     3      32.191%     4.06855   1.72578      0.42418       0.28763
+     4      27.865%     4.32810   2.35949      0.54516       0.39325
+     5      25.059%     4.49647   3.02117      0.67190       0.50353
+     6      23.119%     4.61288   3.70984      0.80423       0.61831
+     8      20.673%     4.75960   5.16358      1.08488       0.86060
+
+   more room buys throughput and costs waiting, in the same column pair</div><p>Read the table as a design trade and not as a limit. Every extra place raises the admitted rate and raises <span class="math">W</span> at the same time, because the customers who used to be turned away are now waiting instead. Which of those you want is a question about the system and not about the queue; what the model supplies is both columns, exactly. &ldquo;Bounded Queues and Loss&rdquo; makes the same trade from the closed forms.</p><div class="example"><span class="label">Example &middot; The closed form agreeing exactly rather than nearly</span><p><span class="math">sysdesign_core.mm1k(6, 5, 5)</span> gives blocking <span class="math">7776/31031</span> and <span class="math">L = 93750/31031</span>. The cut equations on the same rates give the same two fractions.</p><p>That is a stronger check than the one the unbounded models could offer. There the chain was finite and the formula was not, so the best available was agreement to within the truncation. Here both describe the same finite system, so the comparison is an equality of fractions and the page reports it as exact.</p></div><div class="example"><span class="label">Example &middot; Arrivals that balk, where no closed form applies</span><p>Switch the chain to balking on the same rates: <span class="math">λₙ = 6/(n + 1)</span>, so the ratios are <span class="math">6/5, 3/5, 2/5, 3/10, 6/25</span>. The distribution now falls steeply: <span class="math">π</span> runs from <span class="math">15625/51799</span> down to <span class="math">324/51799</span>, the blocking is <span class="math">0.6255%</span>, and <span class="math">L</span> is <span class="math">1.192494</span> against the blocking chain's <span class="math">3.021172</span>.</p><p><span class="math">mm1k</span> does not apply here at all &mdash; it assumes a constant arrival rate &mdash; and the page says so rather than printing its number beside a chain it does not describe. The cut equations needed no change, because customers who decline to join are just a smaller <span class="math">λₙ</span>.</p></div><p>That contrast is the closing argument for the whole of this half. Four named models and one homemade one have come out of a single equation applied between neighbouring states, and the one the textbooks have no formula for cost exactly as much work as the others.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A queue with a wall, and the rate that actually gets in</h2></div><p>blocking, the admitted rate, and the division Little’s Law really asks for</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>A queue with a wall does not need to be stable</strong><span>blocking at the top, an admitted rate below &lambda;, and two numbers both called W</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>&pi; on the finite chain</span><span class="tone-red"><i class="legend-swatch"></i>the blocked state</span><span class="tone-green"><i class="legend-swatch"></i>the closed form for M/M/1/K</span><span class="tone-purple"><i class="legend-swatch"></i>the same chain with arrivals that balk</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="bfChain" viewBox="0 0 660 220" role="img" aria-label="The chain stopped at K, with no arc out of the top state."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="bfPi" viewBox="0 0 660 170" role="img" aria-label="The stationary distribution on the finite chain."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="bfStats"></table></div>
+      <div class="status-banner" id="bfStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the capacity, or let arrivals balk instead</h3>
+          <p>Truncation here is not an approximation: it is the model. Both W values are printed side by side and labelled, because the wrong one is the commonest error in a finite-queue calculation and it is always too small. The balking chain is the case no closed form covers and the cut equation handles without changing.</p>
+        <div class="field">
+          <label for="bfPreset">Worked example</label>
+          <select id="bfPreset"><option value="buffer" selected>A buffer of five, overloaded</option><option value="tiny">Room for two, and a queue that would never settle</option><option value="roomy">A buffer of twelve at a load of four fifths</option></select>
+        </div>
+        <div class="field">
+          <label for="bfLam">Arrival rate &lambda;</label>
+          <input id="bfLam" type="text" value="6" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="bfMu">Service rate &mu;</label>
+          <input id="bfMu" type="text" value="5" inputmode="text" autocomplete="off">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="bfK">Capacity K</label><span class="range-value" id="bfKOut">5</span></div>
+          <input id="bfK" type="range" min="1" max="20" step="1" value="5" />
+        </div>
+        <div class="field">
+          <label for="bfKind">Which chain</label>
+          <select id="bfKind"><option value="block" selected>a hard wall at K: arrivals above it are lost</option><option value="balk">arrivals that balk: &lambda;&#8345; = &lambda;/(n+1)</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>&rho; = &lambda;/&mu;</span><strong id="bfRhoK">&mdash;</strong></div>
+          <div class="kpi"><span>Blocking &pi;&#8342;</span><strong id="bfBlockK">&mdash;</strong></div>
+          <div class="kpi"><span>Admitted rate</span><strong id="bfAdmK">&mdash;</strong></div>
+          <div class="kpi"><span>L</span><strong id="bfLK">&mdash;</strong></div>
+          <div class="kpi"><span>W with &lambda;</span><strong id="bfW1K">&mdash;</strong></div>
+          <div class="kpi"><span>W with the admitted rate</span><strong id="bfW2K">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="bfHint" style="margin:0;">Little&rsquo;s Law needs the rate that actually gets in, and on a lossy system that is &lambda;(1 &minus; &pi;&#8342;) rather than &lambda;. Both divisions are printed here, labelled, because the wrong one is the single most common error in a finite-queue calculation and it is always too small.</p>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Working with a bounded queue</h2></div><p>Four steps. The third is the one that is usually skipped, and it is the reason a reported W is too small.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide whether the wall is real</h3><p>A genuine limit on places means the finite chain is the model and owes no error term. A state count chosen because the computation had to stop somewhere means it is an approximation and owes one. The arithmetic is identical; what you may claim is not.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Stop worrying about ρ</h3><p>A queue that cannot grow cannot run away, so <span class="math">ρ ≥ 1</span> is allowed and the distribution exists. <span class="math">ρ</span> is now a fact about the shape of <span class="math">π</span> &mdash; rising rather than falling &mdash; instead of a condition for <span class="math">π</span> to exist.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the blocking, then the admitted rate</h3><p><span class="math">π_K</span> is the fraction of time the system is full, so <span class="math">λ(1 − π_K)</span> is the rate that actually enters. Write it down before reaching for <span class="math">W</span>; once <span class="math">λ</span> is in your hand the wrong division is the natural one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Divide L by the admitted rate, and say which rate you used</h3><p><span class="math">W = L/λ(1 − π_K)</span>. Dividing by <span class="math">λ</span> understates the answer by exactly the factor <span class="math">1 − π_K</span>, which at a quarter blocked is a twenty-five per cent error in the wrong direction. Naming the rate in the report makes the mistake visible to a reader who did not make it.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Walls, blocking and the right divisor</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>A buffer of five at a load above one, and the same system with balking instead</h3><p>Arrivals at 6 per unit time, service at 5, and room for five in total. The load is above 1 and it does not matter. Then the same rates with a customer who sometimes declines to join.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">hard wall at K = 5      λ = 6, μ = 5, ρ = 6/5
+
+   every cut ratio 6/5, so the weights RISE:
+      1, 6/5, 36/25, 216/125, 1296/625, 7776/3125
+   total 31031/3125
+
+   π   3125   3750   4500   5400   6480   7776       all over 31031
+       n=0    n=1    n=2    n=3    n=4    n=5
+
+   blocking π₅        7776/31031    =  25.0588%
+   mm1k(6, 5, 5)      7776/31031       identical
+   admitted rate      139530/31031  =   4.496471    of 6
+   L                   93750/31031  =   3.021172
+   mm1k L              93750/31031      identical
+
+   W  = L / admitted    3125/4651   =   0.671899    ✓
+   L / λ               15625/31031  =   0.503529    ✗  too small
+   ratio  1 − π₅       23255/31031  =   0.749412
+
+balking on the same rates      λₙ = 6/(n+1)
+
+   ratios   6/5, 3/5, 2/5, 3/10, 6/25
+   π  15625  18750  11250  4500  1350  324     all over 51799
+
+   blocking π₅         324/51799   =   0.6255%
+   admitted rate     180870/51799  =   3.491766
+   L                  61770/51799  =   1.192494
+   W  = L / admitted    2059/6029  =   0.341516
+   mm1k does not apply: it assumes a constant arrival rate</div><p>Compare the two distributions rather than the two summaries. The blocking chain puts its mass at the top, because every ratio is above 1 and the only thing stopping it is the wall. The balking chain puts its mass at the bottom, because the ratios fall away after the first one: <span class="math">6/5</span>, then <span class="math">3/5</span>, then <span class="math">2/5</span>. Same service, same nominal arrival rate, completely different systems.</p><p>The admitted rates are the surprising pair. Balking admits <span class="math">3.49</span> per unit time against the wall's <span class="math">4.50</span>, even though it blocks almost nobody: turning customers away gently and often admits less than turning them away brutally and rarely. That is the kind of comparison a table of blocking probabilities cannot make, and it is one subtraction away once you have both distributions.</p><p>The <span class="math">L/λ</span> column is there to be wrong. <span class="math">0.503529</span> against <span class="math">0.671899</span> is a twenty-five per cent understatement, exactly the blocking fraction, and it is the number a calculation that reached for <span class="math">λ</span> out of habit would report. It is not a rounding and it does not average out.</p><p>For a rehearsal, hold <span class="math">λ = 6</span> and <span class="math">μ = 5</span> and raise <span class="math">K</span> from 5 to 8. The supplied first move is that the blocking falls from <span class="math">25.059%</span> to <span class="math">20.673%</span>. Predict the direction of <span class="math">W</span> before checking, and then say why both <span class="math">W</span> and the admitted rate went up, which sounds contradictory and is not.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dividing L by λ on a lossy system</strong><span>The result is too small by exactly <span class="math">1 − π_K</span>, always in the same direction, and worst where the blocking is highest and the answer matters most. The correct divisor is <span class="math">λ(1 − π_K)</span>, and it costs one multiplication once <span class="math">π_K</span> is in hand.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Carrying the stability condition into a bounded model</strong><span><span class="math">ρ < 1</span> is a condition for an unbounded queue to have a stationary distribution. With a wall there is nothing to check: the chain is finite and always normalises. Refusing to model a system because its nominal load exceeds 1 rejects exactly the systems a buffer exists for.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for a closed form on a chain whose rates vary</strong><span><span class="math">mm1k</span> assumes a constant <span class="math">λ</span>. A balking queue, a finite population of machines, a server that speeds up under load: none of them is covered, and all of them are one rate list away from an exact answer through the cut equations. The formula is the special case, not the tool.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a bounded queue is easier for you than an unbounded one, and you never divide by λ without asking.</strong><p>You should be able to build the stopped chain, say why <span class="math">ρ ≥ 1</span> is permitted, compute the blocking as <span class="math">π_K</span> and the admitted rate as <span class="math">λ(1 − π_K)</span>, produce both candidate <span class="math">W</span> values and name which one you used, and model a balking arrival stream without reaching for a formula that does not cover it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every model here has assumed Poisson arrivals without saying what that means or where they come from. The last of this material builds them: n independent opportunities in one unit of time, each firing with probability λ/n, which is an exact binomial. Its limit as n grows is the Poisson distribution, and that is where this course stops being exact — <span class="math">e^(−λ)</span> is irrational. &ldquo;The Poisson Limit, and Where Exactness Stops&rdquo; prints the difference rather than describing it.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../more-servers-and-erlang-c-read-off-pi/" rel="prev"><span>Lesson</span><strong>More Servers, and Erlang C Read Off π</strong></a>
+      <a class="lesson-link next" href="../the-poisson-limit-and-where-exactness-stops/" rel="next"><span>Lesson</span><strong>The Poisson Limit, and Where Exactness Stops</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="markov-chains-decisions-and-queues/finite-buffers-blocking-and-the-admitted-rate" data-lesson-title="Finite Buffers, Blocking and the Admitted Rate" data-course-title="Markov Chains, Decisions and Queues">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Markov Chains, Decisions and Queues.</strong> Every transition probability, matrix power, steady-state probability, expected number of visits, absorption probability, policy value, queue-length distribution, blocking probability and binomial probability on this course is an exact fraction, and the arithmetic behind them is Gauss-Jordan elimination over the rationals rather than anything numerical. That matters more here than it looks: the central claim is an equality &mdash; <span class="math">&pi;P</span> is <em>exactly</em> <span class="math">&pi;</span>, and the cut equations give <em>exactly</em> the fractions the full balance system gives &mdash; and an equality between two decimals that look alike is evidence of nothing. It also keeps numbers a double cannot hold: <span class="math">P&#8319;</span> on a five-state chain reaches fifteen-digit numerators by the twelfth power, and a truncated queue at ninety states has a <span class="math">&pi;&#8320;</span> whose denominator runs to a hundred and nineteen digits. <strong>One quantity here is not rational and says so</strong>: <span class="math">e^(&minus;&lambda;)</span> in the Poisson limit, computed by <span class="math">expNegApprox</span> as the reciprocal of a positive-term series so that nothing cancels, printed beside the exact binomial with the difference between them given as a number. One result is stated and not proved, and says so: the convergence of <span class="math">P&#8319;</span> to the steady state, whose two hypotheses this course computes and whose conclusion it obtains by solving instead. What none of this can do is decide whether the chain you wrote down is the process you meant.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "On an M/M/1/K queue with <span class=\"math\">\u03c1 = 6/5<\/span>, what does the load above 1 tell you?", "a": ["That there is no stationary distribution", "That the chain must be truncated further", "Nothing about existence: a queue that cannot grow cannot run away, so \u03c0 exists and simply rises with n", "That the blocking probability must be 100%"], "c": 2, "why": "The stability condition belongs to the unbounded model. With a hard limit the chain is finite, the weights always normalise, and <span class=\"math\">\u03c1<\/span> describes the shape of <span class=\"math\">\u03c0<\/span> rather than whether it exists. Here it makes the distribution rise, and the system is full a quarter of the time."}, {"q": "<span class=\"math\">L = 3.021172<\/span> and <span class=\"math\">\u03bb = 6<\/span>, with blocking <span class=\"math\">25.0588%<\/span>. What is <span class=\"math\">W<\/span>?", "a": ["<span class=\"math\">3.021172/6 = 0.503529<\/span>", "<span class=\"math\">3.021172/4.496471 = 0.671899<\/span>, dividing by the admitted rate", "<span class=\"math\">3.021172 \u00d7 6 = 18.13<\/span>", "It cannot be computed without the service time"], "c": 1, "why": "Little's Law relates the number in the system to the rate that actually enters it. Blocked arrivals never entered, so they do not belong in the divisor. Dividing by <span class=\"math\">\u03bb<\/span> understates <span class=\"math\">W<\/span> by exactly <span class=\"math\">1 \u2212 \u03c0_K<\/span>, which is a quarter here."}, {"q": "Why does the page refuse to print <span class=\"math\">mm1k<\/span>'s answer beside the balking chain?", "a": ["Because <span class=\"math\">mm1k<\/span> is only defined for <span class=\"math\">\u03c1 < 1<\/span>", "Because <span class=\"math\">mm1k<\/span> assumes a constant arrival rate, and a balking chain has <span class=\"math\">\u03bb\u2099 = \u03bb/(n+1)<\/span>", "Because the balking chain has no stationary distribution", "Because the two use different service rates"], "c": 1, "why": "The closed form describes a different model. Printing its number in the same table would invite a comparison that means nothing. The cut equations need no change for balking, which is the reason this course builds queues from them rather than from a table of formulas."}, {"q": "Raising <span class=\"math\">K<\/span> from 5 to 8 on the same rates lowers the blocking and raises both <span class=\"math\">W<\/span> and the admitted rate. Why is that not a contradiction?", "a": ["It is: one of the figures must be wrong", "Because customers who used to be turned away now wait instead, so more get in and the average time in the system rises", "Because <span class=\"math\">W<\/span> is measured in different units at different <span class=\"math\">K<\/span>", "Because <span class=\"math\">L<\/span> is unchanged"], "c": 1, "why": "More room converts rejections into waiting. Throughput goes up because fewer arrivals are lost; the time in the system goes up because the extra customers are queueing. Both columns move together and which one you want is a design question."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  function td(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function tdl(t, cls) {
+    return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>';
+  }
+  function th(t) { return '<th>' + t + '</th>'; }
+  function rowhead(t) { return '<th class="rowhead">' + t + '</th>'; }
+  function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function table(caption, heads, rows) {
+    var head = (heads && heads.length)
+      ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
+      + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  /* The two-column "what was done / what it produced" table. The exemplar's
+     trace layout, kept identical so a reader moving between courses is reading
+     the same page furniture. */
+  function steps(caption, pairs) {
+    return table(caption, [], pairs.map(function (p) { return tr([rowhead(p[0]), tdl(p[1])]); }));
+  }
+  function chip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  /* " + 3" or " - 7": a bare number as a continuation. Everything on this page
+     that writes "something + <number>" goes through it, because "a(n-1) + -7"
+     is not a thing a reader writes and not a thing a marker accepts. */
+  function plusnum(r) { return (Rsign(r) < 0 ? ' - ' : ' + ') + Rtext(Rabs(r)); }
+  function tone(t, kind) { return '<span class="tone-' + kind + '">' + t + '</span>'; }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+  /* Reader text goes into innerHTML, and on this course the reader types < and
+     > all day. Escaped once, at the boundary, rather than trusted: "x + 2y <= 8"
+     written raw would lose everything from the < to the next > -- which is the
+     end of the cell -- and the page would quietly drop the reader's own words. */
+  function esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Rparse throws on a zero denominator, and 1/0 is a thing a reader types.
+     Every read of reader input goes through this, so a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function Rread(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+  /* The one rounding this file performs, and it is never used to decide
+     anything -- only to sit beside an exact value that a reader may want to
+     place on a number line. Every caller labels it as a rounding. */
+  function approx(r, places) {
+    var v = Rnum(r);
+    if (!isFinite(v)) return 'not a real number';
+    return v.toFixed(places === undefined ? 4 : places);
+  }
+  /* The least common multiple of two rationals: lcm of the numerators over the
+     gcd of the denominators. For two integers this is the schoolbook lcm, which
+     is what the elimination mode needs; for 1/2 and 1/4 it is 1/2, which is
+     what keeps that mode from inventing multipliers with four-digit numerators
+     the moment a coefficient stops being whole. */
+  function Rlcm(a, b) {
+    if (Rzero(a) || Rzero(b)) return R0;
+    var an = a.n < 0n ? -a.n : a.n, bn = b.n < 0n ? -b.n : b.n;
+    return R(an / bgcd(an, bn) * bn, bgcd(a.d, b.d));
+  }
+
+  /* A matrix is an array of arrays of rationals. Nothing here rounds, and
+     nothing here caches: every routine recomputes from the entries it is given,
+     so two routines that agree agreed by arithmetic rather than by sharing a
+     variable. */
+  function Mcopy(M) { return M.map(function (r) { return r.slice(); }); }
+  function Mrows(M) { return M.length; }
+  function Mcols(M) { return M.length ? M[0].length : 0; }
+  function Msquare(M) { return M.length > 0 && M.length === Mcols(M); }
+  function Mshape(M) { return Mrows(M) + ' by ' + Mcols(M); }
+  function Mzero(r, c) {
+    var out = [];
+    for (var i = 0; i < r; i += 1) { var row = []; for (var j = 0; j < c; j += 1) row.push(R0); out.push(row); }
+    return out;
+  }
+  function Mid(n) {
+    var out = Mzero(n, n);
+    for (var i = 0; i < n; i += 1) out[i][i] = R1;
+    return out;
+  }
+  function Mmap2(A, B, fn) {
+    return A.map(function (row, i) { return row.map(function (v, j) { return fn(v, B[i][j]); }); });
+  }
+  function Madd(A, B) { return Mmap2(A, B, Radd); }
+  function Msub(A, B) { return Mmap2(A, B, Rsub); }
+  function Mscale(A, r) { return A.map(function (row) { return row.map(function (v) { return Rmul(v, r); }); }); }
+  function Mtrans(A) {
+    var out = Mzero(Mcols(A), Mrows(A));
+    for (var i = 0; i < Mrows(A); i += 1) for (var j = 0; j < Mcols(A); j += 1) out[j][i] = A[i][j];
+    return out;
+  }
+  function Msamesize(A, B) { return Mrows(A) === Mrows(B) && Mcols(A) === Mcols(B); }
+  function Mmul(A, B) {
+    if (Mcols(A) !== Mrows(B)) return null;
+    var out = Mzero(Mrows(A), Mcols(B));
+    for (var i = 0; i < Mrows(A); i += 1) {
+      for (var j = 0; j < Mcols(B); j += 1) {
+        var s = R0;
+        for (var k = 0; k < Mcols(A); k += 1) s = Radd(s, Rmul(A[i][k], B[k][j]));
+        out[i][j] = s;
+      }
+    }
+    return out;
+  }
+  /* The row-times-column sum for one entry, written out. This is the entry's
+     definition, and printing it is the only way the reader can check that the
+     number in the box came from the row and column it claims. */
+  function Mdottext(A, B, i, j) {
+    var parts = [];
+    for (var k = 0; k < Mcols(A); k += 1) {
+      parts.push('(' + Rtext(A[i][k]) + ')(' + Rtext(B[k][j]) + ')');
+    }
+    return parts.join(' + ');
+  }
+  function Mequ(A, B) {
+    if (!Msamesize(A, B)) return false;
+    for (var i = 0; i < Mrows(A); i += 1) {
+      for (var j = 0; j < Mcols(A); j += 1) if (!Requ(A[i][j], B[i][j])) return false;
+    }
+    return true;
+  }
+  function Maug(A, B) {
+    return A.map(function (row, i) { return row.concat(B[i]); });
+  }
+  function Mtake(M, from, count) {
+    return M.map(function (row) { return row.slice(from, from + count); });
+  }
+  function Mminor(M, i, j) {
+    var out = [];
+    for (var a = 0; a < M.length; a += 1) {
+      if (a === i) continue;
+      var row = [];
+      for (var b = 0; b < M[a].length; b += 1) { if (b === j) continue; row.push(M[a][b]); }
+      out.push(row);
+    }
+    return out;
+  }
+  /* Cofactor expansion along the first row, recursively. Not the fast way to
+     get a determinant, and that is the point: this is the definition the
+     lesson gives, and the row-reduction determinant beside it is the check. */
+  function Mdet(M) {
+    var n = M.length;
+    if (!Msquare(M)) return null;
+    if (n === 1) return M[0][0];
+    if (n === 2) return Rsub(Rmul(M[0][0], M[1][1]), Rmul(M[0][1], M[1][0]));
+    var total = R0;
+    for (var j = 0; j < n; j += 1) {
+      if (Rzero(M[0][j])) continue;
+      var term = Rmul(M[0][j], Mdet(Mminor(M, 0, j)));
+      total = (j % 2 === 0) ? Radd(total, term) : Rsub(total, term);
+    }
+    return total;
+  }
+
+  /* ---- the three elementary row operations, each on its own ---- */
+  function Mswap(M, i, j) {
+    var out = Mcopy(M), t = out[i]; out[i] = out[j]; out[j] = t;
+    return out;
+  }
+  function Mscalerow(M, i, s) {
+    var out = Mcopy(M);
+    out[i] = out[i].map(function (v) { return Rmul(v, s); });
+    return out;
+  }
+  function Maddrow(M, i, j, s) {
+    var out = Mcopy(M);
+    out[i] = out[i].map(function (v, c) { return Radd(v, Rmul(s, M[j][c])); });
+    return out;
+  }
+
+  /* Gaussian elimination: forward only, pivots left where they are. No row is
+     divided by its pivot, which is what keeps 3x + 2y = 24 from becoming
+     x + (2/3)y = 8 in the first line of a trace the reader is meant to follow. */
+  function Mgauss(M0, ncols) {
+    var M = Mcopy(M0), ops = [], pivots = [], row = 0;
+    var stop = ncols === undefined ? Mcols(M) : ncols;
+    for (var col = 0; col < stop && row < M.length; col += 1) {
+      var p = -1;
+      for (var i = row; i < M.length; i += 1) if (!Rzero(M[i][col])) { p = i; break; }
+      if (p < 0) continue;
+      if (p !== row) {
+        M = Mswap(M, row, p);
+        ops.push({ op: 'R' + (row + 1) + ' &lt;-&gt; R' + (p + 1),
+                   why: 'the pivot position held 0, so a row below it is brought up',
+                   after: Mcopy(M) });
+      }
+      for (var i2 = row + 1; i2 < M.length; i2 += 1) {
+        if (Rzero(M[i2][col])) continue;
+        var m = Rneg(Rdiv(M[i2][col], M[row][col]));
+        M = Maddrow(M, i2, row, m);
+        ops.push({ op: 'R' + (i2 + 1) + ' -&gt; R' + (i2 + 1) + ' + ' + Rterm(m) + 'R' + (row + 1),
+                   why: 'clears the entry below the pivot in column ' + (col + 1),
+                   after: Mcopy(M) });
+      }
+      pivots.push(col);
+      row += 1;
+    }
+    return { M: M, ops: ops, pivots: pivots, rank: pivots.length };
+  }
+
+  /* Gauss-Jordan: every pivot driven to 1 and every other entry in its column
+     driven to 0, recording each elementary operation with the matrix it
+     produced. `detf` is the factor the operations multiplied the determinant
+     by, so det(A) can be recovered from the reduced form without a second
+     implementation of anything. */
+  function Mrref(M0, opts) {
+    opts = opts || {};
+    var stop = opts.cols === undefined ? Mcols(M0) : opts.cols;
+    var M = Mcopy(M0), ops = [], pivots = [], detf = R1, row = 0;
+    for (var col = 0; col < stop && row < M.length; col += 1) {
+      var p = -1;
+      for (var i = row; i < M.length; i += 1) if (!Rzero(M[i][col])) { p = i; break; }
+      if (p < 0) continue;
+      if (p !== row) {
+        M = Mswap(M, row, p);
+        detf = Rneg(detf);
+        ops.push({ op: 'R' + (row + 1) + ' &lt;-&gt; R' + (p + 1),
+                   why: 'a swap, which multiplies the determinant by -1',
+                   after: Mcopy(M) });
+      }
+      var pv = M[row][col];
+      if (!Requ(pv, R1)) {
+        var s = Rinv(pv);
+        M = Mscalerow(M, row, s);
+        detf = Rmul(detf, s);
+        ops.push({ op: 'R' + (row + 1) + ' -&gt; ' + Rterm(s) + 'R' + (row + 1),
+                   why: 'makes the pivot 1, and multiplies the determinant by ' + Rtext(s),
+                   after: Mcopy(M) });
+      }
+      for (var i2 = 0; i2 < M.length; i2 += 1) {
+        if (i2 === row || Rzero(M[i2][col])) continue;
+        var m = Rneg(M[i2][col]);
+        M = Maddrow(M, i2, row, m);
+        ops.push({ op: 'R' + (i2 + 1) + ' -&gt; R' + (i2 + 1) + ' + ' + Rterm(m) + 'R' + (row + 1),
+                   why: 'clears column ' + (col + 1) + ', and leaves the determinant alone',
+                   after: Mcopy(M) });
+      }
+      pivots.push(col);
+      row += 1;
+    }
+    return { M: M, ops: ops, pivots: pivots, rank: pivots.length, detf: detf };
+  }
+
+  /* "2 1 -1; -3 -1 2" -- rows split on ; or a newline, entries on spaces or
+     commas. Every entry goes through Rparse, so 1/2 is an entry and 0.25
+     becomes 1/4 rather than a float that will drift three row operations later. */
+  function Mparse(text, what) {
+    var s = String(text).trim();
+    if (!s) return { bad: (what || 'the matrix') + ' box is empty' };
+    var lines = s.split(/[;\n]/).map(function (t) { return t.trim(); })
+                 .filter(function (t) { return t.length > 0; });
+    if (!lines.length) return { bad: (what || 'the matrix') + ' box has no rows in it' };
+    var out = [], width = -1;
+    for (var i = 0; i < lines.length; i += 1) {
+      var cells = lines[i].split(/[\s,]+/).filter(function (t) { return t.length > 0; });
+      var vals = [];
+      for (var j = 0; j < cells.length; j += 1) {
+        var r = Rread(cells[j]);
+        if (r === null) {
+          return { bad: (what || 'the matrix') + ', row ' + (i + 1) + ', entry ' + (j + 1) + ': "'
+            + esc(cells[j]) + '" is not a whole number or a fraction' };
+        }
+        vals.push(r);
+      }
+      if (!vals.length) return { bad: (what || 'the matrix') + ', row ' + (i + 1) + ' has no entries' };
+      if (width < 0) width = vals.length;
+      else if (vals.length !== width) {
+        return { bad: (what || 'the matrix') + ' is not rectangular: row 1 has ' + width
+          + ' entries and row ' + (i + 1) + ' has ' + vals.length };
+      }
+      out.push(vals);
+    }
+    if (out.length > 6 || width > 6) {
+      return { bad: 'this lab prints matrices up to 6 by 6, and that one is ' + out.length + ' by ' + width };
+    }
+    return { M: out };
+  }
+
+  /* A matrix as a table. `split` tints every column from that index on, which
+     is the augmented bar drawn with the one divider the stylesheet offers. */
+  function Mtable(caption, M, opts) {
+    opts = opts || {};
+    if (!M || !M.length) return table(caption, [], [tr([tdl('(no rows)')])]);
+    var rows = M.map(function (r, i) {
+      var cells = r.map(function (v, j) {
+        var cls = '';
+        if (opts.split !== undefined && j >= opts.split) cls = 'on';
+        if (opts.mark && opts.mark(i, j)) cls = 'on';
+        return td(Rtext(v), cls);
+      });
+      var head = (opts.rowlabels && opts.rowlabels[i] !== undefined) ? opts.rowlabels[i] : ('R' + (i + 1));
+      return tr([rowhead(head)].concat(cells), opts.focus === i ? 'focus' : '');
+    });
+    return table(caption, opts.heads ? [''].concat(opts.heads) : [], rows);
+  }
+  /* The trace: every operation with the matrix it produced. */
+  function Mtrace(caption, start, ops, opts) {
+    var blocks = [Mtable(caption + ' &mdash; the matrix as read', start, opts)];
+    if (!ops.length) {
+      blocks.push(steps(caption + ' &mdash; the operations', [['nothing to do', 'the matrix is already in that form']]));
+      return blocks.join('');
+    }
+    ops.forEach(function (o, i) {
+      blocks.push(Mtable('step ' + (i + 1) + ':  ' + o.op + '   (' + o.why + ')', o.after, opts));
+    });
+    return blocks.join('');
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Birth-death queues, exact for rational arrival and service rates.
+
+     M/M/1 is derived in the lessons from the cut balance equations, so these
+     are the closed forms that result, not a separate model: rho = lam/mu,
+     pi_n = (1-rho)rho^n, L = rho/(1-rho), W = L/lam. */
+  function mm1(lam, mu) {
+    var rho = Rdiv(lam, mu);
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var one = R(1n, 1n), free = Rsub(one, rho);
+    var L = Rdiv(rho, free);
+    var Lq = Rdiv(Rmul(rho, rho), free);
+    return {
+      rho: rho, stable: true, p0: free, L: L, Lq: Lq,
+      W: Rdiv(L, lam), Wq: Rdiv(Lq, lam)
+    };
+  }
+
+  /* Erlang C: the probability an arrival waits with s servers.
+     Rational throughout -- the factorials are BigInt, so a 20-server desk is
+     still an exact fraction. */
+  function erlangC(lam, mu, s) {
+    var a = Rdiv(lam, mu), rho = Rdiv(a, R(BigInt(s), 1n));
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var sum = R(0n, 1n), n;
+    for (n = 0; n < s; n += 1) sum = Radd(sum, Rdiv(Rpow(a, n), R(fact(n), 1n)));
+    var last = Rdiv(Rpow(a, s), Rmul(R(fact(s), 1n), Rsub(R(1n, 1n), rho)));
+    var p0 = Rinv(Radd(sum, last));
+    var pw = Rmul(last, p0);
+    var Lq = Rdiv(Rmul(pw, rho), Rsub(R(1n, 1n), rho));
+    return {
+      rho: rho, stable: true, p0: p0, pWait: pw, Lq: Lq,
+      Wq: Rdiv(Lq, lam), L: Radd(Lq, a), W: Rdiv(Radd(Lq, a), lam)
+    };
+  }
+
+  /* M/M/1/K: finite capacity. Stable at any rho because the queue cannot grow,
+     which is the lesson -- and the arrival rate Little's law may use is the
+     EFFECTIVE one, lam(1 - pK). */
+  function mm1k(lam, mu, K) {
+    var rho = Rdiv(lam, mu), n, un = [], total = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) { var t = Rpow(rho, n); un.push(t); total = Radd(total, t); }
+    var pi = un.map(function (t) { return Rdiv(t, total); });
+    var L = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+    var pK = pi[K], lamEff = Rmul(lam, Rsub(R(1n, 1n), pK));
+    return { rho: rho, pi: pi, blocking: pK, lamEff: lamEff, L: L, W: Rdiv(L, lamEff) };
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* Markov chains, Markov decision processes, and the birth-death queue they
+     all reduce to.  Needs algebra_systems.MATRIX_JS above it.
+
+     A transition matrix is rows-sum-to-one over rationals, and everything here
+     stays rational: P^12 on a five-state chain with denominator-20 entries has
+     entries 15 digits over 16, which is exactly the size Number stops being
+     able to hold and exactly where a lesson about long-run behaviour starts. */
+
+  /* P^n by repeated multiplication.
+
+     NOT NAMED Mpow.  algebra_basics.MONO_JS already defines Mpow -- and its
+     own Mmul -- for MONOMIAL LISTS, and a kit concatenating both blocks would
+     silently get the wrong one and report a plausible wrong matrix.  The
+     collision is the reason for the name. */
+  function chainPow(P, n) {
+    var out = Mid(P.length), base = P.map(function (r) { return r.slice(); }), e = n;
+    while (e > 0) {
+      if (e & 1) out = Mmul(out, base);
+      base = Mmul(base, base);
+      e >>= 1;
+    }
+    return out;
+  }
+
+  /* Communicating classes, by reachability on the SUPPORT digraph: i leads to
+     j when P[i][j] > 0, and i and j communicate when each leads to the other.
+     A class is recurrent when nothing leaves it -- a chain that can leave and
+     not come back is transient, which is a statement about arcs and not about
+     probabilities. */
+  function chainClasses(P) {
+    var n = P.length, i, j, k;
+    var reach = [];
+    for (i = 0; i < n; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) row.push(i === j || !Rzero(P[i][j]));
+      reach.push(row);
+    }
+    for (k = 0; k < n; k += 1) for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1)
+      if (reach[i][k] && reach[k][j]) reach[i][j] = true;
+    var seen = [], classes = [];
+    for (i = 0; i < n; i += 1) seen.push(false);
+    for (i = 0; i < n; i += 1) {
+      if (seen[i]) continue;
+      var cls = [];
+      for (j = 0; j < n; j += 1) if (reach[i][j] && reach[j][i]) { cls.push(j); seen[j] = true; }
+      var closed = true, leaves = [];
+      for (j = 0; j < cls.length; j += 1) {
+        for (k = 0; k < n; k += 1) {
+          if (Rzero(P[cls[j]][k]) || cls.indexOf(k) >= 0) continue;
+          closed = false; leaves.push([cls[j], k]);
+        }
+      }
+      classes.push({ states: cls, recurrent: closed, transient: !closed, leaves: leaves,
+                     why: closed
+                       ? 'nothing leaves {' + cls.join(',') + '}, so once the chain is in it, it stays: recurrent'
+                       : 'from ' + (leaves.length ? leaves[0][0] + ' the chain can reach ' + leaves[0][1] : '')
+                         + ' and not return, so {' + cls.join(',') + '} is transient' });
+    }
+    return { classes: classes, reach: reach,
+             irreducible: classes.length === 1 };
+  }
+
+  /* The period of a class: the gcd of the lengths of every cycle through one
+     of its states.  Computed by levelling the class from that state and taking
+     the gcd of (level[u] + 1 - level[v]) over its arcs, which is the same
+     number without enumerating cycles. */
+  function chainPeriod(P, cls) {
+    var inCls = {}, i, j;
+    for (i = 0; i < cls.length; i += 1) inCls[cls[i]] = true;
+    var level = {}, queue = [cls[0]], g = 0;
+    level[cls[0]] = 0;
+    while (queue.length) {
+      var u = queue.shift();
+      for (j = 0; j < P.length; j += 1) {
+        if (Rzero(P[u][j]) || !inCls[j]) continue;
+        if (level[j] === undefined) { level[j] = level[u] + 1; queue.push(j); }
+        else {
+          var d = level[u] + 1 - level[j];
+          if (d < 0) d = -d;
+          var a = g, b = d;
+          while (b) { var t = a % b; a = b; b = t; }
+          g = a;
+        }
+      }
+    }
+    return { period: g === 0 ? 1 : g, levels: level,
+             aperiodic: (g === 0 ? 1 : g) === 1 };
+  }
+
+  /* pi P = pi with sum pi = 1.  The n balance equations are dependent -- their
+     columns sum to the same thing -- so ONE of them is dropped by name and
+     the normalisation takes its place.  `dropped` says which, because "we drop
+     an equation" without saying which one is where a reader loses the thread. */
+  function steadyState(P, dropIndex) {
+    var n = P.length, i, j;
+    var drop = dropIndex === undefined ? n - 1 : dropIndex;
+    var A = [];
+    for (j = 0; j < n; j += 1) {
+      if (j === drop) continue;
+      var row = [];
+      for (i = 0; i < n; i += 1) row.push(Rsub(P[i][j], i === j ? R1 : R0));
+      row.push(R0);
+      A.push(row);
+    }
+    var last = [];
+    for (i = 0; i < n; i += 1) last.push(R1);
+    last.push(R1);
+    A.push(last);
+    var red = Mrref(A, { cols: n });
+    var pi = [];
+    for (i = 0; i < n; i += 1) pi.push(red.rank === n ? red.M[i][n] : null);
+    var sum = R0;
+    for (i = 0; i < n; i += 1) if (pi[i] !== null) sum = Radd(sum, pi[i]);
+    return { system: A, dropped: drop, pi: pi, ops: red.ops, rank: red.rank,
+             unique: red.rank === n, sum: sum,
+             why: 'balance equation ' + (drop + 1) + ' is dropped because the n equations are dependent -- '
+               + 'every column of P - I sums to zero -- and sum pi = 1 takes its place' };
+  }
+
+  /* An absorbing chain, in the canonical blocks.
+       N = (I - Q)^-1  the expected visits to each transient state
+       t = N 1         the expected steps before absorption
+       B = N R         which absorbing state the chain ends in
+     `partials` is I + Q + ... + Q^k beside N, because N is the SUM of those
+     powers and a reader who has only been told the inverse formula has been
+     told the answer without the reason. */
+  function absorbing(P, abs, kmax) {
+    var n = P.length, i, j, k;
+    var isAbs = {}, trans = [];
+    for (i = 0; i < abs.length; i += 1) isAbs[abs[i]] = true;
+    for (i = 0; i < n; i += 1) if (!isAbs[i]) trans.push(i);
+    var Q = [], Rm = [];
+    for (i = 0; i < trans.length; i += 1) {
+      var qr = [], rr = [];
+      for (j = 0; j < trans.length; j += 1) qr.push(P[trans[i]][trans[j]]);
+      for (j = 0; j < abs.length; j += 1) rr.push(P[trans[i]][abs[j]]);
+      Q.push(qr); Rm.push(rr);
+    }
+    var m = trans.length;
+    var IQ = Msub(Mid(m), Q);
+    var red = Mrref(Maug(IQ, Mid(m)), { cols: m });
+    var N = red.rank === m ? Mtake(red.M, m, m) : null;
+    var t = null, Bm = null;
+    if (N) {
+      t = [];
+      for (i = 0; i < m; i += 1) {
+        var s = R0;
+        for (j = 0; j < m; j += 1) s = Radd(s, N[i][j]);
+        t.push(s);
+      }
+      Bm = Mmul(N, Rm);
+    }
+    var partials = [], acc = Mid(m), pw = Mid(m);
+    partials.push(acc.map(function (r) { return r.slice(); }));
+    for (k = 1; k <= (kmax === undefined ? 6 : kmax); k += 1) {
+      pw = Mmul(pw, Q);
+      acc = Madd(acc, pw);
+      partials.push(acc.map(function (r) { return r.slice(); }));
+    }
+    return { Q: Q, R: Rm, N: N, t: t, B: Bm, partials: partials, ops: red.ops,
+             transient: trans, absorbing: abs.slice(), singular: red.rank !== m };
+  }
+
+  /* ---- Markov decision processes --------------------------------------- */
+
+  /* Evaluate ONE policy: v = r_pi + gamma P_pi v, solved exactly rather than
+     iterated, so the page can show the iteration converging TO something. */
+  function policyEvaluate(P, r, policy, gamma) {
+    var n = policy.length, i, j;
+    var Ppi = [], rpi = [];
+    for (i = 0; i < n; i += 1) { Ppi.push(P[policy[i]][i].slice()); rpi.push(r[policy[i]][i]); }
+    var A = [];
+    for (i = 0; i < n; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) row.push(Rsub(i === j ? R1 : R0, Rmul(gamma, Ppi[i][j])));
+      row.push(rpi[i]);
+      A.push(row);
+    }
+    var red = Mrref(A, { cols: n });
+    var v = [];
+    for (i = 0; i < n; i += 1) v.push(red.rank === n ? red.M[i][n] : null);
+    return { system: A, v: v, ops: red.ops, Ppi: Ppi, rpi: rpi, singular: red.rank !== n };
+  }
+
+  /* Policy iteration: evaluate exactly, improve greedily, repeat.  It stops
+     because there are finitely many policies and the value never decreases --
+     which is a better reason than "the numbers stopped moving". */
+  function policyIterate(P, r, gamma, opts) {
+    opts = opts || {};
+    var n = r[0].length, acts = P.length, i, a, j;
+    var policy = opts.start ? opts.start.slice() : [];
+    while (policy.length < n) policy.push(0);
+    var rounds = [], guard = 0;
+    while (guard < (opts.maxRounds || 20)) {
+      guard += 1;
+      var ev = policyEvaluate(P, r, policy, gamma);
+      var next = [], improve = [];
+      for (i = 0; i < n; i += 1) {
+        var best = null, arg = policy[i], per = [];
+        for (a = 0; a < acts; a += 1) {
+          var q = r[a][i];
+          for (j = 0; j < n; j += 1) q = Radd(q, Rmul(gamma, Rmul(P[a][i][j], ev.v[j])));
+          per.push({ act: a, value: q });
+          if (best === null || Rcmp(q, best) > 0) { best = q; arg = a; }
+        }
+        next.push(arg);
+        improve.push({ state: i, was: policy[i], now: arg, q: per, best: best });
+      }
+      rounds.push({ policy: policy.slice(), v: ev.v.slice(), improve: improve, system: ev.system, ops: ev.ops });
+      var same = true;
+      for (i = 0; i < n; i += 1) if (next[i] !== policy[i]) same = false;
+      policy = next;
+      if (same) break;
+    }
+    /* A few value-iteration steps beside the exact answer, with their
+       denominators growing one power of gamma's denominator per step.  Written
+       out here rather than handed to DPSEQ_JS's discountedValue: `markov` does
+       not carry that block, and ten lines is a better trade than fourteen
+       kilobytes to get one column back. */
+    var iteration = null;
+    if (opts.valueSteps) {
+      var best = rounds[rounds.length - 1].policy, v = [], iters = [], step;
+      for (i = 0; i < n; i += 1) v.push(R0);
+      iters.push(v.slice());
+      for (step = 0; step < opts.valueSteps; step += 1) {
+        var nv = [];
+        for (i = 0; i < n; i += 1) {
+          var acc = r[best[i]][i];
+          for (j = 0; j < n; j += 1) acc = Radd(acc, Rmul(gamma, Rmul(P[best[i]][i][j], v[j])));
+          nv.push(acc);
+        }
+        v = nv; iters.push(v.slice());
+      }
+      var gap = [];
+      for (i = 0; i < n; i += 1) gap.push(Rsub(v[i], rounds[rounds.length - 1].v[i]));
+      iteration = { vT: v, v: rounds[rounds.length - 1].v.slice(), gap: gap, iterations: iters };
+    }
+    return { rounds: rounds, policy: policy, v: rounds[rounds.length - 1].v,
+             iterations: rounds.length, valueIteration: iteration };
+  }
+
+  /* ---- the birth-death queue ------------------------------------------- */
+
+  /* THE KIT'S UNIFYING OBJECT.  Cut the chain between n and n + 1: what
+     crosses upward must cross back down, so pi_{n+1} mu_{n+1} = pi_n lam_n,
+     and every queue on this path is that one equation with different rates.
+     M/M/1 is lam_n = lam, mu_n = mu; M/M/s is mu_n = min(n, s) mu, and Erlang
+     C falls out of the same pi as a reading rather than a second formula.
+
+     `lam[n]` is the arrival rate in state n, for n = 0 .. N - 1.
+     `mu[n]`  is the service rate OUT OF state n + 1, that is mu_{n+1}.
+     The chain therefore has states 0 .. N.
+
+     `stable` answers the question about the UNTRUNCATED chain -- would this
+     still be a distribution if the last pair of rates went on forever -- which
+     is the question a reader is actually asking. */
+  function birthDeath(lam, mu, opts) {
+    opts = opts || {};
+    var s = opts.servers === undefined ? 1 : opts.servers;
+    var N = lam.length, n, ratios = [R1], cuts = [];
+    for (n = 0; n < N; n += 1) {
+      if (Rzero(mu[n])) break;
+      ratios.push(Rmul(ratios[n], Rdiv(lam[n], mu[n])));
+      cuts.push({ n: n, lam: lam[n], mu: mu[n], ratio: Rdiv(lam[n], mu[n]),
+                  why: 'pi_' + (n + 1) + ' = pi_' + n + ' * ' + Rtext(lam[n]) + ' / ' + Rtext(mu[n])
+                    + ' -- what crosses the cut between ' + n + ' and ' + (n + 1) + ' upward must cross back down' });
+    }
+    var total = R0;
+    for (n = 0; n < ratios.length; n += 1) total = Radd(total, ratios[n]);
+    var pi = ratios.map(function (v) { return Rdiv(v, total); });
+    var L = R0, Lq = R0, lamEff = R0;
+    for (n = 0; n < pi.length; n += 1) {
+      L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+      if (n > s) Lq = Radd(Lq, Rmul(R(BigInt(n - s), 1n), pi[n]));
+      if (n < lam.length) lamEff = Radd(lamEff, Rmul(pi[n], lam[n]));
+    }
+    var W = Rzero(lamEff) ? null : Rdiv(L, lamEff);
+    var Wq = Rzero(lamEff) ? null : Rdiv(Lq, lamEff);
+    var stable = N > 0 && !Rzero(mu[N - 1]) && Rcmp(lam[N - 1], mu[N - 1]) < 0;
+    return { pi: pi, ratios: ratios, cuts: cuts, L: L, Lq: Lq, W: W, Wq: Wq,
+             lambdaEffective: lamEff, servers: s, stable: stable,
+             busy: Rsub(R1, pi[0]), states: pi.length,
+             why: 'Little\'s Law closes the loop: L = ' + Rtext(L) + ' and the rate that actually gets in is '
+               + Rtext(lamEff) + ', so W = L / lambda_eff' };
+  }
+
+  /* ---------------------------------------------------- building the rates
+
+     A birth-death chain on states 0..N is two lists: lam[n] for n = 0..N-1 is
+     the arrival rate OUT OF state n, and mu[n] for n = 0..N-1 is the service
+     rate out of state n+1. Every mode below produces those two lists and hands
+     them to or_core's birthDeath, so there is one chain and five readings of
+     it rather than five models. */
+  function ratesConstant(lam, mu, N) {
+    var a = [], b = [], n;
+    for (n = 0; n < N; n += 1) { a.push(lam); b.push(mu); }
+    return { lam: a, mu: b, kind: 'M/M/1', servers: 1 };
+  }
+  function ratesServers(lam, mu, s, N) {
+    var a = [], b = [], n;
+    for (n = 0; n < N; n += 1) {
+      a.push(lam);
+      b.push(Rmul(R(BigInt(Math.min(n + 1, s)), 1n), mu));
+    }
+    return { lam: a, mu: b, kind: 'M/M/' + s, servers: s };
+  }
+  /* Balking: an arrival joins a queue of length n with probability 1/(n + 1),
+     so lam_n = lam/(n + 1). A state-dependent arrival rate is the one thing the
+     closed forms cannot absorb, and it costs this kit nothing because the cut
+     equation never assumed the rates were constant. */
+  function ratesBalking(lam, mu, N) {
+    var a = [], b = [], n;
+    for (n = 0; n < N; n += 1) {
+      a.push(Rdiv(lam, R(BigInt(n + 1), 1n)));
+      b.push(mu);
+    }
+    return { lam: a, mu: b, kind: 'balking', servers: 1 };
+  }
+  /* Rates typed by a reader, one per state, for the mode that shows the cut
+     equations on an arbitrary chain. */
+  function readRates(text) {
+    var parts = String(text).trim().split(/[\s,;]+/).filter(function (t) { return t.length; });
+    var out = [], k;
+    for (k = 0; k < parts.length; k += 1) {
+      var v = Rread(parts[k]);
+      if (v === null || Rsign(v) < 0) return null;
+      out.push(v);
+    }
+    return out.length ? out : null;
+  }
+
+  /* ------------------------------------------- the second route to the same pi
+
+     THE FULL BALANCE SYSTEM, which knows nothing about cuts. For every state n
+
+         pi_n (lam_n + mu_n)  =  pi_{n-1} lam_{n-1} + pi_{n+1} mu_{n+1}
+
+     with lam_N = 0 and mu_0 = 0. Those N + 1 equations are dependent, so one is
+     dropped by name and sum pi = 1 takes its place -- exactly as steadyState
+     does for a discrete chain, and for the same reason. Solved by Mrref over
+     rationals, so the comparison with the cut answer is an equality of
+     fractions and not a tolerance. */
+  function globalBalance(lam, mu, dropIndex) {
+    var N = lam.length, n, j;
+    var states = N + 1;
+    var drop = dropIndex === undefined ? states - 1 : dropIndex;
+    var rows = [];
+    for (n = 0; n < states; n += 1) {
+      if (n === drop) continue;
+      var row = [];
+      for (j = 0; j < states; j += 1) row.push(R0);
+      var out = R0;
+      if (n < N) out = Radd(out, lam[n]);                 /* upward, if there is one */
+      if (n > 0) out = Radd(out, mu[n - 1]);              /* downward, if there is one */
+      row[n] = Rneg(out);
+      if (n > 0) row[n - 1] = Radd(row[n - 1], lam[n - 1]);
+      if (n < N) row[n + 1] = Radd(row[n + 1], mu[n]);
+      row.push(R0);
+      rows.push(row);
+    }
+    var last = [];
+    for (j = 0; j < states; j += 1) last.push(R1);
+    last.push(R1);
+    rows.push(last);
+    var red = Mrref(rows, { cols: states });
+    var pi = [];
+    for (n = 0; n < states; n += 1) pi.push(red.rank === states ? red.M[n][states] : null);
+    return { system: rows, dropped: drop, pi: pi, rank: red.rank, ops: red.ops,
+             unique: red.rank === states,
+             why: 'balance equation ' + (drop + 1) + ' is dropped because the ' + states
+               + ' equations are dependent, and sum pi = 1 takes its place -- the same replacement the '
+               + 'discrete chain needs, for the same reason' };
+  }
+  /* Do the two routes agree, entry for entry, exactly? */
+  function routesAgree(cutPi, systemPi) {
+    if (!systemPi || systemPi.indexOf(null) >= 0) {
+      return { ok: false, at: -1, why: 'the balance system has no unique solution, so there is nothing '
+        + 'to compare the cut equations with' };
+    }
+    if (cutPi.length !== systemPi.length) {
+      return { ok: false, at: -1, why: 'the two routes produced distributions of different lengths, '
+        + cutPi.length + ' against ' + systemPi.length };
+    }
+    for (var i = 0; i < cutPi.length; i += 1) {
+      if (!Requ(cutPi[i], systemPi[i])) {
+        return { ok: false, at: i, why: 'the two routes disagree at state ' + i + ': the cut equations '
+          + 'give ' + Rtext(cutPi[i]) + ' and the balance system ' + Rtext(systemPi[i]) };
+      }
+    }
+    return { ok: true, at: -1, why: 'every entry of pi from the cut equations is EXACTLY the entry the '
+      + 'full balance system produces -- an equality of fractions, not two decimals that look alike' };
+  }
+
+  /* ---------------------------------------------- what truncation costs
+
+     birthDeath works on a finite chain, and an M/M/1 queue is not finite. The
+     honest figure is the mass the truncation threw away: for the untruncated
+     chain pi_n = (1 - rho) rho^n, so everything above state N carries rho^(N+1).
+     Exact, and printed rather than assumed negligible. */
+  function truncationTail(rho, N) {
+    if (Rcmp(rho, R1) >= 0) {
+      return { tail: null, why: 'rho is at least 1, so the untruncated chain has no distribution at all '
+        + 'and the truncation is not an approximation of anything' };
+    }
+    var tail = Rpow(rho, N + 1);
+    return { tail: tail,
+             why: 'the untruncated chain puts rho^' + (N + 1) + ' = ' + Rshort(tail, 6, 8)
+               + ' of its probability above state ' + N + ', and that is exactly what this truncation '
+               + 'redistributes over the states it keeps' };
+  }
+  /* P(N > k) on the truncated chain, exact. */
+  function queueTail(pi, k) {
+    var s = R0, n;
+    for (n = k + 1; n < pi.length; n += 1) s = Radd(s, pi[n]);
+    return s;
+  }
+  /* The probability an arrival has to wait, read off the SAME pi: with s
+     servers that is P(N >= s). Erlang C is this number, and this kit computes
+     it as a reading rather than as a formula. */
+  function waitProbability(pi, s) {
+    var t = R0, n;
+    for (n = s; n < pi.length; n += 1) t = Radd(t, pi[n]);
+    return t;
+  }
+  /* The busy-server count, which is what utilisation means with s servers. */
+  function serversBusy(pi, s) {
+    var b = R0, n;
+    for (n = 0; n < pi.length; n += 1) b = Radd(b, Rmul(R(BigInt(Math.min(n, s)), 1n), pi[n]));
+    return b;
+  }
+
+  /* --------------------------------------------- the arrival process itself
+
+     n opportunities in one unit of time, each an arrival with probability
+     lambda/n, independent. The count is BINOMIAL and that is exact. Its limit
+     as n grows is e^(-lambda) lambda^k / k!, and that is not, because
+     e^(-lambda) is irrational for every rational lambda except 0.
+
+     The recurrence is the one queue.py uses for the same job -- P(k+1) = P(k) *
+     ((n-k)/(k+1)) * p/(1-p) from P(0) = (1-p)^n -- because at n = 1000 the
+     closed form per term has a two-thousand-digit denominator and the page
+     never paints. scripts/mathcheck.js holds this function against that one on
+     the same inputs, so the two Subjects cannot drift apart about a binomial. */
+  function binomRowR(n, p, upto) {
+    var one = R1, notp = Rsub(one, p);
+    if (Rsign(p) < 0 || Rcmp(p, one) > 0) return null;
+    if (Rzero(notp)) {
+      var all = [];
+      for (var i = 0; i <= upto && i < n; i += 1) all.push(R0);
+      all.push(one);
+      return all;
+    }
+    var ratio = Rdiv(p, notp), out = [], cur = Rpow(notp, n), k;
+    out.push(cur);
+    for (k = 0; k < upto && k < n; k += 1) {
+      cur = Rmul(cur, Rmul(R(BigInt(n - k), BigInt(k + 1)), ratio));
+      out.push(cur);
+    }
+    return out;
+  }
+  /* THE ONE APPROXIMATION IN THIS KIT, and the only place it is allowed.
+     expNegApprox is sysdesign_core's, shared with the System Design path, and
+     it is the reciprocal of a positive-term series for e^x: every term has the
+     same sign, so nothing cancels and the answer is right to a rounding of the
+     double. It returns a Number and this returns Numbers, which is how the
+     boundary is marked -- a rational never leaves this function. */
+  function poissonRowApprox(lam, upto) {
+    var m = parseFloat(Rfixed(lam, 17));
+    var t = expNegApprox(m, 1e-15), out = [t], k;
+    for (k = 1; k <= upto; k += 1) { t = t * m / k; out.push(t); }
+    return out;
+  }
+  /* The binomial exactly, the Poisson rounded, and the gap between them --
+     which is what "Poisson limit" means, stated as a measurement. */
+  function poissonGap(n, lam, upto) {
+    var p = Rdiv(lam, R(BigInt(n), 1n));
+    var exact = binomRowR(n, p, upto);
+    if (exact === null) {
+      return { bad: 'lambda/n is not a probability: lambda = ' + Rtext(lam) + ' over n = ' + n
+        + ' is ' + Rtext(p) };
+    }
+    var approx = poissonRowApprox(lam, upto), rows = [], worst = 0, at = -1, k;
+    for (k = 0; k < exact.length; k += 1) {
+      var ex = parseFloat(Rfixed(exact[k], 17));
+      var d = Math.abs(ex - approx[k]);
+      if (d > worst) { worst = d; at = k; }
+      rows.push({ k: k, exact: exact[k], decimal: ex, poisson: approx[k], diff: ex - approx[k] });
+    }
+    return { p: p, rows: rows, worst: worst, at: at,
+             note: 'the binomial column is exact rational arithmetic; the Poisson column is not, '
+               + 'because e^(-lambda) is irrational and every entry carries a factor of it' };
+  }
+  /* The sentence that has to sit beside the Poisson column, in one place so it
+     cannot be worded two ways. */
+  function poissonNote() {
+    return 'The Poisson column is <strong>not exact and cannot be</strong>: every entry carries a factor '
+      + 'of e<sup>&minus;&lambda;</sup>, which is irrational for every rational &lambda; other than 0. '
+      + 'It is computed by <code>expNegApprox</code>, shared with the System Design path, as the '
+      + 'reciprocal of the positive-term series for e<sup>&lambda;</sup> &mdash; every term the same '
+      + 'sign, so nothing cancels &mdash; and it is correct to the rounding of a double, about sixteen '
+      + 'significant figures. The binomial column beside it is exact rational arithmetic with no such '
+      + 'caveat, and the difference between the two columns is printed rather than described.';
+  }
+
+  /* ------------------------------------------------------- drawing the chain
+
+     States in a row, arrivals bowed over the top and services under the
+     bottom, so the two directions of the cut are visibly two directions. A
+     string of SVG, with no element involved. */
+  function bdSvg(lam, mu, pi, opts) {
+    opts = opts || {};
+    var N = lam.length, states = N + 1, w = opts.w || 660, hgt = opts.h || 220;
+    var show = Math.min(states, opts.max || 9);
+    var L = 26, gap = (w - 2 * L) / Math.max(1, show - 1), cy = hgt / 2;
+    var defs = '<defs><marker id="bdUp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
+      + 'markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" '
+      + 'fill="var(--cyan)" /></marker>'
+      + '<marker id="bdDown" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" '
+      + 'orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--purple)" /></marker></defs>';
+    var out = '', n;
+    if (opts.cutAt !== undefined && opts.cutAt >= 0 && opts.cutAt < show - 1) {
+      var cx = L + gap * (opts.cutAt + 0.5);
+      out += '<line x1="' + cx.toFixed(1) + '" y1="14" x2="' + cx.toFixed(1) + '" y2="' + (hgt - 14)
+        + '" stroke="var(--amber)" stroke-width="2" stroke-dasharray="5 4" />'
+        + '<text x="' + (cx + 5).toFixed(1) + '" y="22" font-size="10" fill="var(--amber)">the cut</text>';
+    }
+    for (n = 0; n < show - 1; n += 1) {
+      var x1 = L + gap * n, x2 = L + gap * (n + 1);
+      out += '<path d="M ' + (x1 + 15) + ' ' + (cy - 8) + ' Q ' + ((x1 + x2) / 2) + ' ' + (cy - 42)
+        + ' ' + (x2 - 17) + ' ' + (cy - 8) + '" fill="none" stroke="var(--cyan)" stroke-width="1.6" '
+        + 'marker-end="url(#bdUp)" />'
+        + '<text x="' + ((x1 + x2) / 2) + '" y="' + (cy - 30) + '" font-size="10" fill="var(--cyan)" '
+        + 'text-anchor="middle">' + Rshort(lam[n], 3, 5) + '</text>'
+        + '<path d="M ' + (x2 - 15) + ' ' + (cy + 8) + ' Q ' + ((x1 + x2) / 2) + ' ' + (cy + 42)
+        + ' ' + (x1 + 17) + ' ' + (cy + 8) + '" fill="none" stroke="var(--purple)" stroke-width="1.6" '
+        + 'marker-end="url(#bdDown)" />'
+        + '<text x="' + ((x1 + x2) / 2) + '" y="' + (cy + 38) + '" font-size="10" fill="var(--purple)" '
+        + 'text-anchor="middle">' + Rshort(mu[n], 3, 5) + '</text>';
+    }
+    for (n = 0; n < show; n += 1) {
+      var cxn = L + gap * n;
+      var p = pi && pi[n] ? parseFloat(Rfixed(pi[n], 6)) : 0;
+      var rad = 13 + 9 * Math.min(1, p * 2.2);
+      out += '<circle cx="' + cxn.toFixed(1) + '" cy="' + cy + '" r="' + rad.toFixed(1)
+        + '" fill="var(--cyan)" opacity="0.16" />'
+        + '<circle cx="' + cxn.toFixed(1) + '" cy="' + cy + '" r="13" fill="var(--panel-solid)" '
+        + 'stroke="var(--cyan)" stroke-width="1.8" />'
+        + '<text x="' + cxn.toFixed(1) + '" y="' + (cy + 4) + '" font-size="11" font-weight="700" '
+        + 'fill="var(--cyan)" text-anchor="middle">' + n + '</text>';
+      if (pi && pi[n]) {
+        out += '<text x="' + cxn.toFixed(1) + '" y="' + (hgt - 6) + '" font-size="9" fill="var(--muted)" '
+          + 'text-anchor="middle">' + Rfixed(pi[n], 3) + '</text>';
+      }
+    }
+    if (states > show) {
+      out += '<text x="' + (w - 10) + '" y="' + (cy + 4) + '" font-size="11" fill="var(--muted)" '
+        + 'text-anchor="end">&hellip; ' + (states - show) + ' more</text>';
+    }
+    return defs + out;
+  }
+  /* pi as bars, for the modes where the shape of the distribution is the point. */
+  function piSvg(pi, opts) {
+    opts = opts || {};
+    var w = opts.w || 660, hgt = opts.h || 170, L = 36, T = 12, B = 24;
+    if (!pi.length) return '<text x="14" y="24" font-size="11" fill="var(--muted)">nothing to draw</text>';
+    var show = Math.min(pi.length, opts.max || 40);
+    var top = R0, i;
+    for (i = 0; i < show; i += 1) if (Rcmp(pi[i], top) > 0) top = pi[i];
+    var peak = parseFloat(Rfixed(top, 9)) || 1;
+    var base = hgt - B, slot = (w - L - 14) / show, out = '';
+    out += '<line x1="' + L + '" y1="' + base + '" x2="' + (w - 14) + '" y2="' + base
+      + '" stroke="var(--line-strong)" />';
+    for (i = 0; i < show; i += 1) {
+      var bh = (base - T) * parseFloat(Rfixed(pi[i], 9)) / peak;
+      var tone = (opts.markFrom !== undefined && i >= opts.markFrom) ? 'amber' : 'cyan';
+      out += '<rect x="' + (L + i * slot + 1).toFixed(2) + '" y="' + (base - bh).toFixed(2)
+        + '" width="' + Math.max(1, slot - 2).toFixed(2) + '" height="' + bh.toFixed(2)
+        + '" rx="1.5" fill="var(--' + tone + ')" opacity="0.85" />';
+      if (show <= 24) {
+        out += '<text x="' + (L + i * slot + slot / 2).toFixed(2) + '" y="' + (base + 12)
+          + '" font-size="9" fill="var(--muted)" text-anchor="middle">' + i + '</text>';
+      }
+    }
+    out += '<text x="4" y="' + (T + 8) + '" font-size="10" fill="var(--muted)">' + Rfixed(top, 3) + '</text>'
+      + '<text x="4" y="' + base + '" font-size="10" fill="var(--muted)">0</text>';
+    return out;
+  }
+
+  function setKpi(id, html) { document.getElementById(id).innerHTML = html; }
+  function readPos(text) {
+    var v = Rread(text);
+    return (v === null || Rsign(v) <= 0) ? null : v;
+  }
+  var PRESETS = {"buffer": {"label": "A buffer of five, overloaded", "lam": "6", "mu": "5", "K": 5}, "tiny": {"label": "Room for two, and a queue that would never settle", "lam": "3", "mu": "2", "K": 2}, "roomy": {"label": "A buffer of twelve at a load of four fifths", "lam": "4", "mu": "5", "K": 12}};
+
+  var presetS = document.getElementById('bfPreset');
+  var lamIn = document.getElementById('bfLam');
+  var muIn = document.getElementById('bfMu');
+  var kS = document.getElementById('bfK');
+  var kindS = document.getElementById('bfKind');
+  var chainEl = document.getElementById('bfChain');
+  var piEl = document.getElementById('bfPi');
+  var statsEl = document.getElementById('bfStats');
+  var statusEl = document.getElementById('bfStatus');
+
+  function blank(message) {
+    chainEl.innerHTML = ''; piEl.innerHTML = ''; statsEl.innerHTML = '';
+    ['bfRhoK', 'bfBlockK', 'bfAdmK', 'bfLK', 'bfW1K', 'bfW2K'].forEach(function (id) {
+      setKpi(id, '&mdash;');
+    });
+    statusEl.innerHTML = message;
+  }
+
+  function redraw() {
+    var lam = readPos(lamIn.value), mu = readPos(muIn.value);
+    if (lam === null || mu === null) {
+      blank('Both rates have to be positive numbers or fractions.');
+      return;
+    }
+    var K = Math.max(1, Math.min(20, +kS.value || 1));
+    document.getElementById('bfKOut').textContent = String(K);
+    var balking = kindS.value === 'balk';
+    var rho = Rdiv(lam, mu);
+    var rates = balking ? ratesBalking(lam, mu, K) : ratesConstant(lam, mu, K);
+    var bd = birthDeath(rates.lam, rates.mu);
+    var closed = mm1k(lam, mu, K);
+    var block = bd.pi[bd.pi.length - 1];
+    var admitted = bd.lambdaEffective;
+    var naiveW = Rdiv(bd.L, lam);
+
+    chainEl.innerHTML = bdSvg(rates.lam, rates.mu, bd.pi, { w: 660, h: 220, max: 9 });
+    piEl.innerHTML = piSvg(bd.pi, { w: 660, h: 170, max: 21, markFrom: bd.pi.length - 1 });
+
+    var rows = [], j;
+    for (j = 1; j <= Math.min(K + 3, 12); j += 1) {
+      var rj = balking ? ratesBalking(lam, mu, j) : ratesConstant(lam, mu, j);
+      var bj = birthDeath(rj.lam, rj.mu);
+      var bl = bj.pi[bj.pi.length - 1];
+      rows.push(tr([rowhead('K = ' + j), td(Rpct(bl, 3), j === K ? 'tone-amber' : ''),
+        td(Rshort(bj.lambdaEffective, 5, 7)), td(Rshort(bj.L, 5, 7)),
+        td(bj.W === null ? '&mdash;' : Rshort(bj.W, 5, 7)),
+        td(Rshort(Rdiv(bj.L, lam), 5, 7), 'tone-red')]));
+    }
+    statsEl.innerHTML = '<caption>Capacity against blocking, and the two divisions Little&rsquo;s Law '
+      + 'invites</caption><thead>' + tr([th('capacity'), th('blocking'), th('admitted rate'), th('L'),
+        th('W = L / admitted &check;'), th('L / &lambda; &#10007;')])
+      + '</thead><tbody>' + rows.join('') + '</tbody>';
+
+    var closedAgrees = !balking
+      && Rcmp(Rabs(Rsub(block, closed.blocking)), R(1n, 1000000000n)) < 0
+      && Requ(bd.L, closed.L);
+    setKpi('bfRhoK', Rtext(rho) + (Rcmp(rho, R1) >= 0
+      ? ' <span class="tone-amber">&ge; 1, and it does not matter</span>' : ''));
+    setKpi('bfBlockK', Rpct(block, 4));
+    setKpi('bfAdmK', Rshort(admitted, 5, 7) + ' of ' + Rtext(lam));
+    setKpi('bfLK', Rshort(bd.L, 5, 7));
+    setKpi('bfW1K', '<span class="tone-red">' + Rshort(naiveW, 5, 7) + '</span>');
+    setKpi('bfW2K', bd.W === null ? '&mdash;'
+      : '<span class="tone-green">' + Rshort(bd.W, 5, 7) + '</span>');
+
+    statusEl.innerHTML = '<strong>' + (balking
+        ? 'Arrivals balk: a customer who finds n already there joins with probability 1/(n+1), so '
+          + '&lambda;&#8345; = &lambda;/(n+1).'
+        : 'The chain stops at K = ' + K + ': there is no arc out of the top state, so an arrival that '
+          + 'finds the system full is lost.') + '</strong> '
+      + 'Either way &rho; = ' + Rtext(rho) + ' is not a stability condition any more. '
+      + (Rcmp(rho, R1) >= 0
+          ? 'It is <span class="tone-amber">at least 1</span> here, and the chain still has a perfectly '
+            + 'good distribution, because a queue that cannot grow cannot run away. '
+          : 'It is below 1 here, but that is now a fact about the shape of &pi; rather than a condition '
+            + 'for &pi; to exist. ')
+      + 'The system is full ' + Rpct(block, 4) + ' of the time, so the rate that actually gets in is '
+      + '&lambda;(1 &minus; &pi;&#8342;) = ' + Rshort(admitted, 6, 8) + ' rather than ' + Rtext(lam) + '. '
+      + '<strong>That is the rate Little&rsquo;s Law needs.</strong> Dividing L by it gives W = '
+      + (bd.W === null ? '&mdash;' : Rshort(bd.W, 6, 8))
+      + '; dividing by &lambda; instead gives ' + Rshort(naiveW, 6, 8)
+      + ', which is <span class="tone-red">too small by a factor of 1 &minus; &pi;&#8342;</span> and is '
+      + 'the standard error in a finite-queue calculation. It is too small because it credits the system '
+      + 'with serving customers it never admitted. '
+      + (balking
+          ? 'The closed form <code>mm1k</code> does not apply to a balking chain at all &mdash; it '
+            + 'assumes a constant arrival rate &mdash; which is exactly why this course builds queues '
+            + 'from the cut equation and not from a table of formulas.'
+          : 'sysdesign_core&rsquo;s <code>mm1k</code> gives blocking ' + Rpct(closed.blocking, 4)
+            + ' and L = ' + Rshort(closed.L, 6, 8) + ', and the two routes '
+            + (closedAgrees ? '<span class="tone-green">agree exactly</span>'
+               : '<span class="tone-red">disagree, which means one of them is wrong</span>')
+            + ' &mdash; one Subject&rsquo;s closed form and this one&rsquo;s cut equations, on the same '
+            + 'model.');
+  }
+
+  presetS.addEventListener('change', function () {
+    var p = PRESETS[presetS.value];
+    if (!p) return;
+    lamIn.value = p.lam; muIn.value = p.mu; kS.value = String(p.K);
+    redraw();
+  });
+  kindS.addEventListener('change', redraw);
+  [lamIn, muIn, kS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "markov-chains-decisions-and-queues/finite-buffers-blocking-and-the-admitted-rate";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

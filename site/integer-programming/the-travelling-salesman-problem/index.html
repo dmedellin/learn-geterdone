@@ -1,0 +1,2817 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Travelling Salesman Problem | Lesson | Integer Programming | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="The assignment problem is a relaxation of the travelling salesman problem: it forces one departure and one arrival per city and permits several disjoint subtours. The constraints that would forbid them are exponentially many, so they are added only when a solution actually violates one. Relaxation, cut, branch, repeat solves small instances exactly — and a heuristic tour is only as good as the bound you can measure it against." />
+  <link rel="canonical" href="https://learn.geterdone.io/integer-programming/the-travelling-salesman-problem/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="The Travelling Salesman Problem | Lesson | Integer Programming | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="The assignment problem is a relaxation of the travelling salesman problem: it forces one departure and one arrival per city and permits several disjoint subtours. The constraints that would forbid them are exponentially many, so they are added only when a solution actually violates one. Relaxation, cut, branch, repeat solves small instances exactly — and a heuristic tour is only as good as the bound you can measure it against." />
+  <meta property="og:url" content="https://learn.geterdone.io/integer-programming/the-travelling-salesman-problem/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The Travelling Salesman Problem | Lesson | Integer Programming | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="The assignment problem is a relaxation of the travelling salesman problem: it forces one departure and one arrival per city and permits several disjoint subtours. The constraints that would forbid them are exponentially many, so they are added only when a solution actually violates one. Relaxation, cut, branch, repeat solves small instances exactly — and a heuristic tour is only as good as the bound you can measure it against." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/integer-programming/the-travelling-salesman-problem/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Integer Programming</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">The Travelling Salesman Problem</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The the travelling salesman is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Integer Programming &middot; Cuts, and one hard problem</span>
+        <h1>The Travelling Salesman Problem</h1>
+        <p>The assignment problem is a relaxation of the travelling salesman problem: it forces one departure and one arrival per city and permits several disjoint subtours. The constraints that would forbid them are exponentially many, so they are added only when a solution actually violates one. Relaxation, cut, branch, repeat solves small instances exactly &mdash; and a heuristic tour is only as good as the bound you can measure it against.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">assignment relaxation   one departure and one arrival per city; subtours allowed
+subtour cut   forbid an arc of the shortest subtour, then re-solve and branch
+distinct undirected tours, fixed start   (n − 1)!/2      360 at n = 7
+6 cities   60 tours   bound 80   subtours (1 5)(2 3)(4 6)
+optimum 88 in 5 nodes      nearest neighbour 96, measured gap 8 = 1/12
+nearest neighbour then 2-opt   88 — optimal here, and only a bound says so</div>
+        <div class="float-label" style="right:16px;bottom:16px;">A relaxation that leaves subtours, and a gap you can measure</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One hard idea: the relaxation here is not “drop integrality” but “drop one requirement”, and the requirement it drops is the one that makes a tour a tour.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The assignment problem is the relaxation</h3><p>Choose, for each city, one city to leave for and one to arrive from, at minimum total cost. Every tour satisfies that; so does a set of disjoint subtours, which is not a tour at all. So the assignment optimum is a lower bound on the tour, and the subtours it returns are the exact way in which it failed to be an answer.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The constraints that forbid subtours are added on demand</h3><p>There is one subtour-elimination constraint for every proper subset of the cities, which is exponentially many and cannot be written down. They are also almost all slack at the optimum, so they are added when a solution violates one: solve, find the shortest subtour, forbid an arc of it, re-solve. That is the branching, and it is a cut in the sense of the previous lesson.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Near-optimal is meaningless without a bound</h3><p>A nearest-neighbour tour on the lab's six-city instance costs <span class="math">96</span>. Whether that is good is not a question the tour can answer. Against the optimum of <span class="math">88</span> it is <span class="math">8</span> worse, a measured <span class="math">1/12</span> of the tour in hand; and improving it by 2-opt gives <span class="math">88</span> exactly, which is optimal &mdash; a fact that only the bound could have established.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>A bound, the subtours it leaves, and the gap a heuristic leaves</h2></div><p>How many tours there actually are, where the bound comes from, and why a measured gap and a proved ratio are different kinds of knowledge.</p></div>
+      <article class="card card-pad prose"><p>Before any method, the count &mdash; because three different numbers are in circulation and each is correct for something else. On <span class="math">n</span> cities there are <span class="math">n!</span> orderings of the cities; <span class="math">(n − 1)!</span> tours from a fixed start, counting each once per direction; and <span class="math">(n − 1)!/2</span> <em>distinct undirected</em> tours, which is what you are choosing among when the cost from one city to another is the same both ways.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">  n = 7      n! = 5040        orderings of the cities
+           7!/2 = 2520        each ordering once per direction
+        (n−1)! =  720         tours from a fixed start, both ways
+      (n−1)!/2 =  360         DISTINCT UNDIRECTED TOURS
+
+  n = 6      (n−1)!/2 = 60    and the lab enumerates exactly 60</div><p>Those <span class="math">360</span> at seven cities are why the lab stops at seven: <span class="math">360</span> tours can be enumerated instantly, so an exact answer is available to check every bound against, and that is worth more at this size than another city. The cap is this lab's own and it is a consequence of <span class="math">(n − 1)!/2</span> &mdash; nothing to do with the <span class="math">n!</span> orderings that Discrete Mathematics&rsquo; Hamilton lab enumerates, which is a different quantity on a different object.</p><p>The claim “the number of tours is <span class="math">n!</span>” is therefore an overcount by a factor of <span class="math">2n</span>: at seven cities <span class="math">5040</span> against <span class="math">360</span>, and <span class="math">5040 ÷ 360 = 14 = 2 × 7</span>. The factor <span class="math">n</span> is the arbitrary choice of starting city and the factor <span class="math">2</span> is the direction, neither of which changes the tour or its length.</p><div class="defbox"><span class="label">Definition &middot; Subtour-elimination constraint</span><p>For a proper non-empty subset <span class="math">S</span> of the cities, the constraint says that the chosen arcs may not form a closed cycle inside <span class="math">S</span>: at least one arc must leave <span class="math">S</span>. There is one such constraint per subset, so there are exponentially many, and a formulation that wrote them all down could not be built for a moderate <span class="math">n</span>.</p></div><div class="example"><span class="label">Example &middot; Six cities: the bound, the subtours, and the tree</span><p>On the lab's opening instance the assignment relaxation is worth <span class="math">80</span>, and it returns three two-city subtours: cities <span class="math">1</span> and <span class="math">5</span> shuttling between each other, <span class="math">2</span> and <span class="math">3</span>, and <span class="math">4</span> and <span class="math">6</span>. That is a bound and not a route. Forbid one arc of the shortest subtour and re-solve; two of the children come back with a four-city subtour and a two-city one, still not a tour; forbid an arc again and the next child is a genuine tour worth <span class="math">88</span>. Five nodes in total, and the answer <span class="math">88</span> is the route <span class="math">1 → 2 → 4 → 6 → 3 → 5 → 1</span>.</p></div><h3>A measured gap, and a proved ratio</h3><p>Nearest neighbour from city <span class="math">1</span> gives <span class="math">1 → 5 → 3 → 4 → 6 → 2 → 1</span>, costing <span class="math">96</span>. Against the optimum of <span class="math">88</span> that is <span class="math">8</span> worse, which is <span class="math">8/96 = 1/12</span> of the tour in hand &mdash; a measured gap, on this instance, for this heuristic, which the panel shows as <span class="math">8.3%</span>. with a gap of zero. That happens, and it is worth knowing rather than assuming, which takes a bound.</p><p>A measured gap and a proved ratio are different kinds of knowledge and the difference is worth a paragraph. The Algorithms path&rsquo;s &ldquo;Metric TSP by MST Doubling&rdquo; proves a factor of two for every metric instance there is, for ever, without solving any of them. This lesson measures <span class="math">1/12</span> on one instance, exactly, and claims nothing about the next one. The first is a theorem about a class; the second is a fact about a case &mdash; and on your own data, the fact is often what you need and is the only one of the two you can compute.</p><p>Three results are used here and proved elsewhere. The other exact method is the dynamic programme over subsets of &ldquo;DP over Subsets: Held–Karp&rdquo;, which runs in <span class="math">n² 2ⁿ</span> time &mdash; a different trade, since it beats <span class="math">(n − 1)!</span> badly and still grows exponentially. Why the problem is hard at all is &ldquo;Reductions and Their Direction&rdquo;, in the same subject. And the two-approximation above is that path's as well. None of the three is derived here.</p><p>The apparent tension between “hard” and “solved exactly in five nodes” is not one. Hardness is a statement about every instance of every size; a certificate is a statement about the instance in front of you. Branch and cut solves small and structured instances routinely, and the gap it reports on the ones it cannot close is exactly the honest form of the same fact &mdash; which is what this course has been building toward since the first rounded point failed.</p><p>Every cost in the lab is an integer or a fraction, so every tour length, every bound and every gap on the page is exact. That is deliberate: the one place this problem could produce an irrational number is a Euclidean distance, and a comparison between two tours that differs in the sixth decimal place is not a comparison anybody should be making on a rounded value.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The travelling salesman</h2></div><p>A relaxation that leaves subtours, the cuts that forbid them, and a heuristic with a number attached</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Every tour, and a bound instead</strong><span>the assignment relaxation drops the one-cycle rule, and the subtours it leaves are the branching</span></div>
+        <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>the optimal tour</span><span class="tone-amber"><i class="legend-swatch"></i>the heuristic tour</span><span class="tone-cyan"><i class="legend-swatch"></i>a node still open</span><span class="tone-red"><i class="legend-swatch"></i>closed by the bound</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="tsRing" viewBox="0 0 660 260" role="img" aria-label="The cities with the optimal tour and the heuristic tour drawn over them."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="tsTree" viewBox="0 0 660 200" role="img" aria-label="The branch and bound tree, each node carrying its assignment bound and the subtour it cut."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tsTable"></table></div>
+      <div class="status-banner" id="tsStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Edit the costs; the bound, the tree and the gap all move</h3>
+          <p>Every distinct tour is enumerated, the assignment relaxation is solved and branched on its subtours, and a heuristic tour is measured against the result. Switch the heuristic to nearest neighbour alone to see a gap that is not zero, and raise the city count to seven to watch the tour count go to <span class="math">360</span>.</p>
+        <div class="field">
+          <label for="tsPreset">Instance</label>
+          <select id="tsPreset"><option value="clustered">an asymmetric instance, where a tour and its reversal are different tours</option><option value="metric">a symmetric instance where nearest neighbour happens to do well</option><option value="plants" selected>symmetric, with a loose assignment bound and a heuristic that misses</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="tsN">Cities</label><span class="range-value" id="tsNOut">6</span></div>
+          <input id="tsN" type="range" min="4" max="7" step="1" value="6" />
+        </div>
+        <div class="field">
+          <label for="tsHeur">Heuristic tour</label>
+          <select id="tsHeur"><option value="twoopt" selected>nearest neighbour, then 2-opt</option><option value="nearest">nearest neighbour alone</option></select>
+        </div>
+        <div class="field">
+          <label for="tsCost">Cost matrix, rows separated by semicolons</label>
+          <input id="tsCost" type="text" value="0,32,40,32,8,40,32; 32,0,24,16,32,24,32; 40,24,0,16,8,16,40; 32,16,16,0,40,8,24; 8,32,8,40,0,16,32; 40,24,16,8,16,0,8; 32,32,40,24,32,8,0" inputmode="text" autocomplete="off">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Distinct tours at this size</span><strong id="tsCount">&mdash;</strong></div>
+          <div class="kpi"><span>The optimum, by enumeration</span><strong id="tsOpt">&mdash;</strong></div>
+          <div class="kpi"><span>The assignment bound at the root</span><strong id="tsRoot">&mdash;</strong></div>
+          <div class="kpi"><span>Nodes the tree explored</span><strong id="tsNodes">&mdash;</strong></div>
+          <div class="kpi"><span>The heuristic tour costs</span><strong id="tsHeurCost">&mdash;</strong></div>
+          <div class="kpi"><span>Its gap, against its own length</span><strong id="tsGap">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="tsHint" style="margin:0;">Distinct undirected tours on n cities with a fixed start number (n &minus; 1)! / 2 &mdash; which is why this stops at seven cities. Every cost is an integer or a fraction, so every tour length, bound and gap here is exact.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a small tour exactly, and measuring a heuristic</h2></div><p>Five steps, and the count in the first one is what keeps the last one honest.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the tours before choosing a method</h3><p><span class="math">(n − 1)!/2</span> distinct undirected tours: <span class="math">60</span> at six cities, <span class="math">360</span> at seven, <span class="math">2 520</span> at eight. Enumeration is the right method for exactly as long as that number is small, and knowing where that stops is why the other four steps exist.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Solve the assignment relaxation</h3><p>One departure and one arrival per city, at minimum cost. Its value is a lower bound on every tour. If it happens to return a single cycle, that cycle is the optimal tour and you are finished.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the subtours and forbid an arc of the shortest</h3><p>The shortest subtour is the cheapest one to break and gives the fewest children. Forbidding one arc is a cut: no tour is lost, because a tour cannot contain that subtour anyway. The panel names the banned arc by its raw index, so the city drawn as <span class="math">1</span> appears in that column as <span class="math">0</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Branch, and keep the bound with each node</h3><p>Each child is another assignment problem with one arc forbidden, so the bound rises as arcs are banned. Close a node the moment its bound cannot beat the best tour in hand &mdash; the three closing reasons are the ones from the search lesson.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Measure the heuristic against the bound and report the pair</h3><p>A tour of <span class="math">96</span> is a number. A tour of <span class="math">96</span> against a proved optimum of <span class="math">88</span> is a result: <span class="math">8</span> worse, <span class="math">1/12</span> of it. Without the second number, “near-optimal” has nothing behind it.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Counts, bounds and gaps</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Six plants, the assignment bound, and two heuristic tours</h3><p>The lab's opening instance at six cities, with the costs symmetric. Every figure is exact and every one can be checked against the panel.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">6 cities, symmetric costs.   distinct undirected tours: 5!/2 = 60
+  not 720 = 6!, which counts orderings
+  not 360 = 6!/2, and not 120 = 5!, which counts each tour twice
+
+ASSIGNMENT RELAXATION
+  value 80, and it returns three two-city subtours:
+     (1 5)   (2 3)   (4 6)
+  80 is a lower bound on every tour; it is not a route
+
+THE TREE
+  node 0   bound 80    subtours (1 5)(2 3)(4 6)   branch on (1 5)
+  node 1   bound 88    subtours (1 2 3 5)(4 6)    branch on (4 6)
+  node 2   bound 88    subtours (1 5 3 2)(4 6)    closed by the bound
+  node 3   bound 96    one cycle: a tour, worth 96
+  node 4   bound 88    one cycle: a tour, worth 88   ←  the optimum
+  5 nodes.  optimum 88 on  1 → 2 → 4 → 6 → 3 → 5 → 1
+
+  check by enumeration:  all 60 tours tried, best is 88
+
+HEURISTICS, MEASURED
+  nearest neighbour from city 1:   1 → 5 → 3 → 4 → 6 → 2 → 1   = 96
+     gap 96 − 88 = 8,   8/96 = 1/12 of the tour in hand, shown as 8.3%
+  then 2-opt:                                                   = 88
+     gap 0 — optimal on this instance, and the bound is how you know</div><p>Node 0's three two-city subtours are the clearest possible picture of what the relaxation dropped. Shuttling between two plants satisfies “one departure and one arrival each” perfectly, costs very little, and visits nothing. The <span class="math">8</span> between <span class="math">80</span> and <span class="math">88</span> is the price of the requirement that the route be one cycle.</p><p>Node 2 is closed by the bound at <span class="math">88</span>, equal to the best tour in hand, which is the same closure the search lesson used: nothing in a node beats the node's bound. And node 3 is a reminder that a node returning a tour does not return the best one &mdash; <span class="math">96</span> is a genuine tour and it is beaten two nodes later.</p><p>For a faded rehearsal, raise the lab to seven cities. The supplied first move is the count: <span class="math">(7 − 1)!/2 = 360</span> distinct undirected tours, six times the sixty at six cities. Predict whether the root bound rises or falls when a city is added, then read the optimum, the node count, and the measured gap of the 2-opt tour &mdash; which this time is not zero.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling a heuristic tour near-optimal with no bound</strong><span>“Near” is a comparison and there is nothing to compare with until something has been proved. On the lab's instance nearest neighbour is <span class="math">8</span> off, which is <span class="math">1/12</span> of the tour, and on the next instance it could be <span class="math">40%</span>; the word carries no information either way. A tour and a bound is a result; a tour alone is a route.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the number of tours as n!</strong><span><span class="math">n!</span> counts orderings of the cities, and the tours it corresponds to are counted <span class="math">2n</span> times each: once per starting city and once per direction. At seven cities that is <span class="math">5040</span> against <span class="math">360</span>. The overcount matters because it is the number that decides whether enumeration is possible, and it is wrong by a factor of fourteen at the size where the decision is made.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking an assignment solution as a route</strong><span>One departure and one arrival per city is satisfied by a set of disjoint shuttles, and the lab's opening relaxation returns exactly that: three pairs of plants visiting each other. Its value is a perfectly good bound and its arcs are not a plan, which is the same distinction as a fractional <span class="math">y</span> in the modelling lessons.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a tour without a bound beside it reads as an unfinished result.</strong><p>You should be able to say how many distinct undirected tours a size has and why the other two counts are counts of something else, solve the assignment relaxation and name the subtours it leaves, add a subtour cut and branch to an optimal tour with its certificate, and report a heuristic tour with its measured gap while distinguishing that from a proved ratio.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The cost matrix here is integer or rational, so every tour length, bound and gap on the page is exact. A Euclidean coordinate preset would introduce surds; if one is ever added, the distances are square roots of integers, printed as surds and rounded only for display, with every comparison between tours made on the exact value. A square root of a non-square is the one place this course could round, and it does not.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../cutting-planes-and-gomory-cuts/" rel="prev"><span>Lesson</span><strong>Cutting Planes and Gomory Cuts</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Integer Programming</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="integer-programming/the-travelling-salesman-problem" data-lesson-title="The Travelling Salesman Problem" data-course-title="Integer Programming">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Integer Programming.</strong> Bounds, gaps, cut coefficients and node counts on this course are exact, and so are the floors the cuts are built from: <span class="math">⌊n/d⌋</span> on a rational is a division, not a rounding. The one place a figure could be irrational is a Euclidean distance, so the travelling-salesman lab takes its costs as integers or rationals; if a coordinate preset is ever added, its distances are square roots of integers, printed as surds with a labelled rounding for display only, and every comparison between tours is made on the exact values.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "How many distinct undirected tours are there on seven cities?", "a": ["<span class=\"math\">5040<\/span>, which is <span class=\"math\">7!<\/span>", "<span class=\"math\">2520<\/span>, which is <span class=\"math\">7!/2<\/span>", "<span class=\"math\">720<\/span>, which is <span class=\"math\">6!<\/span>", "<span class=\"math\">360<\/span>, which is <span class=\"math\">6!/2<\/span>"], "c": 3, "why": "<span class=\"math\">(n \u2212 1)!/2<\/span> with <span class=\"math\">n = 7<\/span> is <span class=\"math\">720/2 = 360<\/span>. The other three count real things: <span class=\"math\">5040<\/span> orderings of the cities, <span class=\"math\">2520<\/span> orderings up to direction, and <span class=\"math\">720<\/span> tours from a fixed start counted once per direction. Quoting one of them as \u201cthe number of tours\u201d is where three specifications once disagreed."}, {"q": "The assignment relaxation returns three two-city subtours worth <span class=\"math\">80<\/span> in total. What is <span class=\"math\">80<\/span>?", "a": ["The length of the shortest tour", "A lower bound on every tour, and not a route", "An upper bound on every tour", "The length of the shortest tour through three of the cities"], "c": 1, "why": "Every tour satisfies the assignment constraints, so the assignment minimum is at most the shortest tour: <span class=\"math\">80 \u2264 88<\/span> here. The solution attaining it is not a tour at all, which is precisely why the value is a bound."}, {"q": "Why are the subtour-elimination constraints added only when a solution violates one?", "a": ["Because they are not valid until a subtour appears", "Because there is one per subset of the cities, and almost all are slack at the optimum", "Because adding them all would make the problem infeasible", "Because the assignment relaxation cannot be solved with them present"], "c": 1, "why": "They are all valid all along; there are simply exponentially many, and the optimum satisfies nearly all of them without being told to. Adding the one a solution actually breaks is the same economy as a cutting plane: generate the inequality that is doing work."}, {"q": "A nearest-neighbour tour costs <span class=\"math\">96<\/span> and the proved optimum is <span class=\"math\">88<\/span>. What can you say, and what can you not?", "a": ["It is <span class=\"math\">8<\/span> worse than optimal on this instance; nothing follows about other instances", "Nearest neighbour is within <span class=\"math\">1/12<\/span> of optimal in general", "It is <span class=\"math\">8<\/span> worse, so 2-opt will improve it by <span class=\"math\">8<\/span>", "Nothing, because a gap needs a relaxation rather than an exact optimum"], "c": 0, "why": "A measured gap is a fact about one instance. A statement about every instance is a proved ratio, which is what \u201cMetric TSP by MST Doubling\u201d establishes for a different algorithm &mdash; and the two are different kinds of knowledge. 2-opt does reach <span class=\"math\">88<\/span> here, but that is another measurement, not a consequence."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Reader text goes into innerHTML and on this course the reader types < and
+     > all day, so it is escaped once at the boundary. Written here rather than
+     borrowed from algebra_systems.FORMAT_JS because taking that block for six
+     one-line helpers would put 1.3 KB gzipped on all nine pages of this course
+     to save forty lines on one of them. */
+  function ipEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function ipTd(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function ipTdl(t, cls) { return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function ipTh(t) { return '<th>' + t + '</th>'; }
+  function ipTr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function ipChip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  function ipHead(cells) { return '<thead>' + ipTr(cells.map(ipTh)) + '</thead>'; }
+
+  /* Rparse throws on a zero denominator and 1/0 is a thing a reader types, so
+     every read of reader input goes through this and a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function ipRead(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+
+  /* Pixels, and only pixels. Nothing downstream reads these back: an exact
+     rational becomes an x or a y here and the arithmetic that is REPORTED
+     never goes through Number. */
+  function ipPx(r) { return Number(r.n) / Number(r.d); }
+  function ipAt(v, lo, hi, a, b) { return a + (v - lo) * (b - a) / (hi - lo || 1); }
+
+  function ipEl(tag, attrs, inner) {
+    var s = '<' + tag, k;
+    for (k in attrs) {
+      if (Object.prototype.hasOwnProperty.call(attrs, k) && attrs[k] !== null && attrs[k] !== undefined) {
+        s += ' ' + k + '="' + attrs[k] + '"';
+      }
+    }
+    return inner === undefined ? s + ' />' : s + '>' + inner + '</' + tag + '>';
+  }
+
+  function ipLabel(x, y, text, tone, anchor, size) {
+    return ipEl('text', { x: x, y: y, 'font-size': size || 10, 'text-anchor': anchor || 'start',
+                          fill: 'var(--' + (tone || 'muted') + ')' }, text);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Integer programming.  Needs TABLEAU_JS, PHASE_JS, DUAL_JS and
+     sysdesign_core.RCEIL_JS (Rfloor, Rceil) above it.
+
+     Everything here is the same LP solved again with more constraints, which
+     is the Subject's claim and is why nothing below re-implements a solver. */
+
+  /* The two children: x_j <= floor(v) and x_j >= ceil(v).  The gap between
+     them is where the LP optimum was, and saying so is the lesson. */
+  function branchPair(model, j, v) {
+    var lo = Rfloor(v), hi = Rceil(v);
+    var unit = model.obj.map(function (_, k) { return k === j ? R1 : R0; });
+    var name = (model.names && model.names[j]) || ('x' + (j + 1));
+    var down = { max: model.max, names: model.names, obj: model.obj, free: model.free,
+                 nonpos: model.nonpos,
+                 cons: model.cons.concat([{ a: unit, rel: 'le', b: R(lo, 1n),
+                                            name: name + ' <= ' + lo }]) };
+    var up = { max: model.max, names: model.names, obj: model.obj, free: model.free,
+               nonpos: model.nonpos,
+               cons: model.cons.concat([{ a: unit, rel: 'ge', b: R(hi, 1n),
+                                          name: name + ' >= ' + hi }]) };
+    return { down: down, up: up, floor: lo, ceil: hi, j: j, name: name, value: v,
+             /* &le;/&ge; because they are the symbols the prose means, and
+                the file already used them elsewhere. NOT because <= breaks:
+                a '<' only opens a tag when a letter follows it, so '<= 2'
+                survives innerHTML intact. Checked, after a scan of mine
+                claimed otherwise and was wrong. */
+             why: name + ' came back at ' + Rtext(v) + ', which no integer plan can do; every integer plan has '
+               + name + ' &le; ' + lo + ' or ' + name + ' &ge; ' + hi + ', and those two cases are the children' };
+  }
+
+  /* The tree.  Each child is re-solved FROM ITS PARENT'S TABLEAU by dual
+     simplex -- addRow appends the branch and restores feasibility -- because
+     re-solving from scratch at every node hides the one thing branch and bound
+     is for, which is that a child is a small correction to its parent.
+
+     opts.order is depthFirst or bestBound, and the two node counts on the same
+     instance are C5 L7's whole comparison.  opts.maxNodes is a REFUSAL, not a
+     silent truncation: a tree that stopped early and did not say so reports a
+     wrong optimum with a straight face. */
+  function bbTree(model, opts) {
+    opts = opts || {};
+    var order = opts.order === 'bestBound' ? 'bestBound' : 'depthFirst';
+    var maxNodes = opts.maxNodes || 60;
+    var maximise = model.max !== false;
+    var ints = opts.integers || model.obj.map(function (_, j) { return j; });
+    var root = lpSolve(model, opts);
+    if (root.status !== 'optimal') {
+      return { nodes: [], incumbents: [], bounds: [], gaps: [], counts: { explored: 0 },
+               status: root.status, best: null, refused: false };
+    }
+    var nodes = [], open = [], incumbents = [], bounds = [], gaps = [];
+    var best = null, bestX = null, refused = false, id = 0;
+    var push = function (sol, parent, label) {
+      var node = { id: id, parent: parent, depth: parent === null ? 0 : nodes[parent].depth + 1,
+                   label: label, status: sol.status, bound: sol.status === 'optimal' ? sol.zOrig : null,
+                   relaxation: sol.status === 'optimal' ? sol.x : null,
+                   model: sol.model, sol: sol, prunedBy: null, children: [] };
+      id += 1; nodes.push(node);
+      if (parent !== null) nodes[parent].children.push(node.id);
+      return node;
+    };
+    root.model = model;
+    var r0 = push(root, null, 'root');
+    open.push(r0.id);
+    while (open.length) {
+      if (nodes.length > maxNodes) { refused = true; break; }
+      var pick = 0, k;
+      if (order === 'bestBound') {
+        for (k = 1; k < open.length; k += 1) {
+          var a = nodes[open[k]].bound, b = nodes[open[pick]].bound;
+          if (a === null) continue;
+          if (b === null || (maximise ? Rcmp(a, b) > 0 : Rcmp(a, b) < 0)) pick = k;
+        }
+      } else pick = open.length - 1;
+      var nid = open.splice(pick, 1)[0], node = nodes[nid];
+      if (node.status !== 'optimal') { node.prunedBy = 'infeasible'; continue; }
+      if (best !== null && (maximise ? Rcmp(node.bound, best) <= 0 : Rcmp(node.bound, best) >= 0)) {
+        node.prunedBy = 'bound'; continue;
+      }
+      var frac = -1;
+      for (k = 0; k < ints.length; k += 1) {
+        if (!Rint(node.relaxation[ints[k]])) { frac = ints[k]; break; }
+      }
+      if (frac < 0) {
+        node.prunedBy = 'integral';
+        if (best === null || (maximise ? Rcmp(node.bound, best) > 0 : Rcmp(node.bound, best) < 0)) {
+          best = node.bound; bestX = node.relaxation.slice();
+          incumbents.push({ at: nodes.length, node: node.id, value: best, x: bestX.slice() });
+        }
+        continue;
+      }
+      node.branchOn = frac;
+      var pair = branchPair(node.model, frac, node.relaxation[frac]);
+      node.branch = pair;
+      var kids = [['down', pair.down, pair.name + ' <= ' + pair.floor],
+                  ['up', pair.up, pair.name + ' >= ' + pair.ceil]];
+      var made = [];
+      for (k = 0; k < kids.length; k += 1) {
+        var child = bbChild(node, kids[k][1], frac, kids[k][0] === 'down' ? pair.floor : pair.ceil,
+                            kids[k][0], opts);
+        child.model = kids[k][1];
+        var cn = push(child, node.id, kids[k][2]);
+        made.push(cn.id);
+      }
+      /* depth-first wants the first child on top of the stack last. */
+      if (order === 'depthFirst') { open.push(made[1]); open.push(made[0]); }
+      else { open.push(made[0]); open.push(made[1]); }
+      var gb = null;
+      for (k = 0; k < open.length; k += 1) {
+        var bd = nodes[open[k]].bound;
+        if (bd === null) continue;
+        if (gb === null || (maximise ? Rcmp(bd, gb) > 0 : Rcmp(bd, gb) < 0)) gb = bd;
+      }
+      bounds.push({ at: nodes.length, bound: gb, incumbent: best });
+      if (gb !== null && best !== null) gaps.push({ at: nodes.length, gap: Rabs(Rsub(gb, best)) });
+    }
+    return { nodes: nodes, incumbents: incumbents, bounds: bounds, gaps: gaps,
+             counts: { explored: nodes.length, order: order },
+             best: best, x: bestX, refused: refused,
+             status: refused ? 'refused' : (best === null ? 'no integer point' : 'optimal'),
+             why: refused ? 'the tree passed ' + maxNodes + ' nodes, so it stopped and says so rather than reporting an optimum it has not proved' : '' };
+  }
+
+  /* One child, from its parent's tableau: append the branch as a row and let
+     the dual simplex put feasibility back.  When the parent's tableau is not
+     available -- the root came from Phase I with artificials still around --
+     it falls back to a fresh solve, and says which it did. */
+  function bbChild(node, childModel, j, bound, side, opts) {
+    var std = node.sol.std;
+    if (node.sol.tab && std.varMap && !std.varMap[j].free && std.varMap[j].sign > 0) {
+      var col = std.varMap[j].plus, a = [], q;
+      for (q = 0; q < std.nd; q += 1) a.push(q === col ? R1 : R0);
+      var added = addRow(node.sol.tab, side === 'down'
+        ? { a: a, rel: 'le', b: R(bound, 1n) } : { a: a, rel: 'ge', b: R(bound, 1n) }, opts);
+      if (added.status === 'optimal') {
+        var read = tabRead(added.restored);
+        return { std: added.restored.std, tab: added.restored, run: added.run, status: 'optimal',
+                 read: read, x: stdPoint(std, read.x), z: read.z, zOrig: read.zOrig,
+                 from: 'dual simplex on the parent tableau', addRow: added };
+      }
+      if (added.status === 'infeasible') {
+        return { status: 'infeasible', tab: null, x: null, zOrig: null,
+                 from: 'dual simplex on the parent tableau', addRow: added };
+      }
+    }
+    var fresh = lpSolve(childModel, opts);
+    fresh.from = 'a fresh solve';
+    return fresh;
+  }
+
+  /* A Gomory cut off row r: sum of frac(a_rj) x_j >= frac(b_r).
+
+     EXACT because Rfrac of a rational is a rational -- which is the whole
+     reason this is a cut and not a nudge.  It comes back in both coordinate
+     systems: in the tableau's variables, where it is derived, and in the
+     reader's, where it can be drawn on the lattice picture.  A lesson that
+     shows only the first has not shown a cut, because nobody can see it. */
+  function gomoryCut(tab, r) {
+    var std = tab.std, j, i;
+    var f = [], f0 = Rfrac(tab.T[r][tab.n]);
+    for (j = 0; j < std.n; j += 1) f.push(Rfrac(tab.T[r][j]));
+    /* Into the reader's variables: every added column is a known affine
+       function of the decision ones, so substitute it. */
+    var g = [], h = f0;
+    for (j = 0; j < std.nd; j += 1) g.push(f[j]);
+    for (j = std.nd; j < std.n; j += 1) {
+      if (Rzero(f[j])) continue;
+      var row = -1, kind = std.kinds[j], q;
+      for (q = 0; q < std.m; q += 1) if (std.identity[q] === j || std.rowSlack[q] === j) { row = q; break; }
+      if (row < 0 || kind === 'artificial') continue;
+      /* slack   s_i = b_i - sum A_ij x_j    surplus  e_i = sum A_ij x_j - b_i */
+      var sgn = kind === 'slack' ? -1 : 1;
+      for (q = 0; q < std.nd; q += 1) {
+        g[q] = Radd(g[q], Rmul(f[j], Rmul(R(BigInt(sgn), 1n), std.A[row][q])));
+      }
+      h = Rsub(h, Rmul(f[j], Rmul(R(BigInt(-sgn), 1n), std.b[row])));
+    }
+    var text = function (coefs, rhs, names) {
+      var parts = [];
+      for (var q2 = 0; q2 < coefs.length; q2 += 1) {
+        if (Rzero(coefs[q2])) continue;
+        parts.push(Rterm(coefs[q2]) + names[q2]);
+      }
+      return (parts.length ? parts.join(' + ') : '0') + ' &gt;= ' + Rtext(rhs);
+    };
+    return { cut: { a: f.slice(), b: f0 },
+             row: r, basic: tab.basis[r], basicName: tab.names[tab.basis[r]],
+             fracB: f0, integral: Rzero(f0),
+             inTableau: { a: f.slice(), b: f0, rel: 'ge',
+                          text: text(f, f0, std.names) },
+             inOriginal: { a: g, b: h, rel: 'ge',
+                           text: text(g, h, std.given || std.names) },
+             why: 'row ' + (r + 1) + ' says ' + tab.names[tab.basis[r]] + ' = ' + Rtext(tab.T[r][tab.n])
+               + '; rounding every coefficient down cannot increase the left side, so every INTEGER point satisfies the cut, and the current fractional one does not' };
+  }
+
+  /* Every integer point in the box, marked feasible or not, with its
+     objective.  The exhaustive picture C5 L1 draws, and the only honest way to
+     say "the integer optimum is NOT next to the LP optimum". */
+  function latticePoints(model, box, cap) {
+    cap = cap || 4000;
+    var n = box.length, pts = [], counter = box.map(function (b) { return b[0]; });
+    var total = 1, i, j;
+    for (i = 0; i < n; i += 1) total *= Number(box[i][1] - box[i][0] + 1n);
+    if (total > cap) return { points: [], truncated: true, total: total, cap: cap,
+                              why: 'that box holds ' + total + ' lattice points and this lab draws at most ' + cap };
+    var best = null;
+    while (true) {
+      var x = counter.map(function (v) { return R(v, 1n); });
+      var ok = true, rows = [];
+      for (i = 0; i < model.cons.length; i += 1) {
+        var s = R0;
+        for (j = 0; j < n; j += 1) s = Radd(s, Rmul(model.cons[i].a[j], x[j]));
+        var rel = model.cons[i].rel || 'le', c = Rcmp(s, model.cons[i].b);
+        var good = rel === 'le' ? c <= 0 : (rel === 'ge' ? c >= 0 : c === 0);
+        rows.push({ i: i, value: s, ok: good });
+        if (!good) ok = false;
+      }
+      var obj = R0;
+      for (j = 0; j < n; j += 1) obj = Radd(obj, Rmul(model.obj[j], x[j]));
+      if (ok && (best === null || (model.max !== false ? Rcmp(obj, best.objective) > 0 : Rcmp(obj, best.objective) < 0))) {
+        best = { x: x.slice(), objective: obj };
+      }
+      pts.push({ x: x, feasible: ok, objective: obj, rows: rows });
+      var p = n - 1;
+      while (p >= 0 && counter[p] >= box[p][1]) { counter[p] = box[p][0]; p -= 1; }
+      if (p < 0) break;
+      counter[p] += 1n;
+    }
+    return { points: pts, truncated: false, total: total, best: best,
+             feasibleCount: pts.filter(function (q) { return q.feasible; }).length };
+  }
+
+  /* The knapsack three ways in ONE call, because the lesson is the comparison:
+     the LP relaxation with its one fractional item, what greed gets, and the
+     exact optimum by enumeration.  Quoting any one of them alone is the
+     mistake the mode exists to correct. */
+  function knapsackExact(items, cap) {
+    var n = items.length, i;
+    var order = items.map(function (it, k) { return k; }).sort(function (a, b) {
+      var ra = Rdiv(items[a].value, items[a].weight), rb = Rdiv(items[b].value, items[b].weight);
+      var c = Rcmp(rb, ra);
+      return c !== 0 ? c : a - b;
+    });
+    var left = cap, relax = R0, fractional = null, relaxTake = [], greedy = R0, greedySet = [], gLeft = cap;
+    for (i = 0; i < n; i += 1) {
+      var it = items[order[i]];
+      if (Rcmp(it.weight, left) <= 0) {
+        relax = Radd(relax, it.value); left = Rsub(left, it.weight);
+        relaxTake.push({ item: order[i], part: R1 });
+      } else if (Rsign(left) > 0 && fractional === null) {
+        var part = Rdiv(left, it.weight);
+        relax = Radd(relax, Rmul(it.value, part));
+        fractional = { item: order[i], name: it.name, part: part };
+        relaxTake.push({ item: order[i], part: part });
+        left = R0;
+      }
+      if (Rcmp(it.weight, gLeft) <= 0) { greedy = Radd(greedy, it.value); gLeft = Rsub(gLeft, it.weight); greedySet.push(order[i]); }
+    }
+    var best = R0, bestSet = [];
+    if (n <= 22) {
+      var limit = 1 << n, mask, w, v, set;
+      for (mask = 0; mask < limit; mask += 1) {
+        w = R0; v = R0; set = [];
+        for (i = 0; i < n; i += 1) {
+          if (!(mask & (1 << i))) continue;
+          w = Radd(w, items[i].weight); v = Radd(v, items[i].value); set.push(i);
+        }
+        if (Rcmp(w, cap) <= 0 && Rcmp(v, best) > 0) { best = v; bestSet = set; }
+      }
+    }
+    return { relaxation: relax, fractionalItem: fractional, take: relaxTake,
+             greedy: greedy, greedySet: greedySet, optimum: best, subset: bestSet,
+             ratios: order.map(function (k) { return { item: k, name: items[k].name,
+               ratio: Rdiv(items[k].value, items[k].weight) }; }),
+             exhaustive: n <= 22, count: n <= 22 ? (1 << n) : null };
+  }
+
+  /* ---- the travelling salesman, at lesson size ------------------------- */
+
+  /* Every distinct tour, the best of them, and how many there were.  Distinct
+     means: city 0 is fixed, and on a SYMMETRIC matrix a tour and its reversal
+     are the same tour, so the count is (n-1)!/2 rather than (n-1)!.  Getting
+     that count wrong is how a lesson ends up claiming twice the work. */
+  function tspExact(d, opts) {
+    opts = opts || {};
+    var n = d.length, i, j, symmetric = true;
+    for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1) if (i !== j && !Requ(d[i][j], d[j][i])) symmetric = false;
+    if (n > (opts.maxCities || 8)) {
+      return { tours: [], best: null, count: null, truncated: true, symmetric: symmetric,
+               why: 'this enumerates every tour and ' + n + ' cities is past the point where that is a drawing' };
+    }
+    var rest = [], tours = [], best = null;
+    for (i = 1; i < n; i += 1) rest.push(i);
+    var keep = opts.keepTours !== false;
+    var go = function (used, acc) {
+      if (acc.length === n - 1) {
+        if (symmetric && acc.length > 1 && acc[0] > acc[acc.length - 1]) return;
+        var cost = R0, prev = 0, k;
+        for (k = 0; k < acc.length; k += 1) { cost = Radd(cost, d[prev][acc[k]]); prev = acc[k]; }
+        cost = Radd(cost, d[prev][0]);
+        var tour = [0].concat(acc, [0]);
+        if (keep) tours.push({ tour: tour, cost: cost });
+        if (best === null || Rcmp(cost, best.cost) < 0) best = { tour: tour, cost: cost };
+        return;
+      }
+      for (var k2 = 0; k2 < rest.length; k2 += 1) {
+        if (used[rest[k2]]) continue;
+        used[rest[k2]] = true; acc.push(rest[k2]);
+        go(used, acc);
+        acc.pop(); used[rest[k2]] = false;
+      }
+    };
+    go({}, []);
+    return { tours: tours, best: best, count: keep ? tours.length : null,
+             symmetric: symmetric, truncated: false };
+  }
+
+  /* Branch and bound with the ASSIGNMENT bound and subtour cuts -- Little's
+     method.  The relaxation drops the "one cycle" requirement and keeps "each
+     city entered once and left once", which is exactly the assignment problem
+     `hungarian` already solves; when its answer happens to be a single cycle
+     it is a tour and the bound is attained.  Otherwise the shortest subtour is
+     forbidden one arc at a time, which is the branching. */
+  /* The assignment relaxation: each city entered once and left once, with the
+     "one cycle" requirement dropped.  Solved by a recursion over subsets of
+     columns -- exact, and at the seven cities this mode caps at, instant.
+
+     NOT by calling TRANS_JS's hungarian.  `integer` does not carry the
+     transportation kit's blocks and a thirty-kilobyte dependency to get one
+     number back is the wrong trade.  It is also a genuinely DIFFERENT
+     algorithm, so when mathcheck holds the two to the same answer they agree
+     by arithmetic rather than by sharing an implementation. */
+  function assignMin(cost) {
+    var n = cost.length, full = 1 << n, i, mask, j;
+    var f = [], pick = [];
+    for (i = 0; i <= n; i += 1) {
+      var frow = [], prow = [];
+      for (mask = 0; mask < full; mask += 1) { frow.push(null); prow.push(-1); }
+      f.push(frow); pick.push(prow);
+    }
+    f[0][0] = R0;
+    for (i = 0; i < n; i += 1) {
+      for (mask = 0; mask < full; mask += 1) {
+        if (f[i][mask] === null) continue;
+        for (j = 0; j < n; j += 1) {
+          if (mask & (1 << j)) continue;
+          var next = mask | (1 << j), v = Radd(f[i][mask], cost[i][j]);
+          if (f[i + 1][next] === null || Rcmp(v, f[i + 1][next]) < 0) { f[i + 1][next] = v; pick[i + 1][next] = j; }
+        }
+      }
+    }
+    var assignment = [], left = full - 1;
+    for (i = 0; i < n; i += 1) assignment.push(-1);
+    for (i = n; i > 0; i -= 1) { var c = pick[i][left]; assignment[i - 1] = c; left ^= (1 << c); }
+    return { value: f[n][full - 1], assignment: assignment };
+  }
+
+  function tspBranch(d, opts) {
+    opts = opts || {};
+    var n = d.length, maxNodes = opts.maxNodes || 60, i, j;
+    var big = R1;
+    for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1) big = Radd(big, Rabs(d[i][j]));
+    var withBans = function (bans) {
+      var M = [], b;
+      for (i = 0; i < n; i += 1) {
+        var row = [];
+        for (j = 0; j < n; j += 1) row.push(i === j ? big : d[i][j]);
+        M.push(row);
+      }
+      for (b = 0; b < bans.length; b += 1) M[bans[b][0]][bans[b][1]] = big;
+      return M;
+    };
+    var cycles = function (perm) {
+      var seen = {}, out = [], k;
+      for (k = 0; k < n; k += 1) {
+        if (seen[k]) continue;
+        var cyc = [], at = k;
+        while (!seen[at]) { seen[at] = true; cyc.push(at); at = perm[at]; }
+        out.push(cyc);
+      }
+      return out;
+    };
+    var nodes = [], open = [], best = null, bestTour = null, id = 0, refused = false;
+    var make = function (bans, parent, label) {
+      var h = assignMin(withBans(bans));
+      var cy = cycles(h.assignment);
+      var node = { id: id, parent: parent, bans: bans.slice(), label: label,
+                   bound: h.value, assignment: h.assignment.slice(), cycles: cy,
+                   tour: cy.length === 1, prunedBy: null,
+                   depth: parent === null ? 0 : nodes[parent].depth + 1 };
+      id += 1; nodes.push(node);
+      return node;
+    };
+    open.push(make([], null, 'root').id);
+    while (open.length) {
+      if (nodes.length > maxNodes) { refused = true; break; }
+      var nid = open.pop(), node = nodes[nid];
+      if (best !== null && Rcmp(node.bound, best) >= 0) { node.prunedBy = 'bound'; continue; }
+      if (Rcmp(node.bound, big) >= 0) { node.prunedBy = 'infeasible'; continue; }
+      if (node.tour) {
+        node.prunedBy = 'a complete tour';
+        if (best === null || Rcmp(node.bound, best) < 0) {
+          best = node.bound;
+          var t = [0], at = node.assignment[0];
+          while (at !== 0) { t.push(at); at = node.assignment[at]; }
+          t.push(0); bestTour = t;
+        }
+        continue;
+      }
+      var shortest = node.cycles[0], k2;
+      for (k2 = 1; k2 < node.cycles.length; k2 += 1) if (node.cycles[k2].length < shortest.length) shortest = node.cycles[k2];
+      node.cut = shortest.slice();
+      var kids = [];
+      for (k2 = 0; k2 < shortest.length; k2 += 1) {
+        var from = shortest[k2], to = node.assignment[from];
+        /* ONE-BASED, because the picture is. ipTourSvg draws city i with the
+           label i + 1, so a table row reading "ban 0->4" beside a ring whose
+           cities are 1..n names two cities that are not the ones it forbids.
+           The bans themselves stay zero-based -- this is the display string. */
+        var child = make(node.bans.concat([[from, to]]), node.id,
+                         'ban ' + (from + 1) + '->' + (to + 1));
+        kids.push(child.id);
+      }
+      node.children = kids;
+      for (k2 = kids.length - 1; k2 >= 0; k2 -= 1) open.push(kids[k2]);
+    }
+    return { nodes: nodes, best: best, tour: bestTour, refused: refused,
+             counts: { explored: nodes.length },
+             status: refused ? 'refused' : 'optimal' };
+  }
+
+  /* ---- models the reader can change, built rather than stored ----------- */
+
+  /* A two-variable instance from plain numbers. `rows` is
+     [[a1, a2, rel, b, name], ...] and nothing here is a stored answer: the
+     lab solves what this builds. */
+  function ipTwoVar(maxim, c1, c2, rows, names) {
+    return { max: maxim, names: names || ['x1', 'x2'],
+             obj: [R(BigInt(c1), 1n), R(BigInt(c2), 1n)],
+             cons: rows.map(function (r) {
+               return { a: [R(BigInt(r[0]), 1n), R(BigInt(r[1]), 1n)], rel: r[2],
+                        b: R(BigInt(r[3]), 1n), name: r[4] };
+             }) };
+  }
+
+  /* Every constraint of a two-variable model as a <= half-plane, with the
+     x >= 0 and y >= 0 rows added, which is what the picture actually bounds.
+     Cfromrow does the >= negation, so there is one direction to reason
+     about. */
+  function ipHalfPlanes(model) {
+    var out = [], i;
+    for (i = 0; i < model.cons.length; i += 1) {
+      var k = model.cons[i];
+      out = out.concat(Cfromrow({ c: [k.a[0], k.a[1]], rel: k.rel || 'le', b: k.b,
+                                  src: k.name || ('row ' + (i + 1)) }));
+    }
+    out.push(Cnew(R(-1n, 1n), R0, R0, false, model.names[0] + ' >= 0'));
+    out.push(Cnew(R0, R(-1n, 1n), R0, false, model.names[1] + ' >= 0'));
+    return out;
+  }
+
+  /* The first row a point breaks, named, or null when it breaks none. This is
+     what turns "infeasible" into a sentence: a rounding that fails fails
+     somewhere, and the reader should be told where. */
+  function ipViolated(model, pt) {
+    var i, j;
+    for (j = 0; j < pt.length; j += 1) if (Rsign(pt[j]) < 0) return model.names[j] + ' < 0';
+    for (i = 0; i < model.cons.length; i += 1) {
+      var k = model.cons[i], s = R0;
+      for (j = 0; j < pt.length; j += 1) s = Radd(s, Rmul(k.a[j], pt[j]));
+      var rel = k.rel || 'le', c = Rcmp(s, k.b);
+      var ok = rel === 'le' ? c <= 0 : (rel === 'ge' ? c >= 0 : c === 0);
+      if (!ok) return (k.name || ('row ' + (i + 1))) + ' (it wants ' + Rtext(s) + ')';
+    }
+    return null;
+  }
+
+  function ipObjective(model, pt) {
+    var s = R0, j;
+    for (j = 0; j < pt.length; j += 1) s = Radd(s, Rmul(model.obj[j], pt[j]));
+    return s;
+  }
+
+  /* The 2^k roundings of a point, every combination of floor and ceiling --
+     not "the rounding", because there is no such thing once more than one
+     coordinate is fractional, and believing there is is the misconception the
+     opening mode exists to break. */
+  function ipRoundings(x) {
+    var out = [{ pt: [], how: [] }], j, k, next;
+    for (j = 0; j < x.length; j += 1) {
+      next = [];
+      var lo = R(Rfloor(x[j]), 1n), hi = R(Rceil(x[j]), 1n);
+      var opts = Requ(lo, hi) ? [[lo, 'exact']] : [[lo, 'down'], [hi, 'up']];
+      for (k = 0; k < out.length; k += 1) {
+        for (var q = 0; q < opts.length; q += 1) {
+          next.push({ pt: out[k].pt.concat([opts[q][0]]), how: out[k].how.concat([opts[q][1]]) });
+        }
+      }
+      out = next;
+    }
+    return out;
+  }
+
+  /* ---- the gap, which is the deliverable -------------------------------- */
+
+  /* STILL OPEN means never expanded: not pruned, and not branched either.
+     bbTree sets `prunedBy` on a node it closed and leaves it null on one it
+     branched, so "prunedBy is null" alone counts every interior node of a
+     finished tree as open. */
+  function ipOpen(node) {
+    return !node.prunedBy && node.bound !== null && !(node.children && node.children.length);
+  }
+
+  /* The global bound WHEN THE SEARCH STOPPED EARLY: the best thing any node it
+     never got to still promises. A tree that finished has no such node, and
+     then the bound is the incumbent and the gap is nought.
+
+     Not re-derived per step: the honest step-by-step record is `bounds`, which
+     bbTree writes as it explores, because exploration order is not node order
+     and a trace recomputed from the finished list gets it wrong -- it reported
+     a bound of 54 on an instance whose optimum is 55, which is the kind of
+     wrong a page must not be. `ipBoundTrace` reads that record instead. */
+  function ipOpenBound(nodes, maximise) {
+    var best = null, i;
+    for (i = 0; i < nodes.length; i += 1) {
+      if (!ipOpen(nodes[i])) continue;
+      if (best === null || (maximise ? Rcmp(nodes[i].bound, best) > 0 : Rcmp(nodes[i].bound, best) < 0)) {
+        best = nodes[i].bound;
+      }
+    }
+    return best;
+  }
+
+  /* The incumbent and the global bound after each node, from the two records
+     bbTree keeps as it runs -- `bounds` after every branch and `incumbents`
+     whenever one improves -- merged, forward-filled and finished off with the
+     state the search stopped in. Same tree in, same trace out. */
+  function ipBoundTrace(tree, maximise) {
+    var marks = [], i;
+    for (i = 0; i < tree.bounds.length; i += 1) {
+      marks.push({ at: tree.bounds[i].at, bound: tree.bounds[i].bound, incumbent: tree.bounds[i].incumbent });
+    }
+    for (i = 0; i < tree.incumbents.length; i += 1) {
+      marks.push({ at: tree.incumbents[i].at, bound: null, incumbent: tree.incumbents[i].value });
+    }
+    marks.sort(function (a, b) { return a.at - b.at; });
+    var openBound = ipOpenBound(tree.nodes, maximise);
+    marks.push({ at: tree.nodes.length,
+                 bound: tree.refused ? openBound : tree.best,
+                 incumbent: tree.best });
+    var out = [], bound = null, inc = null;
+    for (i = 0; i < marks.length; i += 1) {
+      if (marks[i].bound !== null) bound = marks[i].bound;
+      if (marks[i].incumbent !== null && (inc === null || (maximise ? Rcmp(marks[i].incumbent, inc) > 0 : Rcmp(marks[i].incumbent, inc) < 0))) {
+        inc = marks[i].incumbent;
+      }
+      if (out.length && out[out.length - 1].at === marks[i].at) out.pop();
+      out.push({ at: marks[i].at, bound: bound, incumbent: inc });
+    }
+    return out;
+  }
+
+  /* Absolute and relative, both exact, and `proved` is the sentence the course
+     wants said out loud: a gap is a statement about the BOUND, with no
+     probability anywhere in it.
+
+     The relative gap is measured AGAINST THE INCUMBENT -- the value actually in
+     hand -- which is the convention every solver reports and the only one that
+     is defined before the optimum is known. Every page that prints it says
+     which number it is a percentage of, because against the bound instead it is
+     a different figure and a reader comparing two pages would have no way to
+     tell. */
+  function ipGap(bound, incumbent, maximise) {
+    if (bound === null || incumbent === null) return { closed: false, abs: null, rel: null, proved: 'nothing is proved yet: there is no incumbent to bound' };
+    var abs = Rabs(Rsub(bound, incumbent));
+    var rel = Rzero(incumbent) ? null : Rdiv(abs, Rabs(incumbent));
+    return { closed: Rzero(abs), abs: abs, rel: rel,
+             proved: Rzero(abs)
+               ? 'the gap is zero, so the incumbent is optimal and that is a proof'
+               : 'nothing beats the incumbent by more than ' + Rtext(abs)
+                 + (rel === null ? '' : ' (' + Rpct(rel, 2) + ')')
+                 + ', which is a statement about the bound and not about how likely the incumbent is to be best' };
+  }
+
+  /* ---- the tour counts, computed rather than quoted --------------------- */
+
+  /* THE FOUR COUNTS, and which one this is.
+
+     On a SYMMETRIC matrix a tour and its reversal are the same tour, so the
+     distinct undirected tours with a fixed start number (n-1)!/2 -- 360 at
+     seven cities. On an asymmetric one they are different tours and the count
+     is (n-1)! -- 720 at seven. The other two are the ones the misconception
+     reaches for: n! counts PERMUTATIONS of the cities (5 040 at seven) and
+     n!/2 counts each of those once per direction (2 520). A page that
+     computes all four cannot quietly mean a different one in the prose, and
+     `tours` is what tspExact actually enumerates. */
+  function ipTourCount(n, symmetric) {
+    var perms = fact(n), directed = n < 2 ? 1n : fact(n - 1);
+    return { tours: symmetric === false ? directed : (n < 3 ? 1n : directed / 2n),
+             directed: directed, perms: perms, halfPerms: perms / 2n,
+             symmetric: symmetric !== false,
+             formula: symmetric === false ? '(n - 1)!' : '(n - 1)! / 2' };
+  }
+
+  function ipTourCost(d, tour) {
+    var s = R0, k;
+    for (k = 0; k + 1 < tour.length; k += 1) s = Radd(s, d[tour[k]][tour[k + 1]]);
+    return s;
+  }
+
+  /* Nearest neighbour from city 0: the heuristic a reader reaches for, and
+     the one the lesson measures rather than praises. */
+  function ipNearest(d) {
+    var n = d.length, seen = {}, tour = [0], at = 0, k, j;
+    seen[0] = true;
+    for (k = 1; k < n; k += 1) {
+      var best = -1;
+      for (j = 0; j < n; j += 1) {
+        if (seen[j] || j === at) continue;
+        if (best < 0 || Rcmp(d[at][j], d[at][best]) < 0) best = j;
+      }
+      seen[best] = true; tour.push(best); at = best;
+    }
+    tour.push(0);
+    return { tour: tour, cost: ipTourCost(d, tour) };
+  }
+
+  /* 2-opt: reverse a segment whenever doing so shortens the tour, until no
+     reversal does. Exact comparisons, so "no improving move" is a fact about
+     the tour and not about a tolerance. */
+  function ipTwoOpt(d) {
+    var start = ipNearest(d), tour = start.tour.slice(), n = d.length;
+    var moves = [], improved = true, guard = 0;
+    while (improved && guard < 200) {
+      improved = false; guard += 1;
+      for (var i = 1; i < n - 1 && !improved; i += 1) {
+        for (var j = i + 1; j < n && !improved; j += 1) {
+          var cand = tour.slice(0, i).concat(tour.slice(i, j + 1).reverse(), tour.slice(j + 1));
+          var before = ipTourCost(d, tour), after = ipTourCost(d, cand);
+          if (Rcmp(after, before) < 0) {
+            moves.push({ i: i, j: j, from: before, to: after });
+            tour = cand; improved = true;
+          }
+        }
+      }
+    }
+    return { tour: tour, cost: ipTourCost(d, tour), moves: moves,
+             start: start.tour, startCost: start.cost };
+  }
+
+  /* The cities on a circle, with up to two tours over them. Coordinates are
+     for the PICTURE only: every cost this mode reports comes from the matrix
+     the reader can edit, never from the drawing. */
+  function ipTourSvg(n, tours, opts) {
+    var w = (opts && opts.width) || 660, h = (opts && opts.height) || 260;
+    var cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 34, i, k;
+    var at = [];
+    for (i = 0; i < n; i += 1) {
+      var th = -Math.PI / 2 + (2 * Math.PI * i) / n;
+      at.push([cx + r * Math.cos(th), cy + r * Math.sin(th)]);
+    }
+    var s = '';
+    for (k = 0; k < tours.length; k += 1) {
+      var t = tours[k], d = '';
+      for (i = 0; i < t.tour.length; i += 1) {
+        d += (i ? 'L' : 'M') + at[t.tour[i]][0] + ' ' + at[t.tour[i]][1];
+      }
+      s += ipEl('path', { d: d, fill: 'none', stroke: 'var(--' + t.tone + ')',
+                          'stroke-width': t.width || 2, 'stroke-dasharray': t.dashed ? '6 4' : null,
+                          'stroke-opacity': t.faint ? '0.65' : '1' });
+    }
+    for (i = 0; i < n; i += 1) {
+      s += ipEl('circle', { cx: at[i][0], cy: at[i][1], r: 11, fill: 'var(--panel-3)',
+                            stroke: 'var(--line-strong)', 'stroke-width': 1 });
+      s += ipLabel(at[i][0], at[i][1] + 4, String(i + 1), 'text', 'middle', 10);
+    }
+    return { svg: s, height: h };
+  }
+
+  /* THE SHARED TREE. Depth down the page, sibling index across it, each node
+     carrying its bound and -- on a leaf -- the reason it closed. Nodes arrive
+     as a flat list with `parent`, which is exactly what bbTree and tspBranch
+     both return, so neither has to be reshaped to be drawn. */
+  function ipTreeSvg(nodes, opts) {
+    opts = opts || {};
+    var w = opts.width || 660, i, j;
+    var maxDepth = 0, byDepth = {};
+    for (i = 0; i < nodes.length; i += 1) {
+      maxDepth = Math.max(maxDepth, nodes[i].depth);
+      byDepth[nodes[i].depth] = (byDepth[nodes[i].depth] || []).concat([i]);
+    }
+    var rowH = opts.rowH || 46, h = 24 + (maxDepth + 1) * rowH;
+    var at = {}, s = '';
+    for (var d = 0; d <= maxDepth; d += 1) {
+      var row = byDepth[d] || [];
+      for (j = 0; j < row.length; j += 1) {
+        at[row[j]] = { x: (w * (j + 1)) / (row.length + 1), y: 20 + d * rowH };
+      }
+    }
+    for (i = 0; i < nodes.length; i += 1) {
+      var p = nodes[i].parent;
+      if (p === null || p === undefined || !at[p]) continue;
+      s += ipEl('line', { x1: at[p].x, y1: at[p].y + 11, x2: at[i].x, y2: at[i].y - 11,
+                          stroke: 'var(--line-strong)', 'stroke-width': 1 });
+    }
+    for (i = 0; i < nodes.length; i += 1) {
+      var n = nodes[i], tone = opts.tone ? opts.tone(n) : 'cyan';
+      var bw = Math.min(96, Math.max(54, (w / Math.max(1, (byDepth[n.depth] || []).length)) - 10));
+      s += ipEl('rect', { x: at[i].x - bw / 2, y: at[i].y - 11, width: bw, height: 22, rx: 3,
+                          fill: 'var(--' + tone + ')', 'fill-opacity': '0.16',
+                          stroke: 'var(--' + tone + ')', 'stroke-width': 1.2 });
+      s += ipLabel(at[i].x, at[i].y + 2, opts.top ? opts.top(n) : String(n.id), tone, 'middle', 10);
+      var under = opts.bottom ? opts.bottom(n) : '';
+      if (under) s += ipLabel(at[i].x, at[i].y + 18, under, 'muted', 'middle', 8.5);
+      var over = opts.above ? opts.above(n) : '';
+      if (over) s += ipLabel(at[i].x, at[i].y - 14, over, 'muted', 'middle', 8.5);
+    }
+    return { svg: s, height: h, depth: maxDepth };
+  }
+
+  var preSel = document.getElementById('tsPreset'), nS = document.getElementById('tsN');
+  var heurSel = document.getElementById('tsHeur'), box = document.getElementById('tsCost');
+  var ring = document.getElementById('tsRing'), treeSvg = document.getElementById('tsTree');
+  var table = document.getElementById('tsTable'), status = document.getElementById('tsStatus');
+  var MATRIX = {"plants": {"matrix": "0,32,40,32,8,40,32; 32,0,24,16,32,24,32; 40,24,0,16,8,16,40; 32,16,16,0,40,8,24; 8,32,8,40,0,16,32; 40,24,16,8,16,0,8; 32,32,40,24,32,8,0", "words": "symmetric, with a loose assignment bound and a heuristic that misses"}, "clustered": {"matrix": "0,3,93,13,33,9,20; 4,0,77,42,21,16,30; 45,17,0,36,16,28,50; 39,90,80,0,56,7,44; 28,46,88,33,0,25,17; 3,88,18,46,92,0,11; 22,35,41,19,27,14,0", "words": "an asymmetric instance, where a tour and its reversal are different tours"}, "metric": {"matrix": "0,10,15,20,25,30,35; 10,0,35,25,20,15,30; 15,35,0,30,10,25,20; 20,25,30,0,15,35,10; 25,20,10,15,0,30,15; 30,15,25,35,30,0,20; 35,30,20,10,15,20,0", "words": "a symmetric instance where nearest neighbour happens to do well"}};
+  var lastPreset = null;
+
+  function readMatrix(text, n) {
+    var rows = String(text).split(';'), out = [], i, j;
+    for (i = 0; i < rows.length && out.length < n; i += 1) {
+      var t = rows[i].trim();
+      if (!t) continue;
+      var cells = t.split(','), row = [];
+      for (j = 0; j < cells.length && row.length < n; j += 1) {
+        var v = ipRead(cells[j]);
+        if (v === null) return { error: 'row ' + (i + 1) + ' has an entry this page cannot read' };
+        row.push(v);
+      }
+      if (row.length < n) return { error: 'row ' + (i + 1) + ' is shorter than ' + n + ' cities' };
+      out.push(row);
+    }
+    if (out.length < n) return { error: 'there are fewer than ' + n + ' rows' };
+    return { d: out };
+  }
+
+  function redraw() {
+    if (preSel.value !== lastPreset) { lastPreset = preSel.value; box.value = MATRIX[preSel.value].matrix; }
+    var n = +nS.value;
+    document.getElementById('tsNOut').textContent = n + ' cities';
+    var parsed = readMatrix(box.value, n);
+    if (parsed.error) {
+      ring.innerHTML = ''; treeSvg.innerHTML = ''; table.innerHTML = '';
+      status.innerHTML = 'The matrix does not read: <strong>' + parsed.error + '</strong>.';
+      return;
+    }
+    var d = parsed.d;
+    var exact = tspExact(d, { maxCities: 7 });
+    var counts = ipTourCount(n, exact.symmetric);
+    var branch = tspBranch(d, { maxNodes: 60 });
+    var heur = heurSel.value === 'nearest' ? ipNearest(d) : ipTwoOpt(d);
+
+    var tours = [];
+    if (heur.tour) tours.push({ tour: heur.tour, tone: 'amber', dashed: true, faint: true, width: 2 });
+    if (exact.best) tours.push({ tour: exact.best.tour, tone: 'green', width: 2.4 });
+    ring.innerHTML = ipTourSvg(n, tours, { width: 660, height: 260 }).svg;
+
+    var drawn = ipTreeSvg(branch.nodes, {
+      width: 660, rowH: 44,
+      tone: function (node) {
+        return node.tour ? 'green' : (node.prunedBy === 'bound' ? 'red' : (node.prunedBy === 'infeasible' ? 'muted' : 'cyan'));
+      },
+      top: function (node) { return Rtext(node.bound); },
+      bottom: function (node) {
+        return node.tour ? 'a tour' : (node.prunedBy === 'bound' ? 'cut off by the bound'
+          : (node.cut ? node.cut.length + '-city subtour' : (node.prunedBy || '')));
+      }
+    });
+    treeSvg.innerHTML = drawn.svg;
+
+    var rows = '', i;
+    for (i = 0; i < branch.nodes.length && i < 14; i += 1) {
+      var nd = branch.nodes[i];
+      rows += ipTr([ipTd(String(nd.id)), ipTd(nd.parent === null ? 'root' : String(nd.parent)),
+                    ipTd(ipEsc(nd.label)), ipTd(Rtext(nd.bound)),
+                    ipTd(nd.cycles.length === 1 ? ipChip('one cycle: a tour', 'ok')
+                         : nd.cycles.map(function (c) { return c.length; }).join(' + ') + ' cities'),
+                    ipTdl(nd.prunedBy || 'branched on its shortest subtour')]);
+    }
+    table.innerHTML = ipHead(['node', 'parent', 'what it forbids', 'assignment bound',
+                              'the relaxation gives', 'what happened'])
+      + '<tbody>' + rows + '</tbody>';
+
+    var root = branch.nodes.length ? branch.nodes[0].bound : null;
+    var gap = exact.best ? ipGap(exact.best.cost, heur.cost, false) : { abs: null, rel: null, proved: '' };
+    document.getElementById('tsCount').textContent = group(String(counts.tours)) + ' distinct';
+    document.getElementById('tsOpt').textContent = exact.best ? Rtext(exact.best.cost) : 'too many to enumerate';
+    document.getElementById('tsRoot').textContent = root === null ? '—' : Rtext(root);
+    document.getElementById('tsNodes').textContent = String(branch.counts.explored);
+    document.getElementById('tsHeurCost').textContent = Rtext(heur.cost);
+    document.getElementById('tsGap').textContent = gap.abs === null ? '—'
+      : Rtext(gap.abs) + (gap.rel === null ? '' : ' (' + Rpct(gap.rel, 1) + ')');
+
+    status.innerHTML = 'At <strong>' + n + ' cities</strong> this instance has <strong>'
+      + group(String(counts.tours)) + '</strong> distinct tours &mdash; '
+      + (counts.symmetric
+          ? '(n &minus; 1)! / 2, because the cost from one city to another is the same both ways, so a tour '
+            + 'and its reversal are one tour. Not ' + group(String(counts.perms)) + ', which counts permutations '
+            + 'of the cities, and not ' + group(String(counts.halfPerms)) + ' or ' + group(String(counts.directed)) + '. '
+          : '(n &minus; 1)!, because the costs are not symmetric here and a tour driven backwards is a '
+            + 'different tour with a different length. On a symmetric instance the same n gives '
+            + group(String(counts.directed / 2n)) + '. ')
+      + 'The enumeration found ' + group(String(exact.count)) + ' of them, which is that number, and the best is <strong>'
+      + (exact.best ? Rtext(exact.best.cost) : '&mdash;') + '</strong>. '
+      + 'Branch and bound reaches the same answer from the assignment relaxation, which starts at <strong>'
+      + (root === null ? '&mdash;' : Rtext(root)) + '</strong> and leaves subtours rather than a tour, '
+      + 'forbidding one arc of the shortest of them at each branch: <strong>' + branch.counts.explored
+      + ' nodes</strong>' + (branch.refused ? ', and it stopped at the node cap rather than claim an unproved optimum' : '')
+      + '. The heuristic tour costs <strong>' + Rtext(heur.cost) + '</strong>, so '
+      + (gap.abs === null ? 'there is nothing to measure it against yet'
+          : (Rzero(gap.abs) ? 'it is optimal on this instance &mdash; which happens, and is worth knowing rather than assuming'
+              : 'it is <strong>' + Rtext(gap.abs) + '</strong> worse, a measured ' + Rpct(gap.rel, 1)
+                + '. Without a bound, "near-optimal" is a word with nothing behind it.'));
+  }
+
+  [preSel, heurSel].forEach(function (el) { el.addEventListener('change', redraw); });
+  nS.addEventListener('input', redraw);
+  box.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "integer-programming/the-travelling-salesman-problem";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

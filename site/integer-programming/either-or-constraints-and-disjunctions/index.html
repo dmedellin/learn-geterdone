@@ -1,0 +1,3068 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Either–Or Constraints | Lesson | Integer Programming | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="“Constraint A or constraint B” cannot be written by writing both, because writing both is the conjunction — and on a sequencing pair the conjunction is infeasible. It is written by relaxing each row with a big-M term that a single binary switches off, so that one value of the binary enforces A and makes B vacuous and the other value does the reverse." />
+  <link rel="canonical" href="https://learn.geterdone.io/integer-programming/either-or-constraints-and-disjunctions/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Either–Or Constraints | Lesson | Integer Programming | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="“Constraint A or constraint B” cannot be written by writing both, because writing both is the conjunction — and on a sequencing pair the conjunction is infeasible. It is written by relaxing each row with a big-M term that a single binary switches off, so that one value of the binary enforces A and makes B vacuous and the other value does the reverse." />
+  <meta property="og:url" content="https://learn.geterdone.io/integer-programming/either-or-constraints-and-disjunctions/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Either–Or Constraints | Lesson | Integer Programming | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="“Constraint A or constraint B” cannot be written by writing both, because writing both is the conjunction — and on a sequencing pair the conjunction is infeasible. It is written by relaxing each row with a big-M term that a single binary switches off, so that one value of the binary enforces A and makes B vacuous and the other value does the reverse." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/integer-programming/either-or-constraints-and-disjunctions/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Integer Programming</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Either–Or Constraints</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The either-or constraints is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Integer Programming &middot; Modelling with binaries</span>
+        <h1>Either–Or Constraints</h1>
+        <p>“Constraint A or constraint B” cannot be written by writing both, because writing both is the conjunction &mdash; and on a sequencing pair the conjunction is infeasible. It is written by relaxing each row with a big-M term that a single binary switches off, so that one value of the binary enforces A and makes B vacuous and the other value does the reverse.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">A or B      A relaxed by M_A(1 − y)      B relaxed by M_B y
+y = 1  enforces A and makes B vacuous;  y = 0  does the reverse
+x₁ − x₂ ≤ −4 + 14(1 − y)        −x₁ + x₂ ≤ −3 + 13y
+y = 1   start at (0, 4)   cost 4        y = 0   start at (3, 0)   cost 3
+y free  →  y = 3/13, both jobs at 0, cost 0 — a bound, not a schedule
+both rows at once  →  0 ≤ −7,  infeasible</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One binary, two rows, and what each value does to them</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One hard idea: “or” is not something you can write by writing more constraints, because constraints accumulate as “and”.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Writing both rows writes the conjunction</h3><p>Constraints in a model are simultaneous. Adding a row never creates a choice; it removes plans. So writing A and writing B asks for both, and on two jobs competing for one machine that asks job one to finish before job two starts <em>and</em> job two to finish before job one starts. Add the two rows and you get <span class="math">0 ≤ −7</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A big-M term, switched by one binary, is what or costs</h3><p>Relax A by <span class="math">M_A(1 − y)</span> and B by <span class="math">M_B y</span>. At <span class="math">y = 1</span> the first term vanishes and A binds, while B has <span class="math">M_B</span> added to its right-hand side and nothing in the region can break it. At <span class="math">y = 0</span> the roles swap. The binary is not a variable in the problem; it is the choice the problem contains.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A fractional binary describes nothing</h3><p>The relaxation may set <span class="math">y = 3/13</span>. Both rows are then half-relaxed at once, both jobs start at time zero on one machine, and the cost is <span class="math">0</span> &mdash; below either real branch, which is what a bound looks like. There is no schedule here at all: “job one is three-thirteenths before job two” is not a sentence about machines.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Or, written with one binary and two constants</h2></div><p>Why the conjunction is infeasible, what each branch is, and what the relaxation says instead.</p></div>
+      <article class="card card-pad prose"><p>Two jobs share one machine. Job one takes four hours, job two takes three, and neither can run while the other is on the machine. Let <span class="math">x₁</span> and <span class="math">x₂</span> be the start times. Either job one finishes before job two starts, which is <span class="math">x₁ + 4 ≤ x₂</span>, or job two finishes before job one starts, which is <span class="math">x₂ + 3 ≤ x₁</span>. Exactly one of those must hold.</p><div class="defbox"><span class="label">Definition &middot; Either-or pair</span><p>Given two rows <span class="math">A(x) ≤ a</span> and <span class="math">B(x) ≤ b</span> of which at least one must hold, the <strong>disjunctive formulation</strong> introduces one binary <span class="math">y</span> and writes <span class="math">A(x) ≤ a + M_A(1 − y)</span> together with <span class="math">B(x) ≤ b + M_B y</span>, where each <span class="math">M</span> is large enough to make its own row vacuous over the rest of the feasible region.</p></div><p>Written as <span class="math">≤</span> rows, the pair above is <span class="math">x₁ − x₂ ≤ −4</span> and <span class="math">−x₁ + x₂ ≤ −3</span>. With deadlines putting both start times in <span class="math">[0, 10]</span>, the most the first left-hand side can exceed its right-hand side is <span class="math">10 − 0 − (−4) = 14</span>, so <span class="math">M_A = 14</span>; by the mirror argument <span class="math">M_B = 13</span>. Each constant is the slack its own row needs to become harmless, and not one unit more.</p><div class="example"><span class="label">Example &middot; Both branches, solved</span><p>Minimise <span class="math">x₁ + x₂</span>. Fixing <span class="math">y = 1</span> enforces “job one first” and the model starts the jobs at <span class="math">(0, 4)</span>, costing <span class="math">4</span>. Fixing <span class="math">y = 0</span> enforces “job two first” and starts them at <span class="math">(3, 0)</span>, costing <span class="math">3</span>. Both are genuine schedules, the second is cheaper, and the integer problem wants the better of exactly these two &mdash; which is what the binary means.</p></div><h3>What the conjunction does, and what the relaxation does</h3><p>Write both original rows together and add them: the left-hand sides cancel to <span class="math">0</span> and the right-hand sides give <span class="math">−7</span>, so the model asserts <span class="math">0 ≤ −7</span> and is infeasible. That is the diagnosis to recognise, because the symptom is a solver reporting infeasibility on data that is perfectly consistent, and the usual response is to go looking for a typo in the processing times.</p><p>Now leave <span class="math">y</span> continuous. The relaxation sets <span class="math">y = 3/13</span>, starts both jobs at time zero, and reports <span class="math">0</span>. Every row is satisfied: <span class="math">y</span> is large enough to relax the second row by <span class="math">3</span> and small enough to relax the first by <span class="math">4</span>, so both are half-off at once. The value <span class="math">0</span> is a perfectly good lower bound on the integer answer of <span class="math">3</span>. It is not a schedule, and the machine cannot run two jobs at once because a variable took a value between <span class="math">0</span> and <span class="math">1</span>.</p><p>The two constants need not be equal and each must be valid for its own row: here <span class="math">14</span> and <span class="math">13</span>. One <span class="math">M</span> used for both, unchecked, is how a disjunction quietly becomes an implication &mdash; if the shared value is big enough for one row and too small for the other, then one branch of the “or” is partially enforced even when the binary says it should be off, and the model answers a question with one alternative half-deleted.</p><p>The same pair, repeated over every pair of jobs on every machine, is what makes a job shop an integer programme rather than a linear one. That is why “Scheduling” can prove single-machine rules by exchange arguments and still needs this course the moment two jobs contend for one resource: the sequencing decision is a binary, and there is no linear model of it.</p><p>The device generalises past two alternatives. Three rows of which exactly one must hold need three binaries summing to <span class="math">1</span>, each relaxing its own row by <span class="math">M(1 − y_k)</span>; and a two-level capacity &mdash; either run at the small size or at the large one &mdash; is the same pattern with the two rows being the two capacity limits. What does not generalise is guessing the constants: each one is sized against its own row, every time.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Either-or constraints</h2></div><p>One binary relaxes one row and enforces the other, and a fractional y describes nothing</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Either, or</strong><span>writing both constraints writes the conjunction, and on a sequencing pair that is infeasible</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the branch y = 1 allows</span><span class="tone-purple"><i class="legend-swatch"></i>the branch y = 0 allows</span><span class="tone-amber"><i class="legend-swatch"></i>where the relaxation stops</span><span class="tone-red"><i class="legend-swatch"></i>writing both</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="djGrid" viewBox="0 0 520 300" role="img" aria-label="The region each branch of the disjunction leaves, drawn over the other."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="djTable"></table></div>
+      <div class="status-banner" id="djStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Fix the binary either way, then let it go</h3>
+          <p>Each branch is solved exactly and drawn as its own region, the two regions do not overlap, and the relaxation is solved with the binary left continuous so its value can be read for what it is. The last setting writes both rows at once, which is the mistake.</p>
+        <div class="field">
+          <label for="djPreset">Instance</label>
+          <select id="djPreset"><option value="machine" selected>two jobs of four and three hours competing for one machine</option><option value="tight">equal jobs and a deadline that only just fits one order</option><option value="uneven">a long job and a short one, where the order matters a great deal</option></select>
+        </div>
+        <div class="field">
+          <label for="djY">The binary</label>
+          <select id="djY"><option value="1" selected>y = 1: the first job goes first</option><option value="0">y = 0: the second job goes first</option><option value="free">leave y continuous, which is the relaxation</option><option value="both">write both constraints, which is the mistake</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="djMA">M for the first row, as a multiple of the tightest</label><span class="range-value" id="djMAOut">10</span></div>
+          <input id="djMA" type="range" min="10" max="60" step="1" value="10" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="djMB">M for the second row, as a multiple of the tightest</label><span class="range-value" id="djMBOut">10</span></div>
+          <input id="djMB" type="range" min="10" max="60" step="1" value="10" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>y</span><strong id="djYval">&mdash;</strong></div>
+          <div class="kpi"><span>Where the schedule starts</span><strong id="djPoint">&mdash;</strong></div>
+          <div class="kpi"><span>Its cost</span><strong id="djZ">&mdash;</strong></div>
+          <div class="kpi"><span>The tightest M for the first row</span><strong id="djTightA">&mdash;</strong></div>
+          <div class="kpi"><span>The tightest M for the second row</span><strong id="djTightB">&mdash;</strong></div>
+          <div class="kpi"><span>What the binary describes</span><strong id="djMeaning">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="djHint" style="margin:0;">The two values of M need not be equal and each must be valid for its own row. One M used for both, unchecked, is how a disjunction quietly becomes an implication &mdash; and the two sliders here are deliberately separate for that reason.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Writing a disjunction you can check</h2></div><p>The check at the end is two re-solves rather than eight rows, and it is the same discipline.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each alternative on its own, as a ≤ row</h3><p><span class="math">x₁ − x₂ ≤ −4</span> and <span class="math">−x₁ + x₂ ≤ −3</span>. Getting both into the same relation first makes the relaxation term easy to place and makes the sign errors visible while they are still cheap.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Decide which alternative y = 1 enforces</h3><p>Then write <span class="math">M_A(1 − y)</span> on that row and <span class="math">M_B y</span> on the other. Writing the convention down is not ceremony: the two rows look alike, and a swapped pair gives a model that solves and means the opposite.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Size each M against its own row</h3><p>The most that row's left-hand side can exceed its right-hand side anywhere the other constraints allow. Here <span class="math">14</span> and <span class="math">13</span>, from the deadlines. Two rows, two constants, two reasons.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Fix y to each value and re-solve</h3><p><span class="math">y = 1</span> should give a schedule with job one first; <span class="math">y = 0</span> one with job two first. If either branch is infeasible or describes the wrong order, the fault is in the signs or in an <span class="math">M</span> that is too small, and you have just found out which.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Leave y continuous and read what it says</h3><p>A fractional <span class="math">y</span> is the relaxation's bound and it is not a plan. Looking at it once, and naming the impossible schedule it describes, is what stops it being reported later as an answer.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Or, and, and the binary between them</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Two jobs, one machine, and the three things you can write</h3><p>One instance, three formulations: the conjunction, the two fixed branches, and the relaxation. Only the middle one describes a machine.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">job one takes 4 hours, job two takes 3; one machine; both start by 10
+x₁, x₂ = start times,  minimise x₁ + x₂
+
+the two alternatives, as ≤ rows
+  A   job one first    x₁ + 4 ≤ x₂       x₁ − x₂ ≤ −4
+  B   job two first    x₂ + 3 ≤ x₁      −x₁ + x₂ ≤ −3
+
+WRONG: write both
+  add them:  (x₁ − x₂) + (−x₁ + x₂) ≤ −4 − 3
+                                 0 ≤ −7        infeasible
+
+RIGHT: one binary, two constants
+  M_A = 10 − 0 − (−4) = 14        M_B = 10 − 0 − (−3) = 13
+  x₁ − x₂ ≤ −4 + 14(1 − y)       −x₁ + x₂ ≤ −3 + 13y
+
+  y = 1   A binds:  x₁ − x₂ ≤ −4      B reads −x₁ + x₂ ≤ 10
+          optimum (0, 4)             cost 4
+  y = 0   B binds: −x₁ + x₂ ≤ −3      A reads  x₁ − x₂ ≤ 10
+          optimum (3, 0)             cost 3      ←  the answer
+
+  y continuous:  y = 3/13
+          14(1 − 3/13) = 140/13 ≥ 4   and   13(3/13) = 3 ≥ 3
+          so (0, 0) satisfies both rows      cost 0   — a bound</div><p>The <span class="math">0 ≤ −7</span> line is the one to memorise, because it is what the model says rather than what the solver says. A solver reports “infeasible” and a reader goes looking for bad data; adding the two rows takes ten seconds and names the real cause, which is that “or” was written as “and”.</p><p>The relaxation's <span class="math">y = 3/13</span> is worth reading arithmetically once. It is the smallest <span class="math">y</span> that relaxes row B by the three hours it needs; and it is small enough that row A is still relaxed by <span class="math">140/13</span>, comfortably more than the four hours it needs. Both alternatives are switched most of the way off at the same time, which is precisely the plan that does not exist.</p><p>For a faded rehearsal, use the lab's second instance &mdash; a seven-hour job against a two-hour one, with the short job weighted twice as heavily in the objective. The supplied first move is that the tightest constants are now <span class="math">19</span> and <span class="math">14</span>, from the same deadline argument. Work out both branches before opening the quiz and say which order wins, and by how much.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing both constraints</strong><span>It is the conjunction, it forces both alternatives, and on a sequencing pair it makes the model infeasible. The reason this one is expensive is the diagnosis: infeasibility on consistent data sends readers looking for a data error, and the fault is in the formulation.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using one M for both rows without checking it</strong><span>The two rows need not need the same slack &mdash; here <span class="math">14</span> and <span class="math">13</span>. A shared value that is valid for one row and short for the other leaves part of one alternative enforced when the binary says it is off, so the disjunction has quietly become an implication and the model is answering a narrower question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a fractional y as mostly one order</strong><span><span class="math">y = 3/13</span> is not “job one goes first about a quarter of the time”, and there is no probability in a linear programme. It is a point at which both rows are partly relaxed, describing a schedule that cannot be run. Its value is a bound; its coordinates are not a plan.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when writing both rows for an either-or reads as a category error rather than a near miss.</strong><p>You should be able to write a disjunctive pair with one binary and two separately sized constants, say what each value of the binary enforces and what it makes vacuous, show in one line why writing both rows is infeasible, and read a fractional binary as a bound with an impossible plan behind it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The two constants need not be equal and each must be valid for its own side; one <span class="math">M</span> used for both, unchecked, is how a disjunction quietly becomes an implication. Sequencing two jobs on one machine is exactly this pair of rows, which is why the job shop of &ldquo;Scheduling&rdquo; is an integer programme and its single-machine rules are not &mdash; and this lesson is where that boundary is drawn.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../fixed-charges-facility-location-and-big-m/" rel="prev"><span>Lesson</span><strong>Fixed Charges, Facility Location and Big-M</strong></a>
+      <a class="lesson-link next" href="../branch-and-bound/" rel="next"><span>Lesson</span><strong>Branch and Bound</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="integer-programming/either-or-constraints-and-disjunctions" data-lesson-title="Either–Or Constraints" data-course-title="Integer Programming">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Integer Programming.</strong> Bounds, gaps, cut coefficients and node counts on this course are exact, and so are the floors the cuts are built from: <span class="math">⌊n/d⌋</span> on a rational is a division, not a rounding. The one place a figure could be irrational is a Euclidean distance, so the travelling-salesman lab takes its costs as integers or rationals; if a coordinate preset is ever added, its distances are square roots of integers, printed as surds with a labelled rounding for display only, and every comparison between tours is made on the exact values.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "You need \u201crow A or row B\u201d and you write both rows. What have you written?", "a": ["The disjunction, since a solver will satisfy whichever it can", "The conjunction: both rows must hold", "Nothing: a model cannot contain two rows on the same variables", "The disjunction, provided the two rows do not overlap"], "c": 1, "why": "Constraints in a model are simultaneous, so adding rows only removes plans. On a sequencing pair the conjunction is infeasible, and adding the two rows shows why in one line: <span class=\"math\">0 \u2264 \u22127<\/span>."}, {"q": "In <span class=\"math\">A \u2264 a + M_A(1 \u2212 y)<\/span> and <span class=\"math\">B \u2264 b + M_B y<\/span>, what does <span class=\"math\">y = 1<\/span> do?", "a": ["Enforces A and makes B vacuous", "Enforces B and makes A vacuous", "Enforces both", "Makes both vacuous"], "c": 0, "why": "At <span class=\"math\">y = 1<\/span> the term <span class=\"math\">M_A(1 \u2212 y)<\/span> is zero, so A binds, while B gains <span class=\"math\">M_B<\/span> on its right-hand side and cannot be broken anywhere in the region. <span class=\"math\">y = 0<\/span> does the reverse, and the two branches are the two schedules."}, {"q": "Both start times lie in <span class=\"math\">[0, 10]<\/span>. What is the tightest valid <span class=\"math\">M_A<\/span> for the row <span class=\"math\">x\u2081 \u2212 x\u2082 \u2264 \u22124<\/span>?", "a": ["<span class=\"math\">4<\/span>", "<span class=\"math\">10<\/span>", "<span class=\"math\">14<\/span>", "<span class=\"math\">20<\/span>"], "c": 2, "why": "<span class=\"math\">M_A<\/span> must be at least the most the left-hand side can exceed the right-hand side anywhere the other constraints allow: <span class=\"math\">x\u2081 = 10<\/span> with <span class=\"math\">x\u2082 = 0<\/span> gives <span class=\"math\">10<\/span>, and the right-hand side is <span class=\"math\">\u22124<\/span>, so <span class=\"math\">14<\/span>. <span class=\"math\">10<\/span> is too small and would leave part of the row enforced when it should be off; <span class=\"math\">20<\/span> is valid and loose."}, {"q": "The relaxation returns <span class=\"math\">y = 3/13<\/span> with both jobs starting at time zero, costing <span class=\"math\">0<\/span>. What is that <span class=\"math\">0<\/span>?", "a": ["The optimal cost, which the integer model will also reach", "A lower bound on the integer optimum of <span class=\"math\">3<\/span>, and not a schedule", "Evidence that the model is infeasible", "The cost of running the two jobs in parallel, which is allowed here"], "c": 1, "why": "A relaxation minimising over a larger set returns a value at or below the integer optimum, so <span class=\"math\">0 \u2264 3<\/span> and <span class=\"math\">0<\/span> is a bound. The point it came from has both jobs on one machine at once, which is why it is a bound and nothing else."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Reader text goes into innerHTML and on this course the reader types < and
+     > all day, so it is escaped once at the boundary. Written here rather than
+     borrowed from algebra_systems.FORMAT_JS because taking that block for six
+     one-line helpers would put 1.3 KB gzipped on all nine pages of this course
+     to save forty lines on one of them. */
+  function ipEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function ipTd(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function ipTdl(t, cls) { return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function ipTh(t) { return '<th>' + t + '</th>'; }
+  function ipTr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function ipChip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  function ipHead(cells) { return '<thead>' + ipTr(cells.map(ipTh)) + '</thead>'; }
+
+  /* Rparse throws on a zero denominator and 1/0 is a thing a reader types, so
+     every read of reader input goes through this and a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function ipRead(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+
+  /* Pixels, and only pixels. Nothing downstream reads these back: an exact
+     rational becomes an x or a y here and the arithmetic that is REPORTED
+     never goes through Number. */
+  function ipPx(r) { return Number(r.n) / Number(r.d); }
+  function ipAt(v, lo, hi, a, b) { return a + (v - lo) * (b - a) / (hi - lo || 1); }
+
+  function ipEl(tag, attrs, inner) {
+    var s = '<' + tag, k;
+    for (k in attrs) {
+      if (Object.prototype.hasOwnProperty.call(attrs, k) && attrs[k] !== null && attrs[k] !== undefined) {
+        s += ' ' + k + '="' + attrs[k] + '"';
+      }
+    }
+    return inner === undefined ? s + ' />' : s + '>' + inner + '</' + tag + '>';
+  }
+
+  function ipLabel(x, y, text, tone, anchor, size) {
+    return ipEl('text', { x: x, y: y, 'font-size': size || 10, 'text-anchor': anchor || 'start',
+                          fill: 'var(--' + (tone || 'muted') + ')' }, text);
+  }
+
+  /* Construction, pivot and ratio test.
+
+     One internal convention, stated once so no kit has to guess: the solver
+     always MAXIMISES.  A minimisation is negated on the way in and `maximised`
+     records that it was, so `tabRead(tab).zOrig` is the number the lesson's
+     objective actually takes.  Reading `tab.z[ncols]` on a minimisation and
+     printing it is the sign error this convention exists to prevent. */
+
+  /* ---- standard form -------------------------------------------------- */
+
+  /* Every constraint becomes an equality with a non-negative right-hand side.
+     `kinds[j]` says what each column is and `sentences[j]` says what it
+     MEASURES, because "s2 = 7" is not an answer and "seven hours of the
+     machine went unused" is. */
+  function stdForm(model) {
+    var nvar = model.obj.length, m = model.cons.length;
+    var given = model.names ? model.names.slice() : [];
+    while (given.length < nvar) given.push('x' + (given.length + 1));
+    /* A variable the lesson did not hold at >= 0 cannot be a tableau column as
+       it stands.  x <= 0 becomes a column for -x, and a FREE x becomes the two
+       columns x+ - x-.  `varMap` records the substitution so stdPoint reads the
+       reader's variables back out of a solution rather than the solver's.  The
+       dual of an equality row is a free variable, so this is not a corner case:
+       it is what makes dualModel's output solvable by the same lpSolve. */
+    var free = model.free || [], nonpos = model.nonpos || [];
+    var varMap = [], vcol = [], names = [], kinds = [], sentences = [], j;
+    for (j = 0; j < nvar; j += 1) {
+      if (free.indexOf(j) >= 0) {
+        varMap.push({ plus: vcol.length, minus: vcol.length + 1, sign: 1, free: true });
+        vcol.push({ from: j, sign: 1 }); vcol.push({ from: j, sign: -1 });
+        names.push(given[j] + '+'); names.push(given[j] + '-');
+        kinds.push('decision'); kinds.push('decision');
+        sentences.push(given[j] + ' is free, so it is carried as ' + given[j] + '+ minus ' + given[j] + '-, both >= 0');
+        sentences.push('the negative part of ' + given[j]);
+      } else if (nonpos.indexOf(j) >= 0) {
+        varMap.push({ plus: vcol.length, minus: null, sign: -1, free: false });
+        vcol.push({ from: j, sign: -1 });
+        names.push('-' + given[j]); kinds.push('decision');
+        sentences.push(given[j] + ' is held at <= 0, so the column carries -' + given[j] + ' >= 0');
+      } else {
+        varMap.push({ plus: vcol.length, minus: null, sign: 1, free: false });
+        vcol.push({ from: j, sign: 1 });
+        names.push(given[j]); kinds.push('decision');
+        sentences.push('how much ' + given[j] + ' the plan does');
+      }
+    }
+    var nd = vcol.length;
+    /* Rows first: flip any row whose right-hand side is negative, so that the
+       slack basis is feasible whenever there is one.  rowSign remembers the
+       flip, because a sensitivity range quoted in flipped units is wrong. */
+    var rows = [], b = [], rels = [], rowSign = [], i;
+    for (i = 0; i < m; i += 1) {
+      var k = model.cons[i], rb = k.b, rel = k.rel || 'le', flip = Rsign(rb) < 0;
+      var a = vcol.map(function (v) {
+        var e = k.a[v.from];
+        if (v.sign < 0) e = Rneg(e);
+        return flip ? Rneg(e) : e;
+      });
+      if (flip) {
+        rb = Rneg(rb);
+        rel = rel === 'le' ? 'ge' : (rel === 'ge' ? 'le' : 'eq');
+        rowSign.push(-1);
+      } else rowSign.push(1);
+      rows.push(a); b.push(rb); rels.push(rel);
+    }
+    /* Then the added columns, in row order, so a reader reads x1 x2 s1 e2 a2
+       down the header and can see which row each one came from. */
+    var extra = [], identity = [], rowSlack = [];
+    for (i = 0; i < m; i += 1) {
+      var label = model.cons[i].name || ('row ' + (i + 1));
+      if (rels[i] === 'le') {
+        rowSlack.push(nd + extra.length);
+        identity.push(nd + extra.length);
+        extra.push({ row: i, sign: 1, kind: 'slack', name: 's' + (i + 1),
+                     text: 'the part of ' + label + ' left unused' });
+      } else if (rels[i] === 'ge') {
+        rowSlack.push(nd + extra.length);
+        extra.push({ row: i, sign: -1, kind: 'surplus', name: 'e' + (i + 1),
+                     text: 'how far ' + label + ' is exceeded' });
+        identity.push(nd + extra.length);
+        extra.push({ row: i, sign: 1, kind: 'artificial', name: 'a' + (i + 1),
+                     text: 'how far ' + label + ' is from being satisfiable at all; it must reach 0' });
+      } else {
+        rowSlack.push(-1);
+        identity.push(nd + extra.length);
+        extra.push({ row: i, sign: 1, kind: 'artificial', name: 'a' + (i + 1),
+                     text: 'how far ' + label + ' is from holding; it must reach 0' });
+      }
+    }
+    var ncols = nd + extra.length;
+    var A = [];
+    for (i = 0; i < m; i += 1) {
+      var r = rows[i].slice();
+      for (j = 0; j < extra.length; j += 1) {
+        r.push(extra[j].row === i ? R(BigInt(extra[j].sign), 1n) : R0);
+      }
+      A.push(r);
+    }
+    for (j = 0; j < extra.length; j += 1) {
+      names.push(extra[j].name); kinds.push(extra[j].kind); sentences.push(extra[j].text);
+    }
+    /* The objective, twice: as the lesson wrote it, and in the max form the
+       tableau uses. */
+    var cOrig = [], c = [];
+    for (j = 0; j < ncols; j += 1) {
+      var v = j < nd ? (vcol[j].sign < 0 ? Rneg(model.obj[vcol[j].from]) : model.obj[vcol[j].from]) : R0;
+      cOrig.push(v);
+      c.push(model.max === false ? Rneg(v) : v);
+    }
+    return { A: A, b: b, c: c, cOrig: cOrig, names: names, kinds: kinds,
+             sentences: sentences, maximised: model.max !== false,
+             identity: identity, rowSlack: rowSlack, rowSign: rowSign,
+             rels: rels, m: m, n: ncols, nd: nd, nvar: nvar, varMap: varMap,
+             given: given, model: model };
+  }
+
+  /* The reader's variables, read back out of a standard-form solution. */
+  function stdPoint(std, x) {
+    return std.varMap.map(function (v) {
+      var val = v.sign < 0 ? Rneg(x[v.plus]) : x[v.plus];
+      return v.minus === null ? val : Rsub(val, x[v.minus]);
+    });
+  }
+
+  /* The value the LESSON's objective takes, given the internal max value. */
+  function zOriginal(std, z) { return std.maximised ? z : Rneg(z); }
+
+  /* ---- the tableau ---------------------------------------------------- */
+
+  /* `T` is the body: m rows of ncols + 1 rationals, the last entry the
+     right-hand side.  `z` is the objective row, ncols + 1 long, entry j being
+     the reduced cost z_j - c_j and the last entry the objective value.
+     `basis[i]` is the column basic in row i.
+
+     `forbid[j]` keeps the artificial columns out of Phase II without deleting
+     them, which matters: their columns ARE B^-1 whenever the row began with a
+     >= or an =, and dualVector and rhsRange read B^-1 out of exactly there. */
+  function tabInit(std, costs) {
+    var c = costs || std.c, i, j;
+    var T = [], basis = std.identity.slice();
+    for (i = 0; i < std.m; i += 1) T.push(std.A[i].slice().concat([std.b[i]]));
+    var forbid = [];
+    for (j = 0; j < std.n; j += 1) forbid.push(std.kinds[j] === 'artificial' && !costs);
+    var tab = { T: T, z: [], basis: basis, names: std.names, kinds: std.kinds,
+                c: c, cOrig: std.cOrig, identity: std.identity.slice(),
+                rowSlack: std.rowSlack, rowSign: std.rowSign, forbid: forbid,
+                m: std.m, n: std.n, nd: std.nd, maximised: std.maximised, std: std };
+    tabCost(tab, c);
+    return tab;
+  }
+
+  /* Rebuild the objective row from the basis that is there.  Phase II calls
+     this on Phase I's final tableau, which is the whole of "the artificials
+     did their job and are now dead weight". */
+  function tabCost(tab, c) {
+    tab.c = c;
+    var row = [], j, i;
+    for (j = 0; j <= tab.n; j += 1) {
+      var s = R0;
+      for (i = 0; i < tab.m; i += 1) s = Radd(s, Rmul(c[tab.basis[i]], tab.T[i][j]));
+      row.push(j < tab.n ? Rsub(s, c[j]) : s);
+    }
+    tab.z = row;
+    return tab;
+  }
+
+  function tabCopy(tab) {
+    return { T: tab.T.map(function (r) { return r.slice(); }), z: tab.z.slice(),
+             basis: tab.basis.slice(), names: tab.names, kinds: tab.kinds,
+             c: tab.c, cOrig: tab.cOrig, identity: tab.identity, rowSlack: tab.rowSlack,
+             rowSign: tab.rowSign, forbid: tab.forbid.slice(), m: tab.m, n: tab.n,
+             nd: tab.nd, maximised: tab.maximised, std: tab.std };
+  }
+  /* The body and the objective row as ONE matrix, which is what Mtable and
+     Mtrace from algebra_systems.MATRIX_JS already know how to print. */
+  function tabMatrix(tab) {
+    return tab.T.map(function (r) { return r.slice(); }).concat([tab.z.slice()]);
+  }
+
+  /* The basic feasible solution this tableau stands for. */
+  function tabRead(tab) {
+    var x = [], j, i;
+    for (j = 0; j < tab.n; j += 1) x.push(R0);
+    var degenerate = false, zeros = [];
+    for (i = 0; i < tab.m; i += 1) {
+      x[tab.basis[i]] = tab.T[i][tab.n];
+      if (Rzero(tab.T[i][tab.n])) { degenerate = true; zeros.push(i); }
+    }
+    var tightRows = [];
+    for (i = 0; i < tab.m; i += 1) {
+      var s = tab.rowSlack[i];
+      if (s < 0 || Rzero(x[s])) tightRows.push(i);
+    }
+    var z = tab.z[tab.n];
+    return { x: x, z: z, zOrig: tab.maximised ? z : Rneg(z), basis: tab.basis.slice(),
+             reduced: tab.z.slice(0, tab.n), degenerate: degenerate,
+             degenerateRows: zeros, tightRows: tightRows,
+             values: tab.basis.map(function (b, k) { return { col: b, name: tab.names[b], value: tab.T[k][tab.n] }; }) };
+  }
+
+  /* ---- the two rules that are the lesson ------------------------------- */
+
+  /* THE TIE-BREAK IS LESSON CONTENT AND IS CHOSEN HERE, NOT BY ACCIDENT.
+       dantzig          most negative z_j - c_j, ties by LOWEST column index
+       bland            the SMALLEST index with z_j - c_j < 0, no tie possible
+       bestImprovement  largest rate * step = the largest actual change in z
+       lastIndex        the largest index with z_j - c_j < 0
+     Under dantzig (with tabRatio's lowest-row tie-break) Beale's example
+     cycles; under bland it terminates.  That contrast is C2 L7.
+
+     There is NO steepest-edge rule on this path: it scores a column by its
+     norm, which is a square root, and nothing here rounds that a ratio test
+     can decide.  bestImprovement is exact -- both factors are rationals -- and
+     it is what C2 L4's "rate * step = dz" panel compares against Dantzig. */
+  function tabEnter(tab, rule) {
+    rule = rule || 'dantzig';
+    var rates = [], j;
+    for (j = 0; j < tab.n; j += 1) {
+      var basic = tab.basis.indexOf(j) >= 0;
+      var red = tab.z[j];
+      var eligible = !basic && !tab.forbid[j] && Rsign(red) < 0;
+      var entry = { j: j, name: tab.names[j], reduced: red, rate: Rneg(red),
+                    basic: basic, eligible: eligible, step: null, delta: null,
+                    unbounded: false };
+      if (eligible) {
+        var rt = tabRatio(tab, j, rule);
+        if (rt.unbounded) { entry.unbounded = true; entry.delta = null; }
+        else {
+          entry.step = rt.rows[rt.leave].ratio;
+          entry.delta = Rmul(entry.rate, entry.step);
+        }
+      }
+      rates.push(entry);
+    }
+    var pick = -1, why = '', k;
+    if (rule === 'bland') {
+      for (j = 0; j < tab.n; j += 1) if (rates[j].eligible) { pick = j; break; }
+      why = pick < 0 ? 'no column has a negative reduced cost, so this basis is optimal'
+        : 'Bland: the smallest-index column with a negative reduced cost is ' + tab.names[pick];
+    } else if (rule === 'lastIndex') {
+      for (j = tab.n - 1; j >= 0; j -= 1) if (rates[j].eligible) { pick = j; break; }
+      why = pick < 0 ? 'no column has a negative reduced cost, so this basis is optimal'
+        : 'last index: the largest-index column with a negative reduced cost is ' + tab.names[pick];
+    } else if (rule === 'bestImprovement') {
+      for (j = 0; j < tab.n; j += 1) {
+        if (!rates[j].eligible) continue;
+        if (rates[j].unbounded) { pick = j; break; }
+        if (pick < 0 || Rcmp(rates[j].delta, rates[pick].delta) > 0) pick = j;
+      }
+      why = pick < 0 ? 'no column has a negative reduced cost, so this basis is optimal'
+        : (rates[pick].unbounded
+           ? 'best improvement: ' + tab.names[pick] + ' improves z without limit'
+           : 'best improvement: ' + tab.names[pick] + ' moves z by rate ' + Rtext(rates[pick].rate)
+             + ' times step ' + Rtext(rates[pick].step) + ' = ' + Rtext(rates[pick].delta)
+             + ', the largest actual change on offer');
+    } else {
+      for (j = 0; j < tab.n; j += 1) {
+        if (!rates[j].eligible) continue;
+        if (pick < 0 || Rcmp(rates[j].reduced, rates[pick].reduced) < 0) pick = j;
+      }
+      why = pick < 0 ? 'no column has a negative reduced cost, so this basis is optimal'
+        : 'Dantzig: ' + tab.names[pick] + ' has the most negative reduced cost, '
+          + Rtext(rates[pick].reduced) + ' (ties go to the lowest column index)';
+    }
+    return { enter: pick, rates: rates, why: why, rule: rule };
+  }
+
+  /* The ratio test on column k.  Ties on the minimum ratio go to the LOWEST
+     ROW INDEX under every rule but bland, which breaks them by the smallest
+     index of the LEAVING BASIC VARIABLE -- the second half of Bland's rule,
+     and the half a textbook usually forgets to state. */
+  function tabRatio(tab, k, rule) {
+    var rows = [], i, best = null;
+    for (i = 0; i < tab.m; i += 1) {
+      var a = tab.T[i][k], bi = tab.T[i][tab.n], eligible = Rsign(a) > 0;
+      var ratio = eligible ? Rdiv(bi, a) : null;
+      rows.push({ i: i, b: bi, a: a, ratio: ratio, eligible: eligible,
+                  leaving: tab.basis[i], name: tab.names[tab.basis[i]],
+                  why: eligible
+                    ? Rtext(bi) + ' / ' + Rtext(a) + ' = ' + Rtext(ratio)
+                      + ', the most ' + tab.names[k] + ' can grow before ' + tab.names[tab.basis[i]] + ' hits 0'
+                    : (Rzero(a) ? tab.names[k] + ' does not appear in this row, so it never binds'
+                       : 'the entry is ' + Rtext(a) + ' < 0, so ' + tab.names[tab.basis[i]]
+                         + ' GROWS as ' + tab.names[k] + ' does and never binds') });
+      if (eligible && (best === null || Rcmp(ratio, best) < 0)) best = ratio;
+    }
+    if (best === null) {
+      var ray = [];
+      for (i = 0; i < tab.n; i += 1) ray.push(R0);
+      ray[k] = R1;
+      for (i = 0; i < tab.m; i += 1) ray[tab.basis[i]] = Rneg(tab.T[i][k]);
+      return { rows: rows, leave: -1, tie: [], unbounded: true, ray: ray, min: null };
+    }
+    var tie = [];
+    for (i = 0; i < tab.m; i += 1) if (rows[i].eligible && Requ(rows[i].ratio, best)) tie.push(i);
+    var leave = tie[0];
+    if (rule === 'bland') {
+      for (i = 0; i < tie.length; i += 1) if (tab.basis[tie[i]] < tab.basis[leave]) leave = tie[i];
+    }
+    return { rows: rows, leave: leave, tie: tie, unbounded: false, ray: null, min: best };
+  }
+
+  /* ---- the pivot ------------------------------------------------------- */
+
+  /* `ops` comes back in exactly the shape algebra_systems.Mrref returns --
+     {op, why, after} -- so a reader moving from Gaussian elimination to a
+     tableau reads the same trace, printed by the same Mtrace. */
+  function tabPivot(tab, r, k) {
+    var out = tabCopy(tab), ops = [], i;
+    var p = out.T[r][k];
+    if (Rzero(p)) throw new Error('cannot pivot on a zero entry');
+    var label = function (i2) { return i2 < out.m ? 'R' + (i2 + 1) : 'z'; };
+    if (!Requ(p, R1)) {
+      var s = Rinv(p);
+      out.T[r] = out.T[r].map(function (v) { return Rmul(v, s); });
+      ops.push({ op: 'R' + (r + 1) + ' -&gt; ' + Rterm(s) + 'R' + (r + 1),
+                 why: 'divides the pivot row by ' + Rtext(p) + ', which makes the pivot 1',
+                 after: tabMatrix(out) });
+    }
+    for (i = 0; i < out.m; i += 1) {
+      if (i === r || Rzero(out.T[i][k])) continue;
+      var mlt = Rneg(out.T[i][k]);
+      out.T[i] = out.T[i].map(function (v, cc) { return Radd(v, Rmul(mlt, out.T[r][cc])); });
+      ops.push({ op: label(i) + ' -&gt; ' + label(i) + ' + ' + Rterm(mlt) + 'R' + (r + 1),
+                 why: 'clears ' + out.names[k] + ' out of row ' + (i + 1),
+                 after: tabMatrix(out) });
+    }
+    if (!Rzero(out.z[k])) {
+      var mz = Rneg(out.z[k]);
+      out.z = out.z.map(function (v, cc) { return Radd(v, Rmul(mz, out.T[r][cc])); });
+      ops.push({ op: 'z -&gt; z + ' + Rterm(mz) + 'R' + (r + 1),
+                 why: 'clears ' + out.names[k] + ' out of the objective row, which is what moves z',
+                 after: tabMatrix(out) });
+    }
+    out.basis[r] = k;
+    out.ops = ops;
+    out.entered = k;
+    out.left = tab.basis[r];
+    out.pivotRow = r;
+    return out;
+  }
+
+  /* Phase I, the infeasibility certificate, and the driver that runs pivots
+     until something stops it.  Needs TABLEAU_JS above it. */
+
+  /* A basis is a SET of columns, so the signature sorts.  Two tableaux with
+     the same basic columns in a different row order stand for the same basic
+     solution, and cycling is a statement about the solution returning. */
+  function basisKey(basis) {
+    return basis.slice().sort(function (a, b) { return a - b; }).join(',');
+  }
+  /* The index at which a basis first repeats, or -1.  `bases` is the list
+     simplexRun collects, one entry per tableau including the starting one. */
+  function cycleIndex(bases) {
+    var seen = {}, i;
+    for (i = 0; i < bases.length; i += 1) {
+      var k = basisKey(bases[i]);
+      if (seen[k] !== undefined) return i;
+      seen[k] = i;
+    }
+    return -1;
+  }
+
+  /* THE DRIVER.  status is one of optimal | unbounded | cycled | limit.
+
+     It must detect a repeated BASIS and stop with `cycled`, not run out at
+     opts.maxPivots.  A lab that reports "limit reached" where the lesson says
+     "it returned to where it started" has taught the wrong thing -- and the
+     difference is visible only because the tableau comparison is exact. */
+  function simplexRun(tab, opts) {
+    opts = opts || {};
+    var rule = opts.rule || 'dantzig';
+    var maxPivots = opts.maxPivots === undefined ? 200 : opts.maxPivots;
+    var cur = tabCopy(tab), path = [cur], bases = [cur.basis.slice()], steps = [];
+    var seen = {}, status = 'optimal', ray = null, cycle = null;
+    seen[basisKey(cur.basis)] = 0;
+    while (true) {
+      var e = tabEnter(cur, rule);
+      if (e.enter < 0) { status = 'optimal'; break; }
+      var rt = tabRatio(cur, e.enter, rule);
+      if (rt.unbounded) { status = 'unbounded'; ray = rt.ray; break; }
+      var before = cur;
+      cur = tabPivot(cur, rt.leave, e.enter);
+      steps.push({ enter: e.enter, enterName: cur.names[e.enter], leave: cur.left,
+                   leaveName: cur.names[cur.left], row: rt.leave, rule: rule,
+                   whyEnter: e.why, whyLeave: rt.rows[rt.leave].why,
+                   rates: e.rates, ratio: rt, ops: cur.ops,
+                   zBefore: before.z[before.n], zAfter: cur.z[cur.n],
+                   delta: Rsub(cur.z[cur.n], before.z[before.n]) });
+      path.push(cur); bases.push(cur.basis.slice());
+      var key = basisKey(cur.basis);
+      if (seen[key] !== undefined) {
+        status = 'cycled';
+        cycle = { at: path.length - 1, from: seen[key] };
+        break;
+      }
+      seen[key] = path.length - 1;
+      if (steps.length >= maxPivots) { status = 'limit'; break; }
+    }
+    var z = cur.z[cur.n];
+    return { path: path, bases: bases, steps: steps, pivots: steps.length,
+             status: status, ray: ray, cycle: cycle, tab: cur, z: z,
+             zOrig: cur.maximised ? z : Rneg(z) };
+  }
+
+  /* ---- Phase I --------------------------------------------------------- */
+
+  /* Minimise the sum of the artificials.  `feasible` is value === 0 -- not
+     "value is small", which is the sentence exactness removes from the page.
+
+     Bland's rule here, not Dantzig's: Phase I is machinery rather than lesson
+     content, and Bland is the rule that provably cannot cycle. */
+  function phaseOne(std, opts) {
+    opts = opts || {};
+    var arts = [], j;
+    for (j = 0; j < std.n; j += 1) if (std.kinds[j] === 'artificial') arts.push(j);
+    if (!arts.length) {
+      return { T: tabInit(std), value: R0, feasible: true, artificialsAtZero: [],
+               needed: false, redundant: [], run: null,
+               why: 'every row is a <= with a non-negative right-hand side, so the slack basis is already feasible and there is no Phase I to run' };
+    }
+    var w = [];
+    for (j = 0; j < std.n; j += 1) w.push(std.kinds[j] === 'artificial' ? R(-1n, 1n) : R0);
+    var run = simplexRun(tabInit(std, w), { rule: opts.rule || 'bland', maxPivots: opts.maxPivots || 300 });
+    var T = run.tab;
+    var value = Rneg(T.z[T.n]);                 /* we maximised -sum, so flip */
+    var feasible = Rzero(value);
+    /* An artificial left basic at zero is not an obstruction, but it must come
+       out before Phase II or the basis is not a basis of the real problem.
+       When no real column can replace it, that row is REDUNDANT -- it is a
+       combination of the others -- and saying so is better than hiding it. */
+    var atZero = [], redundant = [], i, k;
+    if (feasible) {
+      for (i = 0; i < T.m; i += 1) {
+        if (std.kinds[T.basis[i]] !== 'artificial') continue;
+        atZero.push({ row: i, col: T.basis[i], name: T.names[T.basis[i]] });
+        var swap = -1;
+        for (k = 0; k < T.n; k += 1) {
+          if (std.kinds[k] === 'artificial' || T.basis.indexOf(k) >= 0) continue;
+          if (!Rzero(T.T[i][k])) { swap = k; break; }
+        }
+        if (swap < 0) redundant.push(i);
+        else T = tabPivot(T, i, swap);
+      }
+    }
+    return { T: T, value: value, feasible: feasible, artificialsAtZero: atZero,
+             needed: true, redundant: redundant, run: run, artificials: arts,
+             why: feasible
+               ? 'the artificials can all be driven to zero, so the original constraints have a common solution'
+               : 'the artificials cannot be driven below ' + Rtext(value)
+                 + ', so no point satisfies every constraint at once' };
+  }
+
+  /* Phase II: keep Phase I's tableau, restore the real objective, and lock the
+     artificial columns out.  The columns stay because they ARE B^-1 wherever a
+     row began as a >= or an =, and dualVector reads B^-1 out of exactly there. */
+  function phaseTwo(std, ph1) {
+    var T = tabCopy(ph1.T), j;
+    for (j = 0; j < std.n; j += 1) T.forbid[j] = std.kinds[j] === 'artificial';
+    tabCost(T, std.c);
+    return T;
+  }
+
+  /* THE INFEASIBILITY CERTIFICATE.  When Phase I stops positive, its final
+     objective row holds a y with y'A <= 0 and y'b > 0 -- a proof, by Farkas,
+     that no x can satisfy the constraints, and the reason a lab can say "there
+     is none" rather than "I did not find one".
+
+     Where y comes from: the Phase I costs are 0 on real columns and -1 on
+     artificials, so for the column that started as e_i the objective entry is
+     y_i on a slack and y_i + 1 on an artificial.  Negating gives the
+     certificate in the direction Farkas states it.  The per-row arithmetic
+     comes back in `checks` so the page can SHOW the verification rather than
+     assert it. */
+  function farkasCertificate(T) {
+    var std = T.std, m = std.m, i, j;
+    var y = [];
+    for (i = 0; i < m; i += 1) {
+      var col = std.identity[i];
+      var raw = T.z[col];
+      y.push(std.kinds[col] === 'artificial' ? Rsub(R1, raw) : Rneg(raw));
+    }
+    var columns = [];
+    for (j = 0; j < std.n; j += 1) {
+      if (std.kinds[j] === 'artificial') continue;
+      var s = R0, parts = [];
+      for (i = 0; i < m; i += 1) {
+        s = Radd(s, Rmul(y[i], std.A[i][j]));
+        parts.push('(' + Rtext(y[i]) + ')(' + Rtext(std.A[i][j]) + ')');
+      }
+      columns.push({ j: j, name: std.names[j], value: s, ok: Rsign(s) <= 0,
+                     text: parts.join(' + ') + ' = ' + Rtext(s) + ' &lt;= 0' });
+    }
+    var bs = R0, bparts = [];
+    for (i = 0; i < m; i += 1) {
+      bs = Radd(bs, Rmul(y[i], std.b[i]));
+      bparts.push('(' + Rtext(y[i]) + ')(' + Rtext(std.b[i]) + ')');
+    }
+    var allCols = columns.every(function (c) { return c.ok; });
+    return { y: y, checks: { columns: columns,
+                             b: { value: bs, ok: Rsign(bs) > 0,
+                                  text: bparts.join(' + ') + ' = ' + Rtext(bs) + ' &gt; 0' } },
+             ok: allCols && Rsign(bs) > 0, rowSign: std.rowSign.slice() };
+  }
+
+  /* ---- one call, end to end -------------------------------------------- */
+
+  /* Assembly over the five functions above, not new mathematics: a kit that
+     only wants "solve this" should not have to re-write the Phase I hand-off,
+     because every kit that re-wrote it would re-write it slightly differently. */
+  function lpSolve(model, opts) {
+    opts = opts || {};
+    var std = stdForm(model);
+    var p1 = phaseOne(std, opts);
+    if (!p1.feasible) {
+      return { std: std, phase1: p1, status: 'infeasible', tab: p1.T,
+               certificate: farkasCertificate(p1.T), run: null, z: null, zOrig: null,
+               x: null, read: null };
+    }
+    var tab = phaseTwo(std, p1);
+    var run = simplexRun(tab, opts);
+    var read = tabRead(run.tab);
+    return { std: std, phase1: p1, tab: run.tab, run: run, status: run.status,
+             read: read, x: stdPoint(std, read.x), xcols: read.x, z: read.z, zOrig: read.zOrig,
+             ray: run.ray, certificate: null };
+  }
+
+  /* A constraint is  a x + b y <= c , strictly when `strict`. Every >= is
+     stored negated so there is exactly one direction to reason about, and an
+     = becomes the two of them.
+
+     Whether the region is empty, whether it runs off to infinity, and whether
+     an objective grows without bound on it are the same question asked three
+     times -- is this set of inequalities satisfiable -- so one routine answers
+     all three. It is Fourier-Motzkin elimination on exact rationals. Testing a
+     grid of sample points would answer "I did not find one", which is a
+     different sentence from "there is none", and on the preset whose region is
+     the single point (1, 1) the grid answers wrongly. */
+  function Cnew(a, b, c, strict, src) { return { a: a, b: b, c: c, strict: !!strict, src: src || '' }; }
+  function Cfromrow(row) {
+    var a = row.c[0], b = row.c[1], c = row.b;
+    if (row.rel === 'le') return [Cnew(a, b, c, false, row.src)];
+    if (row.rel === 'lt') return [Cnew(a, b, c, true, row.src)];
+    if (row.rel === 'ge') return [Cnew(Rneg(a), Rneg(b), Rneg(c), false, row.src)];
+    if (row.rel === 'gt') return [Cnew(Rneg(a), Rneg(b), Rneg(c), true, row.src)];
+    return [Cnew(a, b, c, false, row.src), Cnew(Rneg(a), Rneg(b), Rneg(c), false, row.src)];
+  }
+  function Cholds(k, x, y) {
+    var cmp = Rcmp(Radd(Rmul(k.a, x), Rmul(k.b, y)), k.c);
+    return k.strict ? cmp < 0 : cmp <= 0;
+  }
+  function Ctext(k, names) {
+    return Ltext([k.a, k.b], names) + ' ' + (k.strict ? '&lt;' : '&lt;=') + ' ' + Rtext(k.c);
+  }
+
+  /* Eliminate y by pairing every upper bound with every lower bound, then read
+     the surviving one-variable constraints off against each other. */
+  function FMfeasible(cons) {
+    var pos = [], neg = [], onex = [];
+    cons.forEach(function (k) {
+      if (Rsign(k.b) > 0) pos.push(k);
+      else if (Rsign(k.b) < 0) neg.push(k);
+      else onex.push(k);
+    });
+    pos.forEach(function (u) {
+      neg.forEach(function (l) {
+        /* (-l.b) * u  +  (u.b) * l  -- both multipliers positive, so both
+           inequalities keep their direction, and the y terms cancel. */
+        var s1 = Rneg(l.b), s2 = u.b;
+        onex.push(Cnew(Radd(Rmul(s1, u.a), Rmul(s2, l.a)), R0,
+                       Radd(Rmul(s1, u.c), Rmul(s2, l.c)), u.strict || l.strict, ''));
+      });
+    });
+    var lo = null, loStrict = false, hi = null, hiStrict = false;
+    for (var i = 0; i < onex.length; i += 1) {
+      var k = onex[i], s = Rsign(k.a);
+      if (s === 0) {
+        var sc = Rsign(k.c);
+        if (sc < 0 || (sc === 0 && k.strict)) {
+          return { feasible: false, why: 'the constraints combine to 0 ' + (k.strict ? '&lt;' : '&lt;=')
+            + ' ' + Rtext(k.c) + ', which no point can satisfy' };
+        }
+        continue;
+      }
+      var bound = Rdiv(k.c, k.a);
+      if (s > 0) {
+        if (hi === null || Rcmp(bound, hi) < 0) { hi = bound; hiStrict = k.strict; }
+        else if (Requ(bound, hi) && k.strict) hiStrict = true;
+      } else {
+        if (lo === null || Rcmp(bound, lo) > 0) { lo = bound; loStrict = k.strict; }
+        else if (Requ(bound, lo) && k.strict) loStrict = true;
+      }
+    }
+    if (lo !== null && hi !== null) {
+      var c2 = Rcmp(lo, hi);
+      if (c2 > 0) {
+        return { feasible: false, why: 'after eliminating y, x would have to be at least ' + Rtext(lo)
+          + ' and at most ' + Rtext(hi) };
+      }
+      if (c2 === 0 && (loStrict || hiStrict)) {
+        return { feasible: false, why: 'after eliminating y, x is squeezed onto ' + Rtext(lo)
+          + ' and then excluded from it by a strict inequality' };
+      }
+    }
+    return { feasible: true, lo: lo, hi: hi, loStrict: loStrict, hiStrict: hiStrict };
+  }
+
+  /* The directions the region goes on forever in: drop every constant, and the
+     inequalities become a cone. "Is the region unbounded" is then "is there a
+     non-zero direction in that cone", and "does cx + dy grow forever" is "is
+     there one on which cx + dy is positive" -- both handed straight back to
+     FMfeasible, which is why neither is a guess. */
+  function Crec(cons) { return cons.map(function (k) { return Cnew(k.a, k.b, R0, false, ''); }); }
+  function Cgrows(cons, ox, oy) {
+    if (Rzero(ox) && Rzero(oy)) return false;
+    return FMfeasible(Crec(cons).concat([Cnew(Rneg(ox), Rneg(oy), R(-1n), false, '')])).feasible;
+  }
+  function Cunbounded(cons) {
+    var dirs = [[R1, R0], [R(-1n), R0], [R0, R1], [R0, R(-1n)]];
+    for (var i = 0; i < dirs.length; i += 1) {
+      if (Cgrows(cons, dirs[i][0], dirs[i][1])) return true;
+    }
+    return false;
+  }
+
+  /* Every point where two boundary lines meet, kept when it satisfies every
+     constraint. `inRegion` is false for a point that sits on a boundary the
+     reader wrote strictly -- it is a corner of the picture that is not a member
+     of the set, which is the whole difference between < and <=. */
+  function Ccorners(cons) {
+    var out = [];
+    for (var i = 0; i < cons.length; i += 1) {
+      for (var j = i + 1; j < cons.length; j += 1) {
+        var A = cons[i], B = cons[j];
+        var det = Rsub(Rmul(A.a, B.b), Rmul(A.b, B.a));
+        if (Rzero(det)) continue;
+        var x = Rdiv(Rsub(Rmul(A.c, B.b), Rmul(A.b, B.c)), det);
+        var y = Rdiv(Rsub(Rmul(A.a, B.c), Rmul(A.c, B.a)), det);
+        var ok = true, inRegion = true;
+        for (var t = 0; t < cons.length; t += 1) {
+          var v = Radd(Rmul(cons[t].a, x), Rmul(cons[t].b, y));
+          var cmp = Rcmp(v, cons[t].c);
+          if (cmp > 0) { ok = false; break; }
+          if (cons[t].strict && cmp === 0) inRegion = false;
+        }
+        if (!ok) continue;
+        var seen = false;
+        for (var q = 0; q < out.length; q += 1) {
+          if (Requ(out[q].x, x) && Requ(out[q].y, y)) { out[q].from.push([i, j]); seen = true; break; }
+        }
+        if (!seen) out.push({ x: x, y: y, inRegion: inRegion, from: [[i, j]] });
+      }
+    }
+    out.sort(function (p, q) { var c = Rcmp(p.x, q.x); return c !== 0 ? c : Rcmp(p.y, q.y); });
+    return out;
+  }
+
+  /* ---- models the reader can change, built rather than stored ----------- */
+
+  /* A two-variable instance from plain numbers. `rows` is
+     [[a1, a2, rel, b, name], ...] and nothing here is a stored answer: the
+     lab solves what this builds. */
+  function ipTwoVar(maxim, c1, c2, rows, names) {
+    return { max: maxim, names: names || ['x1', 'x2'],
+             obj: [R(BigInt(c1), 1n), R(BigInt(c2), 1n)],
+             cons: rows.map(function (r) {
+               return { a: [R(BigInt(r[0]), 1n), R(BigInt(r[1]), 1n)], rel: r[2],
+                        b: R(BigInt(r[3]), 1n), name: r[4] };
+             }) };
+  }
+
+  /* Every constraint of a two-variable model as a <= half-plane, with the
+     x >= 0 and y >= 0 rows added, which is what the picture actually bounds.
+     Cfromrow does the >= negation, so there is one direction to reason
+     about. */
+  function ipHalfPlanes(model) {
+    var out = [], i;
+    for (i = 0; i < model.cons.length; i += 1) {
+      var k = model.cons[i];
+      out = out.concat(Cfromrow({ c: [k.a[0], k.a[1]], rel: k.rel || 'le', b: k.b,
+                                  src: k.name || ('row ' + (i + 1)) }));
+    }
+    out.push(Cnew(R(-1n, 1n), R0, R0, false, model.names[0] + ' >= 0'));
+    out.push(Cnew(R0, R(-1n, 1n), R0, false, model.names[1] + ' >= 0'));
+    return out;
+  }
+
+  /* The first row a point breaks, named, or null when it breaks none. This is
+     what turns "infeasible" into a sentence: a rounding that fails fails
+     somewhere, and the reader should be told where. */
+  function ipViolated(model, pt) {
+    var i, j;
+    for (j = 0; j < pt.length; j += 1) if (Rsign(pt[j]) < 0) return model.names[j] + ' < 0';
+    for (i = 0; i < model.cons.length; i += 1) {
+      var k = model.cons[i], s = R0;
+      for (j = 0; j < pt.length; j += 1) s = Radd(s, Rmul(k.a[j], pt[j]));
+      var rel = k.rel || 'le', c = Rcmp(s, k.b);
+      var ok = rel === 'le' ? c <= 0 : (rel === 'ge' ? c >= 0 : c === 0);
+      if (!ok) return (k.name || ('row ' + (i + 1))) + ' (it wants ' + Rtext(s) + ')';
+    }
+    return null;
+  }
+
+  function ipObjective(model, pt) {
+    var s = R0, j;
+    for (j = 0; j < pt.length; j += 1) s = Radd(s, Rmul(model.obj[j], pt[j]));
+    return s;
+  }
+
+  /* The 2^k roundings of a point, every combination of floor and ceiling --
+     not "the rounding", because there is no such thing once more than one
+     coordinate is fractional, and believing there is is the misconception the
+     opening mode exists to break. */
+  function ipRoundings(x) {
+    var out = [{ pt: [], how: [] }], j, k, next;
+    for (j = 0; j < x.length; j += 1) {
+      next = [];
+      var lo = R(Rfloor(x[j]), 1n), hi = R(Rceil(x[j]), 1n);
+      var opts = Requ(lo, hi) ? [[lo, 'exact']] : [[lo, 'down'], [hi, 'up']];
+      for (k = 0; k < out.length; k += 1) {
+        for (var q = 0; q < opts.length; q += 1) {
+          next.push({ pt: out[k].pt.concat([opts[q][0]]), how: out[k].how.concat([opts[q][1]]) });
+        }
+      }
+      out = next;
+    }
+    return out;
+  }
+
+  /* ---- the gap, which is the deliverable -------------------------------- */
+
+  /* STILL OPEN means never expanded: not pruned, and not branched either.
+     bbTree sets `prunedBy` on a node it closed and leaves it null on one it
+     branched, so "prunedBy is null" alone counts every interior node of a
+     finished tree as open. */
+  function ipOpen(node) {
+    return !node.prunedBy && node.bound !== null && !(node.children && node.children.length);
+  }
+
+  /* The global bound WHEN THE SEARCH STOPPED EARLY: the best thing any node it
+     never got to still promises. A tree that finished has no such node, and
+     then the bound is the incumbent and the gap is nought.
+
+     Not re-derived per step: the honest step-by-step record is `bounds`, which
+     bbTree writes as it explores, because exploration order is not node order
+     and a trace recomputed from the finished list gets it wrong -- it reported
+     a bound of 54 on an instance whose optimum is 55, which is the kind of
+     wrong a page must not be. `ipBoundTrace` reads that record instead. */
+  function ipOpenBound(nodes, maximise) {
+    var best = null, i;
+    for (i = 0; i < nodes.length; i += 1) {
+      if (!ipOpen(nodes[i])) continue;
+      if (best === null || (maximise ? Rcmp(nodes[i].bound, best) > 0 : Rcmp(nodes[i].bound, best) < 0)) {
+        best = nodes[i].bound;
+      }
+    }
+    return best;
+  }
+
+  /* The incumbent and the global bound after each node, from the two records
+     bbTree keeps as it runs -- `bounds` after every branch and `incumbents`
+     whenever one improves -- merged, forward-filled and finished off with the
+     state the search stopped in. Same tree in, same trace out. */
+  function ipBoundTrace(tree, maximise) {
+    var marks = [], i;
+    for (i = 0; i < tree.bounds.length; i += 1) {
+      marks.push({ at: tree.bounds[i].at, bound: tree.bounds[i].bound, incumbent: tree.bounds[i].incumbent });
+    }
+    for (i = 0; i < tree.incumbents.length; i += 1) {
+      marks.push({ at: tree.incumbents[i].at, bound: null, incumbent: tree.incumbents[i].value });
+    }
+    marks.sort(function (a, b) { return a.at - b.at; });
+    var openBound = ipOpenBound(tree.nodes, maximise);
+    marks.push({ at: tree.nodes.length,
+                 bound: tree.refused ? openBound : tree.best,
+                 incumbent: tree.best });
+    var out = [], bound = null, inc = null;
+    for (i = 0; i < marks.length; i += 1) {
+      if (marks[i].bound !== null) bound = marks[i].bound;
+      if (marks[i].incumbent !== null && (inc === null || (maximise ? Rcmp(marks[i].incumbent, inc) > 0 : Rcmp(marks[i].incumbent, inc) < 0))) {
+        inc = marks[i].incumbent;
+      }
+      if (out.length && out[out.length - 1].at === marks[i].at) out.pop();
+      out.push({ at: marks[i].at, bound: bound, incumbent: inc });
+    }
+    return out;
+  }
+
+  /* Absolute and relative, both exact, and `proved` is the sentence the course
+     wants said out loud: a gap is a statement about the BOUND, with no
+     probability anywhere in it.
+
+     The relative gap is measured AGAINST THE INCUMBENT -- the value actually in
+     hand -- which is the convention every solver reports and the only one that
+     is defined before the optimum is known. Every page that prints it says
+     which number it is a percentage of, because against the bound instead it is
+     a different figure and a reader comparing two pages would have no way to
+     tell. */
+  function ipGap(bound, incumbent, maximise) {
+    if (bound === null || incumbent === null) return { closed: false, abs: null, rel: null, proved: 'nothing is proved yet: there is no incumbent to bound' };
+    var abs = Rabs(Rsub(bound, incumbent));
+    var rel = Rzero(incumbent) ? null : Rdiv(abs, Rabs(incumbent));
+    return { closed: Rzero(abs), abs: abs, rel: rel,
+             proved: Rzero(abs)
+               ? 'the gap is zero, so the incumbent is optimal and that is a proof'
+               : 'nothing beats the incumbent by more than ' + Rtext(abs)
+                 + (rel === null ? '' : ' (' + Rpct(rel, 2) + ')')
+                 + ', which is a statement about the bound and not about how likely the incumbent is to be best' };
+  }
+
+  /* The corners of a region, in the order a polygon needs them rather than the
+     order Ccorners hands them back, which is sorted by x. Sorting by angle
+     about the centroid is correct here because the region is an intersection
+     of half-planes and therefore convex. */
+  function ipPolygon(cons) {
+    var pts = Ccorners(cons).map(function (p) { return { x: ipPx(p.x), y: ipPx(p.y) }; });
+    if (pts.length < 3) return pts;
+    var cx = 0, cy = 0, i;
+    for (i = 0; i < pts.length; i += 1) { cx += pts[i].x; cy += pts[i].y; }
+    cx /= pts.length; cy /= pts.length;
+    return pts.slice().sort(function (p, q) {
+      return Math.atan2(p.y - cy, p.x - cx) - Math.atan2(q.y - cy, q.x - cx);
+    });
+  }
+
+  /* THE SHARED LATTICE PICTURE.
+
+     opts: { cons, box: [[x0, x1], [y0, y1]] in integers, points, marks, lines,
+             overlay, width, height, names, note }
+
+     `points` is what latticePoints returned, so the dots are the enumeration
+     the panel quotes and not a second opinion about it. `lines` draws extra
+     half-plane boundaries -- a Gomory cut, a branch bound -- in the reader's
+     own coordinates, which is the only place a cut is visible at all. */
+  function ipLattice(opts) {
+    var w = opts.width || 520, h = opts.height || 300;
+    var L = 34, Rm = 12, T = 12, B = 26;
+    var x0 = opts.box[0][0], x1 = opts.box[0][1], y0 = opts.box[1][0], y1 = opts.box[1][1];
+    var px = function (v) { return ipAt(v, x0, x1, L, w - Rm); };
+    var py = function (v) { return ipAt(v, y0, y1, h - B, T); };
+    var s = '', i, j;
+
+    /* the region, then any overlay region on top of it */
+    var poly = ipPolygon(opts.cons);
+    if (poly.length >= 3) {
+      s += ipEl('polygon', { points: poly.map(function (p) { return px(p.x) + ',' + py(p.y); }).join(' '),
+                             fill: 'var(--cyan)', 'fill-opacity': '0.13',
+                             stroke: 'var(--cyan)', 'stroke-width': '1.5' });
+    }
+    if (opts.overlay) {
+      var over = ipPolygon(opts.overlay);
+      if (over.length >= 3) {
+        s += ipEl('polygon', { points: over.map(function (p) { return px(p.x) + ',' + py(p.y); }).join(' '),
+                               fill: 'var(--purple)', 'fill-opacity': '0.18',
+                               stroke: 'var(--purple)', 'stroke-width': '1.5',
+                               'stroke-dasharray': '4 3' });
+      }
+    }
+
+    /* the axes last-but-one so the region does not paint over them */
+    s += ipEl('line', { x1: L, y1: py(0), x2: w - Rm, y2: py(0), stroke: 'var(--line-strong)', 'stroke-width': 1 });
+    s += ipEl('line', { x1: px(0), y1: T, x2: px(0), y2: h - B, stroke: 'var(--line-strong)', 'stroke-width': 1 });
+    for (i = Math.ceil(x0); i <= x1; i += 1) {
+      s += ipLabel(px(i), h - B + 13, String(i), 'muted', 'middle', 9);
+    }
+    for (j = Math.ceil(y0); j <= y1; j += 1) {
+      s += ipLabel(L - 6, py(j) + 3, String(j), 'muted', 'end', 9);
+    }
+    s += ipLabel(w - Rm, h - B + 13, (opts.names && opts.names[0]) || 'x1', 'text', 'end', 10);
+    s += ipLabel(L - 6, T + 2, (opts.names && opts.names[1]) || 'x2', 'text', 'end', 10);
+
+    /* the lattice itself */
+    if (opts.points) {
+      for (i = 0; i < opts.points.length; i += 1) {
+        var q = opts.points[i], qx = px(ipPx(q.x[0])), qy = py(ipPx(q.x[1]));
+        s += ipEl('circle', { cx: qx, cy: qy, r: q.feasible ? 3 : 1.8,
+                              fill: q.feasible ? 'var(--green)' : 'var(--line-strong)',
+                              'fill-opacity': q.feasible ? '0.95' : '0.6' });
+      }
+    }
+
+    /* extra half-planes: a cut, a branch bound. Drawn as the boundary line
+       clipped to the box, because the half-plane itself is already in cons. */
+    for (i = 0; opts.lines && i < opts.lines.length; i += 1) {
+      var ln = opts.lines[i], a = ipPx(ln.a), b = ipPx(ln.b), c = ipPx(ln.c);
+      var seg = [];
+      if (b !== 0) {
+        seg.push([x0, (c - a * x0) / b]); seg.push([x1, (c - a * x1) / b]);
+      } else if (a !== 0) {
+        seg.push([c / a, y0]); seg.push([c / a, y1]);
+      }
+      if (seg.length === 2) {
+        s += ipEl('line', { x1: px(seg[0][0]), y1: py(seg[0][1]), x2: px(seg[1][0]), y2: py(seg[1][1]),
+                            stroke: 'var(--' + (ln.tone || 'red') + ')', 'stroke-width': 1.6,
+                            'stroke-dasharray': ln.dashed === false ? null : '5 3' });
+        if (ln.label) {
+          s += ipLabel(px(Math.min(x1, Math.max(x0, seg[1][0]))) - 4,
+                       py(Math.min(y1, Math.max(y0, seg[1][1]))) - 5, ln.label, ln.tone || 'red', 'end', 9);
+        }
+      }
+    }
+
+    /* marked points: the LP optimum, the roundings, the integer optimum */
+    for (i = 0; opts.marks && i < opts.marks.length; i += 1) {
+      var mk = opts.marks[i], mx = px(ipPx(mk.x)), my = py(ipPx(mk.y));
+      if (mk.shape === 'square') {
+        s += ipEl('rect', { x: mx - 5, y: my - 5, width: 10, height: 10, rx: 1.5,
+                            fill: 'none', stroke: 'var(--' + mk.tone + ')', 'stroke-width': 2 });
+      } else if (mk.shape === 'cross') {
+        s += ipEl('path', { d: 'M' + (mx - 5) + ' ' + (my - 5) + 'L' + (mx + 5) + ' ' + (my + 5)
+                              + 'M' + (mx + 5) + ' ' + (my - 5) + 'L' + (mx - 5) + ' ' + (my + 5),
+                            stroke: 'var(--' + mk.tone + ')', 'stroke-width': 2, fill: 'none' });
+      } else {
+        s += ipEl('circle', { cx: mx, cy: my, r: 5.5, fill: 'none',
+                              stroke: 'var(--' + mk.tone + ')', 'stroke-width': 2.2 });
+      }
+      if (mk.label) s += ipLabel(mx + 8, my - 6, mk.label, mk.tone, 'start', 9);
+    }
+    if (opts.note) s += ipLabel(L, h - 4, opts.note, 'muted', 'start', 9);
+    return s;
+  }
+
+  /* ---- the disjunction -------------------------------------------------- */
+
+  /* "A or B", written the only way it can be written: each row relaxed by a
+     big-M term that one binary switches off. y = 1 enforces A and makes B
+     vacuous; y = 0 does the reverse. Passing y = null leaves y continuous,
+     which is the relaxation and the point of the mode.
+
+        rowA:  a.x <= bA + MA (1 - y)      ->   a.x + MA y <= bA + MA
+        rowB:  b.x <= bB + MB y            ->   b.x - MB y <= bB
+
+     The two Ms need not be equal and each must be valid for its OWN side; one
+     M used for both, unchecked, is how a disjunction quietly becomes an
+     implication. */
+  function ipDisjunction(spec, MA, MB, yFixed) {
+    var cons = [], a, i;
+    cons.push({ a: [spec.A[0], spec.A[1], MA], rel: 'le', b: Radd(spec.A[2], MA),
+                name: spec.nameA + ' unless y = 0' });
+    cons.push({ a: [spec.B[0], spec.B[1], Rneg(MB)], rel: 'le', b: spec.B[2],
+                name: spec.nameB + ' unless y = 1' });
+    for (i = 0; i < spec.both.length; i += 1) {
+      cons.push({ a: [spec.both[i][0], spec.both[i][1], R0], rel: spec.both[i][3] || 'le',
+                  b: spec.both[i][2], name: spec.both[i][4] });
+    }
+    cons.push({ a: [R0, R0, R1], rel: 'le', b: R1, name: 'y <= 1' });
+    if (yFixed !== null && yFixed !== undefined) {
+      cons.push({ a: [R0, R0, R1], rel: 'eq', b: R(BigInt(yFixed), 1n),
+                  name: 'y = ' + yFixed });
+    }
+    return { max: spec.max !== false, names: [spec.names[0], spec.names[1], 'y'],
+             obj: [spec.obj[0], spec.obj[1], R0], cons: cons };
+  }
+
+  /* The region one branch of the pair leaves, as half-planes in the reader's
+     two variables -- the picture, with y already decided and the vacuous row
+     dropped rather than drawn at a meaningless offset. */
+  function ipBranchRegion(spec, y, MA, MB) {
+    var live = y === 1 ? spec.A : spec.B, name = y === 1 ? spec.nameA : spec.nameB;
+    var cons = [Cnew(live[0], live[1], live[2], false, name)], i;
+    var dead = y === 1 ? spec.B : spec.A, deadName = y === 1 ? spec.nameB : spec.nameA;
+    var deadM = y === 1 ? MB : MA;
+    cons = cons.concat([Cnew(dead[0], dead[1], Radd(dead[2], deadM), false, deadName + ', relaxed by its own M')]);
+    for (i = 0; i < spec.both.length; i += 1) {
+      cons = cons.concat(Cfromrow({ c: [spec.both[i][0], spec.both[i][1]],
+                                    rel: spec.both[i][3] || 'le', b: spec.both[i][2],
+                                    src: spec.both[i][4] }));
+    }
+    cons.push(Cnew(R(-1n, 1n), R0, R0, false, spec.names[0] + ' >= 0'));
+    cons.push(Cnew(R0, R(-1n, 1n), R0, false, spec.names[1] + ' >= 0'));
+    return cons;
+  }
+
+  var SPEC = {"machine": {"p1": 4, "p2": 3, "d1": 10, "d2": 10, "c1": 1, "c2": 1, "words": "two jobs of four and three hours competing for one machine"}, "uneven": {"p1": 7, "p2": 2, "d1": 12, "d2": 12, "c1": 1, "c2": 2, "words": "a long job and a short one, where the order matters a great deal"}, "tight": {"p1": 5, "p2": 5, "d1": 9, "d2": 9, "c1": 2, "c2": 1, "words": "equal jobs and a deadline that only just fits one order"}};
+  var preSel = document.getElementById('djPreset'), ySel = document.getElementById('djY');
+  var maS = document.getElementById('djMA'), mbS = document.getElementById('djMB');
+  var grid = document.getElementById('djGrid'), table = document.getElementById('djTable');
+  var status = document.getElementById('djStatus');
+
+  function build() {
+    var p = SPEC[preSel.value];
+    var ri = function (v) { return R(BigInt(v), 1n); };
+    /* x1 - x2 <= -p1  is "job one finishes before job two starts";
+       -x1 + x2 <= -p2 is the other order. Both deadlines hold either way. */
+    return { names: ['start of job one', 'start of job two'], max: false,
+             obj: [ri(p.c1), ri(p.c2)],
+             A: [R1, R(-1n, 1n), ri(-p.p1)], nameA: 'job one before job two',
+             B: [R(-1n, 1n), R1, ri(-p.p2)], nameB: 'job two before job one',
+             both: [[R1, R0, ri(p.d1), 'le', 'job one starts by its deadline'],
+                    [R0, R1, ri(p.d2), 'le', 'job two starts by its deadline']],
+             p1: ri(p.p1), p2: ri(p.p2), d1: ri(p.d1), d2: ri(p.d2) };
+  }
+
+  /* The tightest valid M for a row is the most that row's left-hand side can
+     exceed its right-hand side anywhere in the box the other constraints
+     allow: enough to make the row vacuous, and not one unit more. */
+  function tightM(spec, which) {
+    var row = which === 'A' ? spec.A : spec.B;
+    /* Row A is x1 - x2 <= -p1, worst at x1 at its deadline and x2 at zero;
+       row B is the mirror of that. */
+    var x = which === 'A' ? spec.d1 : R0, y = which === 'A' ? R0 : spec.d2;
+    return Rsub(Radd(Rmul(row[0], x), Rmul(row[1], y)), row[2]);
+  }
+
+  function redraw() {
+    var spec = build();
+    var tA = tightM(spec, 'A'), tB = tightM(spec, 'B');
+    var MA = Rmul(tA, R(BigInt(+maS.value), 10n)), MB = Rmul(tB, R(BigInt(+mbS.value), 10n));
+    document.getElementById('djMAOut').textContent = (+maS.value / 10).toFixed(1) + ' times';
+    document.getElementById('djMBOut').textContent = (+mbS.value / 10).toFixed(1) + ' times';
+
+    var mode = ySel.value;
+    var model;
+    if (mode === 'both') {
+      model = { max: false, names: [spec.names[0], spec.names[1]], obj: spec.obj,
+                cons: [{ a: [spec.A[0], spec.A[1]], rel: 'le', b: spec.A[2], name: spec.nameA },
+                       { a: [spec.B[0], spec.B[1]], rel: 'le', b: spec.B[2], name: spec.nameB }]
+                  .concat(spec.both.map(function (r) {
+                    return { a: [r[0], r[1]], rel: r[3], b: r[2], name: r[4] };
+                  })) };
+    } else {
+      model = ipDisjunction(spec, MA, MB, mode === 'free' ? null : +mode);
+    }
+    var sol = lpSolve(model);
+    var yVal = (mode === 'both') ? null : (sol.status === 'optimal' ? sol.x[2] : null);
+
+    var regionOne = ipBranchRegion(spec, 1, MA, MB);
+    var regionZero = ipBranchRegion(spec, 0, MA, MB);
+    var marks = [];
+    if (sol.status === 'optimal') {
+      marks.push({ x: sol.x[0], y: sol.x[1], tone: 'amber', shape: 'cross',
+                   label: 'the schedule it picks' });
+    }
+    var span = Math.max(Number(spec.d1.n), Number(spec.d2.n)) + 2;
+    grid.innerHTML = ipLattice({
+      cons: regionOne, overlay: regionZero, box: [[0, span], [0, span]],
+      points: null, marks: marks, width: 520, height: 300,
+      names: ['start of job one', 'start of job two'],
+      note: mode === 'both'
+        ? 'the two rows written together leave nothing at all: their intersection is empty'
+        : 'solid: what y = 1 allows. dashed: what y = 0 allows. They do not overlap, and that is the point'
+    });
+
+    var rows = '';
+    rows += ipTr([ipTdl(spec.nameA), ipTdl('x1 - x2 &lt;= -' + Rtext(spec.p1)),
+                  ipTd(Rtext(tA)), ipTd(Rshort(MA, 2)),
+                  ipTdl('at y = 1 it binds; at y = 0 it becomes x1 - x2 &lt;= ' + Rshort(Rsub(MA, spec.p1), 2) + ', which nothing in the box breaks')]);
+    rows += ipTr([ipTdl(spec.nameB), ipTdl('-x1 + x2 &lt;= -' + Rtext(spec.p2)),
+                  ipTd(Rtext(tB)), ipTd(Rshort(MB, 2)),
+                  ipTdl('at y = 0 it binds; at y = 1 it becomes -x1 + x2 &lt;= ' + Rshort(Rsub(MB, spec.p2), 2) + ', which nothing in the box breaks')]);
+    for (var q = 0; q < 2; q += 1) {
+      var branch = lpSolve(ipDisjunction(spec, MA, MB, q));
+      rows += ipTr([ipTdl('fix y = ' + q), ipTdl(q ? spec.nameA : spec.nameB),
+                    ipTd('&mdash;'), ipTd('&mdash;'),
+                    ipTdl(branch.status === 'optimal'
+                          ? 'starts at (' + Rtext(branch.x[0]) + ', ' + Rtext(branch.x[1]) + '), costing ' + Rtext(branch.zOrig)
+                          : 'that branch is ' + ipEsc(branch.status))]);
+    }
+    table.innerHTML = ipHead(['row', 'as written', 'tightest valid M', 'M in use', 'what the binary does to it'])
+      + '<tbody>' + rows + '</tbody>';
+
+    document.getElementById('djYval').textContent = mode === 'both' ? 'there is none'
+      : (yVal === null ? '&mdash;' : Rtext(yVal));
+    document.getElementById('djPoint').textContent = sol.status === 'optimal'
+      ? '(' + Rtext(sol.x[0]) + ', ' + Rtext(sol.x[1]) + ')' : ipEsc(sol.status);
+    document.getElementById('djZ').textContent = sol.status === 'optimal' ? Rtext(sol.zOrig) : '—';
+    document.getElementById('djTightA').textContent = Rtext(tA);
+    document.getElementById('djTightB').textContent = Rtext(tB);
+    var meaning = 'both jobs run, one after the other';
+    if (mode === 'both') meaning = 'nothing: there is no schedule';
+    else if (yVal !== null && !Rint(yVal)) meaning = 'a schedule that does not exist';
+    document.getElementById('djMeaning').textContent = meaning;
+
+    if (mode === 'both') {
+      status.innerHTML = 'Writing <strong>both</strong> rows is the conjunction, not the disjunction: it asks '
+        + 'that job one finish before job two starts <em>and</em> that job two finish before job one starts. '
+        + 'Adding the two gives 0 &lt;= -' + Rtext(Radd(spec.p1, spec.p2))
+        + ', so the model is <strong>' + ipEsc(sol.status) + '</strong> &mdash; and a reader who wrote it this way '
+        + 'usually goes looking for a data error. The relaxation of each row by a big-M term that one binary '
+        + 'switches off is what "or" actually costs.';
+      return;
+    }
+    if (sol.status !== 'optimal') {
+      status.innerHTML = 'At this setting the model is <strong>' + ipEsc(sol.status)
+        + '</strong>. An M below the tightest valid value does that: it does not merely weaken the bound, '
+        + 'it cuts off schedules that exist.';
+      return;
+    }
+    var frac = !Rint(yVal);
+    status.innerHTML = (mode === 'free'
+        ? 'Left continuous, the relaxation sets <strong>y = ' + Rtext(yVal) + '</strong>'
+        : 'With <strong>y = ' + mode + '</strong> the model enforces ' + (mode === '1' ? spec.nameA : spec.nameB))
+      + ' and starts the jobs at <strong>(' + Rtext(sol.x[0]) + ', ' + Rtext(sol.x[1]) + ')</strong>, costing '
+      + Rtext(sol.zOrig) + '. '
+      + (frac
+          ? 'That y is not 0 and not 1: it says job one is <strong>' + Rpct(yVal, 0) + ' before</strong> job two '
+            + 'and the rest of it after, which is not a schedule. Both rows are half-relaxed at once, so both jobs '
+            + 'may start at the same moment on one machine &mdash; the relaxation has bought a plan that cannot be run, '
+            + 'and its cost is a bound and nothing else.'
+          : 'Each branch is a genuine schedule, and the better of the two is what the integer problem wants. '
+            + 'Sequencing two jobs on one machine IS this pair of constraints, which is why a job shop is an '
+            + 'integer programme rather than a linear one.');
+  }
+
+  [preSel, ySel].forEach(function (el) { el.addEventListener('change', redraw); });
+  [maS, mbS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "integer-programming/either-or-constraints-and-disjunctions";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2632 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AVL Insertion | Lesson | Data Structures | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="After an insertion, at most one node is out of balance — the lowest unbalanced ancestor — and one of four cases applies. The outside cases need a single rotation, the inside cases need two, and one fix restores balance all the way to the root. Ten keys in increasing order give height 3 with six rebalances, against 9 for the plain tree on the same order." />
+  <link rel="canonical" href="https://learn.geterdone.io/data-structures/avl-insertion/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="AVL Insertion | Lesson | Data Structures | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="After an insertion, at most one node is out of balance — the lowest unbalanced ancestor — and one of four cases applies. The outside cases need a single rotation, the inside cases need two, and one fix restores balance all the way to the root. Ten keys in increasing order give height 3 with six rebalances, against 9 for the plain tree on the same order." />
+  <meta property="og:url" content="https://learn.geterdone.io/data-structures/avl-insertion/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="AVL Insertion | Lesson | Data Structures | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="After an insertion, at most one node is out of balance — the lowest unbalanced ancestor — and one of four cases applies. The outside cases need a single rotation, the inside cases need two, and one fix restores balance all the way to the root. Ten keys in increasing order give height 3 with six rebalances, against 9 for the plain tree on the same order." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/data-structures/avl-insertion/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Data Structures</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">AVL Insertion</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The avl insertion and the four cases is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Data Structures &middot; Search trees</span>
+        <h1>AVL Insertion</h1>
+        <p>After an insertion, at most one node is out of balance &mdash; the lowest unbalanced ancestor &mdash; and one of four cases applies. The outside cases need a single rotation, the inside cases need two, and one fix restores balance all the way to the root. Ten keys in increasing order give height <span class="math">3</span> with six rebalances, against <span class="math">9</span> for the plain tree on the same order.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">after an insert, walk back up;  fix the LOWEST unbalanced ancestor
+
+balance +2, key in the left child&#x27;s LEFT  subtree     LL    rotate right
+balance −2, key in the right child&#x27;s RIGHT subtree    RR    rotate left
+balance +2, key in the left child&#x27;s RIGHT subtree     LR    left, then right
+balance −2, key in the right child&#x27;s LEFT  subtree    RL    right, then left
+
+1 … 10 in order:   AVL height 3, 6 rebalances    plain tree height 9</div>
+        <div class="float-label" style="right:16px;bottom:16px;">The four cases, and what one fix costs</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One decision procedure, one counting fact, and one thing that is genuinely surprising the first time: fixing a single node fixes the whole tree.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Only the ancestors of the new key can be unbalanced</h3><p>An insertion changes the height of nothing except the nodes on the path from the new leaf to the root, because every other subtree is untouched. So the repair walks back up that path, and the node to fix is the lowest one whose balance factor has reached <span class="math">±2</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The case is decided by two turns, not by the keys</h3><p>Look at the direction from the unbalanced node to its taller child, and then from that child toward the new key. Same direction twice &mdash; left-left or right-right &mdash; and one rotation suffices. Different directions &mdash; left-right or right-left &mdash; and one rotation moves the problem sideways rather than fixing it, so two are needed.</p></article><article class="card concept-card"><div class="icon">3</div><h3>One fix restores the whole tree</h3><p>After the rebalance the subtree is exactly as tall as it was before the insertion, so every ancestor&rsquo;s balance factor returns to what it was, and none of them needs anything. That is why an AVL insertion costs at most one single or one double rotation regardless of <span class="math">n</span>, and it is a property of insertion specifically &mdash; deletion can need a rotation at every level, which is one reason this course states AVL deletion and does not develop it.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The four cases, the double rotation, and the height against the plain tree</h2></div><p>Why the inside cases need two rotations, why one fix is enough, and what the measured heights are on the same insertion order.</p></div>
+      <article class="card card-pad prose"><p>Insert the key exactly as in a plain search tree: walk to where the search fails and attach a leaf. Then walk back up the path updating heights. If some node&rsquo;s balance factor reaches <span class="math">+2</span> or <span class="math">−2</span>, rebalance there and stop. The lowest such node is the one to fix, and there is at most one of them.</p><h3>The two outside cases</h3><p>Suppose node <span class="math">z</span> has balance <span class="math">+2</span> &mdash; its left subtree is two taller &mdash; and the new key went into the LEFT subtree of <span class="math">z</span>&rsquo;s left child. That is the LL case, and one right rotation at <span class="math">z</span> fixes it: the left child rises, <span class="math">z</span> drops to its right, and the two sides come out equal. RR is the mirror image, fixed by one left rotation.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">LL,  keys 30 20 10                       one right rotation at 30
+
+      30   (+2)                                  20   (0)
+   20                                        10      30
+10
+
+RR,  keys 10 20 30                       one left rotation at 10
+
+  10   (−2)                                      20   (0)
+      20                                     10      30
+         30</div><h3>The two inside cases, and why one rotation is not enough</h3><p>Now suppose <span class="math">z</span> has balance <span class="math">+2</span> and the new key went into the RIGHT subtree of <span class="math">z</span>&rsquo;s left child &mdash; the LR case. A single right rotation at <span class="math">z</span> lifts the left child, but the offending subtree was on that child&rsquo;s right, so it lands back on the left of <span class="math">z</span> and the tree is now <span class="math">−2</span> the other way. The fix is to rotate the child left first, converting LR into LL, and then rotate <span class="math">z</span> right.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">LR,  keys 30 10 20
+
+      30   (+2)          rotate 10 LEFT:      30          then 30 RIGHT:
+   10                                      20                    20
+      20                                10                   10      30
+
+  the grandchild 20 ends up as the root, which is what a double rotation
+  always does:  the INNER grandchild rises two levels
+
+RL,  keys 10 30 20       rotate 30 RIGHT, then 10 LEFT     same result</div><p>The lab names the case at every rebalance and animates it. On the three-key sequences above it reports <span class="math">LL</span>, <span class="math">LR</span> and <span class="math">RL</span> respectively, each with one rebalance, each ending at the same tree <span class="math">20</span> with children <span class="math">10</span> and <span class="math">30</span> &mdash; the same final shape reached three different ways, which is worth seeing because it makes the case analysis feel less arbitrary.</p><div class="thm"><span class="label">Theorem &middot; One rebalance per insertion suffices</span><p>After an AVL insertion, rebalancing the lowest unbalanced ancestor restores the invariant everywhere.</p><p>Before the insertion the subtree rooted at that node had some height <span class="math">h</span>. The insertion made it <span class="math">h + 1</span>, which is what unbalanced it. Both the single and the double rotation return the subtree to height <span class="math">h</span>. So from that node upward nothing has changed height at all, and every ancestor&rsquo;s balance factor is what it was before the insertion &mdash; which was legal. Hence one fix, at most two rotations, regardless of how tall the tree is.</p></div><h3>The measurement, on the input that breaks a plain tree</h3><p>Insert <span class="math">1</span> through <span class="math">10</span> in increasing order &mdash; the order that turns a plain search tree into a path. The lab runs both:</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">keys 1 2 3 4 5 6 7 8 9 10,  in order
+
+                        AVL      plain BST
+height                    3              9
+rebalances                6              —
+comparisons              25
+
+the six fixes, in order:   RR at 3, RR at 5, RR at 6,
+                           RR at 7, RR at 9, RR at 10
+
+height bound from N(h) at n = 10:   N(3) = 7 ≤ 10,  N(4) = 12 &gt; 10
+                                    so h ≤ 3,  and the tree achieves it</div><p>Every one of the six fixes is the RR case, because every key arrives larger than everything present. Height <span class="math">3</span> against <span class="math">9</span>, on the input that is worst for the plain tree and costs the AVL tree six rotations &mdash; one per rebalance, since RR is a single rotation. The bound from the <span class="math">N(h)</span> table is <span class="math">3</span>, and the tree reaches it.</p><p>A mixed order shows all four cases and a smaller gap. On the thirteen keys <span class="math">50 25 75 10 5 30 27 60 90 80 70 98 62</span> the lab reports four rebalances &mdash; <span class="math">LL</span> at <span class="math">5</span>, <span class="math">LR</span> at <span class="math">30</span>, <span class="math">RR</span> at <span class="math">80</span>, <span class="math">RL</span> at <span class="math">62</span> &mdash; giving height <span class="math">3</span> against the plain tree&rsquo;s <span class="math">4</span>, with <span class="math">33</span> comparisons. The gap is one level, because that order was already reasonably balanced. Which is the caution: the measured benefit of balancing depends entirely on the order you measured it on, and the guarantee &mdash; <span class="math">h ≤ 1.44 log₂ n</span> for every order &mdash; is the reason to pay for it.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>AVL insertion and the four cases</h2></div><p>One fix at the lowest unbalanced ancestor restores the invariant everywhere</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>AVL insertion, with the case named</strong><span>four cases, two of which need two rotations</span></div>
+        <div class="inline-legend"><span class="tone-amber"><i class="legend-swatch"></i>a double rotation</span><span class="tone-muted"><i class="legend-swatch"></i>balance factors above each node</span></div>
+      </div>
+      <div class="lab-stage" id="taStage" tabindex="0" role="region" aria-label="The AVL tree after the chosen number of insertions."><svg id="taTree" style="min-width:660px" viewBox="0 0 660 240" role="img" aria-label="The AVL tree after the chosen number of insertions."></svg></div>
+      <div class="lab-stage" id="taPlainStage" tabindex="0" role="region" aria-label="The plain search tree on the same insertion order."><svg id="taPlain" style="min-width:520px" viewBox="0 0 520 210" role="img" aria-label="The plain search tree on the same insertion order."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="taTable"></table></div>
+      <div class="status-banner" id="taStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Insert, and watch the case get named</h3>
+          <p>Type a key sequence. Each insertion is animated, every rebalance is labelled <span class="math">LL</span>, <span class="math">RR</span>, <span class="math">LR</span> or <span class="math">RL</span> with the node it happened at, and the panel reports the resulting height beside the plain search tree&rsquo;s height on the identical order. The opening sequence produces all four cases; the ascending preset produces six of one case and the largest gap.</p>
+        <div class="field" id="taPresetField">
+          <label for="taPreset">Worked example</label>
+          <select id="taPreset"><option value="ascending">insert one to ten in order</option><option value="ll">the outside case on the left</option><option value="lr">the inside case on the left</option><option value="rl">the inside case on the right</option><option value="mixed" selected>a sequence that produces all four cases</option></select>
+        </div>
+        <div class="field" id="taKeysField">
+          <label for="taKeys">Keys, in insertion order</label>
+          <input id="taKeys" type="text" value="50 25 75 10 5 30 27 60 90 80 70 98 62" inputmode="text" autocomplete="off" />
+        </div>
+        <div id="taCountRow">
+          <div class="range-row"><label class="small-copy" for="taCount" id="taCountLab">insert the first</label><span class="range-value" id="taCountOut">&mdash;</span></div>
+          <input id="taCount" type="range" min="1" max="20" step="1" value="13" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>AVL height</span><strong id="taHeight">&mdash;</strong></div>
+          <div class="kpi"><span>Plain search tree height</span><strong id="taPlainH">&mdash;</strong></div>
+          <div class="kpi"><span>Rebalances</span><strong id="taRots">&mdash;</strong></div>
+          <div class="kpi"><span>Cases seen</span><strong id="taCases">&mdash;</strong></div>
+          <div class="kpi"><span>Of them, double rotations</span><strong id="taDoubles">&mdash;</strong></div>
+          <div class="kpi"><span>Fewest nodes at this height</span><strong id="taMin">&mdash;</strong></div>
+          <div class="kpi"><span>Tallest this many nodes may be</span><strong id="taBound">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="taHint" style="margin:0;">The case is named as it happens: LL and RR are fixed by one rotation, LR and RL by two. Insert 30, 10, 20 for an inside case and 30, 20, 10 for an outside one, and watch the plain tree beside it grow into a path while the AVL tree does not.</p>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Inserting into an AVL tree</h2></div><p>Insert, then walk up, then name the case before rotating. Naming it first is what stops a double rotation being attempted as a single one.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Insert as an ordinary search tree, then walk back up</h3><p>The key goes where the search failed. Update the height at each node on the way back to the root and watch the balance factors. Stop at the first node &mdash; the lowest &mdash; whose factor reaches <span class="math">±2</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Name the case from two directions</h3><p>From the unbalanced node to its taller child: left or right. From that child toward the new key: left or right. Same twice is LL or RR; different is LR or RL. The keys&rsquo; values play no part beyond telling you which way the walk went.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Rotate once for an outside case, twice for an inside one</h3><p>LL: rotate right at the unbalanced node. RR: rotate left. LR: rotate the left child left, then the node right. RL: rotate the right child right, then the node left. In the double cases the inner grandchild ends up as the subtree root, which is the thing to check afterwards.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Stop, and verify you may</h3><p>One fix is enough: the subtree is back to its pre-insertion height, so no ancestor has changed. Confirm it by checking the balance factor at the parent of where you rotated &mdash; it should be what it was before the insertion, and if it is not, the rotation was wrong.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Cases and counts</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Four keys that produce an inside case</h3><p>The LR case in full, because it is the one people attempt as a single rotation. Keys arriving <span class="math">30, 10, 20</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">insert 30        30                        balance 0
+
+insert 10        30   (+1)                 still legal
+              10
+
+insert 20        30   (+2)                 lowest unbalanced node: 30
+              10                           from 30 to taller child: LEFT
+                 20                        from 10 toward 20:      RIGHT
+                                           →  LR, a double rotation
+
+  the single rotation that does NOT work:  rotate 30 right
+                 10                       balance at 10 is now −2
+                    30                    the problem moved, unfixed
+                 20
+
+  step 1:  rotate 10 LEFT      30          now it is an LL case
+                            20
+                         10
+
+  step 2:  rotate 30 RIGHT     20          balance 0 everywhere
+                            10    30
+
+in-order 10 20 30 throughout    height 2 → 1    one rebalance, named LR</div><p>The failed single rotation is the useful half of this example. Rotating <span class="math">30</span> right lifts <span class="math">10</span>, but <span class="math">20</span> was hanging on <span class="math">10</span>&rsquo;s right, so it comes along and lands under <span class="math">30</span> again &mdash; the tree is now left-light instead of left-heavy and is still illegal. The first rotation of the double exists to move <span class="math">20</span> onto the outside, where a single rotation can reach it.</p><p>The inner grandchild ends as the subtree root. That is true of every double rotation and is the quickest way to check one: in the LR case the right child of the left child rises two levels. If something else ended up on top, the two rotations were done in the wrong order.</p><p>For a faded rehearsal, insert <span class="math">10, 30, 20</span> &mdash; the RL case, the mirror of this one. The supplied observation is that it must end at the same tree, <span class="math">20</span> with children <span class="math">10</span> and <span class="math">30</span>, because there is only one AVL tree on three keys. Name the two rotations and their nodes, then run the lab&rsquo;s ascending preset and say why all six of its rebalances are the same case.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Attempting an inside case with a single rotation</strong><span>Rotating <span class="math">30</span> right in the tree <span class="math">30, 10, 20</span> lifts <span class="math">10</span> and brings <span class="math">20</span> along with it, leaving the tree unbalanced in the opposite direction. The first rotation of a double exists to move the offending subtree to the outside. The check afterwards is that the inner grandchild is now the subtree root.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Rebalancing the highest unbalanced node instead of the lowest</strong><span>Walk up from the new leaf and fix the first node that reaches <span class="math">±2</span>. Fixing a higher one first can leave the lower one illegal, and the argument that one fix suffices depends on the subtree returning to the height it had before the insertion &mdash; which is only true of the lowest such node.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the measured height gap as the value of balancing</strong><span>On increasing keys the gap is <span class="math">3</span> against <span class="math">9</span>; on a reasonably mixed order it is <span class="math">3</span> against <span class="math">4</span>. Both are real measurements and neither is the reason to use an AVL tree. The reason is the guarantee &mdash; <span class="math">h ≤ 1.44 log₂ n</span> on every input, including the one you did not test &mdash; and a measured gap on a chosen order is not that.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name the case from two turns before touching a pointer.</strong><p>You should be able to insert a key sequence by hand, identify the lowest unbalanced ancestor, name the case, perform the right number of rotations with the inner grandchild ending on top in the double cases, and say why one fix suffices for an insertion in terms of the subtree&rsquo;s height.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A balanced tree gives search, predecessor and an ordered walk in <span class="math">O(log n)</span>, and one extra integer per node gives it two more operations. &ldquo;Augmenting a Tree&rdquo; stores the subtree size at every node, gets <span class="math">rank</span> and <span class="math">select</span> in <span class="math">O(log n)</span> from it, and shows the rotation updating the field &mdash; which is the part that goes stale if it is forgotten.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../rotations-and-the-avl-invariant/" rel="prev"><span>Lesson</span><strong>Rotations and the AVL Invariant</strong></a>
+      <a class="lesson-link next" href="../augmenting-a-tree/" rel="next"><span>Lesson</span><strong>Augmenting a Tree</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="data-structures/avl-insertion" data-lesson-title="AVL Insertion" data-course-title="Data Structures">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Data Structures.</strong> Every count on this course is produced by executing the operation sequence on the structure drawn beside it. Expected chain lengths and load factors are exact fractions; <span class="math">Σ ⌈n/2ʰ⁺¹⌉·h</span> is evaluated exactly. Two numbers are approximations and say so: linear probing's <span class="math">½(1 + 1/(1−α)²)</span>, which is Knuth's and which the lab refuses to quote at all above <span class="math">α = 0.98</span>, and the <span class="math">2 ln n</span> expected depth of a random search tree, which is asymptotic and is printed beside the height and the mean depth that were measured.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A node has balance factor <span class=\"math\">+2<\/span> and the newly inserted key went into the right subtree of that node&rsquo;s left child. Which case is it?", "a": ["LL, one right rotation", "LR, a left rotation then a right one", "RL, a right rotation then a left one", "RR, one left rotation"], "c": 1, "why": "<span class=\"math\">+2<\/span> means left-heavy, so the first letter is L; the key went right from there, so the second is R. LR is an inside case and needs two rotations: the left child rotates left to move the offending subtree outward, then the unbalanced node rotates right. A single right rotation leaves the tree unbalanced the other way."}, {"q": "Inserting <span class=\"math\">1<\/span> through <span class=\"math\">10<\/span> in increasing order gives an AVL tree of height <span class=\"math\">3<\/span> and a plain search tree of height <span class=\"math\">9<\/span>. How many rebalances did the AVL insertion perform?", "a": ["<span class=\"math\">1<\/span>", "<span class=\"math\">3<\/span>", "<span class=\"math\">6<\/span>", "<span class=\"math\">9<\/span>"], "c": 2, "why": "The lab counts six, all of them RR, because every arriving key is larger than everything present. One rebalance per insertion is the maximum, not the rule &mdash; four of the ten insertions needed nothing. <span class=\"math\">3<\/span> is the resulting height and <span class=\"math\">9<\/span> is the plain tree&rsquo;s."}, {"q": "Why does rebalancing one node restore the invariant for the whole tree after an insertion?", "a": ["Because the rotations are applied bottom-up until the root is reached", "Because the rotation returns that subtree to its height before the insertion, so no ancestor changed", "Because an insertion can only unbalance the root", "Because the balance factors are recomputed for every node afterwards"], "c": 1, "why": "The insertion raised that subtree from <span class=\"math\">h<\/span> to <span class=\"math\">h + 1<\/span>; both the single and the double rotation bring it back to <span class=\"math\">h<\/span>. Every ancestor therefore sees the height it saw before the insertion, and their balance factors were legal then. No further walking is needed &mdash; which is specific to insertion, since a deletion can require a rotation at every level."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* A tree renderer, shared for the same reason the graph one is: six kinds of
+     tree are drawn on this path -- search trees, AVL and treaps, Huffman codes,
+     tries, DP subproblem trees, branch-and-bound search trees -- and every one
+     of them was about to be a helper closed over its own lab's element.
+
+     It is generic over the node type: `kids(node)` returns the children (nulls
+     included, so a BST's missing left child still leaves a gap where it
+     belongs) and `label(node)` returns what goes in the circle. x is the
+     in-order position, y is the depth, which is the layout that makes a search
+     tree's in-order sequence readable straight off the drawing. */
+  function treeLayout(root, kids, label, opts) {
+    opts = opts || {};
+    var nodes = [], links = [], next = 0, maxDepth = 0;
+    (function place(node, depth, parent) {
+      if (!node) { next += opts.gaps === false ? 0 : 0.5; return null; }
+      var children = kids(node) || [];
+      var left = children.length ? place(children[0], depth + 1, null) : null;
+      var me = { node: node, label: label(node), depth: depth, order: next, id: nodes.length };
+      next += 1;
+      nodes.push(me);
+      if (left) links.push({ from: me.id, to: left.id, side: 0 });
+      for (var k = 1; k < children.length; k += 1) {
+        var c = place(children[k], depth + 1, null);
+        if (c) links.push({ from: me.id, to: c.id, side: k });
+      }
+      if (depth > maxDepth) maxDepth = depth;
+      return me;
+    })(root, 0, null);
+    var w = opts.width === undefined ? 460 : opts.width;
+    var h = opts.height === undefined ? 210 : opts.height;
+    var cols = Math.max(1, next - 1), rows = Math.max(1, maxDepth);
+    nodes.forEach(function (n) {
+      n.x = 26 + (n.order / cols) * (w - 52);
+      n.y = 22 + (n.depth / rows) * (h - 44);
+    });
+    return { nodes: nodes, links: links, depth: maxDepth, count: nodes.length };
+  }
+  function treeSvg(layout, opts) {
+    opts = opts || {};
+    var hi = {};
+    (opts.highlight || []).forEach(function (i) { hi[i] = true; });
+    var s = '', r = opts.radius === undefined ? 14 : opts.radius;
+    layout.links.forEach(function (l) {
+      var a = layout.nodes[l.from], b = layout.nodes[l.to];
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="'
+        + (hi[l.to] ? 'var(--cyan)' : 'var(--line-strong)') + '" stroke-width="'
+        + (hi[l.to] ? 3 : 1.6) + '" />';
+    });
+    layout.nodes.forEach(function (n) {
+      var fill = opts.fill ? opts.fill(n) : (hi[n.id] ? 'var(--cyan)' : 'var(--panel-3)');
+      s += '<circle cx="' + n.x.toFixed(1) + '" cy="' + n.y.toFixed(1) + '" r="' + r
+        + '" fill="' + fill + '" stroke="var(--line-strong)" stroke-width="1.8" />';
+      s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="'
+        + (hi[n.id] ? 'var(--on-accent)' : 'var(--text)') + '">' + n.label + '</text>';
+      if (opts.note) {
+        var note = opts.note(n);
+        if (note) s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y - r - 4).toFixed(1)
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + note + '</text>';
+      }
+    });
+    return s;
+  }
+  function drawTree(el, root, kids, label, opts) {
+    var s = treeSvg(treeLayout(root, kids, label, opts), opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Search trees. A node is { key, l, r, size, height, priority }; an empty
+     subtree is null. Every routine returns a NEW tree rather than mutating the
+     one it was given, so a mode can draw before and after without keeping its
+     own copy, and so a trace step can hold the actual tree it describes.
+
+     The one approximation in this block is randomBstDepthApprox, and it is one
+     of the four the path's footer names. */
+  function bstNode(key) { return { key: key, l: null, r: null, size: 1, height: 0, priority: 0 }; }
+  function bstCopy(t) {
+    if (!t) return null;
+    return { key: t.key, l: bstCopy(t.l), r: bstCopy(t.r), size: t.size,
+             height: t.height, priority: t.priority };
+  }
+  function bstFix(t) {
+    if (!t) return null;
+    t.size = 1 + (t.l ? t.l.size : 0) + (t.r ? t.r.size : 0);
+    t.height = 1 + Math.max(t.l ? t.l.height : -1, t.r ? t.r.height : -1);
+    return t;
+  }
+  function bstKids(t) { return [t.l, t.r]; }
+  function bstInorder(t) {
+    var out = [];
+    (function walk(n) { if (!n) return; walk(n.l); out.push(n.key); walk(n.r); })(t);
+    return out;
+  }
+  function bstHeight(t) { return t ? t.height : -1; }
+  function bstDepths(t) {
+    var out = [];
+    (function walk(n, d) { if (!n) return; out.push(d); walk(n.l, d + 1); walk(n.r, d + 1); })(t, 0);
+    return out;
+  }
+
+  /* THE GLOBAL CHECK AND THE LOCAL ONE, which is why bstValid takes bounds.
+     Checking only that each node sits between its two children passes trees
+     that are not search trees at all -- the classic wrong answer -- so both
+     verdicts are returned and the lesson shows an instance where they differ. */
+  function bstValid(t, lo, hi) {
+    if (!t) return true;
+    if (lo !== null && lo !== undefined && t.key <= lo) return false;
+    if (hi !== null && hi !== undefined && t.key >= hi) return false;
+    return bstValid(t.l, lo, t.key) && bstValid(t.r, t.key, hi);
+  }
+  function bstLocallyValid(t) {
+    if (!t) return true;
+    if (t.l && t.l.key >= t.key) return false;
+    if (t.r && t.r.key <= t.key) return false;
+    return bstLocallyValid(t.l) && bstLocallyValid(t.r);
+  }
+
+  function bstInsert(root, key, c) {
+    var made = false;
+    function go(t) {
+      if (!t) { made = true; if (c) c.writes += 1; return bstNode(key); }
+      if (c) c.compares += 1;
+      if (key < t.key) t.l = go(t.l);
+      else if (key > t.key) t.r = go(t.r);
+      else return t;
+      return bstFix(t);
+    }
+    var out = go(root);
+    return { root: bstFix(out), inserted: made };
+  }
+  function bstSearch(root, key, c) {
+    var path = [], t = root;
+    while (t) {
+      path.push(t.key);
+      if (c) c.compares += 1;
+      if (key === t.key) return { found: true, path: path };
+      t = key < t.key ? t.l : t.r;
+    }
+    return { found: false, path: path };
+  }
+  /* Deletion, with the two-child case the lesson animates: the node's key is
+     replaced by its in-order SUCCESSOR -- the minimum of the right subtree --
+     and that successor, which has no left child by construction, is deleted
+     from there. `replaced` is what the animation steps through. */
+  function bstDelete(root, key, c) {
+    var replaced = null, removed = false;
+    function minOf(t) { while (t.l) t = t.l; return t; }
+    function go(t) {
+      if (!t) return null;
+      if (c) c.compares += 1;
+      if (key < t.key) { t.l = go(t.l); return bstFix(t); }
+      if (key > t.key) { t.r = go(t.r); return bstFix(t); }
+      removed = true;
+      if (!t.l) return t.r;
+      if (!t.r) return t.l;
+      var s = minOf(t.r);
+      replaced = { from: t.key, to: s.key };
+      t.key = s.key;
+      var k = key; key = s.key;
+      t.r = go(t.r);
+      key = k;
+      return bstFix(t);
+    }
+    var out = go(root);
+    return { root: out, removed: removed, replaced: replaced };
+  }
+
+  /* One operation sequence, with the tree after each step. ops are
+     { op: 'insert' | 'delete' | 'search', key }. */
+  function bstRun(ops) {
+    var root = null, c = counter(), trace = [];
+    ops.forEach(function (o, i) {
+      var note = null;
+      if (o.op === 'insert') { var r = bstInsert(root, o.key, c); root = r.root; note = r.inserted ? 'inserted' : 'already present'; }
+      else if (o.op === 'delete') { var d = bstDelete(root, o.key, c); root = d.root; note = d.replaced ? ('successor ' + d.replaced.to + ' moved up') : (d.removed ? 'removed' : 'absent'); }
+      else { var s = bstSearch(root, o.key, c); note = s.found ? ('found via ' + s.path.join(' -> ')) : 'not found'; }
+      trace.push({ at: i, op: o.op, key: o.key, note: note, tree: bstCopy(root),
+                   inorder: bstInorder(root), valid: bstValid(root, null, null) });
+    });
+    return runOf({ root: root, inorder: bstInorder(root), height: bstHeight(root),
+                   valid: bstValid(root, null, null), locallyValid: bstLocallyValid(root) },
+                 usedCounts(c), trace);
+  }
+
+  /* Height and mean depth under one insertion order. The panel plots the mean
+     against 2 ln n, which is an ASYMPTOTIC statement about a uniformly random
+     order and is drawn as a labelled reference curve, never as the answer. */
+  function bstFromOrder(order) {
+    var root = null, c = counter();
+    order.forEach(function (k) { root = bstInsert(root, k, c).root; });
+    var depths = bstDepths(root), total = depths.reduce(function (a, b) { return a + b; }, 0);
+    return runOf({ root: root, height: bstHeight(root), depths: depths,
+                   meanDepth: R(BigInt(total), BigInt(depths.length || 1)) },
+                 usedCounts(c), []);
+  }
+  /* 2 ln n -- APPROXIMATE, and one of the four this path's footer names. It is
+     the asymptotic mean root-to-node depth of a tree built from a uniformly
+     random insertion order. At n = 15 it reads 5.42 against a true mean nearer
+     4.6: the arithmetic is a double and correct to ~1e-15, and the STATEMENT is
+     an asymptote, which is a different kind of wrong from a rounding. */
+  function randomBstDepthApprox(n) { return n > 0 ? 2 * logApprox(n) : 0; }
+
+  /* Rotation. dir 'right' lifts the left child, dir 'left' lifts the right one.
+     The in-order sequence is unchanged by construction and the panel checks it,
+     because "a rotation preserves the search order" is the claim on which every
+     balanced tree rests. */
+  function rotate(t, dir) {
+    if (!t) return null;
+    var out;
+    if (dir === 'right') {
+      if (!t.l) return t;
+      out = t.l; t.l = out.r; out.r = t;
+    } else {
+      if (!t.r) return t;
+      out = t.r; t.r = out.l; out.l = t;
+    }
+    bstFix(t); bstFix(out);
+    return out;
+  }
+  /* N(h): the fewest nodes an AVL tree of height h can hold, N(h) = N(h-1) +
+     N(h-2) + 1. The table is the bound on an AVL tree's height, and it is a
+     recurrence evaluated, not a log quoted. */
+  function minAvlNodes(h) {
+    var rows = [{ h: 0, n: 1 }, { h: 1, n: 2 }];
+    for (var k = 2; k <= h; k += 1) rows.push({ h: k, n: rows[k - 1].n + rows[k - 2].n + 1 });
+    return { rows: rows.slice(0, Math.max(1, h + 1)), n: rows[Math.min(h, rows.length - 1)].n };
+  }
+  function bstBalance(t) { return t ? bstHeight(t.l) - bstHeight(t.r) : 0; }
+  /* AVL insertion, with the case NAMED at each rebalance -- LL, LR, RR, RL --
+     because the case is what the reader has to learn to recognise. */
+  function avlInsert(keys) {
+    var c = counter(), trace = [], root = null;
+    function fixUp(t, key) {
+      bstFix(t);
+      var bal = bstBalance(t), which = null;
+      if (bal > 1 && key < t.l.key) { which = 'LL'; t = rotate(t, 'right'); }
+      else if (bal < -1 && key > t.r.key) { which = 'RR'; t = rotate(t, 'left'); }
+      else if (bal > 1) { which = 'LR'; t.l = rotate(t.l, 'left'); t = rotate(t, 'right'); }
+      else if (bal < -1) { which = 'RL'; t.r = rotate(t.r, 'right'); t = rotate(t, 'left'); }
+      if (which) { c.swaps += 1; trace.push({ at: trace.length, key: key, rebalance: which, root: t.key }); }
+      return t;
+    }
+    keys.forEach(function (key) {
+      root = (function go(t) {
+        if (!t) { c.writes += 1; return bstNode(key); }
+        c.compares += 1;
+        if (key < t.key) t.l = go(t.l);
+        else if (key > t.key) t.r = go(t.r);
+        else return t;
+        return fixUp(t, key);
+      })(root);
+    });
+    var plain = bstFromOrder(keys);
+    return runOf({ root: root, height: bstHeight(root), inorder: bstInorder(root),
+                   plainHeight: plain.result.height, rebalances: trace.length,
+                   minNodesForHeight: minAvlNodes(bstHeight(root)).n },
+                 usedCounts(c), trace);
+  }
+
+  /* An order-statistic tree: every node carries the size of its subtree, so
+     rank, select and a range count are walks rather than scans. The walk is
+     traced because the subtraction at each right turn is the step readers get
+     wrong. */
+  function augmentWalk(root, query) {
+    var c = counter(), trace = [], t = root, result = null;
+    if (query.op === 'select') {
+      var i = query.i;
+      while (t) {
+        var left = t.l ? t.l.size : 0;
+        c.compares += 1;
+        trace.push({ at: trace.length, node: t.key, leftSize: left, want: i });
+        if (i === left + 1) { result = t.key; break; }
+        if (i <= left) t = t.l;
+        else { i -= left + 1; t = t.r; }
+      }
+    } else if (query.op === 'rank') {
+      var rank = 0;
+      while (t) {
+        var l2 = t.l ? t.l.size : 0;
+        c.compares += 1;
+        trace.push({ at: trace.length, node: t.key, leftSize: l2, running: rank });
+        if (query.key === t.key) { rank += l2 + 1; result = rank; break; }
+        if (query.key < t.key) t = t.l;
+        else { rank += l2 + 1; t = t.r; }
+      }
+    } else {
+      /* rangeCount(lo, hi) as TWO WALKS and not a scan: the keys at most hi
+         minus the keys below lo, each counted by adding a subtree size at every
+         right turn. Scanning the in-order list would give the same number and
+         would not be the lesson, which is that the augmentation makes this
+         O(height). */
+      var hiCount = bstCountAtMost(root, query.hi, c, trace);
+      var loCount = bstCountBelow(root, query.lo, c, trace);
+      result = hiCount - loCount;
+    }
+    return runOf({ value: result }, usedCounts(c), trace);
+  }
+  function bstCountAtMost(root, key, c, trace) {
+    var n = 0, t = root;
+    while (t) {
+      var l = t.l ? t.l.size : 0;
+      if (c) c.compares += 1;
+      if (trace) trace.push({ at: trace.length, node: t.key, leftSize: l, running: n, want: '<= ' + key });
+      if (key < t.key) t = t.l;
+      else { n += l + 1; t = t.r; }
+    }
+    return n;
+  }
+  function bstCountBelow(root, key, c, trace) {
+    var n = 0, t = root;
+    while (t) {
+      var l = t.l ? t.l.size : 0;
+      if (c) c.compares += 1;
+      if (trace) trace.push({ at: trace.length, node: t.key, leftSize: l, running: n, want: '< ' + key });
+      if (key <= t.key) t = t.l;
+      else { n += l + 1; t = t.r; }
+    }
+    return n;
+  }
+
+  /* A treap: a search tree on the keys and a heap on the priorities. Two
+     insertion orders of the same (key, priority) set give the SAME tree, which
+     is the mode's point, so the rotations are counted and the shape returned. */
+  function treapInsert(keys, priorities) {
+    var c = counter(), trace = [], root = null;
+    keys.forEach(function (key, i) {
+      var pri = priorities[i];
+      root = (function go(t) {
+        if (!t) { var n = bstNode(key); n.priority = pri; c.writes += 1; return n; }
+        c.compares += 1;
+        if (key < t.key) {
+          t.l = go(t.l);
+          if (t.l.priority < t.priority) {
+            t = rotate(t, 'right'); c.swaps += 1;
+            trace.push({ at: trace.length, key: key, rotation: 'right', root: t.key });
+          }
+        } else if (key > t.key) {
+          t.r = go(t.r);
+          if (t.r.priority < t.priority) {
+            t = rotate(t, 'left'); c.swaps += 1;
+            trace.push({ at: trace.length, key: key, rotation: 'left', root: t.key });
+          }
+        }
+        return bstFix(t);
+      })(root);
+    });
+    var depths = bstDepths(root), total = depths.reduce(function (a, b) { return a + b; }, 0);
+    return runOf({ root: root, height: bstHeight(root), inorder: bstInorder(root),
+                   meanDepth: R(BigInt(total), BigInt(depths.length || 1)),
+                   heapOrdered: (function ok(t) {
+                     if (!t) return true;
+                     if (t.l && t.l.priority < t.priority) return false;
+                     if (t.r && t.r.priority < t.priority) return false;
+                     return ok(t.l) && ok(t.r);
+                   })(root) },
+                 usedCounts(c), trace);
+  }
+
+  /* A skip list from a COIN TAPE, so the levels are the reader's seed rather
+     than a hidden random source. A key's level is the run of heads at its place
+     on the tape; the search drops a level whenever the next node overshoots,
+     and the hops are what the panel plots against 2 log2 n. */
+  function skipBuild(keys, tape) {
+    var levels = [], c = counter(), at = 0, maxLevel = 0;
+    keys.forEach(function () {
+      var lvl = 0;
+      while (at < tape.length && tape[at] === 1 && lvl < 8) { lvl += 1; at += 1; }
+      at += 1;
+      levels.push(lvl);
+      if (lvl > maxLevel) maxLevel = lvl;
+    });
+    var sorted = keys.map(function (k, i) { return { key: k, level: levels[i] }; })
+                     .sort(function (a, b) { return a.key - b.key; });
+    function search(target) {
+      var lvl = maxLevel, i = -1, hops = 0, path = [];
+      while (lvl >= 0) {
+        var j = i + 1;
+        while (j < sorted.length) {
+          if (sorted[j].level < lvl) { j += 1; continue; }
+          hops += 1;
+          if (sorted[j].key > target) break;
+          path.push({ level: lvl, key: sorted[j].key });
+          i = j;
+          if (sorted[j].key === target) return { hops: hops, found: true, path: path };
+          j += 1;
+        }
+        lvl -= 1;
+      }
+      return { hops: hops, found: i >= 0 && sorted[i].key === target, path: path };
+    }
+    var totalHops = 0, worst = 0;
+    sorted.forEach(function (e) {
+      var r = search(e.key);
+      totalHops += r.hops; c.hops += r.hops;
+      if (r.hops > worst) worst = r.hops;
+    });
+    return runOf({ levels: levels, sorted: sorted, maxLevel: maxLevel, worstHops: worst,
+                   meanHops: R(BigInt(totalHops), BigInt(sorted.length || 1)),
+                   search: search },
+                 usedCounts(c), []);
+  }
+
+  /* ===================== what the reader typed ============================= */
+  function treeParseKeys(text, cap) {
+    var out = [], seen = {}, ignored = [], truncated = false;
+    (String(text === undefined || text === null ? '' : text).match(/-?\d+/g) || [])
+      .forEach(function (token) {
+        var v = parseInt(token, 10);
+        if (!isFinite(v) || v < 0) { ignored.push(token); return; }
+        if (seen[v]) return;
+        seen[v] = true;
+        if (out.length < cap) out.push(v); else truncated = true;
+      });
+    return { keys: out, ignored: ignored, truncated: truncated };
+  }
+  /* insert, delete and search in one line: 40 inserts, -40 deletes, ?40 looks
+     up. Keys are non-negative, so the minus sign is free to mean something. */
+  function treeParseOps(text, cap) {
+    var ops = [], ignored = [], truncated = false;
+    (String(text === undefined || text === null ? '' : text).match(/[+?-]?\d+/g) || [])
+      .forEach(function (token) {
+        var op = 'insert', body = token;
+        if (token.charAt(0) === '-') { op = 'delete'; body = token.slice(1); }
+        else if (token.charAt(0) === '?') { op = 'search'; body = token.slice(1); }
+        else if (token.charAt(0) === '+') { body = token.slice(1); }
+        var v = parseInt(body, 10);
+        if (!isFinite(v) || v < 0) { ignored.push(token); return; }
+        if (ops.length < cap) ops.push({ op: op, key: v }); else truncated = true;
+      });
+    return { ops: ops, ignored: ignored, truncated: truncated };
+  }
+
+  /* ===================== insertion orders ==================================
+
+     The SAME KEY SET in four orders, which is the whole content of the shape
+     lesson: the keys do not decide the tree, the order does.
+
+       sorted      1, 2, 3, ...        a path of height n - 1
+       reversed    n, n-1, ...         the same path, mirrored
+       shuffled    a uniformly random permutation from the reader's seed, by
+                   Fisher-Yates over SEEDED_JS
+       bisect      the middle, then the middle of each half: the order that
+                   gives the SHORTEST possible tree, so the reader has both ends
+                   of the range rather than only the bad one */
+  function insertOrder(kind, n, seed) {
+    var keys = [], i;
+    for (i = 1; i <= n; i += 1) keys.push(i * 10);
+    if (kind === 'sorted') return keys;
+    if (kind === 'reversed') return keys.slice().reverse();
+    if (kind === 'bisect') {
+      var out = [];
+      (function half(lo, hi) {
+        if (lo > hi) return;
+        var mid = Math.floor((lo + hi) / 2);
+        out.push(keys[mid]);
+        half(lo, mid - 1);
+        half(mid + 1, hi);
+      })(0, keys.length - 1);
+      return out;
+    }
+    var perm = algoPermutation(n, seed);
+    return perm.map(function (p) { return keys[p]; });
+  }
+
+  /* ===================== rotation at a chosen node =========================
+
+     rotate() rotates at the node it is handed. A panel that lets the reader
+     pick any node has to put the result back under that node's parent, which
+     is what this does, on a COPY -- so the before picture survives to be drawn
+     beside the after one.
+
+     `rotated` is false when the rotation was impossible: rotate() returns the
+     node unchanged when the child it would lift is missing, and a panel that
+     could not tell that from a real rotation would report "in-order unchanged"
+     as though something had happened. */
+  function rotateAt(root, key, dir) {
+    var copy = bstCopy(root), possible = false, found = false;
+    function go(t) {
+      if (!t) return null;
+      if (t.key === key) {
+        found = true;
+        possible = dir === 'right' ? !!t.l : !!t.r;
+        return rotate(t, dir);
+      }
+      if (key < t.key) t.l = go(t.l); else t.r = go(t.r);
+      return bstFix(t);
+    }
+    var out = go(copy);
+    return { root: bstFix(out), rotated: possible, found: found };
+  }
+
+  /* ===================== the counterexample to the local check =============
+
+     Every node sits between its two children -- 10 is below 20, 30 is above it,
+     25 is above 10 -- and the tree is not a search tree, because 25 is in 20's
+     LEFT subtree. bstValid carries the bounds down and says so; bstLocallyValid
+     checks only parent against child and does not. Built here rather than
+     stored, so both verdicts are computed in the reader's browser. */
+  function localOnlyTree() {
+    var root = bstNode(20), left = bstNode(10), right = bstNode(30), rogue = bstNode(25);
+    left.r = rogue;
+    root.l = left;
+    root.r = right;
+    bstFix(rogue); bstFix(left); bstFix(right); bstFix(root);
+    return root;
+  }
+
+  /* ===================== sizes, checked rather than trusted ================
+
+     "Augmentation is free" is the misconception, and a rotation is where it
+     stops being free. So the panel recomputes every subtree size from the tree
+     it is looking at and compares: an attribute that goes stale through a
+     rotation shows up here as a false, not as a wrong answer three queries
+     later. */
+  function sizesValid(t) {
+    if (!t) return true;
+    if (t.size !== 1 + (t.l ? t.l.size : 0) + (t.r ? t.r.size : 0)) return false;
+    return sizesValid(t.l) && sizesValid(t.r);
+  }
+  /* A tree as a string, so two trees can be compared for SHAPE rather than for
+     height. Two treaps on the same (key, priority) set are the same tree, and
+     equal heights would be much weaker evidence for that than equal shapes. */
+  function treeShape(t) {
+    if (!t) return '.';
+    return '(' + t.key + ' ' + treeShape(t.l) + ' ' + treeShape(t.r) + ')';
+  }
+  /* The tallest an AVL tree with n nodes can be: the largest h whose minimum
+     node count N(h) still fits inside n. A search over the recurrence, not a
+     logarithm. */
+  function avlHeightBound(n) {
+    var rows = minAvlNodes(28).rows, best = 0;
+    for (var i = 0; i < rows.length; i += 1) if (rows[i].n <= n) best = rows[i].h;
+    return best;
+  }
+
+  /* ===================== priorities for a treap ============================
+
+     Ranked rather than taken raw, so no two keys share a priority: a tie would
+     leave the treap shape undetermined and the mode's whole claim -- two
+     insertion orders of the same (key, priority) set give the same tree -- would
+     be false for a reason that has nothing to do with treaps. */
+  function treapPriorities(keys, seed) {
+    var draws = algoStream(seed, keys.length);
+    var idx = keys.map(function (_k, i) { return i; });
+    idx.sort(function (a, b) { return draws[a] - draws[b] || a - b; });
+    var map = {};
+    idx.forEach(function (i, rank) { map[keys[i]] = rank + 1; });
+    return map;
+  }
+  function prioritiesFor(order, map) {
+    return order.map(function (k) { return map[k]; });
+  }
+
+  /* ===================== the two reference curves ==========================
+
+     Neither is a count and the panels say so on the row where each appears.
+     2 ln n is one of the four approximations this path names: an ASYMPTOTE for
+     the mean depth of a tree built from a uniformly random order, which is
+     about 15% wrong about any particular small tree. 2 log2 n is a reference
+     curve for a skip list's expected hops, sampled at double precision; no
+     verdict is read off it. */
+  function hopsReference(n) { return n > 1 ? 2 * Math.log2(n) : 1; }
+
+  /* ===================== the drawings ======================================
+
+     drawBst is the only adapter between TREEDRAW_JS and a {key, l, r, size,
+     height, priority} node, and it is four lines: which children, what label,
+     which nodes to highlight, what note rides above each circle. Everything
+     that draws a tree on this kit goes through it. */
+  function bstLayout(root, opts) {
+    opts = opts || {};
+    return treeLayout(root, bstKids, function (t) { return String(t.key); },
+                      { width: opts.width === undefined ? 660 : opts.width,
+                        height: opts.height === undefined ? 210 : opts.height });
+  }
+  function bstSvg(root, opts) {
+    opts = opts || {};
+    var layout = bstLayout(root, opts), marked = [];
+    if (opts.mark) {
+      layout.nodes.forEach(function (nd) { if (opts.mark(nd.node)) marked.push(nd.id); });
+    }
+    var radius = opts.radius === undefined
+      ? Math.max(6, Math.min(14, Math.floor(96 / (layout.depth + 1)))) : opts.radius;
+    return treeSvg(layout, {
+      highlight: marked, radius: radius,
+      note: opts.note ? function (nd) { return opts.note(nd.node); } : null
+    });
+  }
+  function drawBst(el, root, opts) {
+    var s = root ? bstSvg(root, opts) : '<text x="20" y="40" font-size="12" '
+      + 'fill="var(--muted)">the tree is empty</text>';
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  /* A skip list: one row per level, a node drawn where its key sits in sorted
+     order, and the search path picked out. The express lanes are the lesson, so
+     the row a node is missing from matters as much as the rows it is in. */
+  function skipListSvg(sorted, maxLevel, path) {
+    var n = sorted.length, colW = n > 1 ? (596 / (n - 1)) : 0;
+    var rowH = Math.max(16, Math.min(34, Math.floor(196 / (maxLevel + 1))));
+    var onPath = {};
+    (path || []).forEach(function (p) { onPath[p.level + ':' + p.key] = true; });
+    var s = '', lvl, i;
+    for (lvl = maxLevel; lvl >= 0; lvl -= 1) {
+      var y = 22 + (maxLevel - lvl) * rowH, prevX = null;
+      s += '<text x="0" y="' + (y + 4) + '" font-size="10" fill="var(--muted)">L' + lvl + '</text>';
+      for (i = 0; i < n; i += 1) {
+        if (sorted[i].level < lvl) continue;
+        var x = 34 + i * colW;
+        if (prevX !== null) s += '<line x1="' + prevX.toFixed(1) + '" y1="' + y + '" x2="'
+          + x.toFixed(1) + '" y2="' + y + '" stroke="var(--line-strong)" stroke-width="1.4" />';
+        var hot = onPath[lvl + ':' + sorted[i].key];
+        s += '<circle cx="' + x.toFixed(1) + '" cy="' + y + '" r="' + (rowH >= 24 ? 8 : 6)
+          + '" fill="var(' + (hot ? '--cyan' : '--panel-3')
+          + ')" stroke="var(--line-strong)" stroke-width="1.4" />';
+        prevX = x;
+      }
+    }
+    var base = 22 + maxLevel * rowH + 20;
+    for (i = 0; i < n; i += 1) {
+      if (n <= 20 || i % 2 === 0) {
+        s += '<text x="' + (34 + i * colW).toFixed(1) + '" y="' + base
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + sorted[i].key + '</text>';
+      }
+    }
+    return s;
+  }
+  function drawSkipList(el, sorted, maxLevel, path) {
+    var s = skipListSvg(sorted, maxLevel, path);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  var PRESETS = [{"key": "ascending", "label": "insert one to ten in order", "keys": "1 2 3 4 5 6 7 8 9 10", "count": 10}, {"key": "ll", "label": "the outside case on the left", "keys": "30 20 10", "count": 3}, {"key": "lr", "label": "the inside case on the left", "keys": "30 10 20", "count": 3}, {"key": "rl", "label": "the inside case on the right", "keys": "10 30 20", "count": 3}, {"key": "mixed", "label": "a sequence that produces all four cases", "keys": "50 25 75 10 5 30 27 60 90 80 70 98 62", "count": 13}];
+
+  var stage = document.getElementById('taTree');
+  var plain = document.getElementById('taPlain');
+  var table = document.getElementById('taTable');
+  var status = document.getElementById('taStatus');
+  var preset = document.getElementById('taPreset');
+  var box = document.getElementById('taKeys');
+  var count = document.getElementById('taCount');
+  var CAP = 20;
+
+  function presetOf() {
+    for (var i = 0; i < PRESETS.length; i += 1) if (PRESETS[i].key === preset.value) return PRESETS[i];
+    throw new Error('avl: no preset named ' + preset.value);
+  }
+  function applyPreset() {
+    var p = presetOf();
+    box.value = p.keys;
+    count.value = p.count;
+  }
+  function balanceNote(nd) { return 'b ' + (bstHeight(nd.l) - bstHeight(nd.r)); }
+
+  function redraw() {
+    var parsed = treeParseKeys(box.value, CAP);
+    var all = parsed.keys;
+    var upto = Math.max(1, Math.min(+count.value, all.length));
+    document.getElementById('taCountOut').textContent = all.length
+      ? ('after ' + upto + ' of ' + all.length + ' inserts') : 'nothing to insert';
+    if (!all.length) {
+      stage.innerHTML = ''; plain.innerHTML = ''; table.innerHTML = '';
+      status.innerHTML = 'Type some keys to insert.';
+      return;
+    }
+    var keys = all.slice(0, upto);
+    var run = avlInsert(keys);
+    var r = run.result;
+    drawBst(stage, r.root, { width: 660, height: 210, note: balanceNote });
+    drawBst(plain, bstFromOrder(keys).result.root, { width: 520, height: 190 });
+
+    var cases = {};
+    run.trace.forEach(function (t) { cases[t.rebalance] = (cases[t.rebalance] || 0) + 1; });
+    var named = Object.keys(cases).sort();
+    var doubles = (cases.LR || 0) + (cases.RL || 0);
+    document.getElementById('taHeight').textContent = r.height;
+    document.getElementById('taPlainH').textContent = r.plainHeight;
+    document.getElementById('taRots').textContent = r.rebalances;
+    document.getElementById('taCases').textContent = named.length ? named.join(', ') : 'none yet';
+    document.getElementById('taDoubles').textContent = doubles;
+    document.getElementById('taMin').textContent = r.minNodesForHeight + ' nodes';
+    document.getElementById('taBound').textContent = avlHeightBound(keys.length);
+
+    var rows = '';
+    run.trace.forEach(function (t, i) {
+      var dbl = t.rebalance === 'LR' || t.rebalance === 'RL';
+      rows += '<tr' + (dbl ? ' class="tone-amber"' : '') + '><td>' + (i + 1) + '</td><td>'
+        + t.key + '</td><td>' + t.rebalance + '</td><td>'
+        + (dbl ? 'double: two rotations' : 'single: one rotation') + '</td><td>' + t.root
+        + '</td></tr>';
+    });
+    if (!rows) rows = '<tr><td colspan="5">no rebalance was needed yet</td></tr>';
+    table.innerHTML = '<thead><tr><th>#</th><th>inserting</th><th>case</th><th>fix</th>'
+      + '<th>new subtree root</th></tr></thead><tbody>' + rows + '</tbody>';
+
+    var msg = '';
+    if (parsed.ignored.length) {
+      msg += '<span class="tone-red">Ignored ' + parsed.ignored.join(' ')
+        + '</span> &mdash; keys are non-negative whole numbers. ';
+    }
+    msg += upto + (upto === 1 ? ' insertion' : ' insertions') + ' needed <strong>' + r.rebalances + '</strong> rebalance'
+      + (r.rebalances === 1 ? '' : 's') + ' and left the tree at height <strong>' + r.height
+      + '</strong>. The same keys in the same order, inserted into a plain search tree, give '
+      + 'height <strong>' + r.plainHeight + '</strong>. ';
+    if (doubles) {
+      msg += '<span class="tone-amber">' + doubles
+        + (doubles === 1 ? ' of those was a double rotation' : ' of those were double rotations')
+        + '</span> &mdash; the LR and RL cases, where the new key went into the INSIDE grandchild. A '
+        + 'single rotation there swaps the two sides of the problem without fixing it, which is '
+        + 'why the inside cases need two. ';
+    } else if (r.rebalances) {
+      msg += 'All of them were single rotations, the LL and RR cases, where the new key went into '
+        + 'the outside grandchild. Insert 30, 10, 20 to get an inside case instead. ';
+    }
+    msg += 'Requiring the left and right heights to differ by at most 1 at every node bounds '
+      + 'the height at <strong>' + avlHeightBound(keys.length) + '</strong> for ' + keys.length
+      + ' nodes: an AVL tree of height ' + r.height + ' needs at least ' + r.minNodesForHeight
+      + ' nodes, by the Fibonacci recurrence N(h) = N(h&minus;1) + N(h&minus;2) + 1. One fix at '
+      + 'the lowest unbalanced ancestor restores the invariant all the way to the root, which is '
+      + 'why the rebalance count stays small.';
+    status.innerHTML = msg;
+  }
+
+  preset.addEventListener('change', function () { applyPreset(); redraw(); });
+  box.addEventListener('input', redraw);
+  count.addEventListener('input', redraw);
+  redraw(); window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "data-structures/avl-insertion";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

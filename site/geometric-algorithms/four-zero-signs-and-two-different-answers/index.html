@@ -1,0 +1,2496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Four Zero Signs and Two Different Answers | Lesson | Geometric Algorithms | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="Collinear segments produce four zero determinants whatever they do. Two of the lab&#x27;s worked examples have exactly the same four signs — 0, 0, 0, 0 — and opposite answers: one pair overlaps and one pair has a gap. Since the inputs agree on every quantity the sign test computes, no amount of care with the signs can distinguish them, and the collinear case has to be finished as a one-dimensional interval question." />
+  <link rel="canonical" href="https://learn.geterdone.io/geometric-algorithms/four-zero-signs-and-two-different-answers/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Four Zero Signs and Two Different Answers | Lesson | Geometric Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="Collinear segments produce four zero determinants whatever they do. Two of the lab&#x27;s worked examples have exactly the same four signs — 0, 0, 0, 0 — and opposite answers: one pair overlaps and one pair has a gap. Since the inputs agree on every quantity the sign test computes, no amount of care with the signs can distinguish them, and the collinear case has to be finished as a one-dimensional interval question." />
+  <meta property="og:url" content="https://learn.geterdone.io/geometric-algorithms/four-zero-signs-and-two-different-answers/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Four Zero Signs and Two Different Answers | Lesson | Geometric Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Collinear segments produce four zero determinants whatever they do. Two of the lab&#x27;s worked examples have exactly the same four signs — 0, 0, 0, 0 — and opposite answers: one pair overlaps and one pair has a gap. Since the inputs agree on every quantity the sign test computes, no amount of care with the signs can distinguish them, and the collinear case has to be finished as a one-dimensional interval question." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/geometric-algorithms/four-zero-signs-and-two-different-answers/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Geometric Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Four Zero Signs and Two Different Answers</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The do two segments meet, including every case where one sign is zero is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Geometric Algorithms &middot; Segments, and the zero sign</span>
+        <h1>Four Zero Signs and Two Different Answers</h1>
+        <p>Collinear segments produce four zero determinants whatever they do. Two of the lab's worked examples have exactly the same four signs &mdash; 0, 0, 0, 0 &mdash; and opposite answers: one pair overlaps and one pair has a gap. Since the inputs agree on every quantity the sign test computes, no amount of care with the signs can distinguish them, and the collinear case has to be finished as a one-dimensional interval question.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">overlap:  (0, 0)–(6, 0) and (4, 0)–(10, 0)     signs 0, 0, 0, 0     they meet
+apart:    (0, 0)–(4, 0) and (6, 0)–(10, 0)     signs 0, 0, 0, 0     they miss
+identical four signs, opposite answers: the signs are not a sufficient statistic
+the bounding boxes do separate these two: overlapping, and not
+a degenerate segment is a point, and all four signs are zero again
+the collinear case is an interval overlap along one direction</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One pair of inputs that settles what the four signs can decide</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>A pair of inputs, the argument they make, and the machinery that actually finishes the case.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A determinant is zero everywhere on a line</h3><p>That is not a defect of the orientation test, it is what the test means: <span class="math">orient(a, b, c) = 0</span> says <span class="math">c</span> is on the line through <span class="math">a</span> and <span class="math">b</span>, with no information about where. Once all four points are collinear, all four determinants are zero and every one of them will stay zero however you perturb the points along the line. There is simply no more signal to extract.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Two inputs, one signature, opposite answers</h3><p><span class="math">(0, 0)–(6, 0)</span> against <span class="math">(4, 0)–(10, 0)</span> overlaps on the interval from 4 to 6. <span class="math">(0, 0)–(4, 0)</span> against <span class="math">(6, 0)–(10, 0)</span> has a gap from 4 to 6. Both produce <span class="math">0, 0, 0, 0</span>. Any function of the four signs must give them the same answer, and the right answers are different, so no such function is the intersection test. That is a proof and not a warning, and it takes two lines of the lab to demonstrate.</p></article><article class="card concept-card"><div class="icon">3</div><h3>What finishes it is a one-dimensional question</h3><p>Project both segments onto the direction of the first: <span class="math">t₀ = (q₁ − p₁)·r</span> and <span class="math">t₁ = t₀ + (q₂ − q₁)·r</span>, where <span class="math">r = p₂ − p₁</span>. The first segment occupies <span class="math">[0, r·r]</span> in that coordinate, the second occupies the interval between <span class="math">t₀</span> and <span class="math">t₁</span>, and the two meet exactly when those intervals overlap. Every quantity there is an integer dot product, so the whole test is exact, and it uses no determinant.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Why no sign test can work, and what does</h2></div><p>The impossibility argument, the interval test that finishes the case, and the degenerate inputs that reach it.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Collinear segments, and the projection coordinate</span><p>Two segments are <strong>collinear</strong> when all four endpoints lie on one line, which makes all four orientation determinants zero. For collinear segments with <span class="math">r = p₂ − p₁</span> nonzero, define the <strong>projection coordinate</strong> of a point <span class="math">x</span> as <span class="math">(x − p₁)·r</span>. In this coordinate <span class="math">p₁</span> is at 0 and <span class="math">p₂</span> is at <span class="math">r·r</span>, and both are integers whenever the endpoints are.</p></div><div class="thm"><span class="label">Theorem &middot; No function of the four signs is the intersection test</span><p>There exist two pairs of segments whose four orientation signs are equal, one of which meets and one of which does not. Consequently any intersection test computed from the four signs alone is wrong on at least one of them.</p></div><div class="proof"><p>Take <span class="math">p₁p₂ = (0, 0)–(6, 0)</span> with <span class="math">q₁q₂ = (4, 0)–(10, 0)</span>, and <span class="math">p₁p₂ = (0, 0)–(4, 0)</span> with <span class="math">q₁q₂ = (6, 0)–(10, 0)</span>. In both, all four points lie on the line <span class="math">y = 0</span>, so all four determinants are zero and the sign vectors are both <span class="math">(0, 0, 0, 0)</span>.</p><p>The first pair shares every point with <span class="math">4 ≤ x ≤ 6</span>, so it meets. The second pair has the first segment ending at <span class="math">x = 4</span> and the second starting at <span class="math">x = 6</span>, so no point is on both and it does not meet. A function of the sign vector returns one value on that vector, and it cannot be both <span class="math">true</span> and <span class="math">false</span>.</p><p><span class="qed">&#9633;</span></p></div><p>That argument is short and it is worth stating as a theorem rather than as a remark, because the usual reaction to the collinear case is to look for a cleverer combination of the signs. There is none, and the reason is structural: the signs are a function of which side of each line each point is on, and when everything is on the line, every input with that property has the same signature.</p><div class="example"><span class="label">Example &middot; The two inputs, side by side</span><p>Select the overlapping collinear worked example and read the KPI row: proper crossing no, touching yes, bounding boxes overlap yes, verdict they meet. Select the one with the gap: proper crossing no, touching no, bounding boxes overlap NO, verdict they miss. The four-sign table above is byte-for-byte identical between the two runs, and every other row on the page changes.</p></div><p>One label to distrust while you are there. The worked example with the gap is offered as &ldquo;collinear, boxes touching, no overlap&rdquo;, and the boxes are not touching: they are the intervals from 0 to 4 and from 6 to 10, with two units between them, and the widget's own bounding-box row reports NO on that input. Read the row, not the label. While you are checking: none of the seven worked examples has overlapping boxes AND segments that miss, so the one case that shows the filter failing to decide has to be typed. <span class="math">0, 0; 4, 4; 2, 0; 4, 1</span> does it &mdash; boxes overlapping, no crossing, and the status line then says the boxes are a filter and never an answer.</p><p>The bounding boxes DO separate these two, and it is worth working out why, because the answer is more interesting than a coincidence. Along a line, both coordinates are monotone in the parameter: if the direction has <span class="math">rx ≠ 0</span> then <span class="math">x</span> increases or decreases steadily, and if <span class="math">rx = 0</span> the segment is vertical and <span class="math">y</span> does. So for COLLINEAR segments, overlapping boxes and overlapping intervals along the line are the same condition, and the box test is not a filter at all here &mdash; it is exact. Running 197,506 random collinear pairs past both tests produces not one disagreement.</p><p>That does not make the box test the answer, for two reasons. It stops being exact the moment the segments are not collinear, which is the whole of the rest of the problem and where <span class="math">0, 0; 4, 4; 2, 0; 4, 1</span> lives. And it says nothing about the degenerate case below, where one segment is a point. The projection coordinate is the form worth learning because it is the same computation in both, and because it states the question in the coordinate the answer actually lives in rather than in two coordinates that happen to agree with it.</p><h3>Degenerate segments reach the same branch</h3><p>A segment whose two endpoints coincide is a point. The lab has one: the point <span class="math">(3, 2)</span> against the segment from <span class="math">(0, 0)</span> to <span class="math">(6, 4)</span>, which passes through it. All four determinants are zero again, <span class="math">proper</span> is false, and the right answer is yes. The parametric route handles this by noticing that <span class="math">r·r = 0</span> and falling back to asking whether the point lies on the other segment; a route that divided by <span class="math">r·r</span> would have failed here instead.</p><p>That is the third distinct family that produces four zeros: collinear and overlapping, collinear and disjoint, and degenerate. A fourth is nearly there &mdash; a shared endpoint gives two zeros rather than four. The lab's preset list walks all of them deliberately, and four of its seven entries are inputs the proper test alone gets wrong.</p><h3>How the interval test is kept exact</h3><p>The projection coordinates <span class="math">t₀</span> and <span class="math">t₁</span> are dot products of integer vectors, so they are integers, and the first segment occupies <span class="math">[0, r·r]</span> which is also an integer interval. The test is then <span class="math">max(t₀, t₁) ≥ 0</span> and <span class="math">min(t₀, t₁) ≤ r·r</span>, two integer comparisons. No normalisation, no direction vector of unit length, no division.</p><p>It is worth appreciating how little this costs. The entire collinear branch is a handful of multiplications and two comparisons, and it converts a test that is right on general position into one that is right on everything. The usual reason it is missing from an implementation is not cost; it is that the author never constructed an input that reaches it.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Do two segments meet, including every case where one sign is zero</h2></div><p>Four orientations against an exact solve for the two parameters</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Do these two segments meet</strong><span>four orientation signs against an exact parametric solve</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the first segment</span><span class="tone-purple"><i class="legend-swatch"></i>the second</span><span class="tone-green"><i class="legend-swatch"></i>they meet</span><span class="tone-red"><i class="legend-swatch"></i>they do not</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="sgPlot" viewBox="0 0 520 260" role="img" aria-label="The two segments, drawn with their bounding boxes."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sgSigns"></table></div>
+      <div class="status-banner" id="sgStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Switch between the two collinear examples and watch only the verdict change</h3>
+          <p>The four-orientation table is identical on the overlapping pair and on the pair with a gap, and the two verdicts are opposite. Everything the sign test can see is the same; everything that decides the answer is somewhere else. The parametric solve is run on both and gets both right.</p>
+        <div class="field">
+          <label for="sgPreset">Worked example</label>
+          <select id="sgPreset"><option value="proper">an ordinary crossing, interiors only</option><option value="touch">one segment ends on the other</option><option value="overlap" selected>collinear and overlapping</option><option value="apart">collinear, with a gap between the boxes</option><option value="shared">a shared endpoint and nothing else</option><option value="parallel">parallel, never meeting</option><option value="point">a segment that is a single point</option></select>
+        </div>
+        <div class="field">
+          <label for="sgSpec">Four points: p1, p2, q1, q2</label>
+          <input id="sgSpec" type="text" value="" inputmode="text" autocomplete="off" placeholder="0, 0; 6, 6; 0, 6; 6, 0">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Proper crossing</span><strong id="sgProper">&mdash;</strong></div>
+          <div class="kpi"><span>Touching</span><strong id="sgTouch">&mdash;</strong></div>
+          <div class="kpi"><span>Bounding boxes overlap</span><strong id="sgBox">&mdash;</strong></div>
+          <div class="kpi"><span>Verdict from the four signs</span><strong id="sgVerdict">&mdash;</strong></div>
+          <div class="kpi"><span>Verdict from the parameters</span><strong id="sgOracle">&mdash;</strong></div>
+          <div class="kpi"><span>The two routes agree</span><strong id="sgAgree">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="sgHint" style="margin:0;">Four points, each <span class="tt">x, y</span>: the first two are one segment and the last two are the other. The four signs decide a PROPER crossing, where each segment has the other's endpoints strictly on opposite sides. Every remaining case is a zero sign, and a zero sign means collinear, which is where the second test has to take over. The parametric route below never looks at a sign at all.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Finishing a collinear pair</h2></div><p>Once the determinant is zero, stop thinking about sides and start thinking about intervals.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Confirm the case rather than assuming it</h3><p>Four zeros means all four points are on one line. Two zeros usually means a shared or touching endpoint. One zero means one endpoint is on the other's line. Each leads somewhere different, so read all four before branching.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose a direction and project</h3><p>Take <span class="math">r = p₂ − p₁</span> and compute <span class="math">(x − p₁)·r</span> for the other segment's endpoints. If <span class="math">r·r</span> is zero the first segment is a point, and the question is just whether that point lies on the other segment.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare the two intervals with integers</h3><p>The first segment is <span class="math">[0, r·r]</span>; the second is the interval between the two projected values, in whichever order they came out. They meet when the intervals overlap, which is two comparisons. Everything here is an integer and nothing is normalised.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Test both members of the identical-signature pair</h3><p>Any implementation of this branch should be run on the overlapping pair and the pair with a gap. They are the minimal pair of inputs that distinguishes a correct collinear branch from a missing one, and a test suite without something like them will pass on an implementation that has no collinear branch at all.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>What the signs can and cannot decide</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>The two inputs, and every quantity the page computes for each</h3><p>Both are horizontal and both give four zero determinants. Only one of them meets.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">                             OVERLAP              APART
+  p1, p2                   (0,0) (6,0)         (0,0) (4,0)
+  q1, q2                   (4,0) (10,0)        (6,0) (10,0)
+
+  orient(q1, q2, p1)          0                   0
+  orient(q1, q2, p2)          0                   0
+  orient(p1, p2, q1)          0                   0
+  orient(p1, p2, q2)          0                   0
+  signs                    0, 0, 0, 0          0, 0, 0, 0
+
+  proper crossing            no                  no
+  touching                   yes                 no
+  bounding boxes overlap     yes                 no
+  verdict from the signs     they meet           they miss
+  verdict from the parameters they meet          they miss
+
+  projection coordinate, r = (6,0) so r·r = 36   r = (4,0) so r·r = 16
+    q1 at (q1 − p1)·r          24                  24
+    q2 at (q2 − p1)·r          60                  40
+    first segment occupies    [0, 36]             [0, 16]
+    second occupies           [24, 60]            [24, 40]
+    intervals overlap?         yes                 no</div><p>The top half of that table is the same twice, and the bottom half is where the answer lives. That is the argument in its most compact form: everything the sign test computes is identical, so the sign test cannot be the answer.</p><p>The projection rows are worth reading carefully, because they show the general machinery producing the right answer on both. In the overlapping case the second segment's interval starts at 24 and the first ends at 36, so they share <span class="math">[24, 36]</span>. In the other case the first ends at 16 and the second starts at 24, so they do not. Note that <span class="math">24</span> appears in both columns and means different things, because <span class="math">r</span> is different &mdash; the coordinate is relative to the first segment's own direction and length.</p><p>For a faded rehearsal, construct a diagonal version: <span class="math">(0, 0)–(6, 6)</span> against <span class="math">(4, 4)–(10, 10)</span>, and then against <span class="math">(8, 8)–(10, 10)</span>. The supplied first move is that <span class="math">r = (6, 6)</span> so <span class="math">r·r = 72</span> in both. Compute the two projection intervals for each and predict the verdicts; then check that the bounding boxes agree with them, as the monotonicity argument above says they must, and say what would have to change about the input for them to stop agreeing.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Looking for a cleverer combination of the four signs</strong><span>There is not one, and the two-input argument on this page proves it in three lines. The instinct is natural because the proper test is so nearly complete, but the missing information is not hiding in the signs; it was never in them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding from the collinear case that the box test is enough</strong><span>It really is exact on collinear segments &mdash; that is proved above and checked on nearly two hundred thousand random collinear pairs &mdash; and that is a genuinely narrow result. On segments that are not collinear the boxes overlap whenever the two rectangles do, which has nothing to do with whether the segments meet: <span class="math">0, 0; 4, 4; 2, 0; 4, 1</span> has overlapping boxes and no crossing. The correct reading is that the box test decides the collinear branch and filters the rest.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing an intersection routine only on crossings</strong><span>A test suite of properly crossing and clearly separate pairs passes on an implementation with no collinear branch whatsoever. The minimum useful suite is the seven worked examples on this page, or something like them: a proper crossing, a T-junction, a shared endpoint, a parallel pair, a degenerate segment, and the two collinear cases with the same signs and opposite answers.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove that the four signs are insufficient and implement the branch that finishes the case.</strong><p>You should be able to construct the identical-signature pair from memory, state why no function of the signs can separate them, project a collinear pair onto the first segment's direction and decide the overlap in integers, and say which degenerate families produce four zeros and which produce two.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One pair of segments is a question about two objects. &ldquo;The Sweep Line and the Work It Does Not Save&rdquo; asks it about many at once, and measures how many of the possible pairs a sweep actually tests &mdash; including an input where the answer is all of them.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../do-two-segments-meet/" rel="prev"><span>Lesson</span><strong>Do Two Segments Meet</strong></a>
+      <a class="lesson-link next" href="../the-sweep-line-and-the-work-it-does-not-save/" rel="next"><span>Lesson</span><strong>The Sweep Line and the Work It Does Not Save</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="geometric-algorithms/four-zero-signs-and-two-different-answers" data-lesson-title="Four Zero Signs and Two Different Answers" data-course-title="Geometric Algorithms">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Geometric Algorithms.</strong> Every count on this course is produced by running the algorithm on the points you typed. Determinants, doubled areas, squared distances, hull sizes, pair tests, stack operations and crossing counts are exact integers, computed in arbitrary-precision arithmetic, and no page here rounds one. Areas and comparisons-per-point are exact fractions, printed as fractions with a decimal beside them for reading rather than instead of them. Three quantities on these pages are not exact and each is labelled where it appears: the double-precision determinant, which &ldquo;The Magnitude Where Doubles Lose the Sign&rdquo; measures rather than a defect; the <span class="math">n</span> times <span class="math">log₂ n</span> reference column on the convex-hull page, which is a function evaluated at the number of points on screen and carries no verdict; and the decimal printed beside each exact fraction. Every algorithm is checked against a route that shares no code with it &mdash; the hull against the separating-line definition by brute force, the four-sign segment test against an exact solve for the two parameters, the shoelace area against the trapezoid rule, ray parity against the winding number, and the sweep, the calipers and the closest-pair recursion each against testing every pair &mdash; and where two exact routes disagree the page says so and declines to name a winner. What the labs cannot do is quantify over inputs: 22 wrong signs out of 29 magnitudes, 6 pair tests out of 6, and 5 strip comparisons against a bound of 84 are all measurements of the input shown, and each page names the proof that the corresponding claim rests on instead.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Two inputs produce the sign vector <span class=\"math\">(0, 0, 0, 0)<\/span>; one meets and one does not. What does that establish?", "a": ["That one of the determinants was computed wrongly", "That no function of the four signs is the intersection test, since a function returns one value on one input", "That the four-sign test needs a tolerance", "That collinear segments are a special case best excluded"], "c": 1, "why": "It is an impossibility argument, not a bug report. The four signs are equal on the two inputs and the correct answers differ, so anything computed from the signs alone must be wrong on one of them. Excluding the case is not available either: collinear segments are routine on grid-aligned data."}, {"q": "The bounding boxes do separate these two inputs. What is the reason?", "a": ["Coincidence: both inputs happen to be horizontal", "Both coordinates are monotone along a line, so for collinear segments box overlap and interval overlap are the same condition and the box test is exact", "The box test uses the determinant", "The box test is the correct general intersection test"], "c": 1, "why": "It is not a coincidence and it is not general. Along any line each coordinate moves monotonically with the parameter, so two sub-segments have overlapping <span class=\"math\">x<\/span> ranges exactly when their parameter intervals overlap &mdash; or <span class=\"math\">y<\/span> ranges, if the line is vertical. That makes the box test exact on the collinear branch and still only a filter everywhere else, where <span class=\"math\">0, 0; 4, 4; 2, 0; 4, 1<\/span> has overlapping boxes and no crossing."}, {"q": "A segment has two identical endpoints. What does the parametric oracle do?", "a": ["Divides by zero and reports a failure", "Notices that <span class=\"math\">r\u00b7r<\/span> is zero and asks instead whether that point lies on the other segment", "Treats it as a proper crossing", "Rejects the input"], "c": 1, "why": "A degenerate segment is a point, and the right answer is whether the point is on the other segment. The oracle tests <span class=\"math\">r\u00b7r<\/span> before using it, which is the same discipline as forcing the denominator positive instead of dividing: check the quantity you are about to rely on. The lab has this input as a worked example and both routes answer it."}];
+
+  (function () {
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* Computational geometry in EXACT INTEGERS. No distance on this course is
+     square-rooted: a comparison of distances is a comparison of squared
+     distances, and the answer to every question the course asks -- which side,
+     do they cross, which is closer, what is the area -- is a determinant, a
+     sign, or a doubled area, all of them integers.
+
+     BigInt, and not Number, for the determinants. orient2 on coordinates near
+     10^8 produces cross products near 10^16, which is past 2^53, and a double
+     there returns a WRONG SIGN. Measured, not asserted: at a = (0, 0),
+     b = (134217729, 134217728), c = (134217728, 134217727) the exact
+     determinant is -1 -- a right turn -- and the double gives 0, which reads as
+     three collinear points. A hull built on that answer has a vertex missing
+     and a point-in-polygon test on it flips. The mode prints the float beside
+     the exact value for exactly that reason, and it is the one deliberate
+     float in this block. */
+  function orient2(a, b, c) {
+    var d = (BigInt(b[0]) - BigInt(a[0])) * (BigInt(c[1]) - BigInt(a[1]))
+          - (BigInt(b[1]) - BigInt(a[1])) * (BigInt(c[0]) - BigInt(a[0]));
+    return d;
+  }
+  function orientSign(a, b, c) {
+    var d = orient2(a, b, c);
+    return d > 0n ? 1 : (d < 0n ? -1 : 0);
+  }
+  /* The same determinant in double arithmetic, for the column the lesson puts
+     beside the exact one. It is here to be WRONG in front of the reader. */
+  function orient2Float(a, b, c) {
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  }
+  function boxOverlap(p1, p2, q1, q2) {
+    return Math.min(p1[0], p2[0]) <= Math.max(q1[0], q2[0])
+        && Math.min(q1[0], q2[0]) <= Math.max(p1[0], p2[0])
+        && Math.min(p1[1], p2[1]) <= Math.max(q1[1], q2[1])
+        && Math.min(q1[1], q2[1]) <= Math.max(p1[1], p2[1]);
+  }
+  function onSegment(a, b, q) {
+    return orientSign(a, b, q) === 0
+      && Math.min(a[0], b[0]) <= q[0] && q[0] <= Math.max(a[0], b[0])
+      && Math.min(a[1], b[1]) <= q[1] && q[1] <= Math.max(a[1], b[1]);
+  }
+  /* Four orientations and the verdict, collinear cases included -- which is
+     where a segment-intersection test is usually wrong. */
+  function straddle(p1, p2, q1, q2) {
+    var d1 = orientSign(q1, q2, p1), d2 = orientSign(q1, q2, p2);
+    var d3 = orientSign(p1, p2, q1), d4 = orientSign(p1, p2, q2);
+    var proper = ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0))
+              && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+    var touching = onSegment(q1, q2, p1) || onSegment(q1, q2, p2)
+                || onSegment(p1, p2, q1) || onSegment(p1, p2, q2);
+    return { d: [d1, d2, d3, d4], proper: proper, touching: touching,
+             intersect: proper || touching, boxes: boxOverlap(p1, p2, q1, q2) };
+  }
+
+  function lexSort(points) {
+    return points.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+  }
+  /* Jarvis's march: wrap the hull one vertex at a time, so the work is n per
+     hull vertex -- n*h, which beats n log n exactly when h is small, and the
+     mode plots both. */
+  function jarvis(points) {
+    var c = counter(), pts = lexSort(points), hull = [], start = 0, i;
+    if (pts.length < 3) return runOf({ hull: pts, h: pts.length }, usedCounts(c), []);
+    var at = 0, trace = [];
+    do {
+      hull.push(pts[at]);
+      var next = (at + 1) % pts.length;
+      for (i = 0; i < pts.length; i += 1) {
+        c.compares += 1;
+        var o = orientSign(pts[at], pts[i], pts[next]);
+        if (o > 0) next = i;
+      }
+      trace.push({ at: trace.length, from: pts[at], to: pts[next] });
+      at = next;
+    } while (at !== 0 && hull.length <= pts.length);
+    return runOf({ hull: hull, h: hull.length, work: pts.length * hull.length,
+                   nlogn: pts.length * ilog2(Math.max(2, pts.length)) },
+                 usedCounts(c), trace);
+  }
+  /* Andrew's monotone chain. The stack is the mode: pushes and pops against
+     2n, which is the amortised argument -- a point is pushed once and popped
+     at most once. */
+  function monotoneChain(points) {
+    var c = counter(), pts = lexSort(points), trace = [], i;
+    function half(list) {
+      var stack = [];
+      list.forEach(function (p) {
+        while (stack.length >= 2) {
+          c.compares += 1;
+          if (orientSign(stack[stack.length - 2], stack[stack.length - 1], p) > 0) break;
+          stack.pop(); c.pops += 1;
+          trace.push({ at: trace.length, action: 'pop', stack: stack.slice() });
+        }
+        stack.push(p); c.pushes += 1;
+        trace.push({ at: trace.length, action: 'push', point: p, stack: stack.slice() });
+      });
+      return stack;
+    }
+    var lower = half(pts), upper = half(pts.slice().reverse());
+    var hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+    return runOf({ hull: hull, h: hull.length, lower: lower, upper: upper,
+                   bound: 2 * pts.length }, usedCounts(c), trace);
+  }
+  /* Lift x to (x, x^2): the hull of the lifted points reads back the sorted
+     order, which is the reduction that puts an n log n LOWER bound under every
+     convex hull algorithm. */
+  function liftParabola(xs) {
+    return xs.map(function (x) { return [x, x * x]; });
+  }
+
+  function dist2(a, b) {
+    var dx = BigInt(a[0]) - BigInt(b[0]), dy = BigInt(a[1]) - BigInt(b[1]);
+    return dx * dx + dy * dy;
+  }
+  /* Closest pair by divide and conquer, with the STRIP comparisons counted --
+     the claim being that each point is compared with at most seven others, and
+     the panel plots the measured total against 7n. Squared distances, so
+     nothing is rounded. */
+  function closestPair(points) {
+    var c = counter(), pts = lexSort(points), levels = [], stripTotal = 0;
+    function rec(list, depth) {
+      c.calls += 1;
+      if (list.length <= 3) {
+        var best = null, pair = null;
+        for (var i = 0; i < list.length; i += 1) for (var j = i + 1; j < list.length; j += 1) {
+          c.compares += 1;
+          var d = dist2(list[i], list[j]);
+          if (best === null || d < best) { best = d; pair = [list[i], list[j]]; }
+        }
+        return { d: best, pair: pair };
+      }
+      var mid = list.length >> 1, midX = list[mid][0];
+      var L = rec(list.slice(0, mid), depth + 1), Rr = rec(list.slice(mid), depth + 1);
+      var best2 = L.d === null ? Rr.d : (Rr.d === null ? L.d : (L.d < Rr.d ? L.d : Rr.d));
+      var pair2 = (L.d !== null && (Rr.d === null || L.d <= Rr.d)) ? L.pair : Rr.pair;
+      var strip = list.filter(function (p) {
+        var dx = BigInt(p[0]) - BigInt(midX);
+        return best2 === null || dx * dx < best2;
+      }).sort(function (a, b) { return a[1] - b[1]; });
+      var here = 0;
+      for (var k = 0; k < strip.length; k += 1) {
+        for (var t = k + 1; t < strip.length && t <= k + 7; t += 1) {
+          var dy = BigInt(strip[t][1]) - BigInt(strip[k][1]);
+          if (best2 !== null && dy * dy >= best2) break;
+          c.compares += 1; here += 1;
+          var dd = dist2(strip[k], strip[t]);
+          if (best2 === null || dd < best2) { best2 = dd; pair2 = [strip[k], strip[t]]; }
+        }
+      }
+      stripTotal += here;
+      levels.push({ depth: depth, n: list.length, strip: strip.length, compares: here });
+      return { d: best2, pair: pair2 };
+    }
+    var out = rec(pts, 0);
+    return runOf({ d2: out.d, pair: out.pair, levels: levels, stripCompares: stripTotal,
+                   bound: 7 * pts.length }, usedCounts(c), levels);
+  }
+
+  /* The sweep: events sorted by x, with the status structure holding the
+     segments currently crossed by the sweep line. The status structure IS
+     TREE_JS's bstRun in the lesson, which is the point -- a data structure met
+     in course 1 turns up as the engine of a geometry algorithm. */
+  function sweepEvents(segments) {
+    var events = [];
+    segments.forEach(function (s, i) {
+      var a = s[0], b = s[1];
+      if (a[0] > b[0]) { var t = a; a = b; b = t; }
+      events.push({ x: a[0], y: a[1], kind: 'start', seg: i });
+      events.push({ x: b[0], y: b[1], kind: 'end', seg: i });
+    });
+    /* A COMPARATOR, not a wish. This read
+         p.x - q.x || (p.kind === 'start' ? -1 : 1) || p.y - q.y
+       whose middle term is ALWAYS truthy, so two things followed: the y
+       tie-break was dead code and could never run, and the comparator was
+       inconsistent -- for two starts at the same x it returned -1 for cmp(p,q)
+       AND -1 for cmp(q,p). "Starts before ends at equal x" is what the sweep's
+       correctness argument rests on, and it was resting on whatever the engine's
+       sort does with a comparator that contradicts itself. It happened to hold
+       on every shipped preset. Now it is a difference of ranks, which is
+       antisymmetric, and the y ordering behind it can actually be reached. */
+    var kindRank = function (e) { return e.kind === 'start' ? 0 : 1; };
+    events.sort(function (p, q) {
+      return p.x - q.x || kindRank(p) - kindRank(q) || p.y - q.y;
+    });
+    var active = [], c = counter(), crossings = [], trace = [];
+    events.forEach(function (e) {
+      if (e.kind === 'start') {
+        active.forEach(function (j) {
+          c.compares += 1;
+          var r = straddle(segments[e.seg][0], segments[e.seg][1], segments[j][0], segments[j][1]);
+          if (r.intersect) crossings.push([e.seg, j]);
+        });
+        active.push(e.seg);
+      } else {
+        active = active.filter(function (j) { return j !== e.seg; });
+      }
+      trace.push({ at: trace.length, x: e.x, kind: e.kind, seg: e.seg, active: active.slice() });
+    });
+    var allPairs = segments.length * (segments.length - 1) / 2;
+    return runOf({ events: events, crossings: crossings, tests: c.compares || 0,
+                   allPairs: allPairs }, usedCounts(c), trace);
+  }
+
+  /* The doubled signed area, exactly -- doubled so it stays an integer, which
+     is why the lesson works with 2A and halves only at the end. The sign is the
+     orientation, which is information a magnitude would throw away. */
+  function shoelace2(poly) {
+    var s = 0n;
+    for (var i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      s += BigInt(a[0]) * BigInt(b[1]) - BigInt(b[0]) * BigInt(a[1]);
+    }
+    return s;
+  }
+  /* Point in polygon by ray crossing, INCLUDING the vertex case -- a ray
+     through a vertex is the bug every implementation has, and the fix is the
+     half-open rule below: count an edge only when one endpoint is strictly
+     above the ray and the other is not. */
+  function rayParity(poly, q) {
+    var crossings = 0, onEdge = false, detail = [];
+    for (var i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      if (onSegment(a, b, q)) onEdge = true;
+      var above = (a[1] > q[1]) !== (b[1] > q[1]);
+      if (above) {
+        var side = orientSign(a, b, q) * (b[1] > a[1] ? 1 : -1);
+        if (side > 0) crossings += 1;
+        detail.push({ edge: i, counted: side > 0 });
+      }
+    }
+    return { crossings: crossings, inside: !onEdge && crossings % 2 === 1,
+             onBoundary: onEdge, detail: detail };
+  }
+
+  /* A 2-d tree, split on x then y by depth, and a range query that reports how
+     many NODES it visited -- which is the figure, because the whole claim of a
+     k-d tree is that the visit count is far under n. */
+  function kdBuild(points, depth) {
+    if (!points.length) return null;
+    depth = depth || 0;
+    var axis = depth % 2;
+    var sorted = points.slice().sort(function (a, b) { return a[axis] - b[axis] || a[1 - axis] - b[1 - axis]; });
+    var mid = sorted.length >> 1;
+    return { point: sorted[mid], axis: axis, depth: depth,
+             l: kdBuild(sorted.slice(0, mid), depth + 1),
+             r: kdBuild(sorted.slice(mid + 1), depth + 1) };
+  }
+  function kdKids(n) { return [n.l, n.r]; }
+  function kdRange(tree, rect) {
+    var c = counter(), found = [];
+    (function visit(n) {
+      if (!n) return;
+      c.nodes += 1;
+      var p = n.point;
+      if (p[0] >= rect[0] && p[0] <= rect[2] && p[1] >= rect[1] && p[1] <= rect[3]) found.push(p);
+      var lo = n.axis === 0 ? rect[0] : rect[1], hi = n.axis === 0 ? rect[2] : rect[3];
+      if (lo <= p[n.axis]) visit(n.l);
+      if (hi >= p[n.axis]) visit(n.r);
+    })(tree);
+    return runOf({ found: found, visited: c.nodes }, usedCounts(c), []);
+  }
+
+  /* Rotating calipers: the diameter of a convex polygon is between an
+     ANTIPODAL pair, so the squared diameter comes from h pairs rather than
+     n^2 -- and it is exact, because it is never square-rooted. */
+  function calipers(hull) {
+    var c = counter(), n = hull.length, best = 0n, pair = null, pairs = [];
+    if (n < 2) return runOf({ d2: 0n, pair: null, pairs: [] }, usedCounts(c), []);
+    var j = 1;
+    for (var i = 0; i < n; i += 1) {
+      var ni = (i + 1) % n;
+      while (true) {
+        var area1 = orient2(hull[i], hull[ni], hull[(j + 1) % n]);
+        var area0 = orient2(hull[i], hull[ni], hull[j]);
+        c.compares += 1;
+        if (area1 > area0) j = (j + 1) % n; else break;
+      }
+      pairs.push([i, j]);
+      var d = dist2(hull[i], hull[j]);
+      if (d > best) { best = d; pair = [hull[i], hull[j]]; }
+      var d2b = dist2(hull[ni], hull[j]);
+      if (d2b > best) { best = d2b; pair = [hull[ni], hull[j]]; }
+    }
+    return runOf({ d2: best, pair: pair, pairs: pairs }, usedCounts(c), []);
+  }
+  /* The brute-force diameter, for the mode to agree with. n^2/2 pairs. */
+  function diameterBrute(points) {
+    var best = 0n, pair = null;
+    for (var i = 0; i < points.length; i += 1) for (var j = i + 1; j < points.length; j += 1) {
+      var d = dist2(points[i], points[j]);
+      if (d > best) { best = d; pair = [points[i], points[j]]; }
+    }
+    return { d2: best, pair: pair };
+  }
+
+  /* ------------------------------------------------------ what a reader types
+
+     A clause is `x, y` and clauses are separated by semicolons or newlines.
+     Coordinates are WHOLE NUMBERS and a decimal point is refused rather than
+     rounded: every predicate below is a BigInt determinant, and a coordinate
+     that is not an integer is a coordinate this course cannot be exact about.
+     Anything past 2^53 is refused too -- not because the determinant would
+     overflow, which it cannot, but because the NUMBER the reader typed would
+     already be the wrong number before any determinant was taken. */
+  function geoParse(text, cap) {
+    var clauses = String(text === undefined || text === null ? '' : text)
+                    .replace(/[()\[\]]/g, ' ').split(/[;\n]+/);
+    var pts = [], i;
+    for (i = 0; i < clauses.length; i += 1) {
+      var body = clauses[i].trim();
+      if (!body) continue;
+      var parts = body.split(/[,\s]+/).filter(function (s) { return s.length; });
+      if (parts.length !== 2) return { bad: 'clause ' + (i + 1) + ' is not one point' };
+      if (!/^-?\d+$/.test(parts[0]) || !/^-?\d+$/.test(parts[1])) {
+        return { bad: 'every coordinate must be a whole number' };
+      }
+      var x = parseInt(parts[0], 10), y = parseInt(parts[1], 10);
+      if (!Number.isSafeInteger(x) || !Number.isSafeInteger(y)) {
+        return { bad: 'a coordinate is past 2^53, where the input itself is already rounded' };
+      }
+      pts.push([x, y]);
+    }
+    if (!pts.length) return { bad: 'no points' };
+    if (cap && pts.length > cap) return { bad: pts.length + ' points, and this mode stops at ' + cap };
+    return { points: pts };
+  }
+  function geoParseSegments(text, cap) {
+    var p = geoParse(text, cap ? 2 * cap : 0);
+    if (p.bad) return p;
+    if (p.points.length % 2 !== 0) return { bad: 'a segment is two points, so the count must be even' };
+    var segs = [], i;
+    for (i = 0; i < p.points.length; i += 2) segs.push([p.points[i], p.points[i + 1]]);
+    if (!segs.length) return { bad: 'no segments' };
+    return { segments: segs, points: p.points };
+  }
+  function geoPointText(p) { return '(' + p[0] + ', ' + p[1] + ')'; }
+  function geoListText(list) { return list.map(geoPointText).join(' '); }
+  function geoKey(p) { return p[0] + '|' + p[1]; }
+  function geoPlural(n, one, many) { return n === 1 ? one : many; }
+  function geoStep(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+  /* Duplicates are removed and COUNTED. Both hull routines misbehave on them
+     -- the chain can return one point twice and gift wrapping does -- so this
+     is the first thing every hull mode does, and the count is shown. */
+  function geoDedupe(points) {
+    var seen = {}, out = [], dropped = 0;
+    points.forEach(function (p) {
+      var k = geoKey(p);
+      if (seen[k]) { dropped += 1; return; }
+      seen[k] = true; out.push(p);
+    });
+    return { points: out, dropped: dropped };
+  }
+  /* (b - a) . (c - a), in BigInt. Used to place a collinear point ALONG a
+     line, which a determinant cannot do: it is zero for every point on it. */
+  function geoDot(a, b, c) {
+    return (BigInt(b[0]) - BigInt(a[0])) * (BigInt(c[0]) - BigInt(a[0]))
+         + (BigInt(b[1]) - BigInt(a[1])) * (BigInt(c[1]) - BigInt(a[1]));
+  }
+  /* The SAME determinant as orient2, by cofactor expansion of
+     [[ax, ay, 1], [bx, by, 1], [cx, cy, 1]]. Six products in a different
+     arrangement, so a transposed term shows as a disagreement rather than as a
+     plausible number that nothing contradicts. */
+  function geoDet3(a, b, c) {
+    var ax = BigInt(a[0]), ay = BigInt(a[1]), bx = BigInt(b[0]), by = BigInt(b[1]);
+    var cx = BigInt(c[0]), cy = BigInt(c[1]);
+    return ax * (by - cy) - ay * (bx - cx) + (bx * cy - cx * by);
+  }
+  function geoFloatSign(a, b, c) {
+    var d = orient2Float(a, b, c);
+    return d > 0 ? 1 : (d < 0 ? -1 : 0);
+  }
+  /* THE FAMILY THE COURSE OPENS ON. a = (0, 0), b = (2^k + 1, 2^k),
+     c = (2^k, 2^k - 1). The exact determinant is (2^k+1)(2^k-1) - 2^k*2^k,
+     which is -1 for every k: a right turn, always, at any magnitude. In
+     doubles both products land on the same representable number once
+     2k > 53, and the test reports 0. */
+  function geoNeedle(k) {
+    var P = Math.pow(2, k);
+    return [[0, 0], [P + 1, P], [P, P - 1]];
+  }
+  function geoNeedleSweep(lo, hi) {
+    var rows = [], k, disagree = 0, first = null;
+    for (k = lo; k <= hi; k += 1) {
+      var t = geoNeedle(k);
+      if (!Number.isSafeInteger(t[1][0])) break;
+      var ex = orientSign(t[0], t[1], t[2]), fl = geoFloatSign(t[0], t[1], t[2]);
+      if (ex !== fl) { disagree += 1; if (first === null) first = k; }
+      rows.push({ k: k, tri: t, exact: ex, float: fl, det: orient2(t[0], t[1], t[2]),
+                  detFloat: orient2Float(t[0], t[1], t[2]), agree: ex === fl });
+    }
+    return { rows: rows, disagree: disagree, first: first, tested: rows.length };
+  }
+  /* p is OUTSIDE the convex hull of `others`, exactly and from the definition.
+     There is a separating line through p with every other point weakly on one
+     side, and every point that lies ON that line lies strictly beyond p along
+     it -- which is the clause that distinguishes "p is a vertex" from "p sits
+     inside an edge". Rotating a separating line about p until it touches a
+     point of the set is why testing the lines through p and each other point
+     is enough. */
+  function geoOutside(p, others) {
+    if (!others.length) return true;
+    for (var j = 0; j < others.length; j += 1) {
+      var t = others[j];
+      if (t[0] === p[0] && t[1] === p[1]) return false;
+      var pos = 0, neg = 0, on = [], r;
+      for (r = 0; r < others.length; r += 1) {
+        var s = orientSign(p, t, others[r]);
+        if (s > 0) pos += 1; else if (s < 0) neg += 1; else on.push(others[r]);
+      }
+      if (pos && neg) continue;
+      var ok = true;
+      for (r = 0; r < on.length; r += 1) if (geoDot(p, t, on[r]) <= 0n) { ok = false; break; }
+      if (ok) return true;
+    }
+    return false;
+  }
+  /* The VERTEX set: every point that is outside the hull of the others. */
+  function geoVertexBrute(points) {
+    var out = [], i;
+    for (i = 0; i < points.length; i += 1) {
+      var others = points.filter(function (_, j) { return j !== i; });
+      if (geoOutside(points[i], others)) out.push(points[i]);
+    }
+    return out;
+  }
+  /* The BOUNDARY set, in the words the definition is usually given in: some
+     line through the point has every other point on one side. An edge's
+     interior satisfies that and is not a vertex, which is the whole of the
+     difference between the two hull algorithms on degenerate input. */
+  function geoBoundaryBrute(points) {
+    var out = [], i, j, r;
+    for (i = 0; i < points.length; i += 1) {
+      var p = points[i], on = points.length < 2;
+      for (j = 0; j < points.length && !on; j += 1) {
+        if (j === i) continue;
+        var pos = 0, neg = 0;
+        for (r = 0; r < points.length; r += 1) {
+          var s = orientSign(p, points[j], points[r]);
+          if (s > 0) pos += 1; else if (s < 0) neg += 1;
+        }
+        if (!(pos && neg)) on = true;
+      }
+      if (on) out.push(p);
+    }
+    return out;
+  }
+  function geoSameSet(a, b) {
+    return a.map(geoKey).sort().join(' ') === b.map(geoKey).sort().join(' ');
+  }
+  /* Andrew's monotone chain with the PREDICATE AS A PARAMETER, so the double
+     arm is the exact arm with one function swapped and nothing else changed.
+     It is pinned to algo_core's monotoneChain in scripts/mathcheck.js on every
+     input with two or more distinct points; the one place they differ is a
+     single point, where monotoneChain returns an empty hull. */
+  function geoChainWith(points, sign) {
+    var pts = lexSort(points), pops = 0, pushes = 0, trace = [];
+    function half(list, name) {
+      var stack = [];
+      list.forEach(function (p) {
+        while (stack.length >= 2
+               && sign(stack[stack.length - 2], stack[stack.length - 1], p) <= 0) {
+          var off = stack.pop();
+          pops += 1;
+          trace.push({ at: trace.length, side: name, action: 'pop', point: off,
+                       depth: stack.length });
+        }
+        stack.push(p); pushes += 1;
+        trace.push({ at: trace.length, side: name, action: 'push', point: p,
+                     depth: stack.length });
+      });
+      return stack;
+    }
+    var lower = half(pts, 'lower'), upper = half(pts.slice().reverse(), 'upper');
+    var hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+    if (!hull.length && pts.length) hull = [pts[0]];
+    return { hull: hull, h: hull.length, lower: lower, upper: upper, trace: trace,
+             pops: pops, pushes: pushes, bound: 2 * pts.length };
+  }
+  function geoExactHull(points) { return geoChainWith(points, orientSign); }
+  function geoFloatHull(points) { return geoChainWith(points, geoFloatSign); }
+
+  /* Two segments cross, by exact PARAMETERS rather than by four orientations.
+     p1 + t(p2 - p1) = q1 + u(q2 - q1); t and u are ratios of determinants, and
+     the test 0 <= t <= 1 is done by comparing numerator with denominator after
+     forcing the denominator positive, so nothing is ever divided. */
+  function geoSegOracle(p1, p2, q1, q2) {
+    var rx = BigInt(p2[0]) - BigInt(p1[0]), ry = BigInt(p2[1]) - BigInt(p1[1]);
+    var sx = BigInt(q2[0]) - BigInt(q1[0]), sy = BigInt(q2[1]) - BigInt(q1[1]);
+    var wx = BigInt(q1[0]) - BigInt(p1[0]), wy = BigInt(q1[1]) - BigInt(p1[1]);
+    var den = rx * sy - ry * sx;
+    if (den !== 0n) {
+      var tn = wx * sy - wy * sx, un = wx * ry - wy * rx;
+      var d = den < 0n ? -den : den;
+      var ts = den < 0n ? -tn : tn, us = den < 0n ? -un : un;
+      return { intersect: ts >= 0n && ts <= d && us >= 0n && us <= d,
+               parallel: false, collinear: false };
+    }
+    if (wx * ry - wy * rx !== 0n) return { intersect: false, parallel: true, collinear: false };
+    var rr = rx * rx + ry * ry;
+    if (rr === 0n) return { intersect: onSegment(q1, q2, p1), parallel: true, collinear: true };
+    var t0 = wx * rx + wy * ry, t1 = t0 + (sx * rx + sy * ry);
+    var lo = t0 < t1 ? t0 : t1, hi = t0 < t1 ? t1 : t0;
+    return { intersect: hi >= 0n && lo <= rr, parallel: true, collinear: true };
+  }
+  function geoSweepBrute(segments) {
+    var out = [], i, j;
+    for (i = 0; i < segments.length; i += 1) for (j = i + 1; j < segments.length; j += 1) {
+      if (geoSegOracle(segments[i][0], segments[i][1],
+                       segments[j][0], segments[j][1]).intersect) out.push([i, j]);
+    }
+    return out;
+  }
+  function geoPairKeys(list) {
+    return list.map(function (p) { return Math.min(p[0], p[1]) + '-' + Math.max(p[0], p[1]); })
+               .sort().join(' ');
+  }
+
+  /* 2A by the trapezoid rule: sum (x_i - x_{i+1})(y_i + y_{i+1}). Algebraically
+     the shoelace sum, arithmetically a different set of products, which is what
+     makes it worth printing beside it. */
+  function geoAreaTrapezoid(poly) {
+    var s = 0n, i;
+    for (i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      s += (BigInt(a[0]) - BigInt(b[0])) * (BigInt(a[1]) + BigInt(b[1]));
+    }
+    return s;
+  }
+  /* The WINDING NUMBER: how many times the boundary goes round the point.
+     A different question from ray parity, with the same answer on a simple
+     polygon -- which is why the mode checks simplicity before it says so. */
+  function geoWinding(poly, q) {
+    var w = 0, on = false, i;
+    for (i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      if (onSegment(a, b, q)) on = true;
+      if (a[1] <= q[1]) {
+        if (b[1] > q[1] && orientSign(a, b, q) > 0) w += 1;
+      } else if (b[1] <= q[1] && orientSign(a, b, q) < 0) w -= 1;
+    }
+    return { winding: w, inside: !on && w !== 0, onBoundary: on };
+  }
+  function geoSimple(poly) {
+    var n = poly.length, bad = [], i, j;
+    for (i = 0; i < n; i += 1) for (j = i + 1; j < n; j += 1) {
+      if ((i + 1) % n === j || (j + 1) % n === i) continue;
+      if (geoSegOracle(poly[i], poly[(i + 1) % n], poly[j], poly[(j + 1) % n]).intersect) {
+        bad.push([i, j]);
+      }
+    }
+    return { simple: bad.length === 0, crossings: bad };
+  }
+  function geoClosestBrute(points) {
+    var best = null, pair = null, tests = 0, i, j;
+    for (i = 0; i < points.length; i += 1) for (j = i + 1; j < points.length; j += 1) {
+      tests += 1;
+      var d = dist2(points[i], points[j]);
+      if (best === null || d < best) { best = d; pair = [points[i], points[j]]; }
+    }
+    return { d2: best, pair: pair, tests: tests };
+  }
+  function geoRangeBrute(points, rect) {
+    return points.filter(function (p) {
+      return p[0] >= rect[0] && p[0] <= rect[2] && p[1] >= rect[1] && p[1] <= rect[3];
+    });
+  }
+
+  /* ------------------------------------------------------------- the drawing
+
+     One frame for every mode: the data's own bounding box mapped into the
+     viewBox with one scale on both axes, so a right angle stays a right angle
+     and the picture of a determinant is not a picture of a stretch. */
+  function geoFrame(points, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 520 : opts.width;
+    var h = opts.height === undefined ? 300 : opts.height;
+    var pad = opts.pad === undefined ? 24 : opts.pad;
+    var xs = points.map(function (p) { return p[0]; });
+    var ys = points.map(function (p) { return p[1]; });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    if (x1 === x0) { x0 -= 1; x1 += 1; }
+    if (y1 === y0) { y0 -= 1; y1 += 1; }
+    var s = Math.min((w - 2 * pad) / (x1 - x0), (h - 2 * pad) / (y1 - y0));
+    var ox = pad + ((w - 2 * pad) - (x1 - x0) * s) / 2;
+    var oy = pad + ((h - 2 * pad) - (y1 - y0) * s) / 2;
+    return {
+      w: w, h: h,
+      X: function (x) { return ox + (x - x0) * s; },
+      Y: function (y) { return h - oy - (y - y0) * s; }
+    };
+  }
+  function geoLine(f, a, b, tone, width, dash) {
+    return '<line x1="' + f.X(a[0]).toFixed(1) + '" y1="' + f.Y(a[1]).toFixed(1)
+      + '" x2="' + f.X(b[0]).toFixed(1) + '" y2="' + f.Y(b[1]).toFixed(1)
+      + '" stroke="var(--' + tone + ')" stroke-width="' + (width || 1.6) + '"'
+      + (dash ? ' stroke-dasharray="' + dash + '"' : '') + ' />';
+  }
+  function geoPoly(f, pts, tone, fill) {
+    if (pts.length < 2) return '';
+    var d = pts.map(function (p) { return f.X(p[0]).toFixed(1) + ',' + f.Y(p[1]).toFixed(1); }).join(' ');
+    return '<polygon points="' + d + '" fill="' + (fill ? 'var(--' + tone + ')' : 'none')
+      + '" fill-opacity="' + (fill ? '0.14' : '0') + '" stroke="var(--' + tone
+      + ')" stroke-width="2" stroke-linejoin="round" />';
+  }
+  function geoDot2(f, p, tone, radius, label) {
+    var s = '<circle cx="' + f.X(p[0]).toFixed(1) + '" cy="' + f.Y(p[1]).toFixed(1)
+      + '" r="' + (radius || 4.5) + '" fill="var(--' + tone + ')" stroke="var(--line-strong)" '
+      + 'stroke-width="1" />';
+    if (label) {
+      s += '<text x="' + (f.X(p[0]) + 7).toFixed(1) + '" y="' + (f.Y(p[1]) - 6).toFixed(1)
+        + '" font-size="9" font-weight="700" fill="var(--muted)">' + label + '</text>';
+    }
+    return s;
+  }
+  function geoRect(f, rect, tone) {
+    var x = Math.min(f.X(rect[0]), f.X(rect[2])), y = Math.min(f.Y(rect[1]), f.Y(rect[3]));
+    var w = Math.abs(f.X(rect[2]) - f.X(rect[0])), h = Math.abs(f.Y(rect[3]) - f.Y(rect[1]));
+    return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+      + '" height="' + h.toFixed(1) + '" fill="var(--' + tone + ')" fill-opacity="0.10" '
+      + 'stroke="var(--' + tone + ')" stroke-width="1.6" stroke-dasharray="4 3" />';
+  }
+  function geoScene(points, layers, opts) {
+    var f = geoFrame(points, opts);
+    return { frame: f, svg: layers(f) };
+  }
+  /* Every number below came from running the algorithm on the points on
+     screen. That is one input. Where a page states something about all
+     inputs it either checks the definition exhaustively on this one and
+     says so, or it names the proof the lesson gives -- and where the
+     measured count and the proved bound differ, both are printed. */
+  var SGP = {
+    'proper': { spec: '0, 0; 6, 6; 0, 6; 6, 0' },
+    'touch': { spec: '0, 0; 6, 0; 3, 0; 3, 5' },
+    'overlap': { spec: '0, 0; 6, 0; 4, 0; 10, 0' },
+    'apart': { spec: '0, 0; 4, 0; 6, 0; 10, 0' },
+    'shared': { spec: '0, 0; 4, 0; 4, 0; 4, 5' },
+    'parallel': { spec: '0, 0; 6, 0; 0, 2; 6, 2' },
+    'point': { spec: '3, 2; 3, 2; 0, 0; 6, 4' }
+  };
+
+  var presetIn = document.getElementById('sgPreset'), specIn = document.getElementById('sgSpec');
+  var plot = document.getElementById('sgPlot'), signs = document.getElementById('sgSigns');
+  var status = document.getElementById('sgStatus');
+  var KPIS = ['sgProper', 'sgTouch', 'sgBox', 'sgVerdict', 'sgOracle', 'sgAgree'];
+
+  function blank(why) {
+    plot.innerHTML = ''; signs.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> Four points: '
+      + '<span class="tt">0, 0; 6, 6; 0, 6; 6, 0</span>.';
+  }
+  function yesno(v) { return v ? '<span class="tone-green">yes</span>'
+                               : '<span class="tone-muted">no</span>'; }
+
+  function redraw() {
+    var parsed = geoParse(specIn.value, 4);
+    if (parsed.bad) { blank(parsed.bad); return; }
+    if (parsed.points.length !== 4) { blank('this mode takes exactly four points'); return; }
+    var p1 = parsed.points[0], p2 = parsed.points[1];
+    var q1 = parsed.points[2], q2 = parsed.points[3];
+
+    var s = straddle(p1, p2, q1, q2);
+    var oracle = geoSegOracle(p1, p2, q1, q2);
+    var agree = s.intersect === oracle.intersect;
+
+    var f = geoFrame([p1, p2, q1, q2], { width: 520, height: 260 });
+    var tone = s.intersect ? 'green' : 'red';
+    plot.innerHTML = geoRect(f, [Math.min(p1[0], p2[0]), Math.min(p1[1], p2[1]),
+                                 Math.max(p1[0], p2[0]), Math.max(p1[1], p2[1])], 'muted')
+      + geoRect(f, [Math.min(q1[0], q2[0]), Math.min(q1[1], q2[1]),
+                    Math.max(q1[0], q2[0]), Math.max(q1[1], q2[1])], 'muted')
+      + geoLine(f, p1, p2, 'cyan', 3) + geoLine(f, q1, q2, 'purple', 3)
+      + geoDot2(f, p1, 'cyan', 4.5, 'p1') + geoDot2(f, p2, 'cyan', 4.5, 'p2')
+      + geoDot2(f, q1, 'purple', 4.5, 'q1') + geoDot2(f, q2, 'purple', 4.5, 'q2')
+      + '<text x="12" y="18" font-size="10" font-weight="800" fill="var(--' + tone + ')">'
+      + (s.intersect ? 'they meet' : 'they do not meet') + '</text>';
+
+    var NAMES = ['orient(q1, q2, p1)', 'orient(q1, q2, p2)',
+                 'orient(p1, p2, q1)', 'orient(p1, p2, q2)'];
+    var DETS = [orient2(q1, q2, p1), orient2(q1, q2, p2),
+                orient2(p1, p2, q1), orient2(p1, p2, q2)];
+    var rows = '';
+    s.d.forEach(function (d, i) {
+      rows += '<tr' + (d === 0 ? ' class="tone-amber"' : '') + '><th class="rowhead tt">'
+        + NAMES[i] + '</th><td class="tt">' + DETS[i] + '</td><td>' + d + '</td><td>'
+        + (d === 0 ? 'collinear — the sign alone decides nothing here'
+                   : (d > 0 ? 'left of the line' : 'right of the line')) + '</td></tr>';
+    });
+    signs.innerHTML = '<caption>The four orientations. A proper crossing needs the first pair '
+      + 'to have opposite signs and the second pair too; a zero anywhere means the case has to '
+      + 'be finished on the segment rather than on the line</caption><thead><tr>'
+      + '<th>determinant</th><th>value</th><th>sign</th><th>what it says</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody>';
+
+    document.getElementById('sgProper').textContent = s.proper ? 'yes' : 'no';
+    document.getElementById('sgTouch').textContent = s.touching ? 'yes' : 'no';
+    document.getElementById('sgBox').textContent = s.boxes ? 'yes' : 'no';
+    document.getElementById('sgVerdict').textContent = s.intersect ? 'they meet' : 'they miss';
+    document.getElementById('sgOracle').textContent = oracle.intersect ? 'they meet' : 'they miss';
+    document.getElementById('sgAgree').textContent = agree ? 'yes' : 'NO';
+
+    var zeros = s.d.filter(function (d) { return d === 0; }).length;
+    status.innerHTML = '<strong>' + (s.intersect ? 'They meet' : 'They do not meet') + '.</strong> '
+      + 'Proper crossing ' + yesno(s.proper) + ', touching ' + yesno(s.touching)
+      + ', bounding boxes overlap ' + yesno(s.boxes) + '. '
+      + (zeros
+          ? '<span class="tone-amber">' + zeros + ' of the four signs '
+            + geoPlural(zeros, 'is', 'are') + ' zero</span>, so the proper test alone cannot '
+            + 'settle this input and the collinear cases have to be finished on the SEGMENTS '
+            + 'rather than on the lines. '
+            + (s.proper === s.intersect
+                ? 'Here it happens to reach the right verdict anyway, which is exactly why a '
+                  + 'test that stops at `proper` survives so long. '
+                : 'An implementation that returned `proper` and stopped would answer '
+                  + '<span class="tone-red">' + (s.proper ? 'yes' : 'no') + '</span> where the '
+                  + 'right answer is <span class="tone-green">' + (s.intersect ? 'yes' : 'no')
+                  + '</span>. ')
+          : 'No sign is zero, so the four-orientation test settles it on its own and the '
+            + 'collinear machinery below is never reached. ')
+      + (s.boxes && !s.intersect
+          ? 'The boxes do overlap and the segments still miss, which is why the box test is a '
+            + 'filter and never an answer. '
+          : '')
+      + (agree
+          ? 'Solving p1 + t(p2 − p1) = q1 + u(q2 − q1) exactly — t and u as ratios of '
+            + 'determinants, compared against 1 without ever dividing — reaches the same verdict '
+            + 'by a route with no orientation sign in it.'
+          : '<span class="tone-red">The parametric solve disagrees. Two exact routes to one '
+            + 'question cannot both be right, and this page is not entitled to say which.</span>');
+  }
+
+  function apply() {
+    var p = SGP[presetIn.value];
+    if (!p) return;
+    specIn.value = p.spec;
+    redraw();
+  }
+  var START = SGP[presetIn.value];
+  if (START && !specIn.value) specIn.value = START.spec;
+  presetIn.addEventListener('change', apply);
+  specIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "geometric-algorithms/four-zero-signs-and-two-different-answers";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

@@ -2,9 +2,9 @@
 
 `learn-geterdone` is the repository, the application slug and the image
 title. What it publishes at `https://learn.geterdone.io/` is a **library of
-learning paths** — three paths, twenty-five interactive courses and 336 lessons today, all of them
-on one subject, whose path is now complete end to end, with more subjects
-planned. Every page is a single HTML file with its CSS, JavaScript and graphics
+learning paths** — six paths, fifty-four interactive courses and 654 lessons
+today: trading, discrete mathematics, algebra, system design, algorithms and
+operations research, every one of them complete end to end. Every page is a single HTML file with its CSS, JavaScript and graphics
 inline — it loads no fonts, no frameworks, no analytics, and no third-party
 requests of any kind.
 
@@ -931,11 +931,11 @@ The normative rules live in `dmedellin/platform-ops`
 **Live on the Hetzner container platform.** `https://learn.geterdone.io/` is served
 by Caddy from an immutable GHCR digest, deployed through `platform-ops` and recorded
 in its app registry under the slug `learn-geterdone`. The published tree is this
-`site/` directory: the subject-agnostic site index, three path pages, 25 course
-homes, 336 lessons, the seven published schemas (trade journal, options trade plan,
+`site/` directory: the subject-agnostic site index, six path pages, 54 course
+homes, 654 lessons, the seven published schemas (trade journal, options trade plan,
 indicator rule, volume and order flow rule, trading risk plan, trading system
 specification, and automated trading system), the dated real-data capstone with its
-dataset, `/progress/` and the sign-in redirect target. 369 pages and 8 assets; the
+dataset, `/progress/` and the sign-in redirect target. 719 pages and 8 assets; the
 trading path is complete at eight courses, the capstone is a worked example and not
 a ninth, and nothing in the library is announced without a page behind it.
 

@@ -1,0 +1,2866 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Networks and the Critical Path | Lesson | Networks: Flows, Paths and Assignments | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="A project is a network whose arcs carry precedence and whose nodes carry durations, and nothing flows along it at all. A forward pass gives the earliest each activity can start, a backward pass the latest it can start without delaying the project, and the difference is slack. The activities with none form the critical path — and shortening one of them stops paying the moment a second path draws level." />
+  <link rel="canonical" href="https://learn.geterdone.io/networks-flows-paths-and-assignments/project-networks-and-the-critical-path/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Project Networks and the Critical Path | Lesson | Networks: Flows, Paths and Assignments | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="A project is a network whose arcs carry precedence and whose nodes carry durations, and nothing flows along it at all. A forward pass gives the earliest each activity can start, a backward pass the latest it can start without delaying the project, and the difference is slack. The activities with none form the critical path — and shortening one of them stops paying the moment a second path draws level." />
+  <meta property="og:url" content="https://learn.geterdone.io/networks-flows-paths-and-assignments/project-networks-and-the-critical-path/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Project Networks and the Critical Path | Lesson | Networks: Flows, Paths and Assignments | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A project is a network whose arcs carry precedence and whose nodes carry durations, and nothing flows along it at all. A forward pass gives the earliest each activity can start, a backward pass the latest it can start without delaying the project, and the difference is slack. The activities with none form the critical path — and shortening one of them stops paying the moment a second path draws level." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/networks-flows-paths-and-assignments/project-networks-and-the-critical-path/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Networks: Flows, Paths and Assignments</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Project Networks and the Critical Path</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The project networks and the critical path is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Networks: Flows, Paths and Assignments &middot; Time instead of flow</span>
+        <h1>Project Networks and the Critical Path</h1>
+        <p>A project is a network whose arcs carry precedence and whose nodes carry durations, and nothing flows along it at all. A forward pass gives the earliest each activity can start, a backward pass the latest it can start without delaying the project, and the difference is slack. The activities with none form the critical path &mdash; and shortening one of them stops paying the moment a second path draws level.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">ES(i) = max over predecessors p of EF(p),      EF(i) = ES(i) + duration(i)
+LF(i) = min over successors s of LS(s),        LS(i) = LF(i) − duration(i)
+slack(i) = LS(i) − ES(i) = LF(i) − EF(i)       zero slack ⟹ critical
+project length = max EF = the LONGEST path through the precedence network
+a cycle in the precedence graph means no order exists, so nothing is computable
+shortening a critical activity pays until a second path becomes critical too</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two passes, one subtraction, and where the return stops</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The arithmetic is two sweeps and is over in a minute. The three ideas are about what the numbers mean and what they stop meaning as soon as you act on them.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The project length is a longest path, not a sum</h3><p>Adding the durations up gives the time to do everything one at a time, which is not the question. The finish date is the longest chain of activities that must happen in order, and the forward pass computes it by taking a maximum at every node. On the lab's nine-activity project the durations add to 21 and the project takes 12.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Slack belongs to the activity; criticality belongs to the path</h3><p>An activity with slack can start late without moving the finish date. But the slack is not private: two activities on the same non-critical chain share it, and spending it on one leaves none for the other. That is why the useful object is the critical path rather than the list of critical activities &mdash; and why the lab counts distinct critical paths rather than just naming zero-slack activities.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Shortening pays until something else becomes binding</h3><p>Take a day off a critical activity and the project shortens by a day &mdash; once. Then some other chain, previously a day shorter, is the same length, and the next day off buys nothing at all. The lab draws the whole curve, and the interesting number on it is where it goes flat rather than its first step.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Two passes, and what happens when you act on them</h2></div><p>The definitions, the two sweeps in full on a nine-activity project, then slack, then the crash curve and the case where the first day already buys nothing.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; A project network and its four times</span><p>A <strong>project</strong> is a set of activities, each with a duration and a list of predecessors that must finish before it starts. For each activity: <span class="math">ES</span> is the <strong>earliest start</strong>, <span class="math">EF = ES + d</span> the earliest finish, <span class="math">LF</span> the <strong>latest finish</strong> that does not delay the project, and <span class="math">LS = LF − d</span> the latest start.</p><p>The <strong>slack</strong> of an activity is <span class="math">LS − ES</span>, equivalently <span class="math">LF − EF</span>. An activity with zero slack is <strong>critical</strong>: any delay to it delays the whole project.</p></div><p>Nothing flows here. The arcs are precedence, the numbers on the nodes are times, and the quantity being computed is a longest path rather than a cheapest one. It is on this course because it is a network with a duality reading of its own: the critical path is the certificate that the project cannot be finished sooner, in the same way that a cut certifies a flow.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">A 3 | B 2 after A | C 4 after A | G 5 after A | D 2 after B
+E 3 after C | H 2 after G | F 1 after D E | I 1 after F H
+
+forward pass          ES    EF          backward pass    LS    LF
+   A                   0     3                           0     3
+   B                   3     5                           6     8
+   C                   3     7                           3     7
+   G                   3     8                           4     9
+   D                   5     7                           8    10
+   E                   7    10                           7    10
+   H                   8    10                           9    11
+   F                  10    11                          10    11
+   I                  11    12                          11    12
+
+slack = LS - ES       A 0   B 3   C 0   G 1   D 3
+                      E 0   H 1   F 0   I 0
+
+project length 12     durations add to 21
+critical A C E F I    one critical path</div><p>Read the forward pass off the predecessors: <span class="math">F</span> waits for both <span class="math">D</span> and <span class="math">E</span>, which finish at 7 and 10, so <span class="math">F</span> starts at 10 and not at 7. The maximum is the whole of the rule. The backward pass is the mirror image: <span class="math">G</span> is followed only by <span class="math">H</span>, which must start by 9, so <span class="math">G</span> must finish by 9 &mdash; and since <span class="math">G</span> can finish at 8, it has a unit of slack.</p><h3>Acting on it, and the point where it stops paying</h3><div class="example"><span class="label">Example &middot; One day off C, and then nothing</span><p><span class="math">C</span> is critical, so shortening it by one takes the project from 12 to 11. Shorten it by two, three or four and the project stays at 11. The lab draws the curve <span class="math">12, 11, 11, 11, 11</span> and reports that the return stopped after one unit.</p><p>The reason is on the screen at the moment it happens: with one day off <span class="math">C</span> the project has two critical paths rather than one, and past that the length is held by <span class="math">A, G, H, I</span> &mdash; a chain that <span class="math">C</span> is not on. Every further day taken off <span class="math">C</span> is spent on an activity that no longer controls the finish date.</p></div><p>This is the single most useful thing the method produces and it is not the critical path itself. Knowing which activity to shorten is easy; knowing when to stop shortening it, and which chain has become binding instead, is what keeps a schedule from absorbing money for nothing. The lab reports the slack of the chosen activity, what shortening it is worth, and after how many units it stops paying.</p><div class="example"><span class="label">Example &middot; A project where the first day already buys nothing</span><p>Six activities: <span class="math">A</span> for 3, then two chains of two activities each, joining at <span class="math">F</span>. Both chains take the same time, so the project length is 8 and every activity is critical &mdash; two distinct critical paths, <span class="math">A B D F</span> and <span class="math">A C E F</span>.</p><p>Shorten <span class="math">B</span> by one and the project is still 8, because <span class="math">A C E F</span> is untouched and still takes 8. The return stops after zero units. With parallel critical paths, shortening one activity is not enough; you have to shorten one on each path, or shorten a shared activity like <span class="math">A</span> or <span class="math">F</span>.</p></div><h3>When there is nothing to compute</h3><p>The forward pass needs an order in which every predecessor comes before its activity, and such an order exists exactly when the precedence graph has no cycle. Write <span class="math">A</span> after <span class="math">C</span>, <span class="math">B</span> after <span class="math">A</span>, <span class="math">C</span> after <span class="math">B</span> and there is no order at all: each of the three is waiting for one of the others. The lab names the loop rather than reporting a length, because &ldquo;the project takes zero&rdquo; would be a lie and &ldquo;error&rdquo; would not say what to fix.</p><p>Two smaller refusals are worth the same treatment. An activity waiting on something that is not in the project is refused by name, and so are two activities sharing a name. Both are typing errors, and both would otherwise produce a schedule that looks complete.</p><p>What this lesson does not do is cost anything. Real project crashing trades money for time, with a cost per day for each activity and a budget, and that is a linear programme of its own &mdash; a perfectly good one, and not this course's. What is here is the structural half: which activities can be shortened usefully at all, and for how long.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Project networks and the critical path</h2></div><p>Shortening a critical activity helps — until a second path becomes critical, and then it does nothing</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Earliest, latest and slack</strong><span>the project length is a longest path, and criticality belongs to the path</span></div>
+        <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>a critical activity: zero slack</span><span class="tone-cyan"><i class="legend-swatch"></i>an activity with slack</span><span class="tone-amber"><i class="legend-swatch"></i>the activity being shortened</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="cpPlot" viewBox="0 0 660 300" role="img" aria-label="The precedence network, one node per activity, with the critical chain drawn heavily."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cpTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cpCrash"></table></div>
+      <div class="status-banner" id="cpStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Type a project, then shorten something and watch the return stop</h3>
+          <p>The four times and the slack for every activity, every distinct critical path rather than just the list of critical activities, and a crash control that shortens one activity by up to six units and reports the project length at each step. The step at which a second path becomes critical is the step where the return stops.</p>
+        <div class="field">
+          <label for="cpPreset">Worked example</label>
+          <select id="cpPreset"><option value="nine" selected>nine activities, A through I</option><option value="twopaths">six activities in two parallel chains</option><option value="cycle">three activities in a precedence loop</option></select>
+        </div>
+        <div class="field">
+          <label for="cpSpec">Activities, as name duration after predecessors</label>
+          <input id="cpSpec" type="text" value="" inputmode="text" autocomplete="off" placeholder="A 3, B 2 after A, C 4 after A, G 5 after A, D 2 after B, E 3 after C, H 2 after G, F 1 after D E, I 1 after F H">
+        </div>
+        <div class="field">
+          <label for="cpAct">Shorten this activity</label>
+          <select id="cpAct"><option value="C" selected>C</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="cpCut">By this much</label><span class="range-value" id="cpCutOut">0</span></div>
+          <input id="cpCut" type="range" min="0" max="6" step="1" value="0" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Project length</span><strong id="cpLen">&mdash;</strong></div>
+          <div class="kpi"><span>Critical activities</span><strong id="cpCrit">&mdash;</strong></div>
+          <div class="kpi"><span>Distinct critical paths</span><strong id="cpPaths">&mdash;</strong></div>
+          <div class="kpi"><span>Slack on the chosen activity</span><strong id="cpSlack">&mdash;</strong></div>
+          <div class="kpi"><span>Shortening it is worth</span><strong id="cpGain">&mdash;</strong></div>
+          <div class="kpi"><span>It stops paying after</span><strong id="cpStop">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="cpHint" style="margin:0;">Write <span class="tt">D 2 after B C</span> for an activity of length two that waits for both B and C. Listing the activities so that every predecessor comes first is possible exactly when the precedence graph has no cycle; the method for producing such an order, and the proof that it exists, are not this lab&rsquo;s.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Scheduling a project and deciding what to shorten</h2></div><p>Order first, then forward, then backward, then subtract. Only after all four does any decision get made.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Put the activities in an order with every predecessor first</h3><p>If you cannot, the precedence graph has a cycle and there is nothing to compute. Find the loop and fix the data; no amount of care with the arithmetic will help.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Forward pass: <span class="math">ES</span> is the largest <span class="math">EF</span> among the predecessors</h3><p>Start at zero for activities with none. Take the maximum, not the sum and not the most recent; an activity waiting on three others waits for the last of them. The largest <span class="math">EF</span> in the project is its length.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Backward pass: <span class="math">LF</span> is the smallest <span class="math">LS</span> among the successors</h3><p>Start at the project length for activities with none. Take the minimum: an activity feeding three others must be done in time for the earliest of them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Subtract, and list the critical activities and the critical paths</h3><p><span class="math">slack = LS − ES</span>. Zero means critical. Then chain the critical activities together into paths &mdash; there may be more than one, and how many there are is what decides whether shortening any single activity is worth anything.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Shorten a critical activity one unit at a time, re-running both passes</h3><p>Do not assume the saving continues. Re-run the passes after each unit and watch for a second path reaching the same length; that is the moment the return stops, and it is usually much sooner than expected.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Passes, slack and what shortening buys</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Nine activities, twelve days, and one day&#x27;s worth of improvement</h3><p>The whole schedule, then what happens when the obvious activity is shortened. Every figure is what the lab reports as the crash control is moved.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">PROJECT   A 3 | B 2 after A | C 4 after A | G 5 after A | D 2 after B
+          E 3 after C | H 2 after G | F 1 after D E | I 1 after F H
+
+             ES   EF   LS   LF   slack
+   A          0    3    0    3     0     critical
+   B          3    5    6    8     3
+   C          3    7    3    7     0     critical
+   G          3    8    4    9     1
+   D          5    7    8   10     3
+   E          7   10    7   10     0     critical
+   H          8   10    9   11     1
+   F         10   11   10   11     0     critical
+   I         11   12   11   12     0     critical
+
+   length 12,  one critical path  A C E F I
+   durations add to 21, which is not the answer to anything here
+
+SHORTEN C    by 0   1   2   3   4
+   length      12  11  11  11  11
+   paths        1   2   1   1   1
+   critical   ACEFI | ACGEHFI | AGHI | AGHI | AGHI
+
+   the return stops after ONE unit
+   at that unit a second path draws level; past it, A G H I holds the
+   length and C is not on it
+
+   G has one unit of slack, so shortening G is worth nothing at all
+   until that unit has been used up somewhere
+
+TWO PATHS FROM THE START   A 3 | B 2, C 2 after A | D 2 after B,
+                           E 2 after C | F 1 after D E
+   length 8, every activity critical, TWO paths  A B D F and A C E F
+   shorten B by one:  still 8.  The return stops after ZERO units.</div><p>The row of path counts is the row to read. It goes from one to two and back to one, and the two is where the improvement ended: a second chain reached the same length, and one more day off <span class="math">C</span> left that chain untouched.</p><p>For a rehearsal, shorten <span class="math">G</span> instead. It has a unit of slack, so the first day buys nothing; the second and third then start to matter, because by then the chain through <span class="math">G</span> has become the binding one. Slack is a budget that has to be spent before anything else happens.</p><p>The harder rehearsal: on the two-path project, shorten <span class="math">F</span> &mdash; the activity both chains pass through. One day off <span class="math">F</span> takes the project from 8 to 7, because both paths shorten together. A shared activity is worth more than a private one, and the crash curve is where that becomes a number rather than an intuition.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding the durations up</strong><span>That is the time to do the project with one worker and no concurrency, and it is usually far larger than the answer &mdash; 21 against 12 on the lab's example. The forward pass takes a maximum at every node precisely because independent chains run at the same time.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating slack as private to an activity</strong><span>Two activities on the same non-critical chain share their slack: use it on the first and the second has none left. The list of critical activities does not capture this and the list of critical paths does, which is why the lab reports the paths and counts them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming a critical activity is worth shortening indefinitely</strong><span>The saving lasts exactly until a second chain draws level, which on the lab's project is after a single unit and on its two-path project is immediately. Money spent past that point buys nothing, and nothing in the schedule says so unless you re-run the passes and look at how many paths are critical.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can schedule a project by hand and say how much shortening any given activity is worth.</strong><p>You should be able to order the activities, run both passes taking a maximum forwards and a minimum backwards, compute slack, list the distinct critical paths rather than just the critical activities, and find the point at which shortening a chosen activity stops reducing the project length.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The critical path is a certificate: it is a chain of activities that must run in order and takes as long as the project does, so no schedule can finish sooner, and anyone can check it by adding up five numbers. That is the same shape of argument as a cut bounding a flow, and the rest of this course is about making that resemblance precise. &ldquo;Shortest Paths and Node Potentials&rdquo; starts with the simplest case, where the certificate is one number attached to each node.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../the-assignment-problem/" rel="prev"><span>Lesson</span><strong>The Assignment Problem</strong></a>
+      <a class="lesson-link next" href="../shortest-paths-and-node-potentials/" rel="next"><span>Lesson</span><strong>Shortest Paths and Node Potentials</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="networks-flows-paths-and-assignments/project-networks-and-the-critical-path" data-lesson-title="Project Networks and the Critical Path" data-course-title="Networks: Flows, Paths and Assignments">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Networks: Flows, Paths and Assignments.</strong> Every flow, cost, determinant, potential and cut capacity on this course is an exact fraction, and nothing here is rounded, because nothing here needs to be: the data are rational and the arithmetic stays rational. That matters more on this course than on most, since the central claim is that certain corners are exactly whole. A flow reported as <span class="math">0.9999999</span> would not be evidence of anything. Where a corner is genuinely not whole &mdash; the odd cycle's <span class="math">1/2</span> &mdash; the lab prints the halves as halves, which is the point.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "An activity waits for three predecessors, finishing at times 4, 7 and 5. What is its earliest start?", "a": ["4, the earliest of them", "16, their total", "7, the latest of them", "5, the middle one"], "c": 2, "why": "All three must be complete, so the activity waits for the last. The forward pass is a maximum at every node, and that is exactly what makes the project length a longest path. On the lab's project, <span class=\"math\">F<\/span> waits for <span class=\"math\">D<\/span> at 7 and <span class=\"math\">E<\/span> at 10 and starts at 10."}, {"q": "The activities of a project have durations adding to 21, and the project takes 12. What explains the difference?", "a": ["Nine days of the work are unnecessary", "The project length is the longest chain of activities that must run in order, and independent chains run at the same time", "The backward pass has subtracted the slack", "Some activity has been counted twice"], "c": 1, "why": "Independent chains run concurrently, so the finish date is set by the longest chain and not by the total work. On the lab's project the critical chain is <span class=\"math\">A C E F I<\/span> at <span class=\"math\">3 + 4 + 3 + 1 + 1 = 12<\/span>, while <span class=\"math\">B<\/span>, <span class=\"math\">D<\/span>, <span class=\"math\">G<\/span> and <span class=\"math\">H<\/span> run alongside it."}, {"q": "You shorten a critical activity by one unit and the project shortens by one. What should you expect from the second unit?", "a": ["Another unit of saving, since the activity is still critical", "Nothing, because a critical activity can only be shortened once", "Possibly nothing: another path may now be the same length, and the lab's example is exactly that case", "Two units of saving, because the effect compounds"], "c": 2, "why": "Shortening changes which chain is binding. On the lab's project, one unit off <span class=\"math\">C<\/span> takes it from 12 to 11 and creates a second critical path; from then on the length is held by <span class=\"math\">A G H I<\/span>, which <span class=\"math\">C<\/span> is not on, and further units buy nothing. Re-run both passes after each unit rather than assuming the saving continues."}, {"q": "A project's precedence data says <span class=\"math\">A<\/span> waits for <span class=\"math\">C<\/span>, <span class=\"math\">B<\/span> waits for <span class=\"math\">A<\/span>, and <span class=\"math\">C<\/span> waits for <span class=\"math\">B<\/span>. What does the method report?", "a": ["A project length of zero", "That no order exists, naming the loop, because the forward pass needs an acyclic graph", "The longest of the three durations", "A critical path containing all three"], "c": 1, "why": "The forward pass needs every predecessor computed before its activity, which is possible exactly when the precedence graph is acyclic. With a loop there is no such order and nothing to compute. The lab names the three activities in the loop, because a reader has to know which precedence to delete, and any number reported instead would be a lie."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  function td(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function tdl(t, cls) {
+    return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>';
+  }
+  function th(t) { return '<th>' + t + '</th>'; }
+  function rowhead(t) { return '<th class="rowhead">' + t + '</th>'; }
+  function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function table(caption, heads, rows) {
+    var head = (heads && heads.length)
+      ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
+      + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  /* The two-column "what was done / what it produced" table. The exemplar's
+     trace layout, kept identical so a reader moving between courses is reading
+     the same page furniture. */
+  function steps(caption, pairs) {
+    return table(caption, [], pairs.map(function (p) { return tr([rowhead(p[0]), tdl(p[1])]); }));
+  }
+  function chip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  /* " + 3" or " - 7": a bare number as a continuation. Everything on this page
+     that writes "something + <number>" goes through it, because "a(n-1) + -7"
+     is not a thing a reader writes and not a thing a marker accepts. */
+  function plusnum(r) { return (Rsign(r) < 0 ? ' - ' : ' + ') + Rtext(Rabs(r)); }
+  function tone(t, kind) { return '<span class="tone-' + kind + '">' + t + '</span>'; }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+  /* Reader text goes into innerHTML, and on this course the reader types < and
+     > all day. Escaped once, at the boundary, rather than trusted: "x + 2y <= 8"
+     written raw would lose everything from the < to the next > -- which is the
+     end of the cell -- and the page would quietly drop the reader's own words. */
+  function esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Rparse throws on a zero denominator, and 1/0 is a thing a reader types.
+     Every read of reader input goes through this, so a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function Rread(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+  /* The one rounding this file performs, and it is never used to decide
+     anything -- only to sit beside an exact value that a reader may want to
+     place on a number line. Every caller labels it as a rounding. */
+  function approx(r, places) {
+    var v = Rnum(r);
+    if (!isFinite(v)) return 'not a real number';
+    return v.toFixed(places === undefined ? 4 : places);
+  }
+  /* The least common multiple of two rationals: lcm of the numerators over the
+     gcd of the denominators. For two integers this is the schoolbook lcm, which
+     is what the elimination mode needs; for 1/2 and 1/4 it is 1/2, which is
+     what keeps that mode from inventing multipliers with four-digit numerators
+     the moment a coefficient stops being whole. */
+  function Rlcm(a, b) {
+    if (Rzero(a) || Rzero(b)) return R0;
+    var an = a.n < 0n ? -a.n : a.n, bn = b.n < 0n ? -b.n : b.n;
+    return R(an / bgcd(an, bn) * bn, bgcd(a.d, b.d));
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Networks.  A node is an id, an arc is {from, to, cost, cap}, and every
+     number is a rational.  Needs algebra_systems.MATRIX_JS for Mdet.
+
+     graph.py's GRAPH_JS cannot be reused for any of this and the reason is
+     worth stating: its routines close over module-level N, A and LESSON rather
+     than taking a graph; link(M, i, j) writes both directions, so every graph
+     it builds is undirected; its weights come from the formula
+     ((7a + 13b) % 9) + 1 rather than from data; and dijkstra runs on Infinity
+     and Number.  Its circular layout is four lines inline in a drawing routine
+     rather than a shared function, so "the SVG layout can be shared" is not
+     true as written -- and a source and a sink on a circle is unreadable
+     anyway, which is why `network` gets its own layered layout, kit-local. */
+
+  function netIndex(nodes) {
+    var ix = {}, i;
+    for (i = 0; i < nodes.length; i += 1) ix[nodes[i]] = i;
+    return ix;
+  }
+
+  /* The node-arc incidence matrix: +1 at the tail, -1 at the head.  Every
+     network problem on this path is one LP with this matrix and different
+     data, which is the claim C4 L2 makes and this function is the evidence. */
+  function incidence(nodes, arcs) {
+    var ix = netIndex(nodes), M = [], i, j;
+    for (i = 0; i < nodes.length; i += 1) {
+      var row = [];
+      for (j = 0; j < arcs.length; j += 1) {
+        row.push(ix[arcs[j].from] === i ? R1 : (ix[arcs[j].to] === i ? R(-1n, 1n) : R0));
+      }
+      M.push(row);
+    }
+    return M;
+  }
+
+  /* Net flow out of every node, and the nodes where it does not match what the
+     node is supposed to supply.  Naming the violated nodes is the point: "the
+     flow is invalid" is not a lesson and "node C sends out 3 more than it takes
+     in, and it is supposed to send 0" is. */
+  function conservation(nodes, arcs, flow, supply) {
+    var ix = netIndex(nodes), net = [], out = [], into = [], i, j;
+    for (i = 0; i < nodes.length; i += 1) { net.push(R0); out.push(R0); into.push(R0); }
+    for (j = 0; j < arcs.length; j += 1) {
+      var f = flow[j] === undefined ? R0 : flow[j];
+      out[ix[arcs[j].from]] = Radd(out[ix[arcs[j].from]], f);
+      into[ix[arcs[j].to]] = Radd(into[ix[arcs[j].to]], f);
+    }
+    var violated = [], rows = [];
+    for (i = 0; i < nodes.length; i += 1) {
+      net[i] = Rsub(out[i], into[i]);
+      var want = (supply && supply[nodes[i]] !== undefined) ? supply[nodes[i]] : R0;
+      var ok = Requ(net[i], want);
+      rows.push({ node: nodes[i], out: out[i], into: into[i], net: net[i], want: want, ok: ok,
+                  why: Rtext(out[i]) + ' out - ' + Rtext(into[i]) + ' in = ' + Rtext(net[i])
+                    + ', and ' + nodes[i] + ' must net ' + Rtext(want) });
+      if (!ok) violated.push(nodes[i]);
+    }
+    return { net: net, rows: rows, violated: violated, ok: violated.length === 0 };
+  }
+
+  /* The determinant of any chosen rows and columns, exact.  Mtake slices a
+     CONTIGUOUS block, so the gather is here and the determinant is Mdet's. */
+  function submatrixDet(M, rows, cols) {
+    var sub = rows.map(function (i) { return cols.map(function (j) { return M[i][j]; }); });
+    return Mdet(sub);
+  }
+  /* Every k x k determinant up to kmax, with the ones outside {0, +-1} listed.
+     Totally unimodular means every one of them is in that set, and the only
+     honest way to show it at lesson size is to look at all of them. */
+  function unimodularSweep(M, kmax, cap) {
+    cap = cap || 20000;
+    var nr = M.length, nc = nr ? M[0].length : 0, k, seen = 0;
+    var bad = [], counts = [], stop = false;
+    var pick = function (n, k2) {
+      var out = [], idx = [], i;
+      for (i = 0; i < k2; i += 1) idx.push(i);
+      while (true) {
+        out.push(idx.slice());
+        var p = k2 - 1;
+        while (p >= 0 && idx[p] === n - k2 + p) p -= 1;
+        if (p < 0) break;
+        idx[p] += 1;
+        for (i = p + 1; i < k2; i += 1) idx[i] = idx[i - 1] + 1;
+      }
+      return out;
+    };
+    for (k = 1; k <= Math.min(kmax, nr, nc) && !stop; k += 1) {
+      var rs = pick(nr, k), cs = pick(nc, k), a, b, count = 0;
+      for (a = 0; a < rs.length && !stop; a += 1) {
+        for (b = 0; b < cs.length; b += 1) {
+          seen += 1; count += 1;
+          if (seen > cap) { stop = true; break; }
+          var d = submatrixDet(M, rs[a], cs[b]);
+          if (!(Rzero(d) || Requ(d, R1) || Requ(d, R(-1n, 1n)))) {
+            bad.push({ k: k, rows: rs[a], cols: cs[b], det: d });
+          }
+        }
+      }
+      counts.push({ k: k, checked: count });
+    }
+    return { bad: bad, counts: counts, checked: seen, truncated: stop,
+             unimodular: bad.length === 0 && !stop };
+  }
+
+  /* ---- order, and the longest path ------------------------------------- */
+
+  /* An order, or the cycle that prevents one.  A project network with a cycle
+     has no schedule and saying which activities form the loop is the answer. */
+  function topoOrder(nodes, arcs) {
+    var ix = netIndex(nodes), n = nodes.length, deg = [], adj = [], i, j;
+    for (i = 0; i < n; i += 1) { deg.push(0); adj.push([]); }
+    for (j = 0; j < arcs.length; j += 1) {
+      adj[ix[arcs[j].from]].push(ix[arcs[j].to]);
+      deg[ix[arcs[j].to]] += 1;
+    }
+    var queue = [], order = [];
+    for (i = 0; i < n; i += 1) if (deg[i] === 0) queue.push(i);
+    while (queue.length) {
+      var v = queue.shift();
+      order.push(nodes[v]);
+      for (i = 0; i < adj[v].length; i += 1) {
+        deg[adj[v][i]] -= 1;
+        if (deg[adj[v][i]] === 0) queue.push(adj[v][i]);
+      }
+    }
+    if (order.length === n) return { order: order, cycle: null };
+    /* Walk forward inside what is left until a node repeats: that walk IS a
+       cycle, and every node left has an incoming arc from the leftovers. */
+    var left = {}, k;
+    for (i = 0; i < n; i += 1) left[i] = deg[i] > 0;
+    var start = -1;
+    for (i = 0; i < n; i += 1) if (left[i]) { start = i; break; }
+    var seen = {}, walk = [], cur = start;
+    while (seen[cur] === undefined) {
+      seen[cur] = walk.length; walk.push(cur);
+      var nxt = -1;
+      for (k = 0; k < adj[cur].length; k += 1) if (left[adj[cur][k]]) { nxt = adj[cur][k]; break; }
+      if (nxt < 0) break;
+      cur = nxt;
+    }
+    var cyc = seen[cur] === undefined ? walk : walk.slice(seen[cur]);
+    return { order: order, cycle: cyc.map(function (q) { return nodes[q]; }) };
+  }
+
+  /* The longest path, by relaxation in topological order.  Longest is the
+     right question for a project network and it is only well posed because the
+     graph is acyclic -- which topoOrder has just checked. */
+  function longestPath(nodes, arcs, s, t) {
+    var top = topoOrder(nodes, arcs);
+    if (top.cycle) return { dist: null, path: null, arcs: null, value: null, cycle: top.cycle, order: null };
+    var ix = netIndex(nodes), dist = [], pred = [], predArc = [], i, j;
+    for (i = 0; i < nodes.length; i += 1) {
+      dist.push(s === undefined ? R0 : (nodes[i] === s ? R0 : null));
+      pred.push(-1); predArc.push(-1);
+    }
+    for (i = 0; i < top.order.length; i += 1) {
+      var v = ix[top.order[i]];
+      if (dist[v] === null) continue;
+      for (j = 0; j < arcs.length; j += 1) {
+        if (ix[arcs[j].from] !== v) continue;
+        var w = ix[arcs[j].to], cand = Radd(dist[v], arcs[j].cost || R0);
+        if (dist[w] === null || Rcmp(cand, dist[w]) > 0) { dist[w] = cand; pred[w] = v; predArc[w] = j; }
+      }
+    }
+    var end = -1;
+    if (t !== undefined) end = ix[t];
+    else for (i = 0; i < nodes.length; i += 1) if (dist[i] !== null && (end < 0 || Rcmp(dist[i], dist[end]) > 0)) end = i;
+    var path = [], used = [];
+    if (end >= 0 && dist[end] !== null) {
+      var cur = end;
+      while (cur >= 0) {
+        path.unshift(nodes[cur]);
+        if (predArc[cur] >= 0) used.unshift(predArc[cur]);
+        cur = pred[cur];
+      }
+    }
+    return { dist: dist, pred: pred, path: path, arcs: used,
+             value: end >= 0 ? dist[end] : null, order: top.order, cycle: null };
+  }
+
+  /* The forward and backward passes, and everything a CPM table holds.
+     `activities` is [{id, dur, pred: [id]}].  `paths` is every critical path,
+     not one of them -- "shorten a critical activity and watch a SECOND path
+     become critical" is the lesson, and it needs the plural. */
+  function cpmPasses(activities) {
+    var ix = {}, i, j;
+    for (i = 0; i < activities.length; i += 1) ix[activities[i].id] = i;
+    var nodes = activities.map(function (a) { return a.id; }), arcs = [];
+    for (i = 0; i < activities.length; i += 1) {
+      var ps = activities[i].pred || [];
+      for (j = 0; j < ps.length; j += 1) arcs.push({ from: ps[j], to: activities[i].id, cost: R0 });
+    }
+    var top = topoOrder(nodes, arcs);
+    if (top.cycle) return { cycle: top.cycle, ES: null, critical: null, paths: null };
+    var ES = [], EF = [], LS = [], LF = [], slack = [];
+    for (i = 0; i < activities.length; i += 1) { ES.push(R0); EF.push(R0); }
+    for (i = 0; i < top.order.length; i += 1) {
+      var v = ix[top.order[i]], ps2 = activities[v].pred || [], e = R0;
+      for (j = 0; j < ps2.length; j += 1) if (Rcmp(EF[ix[ps2[j]]], e) > 0) e = EF[ix[ps2[j]]];
+      ES[v] = e; EF[v] = Radd(e, activities[v].dur);
+    }
+    var makespan = R0;
+    for (i = 0; i < activities.length; i += 1) if (Rcmp(EF[i], makespan) > 0) makespan = EF[i];
+    var succ = [];
+    for (i = 0; i < activities.length; i += 1) { LF.push(null); LS.push(null); succ.push([]); }
+    for (i = 0; i < activities.length; i += 1) {
+      var ps3 = activities[i].pred || [];
+      for (j = 0; j < ps3.length; j += 1) succ[ix[ps3[j]]].push(i);
+    }
+    for (i = top.order.length - 1; i >= 0; i -= 1) {
+      var v2 = ix[top.order[i]];
+      if (!succ[v2].length) LF[v2] = makespan;
+      else {
+        var l = null;
+        for (j = 0; j < succ[v2].length; j += 1) {
+          var cand = LS[succ[v2][j]];
+          if (l === null || Rcmp(cand, l) < 0) l = cand;
+        }
+        LF[v2] = l;
+      }
+      LS[v2] = Rsub(LF[v2], activities[v2].dur);
+    }
+    var critical = [];
+    for (i = 0; i < activities.length; i += 1) {
+      slack.push(Rsub(LS[i], ES[i]));
+      if (Rzero(slack[i])) critical.push(activities[i].id);
+    }
+    /* Every critical path: a chain of zero-slack activities each starting when
+       its predecessor finishes. */
+    var paths = [], build = function (i2, acc) {
+      if (paths.length > 200) return;
+      var nxt = [], k;
+      for (k = 0; k < succ[i2].length; k += 1) {
+        var w = succ[i2][k];
+        if (Rzero(slack[w]) && Requ(ES[w], EF[i2])) nxt.push(w);
+      }
+      if (!nxt.length) { paths.push(acc.slice()); return; }
+      for (k = 0; k < nxt.length; k += 1) { acc.push(activities[nxt[k]].id); build(nxt[k], acc); acc.pop(); }
+    };
+    for (i = 0; i < activities.length; i += 1) {
+      if (!Rzero(slack[i]) || (activities[i].pred || []).length) continue;
+      build(i, [activities[i].id]);
+    }
+    return { ES: ES, EF: EF, LS: LS, LF: LF, slack: slack, critical: critical,
+             paths: paths, makespan: makespan, order: top.order, cycle: null,
+             ids: activities.map(function (a) { return a.id; }) };
+  }
+
+  /* ---- labels, potentials, residuals, cuts ----------------------------- */
+
+  /* Bellman-Ford round by round, on RATIONAL arc costs.  The n-th round is not
+     bookkeeping: an improvement there is the certificate of a negative cycle,
+     and the cycle comes back with the arcs that make its cost negative. */
+  function bellmanRounds(nodes, arcs, s) {
+    var ix = netIndex(nodes), n = nodes.length, dist = [], pred = [], predArc = [], i, j, k;
+    for (i = 0; i < n; i += 1) { dist.push(nodes[i] === s ? R0 : null); pred.push(-1); predArc.push(-1); }
+    var rounds = [{ round: 0, dist: dist.slice(), changed: [] }];
+    var negative = false, hit = -1;
+    for (k = 1; k <= n; k += 1) {
+      var changed = [];
+      for (j = 0; j < arcs.length; j += 1) {
+        var u = ix[arcs[j].from], v = ix[arcs[j].to];
+        if (dist[u] === null) continue;
+        var cand = Radd(dist[u], arcs[j].cost);
+        if (dist[v] === null || Rcmp(cand, dist[v]) < 0) {
+          dist[v] = cand; pred[v] = u; predArc[v] = j; changed.push(nodes[v]);
+        }
+      }
+      rounds.push({ round: k, dist: dist.slice(), changed: changed });
+      if (k === n && changed.length) { negative = true; hit = ix[changed[0]]; }
+      if (!changed.length) break;
+    }
+    var cycle = null, cycleCost = null, cycleArcs = null;
+    if (negative) {
+      var cur = hit;
+      for (i = 0; i < n; i += 1) cur = pred[cur];      /* walk into the cycle */
+      var seen = [], at = cur;
+      do { seen.push(at); at = pred[at]; } while (at !== cur && seen.length <= n + 1);
+      seen.push(cur);
+      seen.reverse();
+      cycle = seen.map(function (q) { return nodes[q]; });
+      cycleArcs = []; cycleCost = R0;
+      for (i = 1; i < seen.length; i += 1) {
+        cycleArcs.push(predArc[seen[i]]);
+        cycleCost = Radd(cycleCost, arcs[predArc[seen[i]]].cost);
+      }
+    }
+    return { rounds: rounds, dist: dist, pred: pred, negative: negative,
+             cycle: cycle, cycleArcs: cycleArcs, cycleCost: cycleCost, nodes: nodes };
+  }
+
+  /* Every arc tested against pi_j - pi_i <= c_ij, the tight-arc subgraph, and
+     pi_t - pi_s.  Feasible potentials exist exactly when no negative cycle
+     does, so this is the dual reading of bellmanRounds and the two must agree. */
+  function potentialCheck(nodes, arcs, pi, s, t) {
+    var ix = netIndex(nodes), rows = [], violated = [], tight = [], j;
+    for (j = 0; j < arcs.length; j += 1) {
+      var gap = Rsub(pi[ix[arcs[j].to]], pi[ix[arcs[j].from]]);
+      var slackv = Rsub(arcs[j].cost, gap), ok = Rsign(slackv) >= 0;
+      rows.push({ arc: j, from: arcs[j].from, to: arcs[j].to, cost: arcs[j].cost,
+                  gap: gap, slack: slackv, ok: ok, tight: Rzero(slackv),
+                  why: Rtext(pi[ix[arcs[j].to]]) + ' - ' + Rtext(pi[ix[arcs[j].from]]) + ' = '
+                    + Rtext(gap) + (ok ? ' &lt;= ' : ' &gt; ') + Rtext(arcs[j].cost) });
+      if (!ok) violated.push(j);
+      if (Rzero(slackv)) tight.push(j);
+    }
+    return { rows: rows, violated: violated, tight: tight, ok: violated.length === 0,
+             value: (s !== undefined && t !== undefined) ? Rsub(pi[ix[t]], pi[ix[s]]) : null };
+  }
+
+  /* The residual network: what is left forward, and what can be undone. */
+  function residual(arcs, flow) {
+    var out = [], j;
+    for (j = 0; j < arcs.length; j += 1) {
+      var f = flow[j] === undefined ? R0 : flow[j], cap = arcs[j].cap;
+      var fwd = Rsub(cap, f);
+      if (Rsign(fwd) > 0) out.push({ from: arcs[j].from, to: arcs[j].to, cap: fwd, of: j, kind: 'forward' });
+      if (Rsign(f) > 0) out.push({ from: arcs[j].to, to: arcs[j].from, cap: f, of: j, kind: 'backward' });
+    }
+    return out;
+  }
+  /* The source side of the minimum cut, once no augmenting path is left. */
+  function reachable(nodes, resArcs, s) {
+    var seen = {}, queue = [s], order = [];
+    seen[s] = true;
+    while (queue.length) {
+      var v = queue.shift(); order.push(v);
+      for (var j = 0; j < resArcs.length; j += 1) {
+        if (resArcs[j].from !== v || seen[resArcs[j].to]) continue;
+        seen[resArcs[j].to] = true; queue.push(resArcs[j].to);
+      }
+    }
+    return { set: order, inSet: seen,
+             other: nodes.filter(function (v) { return !seen[v]; }) };
+  }
+  /* The capacity of ANY cut the reader picks, so >= can be exhibited rather
+     than asserted.  Only arcs LEAVING S count -- arcs coming back are free,
+     and that asymmetry is the half a reader gets wrong. */
+  function cutCapacity(nodes, arcs, S) {
+    var inS = {}, i, j, total = R0, crossing = [], back = [];
+    for (i = 0; i < S.length; i += 1) inS[S[i]] = true;
+    for (j = 0; j < arcs.length; j += 1) {
+      if (inS[arcs[j].from] && !inS[arcs[j].to]) { total = Radd(total, arcs[j].cap); crossing.push(j); }
+      else if (!inS[arcs[j].from] && inS[arcs[j].to]) back.push(j);
+    }
+    return { capacity: total, crossing: crossing, back: back, S: S.slice() };
+  }
+
+  /* ---- matching, and the cover Koenig gives -------------------------- */
+
+  /* A maximum matching by augmenting paths, the MINIMUM VERTEX COVER read off
+     the alternating-reachable set by Koenig's theorem, and Hall's deficient
+     set S with |N(S)| < |S| when the matching is imperfect.
+
+     This is what makes the Hungarian method's minimum cover COMPUTABLE.  The
+     "draw lines until you cannot" heuristic a textbook shows is not an
+     algorithm, and a lab that implements it is guessing; the cover here is the
+     one Koenig's theorem names, and its size equals the matching's by
+     construction.
+
+     `edges` is [[leftId, rightId], ...]. */
+  function bipartiteMatch(left, right, edges) {
+    var li = netIndex(left), ri = netIndex(right), i, j;
+    var adj = left.map(function () { return []; });
+    for (j = 0; j < edges.length; j += 1) adj[li[edges[j][0]]].push(ri[edges[j][1]]);
+    var matchL = left.map(function () { return -1; });
+    var matchR = right.map(function () { return -1; });
+    var tryAugment = function (u, seen) {
+      for (var k = 0; k < adj[u].length; k += 1) {
+        var v = adj[u][k];
+        if (seen[v]) continue;
+        seen[v] = true;
+        if (matchR[v] < 0 || tryAugment(matchR[v], seen)) { matchR[v] = u; matchL[u] = v; return true; }
+      }
+      return false;
+    };
+    for (i = 0; i < left.length; i += 1) if (matchL[i] < 0) tryAugment(i, {});
+    /* Alternating reachability from the UNMATCHED left vertices. */
+    var zl = {}, zr = {}, stack = [];
+    for (i = 0; i < left.length; i += 1) if (matchL[i] < 0) { zl[i] = true; stack.push(i); }
+    while (stack.length) {
+      var u2 = stack.pop();
+      for (j = 0; j < adj[u2].length; j += 1) {
+        var v2 = adj[u2][j];
+        if (matchL[u2] === v2 || zr[v2]) continue;          /* cross unmatched edges */
+        zr[v2] = true;
+        if (matchR[v2] >= 0 && !zl[matchR[v2]]) { zl[matchR[v2]] = true; stack.push(matchR[v2]); }
+      }
+    }
+    var matching = [], coverL = [], coverR = [], S = [], NS = [];
+    for (i = 0; i < left.length; i += 1) {
+      if (matchL[i] >= 0) matching.push({ left: left[i], right: right[matchL[i]], li: i, ri: matchL[i] });
+      if (!zl[i]) coverL.push(left[i]); else S.push(left[i]);
+    }
+    for (j = 0; j < right.length; j += 1) if (zr[j]) { coverR.push(right[j]); NS.push(right[j]); }
+    return { matching: matching, size: matching.length,
+             cover: { left: coverL, right: coverR, size: coverL.length + coverR.length },
+             /* Both of these were named for the opposite of what they hold.
+                `hall` was true exactly when HALL'S CONDITION FAILS, and
+                `perfect` was true when the matching saturates the SMALLER
+                side -- so a three-by-two instance reported perfect: true with
+                an applicant unplaced. Nothing reader-facing was wrong only
+                because the one caller recomputes its own verdict. Renamed to
+                what they are; a caller reaching for either name now gets the
+                sense it reads as. */
+             deficient: { S: S, N: NS, gap: S.length - NS.length,
+                          violated: S.length > NS.length },
+             alternating: { left: S.slice(), right: NS.slice() },
+             saturatesSmallerSide:
+               matching.length === Math.min(left.length, right.length),
+             matchL: matchL, matchR: matchR };
+  }
+
+
+  /* ================================================ the directed representation
+
+     An arc is {from, to, cap, cost} and both endpoints are strings.  There is
+     no adjacency matrix anywhere in this kit and that is deliberate: a matrix
+     indexed by (tail, head) holds one cell for the pair, and the whole of the
+     first lesson is that (i, j) and (j, i) are two objects with two capacities,
+     two costs and two flow variables.  An ARRAY of arcs holds both, holds two
+     copies of the same arc if a reader writes one, and indexes the flow vector
+     by arc -- which is the column index of the incidence matrix, so the drawing
+     and the linear programme are the same object read two ways.
+
+     `cap` is null for an arc with no upper bound.  That is not "a very large
+     number": an unbounded arc contributes no row to the linear programme at
+     all, which is what u = infinity means and what a big constant would only
+     approximate. */
+
+  var NETNODES = 8;              /* the drawing can label eight and no more */
+  var NETARCS = 14;
+
+  function netClauses(text) {
+    var parts = String(text).split(/[,;\n]+/), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (s) out.push(s);
+    }
+    return out;
+  }
+
+  /* One clause is  tail>head  followed by the fields, colon separated:
+       s>a 3:4      capacity 3, cost 4
+       s>a 4        one field
+       s>a *:4      no upper bound, cost 4
+     A fraction is a fraction -- 7/2 reads as seven halves, because the field
+     separator is a colon and never a slash. */
+  function parseNet(text, fields) {
+    var cl = netClauses(text), nodes = [], arcs = [], seen = {}, i, k;
+    if (!cl.length) return { bad: 'there is no network here yet' };
+    if (cl.length > NETARCS) {
+      return { bad: 'that is ' + cl.length + ' arcs, and this drawing labels at most ' + NETARCS };
+    }
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^([A-Za-z0-9][A-Za-z0-9]{0,3})\s*(?:->|>)\s*([A-Za-z0-9][A-Za-z0-9]{0,3})\s*(.*)$/.exec(cl[i]);
+      if (!m) return { bad: '"' + esc(cl[i]) + '" is not an arc: write the tail, then &gt;, then the head' };
+      if (m[1] === m[2]) {
+        return { bad: '"' + esc(cl[i]) + '" runs from ' + m[1] + ' back to itself, and a loop carries '
+                      + 'no flow anyone can account for' };
+      }
+      var arc = { from: m[1], to: m[2], cap: null, cost: R0, capped: false };
+      var rest = m[3].trim();
+      var vals = rest ? rest.split(':') : [];
+      if (vals.length > fields.length) {
+        return { bad: '"' + esc(cl[i]) + '" gives ' + vals.length + ' numbers; an arc here carries '
+                      + fields.join(' and then ') };
+      }
+      if (vals.length < fields.length) {
+        return { bad: '"' + esc(cl[i]) + '" is missing the ' + fields[vals.length]
+                      + '; an arc here carries ' + fields.join(' and then ')
+                      + ', colon separated' };
+      }
+      for (k = 0; k < fields.length; k += 1) {
+        var raw = vals[k].trim();
+        if (fields[k] === 'capacity' && raw === '*') { arc.cap = null; arc.capped = false; continue; }
+        var v = Rread(raw);
+        if (v === null) return { bad: '"' + esc(raw) + '" in "' + esc(cl[i]) + '" is not a number' };
+        if (fields[k] === 'capacity') {
+          if (Rsign(v) < 0) return { bad: 'the capacity on "' + esc(cl[i]) + '" is negative' };
+          arc.cap = v; arc.capped = true;
+        } else { arc.cost = v; }
+      }
+      arcs.push(arc);
+      for (k = 0; k < 2; k += 1) {
+        var id = k ? arc.to : arc.from;
+        if (!seen[id]) { seen[id] = true; nodes.push(id); }
+      }
+    }
+    if (nodes.length > NETNODES) {
+      return { bad: 'that is ' + nodes.length + ' nodes, and this drawing labels at most ' + NETNODES };
+    }
+    return { nodes: nodes, arcs: arcs };
+  }
+
+  /* Supplies, as  node:amount .  A node the reader does not name supplies
+     nothing, which is the usual case and should not have to be typed. */
+  function parseSupply(text, nodes) {
+    var cl = netClauses(text), out = {}, i, j;
+    for (j = 0; j < nodes.length; j += 1) out[nodes[j]] = R0;
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^([A-Za-z0-9][A-Za-z0-9]{0,3})\s*[:=]\s*(.*)$/.exec(cl[i]);
+      if (!m) return { bad: '"' + esc(cl[i]) + '" is not a supply: write the node, a colon, the amount' };
+      if (out[m[1]] === undefined) return { bad: 'there is no node called ' + m[1] + ' in this network' };
+      var v = Rread(m[2].trim());
+      if (v === null) return { bad: '"' + esc(m[2]) + '" is not a number' };
+      out[m[1]] = v;
+    }
+    var total = R0;
+    for (j = 0; j < nodes.length; j += 1) total = Radd(total, out[nodes[j]]);
+    return { supply: out, total: total };
+  }
+
+  /* ================================================================ layout
+
+     Layered left to right: a node's column is the longest chain of arcs that
+     reaches it.  A circle is the wrong shape for a network with a source and a
+     sink -- the reader cannot see which way anything flows -- and this is why
+     the layout is kit-local rather than lifted from the undirected kit. */
+  function netLayout(nodes, arcs, width, height) {
+    var ix = netIndex(nodes), n = nodes.length, rank = [], i, j;
+    for (i = 0; i < n; i += 1) rank.push(0);
+    var top = topoOrder(nodes, arcs);
+    if (!top.cycle) {
+      for (i = 0; i < top.order.length; i += 1) {
+        var v = ix[top.order[i]];
+        for (j = 0; j < arcs.length; j += 1) {
+          if (ix[arcs[j].from] !== v) continue;
+          var w = ix[arcs[j].to];
+          if (rank[w] < rank[v] + 1) rank[w] = rank[v] + 1;
+        }
+      }
+    } else {
+      /* A cycle has no layering, so fall back to distance from the first node
+         and let the drawing show the loop as a loop. */
+      var dist = [], queue = [0];
+      for (i = 0; i < n; i += 1) dist.push(i === 0 ? 0 : -1);
+      while (queue.length) {
+        var u = queue.shift();
+        for (j = 0; j < arcs.length; j += 1) {
+          if (ix[arcs[j].from] !== u) continue;
+          var z = ix[arcs[j].to];
+          if (dist[z] < 0) { dist[z] = dist[u] + 1; queue.push(z); }
+        }
+      }
+      for (i = 0; i < n; i += 1) rank[i] = dist[i] < 0 ? 0 : dist[i];
+    }
+    var maxRank = 0, counts = {}, placed = {};
+    for (i = 0; i < n; i += 1) if (rank[i] > maxRank) maxRank = rank[i];
+    for (i = 0; i < n; i += 1) counts[rank[i]] = (counts[rank[i]] || 0) + 1;
+    var left = 46, right = width - 46;
+    var dx = maxRank > 0 ? (right - left) / maxRank : 0;
+    var pos = {};
+    for (i = 0; i < n; i += 1) {
+      var r = rank[i], c = counts[r], k = placed[r] || 0;
+      placed[r] = k + 1;
+      var spread = Math.min(76, (height - 72) / Math.max(1, c));
+      var y = height / 2 + (k - (c - 1) / 2) * spread;
+      pos[nodes[i]] = { x: maxRank > 0 ? left + r * dx : width / 2, y: y, rank: r, index: i };
+    }
+    return { pos: pos, rank: rank, ranks: maxRank + 1, layered: !top.cycle };
+  }
+
+  /* ================================================================ drawing */
+
+  function xy(v) { return Math.round(v * 10) / 10; }
+
+  /* A line with a head on it, trimmed at both ends so the head sits on the
+     circle rather than under it. */
+  function arcSvg(x1, y1, x2, y2, colour, width, dash, off) {
+    var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / len, uy = dy / len, px = -uy, py = ux;
+    var ax = x1 + ux * 17 + px * off, ay = y1 + uy * 17 + py * off;
+    var bx = x2 - ux * 17 + px * off, by = y2 - uy * 17 + py * off;
+    var hx = bx - ux * 9, hy = by - uy * 9;
+    return '<line x1="' + xy(ax) + '" y1="' + xy(ay) + '" x2="' + xy(hx) + '" y2="' + xy(hy)
+      + '" stroke="' + colour + '" stroke-width="' + width + '"'
+      + (dash ? ' stroke-dasharray="5 4"' : '') + ' />'
+      + '<polygon points="' + xy(bx) + ',' + xy(by) + ' ' + xy(hx + px * 4.6) + ',' + xy(hy + py * 4.6)
+      + ' ' + xy(hx - px * 4.6) + ',' + xy(hy - py * 4.6) + '" fill="' + colour + '" />';
+  }
+
+  /* The drawing every mode shares.  `opt.label(j)`, `opt.tone(j)`, `opt.dash(j)`
+     describe the arcs and `opt.nodeTone(id)`, `opt.nodeRing(id)` the nodes; each
+     may be absent.  Antiparallel and parallel arcs are pushed apart
+     perpendicular to their own line, which is the only way (i, j) and (j, i)
+     can both be seen -- and seeing both is the point of the first lesson. */
+  function drawNet(nodes, arcs, layout, opt) {
+    opt = opt || {};
+    var pos = layout.pos, s = '', i, j;
+    var key = function (a) { return a.from < a.to ? a.from + '|' + a.to : a.to + '|' + a.from; };
+    var group = {}, slot = [];
+    for (j = 0; j < arcs.length; j += 1) {
+      var k = key(arcs[j]);
+      slot.push(group[k] === undefined ? 0 : group[k]);
+      group[k] = slot[j] + 1;
+    }
+    for (j = 0; j < arcs.length; j += 1) {
+      var a = pos[arcs[j].from], b = pos[arcs[j].to];
+      if (!a || !b) continue;
+      var count = group[key(arcs[j])];
+      var off = count > 1 ? (slot[j] - (count - 1) / 2) * 13 : 0;
+      var colour = 'var(--' + ((opt.tone && opt.tone(j)) || 'cyan') + ')';
+      var width = (opt.wide && opt.wide(j)) ? 3 : 1.6;
+      s += arcSvg(a.x, a.y, b.x, b.y, colour, width, opt.dash && opt.dash(j), off);
+      var text = opt.label ? opt.label(j) : '';
+      if (text) {
+        var dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+        var px = -dy / len, py = dx / len;
+        var mx = (a.x + b.x) / 2 + px * (off + 12), my = (a.y + b.y) / 2 + py * (off + 12);
+        s += '<text x="' + xy(mx) + '" y="' + xy(my + 4) + '" text-anchor="middle" font-size="11" '
+          + 'font-weight="600" fill="' + colour + '">' + text + '</text>';
+      }
+    }
+    for (i = 0; i < nodes.length; i += 1) {
+      var p = pos[nodes[i]];
+      if (!p) continue;
+      var ring = opt.nodeRing && opt.nodeRing(nodes[i]);
+      s += '<circle cx="' + xy(p.x) + '" cy="' + xy(p.y) + '" r="16" fill="var(--panel-2)" stroke="var(--'
+        + (ring || 'line-strong') + ')" stroke-width="' + (ring ? 3 : 1.5) + '" />'
+        + '<text x="' + xy(p.x) + '" y="' + xy(p.y + 4) + '" text-anchor="middle" font-size="12" '
+        + 'font-weight="700" fill="var(--' + ((opt.nodeTone && opt.nodeTone(nodes[i])) || 'text') + ')">'
+        + ((opt.name && opt.name(nodes[i])) || nodes[i]) + '</text>';
+      var under = opt.under && opt.under(nodes[i]);
+      if (under) {
+        s += '<text x="' + xy(p.x) + '" y="' + xy(p.y + 31) + '" text-anchor="middle" font-size="10" '
+          + 'fill="var(--muted)">' + under + '</text>';
+      }
+    }
+    return s;
+  }
+
+  /* A caption inside the drawing, so the legend and the picture cannot drift
+     apart when a mode changes what it is showing. */
+  function netCaption(text, width, height) {
+    return '<text x="' + (width / 2) + '" y="' + (height - 8) + '" text-anchor="middle" font-size="10" '
+      + 'fill="var(--muted)">' + text + '</text>';
+  }
+
+  function capText(a) { return a.capped ? Rtext(a.cap) : '&#8734;'; }
+
+  /* Activities, precedences, and what shortening one is worth.  The project
+     mode only -- and note that nothing here solves a linear programme, which
+     is why that page carries no simplex at all. */
+
+  /* `A 3, B 2 after A, D 2 after B C` : an activity, its duration, and the
+     activities that must finish first. */
+  function parseActs(text) {
+    var cl = netClauses(text), acts = [], seen = {}, i, k;
+    if (!cl.length) return { bad: 'there are no activities here yet' };
+    if (cl.length > 12) return { bad: 'that is ' + cl.length + ' activities, and this table shows twelve' };
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^([A-Za-z][A-Za-z0-9]{0,2})\s+([0-9]+(?:\/[0-9]+)?)\s*(?:after\s+(.*))?$/i.exec(cl[i]);
+      if (!m) {
+        return { bad: '"' + esc(cl[i]) + '" is not an activity: write its name, its duration, and '
+                      + 'then "after" and the activities it waits for' };
+      }
+      if (seen[m[1]]) return { bad: 'there are two activities called ' + m[1] };
+      var dur = Rread(m[2]);
+      if (dur === null || Rsign(dur) < 0) return { bad: '"' + esc(m[2]) + '" is not a duration' };
+      var preds = [];
+      if (m[3]) {
+        var ps = m[3].trim().split(/[\s]+/);
+        for (k = 0; k < ps.length; k += 1) if (ps[k]) preds.push(ps[k]);
+      }
+      seen[m[1]] = true;
+      acts.push({ id: m[1], dur: dur, pred: preds });
+    }
+    for (i = 0; i < acts.length; i += 1) {
+      for (k = 0; k < acts[i].pred.length; k += 1) {
+        if (!seen[acts[i].pred[k]]) {
+          return { bad: acts[i].id + ' waits for ' + acts[i].pred[k] + ', which is not an activity here' };
+        }
+      }
+    }
+    return { acts: acts };
+  }
+
+  /* How far a critical activity can be shortened before it stops paying.  Not
+     a formula: the project is recomputed at every length, because the answer
+     is "until a SECOND path becomes critical" and which path that is depends
+     on the whole network. */
+  function crashCurve(acts, id, maxCut) {
+    var out = [], k, i;
+    for (k = 0; k <= maxCut; k += 1) {
+      var trial = [];
+      for (i = 0; i < acts.length; i += 1) {
+        trial.push(acts[i].id === id
+          ? { id: acts[i].id, dur: Rsub(acts[i].dur, R(BigInt(k), 1n)), pred: acts[i].pred }
+          : acts[i]);
+      }
+      if (Rsign(trial[0].dur) < 0) break;
+      var pass = cpmPasses(trial);
+      if (!pass || pass.cycle) break;
+      out.push({ cut: k, makespan: pass.makespan, paths: pass.paths ? pass.paths.length : 0,
+                 critical: pass.critical });
+    }
+    var stops = 0;
+    for (k = 1; k < out.length; k += 1) {
+      if (Rcmp(out[k].makespan, out[k - 1].makespan) < 0) stops = k; else break;
+    }
+    return { steps: out, lastUseful: stops };
+  }
+
+  var CPP = {
+    'nine': { spec: 'A 3, B 2 after A, C 4 after A, G 5 after A, D 2 after B, E 3 after C, H 2 after G, F 1 after D E, I 1 after F H', crash: 'C', label: 'nine activities, A through I' },
+    'twopaths': { spec: 'A 3, B 2 after A, C 2 after A, D 2 after B, E 2 after C, F 1 after D E', crash: 'B', label: 'six activities in two parallel chains' },
+    'cycle': { spec: 'A 3 after C, B 2 after A, C 4 after B', crash: 'A', label: 'three activities in a precedence loop' }
+  };
+
+  var presetIn = document.getElementById('cpPreset'), specIn = document.getElementById('cpSpec');
+  var actIn = document.getElementById('cpAct'), cutIn = document.getElementById('cpCut');
+  var plot = document.getElementById('cpPlot'), tableT = document.getElementById('cpTable');
+  var crashT = document.getElementById('cpCrash'), status = document.getElementById('cpStatus');
+  var KPIS = ['cpLen', 'cpCrit', 'cpPaths', 'cpSlack', 'cpGain', 'cpStop'];
+  var PICK = '';
+
+  function blank(why) {
+    plot.innerHTML = ''; tableT.innerHTML = ''; crashT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span>';
+  }
+
+  function redraw() {
+    document.getElementById('cpCutOut').textContent = cutIn.value;
+    var parsed = parseActs(specIn.value);
+    if (parsed.bad) { blank(parsed.bad); return; }
+    var acts = parsed.acts, i, j;
+    var ids = acts.map(function (a) { return a.id; });
+
+    var opts = '';
+    for (i = 0; i < ids.length; i += 1) opts += '<option value="' + ids[i] + '">' + ids[i] + '</option>';
+    actIn.innerHTML = opts;
+    if (ids.indexOf(PICK) < 0) PICK = ids[0];
+    actIn.value = PICK;
+
+    var cut = Number(cutIn.value) || 0;
+    var chosen = null;
+    for (i = 0; i < acts.length; i += 1) if (acts[i].id === PICK) chosen = acts[i];
+    var maxCut = chosen ? Number(chosen.dur.n / chosen.dur.d) : 0;
+    if (cut > maxCut) cut = maxCut;
+    var shortened = [];
+    for (i = 0; i < acts.length; i += 1) {
+      shortened.push(acts[i].id === PICK
+        ? { id: acts[i].id, dur: Rsub(acts[i].dur, R(BigInt(cut), 1n)), pred: acts[i].pred }
+        : acts[i]);
+    }
+    var base = cpmPasses(acts), pass = cpmPasses(shortened);
+    if (pass.cycle) {
+      plot.innerHTML = '';
+      tableT.innerHTML = ''; crashT.innerHTML = '';
+      for (i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+      status.innerHTML = '<strong>' + tone('This project has no schedule.', 'red') + '</strong> '
+        + 'The precedences run in a loop: ' + tone(pass.cycle.join(' → ') + ' → ' + pass.cycle[0], 'amber')
+        + '. No listing of the activities can put every predecessor before the activity that waits for '
+        + 'it, so there is no forward pass to run and no earliest start to compute. Such an order exists '
+        + 'exactly when the precedence graph is acyclic; break the loop and the table comes back.';
+      return;
+    }
+
+    var ix = {}, nodes = [], arcs = [];
+    for (i = 0; i < shortened.length; i += 1) { ix[shortened[i].id] = i; nodes.push(shortened[i].id); }
+    for (i = 0; i < shortened.length; i += 1) {
+      for (j = 0; j < shortened[i].pred.length; j += 1) {
+        arcs.push({ from: shortened[i].pred[j], to: shortened[i].id, cap: null, cost: R0,
+                    capped: false });
+      }
+    }
+    var critical = {};
+    for (i = 0; i < pass.critical.length; i += 1) critical[pass.critical[i]] = true;
+
+    var layout = netLayout(nodes, arcs, 660, 288);
+    plot.innerHTML = drawNet(nodes, arcs, layout, {
+      label: function () { return ''; },
+      tone: function (k) {
+        return critical[arcs[k].from] && critical[arcs[k].to] ? 'red' : 'muted';
+      },
+      wide: function (k) { return critical[arcs[k].from] && critical[arcs[k].to]; },
+      dash: function (k) { return !(critical[arcs[k].from] && critical[arcs[k].to]); },
+      nodeRing: function (v) { return v === PICK ? 'amber' : (critical[v] ? 'red' : null); },
+      under: function (v) { return Rtext(shortened[ix[v]].dur); }
+    }) + netCaption('one node per activity; the number under it is its duration', 660, 300);
+
+    var rows = '';
+    for (i = 0; i < shortened.length; i += 1) {
+      rows += tr([rowhead(shortened[i].id), tdl(shortened[i].pred.join(' ') || '&mdash;'),
+                  td(Rtext(shortened[i].dur)), td(Rtext(pass.ES[i])), td(Rtext(pass.EF[i])),
+                  td(Rtext(pass.LS[i])), td(Rtext(pass.LF[i])),
+                  td(Rzero(pass.slack[i]) ? tone('0', 'red') : Rtext(pass.slack[i])),
+                  td(Rzero(pass.slack[i]) ? tone('critical', 'red') : '')],
+                 Rzero(pass.slack[i]) ? 'tone-red' : (shortened[i].id === PICK ? 'tone-amber' : null));
+    }
+    tableT.innerHTML = '<caption>Forward pass, backward pass, and the difference between them'
+      + '</caption><thead>'
+      + tr([th('activity'), th('after'), th('duration'), th('ES'), th('EF'), th('LS'), th('LF'),
+            th('slack'), th('')]) + '</thead><tbody>' + rows + '</tbody>'
+      + '<tfoot>' + tr([tdl('Every critical path: ' + (pass.paths.length
+          ? pass.paths.map(function (p) { return p.join(' → '); }).join('; ')
+          : 'none'), 'small-copy').replace('<td', '<td colspan="9"')]) + '</tfoot>';
+
+    var curve = crashCurve(acts, PICK, maxCut), crows = '';
+    for (i = 0; i < curve.steps.length; i += 1) {
+      var st = curve.steps[i];
+      crows += tr([rowhead(PICK + ' shortened by ' + st.cut), td(Rtext(st.makespan)),
+                   td(i === 0 ? '&mdash;' : Rtext(Rsub(curve.steps[i - 1].makespan, st.makespan))),
+                   td(String(st.paths)), tdl(st.critical.join(' '))],
+                  i === cut ? 'tone-amber' : (i > curve.lastUseful ? 'tone-muted' : null));
+    }
+    crashT.innerHTML = '<caption>What shortening ' + PICK + ' buys, one unit at a time'
+      + '</caption><thead>'
+      + tr([th('cut'), th('project length'), th('bought'), th('critical paths'), th('critical')])
+      + '</thead><tbody>' + crows + '</tbody>';
+
+    var slack = Rtext(pass.slack[ix[PICK]]);
+    var gain = Rsub(base.makespan, pass.makespan);
+    document.getElementById('cpLen').textContent = Rtext(pass.makespan)
+      + (cut ? ' (was ' + Rtext(base.makespan) + ')' : '');
+    document.getElementById('cpCrit').textContent = pass.critical.join(' ') || 'none';
+    document.getElementById('cpPaths').textContent = pass.paths.length;
+    document.getElementById('cpSlack').textContent = slack;
+    document.getElementById('cpGain').textContent = Rtext(gain) + ' shorter, for ' + cut
+      + ' unit' + plural(cut, '', 's') + ' cut';
+    document.getElementById('cpStop').textContent = curve.lastUseful + ' unit'
+      + plural(curve.lastUseful, '', 's');
+
+    status.innerHTML = '<strong>The project takes ' + tone(Rtext(pass.makespan), 'cyan')
+      + '.</strong> That is the longest path through the precedences, not the sum of the longest '
+      + 'activities and not the length of any one chain you can see: ' + pass.paths.length
+      + ' distinct path' + plural(pass.paths.length, '', 's') + ' through the network '
+      + plural(pass.paths.length, 'has', 'have') + ' zero slack, and slack is LS − ES computed by two '
+      + 'passes over every activity. '
+      + (Rzero(pass.slack[ix[PICK]])
+          ? tone(PICK, 'amber') + ' is critical, so shortening it moves the project &mdash; '
+            + (curve.lastUseful > 0
+                ? 'for ' + tone(curve.lastUseful + ' unit' + plural(curve.lastUseful, '', 's'), 'amber')
+                  + ', and then it stops. After that a second path is critical too and the length is '
+                  + 'held by a chain ' + PICK + ' is not on, so every further unit spent on it buys '
+                  + 'exactly nothing.'
+                : 'or it would, except that another path is already level with it: '
+                  + tone('the first unit buys nothing at all', 'red') + ', because two paths are '
+                  + 'critical and shortening one leaves the other holding the length.')
+          : tone(PICK, 'amber') + ' has ' + slack + ' unit' + plural(Number(slack), '', 's')
+            + ' of slack, so shortening it moves nothing: '
+            + 'it is not on a critical path, and the project length is a property of the path rather '
+            + 'than of any activity on it.');
+  }
+
+  function apply() {
+    var p = CPP[presetIn.value];
+    if (!p) return;
+    specIn.value = p.spec; PICK = p.crash; cutIn.value = '0';
+    redraw();
+  }
+  var START = CPP[presetIn.value];
+  if (START && !specIn.value) specIn.value = START.spec;
+  presetIn.addEventListener('change', apply);
+  specIn.addEventListener('input', redraw);
+  actIn.addEventListener('change', function () { PICK = actIn.value; redraw(); });
+  cutIn.addEventListener('input', redraw);
+  PICK = actIn.value;
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "networks-flows-paths-and-assignments/project-networks-and-the-critical-path";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>
