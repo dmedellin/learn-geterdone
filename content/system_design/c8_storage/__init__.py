@@ -21,13 +21,21 @@ COURSE = {
         "second. The course prices each structure so that &ldquo;use an LSM&rdquo; or "
         "&ldquo;add an index&rdquo; becomes a number a designer can defend."
     ),
+    # Every line fits a narrow column WITHOUT a right-hand gloss holding it
+    # open. The two longest here were 70 and 78 characters, and the gloss wrapped
+    # onto the next line at reading width, so the block read as broken prose --
+    # "bytes/bandwidth      the" / "pattern, not the size". A key line is read as
+    # one statement; it cannot carry a second column that only survives at full
+    # width. The glosses that mattered are now their own lines.
     "key": [
-        "time = seeks × t_seek + bytes/bandwidth      the pattern, not the size",
-        "height = ⌈log_B N⌉                           a billion keys at B = 500 is four",
-        "k indexes  ⟹  k + 1 random writes an insert",
-        "WA ≈ L·F/2        RA ≈ L before filters",
-        "bits/key ≈ log₂(1/p) / ln 2                  independent of n",
-        "durable writes/s ≤ 1/t_fsync,  or B/t_fsync grouped",
+        "time = seeks × t_seek + bytes/bandwidth",
+        "the pattern, not the size",
+        "height = ⌈log_B N⌉",
+        "a billion keys at B = 500 is four",
+        "k indexes ⟹ k + 1 random writes an insert",
+        "WA ≈ L·F/2      RA ≈ L before filters",
+        "bits/key ≈ log₂(1/p) / ln 2, independent of n",
+        "durable writes/s ≤ 1/t_fsync, or B/t_fsync grouped",
     ],
     "assumes_short": "Capacity Estimation and Caching and Hit Rates; trees, logarithms, independence",
     "assumes_long": (
