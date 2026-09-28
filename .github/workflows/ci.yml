@@ -39,7 +39,14 @@ jobs:
   site:
     name: Site checks (well-formed, self-contained, links resolve)
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 10 minutes was a coin-flip once the site reached 719 pages. Run
+    # 36369802512 was killed at 10m3s with every step already reporting
+    # success, and the SAME commit's standalone CI passed at 9m57s -- six
+    # seconds apart, one of them taking the production deploy with it, because
+    # Release reuses this workflow and its build and deploy jobs never started.
+    # `Canonical tests` is 8m14s of that on its own; the ceiling has to clear
+    # the suite by a margin, not shave it.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
         with:
