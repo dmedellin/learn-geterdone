@@ -57,6 +57,7 @@ from . import (
     sortkit,
     storage,
     strings,
+    tense,
     transport,
     tree,
 )
@@ -154,6 +155,7 @@ REGISTRY = {
     "reduction": reduction.reduction_lab,
     "coping": coping.coping_lab,
     "strings": strings.strings_lab,
+    "tense": tense.tense_lab,
     "geometry": geometry.geometry_lab,
 }
 

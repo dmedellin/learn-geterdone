@@ -35,6 +35,10 @@ NUMBER = re.compile(
 # them as unknown vocabulary overstates the gap in the direction that looks rigorous.
 COMPOUND_NUMBER = re.compile(r"^[a-z]+-[a-z]+$")
 WORD = re.compile(r"[A-Za-z][A-Za-z'’-]*")
+# A hyphen-initial fragment is an AFFIX the lesson is talking about -- "-ing",
+# "-ed", "-ies" -- not a word the reader has to know. Counting the lesson's own
+# subject matter as unknown vocabulary is the same failure as counting `x`.
+AFFIX = re.compile(r"(?<![A-Za-z])-[A-Za-z]+")
 
 # Chrome the library puts on every page; it is furniture, not lesson prose.
 CHROME = {
@@ -116,7 +120,8 @@ def measure(markup, forms):
     glossary = set(doc.defined)
 
     tokens = []
-    for sentence_break, chunk in enumerate(re.split(r"(?<=[.!?])\s+", text.replace("\x00", ""))):
+    for sentence_break, chunk in enumerate(re.split(
+            r"(?<=[.!?])\s+", AFFIX.sub(" ", text.replace("\x00", "")))):
         for i, w in enumerate(WORD.findall(chunk)):
             tokens.append((w, i == 0))
 
