@@ -2,6 +2,7 @@
 """Course one of the English Subject: the tense table, generated rather than learned."""
 
 from .part_a import LESSONS as _A
+from .part_b import LESSONS as _B
 
 COURSE = {
     "slug": "tense-tables",
@@ -98,5 +99,5 @@ COURSE = {
         "is counted on the page against the word list printed there. Word list: "
         "the New General Service List (Browne, Culligan and Phillips), CC BY-SA 4.0."
     ),
-    "lessons": list(_A),
+    "lessons": list(_A) + list(_B),
 }

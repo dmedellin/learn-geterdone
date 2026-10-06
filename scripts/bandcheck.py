@@ -47,6 +47,7 @@ CHROME = {
     "menu", "theme", "dark", "light", "browser", "javascript", "copyright",
     "lab", "skip", "blank", "scripting", "interactive", "practice", "ideas",
     "recommended", "background", "foundational", "contents",
+    "feedback", "tick", "english", "british", "american",
 }
 
 
