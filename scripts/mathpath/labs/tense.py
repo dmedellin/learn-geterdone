@@ -126,6 +126,10 @@ def _table(cfg):
     el('tbBody').innerHTML = html;
   };
 
+  /* labcheck calls this after setting a control, and refuses the page without
+     it: a lab whose figures cannot be re-driven from outside cannot be pinned. */
+  window.redrawLab = function () { draw(el('tbVerb').value); };
+
   el('tbVerb').addEventListener('input', function () { draw(this.value); });
   el('tbPreset').addEventListener('change', function () {
     var i;

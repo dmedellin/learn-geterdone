@@ -56,7 +56,8 @@ EXPECTATIONS = REPO_ROOT / "scripts" / "generated-expectations.json"
 # the intended order: convert the kit, then add the line.
 KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "coping",
                           "dpkit", "dpseq", "strings", "geometry",
-                          "markov", "schedule", "network", "graphkit", "flowkit",)
+                          "markov", "schedule", "network", "graphkit", "flowkit",
+                          "tense",)
 
 
 def path_pages(path):

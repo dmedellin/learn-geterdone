@@ -45,6 +45,8 @@ CHROME = {
     "lesson", "lessons", "course", "courses", "subject", "subjects", "path",
     "library", "syllabus", "overview", "glossary", "quiz", "next", "previous",
     "menu", "theme", "dark", "light", "browser", "javascript", "copyright",
+    "lab", "skip", "blank", "scripting", "interactive", "practice", "ideas",
+    "recommended", "background", "foundational", "contents",
 }
 
 
@@ -85,15 +87,25 @@ class Prose(HTMLParser):
             self.depth += 1
         elif self.depth:
             self.depth += 1
+        self.handle_starttag_boundary()
         if tag == "dfn" and not self.depth:
             self._in_dfn = True
             self.chunks.append("\x00")      # marks where a definition begins
 
     def handle_endtag(self, tag):
+        self.chunks.append(" ")
         if self.depth:
             self.depth -= 1
         if tag == "dfn":
             self._in_dfn = False
+
+    def handle_starttag_boundary(self):
+        """An element boundary is a word boundary.
+
+        Joining `<h2>Ideas</h2><p>What` with no separator invents the word
+        "ideaswhat" and then reports it as vocabulary the reader does not have.
+        """
+        self.chunks.append(" ")
 
     def handle_data(self, data):
         if self.depth:
@@ -127,7 +139,7 @@ def measure(markup, forms):
 
     inb, off, early = 0, Counter(), []
     for w, sentence_initial in tokens:
-        low = w.lower()
+        low = re.sub(r"[\u2019']s$", "", w.lower())
         if len(low) < 2:
             continue                                   # a variable, not a word
         if (low in forms or NUMBER.match(low) or low in CHROME
