@@ -170,6 +170,22 @@ class TestProseIslands(unittest.TestCase):
                               'then <span class="math" data-say="r to the power n">rⁿ</span>')
 
 
+class TestReaderScript(unittest.TestCase):
+    def test_parses_in_every_supported_browser(self):
+        """The reader shares one <script> element with the theme, quiz, lab and
+        progress code: syntax an older Safari cannot parse kills all of them."""
+        from mathpath.readout import READOUT_JS
+        for construct in ("(?<", "=>", "?.", "??", "`", "const ", "let "):
+            self.assertNotIn(construct, READOUT_JS)
+
+    def test_no_double_quotes(self):
+        """The trading pages' copy contract lexes their scripts for string
+        literals, and an earlier script on those pages holds an unmatched `"`.
+        A double quote here would pair with it and swallow everything between."""
+        from mathpath.readout import READOUT_JS
+        self.assertNotIn('"', READOUT_JS)
+
+
 class TestCoverage(unittest.TestCase):
     """Every run on the five generated paths is spoken, and nothing is guessed."""
 

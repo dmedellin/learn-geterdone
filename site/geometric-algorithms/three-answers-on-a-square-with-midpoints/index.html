@@ -2755,7 +2755,7 @@ the wrapping walk, in order:
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
-      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
     var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
@@ -2764,7 +2764,7 @@ the wrapping walk, in order:
       + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
       + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
       + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
-      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
       + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
       + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
       + '@media print{.listen-bar,.listen-start{display:none}}';
@@ -2781,15 +2781,17 @@ the wrapping walk, in order:
     function text(el) {
       if (el.matches('table')) return 'a table, shown on the page.';
       if (el.matches('pre')) return 'a code block, shown on the page.';
-      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      // Definition · Sets: a voice may say middle dot; it is a pause
       return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
     }
     // A Chrome network voice stops after about fifteen seconds of one
     // utterance, so a long block is spoken a sentence or two at a time.
     function chunks(s) {
       var parts = [];
-      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
-        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
       });
       var out = [], cur = '';
       parts.forEach(function (p) {
@@ -2813,9 +2815,13 @@ the wrapping walk, in order:
     if (RATES.indexOf(rate) < 0) rate = 1;
     var voice = null;
     function pickVoice() {
-      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
-      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
-        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
     }
     pickVoice();
     if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
@@ -2836,9 +2842,9 @@ the wrapping walk, in order:
     bar.className = 'listen-bar'; bar.hidden = true;
     bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
     var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
-        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
         stop = btn('Stop'), status = document.createElement('span');
-    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
     [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
     document.body.appendChild(bar);
 
@@ -2853,17 +2859,19 @@ the wrapping walk, in order:
       if (r.top < 0 || r.bottom > innerHeight - 80)
         el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
     }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
     function say() {
-      var mine = ++token;
-      synth.cancel();
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
       if (at >= blocks.length) { finish(); return; }
       var b = blocks[at];
       mark(b.el);
-      status.textContent = (at + 1) + ' of ' + blocks.length;
+      count();
       var u = new SpeechSynthesisUtterance(b.parts[part]);
       u.rate = rate; u.lang = document.documentElement.lang || 'en';
       if (voice) u.voice = voice;
-      u.onstart = function () { heard = true; };
+      u.onstart = function () { heard = true; if (mine === token) count(); };
       u.onend = function () {
         if (mine !== token || !playing) return;
         if (++part >= b.parts.length) { part = 0; at++; }
@@ -2871,27 +2879,34 @@ the wrapping walk, in order:
       };
       u.onerror = function (e) {
         if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
-        playing = false; play.textContent = 'Play';
-        status.textContent = 'No voice is available on this device';
+        playing = false; play.textContent = 'Play'; fail();
       };
-      synth.speak(u);
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
     }
-    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
     function begin() {
       bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
       say();
       setTimeout(function () {
-        if (playing && !heard) status.textContent = 'No voice is available on this device';
+        if (playing && !heard) fail();
       }, 2500);
     }
     function finish() {
       playing = false; token++; synth.cancel(); mark(null);
-      bar.hidden = true; at = 0; part = 0; start.focus();
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
     }
-    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
     play.addEventListener('click', function () {
       if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
-      else { part = 0; begin(); }
+      else begin();
     });
     prev.addEventListener('click', function () { go(at - 1); });
     next.addEventListener('click', function () { go(at + 1); });
@@ -2899,10 +2914,13 @@ the wrapping walk, in order:
     speed.addEventListener('click', function () {
       rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
       speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
       try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
-      if (playing) { part = 0; say(); }
+      if (playing) say();
     });
-    addEventListener('pagehide', function () { token++; synth.cancel(); });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>
