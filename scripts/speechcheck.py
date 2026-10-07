@@ -4,7 +4,7 @@ Every run comes out as words (tests/test_speech.py proves that). A few shapes
 read as words and can still be wrong, because the notation itself is
 ambiguous: `x(t)` is a function of t, `λ(r + 1)` is lambda times r + 1.
 `speech.ambiguous()` flags those shapes, and each flagged run needs a spoken
-form in `content/<subject>/spoken.py` -- or the content rewritten to the
+form in `content/spoken/<subject>.py` -- or the content rewritten to the
 unambiguous convention (content/AGENTS.md, "Write math a voice can read").
 
     python3 scripts/speechcheck.py                    # count per subject
@@ -59,8 +59,7 @@ def subjects():
     from build_paths import GENERATED_PATHS
 
     for path in GENERATED_PATHS:
-        package = REPO_ROOT / "content" / path["slug"].replace("-", "_")
-        yield path, load_overrides(package)
+        yield path, load_overrides(path["slug"].replace("-", "_"))
 
 
 def unresolved(path, overrides):

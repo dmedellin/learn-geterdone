@@ -21,6 +21,7 @@ silence, so it is a defect to be fixed in the table or by an override.
 """
 
 import html
+from pathlib import Path
 import re
 import unicodedata
 
@@ -751,18 +752,34 @@ def ambiguous(run):
     return reasons
 
 
-def load_overrides(package_dir):
-    """`content/<subject>/spoken.py`'s SPOKEN dict: math run -> what to say.
+def load_overrides(subject):
+    """`content/spoken/<subject>.py`'s SPOKEN dict: math run -> what to say.
 
-    It lives beside the course modules, not in them, so a spoken form can be
-    added without moving the content-preservation hashes of the prose.
+    It lives outside the subject packages, not in them, so a spoken form can be
+    added without touching the content-preservation contract, which inventories
+    every module inside a subject package.
     """
     import importlib.util
 
-    path = package_dir / "spoken.py"
+    path = SPOKEN_DIR / ("%s.py" % subject)
     if not path.exists():
         return {}
-    spec = importlib.util.spec_from_file_location("_spoken_%s" % package_dir.name, path)
+    spec = importlib.util.spec_from_file_location("_spoken_%s" % subject, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return dict(module.SPOKEN)
+
+
+SPOKEN_DIR = Path(__file__).resolve().parents[2] / "content" / "spoken"
+
+
+def all_overrides():
+    """Every subject's spoken forms in one map.
+
+    A run is spoken the same way wherever it appears; tests/test_speech.py
+    fails if two subjects ever give one run two readings.
+    """
+    merged = {}
+    for path in sorted(SPOKEN_DIR.glob("*.py")):
+        merged.update(load_overrides(path.stem))
+    return merged

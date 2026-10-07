@@ -174,6 +174,17 @@ class TestCoverage(unittest.TestCase):
             with self.subTest(path=path["slug"]):
                 self.assertEqual(sorted(set(overrides) - present), [])
 
+    def test_one_reading_per_run(self):
+        """The page renderer merges every subject's spoken forms, so a run
+        written in two subjects must not be given two readings."""
+        seen, clashes = {}, []
+        for path, overrides in self.subjects:
+            for run, spoken in overrides.items():
+                if run in seen and seen[run][1] != spoken:
+                    clashes.append((run, seen[run][0], path["slug"]))
+                seen.setdefault(run, (path["slug"], spoken))
+        self.assertEqual(clashes, [])
+
     def test_nothing_is_guessed(self):
         """A run whose notation is ambiguous needs a spoken form, or the content
         rewritten to the convention in content/AGENTS.md."""

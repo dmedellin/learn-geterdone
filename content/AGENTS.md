@@ -50,13 +50,13 @@ would be to a listener. Write new math so the reading is not a guess:
   with one cell per column and it is announced as a table instead.
 
 When the notation must stay as it is, give the run a spoken form in
-`content/<subject>/spoken.py`, keyed by the exact run text:
+`content/spoken/<subject>.py`, keyed by the exact run text:
 
     SPOKEN = {
         "λ(1 − π₅)": "lambda times the quantity 1 minus pi sub 5",
     }
 
-It lives beside the course modules rather than in them, so it never moves the
-content-preservation hashes. `python3 scripts/speechcheck.py` lists the runs
+It lives outside the subject packages, so it never touches the
+content-preservation contract. `python3 scripts/speechcheck.py` lists the runs
 still guessed at; `tests/test_speech.py` fails while any are, and when a spoken
 form outlives the math it was written for.
