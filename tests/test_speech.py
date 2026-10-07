@@ -58,6 +58,8 @@ READINGS = {
     # scripts, functions, units
     "x^2 + 3x − 4 = 0": "x squared plus 3 x minus 4 equals 0",
     "log_10(x)": "log base 10 of x",
+    "log_3(x + 6)": "log base 3 of the quantity x plus 6",
+    "√(2KDh)/2": "the square root of the quantity 2 K D h, over 2",
     "2⌊log₂ m⌋": "2 times the floor of log base 2 m",
     "Vₜ(i)": "V sub t of i",
     "all c̄ᵢⱼ ≥ 0": "all c bar sub i j is greater than or equal to 0",

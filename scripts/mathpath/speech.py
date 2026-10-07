@@ -271,6 +271,9 @@ def _is_quantity(tokens, i, close):
     a fraction or a power and holds an operation of its own.
     """
     inner = tokens[i + 1:close]
+    _, before = _sig(tokens, i, -1)
+    if before in ("√", "∛") and len([k for k, _ in inner if k != "ws"]) > 1:
+        return True  # √(2KDh)/2: the root must be heard to end
     if not any(t in ("+", "−", "-", "/", "·", "×", "±", "∧", "∨", "⊕", "∪", "∩", "→")
                for _, t in inner):
         return False
@@ -401,7 +404,10 @@ def _say(text):
         elif tok in "({" and i in brackets and (tok == "(" or pt in ("^", "_")) \
                 and not (paren_ctx and paren_ctx[-1] == "fncall") \
                 and _is_quantity(tokens, i, brackets[i]):
-            if pt == ")" or (pk == "num" and tokens[i - 1][0] == "num") or pt == "!":
+            if i and tokens[i - 1][0] == "sub" or (
+                    pk == "num" and i > 1 and tokens[i - 2][1] == "_"):
+                say("of")  # log_3(x + 6), Vₜ(i + 1)
+            elif pt == ")" or (pk == "num" and tokens[i - 1][0] == "num") or pt == "!":
                 say("times")
             say("the quantity")
             paren_ctx.append("quantity")
