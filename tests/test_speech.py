@@ -37,7 +37,8 @@ READINGS = {
     "Σ deg(v) = 2|E|":
         "the sum of the degree of v equals 2 times the size of E",
     "T(n) = 2T(n/2) + n  ⟹  T(n) = Θ(n log n)":
-        "T of n equals 2 T of n over 2 plus n, implies, T of n equals theta of n log n",
+        "T of n equals 2 T of the quantity n over 2, plus n, implies, "
+        "T of n equals theta of n times log n",
     # grouping: a flat reading changes the meaning
     "¬(p ∧ q)  ≡  ¬p ∨ ¬q":
         "not the quantity p and q, is equivalent to, not p or not q",
@@ -71,6 +72,32 @@ READINGS = {
     "E[N₀]": "E of N sub 0",
     "Θ(nk)": "theta of n k",
     "χ(Cₙ)": "chi of C sub n",
+    # reported by the per-subject spoken-form passes
+    "log_b(M·N)": "log base b of the quantity M times N",
+    "2^{h+1} − 1": "2 to the power the quantity h plus 1, minus 1",
+    "Σ_{i=1}^{n} (2i − 1)²": "the sum from i equals 1 to n of the quantity 2 i minus 1, squared",
+    "Σ_g P(g)": "the sum over g of P of g",
+    "a + ar + ar² + ⋯ + arⁿ": "A plus A r plus A r squared, and so on, plus A r to the power n",
+    "Θ(n ln n)": "theta of n times the natural log of n",
+    "3 x 41 = 123": "3 times 41 equals 123",
+    "ax² + bx + c": "A x squared plus b x plus c",
+    "p⁻¹(25)": "p inverse of 25",
+    "|S*|": "the size of S star",
+    "f(2x + 6)": "f of the quantity 2 x plus 6",
+    "[-2, inf)": "negative 2, infinity",
+    # from the blind sample after the spoken-form passes
+    "|ℕ| = |ℤ|": "the size of the natural numbers, equals the size of the integers",
+    "|h_L − h_R| ≤ 1": "the absolute value of h sub L minus h sub R, is less than or equal to 1",
+    "aₙ = (n + 1)2ⁿ": "A sub n equals the quantity n plus 1, times 2 to the power n",
+    "D(i, j−1) + 1        insert the j-th character":
+        "D of i and j minus 1 plus 1, insert the j-th character",
+    "P(job past 120 ms)": "P of job past 120 milliseconds",
+    "Ā = U \\ A = {x ∈ U : x ∉ A}": "A bar equals U minus A equals the set x in U such that x not in A",
+    "5^0 = 1                  log_5(1) = 0": "5 to the power 0 equals 1, log base 5 of 1 equals 0",
+    "× 2 = 39 813 120 000 bytes/day": "times 2 equals 39813120000 bytes per day",
+    "(1 − λΔ)^(t/Δ) → e^(−λt)           as Δ → 0":
+        "the quantity 1 minus lambda delta, to the power the quantity t over delta, goes to "
+        "e to the power the quantity negative lambda t, as delta goes to 0",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",

@@ -209,7 +209,8 @@ def _pair_bars(tokens):
 
 def _bar_phrase(inner):
     """`|E|` is a size, `|x − 3|` an absolute value: decide by the contents."""
-    if re.search(r"[A-Z∪∩{}∅]", inner) and not re.fullmatch(r"[A-Z]\s*[−+-].*", inner):
+    inner = re.sub(r"_\w|[%s]" % "".join(SUB), "", inner)  # h_L is not a set
+    if re.search(r"[A-Z∪∩{}∅ℕℤℚℝℂ]", inner) and not re.fullmatch(r"[A-Z]\s*[−+-].*", inner):
         return "the size of"
     return "the absolute value of"
 
@@ -245,9 +246,39 @@ def _arrow(tokens, i):
     if ":" in texts[:i]:
         return "to"
     _, before = _sig(tokens, i, -1)
-    if before in ("ℕ", "ℤ", "ℚ", "ℝ", "ℂ") or (before or "").isupper():
+    if before in ("ℕ", "ℤ", "ℚ", "ℝ", "ℂ") or ((before or "").isupper() and before not in GREEK):
         return "to"
     return "goes to"
+
+
+def _script_arg(tokens, j):
+    """The text of a `_` or `^` argument starting at j: a {group} or one token."""
+    if j < len(tokens) and tokens[j][1] == "{":
+        depth, k = 0, j
+        while k < len(tokens):
+            depth += {"{": 1, "}": -1}.get(tokens[k][1], 0)
+            if depth == 0:
+                break
+            k += 1
+        return "".join(t for _, t in tokens[j + 1:k]), k + 1
+    if j < len(tokens):
+        return tokens[j][1], j + 1
+    return "", j
+
+
+def _one_operation(tokens, i, close):
+    """A single-argument call whose argument holds an operation at its top level."""
+    depth, found = 0, False
+    for _, t in tokens[i + 1:close]:
+        if t in "([{":
+            depth += 1
+        elif t in ")]}":
+            depth -= 1
+        elif depth == 0 and t == ",":
+            return False
+        elif depth == 0 and t in ("+", "−", "-", "/", "·", "×", "±"):
+            found = True
+    return found
 
 
 def _match(tokens):
@@ -308,10 +339,14 @@ def _product(tokens, i, tok):
     """Is a short letter run a product of variables (`ax`, `kE`) or a word?"""
     if i and tokens[i - 1][0] == "num":
         return True  # 4ac
+    if i + 1 < len(tokens) and tokens[i + 1][0] == "sup":
+        return True  # ax², at²
     before, after = _bound(tokens, i, -1), _bound(tokens, i, +1)
     beside = before in _ARITH or after in _ARITH
+    if tok in ("th", "st", "nd", "rd") and i and tokens[i - 1][1] in ("-", "−"):
+        return False  # the j-th character
     if tok.lower() not in COMMON_WORDS:
-        return beside or before == "(" or after == ")"  # Θ(nk)
+        return beside or (before == "(" and after == ")")  # Θ(nk), not P(job ...)
     return beside and before in _ARITH | {None} and after in _ARITH | {None}
 
 
@@ -327,7 +362,10 @@ def _say(text):
         if w:
             words.append(w)
 
+    skip_to = 0
     for i, (kind, tok) in enumerate(tokens):
+        if i < skip_to:
+            continue
         pk, pt = _sig(tokens, i, -1)
         nk, nt = _sig(tokens, i, +1)
         touching_next = i + 1 < len(tokens) and tokens[i + 1][0] not in ("ws", "gap")
@@ -339,6 +377,15 @@ def _say(text):
             say(tok.replace(" ", ""))
         elif kind == "word":
             call = touching_next and tokens[i + 1][1] == "("
+            if tok == "inf":
+                say("infinity")
+                continue
+            if tok == "x" and pk == "num" and nk == "num" and tokens[i - 1][0] == "ws":
+                say("times")  # 3 x 41
+                continue
+            if tok in ("log", "ln", "lg", "sin", "cos", "tan", "exp") and i and (
+                    pk == "num" or (pk == "word" and len(pt) == 1)) and tokens[i - 1][0] != "gap":
+                say("times")  # n ln n
             if tok in FUNCTIONS and nt == "over":
                 say(FUNCTIONS[tok])
                 continue
@@ -359,7 +406,7 @@ def _say(text):
                 # `ax + by` is a product of letters, not the word "by"
                 for ch in tok:
                     say("A" if ch == "a" else ch)
-            elif call and tok in SINGLE_LETTER_PRODUCTS and tokens[i + 1][1] == "(":
+            elif call and tok in SINGLE_LETTER_PRODUCTS and tokens[i + 1][1] == "(" and pt != "_":
                 # n(n + 1) is a product; f(x) is not
                 say("A" if tok == "a" else tok)
                 say("times")
@@ -373,6 +420,8 @@ def _say(text):
             if call:
                 say("of")
                 paren_ctx.append("fncall")
+        elif kind == "sup" and tok == "⁻¹" and pk == "word":
+            say("inverse")  # p⁻¹, e⁻¹
         elif kind == "sup":
             say(_script("".join(SUPER[c] for c in tok), sup=True))
         elif kind == "sub" and pt in ("Σ", "∑", "∏", "Π"):
@@ -407,8 +456,8 @@ def _say(text):
                 and not (paren_ctx and paren_ctx[-1] == "fncall") \
                 and _is_quantity(tokens, i, brackets[i]):
             if i and tokens[i - 1][0] == "sub" or (
-                    pk == "num" and i > 1 and tokens[i - 2][1] == "_"):
-                say("of")  # log_3(x + 6), Vₜ(i + 1)
+                    pk in ("num", "word") and i > 1 and tokens[i - 2][1] == "_"):
+                say("of")  # log_3(x + 6), log_b(M·N), Vₜ(i + 1)
             elif pt == ")" or (pk == "num" and tokens[i - 1][0] == "num") or pt == "!":
                 say("times")
             say("the quantity")
@@ -418,18 +467,23 @@ def _say(text):
         elif tok == "(":
             if paren_ctx and paren_ctx[-1] == "fncall" and pt and pt not in _OPERATORS:
                 paren_ctx[-1] = "prob" if pt in ("P", "Pr", "E") else "call"
-            elif i and tokens[i - 1][0] == "sub" or (
-                    pk == "num" and i > 1 and tokens[i - 2][1] == "_"):
-                say("of")
+                if paren_ctx[-1] == "call" and i in brackets and _one_operation(tokens, i, brackets[i]):
+                    say("the quantity")  # f(2x + 6): where the argument ends
+                    paren_ctx[-1] = "callq"
+            elif i and (tokens[i - 1][0] == "sub" or tokens[i - 1][1] in ("'", "′", "⁻¹")) or (
+                    pk in ("num", "word") and i > 1 and tokens[i - 2][1] == "_"):
+                say("of")  # log_b(x), v'(S)
                 paren_ctx.append("call")
             elif i and tokens[i - 1][1] in (")", "!") or (i and tokens[i - 1][0] == "num"):
                 say("times")
                 paren_ctx.append("group")
             else:
                 paren_ctx.append("group")
-        elif tok in ")}" and paren_ctx and paren_ctx[-1] == "quantity":
+        elif tok in ")}" and paren_ctx and paren_ctx[-1] in ("quantity", "callq"):
             paren_ctx.pop()
             say(",")
+            if i + 1 < len(tokens) and tokens[i + 1][0] in ("num", "word"):
+                say("times")  # (n + 1)2ⁿ
         elif tok == "}" and paren_ctx and paren_ctx[-1] == "group" and not brace_depth:
             paren_ctx.pop()
         elif tok == ")":
@@ -451,6 +505,8 @@ def _say(text):
         elif tok == ",":
             say("and" if paren_ctx and paren_ctx[-1] in ("call", "prob")
                 and words and words[-1] != "and" and _arity(tokens, i) == 2 else ",")
+        elif tok == ":" and brace_depth:
+            say("such that")  # {x ∈ U : x ∉ A}
         elif tok in (".", ":", ";"):
             say(",")
         elif tok == "!":
@@ -458,7 +514,7 @@ def _say(text):
         elif tok in ("−", "-"):
             if tok == "-" and pk == "word" and nk == "word" and touching_next and tokens[i - 1][0] == "word":
                 say("-")  # a hyphenated English word
-            elif (pt is None or pt in _OPERATORS - {")", "]"}
+            elif (pt is None or pt in _OPERATORS - {")", "]", "}"}
                   or (pt in SYMBOLS and pt not in _VALUE_END)
                   or bars.get(i - 1) == "open"
                   or (i and tokens[i - 1][0] in ("ws", "gap") and touching_next)):
@@ -466,7 +522,7 @@ def _say(text):
             else:
                 say("minus")
         elif tok == "/":
-            if (pk == "num" or tokens[i - 1][0] == "ws" or pt in UNIT_SAY) and nk == "word" and nt in ("s", "sec", "day", "year", "request", "requests",
+            if (pk == "num" or tokens[i - 1][0] == "ws" or pt in UNIT_SAY or pt in UNITS) and nk == "word" and nt in ("s", "sec", "day", "year", "request", "requests",
                                         "hour", "h", "min", "ms", "node", "user", "op", "write"):
                 say("per")
                 if nt == "s":
@@ -479,10 +535,23 @@ def _say(text):
                 tokens[i + 1] = ("ws", " ")
             else:
                 say("to the power")
+        elif tok == "_" and pt in ("Σ", "∑", "∏", "Π", "max", "min", "argmax", "argmin"):
+            lower, j = _script_arg(tokens, i + 1)
+            upper = None
+            if j < len(tokens) and tokens[j][1] == "^":
+                upper, j = _script_arg(tokens, j + 1)
+            words[-1] = re.sub(r" of$", "", words[-1])
+            if upper is not None:
+                say("from %s to %s of" % (_say(lower), _say(upper)))
+            else:
+                say("over %s of" % _say(lower))
+            skip_to = j
         elif tok == "_":
             say("base" if pt in ("log", "lg") else "sub")
         elif tok == "*":
-            say("star" if nk in (None,) or nt in _OPERATORS else "times")
+            touching_value = touching_next and tokens[i + 1][0] in ("num", "word")
+            say("times" if touching_value or (nk in ("num", "word") and pk in ("num", "word")
+                                              and tokens[i - 1][0] == "ws") else "star")
         elif tok in ("'", "’"):
             say("prime")
         elif tok == "&":
@@ -499,6 +568,10 @@ def _say(text):
             continue
         elif tok in COMBINING:
             say(COMBINING[tok])
+        elif tok in ("…", "⋯") and words and words[-1] in ("plus", "times", "minus") \
+                and nt in ("+", "·", "×", "−"):
+            words.pop()  # a + ar + ⋯ + arⁿ: "and so on", not "plus and so on plus"
+            say(", and so on,")
         elif tok in SYMBOLS:
             phrase = SYMBOLS[tok]
             if tok in "⌊⌈√∛" and i and tokens[i - 1][0] == "num":
