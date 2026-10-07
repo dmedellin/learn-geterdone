@@ -116,6 +116,11 @@ partition is exhaustive and sums: `past = participle` 60, `all different, -n
 participle` 37, `all three the same` 21, `all different, other` 9,
 `base = participle` 4, `base = past` 1.
 
+**The denominator, because a share needs one.** The token figures below are
+over **123,611 word tokens** (letters and apostrophes only), not the 122,396
+whitespace tokens the same text gives. 15,192/123,611 = 12.29%; 15,192/122,396
+would be 12.41%. An agent caught the two not dividing to the printed figure.
+
 **The overclaim this Subject must not make.** "The top 20 cover most of it" is
 87.65% of irregular tokens *including* be/have/do — but **73.89%** without them,
 and be/have/do alone are **59.5%** of the irregular total. Seventeen of the

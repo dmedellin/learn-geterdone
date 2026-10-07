@@ -84,7 +84,7 @@ LESSONS = [
                 "group and the rule is almost perfect.",
             ),
         ],
-        "lab": ("tense", {
+        "lab": ("english", {
             "mode": "doubling",
             "panel_title": "Score the rule yourself, three ways",
             "panel_intro": (

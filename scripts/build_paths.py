@@ -57,7 +57,7 @@ EXPECTATIONS = REPO_ROOT / "scripts" / "generated-expectations.json"
 KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "coping",
                           "dpkit", "dpseq", "strings", "geometry",
                           "markov", "schedule", "network", "graphkit", "flowkit",
-                          "tense",)
+                          "english",)
 
 
 def path_pages(path):

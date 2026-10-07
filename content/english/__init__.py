@@ -27,6 +27,8 @@ shipped byte permissively licensed.
 """
 
 from .c1_tense_tables import COURSE as _C1
+from .c2_irregular_verbs import COURSE as _C2
+from .c3_word_order import COURSE as _C3
 
 PATH = {
     "slug": "english",
@@ -94,5 +96,5 @@ PATH = {
         "List (Browne, Culligan and Phillips), CC BY-SA 4.0; pronunciations are "
         "CMUdict; passages are public domain."
     ),
-    "courses": [_C1],
+    "courses": [_C1, _C2, _C3],
 }

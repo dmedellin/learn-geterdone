@@ -91,7 +91,7 @@ LESSONS = [
                 "This picks the column, and the box is written.",
             ),
         ],
-        "lab": ("tense", {
+        "lab": ("english", {
             "mode": "table",
             "panel_title": "Type any verb and watch the table fill",
             "panel_intro": (
