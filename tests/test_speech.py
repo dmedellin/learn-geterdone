@@ -12,7 +12,6 @@ Two questions, kept apart:
     python3 -m unittest tests.test_speech -v
 """
 
-import re
 import sys
 import unittest
 from pathlib import Path
@@ -21,7 +20,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 sys.path.insert(0, str(REPO_ROOT / "content"))
 
-from mathpath.speech import is_rule, say, unspoken  # noqa: E402
+from mathpath.speech import say, say_block, unspoken  # noqa: E402
 
 READINGS = {
     # the Discrete Mathematics key column
@@ -58,6 +57,8 @@ READINGS = {
     # scripts, functions, units
     "x^2 + 3x − 4 = 0": "x squared plus 3 x minus 4 equals 0",
     "log_10(x)": "log base 10 of x",
+    "⌈n/k⌉ − 1": "the ceiling of n over k, minus 1",
+    "λ − μ": "lambda minus mu",
     "log_3(x + 6)": "log base 3 of the quantity x plus 6",
     "√(2KDh)/2": "the square root of the quantity 2 K D h, over 2",
     "2⌊log₂ m⌋": "2 times the floor of log base 2 m",
@@ -92,47 +93,63 @@ class TestReadings(unittest.TestCase):
         self.assertEqual(say("Σ deg(v)", override="the sum over v of the degree of v"),
                          "the sum over v of the degree of v")
 
+    def test_tables_are_not_read(self):
+        lines = ["speedup        100.00 / 6.00                        =  16.67×",
+                 "  ─────────────────────",
+                 "      1   7       10            2         3            3",
+                 "x = 2 + 1 = 3"]
+        self.assertEqual(say_block(lines), ["a table, shown on the page", "x equals 2 plus 1 equals 3"])
+
     def test_markup_is_not_read(self):
         self.assertEqual(say("w(e) &le; w(g)"), "w of e is less than or equal to w of g")
 
 
-_SPAN = re.compile(r"`([^`]+)`")
-
-
-def _runs(node, out):
-    """Every math run a generated page emits: inline `x` spans, and the lines
-    of key, worked and ("math", ...) display blocks."""
-    if isinstance(node, str):
-        out.extend(_SPAN.findall(node))
-    elif isinstance(node, dict):
-        for k, v in node.items():
-            if k in ("key", "lines") and isinstance(v, list) and all(isinstance(x, str) for x in v):
-                out.extend(x for x in v if not is_rule(x))
-            else:
-                _runs(v, out)
-    elif isinstance(node, (list, tuple)):
-        if isinstance(node, tuple) and len(node) == 2 and node[0] == "math":
-            out.extend(x for x in node[1] if not is_rule(x))
-        else:
-            for x in node:
-                _runs(x, out)
-    return out
-
-
 class TestCoverage(unittest.TestCase):
-    def test_every_run_is_spoken(self):
-        from build_paths import GENERATED_PATHS
+    """Every run on the five generated paths is spoken, and nothing is guessed."""
 
-        for path in GENERATED_PATHS:
+    @classmethod
+    def setUpClass(cls):
+        from speechcheck import runs, subjects, unresolved
+
+        cls.subjects = list(subjects())
+        cls.runs, cls.unresolved = staticmethod(runs), staticmethod(unresolved)
+
+    def test_every_run_is_spoken(self):
+        for path, overrides in self.subjects:
             residue = {}
-            for run in set(_runs(path, [])):
-                for ch in unspoken(say(run)):
+            for run, _, _ in self.runs(path):
+                for ch in unspoken(overrides.get(run) or say(run)):
                     residue.setdefault(ch, run)
             with self.subTest(path=path["slug"]):
                 self.assertEqual(
                     residue, {},
                     "symbols with no spoken form (add them to speech.SYMBOLS, "
-                    "or override the run): %r" % residue)
+                    "or give the run a spoken form): %r" % residue)
+
+    def test_spoken_forms_are_words(self):
+        for path, overrides in self.subjects:
+            for run, spoken in overrides.items():
+                with self.subTest(path=path["slug"], run=run):
+                    self.assertTrue(spoken.strip())
+                    self.assertEqual(unspoken(spoken), set())
+
+    def test_no_spoken_form_for_math_that_is_gone(self):
+        """A spoken form keyed to a run the content no longer has is dead data,
+        and the next edit to that line silently loses its reading."""
+        for path, overrides in self.subjects:
+            present = {run for run, _, _ in self.runs(path)}
+            with self.subTest(path=path["slug"]):
+                self.assertEqual(sorted(set(overrides) - present), [])
+
+    def test_nothing_is_guessed(self):
+        """A run whose notation is ambiguous needs a spoken form, or the content
+        rewritten to the convention in content/AGENTS.md."""
+        for path, overrides in self.subjects:
+            todo = self.unresolved(path, overrides)
+            with self.subTest(path=path["slug"]):
+                self.assertEqual(
+                    [item["run"] for item in todo], [],
+                    "python3 scripts/speechcheck.py --list %s" % path["slug"])
 
 
 if __name__ == "__main__":

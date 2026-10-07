@@ -290,6 +290,8 @@ def _is_quantity(tokens, i, close):
 
 SINGLE_LETTER_PRODUCTS = set("abcijkmnxyz")
 GREEK = set("αβγδεζηθικλμνξπρστυφχψωΓΔΘΛΞΠΣΦΨΩϕϵ")
+# Symbols that end a value: a minus after one subtracts (`⌈n/k⌉ − 1`, `λ − μ`).
+_VALUE_END = GREEK | set("⌋⌉∞∅ℕℤℚℝℂ′″½⅓⅔¼¾ℓ…")
 
 
 def _bound(tokens, i, step):
@@ -456,7 +458,8 @@ def _say(text):
         elif tok in ("−", "-"):
             if tok == "-" and pk == "word" and nk == "word" and touching_next and tokens[i - 1][0] == "word":
                 say("-")  # a hyphenated English word
-            elif (pt is None or pt in _OPERATORS - {")", "]"} or pt in SYMBOLS
+            elif (pt is None or pt in _OPERATORS - {")", "]"}
+                  or (pt in SYMBOLS and pt not in _VALUE_END)
                   or bars.get(i - 1) == "open"
                   or (i and tokens[i - 1][0] in ("ws", "gap") and touching_next)):
                 say("negative")
@@ -582,3 +585,100 @@ def unspoken(spoken):
 def is_rule(line):
     """A display line that is only the ruling of a hand-set table."""
     return not _SILENT.sub("", line).strip(" -=|+")
+
+
+# --- tables -------------------------------------------------------------------
+
+TABLE = "a table, shown on the page"
+
+_NUMERIC_CELL = re.compile(r"[−\-+]?[\d.,%×$/ ]+[a-zA-Z%×]{0,3}")
+
+
+def is_table_row(line):
+    """A ruled line, or three or more wide-gapped columns most of them numbers.
+
+    Read aloud, a row is a run of figures with no headings to hang them on
+    ("2, 800, 24.92, 10"); the reader is pointed at the page instead.
+    """
+    if is_rule(line):
+        return True
+    cells = [c for c in re.split(r" {2,}|\t+", line.strip()) if c]
+    numeric = sum(bool(_NUMERIC_CELL.fullmatch(c)) for c in cells)
+    return len(cells) >= 3 and numeric * 2 >= len(cells)
+
+
+def say_block(lines, overrides=None):
+    """A display block -> one spoken line per authored line.
+
+    Consecutive table rows collapse into a single pointer to the page.
+    """
+    overrides = overrides or {}
+    out = []
+    for line in lines:
+        if line in overrides:
+            out.append(overrides[line])
+        elif is_table_row(line):
+            if not out or out[-1] != TABLE:
+                out.append(TABLE)
+        else:
+            spoken = say(line)
+            if spoken:
+                out.append(spoken)
+    return out
+
+
+# --- what no rule can settle ---------------------------------------------------
+
+_AMBIGUOUS = (
+    # x(t) is a function of t; λ(r + 1) is lambda times r + 1. Same shape.
+    ("letter-call", re.compile(r"(?<![A-Za-z])[a-zα-ωΓ-Ω](?:[₀-₉ₐ-ₜᵢ-ᵥ]*)\((?!\))")),
+    # (n/2) log₂ n -- a group then a function, with the product left unwritten
+    ("implicit-product", re.compile(r"\)\s*(?:log|ln|lg|sin|cos|max|min)\b")),
+    # (1,1)=5 (1,2)=10 -- a table written along one line
+    ("inline-table", re.compile(r"\(\s*\d+\s*,\s*\d+\s*\)\s*=\s*\S+\s+\(\s*\d+\s*,")),
+    # 3/2x -- does the x sit under the bar or beside it?
+    ("fraction-extent", re.compile(r"\d/\d+[a-zA-Zα-ω(]")),
+)
+
+# Single letters the library uses as functions often enough that f(x) is safe,
+# and the asymptotic and big-operator letters, which are never a product.
+_FUNCTION_LETTERS = set("fghFGHPTCEVLRSWNQUDMOKAB") | set("ΘΩΣΠΦΓΛ")
+
+
+def _settled_call(text, m):
+    letter = m.group()[0]
+    if letter in _FUNCTION_LETTERS:
+        return True
+    # n(n − 1), x(x − 2): the letter multiplies an expression in itself
+    rest = text[m.end():]
+    return bool(re.match(r"\s*%s\s*[−+\-]" % re.escape(letter), rest))
+
+
+def ambiguous(run):
+    """Reasons a run's reading is a guess. Empty when the rules can be trusted."""
+    text = html.unescape(re.sub(r"<[^>]+>", "", run))
+    reasons = []
+    for name, pattern in _AMBIGUOUS:
+        for m in pattern.finditer(text):
+            if name == "letter-call" and _settled_call(text, m):
+                continue
+            reasons.append(name)
+            break
+    return reasons
+
+
+def load_overrides(package_dir):
+    """`content/<subject>/spoken.py`'s SPOKEN dict: math run -> what to say.
+
+    It lives beside the course modules, not in them, so a spoken form can be
+    added without moving the content-preservation hashes of the prose.
+    """
+    import importlib.util
+
+    path = package_dir / "spoken.py"
+    if not path.exists():
+        return {}
+    spec = importlib.util.spec_from_file_location("_spoken_%s" % package_dir.name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return dict(module.SPOKEN)
