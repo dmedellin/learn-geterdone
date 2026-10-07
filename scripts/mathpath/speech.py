@@ -83,7 +83,7 @@ SYMBOLS = {
 # ASCII spellings of the same relations. Longest first, so `<=>` is not read
 # as `<=` followed by `>`.
 ASCII_OPS = {
-    "<=>": "if and only if", "<=": "is less than or equal to",
+    "<--": ",", "-->": ",", "<=>": "if and only if", "<=": "is less than or equal to",
     ">=": "is greater than or equal to", "!=": "is not equal to",
     "==": "equals", "->": "to", "=>": "implies", ":=": "is defined as",
     "<-": "gets", "+=": "plus equals", "**": "to the power",
@@ -133,7 +133,7 @@ _TOKEN = re.compile(
     r"|(?P<word>[A-Za-z]+(?:'[a-z]+)?)"
     r"|(?P<sup>[%s]+)"
     r"|(?P<sub>[%s]+)"
-    r"|(?P<ascii><=>|<=|>=|!=|==|->|=>|:=|<-|\+=|\*\*)"
+    r"|(?P<ascii><--|-->|<=>|<=|>=|!=|==|->|=>|:=|<-|\+=|\*\*)"
     r"|(?P<other>.)" % (re.escape("".join(SUPER)), re.escape("".join(SUB))),
     re.S,
 )
@@ -448,10 +448,16 @@ def _say(text):
             elif brace_depth:
                 say("such that")
             elif tok == "∣" or (tokens[i - 1][0] == "ws" and i + 1 < len(tokens)
-                                and tokens[i + 1][0] == "ws"):
+                                and tokens[i + 1][0] == "ws"
+                                and sum(k == "num" for k, _ in tokens[:i]) < 2):
+                # 3 | 12 and m | (a − b) divide; 4 −2 6 | 18 is an augmented matrix
                 say("divides")  # m | (a − b); a table's rule sits in wide gaps
             else:
                 say(",")
+        elif tok == "(" and i in brackets and brackets[i] + 1 < len(tokens) \
+                and tokens[brackets[i] + 1][1] == "‾":
+            say("the complement of the quantity")  # (A ∪ B)‾
+            paren_ctx.append("complement")
         elif tok in "({" and i in brackets and (tok == "(" or pt in ("^", "_")) \
                 and not (paren_ctx and paren_ctx[-1] == "fncall") \
                 and _is_quantity(tokens, i, brackets[i]):
@@ -479,6 +485,10 @@ def _say(text):
                 paren_ctx.append("group")
             else:
                 paren_ctx.append("group")
+        elif tok == ")" and paren_ctx and paren_ctx[-1] == "complement":
+            paren_ctx.pop()
+            say(",")
+            tokens[i + 1] = ("ws", " ")
         elif tok in ")}" and paren_ctx and paren_ctx[-1] in ("quantity", "callq"):
             paren_ctx.pop()
             say(",")
@@ -526,7 +536,8 @@ def _say(text):
                                         "hour", "h", "min", "ms", "node", "user", "op", "write"):
                 say("per")
                 if nt == "s":
-                    tokens[i + 1] = ("word", "second")
+                    j = next(k for k in range(i + 1, len(tokens)) if tokens[k][0] == "word")
+                    tokens[j] = ("word", "second")  # 1200 / s
             else:
                 say("over")
         elif tok == "^":

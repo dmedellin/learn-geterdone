@@ -98,6 +98,12 @@ READINGS = {
     "(1 − λΔ)^(t/Δ) → e^(−λt)           as Δ → 0":
         "the quantity 1 minus lambda delta, to the power the quantity t over delta, goes to "
         "e to the power the quantity negative lambda t, as delta goes to 0",
+    "λ = 1200 / s        μ = 1000 / s": "lambda equals 1200 per second, mu equals 1000 per second",
+    "4 −2 6 | 18": "4 negative 2 6, 18",
+    "3 | 12": "3 divides 12",
+    "6x³y   / 6x³y  =   1        <-- write the 1":
+        "6 x cubed y, over 6 x cubed y, equals, 1, write the 1",
+    "x ∈ (A ∪ B)‾": "x in the complement of the quantity A union B",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",
