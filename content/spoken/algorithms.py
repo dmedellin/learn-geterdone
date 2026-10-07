@@ -84,4 +84,5 @@ SPOKEN = {
     '  the rule of thumb (m/n) ln 2 = 6.93': 'the rule of thumb m over n, times the natural log of 2, equals 6.93',
     "K · v'(i) ≤ v(i) < K · v'(i) + K": 'K times v prime of i is less than or equal to v of i, is less than K times v prime of i, plus K',
     "K · v'(S) ≥ K · v'(S*) > v(S*) - |S*| · K ≥ OPT - n · K": 'K times v prime of S is greater than or equal to K times v prime of S star, is greater than v of S star minus the size of S star times K, is greater than or equal to OPT minus n times K',
+    'the bound m(n - m + 1) = 5 x 26 for both             130     130': 'the bound m times the quantity n minus m plus 1, equals 5 times 26 for both, 130, 130',
 }

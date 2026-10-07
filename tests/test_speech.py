@@ -104,6 +104,11 @@ READINGS = {
     "6x³y   / 6x³y  =   1        <-- write the 1":
         "6 x cubed y, over 6 x cubed y, equals, 1, write the 1",
     "x ∈ (A ∪ B)‾": "x in the complement of the quantity A union B",
+    "on one 30-character text": "on one 30-character text",
+    "n-1": "n minus 1",
+    "n objects, k boxes, n > k   ⟹   some box has ≥ 2":
+        "n objects, k boxes, n is greater than k, implies, some box has at least 2",
+    "n ≥ 2": "n is greater than or equal to 2",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",
@@ -127,14 +132,42 @@ class TestReadings(unittest.TestCase):
                          "the sum over v of the degree of v")
 
     def test_tables_are_not_read(self):
-        lines = ["speedup        100.00 / 6.00                        =  16.67×",
+        lines = ["  2        2      0    98.01%",
                  "  ─────────────────────",
                  "      1   7       10            2         3            3",
                  "x = 2 + 1 = 3"]
         self.assertEqual(say_block(lines), ["a table, shown on the page", "x equals 2 plus 1 equals 3"])
+        # one calculation laid out in columns is read, not skipped
+        self.assertEqual(say_block(["speedup        100.00 / 6.00          =  16.67×"]),
+                         ["speedup, 100.00 over 6.00, equals, 16.67 times"])
+        # a blank spacer or a lone rule between formulas is silence, not a table
+        self.assertEqual(say_block(["x = 1", "", "  ─────", "y = 2"]), ["x equals 1", "y equals 2"])
 
     def test_markup_is_not_read(self):
         self.assertEqual(say("w(e) &le; w(g)"), "w of e is less than or equal to w of g")
+
+
+class TestProseIslands(unittest.TestCase):
+    """Math written into prose without backticks still reaches the voice as words."""
+
+    def test_islands(self):
+        from mathpath.speech import islands
+        cases = {
+            "For a nonzero series, compare |r| with 1 before any formula": ["|r|"],
+            "Finish when |r| &lt; 1 is a question about rⁿ and S∞ is.": ["|r| &lt; 1", "rⁿ", "S∞"],
+            "Factoring x² + bx + c": ["x² + bx + c"],
+            "the same definition &ldquo;λ, μ and ρ&rdquo; gives": ["λ, μ", "ρ"],
+            "A plain sentence with no math, not even a 2.": [],
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual([text[a:b] for a, b in islands(text)], expected)
+
+    def test_render_marks_them_and_keeps_the_text(self):
+        from mathpath import render
+        out = render.inline("compare |r| with 1, then `rⁿ`")
+        self.assertEqual(out, 'compare <span data-say="the absolute value of r">|r|</span> with 1, '
+                              'then <span class="math" data-say="r to the power n">rⁿ</span>')
 
 
 class TestCoverage(unittest.TestCase):

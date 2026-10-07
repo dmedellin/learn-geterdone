@@ -1,6 +1,6 @@
 ---
 name: chrome-renderer
-description: The shared renderer and stylesheet — scripts/mathpath/{chrome,theme,render,progress,feedback}.py. Use for any change to page chrome, the masthead, the completion toggle, the feedback panel, or the stylesheet. One edit here lands on all 654 lessons, so it is never a small change.
+description: The shared renderer and stylesheet — scripts/mathpath/{chrome,theme,render,progress,feedback,speech,readout}.py. Use for any change to page chrome, the masthead, the completion toggle, the feedback panel, or the stylesheet. One edit here lands on all 654 lessons, so it is never a small change.
 model: opus
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---

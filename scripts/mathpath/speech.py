@@ -321,6 +321,10 @@ def _is_quantity(tokens, i, close):
 
 
 SINGLE_LETTER_PRODUCTS = set("abcijkmnxyz")
+# Words after which a relation is prose: "some box has ≥ 2" is "has at least 2".
+_PROSE_VERBS = {"has", "have", "holds", "hold", "needs", "need", "takes", "take", "costs",
+                "cost", "contains", "contain", "gets", "get", "keeps", "keep", "uses", "use",
+                "least", "most", "only", "costs", "waits", "wait", "sees", "see"}
 GREEK = set("αβγδεζηθικλμνξπρστυφχψωΓΔΘΛΞΠΣΦΨΩϕϵ")
 # Symbols that end a value: a minus after one subtracts (`⌈n/k⌉ − 1`, `λ − μ`).
 _VALUE_END = GREEK | set("⌋⌉∞∅ℕℤℚℝℂ′″½⅓⅔¼¾ℓ…")
@@ -523,8 +527,9 @@ def _say(text):
         elif tok == "!":
             say("factorial" if pk in ("num", "word") or pt in (")", "!") else "")
         elif tok in ("−", "-"):
-            if tok == "-" and pk == "word" and nk == "word" and touching_next and tokens[i - 1][0] == "word":
-                say("-")  # a hyphenated English word
+            if tok == "-" and touching_next and i and tokens[i - 1][0] in ("word", "num") \
+                    and tokens[i + 1][0] == "word" and (tokens[i - 1][0] == "word" or len(tokens[i + 1][1]) > 2):
+                say("-")  # a hyphenated word: in-order, a 30-character text
             elif (pt is None or pt in _OPERATORS - {")", "]", "}"}
                   or (pt in SYMBOLS and pt not in _VALUE_END)
                   or bars.get(i - 1) == "open"
@@ -584,6 +589,8 @@ def _say(text):
                 and nt in ("+", "·", "×", "−"):
             words.pop()  # a + ar + ⋯ + arⁿ: "and so on", not "plus and so on plus"
             say(", and so on,")
+        elif tok in ("≥", "≤") and pk == "word" and len(pt) > 2 and pt.lower() in COMMON_WORDS | _PROSE_VERBS:
+            say("at least" if tok == "≥" else "at most")  # some box has ≥ 2
         elif tok in SYMBOLS:
             phrase = SYMBOLS[tok]
             if tok in "⌊⌈√∛" and i and tokens[i - 1][0] == "num":
@@ -689,6 +696,8 @@ def is_table_row(line):
         return True
     cells = [c for c in re.split(r" {2,}|\t+", line.strip()) if c]
     numeric = sum(bool(_NUMERIC_CELL.fullmatch(c)) for c in cells)
+    if re.search(r"[=≈<>≤≥]", line) and numeric < 4:
+        return False  # one worked calculation laid out in columns: speedup  100 / 6  =  16.67×
     return len(cells) >= 3 and numeric * 2 >= len(cells)
 
 
@@ -702,6 +711,8 @@ def say_block(lines, overrides=None):
     for line in lines:
         if line in overrides:
             out.append(overrides[line])
+        elif is_rule(line):
+            continue  # a blank spacer or a drawn rule says nothing on its own
         elif is_table_row(line):
             if not out or out[-1] != TABLE:
                 out.append(TABLE)
@@ -783,3 +794,61 @@ def all_overrides():
     for path in sorted(SPOKEN_DIR.glob("*.py")):
         merged.update(load_overrides(path.stem))
     return merged
+
+
+# --- math written into prose without backticks ----------------------------------
+
+_SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠≈≡≢∝√∛∑∏Σ⟹⟺⇒⇔→←↦ℕℤℚℝℂ∞×·÷±∓∘¬∧∨⌊⌋⌈⌉|^_"
+                     r"⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿⁱᵀᴺᵏʲˣ₀₁₂₃₄₅₆₇₈₉₊₋ₐₑₒₓₖₗₘₙₚₛₜᵢⱼ"
+                     r"αβγδεζηθκλμνξπρστφχψωΓΔΘΛΞΠΦΨΩ]|&(?:le|ge|ne|lt|gt);")
+_OPERATOR = re.compile(r"[=<>+−\-/*%(),.:;!]+|&(?:le|ge|ne|lt|gt);")
+_ISLAND_TOKEN = re.compile(r"\S+")
+
+
+def islands(text):
+    """Spans of plain prose that are math written without backticks.
+
+    "compare |r| with 1 before any formula" holds one, `|r|`; "Finish when
+    |r| < 1 is a question about rⁿ" holds two. An island is a run of
+    space-separated tokens around at least one that carries a math symbol,
+    grown over operators, numbers and short variable names, and trimmed of the
+    English words at its edges, which the voice reads as they are.
+    """
+    # Typographic entities (&ldquo; &mdash;) are prose; blank them to the same
+    # width so every offset still points into the original text.
+    masked = re.sub(r"&(?!(?:le|ge|ne|lt|gt);)#?\w+;", lambda m: " " * len(m.group()), text)
+    tokens = [(m.start(), m.end(), m.group()) for m in _ISLAND_TOKEN.finditer(masked)]
+    text = masked
+
+    def mathy(tok):
+        if re.fullmatch(r"&(?:le|ge|ne|lt|gt);", tok):
+            return True
+        bare = tok.strip(".,;:!?“”\"'")
+        if not bare:
+            return False
+        if _SYMBOL.search(bare) or _OPERATOR.fullmatch(bare):
+            return True
+        return bool(re.fullmatch(r"[A-Za-z0-9]{1,3}|\d[\d.]*", bare)) and bare.lower() not in COMMON_WORDS
+
+    out, i, floor = [], 0, 0
+    while i < len(tokens):
+        if not _SYMBOL.search(tokens[i][2]):
+            i += 1
+            continue
+        lo = hi = i
+        while lo > floor and mathy(tokens[lo - 1][2]):
+            lo -= 1
+        while hi + 1 < len(tokens) and mathy(tokens[hi + 1][2]):
+            hi += 1
+        start, end = tokens[lo][0], tokens[hi][1]
+        # sentence punctuation at the island's edge is prose, not math
+        while end > start and text[end - 1] in ".,;:!?”\"":
+            end -= 1
+        while start < end and text[start] in "“\"(":
+            if text[start] == "(" and ")" in text[start:end]:
+                break
+            start += 1
+        if end > start:
+            out.append((start, end))
+        i = floor = hi + 1
+    return out
