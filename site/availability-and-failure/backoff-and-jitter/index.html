@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">delay of attempt i = base × 2ⁱ⁻¹      waves at 1, 2, 4, 8, 16, 32 s
+        <div class="mathblock" data-say="delay of attempt i equals base times 2 to the power i minus 1, waves at 1, 2, 4, 8, 16, 32 seconds. with jitter w, delay is Uniform from d times the quantity 1 minus w over 2, up to d times the quantity 1 plus w over 2, not including the top. 600 clients, no jitter, peak 3000 per second, with 100 percent jitter, 925 per second. a factor of 3.24 off the peak, from the same seed and the same total" tabindex="0" role="region" aria-label="Mathematical notation">delay of attempt i = base × 2ⁱ⁻¹      waves at 1, 2, 4, 8, 16, 32 s
 with jitter w:  delay ~ Uniform[d(1 − w/2), d(1 + w/2))
 600 clients, no jitter:  peak 3000 /s      with 100% jitter:  925 /s
 a factor of 3.24 off the peak, from the same seed and the same total</div>
@@ -1308,18 +1308,18 @@ a factor of 3.24 off the peak, from the same seed and the same total</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Two properties of a retry schedule that are usually named together and are controlled by different parts of it.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>An outage synchronises every client</h3><p>An outage is, by definition, a moment at which all of a service's clients fail at once. Each then schedules retry <span class="math">i</span> at <span class="math">base × 2ⁱ⁻¹</span> after its own failure, and since the failures were simultaneous the retries are too: the first wave at one second, the next at two, then four, eight, sixteen and thirty-two. Doubling a constant leaves it constant.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Backoff controls the total, not the peak</h3><p>Geometric delays mean a client makes six attempts in forty seconds rather than forty, which is a real reduction in total work. But all six of those attempts land in six instants, so the instantaneous rate at each instant is the full client population. The peak is what decides whether a recovering service stays up, and backoff alone does not touch it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Jitter is the part that spreads them</h3><p>Drawing the delay uniformly from <span class="math">[d(1 − w/2), d(1 + w/2))</span> turns each wave into a smear over an interval proportional to the delay. With 600 clients, a one-second base and full-width jitter the peak falls from 3000 retries a second to 925 &mdash; a factor of <span class="math">3.24</span> &mdash; with the same clients, the same policy and the same seed. Nothing was delayed longer on average; it was spread.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>An outage synchronises every client</h3><p>An outage is, by definition, a moment at which all of a service's clients fail at once. Each then schedules retry <span class="math" data-say="i">i</span> at <span class="math" data-say="base times 2 to the power i minus 1">base × 2ⁱ⁻¹</span> after its own failure, and since the failures were simultaneous the retries are too: the first wave at one second, the next at two, then four, eight, sixteen and thirty-two. Doubling a constant leaves it constant.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Backoff controls the total, not the peak</h3><p>Geometric delays mean a client makes six attempts in forty seconds rather than forty, which is a real reduction in total work. But all six of those attempts land in six instants, so the instantaneous rate at each instant is the full client population. The peak is what decides whether a recovering service stays up, and backoff alone does not touch it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Jitter is the part that spreads them</h3><p>Drawing the delay uniformly from <span class="math" data-say="d times the quantity 1 minus w over 2, up to d times the quantity 1 plus w over 2, not including the top">[d(1 − w/2), d(1 + w/2))</span> turns each wave into a smear over an interval proportional to the delay. With 600 clients, a one-second base and full-width jitter the peak falls from 3000 retries a second to 925 &mdash; a factor of <span class="math" data-say="3.24">3.24</span> &mdash; with the same clients, the same policy and the same seed. Nothing was delayed longer on average; it was spread.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Waves, and the one parameter that flattens them</h2></div><p>What a synchronised retry schedule looks like, why the measurement resolution matters, and what jitter costs.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Exponential backoff and jitter</span><p>Under <strong>exponential backoff</strong> the delay before attempt <span class="math">i</span> is <span class="math">base × 2ⁱ⁻¹</span>. Under <strong>jitter</strong> of width <span class="math">w</span> the delay is instead drawn uniformly from <span class="math">[d(1 − w/2), d(1 + w/2))</span>, where <span class="math">d</span> is that same nominal delay. Jitter of <span class="math">100%</span> therefore spreads attempt <span class="math">i</span> uniformly over an interval of length <span class="math">d</span> centred on <span class="math">d</span>.</p></div><p>The lab draws its delays from a seeded linear congruential generator &mdash; multiplier <span class="math">1 103 515 245</span>, increment <span class="math">12 345</span>, modulus <span class="math">2³¹</span> &mdash; so the histogram is the same every time the page is opened and a reader can check what they were told. Change the seed and the peak moves a little; change the jitter and it moves a lot.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">600 clients, 20-second outage, base 1000 ms, 8 attempts allowed
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Exponential backoff and jitter</span><p>Under <strong>exponential backoff</strong> the delay before attempt <span class="math" data-say="i">i</span> is <span class="math" data-say="base times 2 to the power i minus 1">base × 2ⁱ⁻¹</span>. Under <strong>jitter</strong> of width <span class="math" data-say="w">w</span> the delay is instead drawn uniformly from <span class="math" data-say="d times the quantity 1 minus w over 2, up to d times the quantity 1 plus w over 2, not including the top">[d(1 − w/2), d(1 + w/2))</span>, where <span class="math" data-say="d">d</span> is that same nominal delay. Jitter of <span class="math" data-say="100 percent">100%</span> therefore spreads attempt <span class="math" data-say="i">i</span> uniformly over an interval of length <span class="math" data-say="d">d</span> centred on <span class="math" data-say="d">d</span>.</p></div><p>The lab draws its delays from a seeded linear congruential generator &mdash; multiplier <span class="math" data-say="1103515245">1 103 515 245</span>, increment <span class="math" data-say="12345">12 345</span>, modulus <span class="math" data-say="2 to the power 31">2³¹</span> &mdash; so the histogram is the same every time the page is opened and a reader can check what they were told. Change the seed and the peak moves a little; change the jitter and it moves a lot.</p><div class="mathblock" data-say="600 clients, 20-second outage, base 1000 milliseconds, 8 attempts allowed. retries per second, no jitter. a table, shown on the page. six waves of 600 equals 3600 retries in total. peak, measured in 200 milliseconds slots, 600 per slot equals 3000 per second" tabindex="0" role="region" aria-label="Mathematical notation">600 clients, 20-second outage, base 1000 ms, 8 attempts allowed
 
 retries per second, no jitter
 second     0   1   2   3   4   5   6   7   8   9  …  16  …  32
 count      0 600 600   0 600   0   0   0 600   0  … 600  … 600
 
 six waves of 600 = 3600 retries in total
-peak, measured in 200 ms slots:  600 per slot = 3000 /s</div><p>The slot width is the whole measurement and the lab says so on its face. Without jitter every client in a wave retries in the same millisecond, so the true instantaneous spike is six hundred requests in one millisecond; any bucket wider than that understates it. At the 200 ms resolution the lab uses, the reported <span class="math">3000</span> a second is a floor rather than a measurement.</p><h3>The same clients, spread</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the same run with 100% jitter, seed 7
+peak, measured in 200 ms slots:  600 per slot = 3000 /s</div><p>The slot width is the whole measurement and the lab says so on its face. Without jitter every client in a wave retries in the same millisecond, so the true instantaneous spike is six hundred requests in one millisecond; any bucket wider than that understates it. At the 200 ms resolution the lab uses, the reported <span class="math" data-say="3000">3000</span> a second is a floor rather than a measurement.</p><h3>The same clients, spread</h3><div class="mathblock" data-say="the same run with 100 percent jitter, seed 7. peak, no jitter, 3000 per second. peak, with jitter, 925 per second, a factor of 3.24. total, no jitter, 3600 retries. total, with jitter, 3323 retries. retries per second, with jitter. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">the same run with 100% jitter, seed 7
 
 peak, no jitter        3000 /s
 peak, with jitter       925 /s        a factor of 3.24
@@ -1329,7 +1329,7 @@ total, with jitter     3323 retries
 
 retries per second, with jitter
 second     0   1   2   3   4   5   6   7   8   9  10  11
-count    298 603 438 161 233 225  81  76 122  99 100 109</div><p>Two things changed and they are worth separating. The peak fell by a factor of <span class="math">3.24</span>, which is what jitter is for. The total fell slightly too, from <span class="math">3600</span> to <span class="math">3323</span>, which is an artefact of the outage boundary: a jittered attempt that lands after the service has recovered succeeds and the client stops, where its unjittered twin would have retried once more. Jitter is not a way to reduce total load; the small change here is a side effect.</p><div class="example"><span class="label">Example &middot; What the recovering service sees</span><p>A service coming back after a twenty-second outage has a first second in which it is either hit by 3000 requests or by about 900, depending on a single configuration parameter. If its capacity is 1500 a second, the first case fails again immediately &mdash; and every client that fails re-enters the backoff schedule, which is the previous lesson's loop with a synchronised phase. The second case is served.</p></div><h3>What jitter costs, and what full width means</h3><p>Jitter does not increase the mean delay: the interval <span class="math">[d(1 − w/2), d(1 + w/2))</span> is centred on <span class="math">d</span>, so half the draws are earlier than the nominal delay and half later. What it costs is predictability &mdash; a particular client may retry sooner or later than the schedule says &mdash; and that is almost never a cost anyone is actually paying.</p><p>Full-width jitter, <span class="math">w = 100%</span>, spreads attempt <span class="math">i</span> over <span class="math">[0.5d, 1.5d)</span>. Half-width leaves the waves partly visible: at <span class="math">50%</span> the same run peaks at <span class="math">1240</span> a second rather than <span class="math">925</span>, because each wave is smeared over half the interval and neighbouring waves no longer overlap enough to fill the gaps. The lab's jitter slider makes that comparison directly.</p><div class="example"><span class="label">Example &middot; The cap that matters more than the base</span><p>Backoff without a cap reaches a 32-second delay by the sixth attempt and 512 seconds by the tenth, which is long enough that the client has effectively given up without saying so. Real policies cap the delay, and a capped backoff with jitter is the standard shape: exponential up to a ceiling, then uniform on a jittered interval around that ceiling. The waves this lesson is about are a property of the early attempts, which is exactly where the cap does not apply.</p></div></article>
+count    298 603 438 161 233 225  81  76 122  99 100 109</div><p>Two things changed and they are worth separating. The peak fell by a factor of <span class="math" data-say="3.24">3.24</span>, which is what jitter is for. The total fell slightly too, from <span class="math" data-say="3600">3600</span> to <span class="math" data-say="3323">3323</span>, which is an artefact of the outage boundary: a jittered attempt that lands after the service has recovered succeeds and the client stops, where its unjittered twin would have retried once more. Jitter is not a way to reduce total load; the small change here is a side effect.</p><div class="example"><span class="label">Example &middot; What the recovering service sees</span><p>A service coming back after a twenty-second outage has a first second in which it is either hit by 3000 requests or by about 900, depending on a single configuration parameter. If its capacity is 1500 a second, the first case fails again immediately &mdash; and every client that fails re-enters the backoff schedule, which is the previous lesson's loop with a synchronised phase. The second case is served.</p></div><h3>What jitter costs, and what full width means</h3><p>Jitter does not increase the mean delay: the interval <span class="math" data-say="d times the quantity 1 minus w over 2, up to d times the quantity 1 plus w over 2, not including the top">[d(1 − w/2), d(1 + w/2))</span> is centred on <span class="math" data-say="d">d</span>, so half the draws are earlier than the nominal delay and half later. What it costs is predictability &mdash; a particular client may retry sooner or later than the schedule says &mdash; and that is almost never a cost anyone is actually paying.</p><p>Full-width jitter, <span class="math" data-say="w equals 100 percent">w = 100%</span>, spreads attempt <span class="math" data-say="i">i</span> over <span class="math" data-say="0.5 d, 1.5 d">[0.5d, 1.5d)</span>. Half-width leaves the waves partly visible: at <span class="math" data-say="50 percent">50%</span> the same run peaks at <span class="math" data-say="1240">1240</span> a second rather than <span class="math" data-say="925">925</span>, because each wave is smeared over half the interval and neighbouring waves no longer overlap enough to fill the gaps. The lab's jitter slider makes that comparison directly.</p><div class="example"><span class="label">Example &middot; The cap that matters more than the base</span><p>Backoff without a cap reaches a 32-second delay by the sixth attempt and 512 seconds by the tenth, which is long enough that the client has effectively given up without saying so. Real policies cap the delay, and a capped backoff with jitter is the standard shape: exponential up to a ceiling, then uniform on a jittered interval around that ceiling. The waves this lesson is about are a property of the early attempts, which is exactly where the cap does not apply.</p></div></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Backoff and jitter</h2></div><p>Two seeded histograms of the same outage, one of them synchronised</p></div>
@@ -1380,7 +1380,7 @@ count    298 603 438 161 233 225  81  76 122  99 100 109</div><p>Two things chan
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Designing a retry schedule for a synchronised failure</h2></div><p>The third step is the one that is usually skipped, and skipping it makes the policy look better than it is by whatever factor the bucket is too wide.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Assume every client fails at the same instant</h3><p>That is what an outage is, and it is the case the schedule has to survive. A policy evaluated against independent, uniformly distributed failures is being evaluated against the case it was never needed for.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write down where the waves land</h3><p><span class="math">base × 2ⁱ⁻¹</span> for each attempt, until the delay exceeds the outage or the attempt budget runs out: 1, 2, 4, 8, 16, 32 seconds at a one-second base. Each of those instants receives the entire client population.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Measure the peak at a resolution finer than the wave</h3><p>A one-second bucket turns six hundred simultaneous retries into a comfortable-looking six hundred a second. Use a slot narrow enough to resolve the spike, and report the slot width alongside the peak, because without jitter the true spike is instantaneous and every bucket understates it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add jitter and compare peaks, not totals</h3><p>The total barely moves; the peak falls by roughly the factor the spreading achieves &mdash; <span class="math">3.24</span> here at full width. Compare the jittered peak with the capacity the service has while it is recovering, which is generally less than its steady-state capacity.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Assume every client fails at the same instant</h3><p>That is what an outage is, and it is the case the schedule has to survive. A policy evaluated against independent, uniformly distributed failures is being evaluated against the case it was never needed for.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write down where the waves land</h3><p><span class="math" data-say="base times 2 to the power i minus 1">base × 2ⁱ⁻¹</span> for each attempt, until the delay exceeds the outage or the attempt budget runs out: 1, 2, 4, 8, 16, 32 seconds at a one-second base. Each of those instants receives the entire client population.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Measure the peak at a resolution finer than the wave</h3><p>A one-second bucket turns six hundred simultaneous retries into a comfortable-looking six hundred a second. Use a slot narrow enough to resolve the spike, and report the slot width alongside the peak, because without jitter the true spike is instantaneous and every bucket understates it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add jitter and compare peaks, not totals</h3><p>The total barely moves; the peak falls by roughly the factor the spreading achieves &mdash; <span class="math" data-say="3.24">3.24</span> here at full width. Compare the jittered peak with the capacity the service has while it is recovering, which is generally less than its steady-state capacity.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1391,7 +1391,7 @@ count    298 603 438 161 233 225  81  76 122  99 100 109</div><p>Two things chan
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A thundering herd at 2000 clients, and the capacity it needs</h3><p>A service with 2000 clients and a recovery capacity of 1200 requests a second comes back from a thirty-second outage. The question is whether it survives its own clients, and the answer is a comparison of two numbers.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">2000 clients, base 1000 ms, 30-second outage, recovery capacity 1200 /s
+      <article class="card card-pad prose"><h3>A thundering herd at 2000 clients, and the capacity it needs</h3><p>A service with 2000 clients and a recovery capacity of 1200 requests a second comes back from a thirty-second outage. The question is whether it survives its own clients, and the answer is a comparison of two numbers.</p><div class="mathblock" data-say="2000 clients, base 1000 milliseconds, 30-second outage, recovery capacity 1200 per second. no jitter, the waves. 1 seconds, 2 seconds, 4 seconds, 8 seconds, 16 seconds, 32 seconds, six waves of 2000 equals 12000 retries. each wave lands inside one millisecond. peak at 200 milliseconds resolution equals 2000 per slot equals 10000 per second. 10000 per second against 1200 per second of capacity, the service fails again. and what failing again does. every one of the 2000 clients r e-enters the schedule. the next wave is the same size, one doubling later. with 100 percent jitter, seed 7, the same 2000 clients. total, 11597 retries, against 12000 without. peak, 3075 per second, against 10000 without. a factor of 3.25 off the spike. 3075 per second against the 1200 per second the service has while recovering" tabindex="0" role="region" aria-label="Mathematical notation">2000 clients, base 1000 ms, 30-second outage, recovery capacity 1200 /s
 
 no jitter: the waves
 1 s, 2 s, 4 s, 8 s, 16 s, 32 s   six waves of 2000 = 12 000 retries
@@ -1408,12 +1408,12 @@ total   11 597 retries      against 12 000 without
 peak     3075 /s            against 10 000 without
                             a factor of 3.25 off the spike
 
-3075 /s against the 1200 /s the service has while recovering</div><p>Jitter cut the peak by a factor of <span class="math">3.25</span> and the result is still nearly three times what the service can serve, because spreading 2000 clients over roughly a second is still thousands a second. This is the honest result: jitter is necessary and it is not sufficient, and the remaining gap has to be closed somewhere else &mdash; a larger base delay, a retry budget that lets only a fraction of clients retry at all, or refusing the excess at the door.</p><p>Note which number the design has to be compared against. Recovery capacity is lower than steady-state capacity: caches are cold, connection pools are empty and the first requests after an outage are the expensive ones. Sizing the first wave against the steady-state figure is how a service that should have survived does not.</p><p>For a faded rehearsal, keep the 2000 clients and the 1200 per second, and find the backoff base at which the jittered peak first fits inside capacity. The supplied first move is that full-width jitter spreads wave one over an interval about as long as the base, so the peak falls roughly as <span class="math">clients/base</span> &mdash; which is a lower bound, because later waves overlap the first. Estimate the base from that, then find the true answer in the lab by stepping the base slider and reading the jittered peak, and say how far your estimate was out.</p></article>
+3075 /s against the 1200 /s the service has while recovering</div><p>Jitter cut the peak by a factor of <span class="math" data-say="3.25">3.25</span> and the result is still nearly three times what the service can serve, because spreading 2000 clients over roughly a second is still thousands a second. This is the honest result: jitter is necessary and it is not sufficient, and the remaining gap has to be closed somewhere else &mdash; a larger base delay, a retry budget that lets only a fraction of clients retry at all, or refusing the excess at the door.</p><p>Note which number the design has to be compared against. Recovery capacity is lower than steady-state capacity: caches are cold, connection pools are empty and the first requests after an outage are the expensive ones. Sizing the first wave against the steady-state figure is how a service that should have survived does not.</p><p>For a faded rehearsal, keep the 2000 clients and the 1200 per second, and find the backoff base at which the jittered peak first fits inside capacity. The supplied first move is that full-width jitter spreads wave one over an interval about as long as the base, so the peak falls roughly as <span class="math" data-say="clients over base">clients/base</span> &mdash; which is a lower bound, because later waves overlap the first. Estimate the base from that, then find the true answer in the lab by stepping the base slider and reading the jittered peak, and say how far your estimate was out.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using backoff without jitter</strong><span>Backoff bounds the total attempts and leaves the peak exactly where it was, because every client doubles the same constant. The service that has just come back is then hit by its entire client population in one millisecond, fails, and sends all of them into the next wave. Jitter is not an optimisation of backoff; it is the half of the policy that addresses the peak.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Measuring the peak in buckets wider than the wave</strong><span>An unjittered wave is instantaneous. A one-second bucket divides it by a thousand and reports a rate the service never experienced, which makes a dangerous policy look safe in exactly the graph that would have caught it. Report the resolution with the number, and treat any peak measured without jitter as a lower bound.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Judging jitter by the total instead of the peak</strong><span>The totals here are <span class="math">3600</span> and <span class="math">3323</span>, a difference of under eight per cent, and the peaks are <span class="math">3000</span> and <span class="math">925</span>. A comparison made on totals concludes that jitter barely matters. The quantity that decides whether a recovering service survives is the instantaneous rate, and that is the one jitter moves.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using backoff without jitter</strong><span>Backoff bounds the total attempts and leaves the peak exactly where it was, because every client doubles the same constant. The service that has just come back is then hit by its entire client population in one millisecond, fails, and sends all of them into the next wave. Jitter is not an optimisation of backoff; it is the half of the policy that addresses the peak.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Measuring the peak in buckets wider than the wave</strong><span>An unjittered wave is instantaneous. A one-second bucket divides it by a thousand and reports a rate the service never experienced, which makes a dangerous policy look safe in exactly the graph that would have caught it. Report the resolution with the number, and treat any peak measured without jitter as a lower bound.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Judging jitter by the total instead of the peak</strong><span>The totals here are <span class="math" data-say="3600">3600</span> and <span class="math" data-say="3323">3323</span>, a difference of under eight per cent, and the peaks are <span class="math" data-say="3000">3000</span> and <span class="math" data-say="925">925</span>. A comparison made on totals concludes that jitter barely matters. The quantity that decides whether a recovering service survives is the instantaneous rate, and that is the one jitter moves.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we use exponential backoff” prompts you to ask about the jitter width.</strong><p>You should be able to say where the waves of an unjittered schedule land, measure a peak at a resolution that resolves them, predict the effect of jitter on the peak and on the total separately, and compare a first wave against a recovering service's capacity rather than its steady-state one.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Backoff and jitter make the clients behave. The service can also defend itself, and the arithmetic for that is a comparison of two goodput curves rather than a histogram. &ldquo;Load Shedding&rdquo; computes what a system delivers when it refuses work at the door against what it delivers when it accepts everything, and the second is worse in a way that surprises people.</div></article>
       </div>
     </section>
@@ -1512,7 +1512,7 @@ peak     3075 /s            against 10 000 without
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Six hundred clients fail at the same instant and retry with a one-second exponential backoff and no jitter. When do the retries arrive?", "a": ["Spread evenly over the first minute", "In waves at 1, 2, 4, 8, 16 and 32 seconds, each of 600 retries", "All at one second, since backoff only applies after the second attempt", "At random times, because clients are never perfectly synchronised"], "c": 1, "why": "Each client computes <span class=\"math\">base \u00d7 2\u2071\u207b\u00b9<\/span> from its own failure time, and the failure times are identical, so the delays are too. Doubling a constant keeps it constant, which is why backoff alone cannot desynchronise anything. The last option is the assumption that makes people skip jitter; the clients are synchronised by the outage itself, which is the event under discussion."}, {"q": "Adding full-width jitter to that policy cuts the measured peak from 3000 a second to 925. What happened to the total number of retries?", "a": ["It fell by the same factor of 3.24", "It fell slightly, from 3600 to 3323, and only because some jittered attempts land after the service recovers", "It rose, since jitter adds extra attempts", "It was unchanged at 3600, exactly"], "c": 1, "why": "Jitter redistributes attempts in time; it does not remove them. The small drop in the total is an edge effect at the recovery boundary: an attempt jittered past the twenty-second mark succeeds and the client stops, where its unjittered twin would have made one more. The peak is what jitter is for, and it fell by <span class=\"math\">3.24<\/span>."}, {"q": "A retry peak is reported as &ldquo;600 a second&rdquo;, measured in one-second buckets, for a policy with no jitter. What is wrong with that figure?", "a": ["Nothing; a one-second bucket is the natural unit for a rate", "Without jitter the whole wave lands in one millisecond, so a one-second bucket understates the spike by up to a thousandfold", "It should have been divided by the number of clients", "It is too high, because not every client retries"], "c": 1, "why": "The bucket must be narrower than the event being measured. Six hundred simultaneous retries inside a one-second bucket read as a comfortable <span class=\"math\">600<\/span> a second, and the service experiences six hundred requests at once. Reporting the slot width alongside the peak, as the lab does at 200 ms, is what stops the measurement flattering the policy."}];
+  var QUIZ = [{"q": "Six hundred clients fail at the same instant and retry with a one-second exponential backoff and no jitter. When do the retries arrive?", "a": ["Spread evenly over the first minute", "In waves at 1, 2, 4, 8, 16 and 32 seconds, each of 600 retries", "All at one second, since backoff only applies after the second attempt", "At random times, because clients are never perfectly synchronised"], "c": 1, "why": "Each client computes <span class=\"math\" data-say=\"base times 2 to the power i minus 1\">base \u00d7 2\u2071\u207b\u00b9<\/span> from its own failure time, and the failure times are identical, so the delays are too. Doubling a constant keeps it constant, which is why backoff alone cannot desynchronise anything. The last option is the assumption that makes people skip jitter; the clients are synchronised by the outage itself, which is the event under discussion."}, {"q": "Adding full-width jitter to that policy cuts the measured peak from 3000 a second to 925. What happened to the total number of retries?", "a": ["It fell by the same factor of 3.24", "It fell slightly, from 3600 to 3323, and only because some jittered attempts land after the service recovers", "It rose, since jitter adds extra attempts", "It was unchanged at 3600, exactly"], "c": 1, "why": "Jitter redistributes attempts in time; it does not remove them. The small drop in the total is an edge effect at the recovery boundary: an attempt jittered past the twenty-second mark succeeds and the client stops, where its unjittered twin would have made one more. The peak is what jitter is for, and it fell by <span class=\"math\" data-say=\"3.24\">3.24<\/span>."}, {"q": "A retry peak is reported as &ldquo;600 a second&rdquo;, measured in one-second buckets, for a policy with no jitter. What is wrong with that figure?", "a": ["Nothing; a one-second bucket is the natural unit for a rate", "Without jitter the whole wave lands in one millisecond, so a one-second bucket understates the spike by up to a thousandfold", "It should have been divided by the number of clients", "It is too high, because not every client retries"], "c": 1, "why": "The bucket must be narrower than the event being measured. Six hundred simultaneous retries inside a one-second bucket read as a comfortable <span class=\"math\" data-say=\"600\">600<\/span> a second, and the service experiences six hundred requests at once. Reporting the slot width alongside the peak, as the lab does at 200 ms, is what stops the measurement flattering the policy."}];
 
   (function () {
 
@@ -2587,6 +2587,160 @@ peak     3075 /s            against 10 000 without
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>

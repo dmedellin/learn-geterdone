@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Storage Engines and Indexes &middot; Durability and layout</span>
         <h1>fsync and Group Commit</h1>
-        <p>Durability is a count of fsyncs. One commit per fsync on a <span class="math">10 ms</span> device is <span class="math">100</span> durable writes a second, whatever the CPU and the network could have done. Grouping sixty-four commits into one fsync makes it <span class="math">6 400</span> a second — paid for with a wait to fill the batch, which is why commit latency has a minimum at a batch size rather than falling for ever.</p>
+        <p>Durability is a count of fsyncs. One commit per fsync on a <span class="math" data-say="10 milliseconds">10 ms</span> device is <span class="math" data-say="100">100</span> durable writes a second, whatever the CPU and the network could have done. Grouping sixty-four commits into one fsync makes it <span class="math" data-say="6400">6 400</span> a second — paid for with a wait to fill the batch, which is why commit latency has a minimum at a batch size rather than falling for ever.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">durable writes a second ≤ 1 / t_fsync              one commit per fsync
+        <div class="mathblock" data-say="durable writes a second is less than or equal to 1 over t sub fsync, one commit per fsync. grouped B at a time, is less than or equal to B over t sub fsync, t sub fsync over B each. t sub fsync equals 10 milliseconds, B equals 1, 100 a second. B equals 64, 6400 a second, 156.3 micro s of fsync each. paid for with a wait, the quantity B minus 1, over 2 lambda to fill the batch, then the queue" tabindex="0" role="region" aria-label="Mathematical notation">durable writes a second ≤ 1 / t_fsync              one commit per fsync
 grouped B at a time     ≤ B / t_fsync              t_fsync/B each
 
 t_fsync = 10 ms      B = 1        100 a second
@@ -1311,11 +1311,11 @@ paid for with a wait:  (B − 1)/2λ to fill the batch, then the queue</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One hard ceiling, one way around it, and the price of that way — which is the only part that needs arithmetic.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Durability is a count of fsyncs, not a count of bytes</h3><p>A <span class="math">write()</span> that returns has put bytes in the operating system's page cache. The disk learns about them when something calls <span class="math">fsync</span>, and until then a power loss takes them. So the durable write rate is bounded by how many fsyncs a second the device can complete: <span class="math">1/t_fsync</span>, which at <span class="math">10 ms</span> is <span class="math">100</span> — a number that has nothing to do with how fast anything else is.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Grouping divides one fsync among a batch</h3><p>Nothing says one commit must get one fsync. Collect <span class="math">B</span> commits, write them all, call <span class="math">fsync</span> once, and acknowledge all <span class="math">B</span>: the ceiling becomes <span class="math">B/t_fsync</span> and each write carries <span class="math">t_fsync/B</span> of the cost. At <span class="math">B = 64</span> on a <span class="math">10 ms</span> device that is <span class="math">6 400</span> durable writes a second and <span class="math">156.3 µs</span> of fsync apiece, on the same disk.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The batch is paid for in latency, and the total has a minimum</h3><p>A write that arrives first waits for the rest of its batch — about <span class="math">(B − 1)/2λ</span> at arrival rate <span class="math">λ</span> — and then waits in the queue in front of the fsync. Raising <span class="math">B</span> lengthens the first wait and shortens the second, so commit latency falls, flattens and rises again. On the worked settings it bottoms at <span class="math">B = 121</span> and <span class="math">29.04 ms</span>.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Durability is a count of fsyncs, not a count of bytes</h3><p>A <span class="math" data-say="write of">write()</span> that returns has put bytes in the operating system's page cache. The disk learns about them when something calls <span class="math" data-say="fsync">fsync</span>, and until then a power loss takes them. So the durable write rate is bounded by how many fsyncs a second the device can complete: <span class="math" data-say="1 over t sub fsync">1/t_fsync</span>, which at <span class="math" data-say="10 milliseconds">10 ms</span> is <span class="math" data-say="100">100</span> — a number that has nothing to do with how fast anything else is.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Grouping divides one fsync among a batch</h3><p>Nothing says one commit must get one fsync. Collect <span class="math" data-say="B">B</span> commits, write them all, call <span class="math" data-say="fsync">fsync</span> once, and acknowledge all <span class="math" data-say="B">B</span>: the ceiling becomes <span class="math" data-say="B over t sub fsync">B/t_fsync</span> and each write carries <span class="math" data-say="t sub fsync over B">t_fsync/B</span> of the cost. At <span class="math" data-say="B equals 64">B = 64</span> on a <span class="math" data-say="10 milliseconds">10 ms</span> device that is <span class="math" data-say="6400">6 400</span> durable writes a second and <span class="math" data-say="156.3 micro s">156.3 µs</span> of fsync apiece, on the same disk.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The batch is paid for in latency, and the total has a minimum</h3><p>A write that arrives first waits for the rest of its batch — about <span class="math" data-say="the quantity B minus 1, over 2 lambda">(B − 1)/2λ</span> at arrival rate <span class="math" data-say="lambda">λ</span> — and then waits in the queue in front of the fsync. Raising <span class="math" data-say="B">B</span> lengthens the first wait and shortens the second, so commit latency falls, flattens and rises again. On the worked settings it bottoms at <span class="math" data-say="B equals 121">B = 121</span> and <span class="math" data-say="29.04 milliseconds">29.04 ms</span>.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The durability ceiling, and what a batch buys and costs</h2></div><p>Why a returning write is not a durable one, what grouping does to the ceiling, and where the latency minimum sits.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Durable write, fsync, group commit</span><p>A write is <strong>durable</strong> when it survives the loss of power. <strong>fsync</strong> is the call that forces buffered bytes onto the device and returns when they are there; <span class="math">t_fsync</span> is how long it takes. <strong>Group commit</strong> is the practice of batching <span class="math">B</span> pending commits behind a single fsync and acknowledging them together.</p><p>The durable write rate is at most <span class="math">1/t_fsync</span> without grouping and <span class="math">B/t_fsync</span> with it. Both are ceilings, not achieved rates.</p></div><p>The misconception this lesson is aimed at is that a successful <span class="math">write()</span> means the data is safe. It means the bytes reached the page cache, which is memory, which is exactly the thing a power loss empties. Every engine that promises durability is therefore paying for fsyncs, and the count of them is the whole budget.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">t_fsync = 10 ms = 0.01 s          arrivals λ = 5 000 a second
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Durable write, fsync, group commit</span><p>A write is <strong>durable</strong> when it survives the loss of power. <strong>fsync</strong> is the call that forces buffered bytes onto the device and returns when they are there; <span class="math" data-say="t sub fsync">t_fsync</span> is how long it takes. <strong>Group commit</strong> is the practice of batching <span class="math" data-say="B">B</span> pending commits behind a single fsync and acknowledging them together.</p><p>The durable write rate is at most <span class="math" data-say="1 over t sub fsync">1/t_fsync</span> without grouping and <span class="math" data-say="B over t sub fsync">B/t_fsync</span> with it. Both are ceilings, not achieved rates.</p></div><p>The misconception this lesson is aimed at is that a successful <span class="math" data-say="write of">write()</span> means the data is safe. It means the bytes reached the page cache, which is memory, which is exactly the thing a power loss empties. Every engine that promises durability is therefore paying for fsyncs, and the count of them is the whole budget.</p><div class="mathblock" data-say="t sub fsync equals 10 milliseconds equals 0.01 seconds, arrivals lambda equals 5000 a second. B equals 1, cap 1 over 0.01, equals, 100 durable writes a second. batches arrive at 5000 per second, served at 100 per second, goes to, rho equals 50. no steady state, the backlog grows without bound. B equals 64, cap 64 over 0.01, equals 6400 durable writes a second. fsync per write 0.01 over 64, equals 156.3 micro s. fill wait the quantity 64 minus 1, over the quantity 2 times 5000, equals 6.30 milliseconds. batches 5000 over 64 equals 78.125 per second against 100 per second, goes to, rho equals 0.781. queue plus fsync 1 over the quantity 100 minus 78.125, equals 45.71 milliseconds. commit latency 6.30 plus 45.71, equals 52.01 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">t_fsync = 10 ms = 0.01 s          arrivals λ = 5 000 a second
 
 B = 1      cap 1/0.01                   =   100 durable writes a second
            batches arrive at 5 000/s, served at 100/s   →   ρ = 50
@@ -1326,7 +1326,7 @@ B = 64     cap 64/0.01                  = 6 400 durable writes a second
            fill wait (64 − 1)/(2 × 5 000)= 6.30 ms
            batches 5 000/64 = 78.125/s against 100/s  →  ρ = 0.781
            queue + fsync 1/(100 − 78.125)= 45.71 ms
-           commit latency 6.30 + 45.71  = 52.01 ms</div><p>The <span class="math">B = 1</span> row is worth reading twice. At five thousand writes a second arriving and one hundred fsyncs a second available, the utilisation is <span class="math">50</span> and there is no mean latency to quote at all — the backlog simply grows. The ceiling arrives as a queueing fact rather than as an assertion, which is the M/M/1 model of Queues and Utilisation reused rather than a second model invented here.</p><h3>What the batch costs</h3><p>Two waits, moving in opposite directions. The <strong>fill wait</strong> is how long a write sits while its batch assembles, about <span class="math">(B − 1)/2λ</span> on average, and it grows linearly in <span class="math">B</span>. The <strong>queue</strong> in front of the fsync shrinks as <span class="math">B</span> grows, because batches arrive at <span class="math">λ/B</span> while the fsync still serves at <span class="math">1/t_fsync</span>, so the utilisation <span class="math">ρ = λ t_fsync/B</span> falls. Adding the two gives a curve with an interior minimum.</p><div class="example"><span class="label">Example &middot; Scanning the curve</span><p>At <span class="math">λ = 5 000</span> and <span class="math">t_fsync = 10 ms</span>: <span class="math">B = 64</span> gives <span class="math">6.30 ms</span> of fill and <span class="math">45.71 ms</span> of queue, <span class="math">52.01 ms</span> in total. <span class="math">B = 121</span> gives <span class="math">12.00 ms</span> and <span class="math">17.04 ms</span>, <span class="math">29.04 ms</span> in total — the lowest on the curve. <span class="math">B = 256</span> gives <span class="math">25.50 ms</span> and <span class="math">12.43 ms</span>, <span class="math">37.93 ms</span>, and is past the minimum: the batch is now the problem. The durable ceiling rose the whole way, from <span class="math">6 400</span> to <span class="math">25 600</span> a second, while the latency turned around.</p></div><p>The lab finds that minimum by evaluating every <span class="math">B</span> rather than by a formula, and it says so. A closed form exists for this shape of bargain — a fixed cost amortised over a batch against a cost that grows with the batch — and it belongs to “The EOQ Formula Without Calculus” on the Operations Research path. The same trade appears again as “Batching: Cost and Latency” in Scaling Laws and Cost, with throughput in place of durability and a per-item cost in place of a holding cost.</p><p>Two things this model takes on trust, both of which have cost people data. It assumes <span class="math">t_fsync</span> is what the device actually does, and a device with a volatile write cache that acknowledges an fsync before the platter has it will report a delightful figure and lose your commits anyway — measure it, do not read it off a datasheet. And it assumes a single thread issuing the fsyncs, which is what makes the M/M/1 arithmetic apply.</p></article>
+           commit latency 6.30 + 45.71  = 52.01 ms</div><p>The <span class="math" data-say="B equals 1">B = 1</span> row is worth reading twice. At five thousand writes a second arriving and one hundred fsyncs a second available, the utilisation is <span class="math" data-say="50">50</span> and there is no mean latency to quote at all — the backlog simply grows. The ceiling arrives as a queueing fact rather than as an assertion, which is the M/M/1 model of Queues and Utilisation reused rather than a second model invented here.</p><h3>What the batch costs</h3><p>Two waits, moving in opposite directions. The <strong>fill wait</strong> is how long a write sits while its batch assembles, about <span class="math" data-say="the quantity B minus 1, over 2 lambda">(B − 1)/2λ</span> on average, and it grows linearly in <span class="math" data-say="B">B</span>. The <strong>queue</strong> in front of the fsync shrinks as <span class="math" data-say="B">B</span> grows, because batches arrive at <span class="math" data-say="lambda over B">λ/B</span> while the fsync still serves at <span class="math" data-say="1 over t sub fsync">1/t_fsync</span>, so the utilisation <span class="math" data-say="rho equals lambda t sub fsync over B">ρ = λ t_fsync/B</span> falls. Adding the two gives a curve with an interior minimum.</p><div class="example"><span class="label">Example &middot; Scanning the curve</span><p>At <span class="math" data-say="lambda equals 5000">λ = 5 000</span> and <span class="math" data-say="t sub fsync equals 10 milliseconds">t_fsync = 10 ms</span>: <span class="math" data-say="B equals 64">B = 64</span> gives <span class="math" data-say="6.30 milliseconds">6.30 ms</span> of fill and <span class="math" data-say="45.71 milliseconds">45.71 ms</span> of queue, <span class="math" data-say="52.01 milliseconds">52.01 ms</span> in total. <span class="math" data-say="B equals 121">B = 121</span> gives <span class="math" data-say="12.00 milliseconds">12.00 ms</span> and <span class="math" data-say="17.04 milliseconds">17.04 ms</span>, <span class="math" data-say="29.04 milliseconds">29.04 ms</span> in total — the lowest on the curve. <span class="math" data-say="B equals 256">B = 256</span> gives <span class="math" data-say="25.50 milliseconds">25.50 ms</span> and <span class="math" data-say="12.43 milliseconds">12.43 ms</span>, <span class="math" data-say="37.93 milliseconds">37.93 ms</span>, and is past the minimum: the batch is now the problem. The durable ceiling rose the whole way, from <span class="math" data-say="6400">6 400</span> to <span class="math" data-say="25600">25 600</span> a second, while the latency turned around.</p></div><p>The lab finds that minimum by evaluating every <span class="math" data-say="B">B</span> rather than by a formula, and it says so. A closed form exists for this shape of bargain — a fixed cost amortised over a batch against a cost that grows with the batch — and it belongs to “The EOQ Formula Without Calculus” on the Operations Research path. The same trade appears again as “Batching: Cost and Latency” in Scaling Laws and Cost, with throughput in place of durability and a per-item cost in place of a holding cost.</p><p>Two things this model takes on trust, both of which have cost people data. It assumes <span class="math" data-say="t sub fsync">t_fsync</span> is what the device actually does, and a device with a volatile write cache that acknowledges an fsync before the platter has it will report a delightful figure and lose your commits anyway — measure it, do not read it off a datasheet. And it assumes a single thread issuing the fsyncs, which is what makes the M/M/1 arithmetic apply.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>fsync and group commit</h2></div><p>The durability cap, what grouping buys, and the wait it costs</p></div>
@@ -1342,7 +1342,7 @@ B = 64     cap 64/0.01                  = 6 400 durable writes a second
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Set the fsync time, the batch and the arrival rate</h3>
-          <p>The ceiling is <span class="math">1/t</span> and the grouped ceiling <span class="math">B/t</span>; the latency beside them is the wait to fill the batch plus the sojourn of the batch at the fsync. Take the batch down to <span class="math">1</span> and watch the queue lose its steady state entirely, then walk it up and find where the total turns around.</p>
+          <p>The ceiling is <span class="math" data-say="1 over t">1/t</span> and the grouped ceiling <span class="math" data-say="B over t">B/t</span>; the latency beside them is the wait to fill the batch plus the sojourn of the batch at the fsync. Take the batch down to <span class="math" data-say="1">1</span> and watch the queue lose its steady state entirely, then walk it up and find where the total turns around.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="fsT">fsync time t (&micro;s)</label><span class="range-value" id="fsTOut">10000</span></div>
           <input id="fsT" type="range" min="100" max="20000" step="100" value="10000" />
@@ -1369,7 +1369,7 @@ B = 64     cap 64/0.01                  = 6 400 durable writes a second
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing durability</h2></div><p>The ceiling takes one division. The interesting part is the curve underneath it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure <span class="math">t_fsync</span> on the device you will use</h3><p>Not the datasheet figure, and not the write latency. An fsync is a round-trip to durable media, and a device that returns from it too quickly is usually acknowledging from a volatile cache.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide one second by it</h3><p><span class="math">1/t_fsync</span> is the ungrouped ceiling: <span class="math">100</span> a second at <span class="math">10 ms</span>, <span class="math">1 000</span> at <span class="math">1 ms</span>. Nothing above the line matters if this number is below what the workload needs — no amount of CPU or network moves it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose <span class="math">B</span> and recompute the ceiling and the per-write cost</h3><p><span class="math">B/t_fsync</span> durable writes a second, at <span class="math">t_fsync/B</span> of fsync each. This is the only lever that raises the ceiling without changing hardware.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add the fill wait and the queue, then scan <span class="math">B</span></h3><p><span class="math">(B − 1)/2λ</span> plus the sojourn at utilisation <span class="math">ρ = λ t_fsync/B</span>. Evaluate it across the batch sizes you would consider and take the minimum; it is interior, so neither the smallest nor the largest <span class="math">B</span> wins.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure <span class="math" data-say="t sub fsync">t_fsync</span> on the device you will use</h3><p>Not the datasheet figure, and not the write latency. An fsync is a round-trip to durable media, and a device that returns from it too quickly is usually acknowledging from a volatile cache.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide one second by it</h3><p><span class="math" data-say="1 over t sub fsync">1/t_fsync</span> is the ungrouped ceiling: <span class="math" data-say="100">100</span> a second at <span class="math" data-say="10 milliseconds">10 ms</span>, <span class="math" data-say="1000">1 000</span> at <span class="math" data-say="1 milliseconds">1 ms</span>. Nothing above the line matters if this number is below what the workload needs — no amount of CPU or network moves it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose <span class="math" data-say="B">B</span> and recompute the ceiling and the per-write cost</h3><p><span class="math" data-say="B over t sub fsync">B/t_fsync</span> durable writes a second, at <span class="math" data-say="t sub fsync over B">t_fsync/B</span> of fsync each. This is the only lever that raises the ceiling without changing hardware.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add the fill wait and the queue, then scan <span class="math" data-say="B">B</span></h3><p><span class="math" data-say="the quantity B minus 1, over 2 lambda">(B − 1)/2λ</span> plus the sojourn at utilisation <span class="math" data-say="rho equals lambda t sub fsync over B">ρ = λ t_fsync/B</span>. Evaluate it across the batch sizes you would consider and take the minimum; it is interior, so neither the smallest nor the largest <span class="math" data-say="B">B</span> wins.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1380,7 +1380,7 @@ B = 64     cap 64/0.01                  = 6 400 durable writes a second
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A 10 ms fsync under 5 000 writes a second</h3><p>One division for the ceiling, then the two waits that decide the batch.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">t_fsync = 10 ms = 0.01 s          arrivals λ = 5 000 a second
+      <article class="card card-pad prose"><h3>A 10 ms fsync under 5 000 writes a second</h3><p>One division for the ceiling, then the two waits that decide the batch.</p><div class="mathblock" data-say="t sub fsync equals 10 milliseconds equals 0.01 seconds, arrivals lambda equals 5000 a second. B equals 1, ceiling 1 over 0.01, equals, 100 durable writes over s. batches at 5000 per second served at 100 per second goes to, rho equals 50, no steady state. B equals 64, ceiling 64 over 0.01, equals, 6400 durable writes over s. fsync per write, 0.01 over 64, equals, 156.3 micro s. fill wait, the quantity 64 minus 1, over the quantity 2 times 5000, equals, 6.30 milliseconds. rho equals lambda times t over B equals 5000 times 0.01 over 64, equals, 0.781. queue plus fsync, 1 over the quantity 100 minus 78.125, equals, 45.71 milliseconds. commit latency 6.30 plus 45.71, equals, 52.01 milliseconds. scanning the curve. B equals, 64, ceiling, 6400 per second, fill, 6.30 milliseconds, queue 45.71 milliseconds, total 52.01 milliseconds. B equals 121, ceiling 12100 per second, fill 12.00 milliseconds, queue 17.04 milliseconds, total 29.04 milliseconds, lowest. B equals 128, ceiling 12800 per second, fill 12.70 milliseconds, queue 16.41 milliseconds, total 29.11 milliseconds. B equals 256, ceiling 25600 per second, fill 25.50 milliseconds, queue 12.43 milliseconds, total 37.93 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">t_fsync = 10 ms = 0.01 s          arrivals λ = 5 000 a second
 
 B = 1     ceiling 1/0.01                     =    100 durable writes/s
           batches at 5 000/s served at 100/s →    ρ = 50, no steady state
@@ -1396,12 +1396,12 @@ scanning the curve
   B =  64   ceiling  6 400/s   fill  6.30 ms   queue 45.71 ms   total 52.01 ms
   B = 121   ceiling 12 100/s   fill 12.00 ms   queue 17.04 ms   total 29.04 ms  lowest
   B = 128   ceiling 12 800/s   fill 12.70 ms   queue 16.41 ms   total 29.11 ms
-  B = 256   ceiling 25 600/s   fill 25.50 ms   queue 12.43 ms   total 37.93 ms</div><p>The two middle columns move in opposite directions and neither of them is the answer on its own. The ceiling rises monotonically with <span class="math">B</span> all the way to <span class="math">25 600</span> a second, so a page that reported only throughput would recommend the largest batch available — and it would be recommending <span class="math">37.93 ms</span> of commit latency over <span class="math">29.04 ms</span>.</p><p>The minimum here is <span class="math">B = 121</span>, found by evaluating the curve rather than by differentiating it. The closed form for this shape of bargain belongs to “The EOQ Formula Without Calculus” on the Operations Research path; this course chooses <span class="math">B</span> by looking, and says that a formula exists and where it lives.</p><p>For a faded rehearsal, keep <span class="math">λ = 5 000</span> and take the fsync down to <span class="math">1 ms</span> — a device an order of magnitude better. The supplied first move is the new ungrouped ceiling: <span class="math">1 000</span> durable writes a second. Find the batch that minimises commit latency and the latency there, then say what happened to both relative to the <span class="math">10 ms</span> device. Check in the lab before opening the quiz.</p></article>
+  B = 256   ceiling 25 600/s   fill 25.50 ms   queue 12.43 ms   total 37.93 ms</div><p>The two middle columns move in opposite directions and neither of them is the answer on its own. The ceiling rises monotonically with <span class="math" data-say="B">B</span> all the way to <span class="math" data-say="25600">25 600</span> a second, so a page that reported only throughput would recommend the largest batch available — and it would be recommending <span class="math" data-say="37.93 milliseconds">37.93 ms</span> of commit latency over <span class="math" data-say="29.04 milliseconds">29.04 ms</span>.</p><p>The minimum here is <span class="math" data-say="B equals 121">B = 121</span>, found by evaluating the curve rather than by differentiating it. The closed form for this shape of bargain belongs to “The EOQ Formula Without Calculus” on the Operations Research path; this course chooses <span class="math" data-say="B">B</span> by looking, and says that a formula exists and where it lives.</p><p>For a faded rehearsal, keep <span class="math" data-say="lambda equals 5000">λ = 5 000</span> and take the fsync down to <span class="math" data-say="1 milliseconds">1 ms</span> — a device an order of magnitude better. The supplied first move is the new ungrouped ceiling: <span class="math" data-say="1000">1 000</span> durable writes a second. Find the batch that minimises commit latency and the latency there, then say what happened to both relative to the <span class="math" data-say="10 milliseconds">10 ms</span> device. Check in the lab before opening the quiz.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a successful <span class="math">write()</span> as durability</strong><span>It is an acknowledgement from memory. Everything an engine promises about surviving power loss is bought with fsyncs, and the number of them a second is a hard ceiling set by the device. A system whose durability claim is not backed by a count of fsyncs per second does not have a durability claim.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the grouped ceiling as though latency were unchanged</strong><span><span class="math">64</span> commits a batch raises the ceiling from <span class="math">100</span> to <span class="math">6 400</span> a second and adds <span class="math">6.30 ms</span> of fill wait before the queue is even considered. Throughput and latency move in opposite directions here, and the honest report gives both figures at the chosen <span class="math">B</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Raising <span class="math">B</span> until throughput is sufficient and stopping</strong><span>The latency minimum is interior. At these settings <span class="math">B = 256</span> clears any plausible throughput target and costs <span class="math">37.93 ms</span> where <span class="math">B = 121</span> costs <span class="math">29.04 ms</span>. Choosing the batch on the throughput axis alone lands on the wrong side of a curve that was cheap to evaluate.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a successful <span class="math" data-say="write of">write()</span> as durability</strong><span>It is an acknowledgement from memory. Everything an engine promises about surviving power loss is bought with fsyncs, and the number of them a second is a hard ceiling set by the device. A system whose durability claim is not backed by a count of fsyncs per second does not have a durability claim.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the grouped ceiling as though latency were unchanged</strong><span><span class="math" data-say="64">64</span> commits a batch raises the ceiling from <span class="math" data-say="100">100</span> to <span class="math" data-say="6400">6 400</span> a second and adds <span class="math" data-say="6.30 milliseconds">6.30 ms</span> of fill wait before the queue is even considered. Throughput and latency move in opposite directions here, and the honest report gives both figures at the chosen <span class="math" data-say="B">B</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Raising <span class="math" data-say="B">B</span> until throughput is sufficient and stopping</strong><span>The latency minimum is interior. At these settings <span class="math" data-say="B equals 256">B = 256</span> clears any plausible throughput target and costs <span class="math" data-say="37.93 milliseconds">37.93 ms</span> where <span class="math" data-say="B equals 121">B = 121</span> costs <span class="math" data-say="29.04 milliseconds">29.04 ms</span>. Choosing the batch on the throughput axis alone lands on the wrong side of a curve that was cheap to evaluate.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a durability claim sounds like a rate, and a batch size sounds like a latency decision.</strong><p>You should be able to state the ungrouped ceiling from an fsync time, compute what a given batch does to the ceiling and to the per-write cost, and find the batch that minimises commit latency by evaluating the curve.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The fsync caps how quickly durable bytes land. What a query has to read back is decided somewhere else entirely — by how the values are laid out on the page. “Row vs Column Storage” counts the bytes a scan touches each way and finds the query on which the answer reverses.</div></article>
       </div>
     </section>
@@ -1441,7 +1441,7 @@ scanning the curve
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math">h</span> with <span class="math">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math">9.585</span> rather than the <span class="math">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
+      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is greater than or equal to N">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math" data-say="9.585">9.585</span> rather than the <span class="math" data-say="9.57">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1500,7 +1500,7 @@ scanning the curve
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "A device completes an fsync in <span class=\"math\">10 ms<\/span>. With one commit per fsync, what is the durable write ceiling?", "a": ["<span class=\"math\">10<\/span> a second", "<span class=\"math\">100<\/span> a second", "<span class=\"math\">1 000<\/span> a second", "It depends on the write size"], "c": 1, "why": "<span class=\"math\">1/t_fsync = 1/0.01 = 100<\/span> durable writes a second. The write size does not enter: an fsync is a round trip to durable media, and its cost is dominated by that round trip rather than by the bytes riding on it \u2014 which is exactly why batching works at all."}, {"q": "The same device groups <span class=\"math\">64<\/span> commits behind one fsync. What does each write now pay in fsync cost, and what is the ceiling?", "a": ["<span class=\"math\">156.3 \u00b5s<\/span> each, ceiling <span class=\"math\">6 400<\/span> a second", "<span class=\"math\">10 ms<\/span> each, ceiling <span class=\"math\">6 400<\/span> a second", "<span class=\"math\">156.3 \u00b5s<\/span> each, ceiling <span class=\"math\">100<\/span> a second", "<span class=\"math\">640 \u00b5s<\/span> each, ceiling <span class=\"math\">1 562<\/span> a second"], "c": 0, "why": "<span class=\"math\">t_fsync/B = 0.01/64 = 156.3 \u00b5s<\/span> and <span class=\"math\">B/t_fsync = 6 400<\/span> a second. The fsync still takes <span class=\"math\">10 ms<\/span>; what changed is how many acknowledgements it carries. Both halves have to move together \u2014 a higher ceiling and a lower per-write cost are the same fact."}, {"q": "<span class=\"math\">write()<\/span> has returned successfully. Is the data durable?", "a": ["Yes; a successful write is a completed write", "No; the bytes are in the page cache, and a power loss takes them until something calls fsync", "Yes, provided the file was opened for synchronous writing", "Only if the write was smaller than one page"], "c": 1, "why": "A returning <span class=\"math\">write()<\/span> means the operating system accepted the bytes into memory. Durability begins at the fsync. Opening with synchronous semantics does force the flush, and it does so by paying the <span class=\"math\">t_fsync<\/span> on every write \u2014 which puts you back at the <span class=\"math\">100<\/span> a second ceiling rather than exempting you from it."}, {"q": "Raising the batch size raises the durable ceiling every time. Why is the largest batch not the best choice?", "a": ["Because very large batches overflow the log buffer", "Because the wait to fill the batch grows linearly in <span class=\"math\">B<\/span>, and past a point it grows faster than the queue shrinks", "Because the fsync itself takes longer for a larger batch", "Because the utilisation rises with <span class=\"math\">B<\/span>"], "c": 1, "why": "Fill wait is about <span class=\"math\">(B \u2212 1)/2\u03bb<\/span> and the queue shrinks because <span class=\"math\">\u03c1 = \u03bbt/B<\/span> falls, so the sum turns around \u2014 here at <span class=\"math\">B = 121<\/span>, after which the total rises again. The utilisation falls rather than rising with <span class=\"math\">B<\/span>, which is precisely the half of the trade that makes batching worth doing at all."}];
+  var QUIZ = [{"q": "A device completes an fsync in <span class=\"math\" data-say=\"10 milliseconds\">10 ms<\/span>. With one commit per fsync, what is the durable write ceiling?", "a": ["<span class=\"math\" data-say=\"10\">10<\/span> a second", "<span class=\"math\" data-say=\"100\">100<\/span> a second", "<span class=\"math\" data-say=\"1000\">1 000<\/span> a second", "It depends on the write size"], "c": 1, "why": "<span class=\"math\" data-say=\"1 over t sub fsync equals 1 over 0.01 equals 100\">1/t_fsync = 1/0.01 = 100<\/span> durable writes a second. The write size does not enter: an fsync is a round trip to durable media, and its cost is dominated by that round trip rather than by the bytes riding on it \u2014 which is exactly why batching works at all."}, {"q": "The same device groups <span class=\"math\" data-say=\"64\">64<\/span> commits behind one fsync. What does each write now pay in fsync cost, and what is the ceiling?", "a": ["<span class=\"math\" data-say=\"156.3 micro s\">156.3 \u00b5s<\/span> each, ceiling <span class=\"math\" data-say=\"6400\">6 400<\/span> a second", "<span class=\"math\" data-say=\"10 milliseconds\">10 ms<\/span> each, ceiling <span class=\"math\" data-say=\"6400\">6 400<\/span> a second", "<span class=\"math\" data-say=\"156.3 micro s\">156.3 \u00b5s<\/span> each, ceiling <span class=\"math\" data-say=\"100\">100<\/span> a second", "<span class=\"math\" data-say=\"640 micro s\">640 \u00b5s<\/span> each, ceiling <span class=\"math\" data-say=\"1562\">1 562<\/span> a second"], "c": 0, "why": "<span class=\"math\" data-say=\"t sub fsync over B equals 0.01 over 64 equals 156.3 micro s\">t_fsync/B = 0.01/64 = 156.3 \u00b5s<\/span> and <span class=\"math\" data-say=\"B over t sub fsync equals 6400\">B/t_fsync = 6 400<\/span> a second. The fsync still takes <span class=\"math\" data-say=\"10 milliseconds\">10 ms<\/span>; what changed is how many acknowledgements it carries. Both halves have to move together \u2014 a higher ceiling and a lower per-write cost are the same fact."}, {"q": "<span class=\"math\" data-say=\"write of\">write()<\/span> has returned successfully. Is the data durable?", "a": ["Yes; a successful write is a completed write", "No; the bytes are in the page cache, and a power loss takes them until something calls fsync", "Yes, provided the file was opened for synchronous writing", "Only if the write was smaller than one page"], "c": 1, "why": "A returning <span class=\"math\" data-say=\"write of\">write()<\/span> means the operating system accepted the bytes into memory. Durability begins at the fsync. Opening with synchronous semantics does force the flush, and it does so by paying the <span class=\"math\" data-say=\"t sub fsync\">t_fsync<\/span> on every write \u2014 which puts you back at the <span class=\"math\" data-say=\"100\">100<\/span> a second ceiling rather than exempting you from it."}, {"q": "Raising the batch size raises the durable ceiling every time. Why is the largest batch not the best choice?", "a": ["Because very large batches overflow the log buffer", "Because the wait to fill the batch grows linearly in <span class=\"math\" data-say=\"B\">B<\/span>, and past a point it grows faster than the queue shrinks", "Because the fsync itself takes longer for a larger batch", "Because the utilisation rises with <span class=\"math\" data-say=\"B\">B<\/span>"], "c": 1, "why": "Fill wait is about <span class=\"math\" data-say=\"the quantity B minus 1, over 2 lambda\">(B \u2212 1)/2\u03bb<\/span> and the queue shrinks because <span class=\"math\" data-say=\"rho equals lambda t over B\">\u03c1 = \u03bbt/B<\/span> falls, so the sum turns around \u2014 here at <span class=\"math\" data-say=\"B equals 121\">B = 121<\/span>, after which the total rises again. The utilisation falls rather than rising with <span class=\"math\" data-say=\"B\">B<\/span>, which is precisely the half of the trade that makes batching worth doing at all."}];
 
   (function () {
 
@@ -2587,6 +2587,160 @@ scanning the curve
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>

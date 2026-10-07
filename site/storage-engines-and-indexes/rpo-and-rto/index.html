@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Storage Engines and Indexes &middot; Durability and layout</span>
         <h1>RPO and RTO</h1>
-        <p>Two questions, two units. The recovery point objective is bytes: the backup interval multiplied by the write rate, <span class="math">1.73 TB</span> at a daily backup and <span class="math">20 MB/s</span> of writes. The recovery time objective is hours: the dataset over the restore bandwidth plus the log replay, <span class="math">12.38 h</span> for two terabytes. Shortening the interval moves both — and cannot touch the copy, which is the floor under either promise.</p>
+        <p>Two questions, two units. The recovery point objective is bytes: the backup interval multiplied by the write rate, <span class="math" data-say="1.73 terabytes">1.73 TB</span> at a daily backup and <span class="math" data-say="20 megabytes per second">20 MB/s</span> of writes. The recovery time objective is hours: the dataset over the restore bandwidth plus the log replay, <span class="math" data-say="12.38 h">12.38 h</span> for two terabytes. Shortening the interval moves both — and cannot touch the copy, which is the floor under either promise.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">RPO = backup interval × write rate                      bytes at risk
+        <div class="mathblock" data-say="RPO equals backup interval times write rate, bytes at risk. RTO equals size over restore bandwidth plus log over replay rate, hours to be back. 24 h at 20 megabytes per second, RPO, 1.73 terabytes worst, 864.00 gigabytes expected. 2 terabytes at 200 megabytes per second, copy back, 2.78 h. 1.73 terabytes at 50 megabytes per second, replay, 9.60 h. RTO, 12.38 h" tabindex="0" role="region" aria-label="Mathematical notation">RPO = backup interval × write rate                      bytes at risk
 RTO = size / restore bandwidth + log / replay rate      hours to be back
 
 24 h at 20 MB/s        RPO   1.73 TB worst,   864.00 GB expected
@@ -1311,11 +1311,11 @@ RTO = size / restore bandwidth + log / replay rate      hours to be back
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The whole lesson is that these are different numbers. Everything else is two multiplications and a division.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>RPO is bytes and RTO is hours</h3><p>The recovery <em>point</em> objective asks how much work is lost: the backup interval times the write rate, in bytes. The recovery <em>time</em> objective asks how long the system is down: the dataset over the restore bandwidth, plus replaying whatever log survived. They answer different questions, they are measured in different units, and a single statement cannot satisfy both.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A failure lands inside the interval, so the expected loss is half the worst case</h3><p>The worst case is a failure one instant before the next backup, losing a whole interval of writes: <span class="math">1.73 TB</span> at a daily backup and <span class="math">20 MB/s</span>. A failure at a uniformly random moment inside the interval loses half of that on average, <span class="math">864.00 GB</span>. Quote both — the first is what you must survive and the second is what you will typically pay.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The copy is the floor, and the schedule cannot move it</h3><p>Halving the backup interval halves the bytes at risk and halves the replay, but copying <span class="math">2.00 TB</span> back at <span class="math">200 MB/s</span> takes <span class="math">2.78 h</span> on every row of the table. No backup schedule in existence makes a restore faster than the time it takes to move the data, which is why an aggressive RTO target is a statement about bandwidth and dataset size rather than about backups.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>RPO is bytes and RTO is hours</h3><p>The recovery <em>point</em> objective asks how much work is lost: the backup interval times the write rate, in bytes. The recovery <em>time</em> objective asks how long the system is down: the dataset over the restore bandwidth, plus replaying whatever log survived. They answer different questions, they are measured in different units, and a single statement cannot satisfy both.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A failure lands inside the interval, so the expected loss is half the worst case</h3><p>The worst case is a failure one instant before the next backup, losing a whole interval of writes: <span class="math" data-say="1.73 terabytes">1.73 TB</span> at a daily backup and <span class="math" data-say="20 megabytes per second">20 MB/s</span>. A failure at a uniformly random moment inside the interval loses half of that on average, <span class="math" data-say="864.00 gigabytes">864.00 GB</span>. Quote both — the first is what you must survive and the second is what you will typically pay.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The copy is the floor, and the schedule cannot move it</h3><p>Halving the backup interval halves the bytes at risk and halves the replay, but copying <span class="math" data-say="2.00 terabytes">2.00 TB</span> back at <span class="math" data-say="200 megabytes per second">200 MB/s</span> takes <span class="math" data-say="2.78 h">2.78 h</span> on every row of the table. No backup schedule in existence makes a restore faster than the time it takes to move the data, which is why an aggressive RTO target is a statement about bandwidth and dataset size rather than about backups.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Bytes at risk, hours to be back, and the floor under both</h2></div><p>Two formulas, the difference between worst case and expected, and what a target actually constrains.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Recovery point and recovery time objectives</span><p>The <strong>recovery point objective</strong> (RPO) is the volume of writes lost by a failure, measured in bytes: at most <span class="math">interval × write rate</span>, and <span class="math">interval × write rate / 2</span> in expectation for a failure at a uniformly random moment.</p><p>The <strong>recovery time objective</strong> (RTO) is the elapsed time to be serving again, measured in hours: <span class="math">size / restore bandwidth + surviving log / replay rate</span>.</p></div><p>Writing them side by side is most of the work, because the two are routinely collapsed into one sentence about backups existing. They are controlled by different things: the RPO by the schedule, the RTO by bandwidth. Doubling the backup frequency improves the first proportionally and the second hardly at all.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">interval 24 h = 86 400 s      writes 20 MB/s      dataset 2.00 TB
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Recovery point and recovery time objectives</span><p>The <strong>recovery point objective</strong> (RPO) is the volume of writes lost by a failure, measured in bytes: at most <span class="math" data-say="interval times write rate">interval × write rate</span>, and <span class="math" data-say="interval times write rate over 2">interval × write rate / 2</span> in expectation for a failure at a uniformly random moment.</p><p>The <strong>recovery time objective</strong> (RTO) is the elapsed time to be serving again, measured in hours: <span class="math" data-say="size over restore bandwidth plus surviving log over replay rate">size / restore bandwidth + surviving log / replay rate</span>.</p></div><p>Writing them side by side is most of the work, because the two are routinely collapsed into one sentence about backups existing. They are controlled by different things: the RPO by the schedule, the RTO by bandwidth. Doubling the backup frequency improves the first proportionally and the second hardly at all.</p><div class="mathblock" data-say="interval 24 h equals 86400 seconds, writes 20 megabytes per second, dataset 2.00 terabytes. restore 200 megabytes per second, log replay 50 megabytes per second. RPO worst, 86400 seconds times 20 megabytes per second, equals, 1.73 terabytes. RPO expected, half the interval, on average, equals 864.00 gigabytes. copy back, 2.00 terabytes over 200 megabytes per second equals 10000 seconds, equals, 2.78 h. replay, 1.73 terabytes over 50 megabytes per second, equals 34560 seconds, equals, 9.60 h. RTO, 2.78 h plus 9.60 h, equals, 12.38 h" tabindex="0" role="region" aria-label="Mathematical notation">interval 24 h = 86 400 s      writes 20 MB/s      dataset 2.00 TB
 restore 200 MB/s              log replay 50 MB/s
 
 RPO worst       86 400 s × 20 MB/s             =  1.73 TB
@@ -1323,7 +1323,7 @@ RPO expected    half the interval, on average  = 864.00 GB
 
 copy back       2.00 TB / 200 MB/s = 10 000 s  =   2.78 h
 replay          1.73 TB / 50 MB/s  = 34 560 s  =   9.60 h
-RTO             2.78 h + 9.60 h                =  12.38 h</div><p>Notice what dominates. Of the <span class="math">12.38 h</span>, the copy is <span class="math">2.78</span> and the replay is <span class="math">9.60</span> — so on this schedule most of the outage is spent reapplying a day's worth of log, and the fastest available lever is the backup interval rather than the restore path. That balance flips as the interval shortens, which is exactly why both terms have to be computed rather than one of them assumed dominant.</p><h3>What a shorter interval buys</h3><p>It buys twice: fewer bytes at risk, and less log to replay. Backing up hourly instead of daily takes the RPO from <span class="math">1.73 TB</span> to <span class="math">72.00 GB</span> and the RTO from <span class="math">12.38 h</span> to <span class="math">3.18 h</span> — a factor of twenty-four on the first and most of the way to the floor on the second. What it does not touch is the <span class="math">2.78 h</span> of copying, which sits under every row.</p><div class="example"><span class="label">Example &middot; The same table at four intervals</span><p>At <span class="math">20 MB/s</span> of writes into a <span class="math">2.00 TB</span> dataset restored at <span class="math">200 MB/s</span> with <span class="math">50 MB/s</span> of replay: one hour gives <span class="math">72.00 GB</span> at risk and an RTO of <span class="math">3.18 h</span>; six hours, <span class="math">432.00 GB</span> and <span class="math">5.18 h</span>; twelve hours, <span class="math">864.00 GB</span> and <span class="math">7.58 h</span>; twenty-four hours, <span class="math">1.73 TB</span> and <span class="math">12.38 h</span>. The RPO is linear in the interval and so is the replay, so the RTO is a straight line starting at <span class="math">2.78 h</span>.</p></div><p>Run it backwards to turn a target into a schedule. A four-hour RTO leaves <span class="math">4 h − 2.78 h = 1.22 h</span> for replay, which at <span class="math">50 MB/s</span> is about <span class="math">220 GB</span> of log, which at <span class="math">20 MB/s</span> of writes is <span class="math">3.06 h</span> of interval. So “we must be back inside four hours” is, on this hardware, a requirement to back up at least every three hours — and if the copy alone exceeded four hours the target would be unreachable at any schedule, which the arithmetic says immediately.</p><p>The misconception this page exists for is offering “we have backups” as an answer. It is not a number of bytes, so it is not an RPO; it is not a number of hours, so it is not an RTO. Both of the real answers are one multiplication away from figures an operator already has, and the unwillingness to produce them is usually a sign that nobody has timed a restore.</p><p>Which is the honest caveat. Restore bandwidth must be measured on a real restore, not assumed from a network specification; a backup that has never been restored is a forecast rather than a fact. And this model starts the clock at the moment of failure, while a real outage also contains detection and the decision to restore — neither of which is in these two formulas and both of which are in the outage.</p></article>
+RTO             2.78 h + 9.60 h                =  12.38 h</div><p>Notice what dominates. Of the <span class="math" data-say="12.38 h">12.38 h</span>, the copy is <span class="math" data-say="2.78">2.78</span> and the replay is <span class="math" data-say="9.60">9.60</span> — so on this schedule most of the outage is spent reapplying a day's worth of log, and the fastest available lever is the backup interval rather than the restore path. That balance flips as the interval shortens, which is exactly why both terms have to be computed rather than one of them assumed dominant.</p><h3>What a shorter interval buys</h3><p>It buys twice: fewer bytes at risk, and less log to replay. Backing up hourly instead of daily takes the RPO from <span class="math" data-say="1.73 terabytes">1.73 TB</span> to <span class="math" data-say="72.00 gigabytes">72.00 GB</span> and the RTO from <span class="math" data-say="12.38 h">12.38 h</span> to <span class="math" data-say="3.18 h">3.18 h</span> — a factor of twenty-four on the first and most of the way to the floor on the second. What it does not touch is the <span class="math" data-say="2.78 h">2.78 h</span> of copying, which sits under every row.</p><div class="example"><span class="label">Example &middot; The same table at four intervals</span><p>At <span class="math" data-say="20 megabytes per second">20 MB/s</span> of writes into a <span class="math" data-say="2.00 terabytes">2.00 TB</span> dataset restored at <span class="math" data-say="200 megabytes per second">200 MB/s</span> with <span class="math" data-say="50 megabytes per second">50 MB/s</span> of replay: one hour gives <span class="math" data-say="72.00 gigabytes">72.00 GB</span> at risk and an RTO of <span class="math" data-say="3.18 h">3.18 h</span>; six hours, <span class="math" data-say="432.00 gigabytes">432.00 GB</span> and <span class="math" data-say="5.18 h">5.18 h</span>; twelve hours, <span class="math" data-say="864.00 gigabytes">864.00 GB</span> and <span class="math" data-say="7.58 h">7.58 h</span>; twenty-four hours, <span class="math" data-say="1.73 terabytes">1.73 TB</span> and <span class="math" data-say="12.38 h">12.38 h</span>. The RPO is linear in the interval and so is the replay, so the RTO is a straight line starting at <span class="math" data-say="2.78 h">2.78 h</span>.</p></div><p>Run it backwards to turn a target into a schedule. A four-hour RTO leaves <span class="math" data-say="4 h minus 2.78 h equals 1.22 h">4 h − 2.78 h = 1.22 h</span> for replay, which at <span class="math" data-say="50 megabytes per second">50 MB/s</span> is about <span class="math" data-say="220 gigabytes">220 GB</span> of log, which at <span class="math" data-say="20 megabytes per second">20 MB/s</span> of writes is <span class="math" data-say="3.06 h">3.06 h</span> of interval. So “we must be back inside four hours” is, on this hardware, a requirement to back up at least every three hours — and if the copy alone exceeded four hours the target would be unreachable at any schedule, which the arithmetic says immediately.</p><p>The misconception this page exists for is offering “we have backups” as an answer. It is not a number of bytes, so it is not an RPO; it is not a number of hours, so it is not an RTO. Both of the real answers are one multiplication away from figures an operator already has, and the unwillingness to produce them is usually a sign that nobody has timed a restore.</p><p>Which is the honest caveat. Restore bandwidth must be measured on a real restore, not assumed from a network specification; a backup that has never been restored is a forecast rather than a fact. And this model starts the clock at the moment of failure, while a real outage also contains detection and the decision to restore — neither of which is in these two formulas and both of which are in the outage.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>RPO and RTO are two different numbers</h2></div><p>Bytes at risk from the schedule, hours to restore from the bandwidth</p></div>
@@ -1374,7 +1374,7 @@ RTO             2.78 h + 9.60 h                =  12.38 h</div><p>Notice what do
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Turning a schedule into two promises</h2></div><p>Two multiplications, one addition, and then the same arithmetic run backwards.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Multiply the interval by the write rate</h3><p>That is the worst-case RPO in bytes: <span class="math">86 400 s × 20 MB/s = 1.73 TB</span> for a daily backup. Use the write rate, not the read rate and not the ingest of the busiest hour unless that is the hour you are protecting.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Halve it for the expected case, and keep both figures</h3><p>A failure at a uniformly random moment inside the interval loses half the worst case on average, <span class="math">864.00 GB</span> here. The worst case is what a commitment has to survive; the expected case is what the business will actually experience.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the copy and the replay</h3><p><span class="math">size / restore bandwidth</span> plus <span class="math">RPO / replay rate</span>. Write the two terms separately: the first is the floor and cannot be moved by the schedule, and seeing which of the two dominates tells you which lever is worth pulling.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Invert it: solve for the interval a target allows</h3><p>Subtract the copy from the target, multiply what is left by the replay rate to get a log size, and divide by the write rate. A four-hour target on this hardware allows <span class="math">3.06 h</span> between backups. If the copy alone exceeds the target, no schedule reaches it and the conversation is about bandwidth.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Multiply the interval by the write rate</h3><p>That is the worst-case RPO in bytes: <span class="math" data-say="86400 seconds times 20 megabytes per second equals 1.73 terabytes">86 400 s × 20 MB/s = 1.73 TB</span> for a daily backup. Use the write rate, not the read rate and not the ingest of the busiest hour unless that is the hour you are protecting.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Halve it for the expected case, and keep both figures</h3><p>A failure at a uniformly random moment inside the interval loses half the worst case on average, <span class="math" data-say="864.00 gigabytes">864.00 GB</span> here. The worst case is what a commitment has to survive; the expected case is what the business will actually experience.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the copy and the replay</h3><p><span class="math" data-say="size over restore bandwidth">size / restore bandwidth</span> plus <span class="math" data-say="RPO over replay rate">RPO / replay rate</span>. Write the two terms separately: the first is the floor and cannot be moved by the schedule, and seeing which of the two dominates tells you which lever is worth pulling.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Invert it: solve for the interval a target allows</h3><p>Subtract the copy from the target, multiply what is left by the replay rate to get a log size, and divide by the write rate. A four-hour target on this hardware allows <span class="math" data-say="3.06 h">3.06 h</span> between backups. If the copy alone exceeds the target, no schedule reaches it and the conversation is about bandwidth.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1385,7 +1385,7 @@ RTO             2.78 h + 9.60 h                =  12.38 h</div><p>Notice what do
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A daily backup of two terabytes at 20 MB/s</h3><p>The two objectives, then the same arithmetic at four intervals, then run backwards from a target.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">interval 24 h = 86 400 s      writes 20 MB/s      dataset 2.00 TB
+      <article class="card card-pad prose"><h3>A daily backup of two terabytes at 20 MB/s</h3><p>The two objectives, then the same arithmetic at four intervals, then run backwards from a target.</p><div class="mathblock" data-say="interval 24 h equals 86400 seconds, writes 20 megabytes per second, dataset 2.00 terabytes. restore 200 megabytes per second, log replay 50 megabytes per second. RPO worst, 86400 seconds times 20 megabytes per second, equals, 1.73 terabytes. RPO expected, half of the interval, on average equals 864.00 gigabytes. copy back, 2.00 terabytes over 200 megabytes per second equals 10000 seconds, equals, 2.78 h. replay, 1.73 terabytes over 50 megabytes per second, equals 34560 seconds, equals, 9.60 h. RTO, 2.78 plus 9.60, equals, 12.38 h. interval, RPO worst, copy, replay, RTO. a table, shown on the page. for RTO is less than or equal to 4 h, 4 h minus 2.78 h equals 1.22 h of replay. 1.22 h times 50 megabytes per second is approximately 220 gigabytes of log. 220 gigabytes over 20 megabytes per second, goes to, interval is less than or equal to 3.06 h" tabindex="0" role="region" aria-label="Mathematical notation">interval 24 h = 86 400 s      writes 20 MB/s      dataset 2.00 TB
 restore 200 MB/s              log replay 50 MB/s
 
 RPO worst       86 400 s × 20 MB/s               =   1.73 TB
@@ -1403,12 +1403,12 @@ interval    RPO worst     copy      replay        RTO
 
 for RTO ≤ 4 h    4 h − 2.78 h = 1.22 h of replay
                  1.22 h × 50 MB/s ≈ 220 GB of log
-                 220 GB / 20 MB/s        →   interval ≤ 3.06 h</div><p>The copy column never moves. <span class="math">2.78 h</span> is the floor under every recovery promise this hardware can make, and only a faster restore path or a smaller dataset lowers it — no backup schedule does. That is the single most useful sentence on this page, because it converts an argument about backup frequency into an arithmetic fact about bandwidth.</p><p>Shortening the interval buys on both axes at once, which is unusual enough to be worth saying out loud: from twenty-four hours to one, the bytes at risk fall by a factor of twenty-four and the recovery time falls from <span class="math">12.38 h</span> to <span class="math">3.18 h</span>, which is within half an hour of the floor. Past that point more frequent backups buy almost nothing.</p><p>For a faded rehearsal, keep the daily schedule and double the restore bandwidth to <span class="math">400 MB/s</span>. The supplied first move is that the copy falls to <span class="math">1.39 h</span>. Compute the new RTO, then say what a four-hour target now allows as a backup interval, and why that answer moved so much further than the RTO did. Check both in the lab before opening the quiz.</p></article>
+                 220 GB / 20 MB/s        →   interval ≤ 3.06 h</div><p>The copy column never moves. <span class="math" data-say="2.78 h">2.78 h</span> is the floor under every recovery promise this hardware can make, and only a faster restore path or a smaller dataset lowers it — no backup schedule does. That is the single most useful sentence on this page, because it converts an argument about backup frequency into an arithmetic fact about bandwidth.</p><p>Shortening the interval buys on both axes at once, which is unusual enough to be worth saying out loud: from twenty-four hours to one, the bytes at risk fall by a factor of twenty-four and the recovery time falls from <span class="math" data-say="12.38 h">12.38 h</span> to <span class="math" data-say="3.18 h">3.18 h</span>, which is within half an hour of the floor. Past that point more frequent backups buy almost nothing.</p><p>For a faded rehearsal, keep the daily schedule and double the restore bandwidth to <span class="math" data-say="400 megabytes per second">400 MB/s</span>. The supplied first move is that the copy falls to <span class="math" data-say="1.39 h">1.39 h</span>. Compute the new RTO, then say what a four-hour target now allows as a backup interval, and why that answer moved so much further than the RTO did. Check both in the lab before opening the quiz.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Offering “we have backups” as a recovery-time claim</strong><span>Backups existing is a precondition, not an answer. The two answers are <span class="math">interval × write rate</span> in bytes and <span class="math">size/bandwidth + log/replay</span> in hours, and both are computable in a minute from numbers an operator already has. A recovery plan whose strongest statement is that backups run has not been tested, and the first restore will discover the bandwidth.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the worst case and the expected loss as if they were one number</strong><span>A daily backup at <span class="math">20 MB/s</span> puts <span class="math">1.73 TB</span> at risk and loses <span class="math">864.00 GB</span> on average, and the two figures are for different conversations: the first is what a commitment must survive, the second what will typically happen. Using the expected figure in a contract understates the exposure by two.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the log replay out of the recovery time</strong><span>The copy is <span class="math">2.78 h</span> of a <span class="math">12.38 h</span> recovery here — less than a quarter. A plan that quotes only the restore bandwidth is quoting the smaller term, and it is the term that does <em>not</em> respond to the backup schedule, so the plan also loses the one lever it had.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Offering “we have backups” as a recovery-time claim</strong><span>Backups existing is a precondition, not an answer. The two answers are <span class="math" data-say="interval times write rate">interval × write rate</span> in bytes and <span class="math" data-say="size over bandwidth plus log over replay">size/bandwidth + log/replay</span> in hours, and both are computable in a minute from numbers an operator already has. A recovery plan whose strongest statement is that backups run has not been tested, and the first restore will discover the bandwidth.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the worst case and the expected loss as if they were one number</strong><span>A daily backup at <span class="math" data-say="20 megabytes per second">20 MB/s</span> puts <span class="math" data-say="1.73 terabytes">1.73 TB</span> at risk and loses <span class="math" data-say="864.00 gigabytes">864.00 GB</span> on average, and the two figures are for different conversations: the first is what a commitment must survive, the second what will typically happen. Using the expected figure in a contract understates the exposure by two.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the log replay out of the recovery time</strong><span>The copy is <span class="math" data-say="2.78 h">2.78 h</span> of a <span class="math" data-say="12.38 h">12.38 h</span> recovery here — less than a quarter. A plan that quotes only the restore bandwidth is quoting the smaller term, and it is the term that does <em>not</em> respond to the backup schedule, so the plan also loses the one lever it had.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a recovery question gets two numbers in two units.</strong><p>You should be able to compute worst-case and expected RPO from a schedule and a write rate, compute RTO from a dataset, a restore bandwidth and a replay rate, and invert the second to say what backup interval a stated target allows.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every number on this course has been a count — of seeks, levels, rewrites, bits, fsyncs and hours — and none of them has had a price attached. Scaling Laws and Cost is where a count becomes money, and where the compression ratio this course took as an input finally has to earn the processor time it costs.</div></article>
       </div>
     </section>
@@ -1448,7 +1448,7 @@ for RTO ≤ 4 h    4 h − 2.78 h = 1.22 h of replay
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math">h</span> with <span class="math">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math">9.585</span> rather than the <span class="math">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
+      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is greater than or equal to N">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math" data-say="9.585">9.585</span> rather than the <span class="math" data-say="9.57">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1507,7 +1507,7 @@ for RTO ≤ 4 h    4 h − 2.78 h = 1.22 h of replay
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Backups run every <span class=\"math\">6<\/span> hours and the system writes <span class=\"math\">20 MB/s<\/span>. What is the worst-case RPO?", "a": ["<span class=\"math\">72.00 GB<\/span>", "<span class=\"math\">216.00 GB<\/span>", "<span class=\"math\">432.00 GB<\/span>", "<span class=\"math\">1.73 TB<\/span>"], "c": 2, "why": "<span class=\"math\">6 \u00d7 3 600 s \u00d7 20 MB/s = 432.00 GB<\/span>. <span class=\"math\">216.00 GB<\/span> is the expected loss, half the worst case, which is a different figure and worth quoting separately; <span class=\"math\">72.00 GB<\/span> is the hourly schedule and <span class=\"math\">1.73 TB<\/span> the daily one."}, {"q": "A <span class=\"math\">2.00 TB<\/span> dataset restores at <span class=\"math\">200 MB/s<\/span> with <span class=\"math\">50 MB/s<\/span> of log replay, on a daily backup. Which term dominates the <span class=\"math\">12.38 h<\/span> recovery?", "a": ["The copy, at <span class=\"math\">9.60 h<\/span>", "The replay, at <span class=\"math\">9.60 h<\/span>", "They are about equal", "Neither; most of it is detection time"], "c": 1, "why": "The copy is <span class=\"math\">2.00 TB / 200 MB/s = 2.78 h<\/span> and the replay is <span class=\"math\">1.73 TB / 50 MB/s = 9.60 h<\/span>. A day of log at a replay rate four times slower than the restore path is most of the outage, which is why the backup interval is the effective lever here. Detection time is real and is not in this model."}, {"q": "The backup interval is halved. What happens to the recovery time?", "a": ["It halves", "It falls, but by less than half, because the copy is unchanged", "It is unchanged", "It falls by the same factor as the RPO"], "c": 1, "why": "Halving the interval halves the log and therefore the replay term, and leaves the copy exactly where it is. From <span class=\"math\">12.38 h<\/span> at twenty-four hours to <span class=\"math\">7.58 h<\/span> at twelve: the RPO halved exactly and the RTO did not, because <span class=\"math\">2.78 h<\/span> of it was never a function of the schedule."}, {"q": "Someone answers a recovery question with \u201cwe have backups\u201d. What has that established?", "a": ["The RPO, but not the RTO", "The RTO, but not the RPO", "Neither \u2014 it is not a number of bytes and not a number of hours", "Both, provided the backups are recent"], "c": 2, "why": "An RPO is bytes and an RTO is hours; the sentence produces neither. Both are one multiplication away from figures the operator already has \u2014 interval, write rate, dataset size, restore bandwidth \u2014 and the absence of them usually means no restore has been timed."}];
+  var QUIZ = [{"q": "Backups run every <span class=\"math\" data-say=\"6\">6<\/span> hours and the system writes <span class=\"math\" data-say=\"20 megabytes per second\">20 MB/s<\/span>. What is the worst-case RPO?", "a": ["<span class=\"math\" data-say=\"72.00 gigabytes\">72.00 GB<\/span>", "<span class=\"math\" data-say=\"216.00 gigabytes\">216.00 GB<\/span>", "<span class=\"math\" data-say=\"432.00 gigabytes\">432.00 GB<\/span>", "<span class=\"math\" data-say=\"1.73 terabytes\">1.73 TB<\/span>"], "c": 2, "why": "<span class=\"math\" data-say=\"6 times 3600 seconds times 20 megabytes per second equals 432.00 gigabytes\">6 \u00d7 3 600 s \u00d7 20 MB/s = 432.00 GB<\/span>. <span class=\"math\" data-say=\"216.00 gigabytes\">216.00 GB<\/span> is the expected loss, half the worst case, which is a different figure and worth quoting separately; <span class=\"math\" data-say=\"72.00 gigabytes\">72.00 GB<\/span> is the hourly schedule and <span class=\"math\" data-say=\"1.73 terabytes\">1.73 TB<\/span> the daily one."}, {"q": "A <span class=\"math\" data-say=\"2.00 terabytes\">2.00 TB<\/span> dataset restores at <span class=\"math\" data-say=\"200 megabytes per second\">200 MB/s<\/span> with <span class=\"math\" data-say=\"50 megabytes per second\">50 MB/s<\/span> of log replay, on a daily backup. Which term dominates the <span class=\"math\" data-say=\"12.38 h\">12.38 h<\/span> recovery?", "a": ["The copy, at <span class=\"math\" data-say=\"9.60 h\">9.60 h<\/span>", "The replay, at <span class=\"math\" data-say=\"9.60 h\">9.60 h<\/span>", "They are about equal", "Neither; most of it is detection time"], "c": 1, "why": "The copy is <span class=\"math\" data-say=\"2.00 terabytes over 200 megabytes per second equals 2.78 h\">2.00 TB / 200 MB/s = 2.78 h<\/span> and the replay is <span class=\"math\" data-say=\"1.73 terabytes over 50 megabytes per second equals 9.60 h\">1.73 TB / 50 MB/s = 9.60 h<\/span>. A day of log at a replay rate four times slower than the restore path is most of the outage, which is why the backup interval is the effective lever here. Detection time is real and is not in this model."}, {"q": "The backup interval is halved. What happens to the recovery time?", "a": ["It halves", "It falls, but by less than half, because the copy is unchanged", "It is unchanged", "It falls by the same factor as the RPO"], "c": 1, "why": "Halving the interval halves the log and therefore the replay term, and leaves the copy exactly where it is. From <span class=\"math\" data-say=\"12.38 h\">12.38 h<\/span> at twenty-four hours to <span class=\"math\" data-say=\"7.58 h\">7.58 h<\/span> at twelve: the RPO halved exactly and the RTO did not, because <span class=\"math\" data-say=\"2.78 h\">2.78 h<\/span> of it was never a function of the schedule."}, {"q": "Someone answers a recovery question with \u201cwe have backups\u201d. What has that established?", "a": ["The RPO, but not the RTO", "The RTO, but not the RPO", "Neither \u2014 it is not a number of bytes and not a number of hours", "Both, provided the backups are recent"], "c": 2, "why": "An RPO is bytes and an RTO is hours; the sentence produces neither. Both are one multiplication away from figures the operator already has \u2014 interval, write rate, dataset size, restore bandwidth \u2014 and the absence of them usually means no restore has been timed."}];
 
   (function () {
 
@@ -2574,6 +2574,160 @@ for RTO ≤ 4 h    4 h − 2.78 h = 1.22 h of replay
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>

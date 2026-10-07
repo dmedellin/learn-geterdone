@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Storage Engines and Indexes &middot; The cost model</span>
         <h1>Hash vs Tree for Ranges</h1>
-        <p>A hash index answers a point lookup in one I/O and answers a range query only by reading the whole table, because hashing destroys the order a range needs. A tree pays its height on both. On a workload of nine hundred lookups and a hundred small ranges a second that is <span class="math">500 900</span> I/O against <span class="math">3 000</span>, and “hash is faster” turns out to be a true claim about one operation wearing the clothes of a claim about an index.</p>
+        <p>A hash index answers a point lookup in one I/O and answers a range query only by reading the whole table, because hashing destroys the order a range needs. A tree pays its height on both. On a workload of nine hundred lookups and a hundred small ranges a second that is <span class="math" data-say="500900">500 900</span> I/O against <span class="math" data-say="3000">3 000</span>, and “hash is faster” turns out to be a true claim about one operation wearing the clothes of a claim about an index.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">hash    point  1 I/O            range  a full scan = rows / rows a page
+        <div class="mathblock" data-say="hash, point, 1 I over O, range, a full scan equals rows over rows a page. tree, point, h I over O, range, h minus 1 plus the ceiling of k over rows a page. 10 to the power 6 rows, B equals 500, 200 rows a page, ranges returning 100 rows. point, range, 900 point over s plus 100 range over s. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">hash    point  1 I/O            range  a full scan = rows / rows a page
 tree    point  h I/O            range  (h − 1) + ⌈k / rows a page⌉
 
 10⁶ rows, B = 500, 200 rows a page, ranges returning 100 rows
@@ -1311,11 +1311,11 @@ tree                3          3                 3 000 I/O a second</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Two structures, two operations, four numbers. The argument people have about this is entirely caused by quoting one of the four.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A hash index is fast at exactly one thing</h3><p>It computes a bucket from a key and reads it: one I/O, no descent, no comparisons. The expected probe length behind that <span class="math">1</span> is <span class="math">Θ(1 + α)</span> under simple uniform hashing, with a <span class="math">Θ(n)</span> worst case no hash function removes; “Hashing with Chaining” on the Algorithms path establishes both, and this lesson uses them rather than re-deriving them. What the structure spends to get that <span class="math">1</span> is the order of the keys.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A range query has no hash plan at all</h3><p>There is no way to ask a hash index for the keys between two values except to look at every one of them, so a range costs a full scan: <span class="math">10⁶</span> rows at <span class="math">200</span> rows a page is <span class="math">5 000</span> page reads. It is not that a hash is slower at ranges. It is that it has no access path for them, and what you are pricing is the table scan the planner falls back to.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A tree charges its height and then walks</h3><p>A B-tree descends to the first matching key and then reads leaves in key order, so a range of <span class="math">k</span> rows costs about <span class="math">(h − 1) + ⌈k/rows per page⌉</span>. Over a million rows at <span class="math">B = 500</span> the height is <span class="math">3</span>, and a range of a hundred rows is <span class="math">3</span> I/Os altogether: two internal levels, then one leaf that already holds all hundred.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A hash index is fast at exactly one thing</h3><p>It computes a bucket from a key and reads it: one I/O, no descent, no comparisons. The expected probe length behind that <span class="math" data-say="1">1</span> is <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> under simple uniform hashing, with a <span class="math" data-say="theta of n">Θ(n)</span> worst case no hash function removes; “Hashing with Chaining” on the Algorithms path establishes both, and this lesson uses them rather than re-deriving them. What the structure spends to get that <span class="math" data-say="1">1</span> is the order of the keys.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A range query has no hash plan at all</h3><p>There is no way to ask a hash index for the keys between two values except to look at every one of them, so a range costs a full scan: <span class="math" data-say="10 to the power 6">10⁶</span> rows at <span class="math" data-say="200">200</span> rows a page is <span class="math" data-say="5000">5 000</span> page reads. It is not that a hash is slower at ranges. It is that it has no access path for them, and what you are pricing is the table scan the planner falls back to.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A tree charges its height and then walks</h3><p>A B-tree descends to the first matching key and then reads leaves in key order, so a range of <span class="math" data-say="k">k</span> rows costs about <span class="math" data-say="h minus 1 plus the ceiling of k over rows per page">(h − 1) + ⌈k/rows per page⌉</span>. Over a million rows at <span class="math" data-say="B equals 500">B = 500</span> the height is <span class="math" data-say="3">3</span>, and a range of a hundred rows is <span class="math" data-say="3">3</span> I/Os altogether: two internal levels, then one leaf that already holds all hundred.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>One I/O, or the whole table</h2></div><p>What a hash index gives up for its point lookup, and what that costs on the operation it gave up.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Point lookup and range query</span><p>A <strong>point lookup</strong> retrieves the row for one exact key. A <strong>range query</strong> retrieves every row whose key lies between two bounds, and is priced by the number of rows <span class="math">k</span> it returns.</p><p>An index is <strong>ordered</strong> if it stores keys in a comparison order, and <strong>unordered</strong> if it stores them by a hash of the key. Only an ordered index has an access path for a range.</p></div><p>The hash index's <span class="math">1</span> is worth taking seriously rather than waving at. Under simple uniform hashing the expected number of probes is <span class="math">Θ(1 + α)</span> in the load factor <span class="math">α</span>, so a table kept at a sensible load factor really does answer in about one access — and the worst case, where every key collides, really is <span class="math">Θ(n)</span>. Those are Algorithms' results, proved in “Hashing with Chaining”; what this lesson adds is that on disk the unit is a page read and the constant is therefore expensive.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">10⁶ rows     B = 500     200 rows a page     ranges return 100 rows
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Point lookup and range query</span><p>A <strong>point lookup</strong> retrieves the row for one exact key. A <strong>range query</strong> retrieves every row whose key lies between two bounds, and is priced by the number of rows <span class="math" data-say="k">k</span> it returns.</p><p>An index is <strong>ordered</strong> if it stores keys in a comparison order, and <strong>unordered</strong> if it stores them by a hash of the key. Only an ordered index has an access path for a range.</p></div><p>The hash index's <span class="math" data-say="1">1</span> is worth taking seriously rather than waving at. Under simple uniform hashing the expected number of probes is <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> in the load factor <span class="math" data-say="alpha">α</span>, so a table kept at a sensible load factor really does answer in about one access — and the worst case, where every key collides, really is <span class="math" data-say="theta of n">Θ(n)</span>. Those are Algorithms' results, proved in “Hashing with Chaining”; what this lesson adds is that on disk the unit is a page read and the constant is therefore expensive.</p><div class="mathblock" data-say="10 to the power 6 rows, B equals 500, 200 rows a page, ranges return 100 rows. hash, point, 1 I over O. range, 10 to the power 6 over 200, equals, 5000 I over O, full scan. tree, height, 500 squared equals 250000 is less than 10 to the power 6 is less than or equal to 125000000 equals 500 cubed, goes to, h equals 3. point, 3 I over O. range, 3 minus 1 plus the ceiling of 100 over 200, equals, 3 I over O. mix, 900 point over s plus 100 range over s. hash, 900 times 1 plus 100 times 5000, equals, 500900 I over O a second. tree, 900 times 3 plus 100 times 3, equals, 3000 I over O a second" tabindex="0" role="region" aria-label="Mathematical notation">10⁶ rows     B = 500     200 rows a page     ranges return 100 rows
 
 hash    point    1 I/O
         range    10⁶ / 200                    =  5 000 I/O   (full scan)
@@ -1326,7 +1326,7 @@ tree    height   500² = 250 000 &lt; 10⁶ ≤ 125 000 000 = 500³   →   h = 
 
 mix     900 point/s + 100 range/s
         hash     900(1) + 100(5 000)          =  500 900 I/O a second
-        tree     900(3) + 100(3)              =    3 000 I/O a second</div><p>The hash index does one hundred and sixty-seven times the I/O of the tree on that mix, and it is genuinely three times cheaper on the operation it is good at. Both facts come out of the same four numbers. Which one you quote is a choice about what you want the answer to be.</p><h3>Where the ordering reverses</h3><p>Set the two totals equal and solve for the range rate <span class="math">r</span> at a fixed point rate. With <span class="math">900</span> point lookups a second: <span class="math">900(1) + r(5 000) = 900(3) + r(3)</span>, so <span class="math">r(5 000 − 3) = 900(3 − 1)</span> and <span class="math">r = 1800/4997 ≈ 0.360</span> range scans a second. One range query every three seconds is enough to make the tree the cheaper engine on this table.</p><div class="example"><span class="label">Example &middot; A workload where the hash genuinely wins</span><p>Remove the ranges entirely. At <span class="math">900</span> point lookups a second and nothing else, the hash index does <span class="math">900</span> I/O a second and the tree does <span class="math">2 700</span> — three times as many, exactly the ratio of <span class="math">1</span> to <span class="math">h</span>. The true claim behind “hash is faster” is alive; it is just very small, and it is a claim about one operation.</p></div><p>The same misconception exists in memory, where “a hash table is always the fastest map” is corrected by pointing out that it cannot answer predecessor, range or ordered iteration at all. “Choosing a Structure” on the Algorithms path is that statement. This lesson is the same fact with a disk attached, and the disk is what turns a structural limitation into a number: not “unsupported” but <span class="math">5 000</span> I/O.</p><p>What the count assumes: that pages hold their nominal number of rows, that nothing is cached, and that the range is contiguous in the index's key order. Cache the tree's top two levels and its point lookup falls from <span class="math">3</span> to <span class="math">1</span>, at which point the hash index's advantage on the operation it is good at disappears entirely — which is worth knowing before anyone builds an argument on the <span class="math">1</span> against <span class="math">3</span>.</p></article>
+        tree     900(3) + 100(3)              =    3 000 I/O a second</div><p>The hash index does one hundred and sixty-seven times the I/O of the tree on that mix, and it is genuinely three times cheaper on the operation it is good at. Both facts come out of the same four numbers. Which one you quote is a choice about what you want the answer to be.</p><h3>Where the ordering reverses</h3><p>Set the two totals equal and solve for the range rate <span class="math" data-say="r">r</span> at a fixed point rate. With <span class="math" data-say="900">900</span> point lookups a second: <span class="math" data-say="900 times 1 plus r times 5000 equals 900 times 3 plus r times 3">900(1) + r(5 000) = 900(3) + r(3)</span>, so <span class="math" data-say="r times the quantity 5000 minus 3, equals 900 times the quantity 3 minus 1">r(5 000 − 3) = 900(3 − 1)</span> and <span class="math" data-say="r equals 1800 over 4997 is approximately 0.360">r = 1800/4997 ≈ 0.360</span> range scans a second. One range query every three seconds is enough to make the tree the cheaper engine on this table.</p><div class="example"><span class="label">Example &middot; A workload where the hash genuinely wins</span><p>Remove the ranges entirely. At <span class="math" data-say="900">900</span> point lookups a second and nothing else, the hash index does <span class="math" data-say="900">900</span> I/O a second and the tree does <span class="math" data-say="2700">2 700</span> — three times as many, exactly the ratio of <span class="math" data-say="1">1</span> to <span class="math" data-say="h">h</span>. The true claim behind “hash is faster” is alive; it is just very small, and it is a claim about one operation.</p></div><p>The same misconception exists in memory, where “a hash table is always the fastest map” is corrected by pointing out that it cannot answer predecessor, range or ordered iteration at all. “Choosing a Structure” on the Algorithms path is that statement. This lesson is the same fact with a disk attached, and the disk is what turns a structural limitation into a number: not “unsupported” but <span class="math" data-say="5000">5 000</span> I/O.</p><p>What the count assumes: that pages hold their nominal number of rows, that nothing is cached, and that the range is contiguous in the index's key order. Cache the tree's top two levels and its point lookup falls from <span class="math" data-say="3">3</span> to <span class="math" data-say="1">1</span>, at which point the hash index's advantage on the operation it is good at disappears entirely — which is worth knowing before anyone builds an argument on the <span class="math" data-say="1">1</span> against <span class="math" data-say="3">3</span>.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Hash against tree, counted in I/Os</h2></div><p>One I/O for a point lookup, the whole table for a range</p></div>
@@ -1371,7 +1371,7 @@ mix     900 point/s + 100 range/s
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a workload in I/Os</h2></div><p>Four costs, then two products, then a comparison. The order stops you from quoting the wrong one of the four.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write all four costs before looking at the workload</h3><p>Point and range, hash and tree. Any claim about an index made from fewer than four numbers is a claim about one operation, and it will be defended as though it were about the index.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count a range in pages, not in rows</h3><p>A range returning <span class="math">k</span> rows at <span class="math">p</span> rows a page is <span class="math">⌈k/p⌉</span> leaf pages, and a full scan of <span class="math">n</span> rows is <span class="math">⌈n/p⌉</span> pages. Rows are what the query asks for; pages are what the device delivers.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply each cost by its rate and add</h3><p><span class="math">point rate × I/O a point + range rate × I/O a range</span>, for each engine, in I/O a second. Now the two engines are comparable, which they were not when the units were operations.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve for the rate that ties them</h3><p>Set the two totals equal and solve for whichever rate is in doubt. The crossover is more useful than the winner: it tells you how much of the workload would have to change to change the answer, and here that is one range query every three seconds.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write all four costs before looking at the workload</h3><p>Point and range, hash and tree. Any claim about an index made from fewer than four numbers is a claim about one operation, and it will be defended as though it were about the index.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count a range in pages, not in rows</h3><p>A range returning <span class="math" data-say="k">k</span> rows at <span class="math" data-say="p">p</span> rows a page is <span class="math" data-say="the ceiling of k over p">⌈k/p⌉</span> leaf pages, and a full scan of <span class="math" data-say="n">n</span> rows is <span class="math" data-say="the ceiling of n over p">⌈n/p⌉</span> pages. Rows are what the query asks for; pages are what the device delivers.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply each cost by its rate and add</h3><p><span class="math" data-say="point rate times I over O a point plus range rate times I over O a range">point rate × I/O a point + range rate × I/O a range</span>, for each engine, in I/O a second. Now the two engines are comparable, which they were not when the units were operations.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve for the rate that ties them</h3><p>Set the two totals equal and solve for whichever rate is in doubt. The crossover is more useful than the winner: it tells you how much of the workload would have to change to change the answer, and here that is one range query every three seconds.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1382,7 +1382,7 @@ mix     900 point/s + 100 range/s
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>900 point lookups and 100 ranges a second over a million rows</h3><p>Four costs, two totals, and then the rate at which the two totals meet.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">10⁶ rows      4 kB page holds 500 index entries or 200 rows
+      <article class="card card-pad prose"><h3>900 point lookups and 100 ranges a second over a million rows</h3><p>Four costs, two totals, and then the rate at which the two totals meet.</p><div class="mathblock" data-say="10 to the power 6 rows, 4 kB page holds 500 index entries or 200 rows. ranges return 100 rows, 900 point lookups over s, 100 ranges over s. tree height, 500 squared equals 250000 is less than 10 to the power 6 is less than or equal to 125000000 equals 500 cubed, goes to, h equals 3. hash index, B-tree. point lookup, 1 I over O, 3 I over O. range of 100 rows, 5000 I over O, full scan, 3 I over O, equals 2 plus the ceiling of 100 over 200. a table, shown on the page. crossover, 900 times 1 plus r times 5000 equals 900 times 3 plus r times 3. r times 4997 equals 1800, r equals 1800 over 4997 equals 0.360 ranges a second" tabindex="0" role="region" aria-label="Mathematical notation">10⁶ rows      4 kB page holds 500 index entries or 200 rows
 ranges return 100 rows      900 point lookups/s      100 ranges/s
 
 tree height     500² = 250 000 &lt; 10⁶ ≤ 125 000 000 = 500³    →    h = 3
@@ -1396,12 +1396,12 @@ tree height     500² = 250 000 &lt; 10⁶ ≤ 125 000 000 = 500³    →    h =
   the mix                500 900                 3 000
 
 crossover     900(1) + r(5 000) = 900(3) + r(3)
-              r(4 997) = 1 800      r = 1 800/4 997 = 0.360 ranges a second</div><p>The <span class="math">5 000</span> contains no hash parameter. It is <span class="math">10⁶/200</span>: rows divided by rows a page, which is what a scan costs when there is no access path. Doubling the buckets, improving the hash function or removing every collision leaves it exactly where it is.</p><p>The crossover is the honest summary. At these page geometries the tree wins any workload with more than about one range scan every three seconds, and the hash index wins below that. Neither engine is faster; one of them is cheaper at your mix, and the mix is measurable.</p><p>For a faded rehearsal, widen the range to <span class="math">1 000</span> rows and keep everything else. The supplied first move is that the tree's range cost becomes <span class="math">2 + ⌈1 000/200⌉</span>. Compute it, recompute both totals, and then say what happened to the crossover rate and why it moved in the direction it did. Run the lab at your numbers before opening the quiz.</p></article>
+              r(4 997) = 1 800      r = 1 800/4 997 = 0.360 ranges a second</div><p>The <span class="math" data-say="5000">5 000</span> contains no hash parameter. It is <span class="math" data-say="10 to the power 6 over 200">10⁶/200</span>: rows divided by rows a page, which is what a scan costs when there is no access path. Doubling the buckets, improving the hash function or removing every collision leaves it exactly where it is.</p><p>The crossover is the honest summary. At these page geometries the tree wins any workload with more than about one range scan every three seconds, and the hash index wins below that. Neither engine is faster; one of them is cheaper at your mix, and the mix is measurable.</p><p>For a faded rehearsal, widen the range to <span class="math" data-say="1000">1 000</span> rows and keep everything else. The supplied first move is that the tree's range cost becomes <span class="math" data-say="2 plus the ceiling of 1000 over 200">2 + ⌈1 000/200⌉</span>. Compute it, recompute both totals, and then say what happened to the crossover rate and why it moved in the direction it did. Run the lab at your numbers before opening the quiz.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying that one index is faster than another</strong><span>There is no such quantity. The four costs here are <span class="math">1</span>, <span class="math">5 000</span>, <span class="math">3</span> and <span class="math">3</span>, and every honest sentence names an operation: faster at point lookups, by a factor of three, on an uncached tree. A claim without the operation in it cannot be checked, and it is usually the true claim about the wrong half of the workload.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting a range in rows</strong><span>A range returning <span class="math">100</span> rows out of pages holding <span class="math">200</span> is one page read, not a hundred. The device delivers pages, so a range is <span class="math">⌈k/rows per page⌉</span> leaves however few rows it returns — which is also why widening a range from ten rows to a hundred can cost nothing at all.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a better hash to fix the range</strong><span>The <span class="math">5 000</span> is <span class="math">10⁶/200</span>: rows divided by rows a page, containing no hash parameter of any kind. It is the cost of having no access path. More buckets, a better function or zero collisions leave it untouched, because the problem is not collisions — it is that the order was thrown away on purpose.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying that one index is faster than another</strong><span>There is no such quantity. The four costs here are <span class="math" data-say="1">1</span>, <span class="math" data-say="5000">5 000</span>, <span class="math" data-say="3">3</span> and <span class="math" data-say="3">3</span>, and every honest sentence names an operation: faster at point lookups, by a factor of three, on an uncached tree. A claim without the operation in it cannot be checked, and it is usually the true claim about the wrong half of the workload.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting a range in rows</strong><span>A range returning <span class="math" data-say="100">100</span> rows out of pages holding <span class="math" data-say="200">200</span> is one page read, not a hundred. The device delivers pages, so a range is <span class="math" data-say="the ceiling of k over rows per page">⌈k/rows per page⌉</span> leaves however few rows it returns — which is also why widening a range from ten rows to a hundred can cost nothing at all.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a better hash to fix the range</strong><span>The <span class="math" data-say="5000">5 000</span> is <span class="math" data-say="10 to the power 6 over 200">10⁶/200</span>: rows divided by rows a page, containing no hash parameter of any kind. It is the cost of having no access path. More buckets, a better function or zero collisions leave it untouched, because the problem is not collisions — it is that the order was thrown away on purpose.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you answer “which is faster” with a question about the mix.</strong><p>You should be able to write down all four costs for a stated page geometry, total a workload in I/O a second on both engines, and solve for the rate at which the answer changes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both engines here were priced for readers. “The Write Cost of an Index” prices the same indexes for the writer, and the arithmetic is a division rather than an addition — which is why the answer surprises people who have only ever been shown the read side.</div></article>
       </div>
     </section>
@@ -1441,7 +1441,7 @@ crossover     900(1) + r(5 000) = 900(3) + r(3)
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math">h</span> with <span class="math">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math">9.585</span> rather than the <span class="math">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
+      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is greater than or equal to N">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math" data-say="9.585">9.585</span> rather than the <span class="math" data-say="9.57">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1500,7 +1500,7 @@ crossover     900(1) + r(5 000) = 900(3) + r(3)
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "A range query returns <span class=\"math\">100<\/span> rows from a million-row table with <span class=\"math\">200<\/span> rows to a page. What does it cost on a hash index?", "a": ["<span class=\"math\">1<\/span> I/O, the same as a point lookup", "<span class=\"math\">1<\/span> I/O per row, so <span class=\"math\">100<\/span>", "<span class=\"math\">5 000<\/span> I/O \u2014 the whole table, <span class=\"math\">10\u2076/200<\/span> pages", "<span class=\"math\">3<\/span> I/O, the height of the equivalent tree"], "c": 2, "why": "A hash index stores keys by hash, so the rows of a range are scattered across every bucket and the only way to find them is to read everything: <span class=\"math\">10\u2076/200 = 5 000<\/span> pages. <span class=\"math\">100<\/span> would be one I/O a row, which is worse than a scan, not better; the <span class=\"math\">3<\/span> is what the tree charges."}, {"q": "On the same table the workload is <span class=\"math\">900<\/span> point lookups and <span class=\"math\">100<\/span> ranges a second. Which engine does less I/O, and by roughly how much?", "a": ["The hash index, by about three times", "The B-tree, by about one hundred and sixty-seven times", "They are within a few per cent of each other", "The hash index, by about one hundred and sixty-seven times"], "c": 1, "why": "<span class=\"math\">500 900<\/span> against <span class=\"math\">3 000<\/span>. The hash index is three times cheaper on the point lookups \u2014 <span class=\"math\">900<\/span> against <span class=\"math\">2 700<\/span> \u2014 and that advantage is swamped by <span class=\"math\">100 \u00d7 5 000<\/span> I/O of scans. The first answer quotes the true fact about the wrong operation."}, {"q": "At <span class=\"math\">900<\/span> point lookups a second, how many range scans a second make the two engines cost the same?", "a": ["About <span class=\"math\">0.36<\/span> a second", "About <span class=\"math\">3.6<\/span> a second", "About <span class=\"math\">36<\/span> a second", "<span class=\"math\">900<\/span>, one per lookup"], "c": 0, "why": "<span class=\"math\">900(1) + r(5 000) = 900(3) + r(3)<\/span> gives <span class=\"math\">r = 1 800/4 997 \u2248 0.360<\/span>. One range query every three seconds is the whole margin: the tree's extra <span class=\"math\">2<\/span> I/O on each of nine hundred lookups is <span class=\"math\">1 800<\/span>, and one scan costs <span class=\"math\">4 997<\/span> more than the tree's range."}, {"q": "The B-tree's top two levels are cached, so a point lookup costs <span class=\"math\">1<\/span> I/O rather than <span class=\"math\">3<\/span>. What happens to the comparison?", "a": ["The hash index becomes cheaper on the mix", "The tree matches the hash on point lookups and still wins the mix outright", "Nothing; caching affects both engines equally", "The crossover rate rises above <span class=\"math\">100<\/span> ranges a second"], "c": 1, "why": "Caching the top two levels removes two of the three reads in every descent, so a tree point lookup costs <span class=\"math\">1<\/span> I/O \u2014 the same as the hash index's. Its range still costs a handful of leaf reads against a <span class=\"math\">5 000<\/span>-page scan, so the tree wins the mix by more than before. Caching helps a hash index too; it simply has no descent to remove, and its <span class=\"math\">1<\/span> cannot go below <span class=\"math\">1<\/span>."}];
+  var QUIZ = [{"q": "A range query returns <span class=\"math\" data-say=\"100\">100<\/span> rows from a million-row table with <span class=\"math\" data-say=\"200\">200<\/span> rows to a page. What does it cost on a hash index?", "a": ["<span class=\"math\" data-say=\"1\">1<\/span> I/O, the same as a point lookup", "<span class=\"math\" data-say=\"1\">1<\/span> I/O per row, so <span class=\"math\" data-say=\"100\">100<\/span>", "<span class=\"math\" data-say=\"5000\">5 000<\/span> I/O \u2014 the whole table, <span class=\"math\" data-say=\"10 to the power 6 over 200\">10\u2076/200<\/span> pages", "<span class=\"math\" data-say=\"3\">3<\/span> I/O, the height of the equivalent tree"], "c": 2, "why": "A hash index stores keys by hash, so the rows of a range are scattered across every bucket and the only way to find them is to read everything: <span class=\"math\" data-say=\"10 to the power 6 over 200 equals 5000\">10\u2076/200 = 5 000<\/span> pages. <span class=\"math\" data-say=\"100\">100<\/span> would be one I/O a row, which is worse than a scan, not better; the <span class=\"math\" data-say=\"3\">3<\/span> is what the tree charges."}, {"q": "On the same table the workload is <span class=\"math\" data-say=\"900\">900<\/span> point lookups and <span class=\"math\" data-say=\"100\">100<\/span> ranges a second. Which engine does less I/O, and by roughly how much?", "a": ["The hash index, by about three times", "The B-tree, by about one hundred and sixty-seven times", "They are within a few per cent of each other", "The hash index, by about one hundred and sixty-seven times"], "c": 1, "why": "<span class=\"math\" data-say=\"500900\">500 900<\/span> against <span class=\"math\" data-say=\"3000\">3 000<\/span>. The hash index is three times cheaper on the point lookups \u2014 <span class=\"math\" data-say=\"900\">900<\/span> against <span class=\"math\" data-say=\"2700\">2 700<\/span> \u2014 and that advantage is swamped by <span class=\"math\" data-say=\"100 times 5000\">100 \u00d7 5 000<\/span> I/O of scans. The first answer quotes the true fact about the wrong operation."}, {"q": "At <span class=\"math\" data-say=\"900\">900<\/span> point lookups a second, how many range scans a second make the two engines cost the same?", "a": ["About <span class=\"math\" data-say=\"0.36\">0.36<\/span> a second", "About <span class=\"math\" data-say=\"3.6\">3.6<\/span> a second", "About <span class=\"math\" data-say=\"36\">36<\/span> a second", "<span class=\"math\" data-say=\"900\">900<\/span>, one per lookup"], "c": 0, "why": "<span class=\"math\" data-say=\"900 times 1 plus r times 5000 equals 900 times 3 plus r times 3\">900(1) + r(5 000) = 900(3) + r(3)<\/span> gives <span class=\"math\" data-say=\"r equals 1800 over 4997 is approximately 0.360\">r = 1 800/4 997 \u2248 0.360<\/span>. One range query every three seconds is the whole margin: the tree's extra <span class=\"math\" data-say=\"2\">2<\/span> I/O on each of nine hundred lookups is <span class=\"math\" data-say=\"1800\">1 800<\/span>, and one scan costs <span class=\"math\" data-say=\"4997\">4 997<\/span> more than the tree's range."}, {"q": "The B-tree's top two levels are cached, so a point lookup costs <span class=\"math\" data-say=\"1\">1<\/span> I/O rather than <span class=\"math\" data-say=\"3\">3<\/span>. What happens to the comparison?", "a": ["The hash index becomes cheaper on the mix", "The tree matches the hash on point lookups and still wins the mix outright", "Nothing; caching affects both engines equally", "The crossover rate rises above <span class=\"math\" data-say=\"100\">100<\/span> ranges a second"], "c": 1, "why": "Caching the top two levels removes two of the three reads in every descent, so a tree point lookup costs <span class=\"math\" data-say=\"1\">1<\/span> I/O \u2014 the same as the hash index's. Its range still costs a handful of leaf reads against a <span class=\"math\" data-say=\"5000\">5 000<\/span>-page scan, so the tree wins the mix by more than before. Caching helps a hash index too; it simply has no descent to remove, and its <span class=\"math\" data-say=\"1\">1<\/span> cannot go below <span class=\"math\" data-say=\"1\">1<\/span>."}];
 
   (function () {
 
@@ -2537,6 +2537,160 @@ crossover     900(1) + r(5 000) = 900(3) + r(3)
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>

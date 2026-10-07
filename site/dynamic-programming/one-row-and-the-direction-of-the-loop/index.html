@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">for each item:   for w = W down to weight(i):   row[w] = max(row[w], row[w − weight(i)] + value(i))
+        <div class="mathblock" data-say="for each item, for w equals W down to weight of i, row at w equals the max of row at w and row at w minus weight of i plus value of i. for each item, for w equals weight of i up to W, row at w equals the max of row at w and row at w minus weight of i plus value of i. items 2 over 3, 3 over 5, 5 over 9 and a capacity of 11. swept backward, 17, each item at most once, the 0 over 1 answer. swept forward, 19, items reusable, the unbounded answer. one character of difference, two problems" tabindex="0" role="region" aria-label="Mathematical notation">for each item:   for w = W down to weight(i):   row[w] = max(row[w], row[w − weight(i)] + value(i))
 for each item:   for w = weight(i) up to W:     row[w] = max(row[w], row[w − weight(i)] + value(i))
 
 items 2/3, 3/5, 5/9 and a capacity of 11
@@ -1312,11 +1312,11 @@ one character of difference, two problems</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the loop direction encodes which row you are reading from, and the code never says which row it means.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The grid&#x27;s rows are read once, so only one is needed</h3><p><span class="math">V(i, w)</span> reads <span class="math">V(i−1, w)</span> and <span class="math">V(i−1, w − weight(i))</span>, both in the row immediately above. Nothing ever reads two rows up. So the whole table can be one array of <span class="math">W + 1</span> numbers, overwritten once per item, and the space falls from <span class="math">Θ(nW)</span> to <span class="math">Θ(W)</span> with the same <span class="math">Θ(nW)</span> time.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Swept backward, a cell reads the previous item&#x27;s values</h3><p>Going from <span class="math">W</span> down to the item's weight, the cell at <span class="math">w</span> reads <span class="math">w − weight(i)</span>, which is to its left and has not been touched yet in this pass. So it still holds the value from before this item was considered, which is exactly <span class="math">V(i−1, ·)</span>. The item can therefore be used at most once, and the single row reproduces the grid exactly.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Swept forward, a cell reads this item&#x27;s own updates</h3><p>Going upward, the cell at <span class="math">w</span> reads <span class="math">w − weight(i)</span>, which this same pass has already updated. That value may already include one copy of the current item, so adding another gives two, and the pass can stack as many copies as fit. The result is the unbounded knapsack, correctly solved &mdash; by code that differs from the 0/1 version only in which way the loop counts.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The grid&#x27;s rows are read once, so only one is needed</h3><p><span class="math" data-say="V of i and w">V(i, w)</span> reads <span class="math" data-say="V of i minus 1 and w">V(i−1, w)</span> and <span class="math" data-say="V of i minus 1 and w minus weight of i">V(i−1, w − weight(i))</span>, both in the row immediately above. Nothing ever reads two rows up. So the whole table can be one array of <span class="math" data-say="W plus 1">W + 1</span> numbers, overwritten once per item, and the space falls from <span class="math" data-say="theta of n W">Θ(nW)</span> to <span class="math" data-say="theta of W">Θ(W)</span> with the same <span class="math" data-say="theta of n W">Θ(nW)</span> time.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Swept backward, a cell reads the previous item&#x27;s values</h3><p>Going from <span class="math" data-say="W">W</span> down to the item's weight, the cell at <span class="math" data-say="w">w</span> reads <span class="math" data-say="w minus weight of i">w − weight(i)</span>, which is to its left and has not been touched yet in this pass. So it still holds the value from before this item was considered, which is exactly <span class="math" data-say="V of i minus 1 and times">V(i−1, ·)</span>. The item can therefore be used at most once, and the single row reproduces the grid exactly.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Swept forward, a cell reads this item&#x27;s own updates</h3><p>Going upward, the cell at <span class="math" data-say="w">w</span> reads <span class="math" data-say="w minus weight of i">w − weight(i)</span>, which this same pass has already updated. That value may already include one copy of the current item, so adding another gives two, and the pass can stack as many copies as fit. The result is the unbounded knapsack, correctly solved &mdash; by code that differs from the 0/1 version only in which way the loop counts.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>One array, two directions, and two different problems</h2></div><p>Why one row suffices, what each direction reads, the proof that backward is 0/1, and what the space saving costs.</p></div>
-      <article class="card card-pad prose"><p>Look again at the recurrence. <span class="math">V(i, w)</span> is the larger of <span class="math">V(i−1, w)</span> and <span class="math">value(i) + V(i−1, w − weight(i))</span>. Both terms are in row <span class="math">i−1</span>. Row <span class="math">i−2</span> is never mentioned, and once row <span class="math">i</span> is complete row <span class="math">i−1</span> is never read again. A table whose rows are used once and discarded does not need to be stored.</p><div class="defbox"><span class="label">Definition &middot; The one-row form</span><p>Keep an array <span class="math">row[0..W]</span>, initialised to zero. For each item in turn, update <span class="math">row[w] = max(row[w], row[w − weight(i)] + value(i))</span> for every <span class="math">w</span> from <span class="math">weight(i)</span> to <span class="math">W</span>. The order in which those <span class="math">w</span> are visited is not specified by the recurrence and is the subject of this lesson.</p></div><div class="thm"><span class="label">Theorem &middot; Backward gives 0/1; forward gives unbounded</span><p>If the inner loop runs <span class="math">w</span> from <span class="math">W</span> downward, the array after item <span class="math">i</span> equals row <span class="math">i</span> of the 0/1 grid. If it runs <span class="math">w</span> upward, the array after item <span class="math">i</span> holds the best value obtainable from the first <span class="math">i</span> items with each usable any number of times.</p></div><div class="proof"><p>Downward: when <span class="math">w</span> is updated, the cell at <span class="math">w − weight(i)</span> is strictly to the left and, because the loop is descending, has not yet been visited in this pass. It therefore still holds the value it had before item <span class="math">i</span> was considered, which by induction is <span class="math">V(i−1, w − weight(i))</span>. So the update computes exactly <span class="math">max(V(i−1, w), value(i) + V(i−1, w − weight(i)))</span>, which is the grid's recurrence, and the array after the pass is row <span class="math">i</span>.</p><p>Upward: the cell at <span class="math">w − weight(i)</span> has already been visited this pass, so it holds the best value using items <span class="math">1..i</span> with item <span class="math">i</span> allowed. Adding one more copy of item <span class="math">i</span> therefore extends a solution that may already contain it, and by induction on <span class="math">w</span> the array holds the unbounded optimum over the first <span class="math">i</span> items. Both statements are exact; neither direction is an approximation of the other.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Three items, capacity eleven, and the two rows in full</span><p>The items are <span class="math">2/3</span>, <span class="math">3/5</span> and <span class="math">5/9</span>. Swept backward the array ends <span class="math">0 0 3 5 5 9 9 12 14 14 17 17</span>, so the answer is 17, which is all three items at a total weight of 10. Swept forward it ends <span class="math">0 0 3 5 6 9 10 12 14 15 18 19</span>, so the answer is 19, which is two copies of <span class="math">3/5</span> and one of <span class="math">5/9</span> at a total weight of exactly 11. The grid, filled in full, also says 17, and every one of the eight subsets says 17.</p></div><h3>Watching the first item make the difference</h3><p>The clearest place to see it is after the first pass. Backward, item <span class="math">2/3</span> leaves the array <span class="math">0 0 3 3 3 3 3 3 3 3 3 3</span>: one copy of a weight-2 item is all that any capacity can hold, because the item appears once. Forward, the same item leaves <span class="math">0 0 3 3 6 6 9 9 12 12 15 15</span>: at capacity 4 it has been taken twice, at capacity 6 three times, and the pass built each of those on the value it had just written two columns earlier.</p><h3>What the collapse costs</h3><p>The reconstruction. The grid records, for each cell, which cell it came from, and the walk back through those pointers is what produced the item set on the previous page. One row has nowhere to keep them: by the time the answer is known, every intermediate value has been overwritten. So the one-row form answers what the optimum is and not what it consists of, and the panel's one-row figures sit beside the grid's rather than replacing them.</p><p>That is the trade in one sentence: <span class="math">Θ(W)</span> space instead of <span class="math">Θ(nW)</span>, at the cost of the object. Recovering the object from one row means either keeping the rows after all, or running the whole thing again with a divide-and-conquer trick that this course does not develop. Knowing which of the two questions you are answering is the point.</p><p>The measured figures are 17 and 19 on three items at capacity 11, with the grid and the enumeration of all eight subsets both confirming 17. The proved statement is that time is <span class="math">Θ(nW)</span> in both forms and space falls from <span class="math">Θ(nW)</span> to <span class="math">Θ(W)</span> &mdash; 48 cells against 12 numbers here, which at this size is a saving of thirty-six words and no wall-clock time at all. The space bound is what makes the collapse worth knowing; this instance is far too small to show it, and saying so is more useful than a ratio measured on twelve numbers.</p></article>
+      <article class="card card-pad prose"><p>Look again at the recurrence. <span class="math" data-say="V of i and w">V(i, w)</span> is the larger of <span class="math" data-say="V of i minus 1 and w">V(i−1, w)</span> and <span class="math" data-say="value of i plus V of i minus 1 and w minus weight of i">value(i) + V(i−1, w − weight(i))</span>. Both terms are in row <span class="math" data-say="i minus 1">i−1</span>. Row <span class="math" data-say="i minus 2">i−2</span> is never mentioned, and once row <span class="math" data-say="i">i</span> is complete row <span class="math" data-say="i minus 1">i−1</span> is never read again. A table whose rows are used once and discarded does not need to be stored.</p><div class="defbox"><span class="label">Definition &middot; The one-row form</span><p>Keep an array <span class="math" data-say="row at 0, W">row[0..W]</span>, initialised to zero. For each item in turn, update <span class="math" data-say="row at w equals the max of row at w and row at w minus weight of i plus value of i">row[w] = max(row[w], row[w − weight(i)] + value(i))</span> for every <span class="math" data-say="w">w</span> from <span class="math" data-say="weight of i">weight(i)</span> to <span class="math" data-say="W">W</span>. The order in which those <span class="math" data-say="w">w</span> are visited is not specified by the recurrence and is the subject of this lesson.</p></div><div class="thm"><span class="label">Theorem &middot; Backward gives 0/1; forward gives unbounded</span><p>If the inner loop runs <span class="math" data-say="w">w</span> from <span class="math" data-say="W">W</span> downward, the array after item <span class="math" data-say="i">i</span> equals row <span class="math" data-say="i">i</span> of the 0/1 grid. If it runs <span class="math" data-say="w">w</span> upward, the array after item <span class="math" data-say="i">i</span> holds the best value obtainable from the first <span class="math" data-say="i">i</span> items with each usable any number of times.</p></div><div class="proof"><p>Downward: when <span class="math" data-say="w">w</span> is updated, the cell at <span class="math" data-say="w minus weight of i">w − weight(i)</span> is strictly to the left and, because the loop is descending, has not yet been visited in this pass. It therefore still holds the value it had before item <span class="math" data-say="i">i</span> was considered, which by induction is <span class="math" data-say="V of i minus 1 and w minus weight of i">V(i−1, w − weight(i))</span>. So the update computes exactly <span class="math" data-say="the max of V of i minus 1 and w and value of i plus V of i minus 1 and w minus weight of i">max(V(i−1, w), value(i) + V(i−1, w − weight(i)))</span>, which is the grid's recurrence, and the array after the pass is row <span class="math" data-say="i">i</span>.</p><p>Upward: the cell at <span class="math" data-say="w minus weight of i">w − weight(i)</span> has already been visited this pass, so it holds the best value using items <span class="math" data-say="1, i">1..i</span> with item <span class="math" data-say="i">i</span> allowed. Adding one more copy of item <span class="math" data-say="i">i</span> therefore extends a solution that may already contain it, and by induction on <span class="math" data-say="w">w</span> the array holds the unbounded optimum over the first <span class="math" data-say="i">i</span> items. Both statements are exact; neither direction is an approximation of the other.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Three items, capacity eleven, and the two rows in full</span><p>The items are <span class="math" data-say="2 over 3">2/3</span>, <span class="math" data-say="3 over 5">3/5</span> and <span class="math" data-say="5 over 9">5/9</span>. Swept backward the array ends <span class="math" data-say="0 0 3 5 5 9 9 12 14 14 17 17">0 0 3 5 5 9 9 12 14 14 17 17</span>, so the answer is 17, which is all three items at a total weight of 10. Swept forward it ends <span class="math" data-say="0 0 3 5 6 9 10 12 14 15 18 19">0 0 3 5 6 9 10 12 14 15 18 19</span>, so the answer is 19, which is two copies of <span class="math" data-say="3 over 5">3/5</span> and one of <span class="math" data-say="5 over 9">5/9</span> at a total weight of exactly 11. The grid, filled in full, also says 17, and every one of the eight subsets says 17.</p></div><h3>Watching the first item make the difference</h3><p>The clearest place to see it is after the first pass. Backward, item <span class="math" data-say="2 over 3">2/3</span> leaves the array <span class="math" data-say="0 0 3 3 3 3 3 3 3 3 3 3">0 0 3 3 3 3 3 3 3 3 3 3</span>: one copy of a weight-2 item is all that any capacity can hold, because the item appears once. Forward, the same item leaves <span class="math" data-say="0 0 3 3 6 6 9 9 12 12 15 15">0 0 3 3 6 6 9 9 12 12 15 15</span>: at capacity 4 it has been taken twice, at capacity 6 three times, and the pass built each of those on the value it had just written two columns earlier.</p><h3>What the collapse costs</h3><p>The reconstruction. The grid records, for each cell, which cell it came from, and the walk back through those pointers is what produced the item set on the previous page. One row has nowhere to keep them: by the time the answer is known, every intermediate value has been overwritten. So the one-row form answers what the optimum is and not what it consists of, and the panel's one-row figures sit beside the grid's rather than replacing them.</p><p>That is the trade in one sentence: <span class="math" data-say="theta of W">Θ(W)</span> space instead of <span class="math" data-say="theta of n W">Θ(nW)</span>, at the cost of the object. Recovering the object from one row means either keeping the rows after all, or running the whole thing again with a divide-and-conquer trick that this course does not develop. Knowing which of the two questions you are answering is the point.</p><p>The measured figures are 17 and 19 on three items at capacity 11, with the grid and the enumeration of all eight subsets both confirming 17. The proved statement is that time is <span class="math" data-say="theta of n W">Θ(nW)</span> in both forms and space falls from <span class="math" data-say="theta of n W">Θ(nW)</span> to <span class="math" data-say="theta of W">Θ(W)</span> &mdash; 48 cells against 12 numbers here, which at this size is a saving of thirty-six words and no wall-clock time at all. The space bound is what makes the collapse worth knowing; this instance is far too small to show it, and saying so is more useful than a ratio measured on twelve numbers.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>The grid, what each cell read, and the answer re-weighed</h2></div><p>0/1 against every subset, and the one loop direction that makes it unbounded</p></div>
@@ -1367,7 +1367,7 @@ one character of difference, two problems</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Collapsing a table safely</h2></div><p>Three checks, and the first of them is the one that decides whether the collapse is available at all.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the furthest row any cell reads</h3><p>If it is one, the table collapses to a single row. If cells read two rows back &mdash; some sequence recurrences do &mdash; keep two. If they read arbitrarily far back, as the chain recurrence does, the table does not collapse at all and trying it will produce exactly the silent failure of the fill-order lesson.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Derive the sweep direction from which values you need</h3><p>You need the previous row's value at <span class="math">w − weight(i)</span>. Sweep away from the direction the reads come from, so that the cells you read are the ones you have not yet overwritten. For reads to the left, that means descending.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run both directions and compare with the grid</h3><p>The wrong direction does not fail; it solves a different problem, correctly. The only cheap way to know which one you have written is to keep the full grid around on a small instance and compare, which is what the panel does.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide whether you need the object before you throw the rows away</h3><p>One row cannot be walked back. If the answer has to be a set of items rather than a number, the rows are not dead weight and the space saving is not available at this price.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the furthest row any cell reads</h3><p>If it is one, the table collapses to a single row. If cells read two rows back &mdash; some sequence recurrences do &mdash; keep two. If they read arbitrarily far back, as the chain recurrence does, the table does not collapse at all and trying it will produce exactly the silent failure of the fill-order lesson.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Derive the sweep direction from which values you need</h3><p>You need the previous row's value at <span class="math" data-say="w minus weight of i">w − weight(i)</span>. Sweep away from the direction the reads come from, so that the cells you read are the ones you have not yet overwritten. For reads to the left, that means descending.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run both directions and compare with the grid</h3><p>The wrong direction does not fail; it solves a different problem, correctly. The only cheap way to know which one you have written is to keep the full grid around on a small instance and compare, which is what the panel does.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide whether you need the object before you throw the rows away</h3><p>One row cannot be walked back. If the answer has to be a set of items rather than a number, the rows are not dead weight and the space saving is not available at this price.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1378,7 +1378,7 @@ one character of difference, two problems</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>One row, three items, swept both ways</h3><p>The array holds one number per capacity from 0 to 11 and starts as all zeros. Each line below is the whole array after one item has been processed. The items are A = 2/3, B = 3/5 and C = 5/9, written weight over value.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">capacity        0   1   2   3   4   5   6   7   8   9  10  11
+      <article class="card card-pad prose"><h3>One row, three items, swept both ways</h3><p>The array holds one number per capacity from 0 to 11 and starts as all zeros. Each line below is the whole array after one item has been processed. The items are A = 2/3, B = 3/5 and C = 5/9, written weight over value.</p><div class="mathblock" data-say="a table, shown on the page. swept backward, w from 11 down to the item&#x27;s weight. a table, shown on the page. swept forward, w from the item&#x27;s weight up to 11. a table, shown on the page. the full grid, all four rows, says, 17. every one of the eight subsets says, 17. the forward sweep says, 19. 19 is, 3 over 5 twice and 5 over 9 once, weight 11, value 19" tabindex="0" role="region" aria-label="Mathematical notation">capacity        0   1   2   3   4   5   6   7   8   9  10  11
 
 swept backward, w from 11 down to the item&#x27;s weight
   after A       0   0   3   3   3   3   3   3   3   3   3   3
@@ -1394,7 +1394,7 @@ the full grid, all four rows, says                          17
 every one of the eight subsets says                         17
 the forward sweep says                                      19
                                                             
-19 is  3/5 twice and 5/9 once:  weight 11, value 19</div><p>The first backward line is the tell. After item A the array is 3 at every capacity from 2 upward, because one copy of a weight-2 item is the most that can be in the answer. The first forward line climbs in steps of 3 every two columns, because each cell was built from a cell two to its left that this same pass had already improved.</p><p>Both algorithms are correct. Neither is a bug in the other. If the problem says an item exists once, the backward sweep is the algorithm and the forward one silently answers a question nobody asked; if items are available in unlimited quantity, it is the other way round. The failure this page is about is not an incorrect answer but a correct answer to the wrong question, which is the hardest kind to notice in a number.</p><p>For a faded rehearsal, keep the items and drop the capacity to 5 before running it. The supplied first move: at capacity 5 the backward answer must be one of <span class="math">2/3 + 3/5</span>, <span class="math">5/9</span> alone, or less, so it is 9 or less. Work out both sweeps by hand for the five columns, then check them &mdash; and note that the two agree at some capacities and not at others, which is why spot-checking one column proves nothing.</p></article>
+19 is  3/5 twice and 5/9 once:  weight 11, value 19</div><p>The first backward line is the tell. After item A the array is 3 at every capacity from 2 upward, because one copy of a weight-2 item is the most that can be in the answer. The first forward line climbs in steps of 3 every two columns, because each cell was built from a cell two to its left that this same pass had already improved.</p><p>Both algorithms are correct. Neither is a bug in the other. If the problem says an item exists once, the backward sweep is the algorithm and the forward one silently answers a question nobody asked; if items are available in unlimited quantity, it is the other way round. The failure this page is about is not an incorrect answer but a correct answer to the wrong question, which is the hardest kind to notice in a number.</p><p>For a faded rehearsal, keep the items and drop the capacity to 5 before running it. The supplied first move: at capacity 5 the backward answer must be one of <span class="math" data-say="2 over 3 plus 3 over 5">2/3 + 3/5</span>, <span class="math" data-say="5 over 9">5/9</span> alone, or less, so it is 9 or less. Work out both sweeps by hand for the five columns, then check them &mdash; and note that the two agree at some capacities and not at others, which is why spot-checking one column proves nothing.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1439,7 +1439,7 @@ the forward sweep says                                      19
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math">n²2ⁿ</span> and <span class="math">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
+      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math" data-say="n squared 2 to the power n">n²2ⁿ</span> and <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1498,7 +1498,7 @@ the forward sweep says                                      19
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Why can the 0/1 knapsack grid be collapsed to a single row?", "a": ["Because the values in each row are non-decreasing", "Because no cell ever reads a row more than one above itself", "Because the capacity axis is longer than the item axis", "Because the reconstruction only needs the last row"], "c": 1, "why": "<span class=\"math\">V(i, w)<\/span> reads <span class=\"math\">V(i\u22121, w)<\/span> and <span class=\"math\">V(i\u22121, w \u2212 weight(i))<\/span>, and nothing reads further back, so a row is dead as soon as the next one is complete. Monotonicity along a row is true but irrelevant, the axis lengths do not matter, and the reconstruction is precisely what the collapse destroys."}, {"q": "The forward sweep reports 19 where the grid reports 17. What is wrong with the forward sweep?", "a": ["It reads a cell before that cell has been written", "It double-counts the capacity, so its answer exceeds the true optimum", "Nothing: it correctly solves the unbounded problem, where items may be reused", "It uses a strict inequality where the comparison should be non-strict"], "c": 2, "why": "19 is achievable: two copies of <span class=\"math\">3/5<\/span> and one of <span class=\"math\">5/9<\/span> weigh exactly 11 and are worth 19. The sweep is a correct algorithm for a different problem, and every cell it reads has been written &mdash; written by this same pass, which is exactly what allows the reuse."}, {"q": "You need the set of items, not just the best value. What does that rule out?", "a": ["The one-row form, because the intermediate values it would need are overwritten", "The backward sweep, because it visits capacities in the wrong order for a walk", "The grid, because it stores values rather than items", "Nothing: the set can be recovered from the final row by subtracting weights"], "c": 0, "why": "The walk back needs to know, for each item, what the array looked like before that item was processed, and one row keeps none of that. The grid keeps it, which is why the previous lesson could return a set. Recovering the set from a final row by subtracting weights is not reliable: several different sets can produce the same final row."}, {"q": "A sequence recurrence has cells that read two rows back. What follows for the collapse?", "a": ["It still collapses to one row, with the reads taken from the current pass", "It collapses to two rows rather than one", "It does not collapse, because the fill order would be violated", "It collapses only if the sweep runs forward"], "c": 1, "why": "The rule is to keep as many rows as the furthest read reaches back, so two reads back means two rows. Taking those reads from the current pass would silently change the problem, as the forward sweep does. Recurrences that read arbitrarily far back &mdash; the matrix chain, for one &mdash; are the ones that do not collapse."}];
+  var QUIZ = [{"q": "Why can the 0/1 knapsack grid be collapsed to a single row?", "a": ["Because the values in each row are non-decreasing", "Because no cell ever reads a row more than one above itself", "Because the capacity axis is longer than the item axis", "Because the reconstruction only needs the last row"], "c": 1, "why": "<span class=\"math\" data-say=\"V of i and w\">V(i, w)<\/span> reads <span class=\"math\" data-say=\"V of i minus 1 and w\">V(i\u22121, w)<\/span> and <span class=\"math\" data-say=\"V of i minus 1 and w minus weight of i\">V(i\u22121, w \u2212 weight(i))<\/span>, and nothing reads further back, so a row is dead as soon as the next one is complete. Monotonicity along a row is true but irrelevant, the axis lengths do not matter, and the reconstruction is precisely what the collapse destroys."}, {"q": "The forward sweep reports 19 where the grid reports 17. What is wrong with the forward sweep?", "a": ["It reads a cell before that cell has been written", "It double-counts the capacity, so its answer exceeds the true optimum", "Nothing: it correctly solves the unbounded problem, where items may be reused", "It uses a strict inequality where the comparison should be non-strict"], "c": 2, "why": "19 is achievable: two copies of <span class=\"math\" data-say=\"3 over 5\">3/5<\/span> and one of <span class=\"math\" data-say=\"5 over 9\">5/9<\/span> weigh exactly 11 and are worth 19. The sweep is a correct algorithm for a different problem, and every cell it reads has been written &mdash; written by this same pass, which is exactly what allows the reuse."}, {"q": "You need the set of items, not just the best value. What does that rule out?", "a": ["The one-row form, because the intermediate values it would need are overwritten", "The backward sweep, because it visits capacities in the wrong order for a walk", "The grid, because it stores values rather than items", "Nothing: the set can be recovered from the final row by subtracting weights"], "c": 0, "why": "The walk back needs to know, for each item, what the array looked like before that item was processed, and one row keeps none of that. The grid keeps it, which is why the previous lesson could return a set. Recovering the set from a final row by subtracting weights is not reliable: several different sets can produce the same final row."}, {"q": "A sequence recurrence has cells that read two rows back. What follows for the collapse?", "a": ["It still collapses to one row, with the reads taken from the current pass", "It collapses to two rows rather than one", "It does not collapse, because the fill order would be violated", "It collapses only if the sweep runs forward"], "c": 1, "why": "The rule is to keep as many rows as the furthest read reaches back, so two reads back means two rows. Taking those reads from the current pass would silently change the problem, as the forward sweep does. Recurrences that read arbitrarily far back &mdash; the matrix chain, for one &mdash; are the ones that do not collapse."}];
 
   (function () {
 
@@ -3378,6 +3378,160 @@ the forward sweep says                                      19
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>

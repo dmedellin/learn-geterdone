@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Replication and Consistency &middot; What it costs</span>
         <h1>Reads Scale, Writes Do Not</h1>
-        <p>Adding replicas buys read capacity and nothing else. <span class="math">N</span> copies serve <span class="math">N×</span> the reads, accept <span class="math">1×</span> the writes however many you buy, apply <span class="math">N×</span> the write work and hold <span class="math">N×</span> the bytes. What a real mixed workload gains is <span class="math">1/(w + r/N)</span>, and the ceiling on that is <span class="math">1 + ρ</span> — a property of the read/write ratio rather than of the fleet, which is why a write-heavy service gets nothing from replication and pays <span class="math">N</span> times for it.</p>
+        <p>Adding replicas buys read capacity and nothing else. <span class="math" data-say="N">N</span> copies serve <span class="math" data-say="N times">N×</span> the reads, accept <span class="math" data-say="1 times">1×</span> the writes however many you buy, apply <span class="math" data-say="N times">N×</span> the write work and hold <span class="math" data-say="N times">N×</span> the bytes. What a real mixed workload gains is <span class="math" data-say="1 over the quantity w plus r over N">1/(w + r/N)</span>, and the ceiling on that is <span class="math" data-say="1 plus rho">1 + ρ</span> — a property of the read/write ratio rather than of the fleet, which is why a write-heavy service gets nothing from replication and pays <span class="math" data-say="N">N</span> times for it.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">N replicas:  N× reads,  1× writes,  N× write work,  N× storage
+        <div class="mathblock" data-say="N replicas, N times reads, 1 times writes, N times write work, N times storage. rho reads per write, w equals 1 over the quantity 1 plus rho, writes, r equals rho over the quantity 1 plus rho, reads. speed-up of N equals 1 over the quantity w plus r over N, only the read share divides. ceiling equals 1 plus rho, set by the mix, never reached. N equals 3, rho equals 9, 2.5 times of a ceiling of 10 times, for 3 times the write work" tabindex="0" role="region" aria-label="Mathematical notation">N replicas:  N× reads,  1× writes,  N× write work,  N× storage
 ρ reads per write:  w = 1/(1 + ρ) writes,  r = ρ/(1 + ρ) reads
 speed-up(N) = 1 / (w + r/N)        only the read share divides
 ceiling = 1 + ρ                    set by the mix, never reached
@@ -1309,11 +1309,11 @@ N = 3, ρ = 9:  2.5× of a ceiling of 10×, for 3× the write work</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three sentences, and the third decides whether the replication factor was worth buying at all.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Every replica applies every write</h3><p>A copy that skipped a write would not be a copy. So each write is applied <span class="math">N</span> times, once per replica, and the rate at which the cluster can accept writes is exactly the rate at which one machine can apply them — <span class="math">1×</span>, at <span class="math">N = 3</span> and at <span class="math">N = 30</span>. The <span class="math">N×</span> that replication is sold on is the read side and only the read side.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Only the read stream divides</h3><p>Reads can be served by any replica that holds the data, so <span class="math">N</span> replicas serve <span class="math">N</span> times the reads of one. That is a genuine multiplier and it is the reason to replicate. It is also the only one of the four numbers that moves in your favour: the write work and the storage move against you at exactly the same rate.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The ceiling belongs to the workload, not to the fleet</h3><p>If a fraction <span class="math">w</span> of operations are writes and <span class="math">r = 1 − w</span> are reads, the cluster does <span class="math">1/(w + r/N)</span> times the work of one machine. Send <span class="math">N</span> to infinity and the reads cost nothing, leaving <span class="math">1/w = 1 + ρ</span>. At nine reads per write that ceiling is <span class="math">10×</span>; at one read per write it is <span class="math">2×</span>; at zero reads it is <span class="math">1×</span>. No number of replicas raises it, because every replica still applies every write.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Every replica applies every write</h3><p>A copy that skipped a write would not be a copy. So each write is applied <span class="math" data-say="N">N</span> times, once per replica, and the rate at which the cluster can accept writes is exactly the rate at which one machine can apply them — <span class="math" data-say="1 times">1×</span>, at <span class="math" data-say="N equals 3">N = 3</span> and at <span class="math" data-say="N equals 30">N = 30</span>. The <span class="math" data-say="N times">N×</span> that replication is sold on is the read side and only the read side.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Only the read stream divides</h3><p>Reads can be served by any replica that holds the data, so <span class="math" data-say="N">N</span> replicas serve <span class="math" data-say="N">N</span> times the reads of one. That is a genuine multiplier and it is the reason to replicate. It is also the only one of the four numbers that moves in your favour: the write work and the storage move against you at exactly the same rate.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The ceiling belongs to the workload, not to the fleet</h3><p>If a fraction <span class="math" data-say="w">w</span> of operations are writes and <span class="math" data-say="r equals 1 minus w">r = 1 − w</span> are reads, the cluster does <span class="math" data-say="1 over the quantity w plus r over N">1/(w + r/N)</span> times the work of one machine. Send <span class="math" data-say="N">N</span> to infinity and the reads cost nothing, leaving <span class="math" data-say="1 over w equals 1 plus rho">1/w = 1 + ρ</span>. At nine reads per write that ceiling is <span class="math" data-say="10 times">10×</span>; at one read per write it is <span class="math" data-say="2 times">2×</span>; at zero reads it is <span class="math" data-say="1 times">1×</span>. No number of replicas raises it, because every replica still applies every write.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>What a replication factor buys, and what it bills</h2></div><p>The four multipliers, the speed-up a real mix actually gets, and the ceiling that no fleet size reaches.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Replication factor, and the four multipliers</span><p>A <strong>replication factor</strong> of <span class="math">N</span> keeps <span class="math">N</span> complete copies of the data. Against a single machine it multiplies <strong>read capacity</strong> by <span class="math">N</span>, <strong>write capacity</strong> by <span class="math">1</span>, <strong>write work</strong> by <span class="math">N</span> and <strong>storage</strong> by <span class="math">N</span>. The first is the benefit; the other three are the bill.</p></div><p>The asymmetry is not an implementation detail that a better design removes. It follows from what a replica is. A read is answered by one copy, so copies divide the read stream between them; a write must reach every copy, so copies multiply the write stream instead.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">one replica serves 1000 ops/s,  ρ = 9 reads per write
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Replication factor, and the four multipliers</span><p>A <strong>replication factor</strong> of <span class="math" data-say="N">N</span> keeps <span class="math" data-say="N">N</span> complete copies of the data. Against a single machine it multiplies <strong>read capacity</strong> by <span class="math" data-say="N">N</span>, <strong>write capacity</strong> by <span class="math" data-say="1">1</span>, <strong>write work</strong> by <span class="math" data-say="N">N</span> and <strong>storage</strong> by <span class="math" data-say="N">N</span>. The first is the benefit; the other three are the bill.</p></div><p>The asymmetry is not an implementation detail that a better design removes. It follows from what a replica is. A read is answered by one copy, so copies divide the read stream between them; a write must reach every copy, so copies multiply the write stream instead.</p><div class="mathblock" data-say="one replica serves 1000 ops per second, rho equals 9 reads per write. N, read capacity, write capacity, write work, storage. a table, shown on the page. column three is constant by construction, not by coincidence" tabindex="0" role="region" aria-label="Mathematical notation">one replica serves 1000 ops/s,  ρ = 9 reads per write
 
  N    read capacity    write capacity    write work    storage
  1     1000 reads/s     1000 writes/s        1×           1×
@@ -1321,7 +1321,7 @@ N = 3, ρ = 9:  2.5× of a ceiling of 10×, for 3× the write work</div>
  3     3000             1000                 3×           3×
  4     4000             1000                 4×           4×
 
-column three is constant by construction, not by coincidence</div><p>Neither of the first two columns is what the cluster serves, because a real workload is a mix. The read capacity is what you would get if every operation were a read, and the write capacity is what you would get if every operation were a write. The mix decides where between them you land.</p><h3>The mix decides, and it sets a ceiling</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">at ρ = 9 reads per write:  w = 1/10 of the ops are writes
+column three is constant by construction, not by coincidence</div><p>Neither of the first two columns is what the cluster serves, because a real workload is a mix. The read capacity is what you would get if every operation were a read, and the write capacity is what you would get if every operation were a write. The mix decides where between them you land.</p><h3>The mix decides, and it sets a ceiling</h3><div class="mathblock" data-say="at rho equals 9 reads per write, w equals 1 over 10 of the ops are writes. r equals 9 over 10 are reads. speed-up of N equals 1 over the quantity w plus r over N. N equals 1, 1 over the quantity 1 over 10 plus 9 over 10, equals 1 times. N equals 3, 1 over the quantity 1 over 10 plus 3 over 10, equals 1 over the quantity 2 over 5, equals 2.5 times. N equals 12, 1 over the quantity 1 over 10 plus 3 over 40, equals 1 over the quantity 7 over 40, equals 5.714 and so on times. N to infinity, 1 over the quantity 1 over 10, equals 10 times, equals 1 plus rho" tabindex="0" role="region" aria-label="Mathematical notation">at ρ = 9 reads per write:  w = 1/10 of the ops are writes
                            r = 9/10 are reads
 
 speed-up(N) = 1 / (w + r/N)
@@ -1329,7 +1329,7 @@ speed-up(N) = 1 / (w + r/N)
   N = 1    1 / (1/10 + 9/10)      = 1×
   N = 3    1 / (1/10 + 3/10)      = 1/(2/5)   = 2.5×
   N = 12   1 / (1/10 + 3/40)      = 1/(7/40)  = 5.714…×
-  N → ∞    1 / (1/10)             = 10×       = 1 + ρ</div><p>The shape is the one Scaling Laws and Cost will name: a serial part that no amount of parallelism divides. Here the serial part is the write, and it is serial in a precise sense — every machine does all of it. Three replicas at nine reads per write reach <span class="math">2.5×</span> of a possible <span class="math">10×</span>, and the remaining nine machines in the world cannot close that gap.</p><div class="example"><span class="label">Example &middot; The write-heavy service</span><p>At <span class="math">ρ = 0</span> — every operation a write — <span class="math">w = 1</span>, so <span class="math">speed-up(N) = 1/(1 + 0) = 1×</span> at every <span class="math">N</span>, and the ceiling <span class="math">1 + ρ</span> is <span class="math">1×</span> as well. Three replicas serve exactly what one served, for three times the storage and three times the write work. This is not a corner case: an append-only ingest path, a metrics writer or an audit log can sit very close to it, and replicating one of those buys durability and availability and no throughput whatsoever. Those are good reasons to replicate. They are not this reason.</p></div><p>So the honest report of a replication factor is four numbers and a ratio, not one number. “We tripled the replicas” is a statement about the storage bill; whether it is also a statement about throughput depends entirely on <span class="math">ρ</span>, and <span class="math">ρ</span> is a measurement of the workload that Capacity Estimation already taught you to take.</p></article>
+  N → ∞    1 / (1/10)             = 10×       = 1 + ρ</div><p>The shape is the one Scaling Laws and Cost will name: a serial part that no amount of parallelism divides. Here the serial part is the write, and it is serial in a precise sense — every machine does all of it. Three replicas at nine reads per write reach <span class="math" data-say="2.5 times">2.5×</span> of a possible <span class="math" data-say="10 times">10×</span>, and the remaining nine machines in the world cannot close that gap.</p><div class="example"><span class="label">Example &middot; The write-heavy service</span><p>At <span class="math" data-say="rho equals 0">ρ = 0</span> — every operation a write — <span class="math" data-say="w equals 1">w = 1</span>, so <span class="math" data-say="speed-up of N equals 1 over the quantity 1 plus 0, equals 1 times">speed-up(N) = 1/(1 + 0) = 1×</span> at every <span class="math" data-say="N">N</span>, and the ceiling <span class="math" data-say="1 plus rho">1 + ρ</span> is <span class="math" data-say="1 times">1×</span> as well. Three replicas serve exactly what one served, for three times the storage and three times the write work. This is not a corner case: an append-only ingest path, a metrics writer or an audit log can sit very close to it, and replicating one of those buys durability and availability and no throughput whatsoever. Those are good reasons to replicate. They are not this reason.</p></div><p>So the honest report of a replication factor is four numbers and a ratio, not one number. “We tripled the replicas” is a statement about the storage bill; whether it is also a statement about throughput depends entirely on <span class="math" data-say="rho">ρ</span>, and <span class="math" data-say="rho">ρ</span> is a measurement of the workload that Capacity Estimation already taught you to take.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reads scale, writes do not</h2></div><p>Four multipliers, and the read/write ratio that caps the third</p></div>
@@ -1345,7 +1345,7 @@ speed-up(N) = 1 / (w + r/N)
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Set the replication factor and the mix</h3>
-          <p>The four multipliers, the cluster throughput and the ceiling are all computed from <span class="math">N</span> and the read/write ratio. Move <span class="math">ρ</span> to zero and watch the speed-up collapse to <span class="math">1×</span> at every replication factor while the storage column keeps climbing.</p>
+          <p>The four multipliers, the cluster throughput and the ceiling are all computed from <span class="math" data-say="N">N</span> and the read/write ratio. Move <span class="math" data-say="rho">ρ</span> to zero and watch the speed-up collapse to <span class="math" data-say="1 times">1×</span> at every replication factor while the storage column keeps climbing.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="fnN">Replicas N</label><span class="range-value" id="fnNOut">3</span></div>
           <input id="fnN" type="range" min="1" max="12" step="1" value="3" />
@@ -1371,8 +1371,8 @@ speed-up(N) = 1 / (w + r/N)
       </div>
     </section>
     <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a replication factor</h2></div><p>The ratio comes first. Every number after it is arithmetic, and every argument about whether replication helped is really an argument about <span class="math">ρ</span>.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure the read/write ratio before anything else</h3><p><span class="math">ρ</span> is reads per write on the workload you actually have, not the one in the design document. A cache in front of the database removes reads and lowers <span class="math">ρ</span>, which lowers the ceiling; a fan-out that turns one user action into twenty reads raises it. Take this number from a trace.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the four multipliers down separately</h3><p><span class="math">N×</span> reads, <span class="math">1×</span> writes, <span class="math">N×</span> write work, <span class="math">N×</span> storage. Keeping them apart is what stops the read multiplier from being quoted as though it were the cluster's.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the speed-up, and put the ceiling beside it</h3><p><span class="math">1/(w + r/N)</span> against <span class="math">1 + ρ</span>. Two numbers, always together: the second says how much of the possible gain the first one is, and how much buying more machines could ever add.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Charge the write work and the storage against the gain</h3><p><span class="math">N</span> times the bytes and <span class="math">N</span> times the write applications are paid whether or not the reads arrived. If the speed-up is <span class="math">2.5×</span> for a <span class="math">3×</span> bill, say so; that may still be the right trade, but it is a trade and not a win.</p></article></div>
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a replication factor</h2></div><p>The ratio comes first. Every number after it is arithmetic, and every argument about whether replication helped is really an argument about <span class="math" data-say="rho">ρ</span>.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure the read/write ratio before anything else</h3><p><span class="math" data-say="rho">ρ</span> is reads per write on the workload you actually have, not the one in the design document. A cache in front of the database removes reads and lowers <span class="math" data-say="rho">ρ</span>, which lowers the ceiling; a fan-out that turns one user action into twenty reads raises it. Take this number from a trace.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the four multipliers down separately</h3><p><span class="math" data-say="N times">N×</span> reads, <span class="math" data-say="1 times">1×</span> writes, <span class="math" data-say="N times">N×</span> write work, <span class="math" data-say="N times">N×</span> storage. Keeping them apart is what stops the read multiplier from being quoted as though it were the cluster's.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the speed-up, and put the ceiling beside it</h3><p><span class="math" data-say="1 over the quantity w plus r over N">1/(w + r/N)</span> against <span class="math" data-say="1 plus rho">1 + ρ</span>. Two numbers, always together: the second says how much of the possible gain the first one is, and how much buying more machines could ever add.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Charge the write work and the storage against the gain</h3><p><span class="math" data-say="N">N</span> times the bytes and <span class="math" data-say="N">N</span> times the write applications are paid whether or not the reads arrived. If the speed-up is <span class="math" data-say="2.5 times">2.5×</span> for a <span class="math" data-say="3 times">3×</span> bill, say so; that may still be the right trade, but it is a trade and not a win.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1383,7 +1383,7 @@ speed-up(N) = 1 / (w + r/N)
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Three replicas at nine reads per write</h3><p>One machine serves a thousand operations a second. The workload is nine reads for every write. Two more machines are added. The question is what each of the four currencies did.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">one replica        1000 ops/s
+      <article class="card card-pad prose"><h3>Three replicas at nine reads per write</h3><p>One machine serves a thousand operations a second. The workload is nine reads for every write. Two more machines are added. The question is what each of the four currencies did.</p><div class="mathblock" data-say="one replica, 1000 ops per second. N equals 3, rho equals 9 reads per write. read capacity, 3 times 1000 equals 3000 reads over s. write capacity, 1000 writes over s, at every N. write work, 3 times, every replica applies every write. storage, 3 times, the bytes, three times. the mix, w equals 1 over 10 writes, r equals 9 over 10 reads. speed-u p, 1 over the quantity 1 over 10 plus the quantity 9 over 10, over 3. equals 1 over the quantity 1 over 10 plus 3 over 10. equals 1 over the quantity 2 over 5, equals 5 over 2 equals 2.5 times. cluster, 2.5 times 1000 equals 2500 ops per second. of which 2250 reads over s and 250 writes over s. ceiling, 1 plus rho equals 10 times, and 2.5 times is a quarter of it. N equals 12, 1 over the quantity 1 over 10 plus the quantity 9 over 10, over 12, equals 40 over 7 equals 5.714 and so on times" tabindex="0" role="region" aria-label="Mathematical notation">one replica        1000 ops/s
 N = 3              ρ = 9 reads per write
 
 read capacity      3 × 1000 = 3000 reads/s
@@ -1400,13 +1400,13 @@ cluster            2.5 × 1000 = 2500 ops/s
                    of which 2250 reads/s and 250 writes/s
 
 ceiling            1 + ρ = 10×, and 2.5× is a quarter of it
-N = 12             1 / (1/10 + (9/10)/12) = 40/7 = 5.714…×</div><p>Two and a half times the work for three times the storage and three times the write applications. That is a defensible trade and it is not the <span class="math">3×</span> the replication factor suggests, because a tenth of the operations were never going to divide.</p><p>The last line is the one that changes decisions. Going from three replicas to twelve — four times the fleet — takes the speed-up from <span class="math">2.5×</span> to about <span class="math">5.71×</span>, a little over double, and the ceiling is still <span class="math">10×</span>. Replication is subject to diminishing returns that are set by the workload, and the way to raise the ceiling is to change <span class="math">ρ</span>, which means caching or batching the writes, not buying machines.</p><p>For a faded rehearsal, take the same service at <span class="math">ρ = 2</span> reads per write. The supplied first move is <span class="math">w = 1/3</span>, so the ceiling is <span class="math">3×</span>. Compute the speed-up at <span class="math">N = 3</span> and at <span class="math">N = 12</span>, say what fraction of the ceiling each reaches, and state the storage bill beside each before you check them in the lab.</p></article>
+N = 12             1 / (1/10 + (9/10)/12) = 40/7 = 5.714…×</div><p>Two and a half times the work for three times the storage and three times the write applications. That is a defensible trade and it is not the <span class="math" data-say="3 times">3×</span> the replication factor suggests, because a tenth of the operations were never going to divide.</p><p>The last line is the one that changes decisions. Going from three replicas to twelve — four times the fleet — takes the speed-up from <span class="math" data-say="2.5 times">2.5×</span> to about <span class="math" data-say="5.71 times">5.71×</span>, a little over double, and the ceiling is still <span class="math" data-say="10 times">10×</span>. Replication is subject to diminishing returns that are set by the workload, and the way to raise the ceiling is to change <span class="math" data-say="rho">ρ</span>, which means caching or batching the writes, not buying machines.</p><p>For a faded rehearsal, take the same service at <span class="math" data-say="rho equals 2">ρ = 2</span> reads per write. The supplied first move is <span class="math" data-say="w equals 1 over 3">w = 1/3</span>, so the ceiling is <span class="math" data-say="3 times">3×</span>. Compute the speed-up at <span class="math" data-say="N equals 3">N = 3</span> and at <span class="math" data-say="N equals 12">N = 12</span>, say what fraction of the ceiling each reaches, and state the storage bill beside each before you check them in the lab.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting <span class="math">N×</span> for the cluster when it is <span class="math">N×</span> for the reads only</strong><span>The read capacity and the cluster throughput are different numbers and they differ by the mix. At <span class="math">ρ = 9</span> and <span class="math">N = 3</span> they are <span class="math">3000</span> and <span class="math">2500</span>; at <span class="math">ρ = 1</span> they are <span class="math">3000</span> and <span class="math">1500</span>; at <span class="math">ρ = 0</span> they are <span class="math">3000</span> and <span class="math">1000</span>. Any capacity plan that used the first number has over-provisioned its confidence and under-provisioned its machines.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting that the write work is billed <span class="math">N</span> times</strong><span>Each replica applies the full write stream, so the cluster's total write work is <span class="math">N</span> times one machine's — <span class="math">N</span> times the disk writes, <span class="math">N</span> times the index maintenance, <span class="math">N</span> times the compaction. It is invisible in a throughput number and very visible in a bill, and it is the reason a write-heavy service gets slower per unit of cost as it is replicated.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the ceiling as something a larger fleet reaches</strong><span><span class="math">1 + ρ</span> is a limit, not a target. Every replica still applies every write, so the write share of the work never divides, and the speed-up approaches <span class="math">1 + ρ</span> without arriving. If <span class="math">2.5×</span> of a possible <span class="math">10×</span> is not enough, the lever is <span class="math">ρ</span> — cache the reads elsewhere, batch the writes — because the lever <span class="math">N</span> has already been most of the way pulled.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added replicas” makes you ask for the read/write ratio before anything else.</strong><p>You should be able to state the four multipliers for a given <span class="math">N</span> without hesitating, compute <span class="math">1/(w + r/N)</span> and the ceiling <span class="math">1 + ρ</span> beside it, say what a write-only workload gains from replication, and name the storage and write-work bill in the same sentence as the throughput gain.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That prices replication in capacity. It also has a latency, and the next lesson, “Synchronous Writes Wait for the Slowest”, is where most readers get a number badly wrong for the first time on this course: asked what three replicas cost in write latency against one, almost everyone multiplies, and the write is not waiting for a sum.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting <span class="math" data-say="N times">N×</span> for the cluster when it is <span class="math" data-say="N times">N×</span> for the reads only</strong><span>The read capacity and the cluster throughput are different numbers and they differ by the mix. At <span class="math" data-say="rho equals 9">ρ = 9</span> and <span class="math" data-say="N equals 3">N = 3</span> they are <span class="math" data-say="3000">3000</span> and <span class="math" data-say="2500">2500</span>; at <span class="math" data-say="rho equals 1">ρ = 1</span> they are <span class="math" data-say="3000">3000</span> and <span class="math" data-say="1500">1500</span>; at <span class="math" data-say="rho equals 0">ρ = 0</span> they are <span class="math" data-say="3000">3000</span> and <span class="math" data-say="1000">1000</span>. Any capacity plan that used the first number has over-provisioned its confidence and under-provisioned its machines.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting that the write work is billed <span class="math" data-say="N">N</span> times</strong><span>Each replica applies the full write stream, so the cluster's total write work is <span class="math" data-say="N">N</span> times one machine's — <span class="math" data-say="N">N</span> times the disk writes, <span class="math" data-say="N">N</span> times the index maintenance, <span class="math" data-say="N">N</span> times the compaction. It is invisible in a throughput number and very visible in a bill, and it is the reason a write-heavy service gets slower per unit of cost as it is replicated.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the ceiling as something a larger fleet reaches</strong><span><span class="math" data-say="1 plus rho">1 + ρ</span> is a limit, not a target. Every replica still applies every write, so the write share of the work never divides, and the speed-up approaches <span class="math" data-say="1 plus rho">1 + ρ</span> without arriving. If <span class="math" data-say="2.5 times">2.5×</span> of a possible <span class="math" data-say="10 times">10×</span> is not enough, the lever is <span class="math" data-say="rho">ρ</span> — cache the reads elsewhere, batch the writes — because the lever <span class="math" data-say="N">N</span> has already been most of the way pulled.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added replicas” makes you ask for the read/write ratio before anything else.</strong><p>You should be able to state the four multipliers for a given <span class="math" data-say="N">N</span> without hesitating, compute <span class="math" data-say="1 over the quantity w plus r over N">1/(w + r/N)</span> and the ceiling <span class="math" data-say="1 plus rho">1 + ρ</span> beside it, say what a write-only workload gains from replication, and name the storage and write-work bill in the same sentence as the throughput gain.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That prices replication in capacity. It also has a latency, and the next lesson, “Synchronous Writes Wait for the Slowest”, is where most readers get a number badly wrong for the first time on this course: asked what three replicas cost in write latency against one, almost everyone multiplies, and the write is not waiting for a sum.</div></article>
       </div>
     </section>
     </main>
@@ -1503,7 +1503,7 @@ N = 12             1 / (1/10 + (9/10)/12) = 40/7 = 5.714…×</div><p>Two and a 
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "One replica serves <span class=\"math\">1000<\/span> ops/s and the workload is nine reads per write. You add two more replicas. What does the cluster serve?", "a": ["<span class=\"math\">1000<\/span> ops/s", "<span class=\"math\">2500<\/span> ops/s", "<span class=\"math\">3000<\/span> ops/s", "<span class=\"math\">10 000<\/span> ops/s"], "c": 1, "why": "<span class=\"math\">1/(1/10 + (9/10)/3) = 2.5<\/span>, so <span class=\"math\">2500<\/span> ops/s. <span class=\"math\">3000<\/span> is the read capacity \u2014 what three replicas would serve if every operation were a read. <span class=\"math\">10 000<\/span> is the ceiling <span class=\"math\">1 + \u03c1<\/span>, which no replication factor reaches. <span class=\"math\">1000<\/span> is the write capacity, which is what the cluster would serve if every operation were a write."}, {"q": "Same three replicas. What has happened to the rate at which the cluster can accept writes?", "a": ["It tripled, to <span class=\"math\">3000<\/span> writes/s", "It is unchanged at <span class=\"math\">1000<\/span> writes/s", "It fell to a third, because each write now costs three applications", "It rose by the read/write ratio, to <span class=\"math\">9000<\/span> writes/s"], "c": 1, "why": "Every replica applies every write, so the cluster accepts writes at the rate one machine applies them \u2014 unchanged. It did not fall either: the three applications happen on three machines in parallel, not three times on one. What tripled is the total write work being done, which is why the bill went up while the capacity did not."}, {"q": "Two services, each <span class=\"math\">1000<\/span> ops/s per replica, replicated three ways. One runs at <span class=\"math\">\u03c1 = 9<\/span> reads per write, the other at <span class=\"math\">\u03c1 = 1<\/span>. Which gains more, and what caps each?", "a": ["<span class=\"math\">\u03c1 = 9<\/span>, reaching <span class=\"math\">2.5\u00d7<\/span> against a ceiling of <span class=\"math\">10\u00d7<\/span>; <span class=\"math\">\u03c1 = 1<\/span> reaches <span class=\"math\">1.5\u00d7<\/span> against a ceiling of <span class=\"math\">2\u00d7<\/span>", "<span class=\"math\">\u03c1 = 1<\/span>, because fewer reads means less work to divide", "Neither \u2014 both reach <span class=\"math\">3\u00d7<\/span>, because both have three replicas", "<span class=\"math\">\u03c1 = 9<\/span>, but only because it is running on more machines"], "c": 0, "why": "<span class=\"math\">1/(1/10 + 3/10) = 2.5<\/span> and <span class=\"math\">1/(1/2 + 1/6) = 1.5<\/span>, with ceilings <span class=\"math\">1 + \u03c1<\/span> of <span class=\"math\">10\u00d7<\/span> and <span class=\"math\">2\u00d7<\/span>. The third option is the misconception this lesson exists to break: <span class=\"math\">N<\/span> replicas give <span class=\"math\">N\u00d7<\/span> reads, not <span class=\"math\">N\u00d7<\/span> throughput, and a mixed workload never reaches the read multiplier. The fourth is wrong on its face \u2014 both are running three machines."}];
+  var QUIZ = [{"q": "One replica serves <span class=\"math\" data-say=\"1000\">1000<\/span> ops/s and the workload is nine reads per write. You add two more replicas. What does the cluster serve?", "a": ["<span class=\"math\" data-say=\"1000\">1000<\/span> ops/s", "<span class=\"math\" data-say=\"2500\">2500<\/span> ops/s", "<span class=\"math\" data-say=\"3000\">3000<\/span> ops/s", "<span class=\"math\" data-say=\"10000\">10 000<\/span> ops/s"], "c": 1, "why": "<span class=\"math\" data-say=\"1 over the quantity 1 over 10 plus the quantity 9 over 10, over 3, equals 2.5\">1/(1/10 + (9/10)/3) = 2.5<\/span>, so <span class=\"math\" data-say=\"2500\">2500<\/span> ops/s. <span class=\"math\" data-say=\"3000\">3000<\/span> is the read capacity \u2014 what three replicas would serve if every operation were a read. <span class=\"math\" data-say=\"10000\">10 000<\/span> is the ceiling <span class=\"math\" data-say=\"1 plus rho\">1 + \u03c1<\/span>, which no replication factor reaches. <span class=\"math\" data-say=\"1000\">1000<\/span> is the write capacity, which is what the cluster would serve if every operation were a write."}, {"q": "Same three replicas. What has happened to the rate at which the cluster can accept writes?", "a": ["It tripled, to <span class=\"math\" data-say=\"3000\">3000<\/span> writes/s", "It is unchanged at <span class=\"math\" data-say=\"1000\">1000<\/span> writes/s", "It fell to a third, because each write now costs three applications", "It rose by the read/write ratio, to <span class=\"math\" data-say=\"9000\">9000<\/span> writes/s"], "c": 1, "why": "Every replica applies every write, so the cluster accepts writes at the rate one machine applies them \u2014 unchanged. It did not fall either: the three applications happen on three machines in parallel, not three times on one. What tripled is the total write work being done, which is why the bill went up while the capacity did not."}, {"q": "Two services, each <span class=\"math\" data-say=\"1000\">1000<\/span> ops/s per replica, replicated three ways. One runs at <span class=\"math\" data-say=\"rho equals 9\">\u03c1 = 9<\/span> reads per write, the other at <span class=\"math\" data-say=\"rho equals 1\">\u03c1 = 1<\/span>. Which gains more, and what caps each?", "a": ["<span class=\"math\" data-say=\"rho equals 9\">\u03c1 = 9<\/span>, reaching <span class=\"math\" data-say=\"2.5 times\">2.5\u00d7<\/span> against a ceiling of <span class=\"math\" data-say=\"10 times\">10\u00d7<\/span>; <span class=\"math\" data-say=\"rho equals 1\">\u03c1 = 1<\/span> reaches <span class=\"math\" data-say=\"1.5 times\">1.5\u00d7<\/span> against a ceiling of <span class=\"math\" data-say=\"2 times\">2\u00d7<\/span>", "<span class=\"math\" data-say=\"rho equals 1\">\u03c1 = 1<\/span>, because fewer reads means less work to divide", "Neither \u2014 both reach <span class=\"math\" data-say=\"3 times\">3\u00d7<\/span>, because both have three replicas", "<span class=\"math\" data-say=\"rho equals 9\">\u03c1 = 9<\/span>, but only because it is running on more machines"], "c": 0, "why": "<span class=\"math\" data-say=\"1 over the quantity 1 over 10 plus 3 over 10, equals 2.5\">1/(1/10 + 3/10) = 2.5<\/span> and <span class=\"math\" data-say=\"1 over the quantity 1 over 2 plus 1 over 6, equals 1.5\">1/(1/2 + 1/6) = 1.5<\/span>, with ceilings <span class=\"math\" data-say=\"1 plus rho\">1 + \u03c1<\/span> of <span class=\"math\" data-say=\"10 times\">10\u00d7<\/span> and <span class=\"math\" data-say=\"2 times\">2\u00d7<\/span>. The third option is the misconception this lesson exists to break: <span class=\"math\" data-say=\"N\">N<\/span> replicas give <span class=\"math\" data-say=\"N times\">N\u00d7<\/span> reads, not <span class=\"math\" data-say=\"N times\">N\u00d7<\/span> throughput, and a mixed workload never reaches the read multiplier. The fourth is wrong on its face \u2014 both are running three machines."}];
 
   (function () {
 
@@ -2833,6 +2833,160 @@ N = 12             1 / (1/10 + (9/10)/12) = 40/7 = 5.714…×</div><p>Two and a 
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>

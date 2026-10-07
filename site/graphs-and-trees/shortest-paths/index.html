@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">unweighted: BFS gives shortest paths
+        <div class="mathblock" data-say="unweighted, BFS gives shortest paths. weighted, Dijkstra, settle the nearest unsettled vertex, relax its edges. requires NON-NEGATIVE weights. negative weights implies Bellman to Ford instead" tabindex="0" role="region" aria-label="Mathematical notation">unweighted: BFS gives shortest paths
 weighted:   Dijkstra — settle the nearest unsettled vertex, relax its edges
 requires NON-NEGATIVE weights
 negative weights ⟹ Bellman–Ford instead</div>
@@ -1312,14 +1312,14 @@ negative weights ⟹ Bellman–Ford instead</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Weighted shortest paths</h2></div><p>The algorithm, why it is correct, and where it fails.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Weighted graph and path weight</span><p>A <strong>weighted graph</strong> assigns each edge a number. The <strong>weight</strong> of a path is the sum of its edge weights, and a <strong>shortest path</strong> is one of minimum weight.</p></div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">DIJKSTRA(G, s):
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Weighted graph and path weight</span><p>A <strong>weighted graph</strong> assigns each edge a number. The <strong>weight</strong> of a path is the sum of its edge weights, and a <strong>shortest path</strong> is one of minimum weight.</p></div><div class="mathblock" data-say="DIJKSTRA of G and s. dist at s equals 0, dist at v equals infinity for v is not equal to s, all vertices unsettled. while some unsettled vertex has finite dist. u equals unsettled vertex with smallest dist. settle u. for each neighbour v of u. if dist at u plus w of u and v is less than dist at v. dist at v equals dist at u plus w of u and v, parent at v equals u" tabindex="0" role="region" aria-label="Mathematical notation">DIJKSTRA(G, s):
     dist[s] = 0;  dist[v] = ∞ for v ≠ s;  all vertices unsettled
     while some unsettled vertex has finite dist:
         u = unsettled vertex with smallest dist
         settle u
         for each neighbour v of u:
             if dist[u] + w(u,v) &lt; dist[v]:
-                dist[v] = dist[u] + w(u,v);  parent[v] = u</div><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>With non-negative weights, when Dijkstra settles a vertex <span class="math">u</span>, <span class="math">dist[u]</span> is the true shortest distance from <span class="math">s</span> to <span class="math">u</span>.</p></div><div class="proof"><p>By induction on the order of settling. Suppose every previously settled vertex has its true distance, and consider the moment <span class="math">u</span> is chosen.</p><p>Take any path <span class="math">P</span> from <span class="math">s</span> to <span class="math">u</span>, and let <span class="math">x</span> be its first vertex that is not yet settled, with predecessor <span class="math">y</span> (settled). Then the length of <span class="math">P</span> is at least <span class="math">dist[y] + w(y,x) ≥ dist[x] ≥ dist[u]</span>, the last step because <span class="math">u</span> was chosen as the smallest.</p><p>The first inequality uses that the remaining part of <span class="math">P</span> has non-negative weight &mdash; which is exactly where the hypothesis enters. So no path beats <span class="math">dist[u]</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The proof names the place non-negativity is used, which is the useful way to read it: the argument is fine until a negative edge lets the tail of a path reduce its total.</p><div class="example"><span class="label">Example &middot; Where a negative edge breaks it</span><p>Vertices <span class="math">s, a, b</span> with <span class="math">w(s,a) = 1</span>, <span class="math">w(s,b) = 2</span>, <span class="math">w(b,a) = −2</span>. Dijkstra settles <span class="math">a</span> at distance 1 and never reconsiders, but <span class="math">s → b → a</span> has weight 0. The answer is wrong and the algorithm never notices.</p></div><p>Bellman&ndash;Ford handles negative weights by relaxing every edge <span class="math">n−1</span> times, at cost <span class="math">Θ(n|E|)</span>, and detects negative cycles &mdash; for which no shortest path exists at all, since going round the cycle again always reduces the total.</p><h3>Cost</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">implementation of &quot;smallest unsettled&quot;     cost
+                dist[v] = dist[u] + w(u,v);  parent[v] = u</div><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>With non-negative weights, when Dijkstra settles a vertex <span class="math" data-say="u">u</span>, <span class="math" data-say="dist at u">dist[u]</span> is the true shortest distance from <span class="math" data-say="s">s</span> to <span class="math" data-say="u">u</span>.</p></div><div class="proof"><p>By induction on the order of settling. Suppose every previously settled vertex has its true distance, and consider the moment <span class="math" data-say="u">u</span> is chosen.</p><p>Take any path <span class="math" data-say="P">P</span> from <span class="math" data-say="s">s</span> to <span class="math" data-say="u">u</span>, and let <span class="math" data-say="x">x</span> be its first vertex that is not yet settled, with predecessor <span class="math" data-say="y">y</span> (settled). Then the length of <span class="math" data-say="P">P</span> is at least <span class="math" data-say="dist at y plus w of y and x is greater than or equal to dist at x is greater than or equal to dist at u">dist[y] + w(y,x) ≥ dist[x] ≥ dist[u]</span>, the last step because <span class="math" data-say="u">u</span> was chosen as the smallest.</p><p>The first inequality uses that the remaining part of <span class="math" data-say="P">P</span> has non-negative weight &mdash; which is exactly where the hypothesis enters. So no path beats <span class="math" data-say="dist at u">dist[u]</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The proof names the place non-negativity is used, which is the useful way to read it: the argument is fine until a negative edge lets the tail of a path reduce its total.</p><div class="example"><span class="label">Example &middot; Where a negative edge breaks it</span><p>Vertices <span class="math" data-say="s, A, b">s, a, b</span> with <span class="math" data-say="w of s and A equals 1">w(s,a) = 1</span>, <span class="math" data-say="w of s and b equals 2">w(s,b) = 2</span>, <span class="math" data-say="w of b and A equals negative 2">w(b,a) = −2</span>. Dijkstra settles <span class="math" data-say="A">a</span> at distance 1 and never reconsiders, but <span class="math" data-say="s goes to b goes to a">s → b → a</span> has weight 0. The answer is wrong and the algorithm never notices.</p></div><p>Bellman&ndash;Ford handles negative weights by relaxing every edge <span class="math" data-say="n minus 1">n−1</span> times, at cost <span class="math" data-say="theta of n the size of E">Θ(n|E|)</span>, and detects negative cycles &mdash; for which no shortest path exists at all, since going round the cycle again always reduces the total.</p><h3>Cost</h3><div class="mathblock" data-say="implementation of smallest unsettled, cost. linear scan, theta of the quantity n squared plus the size of E. binary heap, theta of the quantity n plus the size of E, times log n. Fibonacci heap, theta of the quantity the size of E, plus n times log n" tabindex="0" role="region" aria-label="Mathematical notation">implementation of &quot;smallest unsettled&quot;     cost
 linear scan                                 Θ(n² + |E|)
 binary heap                                 Θ((n + |E|) log n)
 Fibonacci heap                              Θ(|E| + n log n)</div><p>For sparse graphs the heap version is much faster; for dense ones the simple scan is competitive. The choice is exactly “Graph Representations”'s representation trade-off appearing again.</p><p>With all weights equal to 1, Dijkstra settles vertices in the order BFS visits them, and the priority queue degenerates into a plain queue. BFS is Dijkstra's special case, which is why “Breadth-First and Depth-First Search” came first.</p></article>
@@ -1343,7 +1343,7 @@ Fibonacci heap                              Θ(|E| + n log n)</div><p>For sparse
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Cheapest, not shortest</h3>
-          <p>The worked example is loaded with its weights, <span class="math">s, a, b, t</span> as <span class="math">1, 2, 3, 4</span>. The panel reads weighted distance 6 by <span class="math">1 → 3 → 2 → 4</span>, three edges, against a fewest-edge distance of 2 &mdash; the disagreement the lesson is about &mdash; and the labels are the settled distances <span class="math">0, 5, 3, 6</span>. Edges you add take the workbench's own weights, which every other preset uses throughout; on <span class="math">K₆</span> the cheapest route <span class="math">1 → 6</span> happens to be the direct edge, and the status line says so.</p>
+          <p>The worked example is loaded with its weights, <span class="math" data-say="s, A, b, t">s, a, b, t</span> as <span class="math" data-say="1, 2, 3, 4">1, 2, 3, 4</span>. The panel reads weighted distance 6 by <span class="math" data-say="1 goes to 3 goes to 2 goes to 4">1 → 3 → 2 → 4</span>, three edges, against a fewest-edge distance of 2 &mdash; the disagreement the lesson is about &mdash; and the labels are the settled distances <span class="math" data-say="0, 5, 3, 6">0, 5, 3, 6</span>. Edges you add take the workbench's own weights, which every other preset uses throughout; on <span class="math" data-say="K sub 6">K₆</span> the cheapest route <span class="math" data-say="1 goes to 6">1 → 6</span> happens to be the direct edge, and the status line says so.</p>
         <div class="field">
           <label for="gAlgo">Algorithm</label>
           <select id="gAlgo">
@@ -1405,7 +1405,7 @@ Fibonacci heap                              Θ(|E| + n log n)</div><p>For sparse
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Cheapest and shortest disagree</h3><p><span class="math">s → a</span> weight 10; <span class="math">s → b</span> weight 3; <span class="math">b → a</span> weight 2; <span class="math">a → t</span> weight 1; <span class="math">b → t</span> weight 9.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">settle s     dist: s=0, a=10, b=3,  t=∞
+      <article class="card card-pad prose"><h3>Cheapest and shortest disagree</h3><p><span class="math" data-say="s goes to a">s → a</span> weight 10; <span class="math" data-say="s goes to b">s → b</span> weight 3; <span class="math" data-say="b goes to a">b → a</span> weight 2; <span class="math" data-say="A goes to t">a → t</span> weight 1; <span class="math" data-say="b goes to t">b → t</span> weight 9.</p><div class="mathblock" data-say="settle s, dist, s equals 0, A equals 10, b equals 3, t equals infinity. settle b 3 relax, A equals the min of 10 and 3 plus 2 equals 5, t equals the min of infinity and 3 plus 9 equals 12. settle A 5 relax, t equals the min of 12 and 5 plus 1 equals 6. settle t 6. shortest by WEIGHT, s to b to a to t, weight 6, three edges. shortest by EDGES, s to a to t, weight 11, or, s to b to t, weight 12. two edges each. BFS returns one of the two-edge routes, 11 or 12, against 6" tabindex="0" role="region" aria-label="Mathematical notation">settle s     dist: s=0, a=10, b=3,  t=∞
 settle b (3) relax:  a = min(10, 3+2) = 5     t = min(∞, 3+9) = 12
 settle a (5) relax:  t = min(12, 5+1) = 6
 settle t (6)
@@ -1414,7 +1414,7 @@ shortest by WEIGHT:   s → b → a → t   weight 6,  three edges
 shortest by EDGES:    s → a → t  (weight 11)   or   s → b → t  (weight 12)
                       two edges each
 
-BFS returns one of the two-edge routes: 11 or 12, against 6.</div><p>The relaxation of <span class="math">a</span> from 10 down to 5 is the step BFS cannot perform: it settles a vertex on first contact and never improves it. That is exactly right when every edge costs 1 and wrong otherwise.</p></article>
+BFS returns one of the two-edge routes: 11 or 12, against 6.</div><p>The relaxation of <span class="math" data-say="A">a</span> from 10 down to 5 is the step BFS cannot perform: it settles a vertex on first contact and never improves it. That is exactly right when every edge costs 1 and wrong otherwise.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1518,7 +1518,7 @@ BFS returns one of the two-edge routes: 11 or 12, against 6.</div><p>The relaxat
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Dijkstra requires:", "a": ["a connected graph", "non-negative edge weights", "integer weights", "a tree"], "c": 1, "why": "A settled vertex is never revisited, which is only safe when no later route can be cheaper &mdash; guaranteed by non-negativity. Connectivity is not needed (unreachable vertices stay at <span class=\"math\">\u221e<\/span>), the weights may be any non-negative reals, and a tree would make the problem trivial: one path per pair."}, {"q": "With all weights equal to 1, Dijkstra reduces to:", "a": ["DFS", "BFS", "Kruskal", "nothing"], "c": 1, "why": "The priority queue becomes an ordinary queue and vertices settle in distance order: BFS is the special case. DFS has no distance guarantee at any weight, and Kruskal builds a spanning tree, not shortest paths."}, {"q": "For negative edge weights you should use:", "a": ["Dijkstra with an offset added to every weight", "Bellman&ndash;Ford", "BFS", "Kruskal"], "c": 1, "why": "Adding a constant <span class=\"math\">c<\/span> to every weight adds <span class=\"math\">c<\/span> times the edge count to each path, so paths of different lengths are penalised differently and the cheapest can change &mdash; the lesson's third mistake. BFS ignores weights altogether, Kruskal answers a different question, and Bellman&ndash;Ford handles negative weights directly and detects negative cycles."}];
+  var QUIZ = [{"q": "Dijkstra requires:", "a": ["a connected graph", "non-negative edge weights", "integer weights", "a tree"], "c": 1, "why": "A settled vertex is never revisited, which is only safe when no later route can be cheaper &mdash; guaranteed by non-negativity. Connectivity is not needed (unreachable vertices stay at <span class=\"math\" data-say=\"infinity\">\u221e<\/span>), the weights may be any non-negative reals, and a tree would make the problem trivial: one path per pair."}, {"q": "With all weights equal to 1, Dijkstra reduces to:", "a": ["DFS", "BFS", "Kruskal", "nothing"], "c": 1, "why": "The priority queue becomes an ordinary queue and vertices settle in distance order: BFS is the special case. DFS has no distance guarantee at any weight, and Kruskal builds a spanning tree, not shortest paths."}, {"q": "For negative edge weights you should use:", "a": ["Dijkstra with an offset added to every weight", "Bellman&ndash;Ford", "BFS", "Kruskal"], "c": 1, "why": "Adding a constant <span class=\"math\" data-say=\"c\">c<\/span> to every weight adds <span class=\"math\" data-say=\"c\">c<\/span> times the edge count to each path, so paths of different lengths are penalised differently and the cheapest can change &mdash; the lesson's third mistake. BFS ignores weights altogether, Kruskal answers a different question, and Bellman&ndash;Ford handles negative weights directly and detects negative cycles."}];
 
   (function () {
 
@@ -2557,6 +2557,160 @@ BFS returns one of the two-edge routes: 11 or 12, against 6.</div><p>The relaxat
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden="true"],[data-listen="skip"]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // "Definition · Sets": a voice may say "middle dot"; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      s.split(/(?<=[.!?;])\s+/).forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.split(/(?<=,)\s+/) : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      var lang = (navigator.language || 'en').slice(0, 2), vs = synth.getVoices();
+      voice = vs.filter(function (v) { return v.default && v.lang.slice(0, 2) === lang; })[0]
+        || vs.filter(function (v) { return v.lang.slice(0, 2) === lang; })[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status'; status.setAttribute('aria-live', 'polite');
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function say() {
+      var mine = ++token;
+      synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      status.textContent = (at + 1) + ' of ' + blocks.length;
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play';
+        status.textContent = 'No voice is available on this device';
+      };
+      synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); status.textContent = (at + 1) + ' of ' + blocks.length; } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) status.textContent = 'No voice is available on this device';
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus();
+    }
+    start.addEventListener('click', function () { if (bar.hidden) { at = 0; part = 0; } begin(); });
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else { part = 0; begin(); }
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) { part = 0; say(); }
+    });
+    addEventListener('pagehide', function () { token++; synth.cancel(); });
   })();
   </script>
 </body>
