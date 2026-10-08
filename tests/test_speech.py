@@ -112,6 +112,9 @@ READINGS = {
     "≤": "less-than-or-equal",
     "&ge;": "greater-than-or-equal",
     "0 ≤ r < d": "0 is at most r is less than d",
+    "□p → p": "necessarily p implies p",
+    "◇p": "possibly p",
+    "A ≻ B": "A is preferred to B",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",
