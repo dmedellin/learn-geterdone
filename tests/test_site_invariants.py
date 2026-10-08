@@ -1037,8 +1037,48 @@ PHIL_COURSES = (
 PHIL_PATH_COURSE_COUNT = 10
 PHIL_UPCOMING_COURSES = ()
 
+
+ENG_PATH_PAGE = "/paths/english/"
+
+ENG_COURSE_1_HOME = "/tense-tables/"
+ENG_COURSE_1_LESSONS = (
+    "five-forms-and-the-whole-table",
+    "when-the-last-letter-doubles",
+)
+
+ENG_COURSE_2_HOME = "/irregular-verbs/"
+ENG_COURSE_2_LESSONS = (
+    "the-verbs-that-break-the-rules",
+    "six-patterns-not-one-hundred-and-eighty",
+    "how-much-of-english-is-irregular",
+)
+
+ENG_COURSE_3_HOME = "/word-order/"
+ENG_COURSE_3_LESSONS = (
+    "who-does-what-to-whom",
+    "where-the-adverb-goes",
+    "asking-a-question",
+)
+
+ENG_COURSE_4_HOME = "/listening/"
+ENG_COURSE_4_LESSONS = (
+    "why-it-sounds-too-fast",
+    "where-a-word-begins",
+)
+
+ENG_COURSES = (
+    ("Tense Tables", ENG_COURSE_1_HOME, ENG_COURSE_1_LESSONS),
+    ("Irregular Verbs", ENG_COURSE_2_HOME, ENG_COURSE_2_LESSONS),
+    ("Word Order", ENG_COURSE_3_HOME, ENG_COURSE_3_LESSONS),
+    ("Listening", ENG_COURSE_4_HOME, ENG_COURSE_4_LESSONS),
+)
+
+ENG_PATH_COURSE_COUNT = 4
+# Every course of this Subject is published; nothing is promised without a page.
+ENG_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
-               + ALGO_COURSES + OR_COURSES + PHIL_COURSES)
+               + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1177,6 +1217,8 @@ PATHS = (
      OR_UPCOMING_COURSES),
     ("Philosophy", PHIL_PATH_PAGE, PHIL_COURSES, PHIL_PATH_COURSE_COUNT,
      PHIL_UPCOMING_COURSES),
+    ("English", ENG_PATH_PAGE, ENG_COURSES, ENG_PATH_COURSE_COUNT,
+     ENG_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)

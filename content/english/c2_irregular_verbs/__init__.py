@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Course two: the verbs that break course one's rules, and how few patterns they take."""
+"""Course two: the verbs that break the forming rules, and how few patterns they take."""
 
 from .part_a import LESSONS as _A
 from .part_b import LESSONS as _B
@@ -11,9 +11,9 @@ COURSE = {
     "title": "Irregular Verbs",
     "level": "Foundational",
     "blurb": (
-        "Course one built any verb from four rules. An <dfn>irregular</dfn> verb is "
-        "one those rules do not reach. This is the list of them "
-        "that ignore them &mdash; and it is shorter than it looks, because the "
+        "<em>Tense Tables</em> built any verb from four rules. An <dfn>irregular</dfn> verb is "
+        "one those rules do not reach. This is the list of them, and it is "
+        "shorter than it looks, because the "
         "133 verbs here fall into six patterns, and three words carry more than "
         "half of the trouble."
     ),
@@ -28,8 +28,8 @@ COURSE = {
     ),
     "assumes_short": "Tense Tables, because an irregular verb is one the rules there do not reach.",
     "assumes_long": (
-        "Course one. An irregular verb is defined here as one whose forms the "
-        "rules of course one do not produce, so those rules have to exist first. "
+        "Tense Tables. An irregular verb is defined here as one whose forms the "
+        "rules of Tense Tables do not produce, so those rules have to exist first. "
         "Nothing else is assumed and the number work is counting and shares."
     ),
     "how_to": [
@@ -48,7 +48,7 @@ COURSE = {
     ),
     "outcomes": [
         ("Say what makes a verb one of these",
-         "Its forms are not the ones course one&rsquo;s rules produce. That is a "
+         "Its forms are not the ones <em>Tense Tables</em> produces. That is a "
          "test, not a feeling, and it decides the whole list."),
         ("Sort a verb into one of six patterns",
          "Decided by the three written forms: all the same, past and the form "

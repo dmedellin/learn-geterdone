@@ -28,8 +28,8 @@ COURSE = {
     "assumes_short": "Tense Tables and Irregular Verbs, because a verb has to exist before you can ask where it goes.",
     "assumes_long": (
         "The two courses before this one. The scans here look for a verb next to "
-        "a pronoun, so they need the forms course one builds and the broken ones "
-        "course two lists. Nothing else is assumed, and the number work is still "
+        "a pronoun, so they need the forms Tense Tables builds and the broken ones "
+        "Irregular Verbs lists. Nothing else is assumed, and the number work is still "
         "counting and working out a share."
     ),
     "how_to": [

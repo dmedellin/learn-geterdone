@@ -222,7 +222,7 @@ class TestGeneratedLessonUI(unittest.TestCase):
                                      "lesson breadcrumb must include its subject and unnumbered names")
                     self.assertEqual("Lesson", words(doc.find(**{"data-ui": "page-kind"})[0]))
                     checked += 1
-        self.assertEqual(56, checked, "hierarchy sweep must cover every generated course")
+        self.assertEqual(60, checked, "hierarchy sweep must cover every generated course")
 
     def test_understanding_and_terminal_navigation(self):
         subject = build_paths.GENERATED_PATHS[0]
@@ -378,7 +378,7 @@ class TestGeneratedCatalogUI(unittest.TestCase):
                         self.assertNotIn("rel", terminal["attrs"])
                     self.assertFalse(re.search(r"\bcourse\s+\d|lessons? in (?:a )?fixed order", words(doc.find("body")[0]), re.I),
                                      "course identity and overview must not prescribe course order")
-        self.assertEqual(56, checked)
+        self.assertEqual(60, checked)
 
 
 class TestTradingNormalization(unittest.TestCase):

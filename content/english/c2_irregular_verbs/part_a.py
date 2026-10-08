@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Course 2, lesson one: what an irregular verb is, and how many there are."""
+"""Irregular Verbs, lesson one: what an irregular verb is, and how many there are."""
 
 LESSONS = [
     {
         "slug": "the-verbs-that-break-the-rules",
-        "module": "The exception list that course one kept pointing at",
+        "module": "The exception list Tense Tables kept pointing at",
         "title": "The Verbs That Break the Rules",
         "one_line": "About 180 verbs ignore the -ed rule, and they are the verbs you use most.",
         "standard": (
@@ -18,7 +18,7 @@ LESSONS = [
             "one you rarely meet.",
         ),
         "summary": (
-            "Course one gave four rules that build every regular verb, and "
+            "<em>Tense Tables</em> gave four rules that build every regular verb, and "
             "the rules were right about 99 times in 100. This course is about "
             "the rest. An <dfn>irregular</dfn> verb does not make its past by "
             "adding <em>-ed</em>. The lab holds 133 of them, sorted into six "
@@ -40,7 +40,7 @@ LESSONS = [
         "concepts": [
             (
                 "A verb is irregular when the -ed rule fails",
-                "Course one showed that adding <em>-ed</em> gives the past of "
+                "<em>Tense Tables</em> showed that adding <em>-ed</em> gives the past of "
                 "almost every regular verb. A verb is <em>irregular</em> when "
                 "that rule gives the wrong answer. <em>Bring</em> becomes "
                 "<em>brought</em>, and "
@@ -71,11 +71,11 @@ LESSONS = [
                 "The base, the past, and the form used after <em>have</em>. "
                 "These three are enough. The other two forms, the <em>-s</em> "
                 "form and the <em>-ing</em> form, follow the rules from "
-                "course one even for irregular verbs.",
+                "that course even for irregular verbs.",
             ),
             (
                 "Build the past by the -ed rule",
-                "Add <em>-ed</em>, with the small changes course one listed. "
+                "Add <em>-ed</em>, with the small changes that course listed. "
                 "This is your guess.",
             ),
             (
@@ -177,7 +177,7 @@ LESSONS = [
                 "why": (
                     "<em>Brought</em> is not <em>bring</em> plus <em>-ed</em>. "
                     "The others are built by the <em>-ed</em> rule, with the "
-                    "doubling change from course one for <em>plan</em> and "
+                    "doubling change from <em>Tense Tables</em> for <em>plan</em> and "
                     "<em>stop</em>."
                 ),
             },
@@ -227,7 +227,7 @@ LESSONS = [
         ],
         "body": [
             ("p",
-             "Course one ended with a promise. Four rules build the five forms "
+             "<em>Tense Tables</em> ended with a promise. Four rules build the five forms "
              "of any regular verb, and they were right 99.85%, 98.97% and "
              "98.67% of the time. The words they missed were a short list. "
              "This course is that list."),
@@ -242,7 +242,7 @@ LESSONS = [
              "A verb is <em>irregular</em> when that rule gives the wrong "
              "answer for the past, the participle, or both. <em>Bring</em>, "
              "<em>brought</em>, <em>brought</em>. <em>Know</em>, "
-             "<em>knew</em>, <em>known</em>. No rule from course one makes "
+             "<em>knew</em>, <em>known</em>. No rule from <em>Tense Tables</em> makes "
              "these, and you cannot work them out from the base."),
             ("h3", "How many there are"),
             ("p",

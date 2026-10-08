@@ -241,7 +241,7 @@ LESSONS = [
             ("p",
              "There is a reason these three stand apart. They are not only "
              "main verbs. They are also the helping words that build the "
-             "tenses from course one, so they appear whether or not the "
+             "tenses from <em>Tense Tables</em>, so they appear whether or not the "
              "sentence is about being, having or doing anything."),
             ("h3", "The top twenty"),
             ("p",
