@@ -283,7 +283,7 @@ assert(!/\bpath\b/i.test(context.emptyState('missing').textContent));
 const inventory=/var COURSES = (\[[\s\S]*?\n      \]);/.exec(source);
 assert(inventory,'course search inventory missing');
 const courses=vm.runInNewContext(inventory[1]);
-assert.equal(courses.length,64,'search must cover every published course');
+assert.equal(courses.length,68,'search must cover every published course');
 for(const c of courses) assert(!/\b(?:the|this|learning|Trading|Algebra|Discrete Mathematics) path\b|\bcourse\s+\d/i.test(context.resultItem(c,'').textContent),c.title+' has curricular search copy');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(courses.map(c=>[c.path,c.title,c.href,c.lessons]))),EXPECTED_INVENTORY);
 console.log('library search: subject names, factual lesson counts, neutral empty state');

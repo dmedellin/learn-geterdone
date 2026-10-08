@@ -1198,7 +1198,7 @@ def source_of(url):
 # them -- but the per-course invariants do not, because neither is a course.
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
-                       PHIL_PATH_PAGE)
+                       PHIL_PATH_PAGE, ENG_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1732,9 +1732,14 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(PHIL_COURSES)
             + sum(len(slugs) for _t, _h, slugs in PHIL_COURSES)
         )
+        eng_tree = (
+            1  # the English path page
+            + len(ENG_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in ENG_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
-                       + phil_tree)  # 1 for the index
+                       + phil_tree + eng_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -1778,9 +1783,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "+ 10 + 9 = 119 pages, got %d" % phil_tree,
         )
         self.assertEqual(
-            834,
+            849,
             course_tree,
-            "the site index plus all seven path trees is 834 pages, got %d" % course_tree,
+            "the site index plus all eight path trees is 849 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -1793,7 +1798,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         self.assertEqual(
             853,
             expected,
-            "834 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 853, "
+            "849 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 853, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2418,7 +2423,7 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            826,
+            841,
             len(course_pages),
             "sixty-eight course homes and 772 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
@@ -3411,7 +3416,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(64, checked, "every published course must be checked")
+        self.assertEqual(68, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}

@@ -1362,6 +1362,58 @@ PHIL_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+
+# English, same shape: one row per course, and the check ids built from it so
+# smoke and the invariant suite cannot probe different URL sets.
+ENG_PATH_PAGE_PATH = "/paths/english/"
+ENG_MATERIAL_MARKER = "run over the words printed on the page"
+ENG_COURSES = (
+    ("tense-tables", "Tense Tables", (
+        "five-forms-and-the-whole-table",
+        "when-the-last-letter-doubles",
+    )),
+    ("irregular-verbs", "Irregular Verbs", (
+        "the-verbs-that-break-the-rules",
+        "six-patterns-not-one-hundred-and-eighty",
+        "how-much-of-english-is-irregular",
+    )),
+    ("word-order", "Word Order", (
+        "who-does-what-to-whom",
+        "where-the-adverb-goes",
+        "asking-a-question",
+    )),
+    ("listening", "Listening", (
+        "why-it-sounds-too-fast",
+        "where-a-word-begins",
+    )),
+)
+
+ENG_PATH_PAGE_MARKERS = (
+    canonical_marker(ENG_PATH_PAGE_PATH),
+    ENG_COURSES[0][1],
+    ENG_COURSES[-1][1],
+    'href="../../%s/"' % ENG_COURSES[-1][0],
+)
+
+ENG_COURSE_HOMES = tuple(
+    (
+        "eng-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, ENG_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, _lessons) in enumerate(ENG_COURSES, start=1)
+)
+
+ENG_COURSE_LESSONS = tuple(
+    (
+        "eng-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), ENG_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, lessons) in enumerate(ENG_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1456,6 +1508,7 @@ def path_page_targets(args):
         ("algo-path", ALGO_PATH_PAGE_PATH, ALGO_PATH_PAGE_MARKERS),
         ("or-path", OR_PATH_PAGE_PATH, OR_PATH_PAGE_MARKERS),
         ("phil-path", PHIL_PATH_PAGE_PATH, PHIL_PATH_PAGE_MARKERS),
+        ("eng-path", ENG_PATH_PAGE_PATH, ENG_PATH_PAGE_MARKERS),
     ]
 
 
@@ -1477,7 +1530,8 @@ def course_home_targets(args):
     for check_id, path, markers in (COURSE_HOMES + MATH_COURSE_HOMES
                                     + ALGEBRA_COURSE_HOMES + SYSDESIGN_COURSE_HOMES
                                     + ALGO_COURSE_HOMES + OR_COURSE_HOMES
-                                    + PHIL_COURSE_HOMES):
+                                    + PHIL_COURSE_HOMES
+                                    + ENG_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -1514,6 +1568,7 @@ def lesson_targets(args):
         + ALGO_COURSE_LESSONS
         + OR_COURSE_LESSONS
         + PHIL_COURSE_LESSONS
+        + ENG_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:
