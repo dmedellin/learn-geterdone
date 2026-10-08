@@ -79,10 +79,10 @@ COURSE = {
         "value of a sentence."
     ),
     "how_to": [
-        "Read the course in order. “Dualism and the Conceivability Argument” "
-        "uses the possible-worlds models of the course before this one, and the "
-        "language lessons begin with “Compositional Truth Conditions”, on which "
-        "the three after it depend.",
+        "Know what each lesson leans on. “Dualism and the Conceivability "
+        "Argument” uses the possible-worlds models of Identity, Modality and "
+        "Freedom, and the language lessons build on “Compositional Truth "
+        "Conditions”, on which the three after it depend.",
         "Change the model and watch the verdict. In each lab the premises, "
         "worlds, likelihoods or extensions are text you can edit. The most "
         "useful minute in a lesson is the one in which you try to break its "

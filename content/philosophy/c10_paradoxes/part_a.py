@@ -789,7 +789,7 @@ LESSONS = [
             ("p", "The ratio `r` is the tortoise's speed divided by Achilles' speed, `1/10` "
                   "here, and it is the same each stage because the speeds do not change. "
                   "The first term is the head start. The lab sums the gaps exactly. After six stages Achilles has run "
-                  "`111111/1000` metres, with `1/9000` still to come, and it reports the "
+                  "`111111/1000` metres, with `1/9000` still to cover, and it reports the "
                   "limit as `1000/9` metres, a little over 111. That is the "
                   "total distance Achilles has run when he draws level, and each stage of "
                   "Zeno's argument takes place before that distance. After the last gap "

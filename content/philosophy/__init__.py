@@ -73,7 +73,7 @@ PATH = {
     "prerequisites": [
         "School arithmetic: fractions, percentages, and the willingness to add up a column. Every number on this path is a fraction or a whole number, and the labs do the arithmetic; what is asked of you is to read it.",
         "No logic. Arguments and Validity teaches every piece of logic the Subject uses, starting from what an argument is. If you have met truth tables before you will move quickly through its first half; if you have not, it is where to start.",
-        "No probability. Knowledge and Evidence introduces credence and Bayes&rsquo; rule from a table of a million people, and nothing later assumes more than that lesson gives. Discrete Probability on the Discrete Mathematics path covers the same ground more formally and is a fine companion, not a prerequisite.",
+        "No probability. Knowledge and Evidence introduces credence and Bayes&rsquo; rule from a table of a million people, and nothing later assumes more than that lesson gives. Discrete Probability, in Discrete Mathematics, covers the same ground more formally and is a fine companion, not a prerequisite.",
         "Patience with premises. The hard part of philosophy is not following an argument but deciding which premise to doubt, and the labs cannot do that for you. They will tell you an argument is valid; whether to accept its conclusion or reject a premise is the question every lesson leaves open on purpose.",
     ],
     # Each path names its own hazard. This one's is that a lab can check every
