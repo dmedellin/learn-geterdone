@@ -27,12 +27,13 @@ sys.dont_write_bytecode = True
 from algebra import PATH as ALGEBRA_PATH  # noqa: E402
 from algorithms import PATH as ALGORITHMS_PATH  # noqa: E402
 from discrete_math import PATH as DISCRETE_MATH_PATH  # noqa: E402
+from english import PATH as ENGLISH_PATH  # noqa: E402
 from operations_research import PATH as OPERATIONS_RESEARCH_PATH  # noqa: E402
 from system_design import PATH as SYSTEM_DESIGN_PATH  # noqa: E402
 from mathpath import render  # noqa: E402
 
 GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
-                   ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH)
+                   ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, ENGLISH_PATH)
 
 SITE = REPO_ROOT / "site"
 # The list of pages this build produces, consumed by scripts/labcheck.js.

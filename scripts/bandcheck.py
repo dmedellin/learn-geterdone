@@ -62,6 +62,23 @@ def load_bands(path):
     return forms
 
 
+def english_pages():
+    """Every page of the English Subject, named by the Subject rather than globbed."""
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    sys.path.insert(0, str(ROOT / "content"))
+    try:
+        from english import PATH
+    except ImportError:
+        return []
+    out = [ROOT / "site" / "paths" / PATH["slug"] / "index.html"]
+    for course in PATH["courses"]:
+        out.append(ROOT / "site" / course["slug"] / "index.html")
+        for lesson in course["lessons"]:
+            out.append(ROOT / "site" / course["slug"] / lesson["slug"] / "index.html")
+    return [p for p in out if p.exists()]
+
+
 class Prose(HTMLParser):
     """Lesson prose, with everything that is not prose removed.
 
@@ -164,11 +181,15 @@ def main():
     args = ap.parse_args()
 
     forms = load_bands(WORDLIST)
-    targets = [pathlib.Path(p) for p in args.paths] or sorted(
-        (ROOT / "site" / "english").glob("**/index.html"))
+    targets = [pathlib.Path(p) for p in args.paths] or english_pages()
     if not targets:
-        print("bandcheck: no pages to check")
-        return 0
+        # A gate that silently checks nothing is worse than no gate. The default
+        # target is derived from the Subject itself, not from a directory glob:
+        # course slugs sit at the top of site/, not under site/english/, and an
+        # earlier version globbed a directory that has never existed.
+        print("bandcheck: FOUND NO ENGLISH PAGES -- the Subject moved or the "
+              "build has not run; refusing to pass by checking nothing")
+        return 1
 
     failures = 0
     for page in targets:

@@ -1564,9 +1564,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            719,
+            734,
             expected,
-            "715 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 719, "
+            "730 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 734, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2192,7 +2192,7 @@ class TestContent(SiteFixture):
         self.assertEqual(
             708,
             len(course_pages),
-            "fifty-four course homes and 654 lessons carry a material "
+            "fifty-eight course homes and 664 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )

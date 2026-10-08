@@ -34,7 +34,7 @@ class TestCatalogDestinations(unittest.TestCase):
     def test_every_lesson_destination_is_literal(self):
         courses,lessons,links=catalog_inventory(ui.SITE)
         self.assertEqual(54,len(courses))
-        self.assertEqual(654,len(lessons))
+        self.assertEqual(664,len(lessons))
         self.assertEqual(669,len(links))
         self.assertEqual(lessons,{a['target'] for a in links})
         self.assertEqual(set(courses),{a['course'] for a in links})

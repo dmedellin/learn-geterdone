@@ -141,9 +141,9 @@ class TestPublicCopy(unittest.TestCase):
 
     def test_rendered_inventory_has_no_ordinal_references(self):
         pages, records = copy.scan(SITE)
-        self.assertEqual(719, len(pages), 'visitor inventory must include every family')
+        self.assertEqual(734, len(pages), 'visitor inventory must include every family')
         self.assertEqual(54, sum(p.family == 'course' for p in pages.values()))
-        self.assertEqual(654, sum(p.family == 'lesson' for p in pages.values()))
+        self.assertEqual(664, sum(p.family == 'lesson' for p in pages.values()))
         self.assertGreater(len(records), 45000)
         focus = os.environ.get('AB_COURSE')
         if focus:

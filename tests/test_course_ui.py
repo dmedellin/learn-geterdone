@@ -78,7 +78,7 @@ class TestPublishedUI(unittest.TestCase):
         families += [(url, "subject") for url in PATH_PAGES]
         families += [(url, "course") for _title, url, _lessons in ALL_COURSES]
         families += [(url + lesson + "/", "lesson") for _title, url, lessons in ALL_COURSES for lesson in lessons]
-        self.assertEqual({"library": 1, "subject": 6, "course": 54, "lesson": 654, "progress": 1},
+        self.assertEqual({"library": 1, "subject": 7, "course": 58, "lesson": 664, "progress": 1},
                          {kind: sum(k == kind for _u, k in families) for _url, kind in families})
         required = {"library": ["hero", "subject-list", "course-search"],
                     "subject": ["breadcrumbs", "hero", "metadata", "overview", "course-list", "background"],

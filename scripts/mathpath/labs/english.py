@@ -22,7 +22,7 @@ from .algebra_core import RATIONAL_JS
 from .english_core import ENGLISH_VERB_JS
 
 MODES = ("table", "doubling", "svo", "adverbs", "questions",
-         "irregular", "classes", "irrshare")
+         "irregular", "classes", "irrshare", "listening")
 
 
 # ---------------------------------------------------------------------------
@@ -839,9 +839,123 @@ def _irrshare(cfg):
     )
 
 
+
+
+# ---------------------------------------------------------------------------
+# listening -- the one thing a page can teach about hearing English
+#
+# No sound is played. What a learner who says English is "too fast" is usually
+# failing at is not speed but WORD BOUNDARIES, and the two regularities native
+# listeners use to find them can both be printed:
+#
+#   function words reduce, and they are nearly half of every sentence;
+#   content words almost always BEGIN with the strong syllable, so a strong
+#   syllable is a good guess at where a word starts (Cutler and Carter 1987).
+#
+# Both are annotation, both are printed, and both are counted on the page.
+# ---------------------------------------------------------------------------
+
+LISTENING_DATA = _data("listening.json")
+
+_LS_PRESETS = [
+    {"id": "weak", "label": "mark the words that get squashed", "view": "weak",
+     "expect": {"lsWeak": "452 of 949", "lsWeakPct": "47.6%", "lsTypes": "51"}},
+    {"id": "strong", "label": "mark where each other word is said hardest", "view": "strong",
+     "expect": {"lsStrong": "399 of 485", "lsStrongPct": "82.3%"}},
+]
+
+
+def _listening(cfg):
+    markup = (
+        '<div class="kpi-grid">'
+        '<div class="kpi"><span class="kpi-label">squashed words</span>'
+        '<span class="kpi-value" id="lsWeak">452 of 949</span></div>'
+        '<div class="kpi"><span class="kpi-label">share of the page</span>'
+        '<span class="kpi-value" id="lsWeakPct">47.6%</span></div>'
+        '<div class="kpi"><span class="kpi-label">different ones used</span>'
+        '<span class="kpi-value" id="lsTypes">51</span></div>'
+        '<div class="kpi"><span class="kpi-label">other words starting strong</span>'
+        '<span class="kpi-value" id="lsStrongPct">82.3%</span></div>'
+        '</div>'
+        '<div class="kpi-grid"><div class="kpi">'
+        '<span class="kpi-label">of the words that are not squashed</span>'
+        '<span class="kpi-value" id="lsStrong">399 of 485</span></div></div>'
+        '<div class="mathblock" id="lsText" style="font-size:0.84rem;line-height:2;"></div>'
+        '<div class="table-wrap"><table id="lsTable"><thead><tr>'
+        '<th>word</th><th>said as</th></tr></thead><tbody id="lsBody"></tbody></table></div>'
+    )
+    controls = (
+        '<label for="lsPreset">What to mark</label> <select id="lsPreset">'
+        + "".join('<option value="%s">%s</option>' % (p["id"], p["label"])
+                  for p in _LS_PRESETS)
+        + '</select>'
+    )
+    script = (SCAN_JS + cfg_literal("LS_DATA", LISTENING_DATA)
+              + cfg_literal("LS_TEXT", _data("wordorder_passage.json"))
+              + cfg_literal("LS_PRESETS", _LS_PRESETS) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var view = 'weak';
+
+  var draw = function () {
+    var w = wordsOf(LS_TEXT.passage), lw = lower(w), i, t;
+    var weak = 0, types = {}, strong = 0, annotated = 0, out = [];
+    for (i = 0; i < lw.length; i++) {
+      t = lw[i];
+      if (inSet(LS_DATA.weak, t)) {
+        weak++; types[t] = true;
+        out.push(view === 'weak' ? '[' + w[i] + ']' : w[i]);
+      } else if (inSet(LS_DATA.stress, t)) {
+        annotated++;
+        var pat = LS_DATA.stress[t];
+        if (pat.charAt(0) === 'S') strong++;
+        out.push(view === 'strong' ? w[i] + '(' + pat + ')' : w[i]);
+      } else {
+        out.push(w[i]);
+      }
+    }
+    el('lsWeak').textContent = weak + ' of ' + lw.length;
+    el('lsWeakPct').textContent = share1(weak, lw.length);
+    el('lsTypes').textContent = String(Object.keys(types).length);
+    el('lsStrong').textContent = strong + ' of ' + annotated;
+    el('lsStrongPct').textContent = share1(strong, annotated);
+    el('lsText').textContent = out.join(' ');
+
+    var names = Object.keys(types).sort(), html = '';
+    for (i = 0; i < names.length; i++) {
+      html += '<tr><td>' + names[i] + '</td><td>'
+            + (LS_DATA.weak[names[i]] || '') + '</td></tr>';
+    }
+    el('lsBody').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('lsPreset').addEventListener('change', function () {
+    var i;
+    for (i = 0; i < LS_PRESETS.length; i++) {
+      if (LS_PRESETS[i].id === this.value) { view = LS_PRESETS[i].view; draw(); return; }
+    }
+  });
+  draw();
+}());
+""")
+    return Lab(
+        title="Why it sounds too fast, marked on the page",
+        subtitle="No sound is played here; what is printed is what to listen for",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Mark the squashed words, then the strong parts"),
+        panel_intro=cfg.get("panel_intro",
+            "Nothing on this page makes a sound. What it can do is show you which "
+            "words get squashed when people speak, and which part of every other "
+            "word is said hardest. Both are counted on the passage below, and the "
+            "squashed words are listed with how they are actually said."),
+        script=script, expect={"lsPreset": _expect(_LS_PRESETS)},
+    )
+
+
 _MODES = {"table": _table, "doubling": _doubling,
           "svo": _svo, "adverbs": _adverbs, "questions": _questions,
-          "irregular": _irregular, "classes": _classes, "irrshare": _irrshare}
+          "irregular": _irregular, "classes": _classes, "irrshare": _irrshare,
+          "listening": _listening}
 
 
 def english_lab(cfg):

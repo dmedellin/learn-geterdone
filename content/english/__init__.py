@@ -29,6 +29,7 @@ shipped byte permissively licensed.
 from .c1_tense_tables import COURSE as _C1
 from .c2_irregular_verbs import COURSE as _C2
 from .c3_word_order import COURSE as _C3
+from .c4_listening import COURSE as _C4
 
 PATH = {
     "slug": "english",
@@ -56,7 +57,7 @@ PATH = {
         "carry most of real writing",
     ],
     "sequence_intro": (
-        "Three courses, in one order, and each one needs the last. The first builds any "
+        "Four courses. The first three are in one order and each needs the last. The first builds any "
         "verb's forms from rules. The second takes the verbs that break those "
         "rules. The third puts the verb in a sentence and asks where everything "
         "else goes."
@@ -96,5 +97,5 @@ PATH = {
         "List (Browne, Culligan and Phillips), CC BY-SA 4.0; pronunciations are "
         "CMUdict; passages are public domain."
     ),
-    "courses": [_C1, _C2, _C3],
+    "courses": [_C1, _C2, _C3, _C4],
 }
