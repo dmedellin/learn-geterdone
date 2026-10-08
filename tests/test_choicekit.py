@@ -420,7 +420,7 @@ CONTROLS = {
     "commons": ["cmPreset", "cmN", "cmPC", "cmPD", "cmX0", "cmGens"],
     "vote": ["voPreset", "voKind", "voProfile", "voRule", "voRemove"],
     "aggregate": ["agPreset", "agA", "agB", "agRule", "agKnee", "agThresh", "agEps"],
-    "simpson": ["siPreset", "siNames", "siTable", "siWeight"],
+    "simpson": ["siPreset", "siNames", "siCounts", "siWeight"],
 }
 PREFIX = {"decide": "de", "update": "up", "credence": "cr", "series": "sr", "game": "ga", "iterated": "it",
           "commons": "cm", "vote": "vo", "aggregate": "ag", "simpson": "si"}
@@ -451,6 +451,10 @@ class TestEveryModeBuilds(unittest.TestCase):
                 # no control ships a value containing ">"
                 for value in re.findall(r'value="([^"]*)"', lab.controls):
                     self.assertNotIn(">", value)
+                # one id per element: the simpson mode once named its counts box
+                # siTable, the id of the table it draws, so field() read the table
+                ids = re.findall(r'\bid="([^"]+)"', page)
+                self.assertEqual(sorted({i for i in ids if ids.count(i) > 1}), [])
 
     def test_a_page_ships_one_mode(self):
         lab = labs.build("choicekit", FIXTURES[0][1])

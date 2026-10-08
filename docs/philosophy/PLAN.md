@@ -1220,7 +1220,7 @@ Modules: *Method* (1–2), *The infinite* (3–5), *Probability* (6–8), *Belie
 #### simpson
 - Purpose: rates within two groups and pooled; reversal; standardised rates.
 - cfg: `presets[{id, label, names: [A, B], groups: [{name, a: [s, t], b: [s, t]}], expect}]`, `weight` (`pooled` | `standardised`).
-- Controls: `siPreset`; `siNames` (text); `siTable` (text, `small: 81/87 234/270; large: 192/263 55/80`); `siWeight` (redraw-only).
+- Controls: `siPreset`; `siNames` (text); `siCounts` (text, `small: 81/87 234/270; large: 192/263 55/80`); `siWeight` (redraw-only).
 - Computation: rates per cell as exact fractions; pooled rates; within-group comparisons; reversal iff the pooled comparison disagrees with both within-group comparisons; standardised rate = Σ_g w_g·rate_g with w_g the group's share of all trials.
 - Tiles: `siPooled` (`A 273/350 vs B 289/350: B higher`); `siGroup1`, `siGroup2` (`A higher` | `B higher` | `equal`); `siAdjusted` (same format as `siPooled`); `siVerdict` (`Reversal` | `No reversal`).
 - Serves: 2.10, 3.8, 7.4.

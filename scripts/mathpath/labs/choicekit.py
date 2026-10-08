@@ -2558,18 +2558,18 @@ def _simpson(cfg):
     controls = (
         _select("siPreset", "Worked example", menu, chosen)
         + _text("siNames", "The two treatments", here["names"])
-        + _text("siTable", "Groups, &ldquo;name: successes/trials for each; &hellip;&rdquo;", here["table"])
+        + _text("siCounts", "Groups, &ldquo;name: successes/trials for each; &hellip;&rdquo;", here["table"])
         + _select("siWeight", "Adjusted rate weights", SI_WEIGHTS, weight)
         + _kpis([("Pooled", "siPooled"), ("Group 1", "siGroup1"), ("Group 2", "siGroup2"),
                  ("Adjusted", "siAdjusted"), ("Verdict", "siVerdict")])
     )
     body = r"""
-  var FIELDS = { names: 'siNames', table: 'siTable' };
+  var FIELDS = { names: 'siNames', table: 'siCounts' };
   var REDRAW_ONLY = ['siWeight'];
   var TILES = ['siPooled', 'siGroup1', 'siGroup2', 'siAdjusted', 'siVerdict'];
   function redraw() {
     var inst;
-    try { inst = siRead(field('siNames').value, field('siTable').value); }
+    try { inst = siRead(field('siNames').value, field('siCounts').value); }
     catch (err) { tableEl.innerHTML = ''; ckRefuse(statusEl, TILES, err.message); return; }
     var o = siSolve(inst), nm = inst.names, g = inst.groups;
     var pooled = nm[0] + ' ' + o.pa.s + '/' + o.pa.t + ' vs ' + nm[1] + ' ' + o.pb.s + '/' + o.pb.t + ': ' + siWord(nm, o.pooled);
