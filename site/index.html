@@ -1343,8 +1343,18 @@
       display: inline-flex; align-items: center; vertical-align: middle;
       max-width: 100%; white-space: normal; overflow-wrap: anywhere;
     }
-    @media (max-width: 920px) {
-      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    /* The hero's right column carries a monospace key block, and the block is
+       authored to a fixed 46 characters because it is `white-space: pre-wrap`
+       -- a line that does not fit is not reflowed, it is broken.
+       The column holds 46 only while the shell is at its full 1160px, which
+       takes a 1192px viewport. Below that it shrinks fast: 41 characters at
+       1100, 37 at 1024, 31 at 900, and 22 at 721 -- one pixel above the old
+       720px collapse, where the same block jumps back to 63. Every width in
+       that range was WORSE than stacking, so the hero now stacks below the
+       width its own content was written for. Measured in Chrome, not derived.
+       This subsumes the supplemental-only collapse that used to sit at 920. */
+    @media (max-width: 1191px) {
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 720px) {
       [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }

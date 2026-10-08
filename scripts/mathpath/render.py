@@ -5,11 +5,12 @@ chrome.py or theme.py, so a page produced here cannot ship a variant of the
 pager, the palette or the theme toggle even if a lesson wanted one.
 """
 
+import functools
 import html
 import json
 import re
 
-from . import chrome, feedback, labs, progress
+from . import chrome, feedback, labs, progress, readout, speech
 from .chrome import esc
 
 ORIGIN = chrome.CANONICAL_ORIGIN
@@ -22,8 +23,38 @@ ORIGIN = chrome.CANONICAL_ORIGIN
 _MATH_RE = re.compile(r"`([^`]+)`")
 
 
+# What a voice says for each math run, for Listen (readout.py). Computed here,
+# at build time, so the page needs no speech rules of its own.
+_SPOKEN = speech.all_overrides()
+
+
+@functools.lru_cache(maxsize=None)
+def _say(run):
+    return speech.say(run, override=_SPOKEN.get(run))
+
+
+def _prose(segment):
+    """Prose outside the `x` runs, with any math written into it unmarked
+    (`compare |r| with 1`) given a spoken form; the visible text is unchanged."""
+    out = []
+    for piece in re.split(r"(<[^>]+>)", segment):
+        if piece.startswith("<"):
+            out.append(piece)
+            continue
+        at = 0
+        for start, end in speech.islands(piece):
+            out.append(piece[at:start])
+            out.append('<span data-say="%s">%s</span>' % (esc(_say(piece[start:end])), piece[start:end]))
+            at = end
+        out.append(piece[at:])
+    return "".join(out)
+
+
 def inline(text):
-    return _MATH_RE.sub(lambda m: '<span class="math">%s</span>' % m.group(1), text)
+    parts = _MATH_RE.split(text)
+    return "".join(
+        '<span class="math" data-say="%s">%s</span>' % (esc(_say(part)), part) if odd else _prose(part)
+        for odd, part in ((i % 2, part) for i, part in enumerate(parts)))
 
 
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -62,7 +93,9 @@ def esc_inline(text):
 
 
 def _mathblock(lines):
-    return '<div class="mathblock">%s</div>' % "\n".join(esc(line) for line in lines)
+    spoken = ". ".join(speech.say_block(lines, _SPOKEN))
+    return '<div class="mathblock" data-say="%s">%s</div>' % (
+        esc(spoken), "\n".join(esc(line) for line in lines))
 
 
 def _block(kind, payload):
@@ -323,7 +356,8 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
                              + progress.PROGRESS_JS
                              + progress.LESSON_JS % json.dumps(lesson_id)
                              + feedback.STORE_JS
-                             + feedback.LESSON_JS))
+                             + feedback.LESSON_JS
+                             + readout.READOUT_JS))
     return chrome.name_horizontal_scrollers("".join(parts)), lab
 
 

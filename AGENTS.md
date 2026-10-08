@@ -255,9 +255,13 @@ the truth by 40% or more, which is how a budget quietly stops being a budget:
 
 | page | raw (median / max) | gzipped (median / max) |
 | --- | --- | --- |
-| Discrete Mathematics lesson (106 pages) | 94 KB / 129 KB | 24 KB / 33 KB |
-| Algebra, course 1 (5-mode lab, 13 pages) | 131 KB / 137 KB | 34 KB / 36 KB |
-| Algebra, course 9 (11-mode lab, 11 pages) | 230 KB / 233 KB | 61 KB / 62 KB |
+| Discrete Mathematics lesson (106 pages) | 106 KB / 143 KB | 27 KB / 37 KB |
+| Algebra, course 1 (5-mode lab, 13 pages) | 145 KB / 154 KB | 38 KB / 40 KB |
+| Algebra, course 9 (11-mode lab, 11 pages) | 246 KB / 255 KB | 66 KB / 67 KB |
+
+Re-measured 2026-10-07 when Listen landed: every lesson now carries the spoken
+form of its math (`data-say`, from `scripts/mathpath/speech.py`) and the reader
+script (`scripts/mathpath/readout.py`), about 3 KB gzipped a page in all.
 
 Re-derive them rather than trusting them; they go stale every time a lab grows:
 
@@ -276,9 +280,9 @@ The second factor is the number of MODES a lab has. One function serves every
 mode of a lab, so a page ships all of them: a reader on the sigma-notation
 lesson downloads the annuity and Pascal code as well. Emitting only the active
 mode is a real optimisation and a real change to the lab kit; it has not been
-made, and 62 KB on the wire does not justify making it yet.
+made, and 67 KB on the wire does not justify making it yet.
 
-**62 KB gzipped is the current ceiling, and it is the number to check** before
+**67 KB gzipped is the current ceiling, and it is the number to check** before
 anyone proposes "just extract the shared JavaScript into one file both paths
 load" -- that would cut the bytes sharply and break the invariant in section 2,
 which is the one rule this repository does not trade away. If page weight ever
@@ -286,7 +290,7 @@ does become a problem, the fix is a smaller lab, not a shared file.
 
 A kit author designing a lab with ten or more modes should measure the page
 before believing it fits. The heaviest page in the repository today is
-`sequences-and-series/infinite-geometric-series` at 62 KB gzipped, and it is an
+`sequences-and-series/infinite-geometric-series` at 67 KB gzipped, and it is an
 eleven-mode lab.
 
 ## 2. The self-containment invariant (non-negotiable)
@@ -501,7 +505,7 @@ small the diff looks.
 | agent | tier | Claude | Codex | owns | why this tier |
 | --- | --- | --- | --- | --- | --- |
 | `site-architect` | deep | opus | `-p deep` | URL space, cross-path design, retirements | one decision reshapes five declarations and the public URL space |
-| `chrome-renderer` | deep | opus | `-p deep` | `scripts/mathpath/{chrome,theme,render,progress,feedback}.py` | one edit lands on all 654 lessons at once |
+| `chrome-renderer` | deep | opus | `-p deep` | `scripts/mathpath/{chrome,theme,render,progress,feedback,speech,readout}.py` | one edit lands on all 654 lessons at once |
 | `lab-arithmetic` | deep | opus | `-p deep` | `scripts/mathpath/labs/`, `scripts/mathcheck.js` | exact rational arithmetic; a wrong answer is invisible to every other check |
 | `invariants` | deep | opus | `-p deep` | `tests/test_site_invariants.py` | a test that is wrong passes, and keeps passing |
 | `release-safety` | safety | opus | `-p safety` | `release/`, `Containerfile.release`, `.github/workflows/`, `deploy/` | irreversible and expensive; **read-only** |

@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Data Structures &middot; Heaps</span>
         <h1>Priority Queues and Binary Heaps</h1>
-        <p>A binary heap keeps one inequality true &mdash; every parent is at most its children &mdash; on a complete tree stored in a plain array. That is enough for insert and extract-min in <span class="math">O(log n)</span>, with no pointers anywhere, because the tree&rsquo;s shape is arithmetic on indices. What it is not is sorted: siblings are in no particular order, and the array almost never reads as an ordered list.</p>
+        <p>A binary heap keeps one inequality true &mdash; every parent is at most its children &mdash; on a complete tree stored in a plain array. That is enough for insert and extract-min in <span class="math" data-say="big O of log n">O(log n)</span>, with no pointers anywhere, because the tree&rsquo;s shape is arithmetic on indices. What it is not is sorted: siblings are in no particular order, and the array almost never reads as an ordered list.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">heap property        parent ≤ both children,  at every node
+        <div class="mathblock" data-say="heap property, parent is less than or equal to both children, at every node. complete tree, every level full except the last, which fills left to right. layout, from 1, children of i at 2 i and 2 i plus 1, parent of i at the floor of i over 2. layout, from 0, children of i at 2 i plus 1 and 2 i plus 2, what the lab draws. insert, sift UP, is less than or equal to the floor of log base 2 n, comparisons. extract-min, sift DOWN, is less than or equal to 2 times the floor of log base 2 n, comparisons" tabindex="0" role="region" aria-label="Mathematical notation">heap property        parent ≤ both children,  at every node
 complete tree        every level full except the last, which fills left to right
 layout, from 1       children of i at 2i and 2i + 1;  parent of i at ⌊i/2⌋
 layout, from 0       children of i at 2i + 1 and 2i + 2   (what the lab draws)
@@ -1311,11 +1311,11 @@ extract-min  sift DOWN   ≤ 2⌊log₂ n⌋ comparisons</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three things, and the third is the one that gets misread on every first reading: the inequality, the layout, and what the inequality does not say.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The heap property is local and it is only about ancestry</h3><p><span class="math">parent ≤ child</span> at every node. Nothing relates a node to its sibling, to its cousin, or to anything that is not on the path between it and the root. The consequence that matters is that the minimum is at the root, because the root is an ancestor of everything &mdash; and the consequence that gets assumed and is false is that the array is in order.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The shape is arithmetic, so there are no pointers</h3><p>A complete tree can be laid out level by level in an array, and then the children of position <span class="math">i</span> are at <span class="math">2i</span> and <span class="math">2i + 1</span> when positions start at <span class="math">1</span>. No node stores a link; the tree is a way of reading the array. This is why a heap is the cheapest structure in this course to implement and the one a sorting algorithm can build in place.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A sift walks one root-to-leaf path, and that is where the log comes from</h3><p>Insert puts the new key at the end and swaps it up while it is smaller than its parent: at most one comparison per level. Extract-min moves the last key to the root and swaps it down while it is larger than a child: two comparisons per level, because the smaller child has to be found first. A complete tree on <span class="math">n</span> nodes has height <span class="math">⌊log₂ n⌋</span>, and that is the whole bound.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The heap property is local and it is only about ancestry</h3><p><span class="math" data-say="parent is less than or equal to child">parent ≤ child</span> at every node. Nothing relates a node to its sibling, to its cousin, or to anything that is not on the path between it and the root. The consequence that matters is that the minimum is at the root, because the root is an ancestor of everything &mdash; and the consequence that gets assumed and is false is that the array is in order.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The shape is arithmetic, so there are no pointers</h3><p>A complete tree can be laid out level by level in an array, and then the children of position <span class="math" data-say="i">i</span> are at <span class="math" data-say="2 i">2i</span> and <span class="math" data-say="2 i plus 1">2i + 1</span> when positions start at <span class="math" data-say="1">1</span>. No node stores a link; the tree is a way of reading the array. This is why a heap is the cheapest structure in this course to implement and the one a sorting algorithm can build in place.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A sift walks one root-to-leaf path, and that is where the log comes from</h3><p>Insert puts the new key at the end and swaps it up while it is smaller than its parent: at most one comparison per level. Extract-min moves the last key to the root and swaps it down while it is larger than a child: two comparisons per level, because the smaller child has to be found first. A complete tree on <span class="math" data-say="n">n</span> nodes has height <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span>, and that is the whole bound.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The property, the layout, and the two sifts</h2></div><p>What a heap promises, how an array becomes a tree, and the measured comparison counts against the height.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Min-heap</span><p>A <strong>min-heap</strong> is a complete binary tree whose every node satisfies the <strong>heap property</strong>: the key at a node is less than or equal to the keys at both of its children. <strong>Complete</strong> means every level is full except possibly the last, which is filled from the left.</p><p>The root therefore holds a minimum, since it is an ancestor of every node and the property is transitive along a path. A max-heap reverses the inequality and nothing else about it changes.</p></div><p>Completeness is what allows the array layout, and the array layout is what removes the pointers. Write the levels out in order, left to right. Then for a position <span class="math">i</span> counted from <span class="math">1</span>, the children sit at <span class="math">2i</span> and <span class="math">2i + 1</span> and the parent at <span class="math">⌊i/2⌋</span>. The lab draws its array with positions counted from <span class="math">0</span>, where the same tree has its children at <span class="math">2i + 1</span> and <span class="math">2i + 2</span> &mdash; the arithmetic differs by where you start counting and the tree is identical, which is worth confirming once on the picture rather than believing.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">array      1    3    2    6    8    7    4    9        positions from 1
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Min-heap</span><p>A <strong>min-heap</strong> is a complete binary tree whose every node satisfies the <strong>heap property</strong>: the key at a node is less than or equal to the keys at both of its children. <strong>Complete</strong> means every level is full except possibly the last, which is filled from the left.</p><p>The root therefore holds a minimum, since it is an ancestor of every node and the property is transitive along a path. A max-heap reverses the inequality and nothing else about it changes.</p></div><p>Completeness is what allows the array layout, and the array layout is what removes the pointers. Write the levels out in order, left to right. Then for a position <span class="math" data-say="i">i</span> counted from <span class="math" data-say="1">1</span>, the children sit at <span class="math" data-say="2 i">2i</span> and <span class="math" data-say="2 i plus 1">2i + 1</span> and the parent at <span class="math" data-say="the floor of i over 2">⌊i/2⌋</span>. The lab draws its array with positions counted from <span class="math" data-say="0">0</span>, where the same tree has its children at <span class="math" data-say="2 i plus 1">2i + 1</span> and <span class="math" data-say="2 i plus 2">2i + 2</span> &mdash; the arithmetic differs by where you start counting and the tree is identical, which is worth confirming once on the picture rather than believing.</p><div class="mathblock" data-say="a table, shown on the page. 1, level 0. a table, shown on the page. 9, level 3. a table, shown on the page. siblings are unrelated, 3 sits left of 2, 8 left of 7" tabindex="0" role="region" aria-label="Mathematical notation">array      1    3    2    6    8    7    4    9        positions from 1
 
                       1                    level 0
                  3         2               level 1
@@ -1323,7 +1323,7 @@ extract-min  sift DOWN   ≤ 2⌊log₂ n⌋ comparisons</div>
               9                            level 3
 
   every path down increases:  1 3 6 9,  1 3 8,  1 2 7,  1 2 4
-  siblings are unrelated:     3 sits left of 2,  8 left of 7</div><p>That array is what the lab holds after inserting <span class="math">1, 9, 2, 8, 3, 7, 4, 6</span> in that order, and it is a perfectly valid heap. It is also not sorted, not nearly sorted, and not sorted after any prefix: the second element is <span class="math">3</span> and the third is <span class="math">2</span>. If a heap were sorted then building one would sort, and sorting costs more than building a heap does &mdash; which is the argument that ought to make the misconception uncomfortable before the picture does.</p><h3>Insert, by sifting up</h3><p>Put the new key in the first free array position, which keeps the tree complete. Then while it is smaller than its parent, swap the two. The property can only be violated between the new key and its ancestors, and each swap repairs one level, so the walk stops at the root at the latest: at most <span class="math">⌊log₂ n⌋</span> comparisons and as many swaps.</p><div class="example"><span class="label">Example &middot; The insertion that swaps, and the one that does not</span><p>Inserting <span class="math">8</span> into the three-element heap the lab has after <span class="math">1, 9, 2</span> compares <span class="math">8</span> against its parent <span class="math">9</span>, swaps, compares against <span class="math">1</span>, and stops: <span class="math">2</span> comparisons, <span class="math">1</span> swap, against a bound of <span class="math">⌊log₂ 4⌋ = 2</span>. Inserting <span class="math">7</span> a step later costs <span class="math">1</span> comparison and no swap at all, because it lands under <span class="math">2</span> and is bigger. Both are <span class="math">O(log n)</span>; one of them did nothing.</p></div><h3>Extract-min, by sifting down</h3><p>The root is the answer. Removing it leaves a hole, so move the last element into the root &mdash; which keeps the tree complete &mdash; and then push it down: compare its two children with each other, then compare it with the smaller one, and swap if it is larger. Two comparisons per level, <span class="math">⌊log₂ n⌋</span> levels, so at most <span class="math">2⌊log₂ n⌋</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">heap    1  3  2  6  8  7  4  9          extract the minimum, 1
+  siblings are unrelated:     3 sits left of 2,  8 left of 7</div><p>That array is what the lab holds after inserting <span class="math" data-say="1, 9, 2, 8, 3, 7, 4, 6">1, 9, 2, 8, 3, 7, 4, 6</span> in that order, and it is a perfectly valid heap. It is also not sorted, not nearly sorted, and not sorted after any prefix: the second element is <span class="math" data-say="3">3</span> and the third is <span class="math" data-say="2">2</span>. If a heap were sorted then building one would sort, and sorting costs more than building a heap does &mdash; which is the argument that ought to make the misconception uncomfortable before the picture does.</p><h3>Insert, by sifting up</h3><p>Put the new key in the first free array position, which keeps the tree complete. Then while it is smaller than its parent, swap the two. The property can only be violated between the new key and its ancestors, and each swap repairs one level, so the walk stops at the root at the latest: at most <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span> comparisons and as many swaps.</p><div class="example"><span class="label">Example &middot; The insertion that swaps, and the one that does not</span><p>Inserting <span class="math" data-say="8">8</span> into the three-element heap the lab has after <span class="math" data-say="1, 9, 2">1, 9, 2</span> compares <span class="math" data-say="8">8</span> against its parent <span class="math" data-say="9">9</span>, swaps, compares against <span class="math" data-say="1">1</span>, and stops: <span class="math" data-say="2">2</span> comparisons, <span class="math" data-say="1">1</span> swap, against a bound of <span class="math" data-say="the floor of log base 2 4, equals 2">⌊log₂ 4⌋ = 2</span>. Inserting <span class="math" data-say="7">7</span> a step later costs <span class="math" data-say="1">1</span> comparison and no swap at all, because it lands under <span class="math" data-say="2">2</span> and is bigger. Both are <span class="math" data-say="big O of log n">O(log n)</span>; one of them did nothing.</p></div><h3>Extract-min, by sifting down</h3><p>The root is the answer. Removing it leaves a hole, so move the last element into the root &mdash; which keeps the tree complete &mdash; and then push it down: compare its two children with each other, then compare it with the smaller one, and swap if it is larger. Two comparisons per level, <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span> levels, so at most <span class="math" data-say="2 times the floor of log base 2 n">2⌊log₂ n⌋</span>.</p><div class="mathblock" data-say="a table, shown on the page. children of 9 are 3, 2, goes to, smaller is 2, goes to, 9 is greater than 2, swap. a table, shown on the page. children of 9 are 7, 4, goes to, smaller is 4, goes to, 9 is greater than 4, swap. a table, shown on the page. comparisons 4, swaps 2, bound 2 times the floor of log base 2 7, equals 4, tight here" tabindex="0" role="region" aria-label="Mathematical notation">heap    1  3  2  6  8  7  4  9          extract the minimum, 1
 
 move 9 to the root:     9  3  2  6  8  7  4
 children of 9 are 3, 2  →  smaller is 2  →  9 &gt; 2, swap
@@ -1331,7 +1331,7 @@ children of 9 are 3, 2  →  smaller is 2  →  9 &gt; 2, swap
 children of 9 are 7, 4  →  smaller is 4  →  9 &gt; 4, swap
                         2  3  4  6  8  7  9
 
-comparisons 4,  swaps 2,  bound 2⌊log₂ 7⌋ = 4      tight here</div><p>Four comparisons against a bound of four: the sift reached a leaf, which is the worst case at that size, and the counter and the bound agree. That agreement is a coincidence of this input, and the very next extraction in the lab also costs <span class="math">4</span> while the inserts before it cost between <span class="math">0</span> and <span class="math">2</span> against bounds of <span class="math">0</span> to <span class="math">3</span>. Over the whole ten-operation sequence the lab counts <span class="math">18</span> comparisons and <span class="math">7</span> swaps, and reports that every single step came in at or under its bound.</p><p>That last report is the one to be careful with. &ldquo;Every step came in under its bound&rdquo; is a statement about ten operations on eight keys. The bound itself is a statement about a path in a complete tree, and the proof is one line: a complete tree on <span class="math">n</span> nodes has height <span class="math">⌊log₂ n⌋</span>, a sift visits each level at most once, and each level costs at most two comparisons. The lab can show you the walk; it cannot show you that there is no taller tree.</p></article>
+comparisons 4,  swaps 2,  bound 2⌊log₂ 7⌋ = 4      tight here</div><p>Four comparisons against a bound of four: the sift reached a leaf, which is the worst case at that size, and the counter and the bound agree. That agreement is a coincidence of this input, and the very next extraction in the lab also costs <span class="math" data-say="4">4</span> while the inserts before it cost between <span class="math" data-say="0">0</span> and <span class="math" data-say="2">2</span> against bounds of <span class="math" data-say="0">0</span> to <span class="math" data-say="3">3</span>. Over the whole ten-operation sequence the lab counts <span class="math" data-say="18">18</span> comparisons and <span class="math" data-say="7">7</span> swaps, and reports that every single step came in at or under its bound.</p><p>That last report is the one to be careful with. &ldquo;Every step came in under its bound&rdquo; is a statement about ten operations on eight keys. The bound itself is a statement about a path in a complete tree, and the proof is one line: a complete tree on <span class="math" data-say="n">n</span> nodes has height <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span>, a sift visits each level at most once, and each level costs at most two comparisons. The lab can show you the walk; it cannot show you that there is no taller tree.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Insert and extract, by sifting</h2></div><p>Comparisons per operation against the height of the tree</p></div>
@@ -1348,7 +1348,7 @@ comparisons 4,  swaps 2,  bound 2⌊log₂ 7⌋ = 4      tight here</div><p>Four
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Insert, extract, and read the array as a tree</h3>
-          <p>Type the keys to insert and how many minima to extract. The tree and the array are drawn together, the swapped positions are highlighted on both, and each operation reports its comparisons beside <span class="math">⌊log₂ n⌋</span>. The opening keys are chosen so that the siblings come out unordered &mdash; the array is a valid heap and is nothing like sorted.</p>
+          <p>Type the keys to insert and how many minima to extract. The tree and the array are drawn together, the swapped positions are highlighted on both, and each operation reports its comparisons beside <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span>. The opening keys are chosen so that the siblings come out unordered &mdash; the array is a valid heap and is nothing like sorted.</p>
         <div class="field" id="hoPresetField">
           <label for="hoPreset">Worked sequence</label>
           <select id="hoPreset"><option value="sift-both-ways">six keys in, then two smallest out</option><option value="arriving-in-order">keys arriving already in increasing order</option><option value="arriving-backwards">keys arriving in decreasing order</option><option value="siblings-unordered" selected>keys that leave the siblings out of order</option></select>
@@ -1379,7 +1379,7 @@ comparisons 4,  swaps 2,  bound 2⌊log₂ 7⌋ = 4      tight here</div><p>Four
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Operating a heap by hand</h2></div><p>Four steps, and the first is the one that prevents an hour of confusion: decide where you are counting positions from.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix your indexing before you touch anything</h3><p>From <span class="math">1</span>, children of <span class="math">i</span> are at <span class="math">2i</span> and <span class="math">2i + 1</span>. From <span class="math">0</span>, they are at <span class="math">2i + 1</span> and <span class="math">2i + 2</span>. Both are in use, the lab draws the second, and an index formula from one convention applied under the other silently walks to the wrong node.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Insert at the end, then sift up</h3><p>The new key goes in the first free position so the tree stays complete. Compare it with its parent and swap while it is smaller. Stop at the root or at the first parent that is already smaller &mdash; there is nothing further up to fix.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Extract by promoting the last element, then sift down</h3><p>Take the root as the answer, move the last element into the root, and push it down. At each level find the smaller child first, then compare. Skipping the child-versus-child comparison is the error that produces a tree that still looks plausible.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the property, then check the count</h3><p>Walk every node and confirm <span class="math">parent ≤ children</span>. Then compare the comparisons you made with <span class="math">⌊log₂ n⌋</span> for an insert and <span class="math">2⌊log₂ n⌋</span> for an extract. A count above the bound means a step went wrong; a count well below it means the sift stopped early, which is ordinary.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix your indexing before you touch anything</h3><p>From <span class="math" data-say="1">1</span>, children of <span class="math" data-say="i">i</span> are at <span class="math" data-say="2 i">2i</span> and <span class="math" data-say="2 i plus 1">2i + 1</span>. From <span class="math" data-say="0">0</span>, they are at <span class="math" data-say="2 i plus 1">2i + 1</span> and <span class="math" data-say="2 i plus 2">2i + 2</span>. Both are in use, the lab draws the second, and an index formula from one convention applied under the other silently walks to the wrong node.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Insert at the end, then sift up</h3><p>The new key goes in the first free position so the tree stays complete. Compare it with its parent and swap while it is smaller. Stop at the root or at the first parent that is already smaller &mdash; there is nothing further up to fix.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Extract by promoting the last element, then sift down</h3><p>Take the root as the answer, move the last element into the root, and push it down. At each level find the smaller child first, then compare. Skipping the child-versus-child comparison is the error that produces a tree that still looks plausible.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the property, then check the count</h3><p>Walk every node and confirm <span class="math" data-say="parent is less than or equal to children">parent ≤ children</span>. Then compare the comparisons you made with <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span> for an insert and <span class="math" data-say="2 times the floor of log base 2 n">2⌊log₂ n⌋</span> for an extract. A count above the bound means a step went wrong; a count well below it means the sift stopped early, which is ordinary.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1390,7 +1390,7 @@ comparisons 4,  swaps 2,  bound 2⌊log₂ 7⌋ = 4      tight here</div><p>Four
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Eight keys in, two minima out</h3><p>The lab&rsquo;s opening sequence, by hand. The comparison count and the bound sit in the last two columns; the array after each step is what the picture is drawing.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">insert   array after                  cmp   bound ⌊log₂ n⌋
+      <article class="card card-pad prose"><h3>Eight keys in, two minima out</h3><p>The lab&rsquo;s opening sequence, by hand. The comparison count and the bound sit in the last two columns; the array after each step is what the picture is drawing.</p><div class="mathblock" data-say="insert, array after, cmp, bound the floor of log base 2 n. a table, shown on the page. extract, array after, cmp, bound 2 times the floor of log base 2 n. a table, shown on the page. totals, comparisons 18, swaps 7, every step at or under its bound" tabindex="0" role="region" aria-label="Mathematical notation">insert   array after                  cmp   bound ⌊log₂ n⌋
 
    1     1                              0       0
    9     1 9                            1       1
@@ -1406,13 +1406,13 @@ extract  array after                  cmp   bound 2⌊log₂ n⌋
    1     2 3 4 6 8 7 9                   4       4
    2     3 6 4 9 8 7                     4       4
 
-totals   comparisons 18,  swaps 7,  every step at or under its bound</div><p>Look at the array after the eighth insert: <span class="math">1 3 2 6 8 7 4 9</span>. Every root-to-leaf path increases &mdash; <span class="math">1 3 6 9</span>, <span class="math">1 3 8</span>, <span class="math">1 2 7</span>, <span class="math">1 2 4</span> &mdash; and the array itself is in no order whatever. <span class="math">3</span> precedes <span class="math">2</span>, and <span class="math">8</span> precedes <span class="math">7</span> and <span class="math">4</span>. This is the picture that settles the misconception, and it is worth staring at until it stops looking like a mistake.</p><p>The two extractions both cost <span class="math">4</span>, which equals <span class="math">2⌊log₂ 7⌋</span> and <span class="math">2⌊log₂ 6⌋</span>. Both sifts went all the way to a leaf, which is the worst case at those sizes. The inserts, by contrast, came in at <span class="math">0</span> to <span class="math">2</span> against bounds of <span class="math">0</span> to <span class="math">3</span>, because a sift up stops as soon as the parent is smaller and most keys arrive somewhere they can stay.</p><p>For a faded rehearsal, insert <span class="math">8, 7, 6, 5, 4, 3, 2, 1</span> in that order and extract three times. The supplied observation is that every one of these keys is smaller than everything already in the heap, so every insert sifts all the way to the root: the swap count and the comparison count coincide. Predict the total before running it &mdash; the lab reports <span class="math">22</span> comparisons and <span class="math">17</span> swaps &mdash; and then say why reversing the input made no difference at all to the bound.</p></article>
+totals   comparisons 18,  swaps 7,  every step at or under its bound</div><p>Look at the array after the eighth insert: <span class="math" data-say="1 3 2 6 8 7 4 9">1 3 2 6 8 7 4 9</span>. Every root-to-leaf path increases &mdash; <span class="math" data-say="1 3 6 9">1 3 6 9</span>, <span class="math" data-say="1 3 8">1 3 8</span>, <span class="math" data-say="1 2 7">1 2 7</span>, <span class="math" data-say="1 2 4">1 2 4</span> &mdash; and the array itself is in no order whatever. <span class="math" data-say="3">3</span> precedes <span class="math" data-say="2">2</span>, and <span class="math" data-say="8">8</span> precedes <span class="math" data-say="7">7</span> and <span class="math" data-say="4">4</span>. This is the picture that settles the misconception, and it is worth staring at until it stops looking like a mistake.</p><p>The two extractions both cost <span class="math" data-say="4">4</span>, which equals <span class="math" data-say="2 times the floor of log base 2 7">2⌊log₂ 7⌋</span> and <span class="math" data-say="2 times the floor of log base 2 6">2⌊log₂ 6⌋</span>. Both sifts went all the way to a leaf, which is the worst case at those sizes. The inserts, by contrast, came in at <span class="math" data-say="0">0</span> to <span class="math" data-say="2">2</span> against bounds of <span class="math" data-say="0">0</span> to <span class="math" data-say="3">3</span>, because a sift up stops as soon as the parent is smaller and most keys arrive somewhere they can stay.</p><p>For a faded rehearsal, insert <span class="math" data-say="8, 7, 6, 5, 4, 3, 2, 1">8, 7, 6, 5, 4, 3, 2, 1</span> in that order and extract three times. The supplied observation is that every one of these keys is smaller than everything already in the heap, so every insert sifts all the way to the root: the swap count and the comparison count coincide. Predict the total before running it &mdash; the lab reports <span class="math" data-say="22">22</span> comparisons and <span class="math" data-say="17">17</span> swaps &mdash; and then say why reversing the input made no difference at all to the bound.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the array, or any prefix of it, to be in order</strong><span><span class="math">1 3 2 6 8 7 4 9</span> is a valid heap in which <span class="math">3</span> precedes <span class="math">2</span>. Only root-to-leaf paths are ordered. The habit to build is to check the property node by node rather than to scan the array and feel uneasy, and the argument to remember is that a sorted array is a much stronger object than a heap and costs more to produce.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sifting down without first comparing the two children</strong><span>Swapping with the left child because it happens to be smaller than the descending key gives a tree that satisfies the property on that one edge and violates it on the other. Find the smaller child, then compare. This is also where the factor of two in the bound comes from, so an implementation missing it is both wrong and suspiciously fast.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing the two index conventions</strong><span><span class="math">2i</span> and <span class="math">2i + 1</span> is correct when positions start at <span class="math">1</span>; <span class="math">2i + 1</span> and <span class="math">2i + 2</span> is correct when they start at <span class="math">0</span>. Applying the first formula to a zero-based array sends you to a cousin instead of a child, and the resulting tree usually still satisfies the property somewhere, so the bug survives a casual check. Decide once, write it down, and read the lab&rsquo;s array labels before trusting a position.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a heap that is obviously not sorted stops looking broken.</strong><p>You should be able to insert and extract by hand on a drawn heap without losing completeness, find the smaller child before comparing, convert between the array and the tree in both index conventions, and quote the comparison bound for each operation with the reason the extraction&rsquo;s bound carries a factor of two.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Inserting <span class="math">n</span> keys one at a time costs <span class="math">O(n log n)</span>, and a heap can be built from an arbitrary array much faster than that. &ldquo;Building a Heap in Linear Time&rdquo; sifts down from the last internal node to the root instead, and the sum <span class="math">Σ ⌈n/2ʰ⁺¹⌉·h</span> that prices it is under <span class="math">2n</span> &mdash; evaluated exactly, beside both methods running with counters on the same input.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the array, or any prefix of it, to be in order</strong><span><span class="math" data-say="1 3 2 6 8 7 4 9">1 3 2 6 8 7 4 9</span> is a valid heap in which <span class="math" data-say="3">3</span> precedes <span class="math" data-say="2">2</span>. Only root-to-leaf paths are ordered. The habit to build is to check the property node by node rather than to scan the array and feel uneasy, and the argument to remember is that a sorted array is a much stronger object than a heap and costs more to produce.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sifting down without first comparing the two children</strong><span>Swapping with the left child because it happens to be smaller than the descending key gives a tree that satisfies the property on that one edge and violates it on the other. Find the smaller child, then compare. This is also where the factor of two in the bound comes from, so an implementation missing it is both wrong and suspiciously fast.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing the two index conventions</strong><span><span class="math" data-say="2 i">2i</span> and <span class="math" data-say="2 i plus 1">2i + 1</span> is correct when positions start at <span class="math" data-say="1">1</span>; <span class="math" data-say="2 i plus 1">2i + 1</span> and <span class="math" data-say="2 i plus 2">2i + 2</span> is correct when they start at <span class="math" data-say="0">0</span>. Applying the first formula to a zero-based array sends you to a cousin instead of a child, and the resulting tree usually still satisfies the property somewhere, so the bug survives a casual check. Decide once, write it down, and read the lab&rsquo;s array labels before trusting a position.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a heap that is obviously not sorted stops looking broken.</strong><p>You should be able to insert and extract by hand on a drawn heap without losing completeness, find the smaller child before comparing, convert between the array and the tree in both index conventions, and quote the comparison bound for each operation with the reason the extraction&rsquo;s bound carries a factor of two.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Inserting <span class="math" data-say="n">n</span> keys one at a time costs <span class="math" data-say="big O of n times log n">O(n log n)</span>, and a heap can be built from an arbitrary array much faster than that. &ldquo;Building a Heap in Linear Time&rdquo; sifts down from the last internal node to the root instead, and the sum <span class="math" data-say="the sum of the ceiling of n over 2 to the power h plus 1, times h">Σ ⌈n/2ʰ⁺¹⌉·h</span> that prices it is under <span class="math" data-say="2 n">2n</span> &mdash; evaluated exactly, beside both methods running with counters on the same input.</div></article>
       </div>
     </section>
     </main>
@@ -1451,7 +1451,7 @@ totals   comparisons 18,  swaps 7,  every step at or under its bound</div><p>Loo
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Data Structures.</strong> Every count on this course is produced by executing the operation sequence on the structure drawn beside it. Expected chain lengths and load factors are exact fractions; <span class="math">Σ ⌈n/2ʰ⁺¹⌉·h</span> is evaluated exactly. Two numbers are approximations and say so: linear probing's <span class="math">½(1 + 1/(1−α)²)</span>, which is Knuth's and which the lab refuses to quote at all above <span class="math">α = 0.98</span>, and the <span class="math">2 ln n</span> expected depth of a random search tree, which is asymptotic and is printed beside the height and the mean depth that were measured.</p>
+      <p><strong>Data Structures.</strong> Every count on this course is produced by executing the operation sequence on the structure drawn beside it. Expected chain lengths and load factors are exact fractions; <span class="math" data-say="the sum of the ceiling of n over 2 to the power h plus 1, times h">Σ ⌈n/2ʰ⁺¹⌉·h</span> is evaluated exactly. Two numbers are approximations and say so: linear probing's <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span>, which is Knuth's and which the lab refuses to quote at all above <span class="math" data-say="alpha equals 0.98">α = 0.98</span>, and the <span class="math" data-say="2 times the natural log of n">2 ln n</span> expected depth of a random search tree, which is asymptotic and is printed beside the height and the mean depth that were measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1510,7 +1510,7 @@ totals   comparisons 18,  swaps 7,  every step at or under its bound</div><p>Loo
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Is <span class=\"math\">1 3 2 6 8 7 4 9<\/span> a valid min-heap, reading positions from <span class=\"math\">1<\/span>?", "a": ["No, because <span class=\"math\">3<\/span> comes before <span class=\"math\">2<\/span>", "Yes: every parent is at most both of its children", "No, because the array is not sorted", "Only if the tree is not complete"], "c": 1, "why": "Children of position <span class=\"math\">1<\/span> are <span class=\"math\">3<\/span> and <span class=\"math\">2<\/span>, and <span class=\"math\">1 \u2264 3<\/span> and <span class=\"math\">1 \u2264 2<\/span>. Children of <span class=\"math\">2<\/span> are <span class=\"math\">6<\/span> and <span class=\"math\">8<\/span>, and <span class=\"math\">3<\/span> is at most both. Children of <span class=\"math\">3<\/span> are <span class=\"math\">7<\/span> and <span class=\"math\">4<\/span>, and <span class=\"math\">2<\/span> is at most both. Child of <span class=\"math\">4<\/span> is <span class=\"math\">9<\/span>. Every check passes. <span class=\"math\">3<\/span> before <span class=\"math\">2<\/span> is a statement about siblings, which the heap property says nothing about, and a heap is not required to be sorted &mdash; if it were, building one would sort."}, {"q": "An extract-min on a heap of <span class=\"math\">7<\/span> elements is bounded by <span class=\"math\">2\u230alog\u2082 7\u230b<\/span> comparisons. Why the factor of <span class=\"math\">2<\/span>?", "a": ["Because the sift may have to run twice", "Because the root is compared with both of its children at each level", "Because the tree has two subtrees", "Because the last element is moved and then the root is removed"], "c": 1, "why": "At each level the sift first compares the two children with each other to find the smaller, then compares the descending key with that child: two comparisons per level. The sift itself runs once. &ldquo;Two subtrees&rdquo; is true of every node and is not what the factor counts; the move-then-remove is a constant amount of work, not a doubling."}, {"q": "Inserting a key into a heap of <span class=\"math\">6<\/span> elements, you make <span class=\"math\">1<\/span> comparison and no swaps. What happened?", "a": ["The key was smaller than everything and went to the root", "The key was at least its parent, so the sift stopped immediately", "The heap property was violated and the insert failed", "The heap was already sorted, so no work was needed"], "c": 1, "why": "One comparison and no swap means the new key was compared with its parent and found to be at least as large, so it stays where it landed and the property already holds everywhere. A key smaller than everything sifts all the way up, costing <span class=\"math\">\u230alog\u2082 7\u230b = 2<\/span> comparisons and <span class=\"math\">2<\/span> swaps here. Nothing failed, and a heap being sorted is neither necessary nor usual."}];
+  var QUIZ = [{"q": "Is <span class=\"math\" data-say=\"1 3 2 6 8 7 4 9\">1 3 2 6 8 7 4 9<\/span> a valid min-heap, reading positions from <span class=\"math\" data-say=\"1\">1<\/span>?", "a": ["No, because <span class=\"math\" data-say=\"3\">3<\/span> comes before <span class=\"math\" data-say=\"2\">2<\/span>", "Yes: every parent is at most both of its children", "No, because the array is not sorted", "Only if the tree is not complete"], "c": 1, "why": "Children of position <span class=\"math\" data-say=\"1\">1<\/span> are <span class=\"math\" data-say=\"3\">3<\/span> and <span class=\"math\" data-say=\"2\">2<\/span>, and <span class=\"math\" data-say=\"1 is less than or equal to 3\">1 \u2264 3<\/span> and <span class=\"math\" data-say=\"1 is less than or equal to 2\">1 \u2264 2<\/span>. Children of <span class=\"math\" data-say=\"2\">2<\/span> are <span class=\"math\" data-say=\"6\">6<\/span> and <span class=\"math\" data-say=\"8\">8<\/span>, and <span class=\"math\" data-say=\"3\">3<\/span> is at most both. Children of <span class=\"math\" data-say=\"3\">3<\/span> are <span class=\"math\" data-say=\"7\">7<\/span> and <span class=\"math\" data-say=\"4\">4<\/span>, and <span class=\"math\" data-say=\"2\">2<\/span> is at most both. Child of <span class=\"math\" data-say=\"4\">4<\/span> is <span class=\"math\" data-say=\"9\">9<\/span>. Every check passes. <span class=\"math\" data-say=\"3\">3<\/span> before <span class=\"math\" data-say=\"2\">2<\/span> is a statement about siblings, which the heap property says nothing about, and a heap is not required to be sorted &mdash; if it were, building one would sort."}, {"q": "An extract-min on a heap of <span class=\"math\" data-say=\"7\">7<\/span> elements is bounded by <span class=\"math\" data-say=\"2 times the floor of log base 2 7\">2\u230alog\u2082 7\u230b<\/span> comparisons. Why the factor of <span class=\"math\" data-say=\"2\">2<\/span>?", "a": ["Because the sift may have to run twice", "Because the root is compared with both of its children at each level", "Because the tree has two subtrees", "Because the last element is moved and then the root is removed"], "c": 1, "why": "At each level the sift first compares the two children with each other to find the smaller, then compares the descending key with that child: two comparisons per level. The sift itself runs once. &ldquo;Two subtrees&rdquo; is true of every node and is not what the factor counts; the move-then-remove is a constant amount of work, not a doubling."}, {"q": "Inserting a key into a heap of <span class=\"math\" data-say=\"6\">6<\/span> elements, you make <span class=\"math\" data-say=\"1\">1<\/span> comparison and no swaps. What happened?", "a": ["The key was smaller than everything and went to the root", "The key was at least its parent, so the sift stopped immediately", "The heap property was violated and the insert failed", "The heap was already sorted, so no work was needed"], "c": 1, "why": "One comparison and no swap means the new key was compared with its parent and found to be at least as large, so it stays where it landed and the property already holds everywhere. A key smaller than everything sifts all the way up, costing <span class=\"math\" data-say=\"the floor of log base 2 7, equals 2\">\u230alog\u2082 7\u230b = 2<\/span> comparisons and <span class=\"math\" data-say=\"2\">2<\/span> swaps here. Nothing failed, and a heap being sorted is neither necessary nor usual."}];
 
   (function () {
 
@@ -2906,6 +2906,178 @@ totals   comparisons 18,  swaps 7,  every step at or under its bound</div><p>Loo
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

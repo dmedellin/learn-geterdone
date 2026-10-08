@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">coins 1, 2, 5 and an amount of 18
+        <div class="mathblock" data-say="coins 1, 2, 5 and an amount of 18. no memo, 22089 calls. with a memo, 50 calls, 18 distinct subproblems. the table, 76 cells, no recursion at all. 22089 over 50 equals 441.8 times fewer, and all three answer 5. overlapping subproblems, the recursion tree has few DISTINCT nodes" tabindex="0" role="region" aria-label="Mathematical notation">coins 1, 2, 5 and an amount of 18
   no memo          22 089 calls
   with a memo           50 calls      18 distinct subproblems
   the table             76 cells      no recursion at all
@@ -1312,11 +1312,11 @@ overlapping subproblems: the recursion tree has few DISTINCT nodes</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the memo's saving is predicted, not discovered: it is the recursion tree's node count against the number of distinct arguments, and both are on the panel.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Overlapping subproblems is a property of the recursion, not of the code</h3><p><span class="math">f(18)</span> asks for <span class="math">f(17)</span>, <span class="math">f(16)</span> and <span class="math">f(13)</span>; <span class="math">f(17)</span> asks for <span class="math">f(16)</span> again. The recursion tree has thousands of nodes and eighteen distinct arguments, because the argument is a single number between 1 and 18. A recursion whose arguments are all distinct &mdash; merge sort's halves, say &mdash; has nothing for a memo to save, which is why divide and conquer is not this.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A memo turns the tree into the graph it always was</h3><p>Writing each answer down the first time makes every later request for the same argument a lookup. The measured calls fall from 22 089 to 50, and 50 is not mysterious: the memo holds eighteen entries and each is computed once from at most three sub-calls. The panel prints the ratio as the exact fraction <span class="math">22089/50</span>, because a decimal there would be a number that is merely close.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The table is the same computation with the recursion removed</h3><p>Filling bottom-up visits every (denomination, amount) pair in a fixed order, which is 76 cells for three denominations and an amount of eighteen, and it never calls itself. It does strictly more work than the memo &mdash; 76 cells against 18 memo entries &mdash; because it computes answers the recursion never asked for. What it buys is a fixed order, which is the subject of the next lesson and the thing that can be got wrong.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Overlapping subproblems is a property of the recursion, not of the code</h3><p><span class="math" data-say="f of 18">f(18)</span> asks for <span class="math" data-say="f of 17">f(17)</span>, <span class="math" data-say="f of 16">f(16)</span> and <span class="math" data-say="f of 13">f(13)</span>; <span class="math" data-say="f of 17">f(17)</span> asks for <span class="math" data-say="f of 16">f(16)</span> again. The recursion tree has thousands of nodes and eighteen distinct arguments, because the argument is a single number between 1 and 18. A recursion whose arguments are all distinct &mdash; merge sort's halves, say &mdash; has nothing for a memo to save, which is why divide and conquer is not this.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A memo turns the tree into the graph it always was</h3><p>Writing each answer down the first time makes every later request for the same argument a lookup. The measured calls fall from 22 089 to 50, and 50 is not mysterious: the memo holds eighteen entries and each is computed once from at most three sub-calls. The panel prints the ratio as the exact fraction <span class="math" data-say="22089 over 50">22089/50</span>, because a decimal there would be a number that is merely close.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The table is the same computation with the recursion removed</h3><p>Filling bottom-up visits every (denomination, amount) pair in a fixed order, which is 76 cells for three denominations and an amount of eighteen, and it never calls itself. It does strictly more work than the memo &mdash; 76 cells against 18 memo entries &mdash; because it computes answers the recursion never asked for. What it buys is a fixed order, which is the subject of the next lesson and the thing that can be got wrong.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Why the same recursion costs three different amounts</h2></div><p>Overlapping subproblems defined, the call counts measured, the arithmetic that predicts them, and the bound none of the counts establishes.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Overlapping subproblems</span><p>A recursive formulation has <strong>overlapping subproblems</strong> when the set of distinct arguments it is ever called with is much smaller than the number of calls it makes. The two numbers are both countable by running it, and their ratio is what a memo can save.</p></div><p>This is the second of the two properties a dynamic program needs, and it is the one about cost rather than about correctness. Optimal substructure says the recurrence is right. Overlapping subproblems says evaluating it naively is wasteful and that there is a specific, countable amount of waste to remove. A problem with the first and not the second is a divide-and-conquer problem, and a memo on it stores entries nothing ever reads.</p><div class="example"><span class="label">Example &middot; Eighteen from 1, 2 and 5, counted three ways</span><p>The lab loads this instance. The memo-free recursion answers 5 after 22 089 calls. The same recursion with a memo answers 5 after 50 calls, and reports that it stored eighteen distinct subproblems. The table answers 5 after filling 76 cells and making 106 reads, with no recursion at all. Three routes, one answer, three costs a factor of hundreds apart.</p></div><p>Fifty is worth deriving rather than accepting. The memoised function is entered once per distinct argument that is genuinely computed &mdash; eighteen of them, plus the base case &mdash; and each such call makes one sub-call per denomination that fits. Every one of those sub-calls is itself a call. So the total is one call to start with, plus one call for every edge leaving a computed amount &mdash; and the amounts 1 through 18 have out-degrees 1, then 2 three times, then 3 fourteen times, which is 49. One and 49 is 50. Nothing about that figure is a property of the memo as a technique; it is the size of the dependency graph.</p><h3>The two numbers the panel separates, and why</h3><p>The memo stores eighteen entries; the table fills 76 cells. Those count different things. The memo's key is the remaining amount alone, because the recursion may use any denomination at any step; the table's cell is a (denomination-prefix, amount) pair, because it is filled in an order and each row makes one more denomination available. Four rows by nineteen columns is 76. Both are correct formulations of the same problem with different state, and the choice of state is the design decision this course keeps returning to.</p><div class="thm"><span class="label">Theorem &middot; The memoised recursion and the table compute the same function</span><p>For every amount <span class="math">a</span> reachable from the coin set, the value the memoised recursion returns for <span class="math">a</span> equals the value in the table's last row at column <span class="math">a</span>, and both equal <span class="math">f(a)</span>.</p></div><div class="proof"><p>By strong induction on <span class="math">a</span>. Both agree at <span class="math">a = 0</span>, where each is 0. Suppose both compute <span class="math">f</span> correctly at every amount below <span class="math">a</span>. The memoised recursion evaluates <span class="math">1 + min of f(a − c)</span> over the denominations that fit, using stored values that are correct by hypothesis, so it returns <span class="math">f(a)</span> by the theorem of the previous lesson.</p><p>The table's last row at column <span class="math">a</span> takes the minimum over the same set of options, reached as a row of cells rather than as a set of calls: the cell for denomination prefix <span class="math">i</span> and amount <span class="math">a</span> is the better of the cell above it and one more than the cell <span class="math">c</span> columns to its left in its own row. Unfolding that row from left to right gives exactly the same minimum. Both therefore equal <span class="math">f(a)</span>, and the memo's smaller entry count is a difference of state, not of answer.</p><p><span class="qed">&#9633;</span></p></div><h3>What 441.8 times fewer does and does not say</h3><p>The panel prints <span class="math">22089/50</span> and its decimal to one place, and the exact fraction is there because the ratio is a count divided by a count and rounding it would misrepresent two integers as one estimate. It is a measurement on one amount with one coin system. The proved statement is different in kind: the table is <span class="math">Θ(nk)</span> for <span class="math">n</span> denominations and amount <span class="math">k</span>, and the memo-free recursion's call count grows exponentially in <span class="math">k</span> because the recursion tree branches at least twice at every level whenever two denominations fit.</p><p>The two statements diverge in a way this page can show you. At an amount of six with coins 1, 3 and 4 &mdash; the previous lesson's instance &mdash; the memo-free recursion makes 24 calls and the table fills 28 cells, so the exponential method is ahead. At eighteen with 1, 2 and 5 the same two routes cost 22 089 and 76. Nothing changed about either bound between those two runs. What changed is which side of the crossing the input sits on, and no count on either side of it is a statement about the other.</p><p>The plot beside the grid makes the shape visible: call counts against the amount, on a logarithmic axis, with a dashed reference curve. It stops at sixteen whatever the amount is set to, because the unmemoised arm is re-run at every point on every redraw and plotting further would cost a few million calls for a picture that has already made its point. The figure above the plot is the full amount.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Overlapping subproblems</span><p>A recursive formulation has <strong>overlapping subproblems</strong> when the set of distinct arguments it is ever called with is much smaller than the number of calls it makes. The two numbers are both countable by running it, and their ratio is what a memo can save.</p></div><p>This is the second of the two properties a dynamic program needs, and it is the one about cost rather than about correctness. Optimal substructure says the recurrence is right. Overlapping subproblems says evaluating it naively is wasteful and that there is a specific, countable amount of waste to remove. A problem with the first and not the second is a divide-and-conquer problem, and a memo on it stores entries nothing ever reads.</p><div class="example"><span class="label">Example &middot; Eighteen from 1, 2 and 5, counted three ways</span><p>The lab loads this instance. The memo-free recursion answers 5 after 22 089 calls. The same recursion with a memo answers 5 after 50 calls, and reports that it stored eighteen distinct subproblems. The table answers 5 after filling 76 cells and making 106 reads, with no recursion at all. Three routes, one answer, three costs a factor of hundreds apart.</p></div><p>Fifty is worth deriving rather than accepting. The memoised function is entered once per distinct argument that is genuinely computed &mdash; eighteen of them, plus the base case &mdash; and each such call makes one sub-call per denomination that fits. Every one of those sub-calls is itself a call. So the total is one call to start with, plus one call for every edge leaving a computed amount &mdash; and the amounts 1 through 18 have out-degrees 1, then 2 three times, then 3 fourteen times, which is 49. One and 49 is 50. Nothing about that figure is a property of the memo as a technique; it is the size of the dependency graph.</p><h3>The two numbers the panel separates, and why</h3><p>The memo stores eighteen entries; the table fills 76 cells. Those count different things. The memo's key is the remaining amount alone, because the recursion may use any denomination at any step; the table's cell is a (denomination-prefix, amount) pair, because it is filled in an order and each row makes one more denomination available. Four rows by nineteen columns is 76. Both are correct formulations of the same problem with different state, and the choice of state is the design decision this course keeps returning to.</p><div class="thm"><span class="label">Theorem &middot; The memoised recursion and the table compute the same function</span><p>For every amount <span class="math" data-say="A">a</span> reachable from the coin set, the value the memoised recursion returns for <span class="math" data-say="A">a</span> equals the value in the table's last row at column <span class="math" data-say="A">a</span>, and both equal <span class="math" data-say="f of A">f(a)</span>.</p></div><div class="proof"><p>By strong induction on <span class="math" data-say="A">a</span>. Both agree at <span class="math" data-say="A equals 0">a = 0</span>, where each is 0. Suppose both compute <span class="math" data-say="f">f</span> correctly at every amount below <span class="math" data-say="A">a</span>. The memoised recursion evaluates <span class="math" data-say="1 plus min of f of the quantity A minus c">1 + min of f(a − c)</span> over the denominations that fit, using stored values that are correct by hypothesis, so it returns <span class="math" data-say="f of A">f(a)</span> by the theorem of the previous lesson.</p><p>The table's last row at column <span class="math" data-say="A">a</span> takes the minimum over the same set of options, reached as a row of cells rather than as a set of calls: the cell for denomination prefix <span class="math" data-say="i">i</span> and amount <span class="math" data-say="A">a</span> is the better of the cell above it and one more than the cell <span class="math" data-say="c">c</span> columns to its left in its own row. Unfolding that row from left to right gives exactly the same minimum. Both therefore equal <span class="math" data-say="f of A">f(a)</span>, and the memo's smaller entry count is a difference of state, not of answer.</p><p><span class="qed">&#9633;</span></p></div><h3>What 441.8 times fewer does and does not say</h3><p>The panel prints <span class="math" data-say="22089 over 50">22089/50</span> and its decimal to one place, and the exact fraction is there because the ratio is a count divided by a count and rounding it would misrepresent two integers as one estimate. It is a measurement on one amount with one coin system. The proved statement is different in kind: the table is <span class="math" data-say="theta of n k">Θ(nk)</span> for <span class="math" data-say="n">n</span> denominations and amount <span class="math" data-say="k">k</span>, and the memo-free recursion's call count grows exponentially in <span class="math" data-say="k">k</span> because the recursion tree branches at least twice at every level whenever two denominations fit.</p><p>The two statements diverge in a way this page can show you. At an amount of six with coins 1, 3 and 4 &mdash; the previous lesson's instance &mdash; the memo-free recursion makes 24 calls and the table fills 28 cells, so the exponential method is ahead. At eighteen with 1, 2 and 5 the same two routes cost 22 089 and 76. Nothing changed about either bound between those two runs. What changed is which side of the crossing the input sits on, and no count on either side of it is a statement about the other.</p><p>The plot beside the grid makes the shape visible: call counts against the amount, on a logarithmic axis, with a dashed reference curve. It stops at sixteen whatever the amount is set to, because the unmemoised arm is re-run at every point on every redraw and plotting further would cost a few million calls for a picture that has already made its point. The figure above the plot is the full amount.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>One recurrence, three costs, one answer</h2></div><p>The same definition run without a memo, with one, and as a table</p></div>
@@ -1363,7 +1363,7 @@ overlapping subproblems: the recursion tree has few DISTINCT nodes</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether a memo is worth adding</h2></div><p>Both inputs to that decision are countable before any code is rewritten.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the distinct arguments the recursion can be called with</h3><p>Not the calls &mdash; the arguments. Here it is the remaining amount, so there are <span class="math">k + 1</span> of them. If that count is comparable to the number of calls, there is nothing to save and a memo is overhead.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the calls, by running it</h3><p>Put a counter in the function and run it on the instance you have. The ratio of the two counts is the saving available, and it is a measurement on that input rather than a property of the problem.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose the state, and know what you have chosen</h3><p>The memo keys on the amount alone; the table keys on the amount and how many denominations are in play. Both are correct. The first has eighteen entries and the second has 76 cells, and that difference is a design decision you are making whether or not you notice it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check that the memoised and unmemoised answers agree before trusting either</h3><p>A memo keyed on too little state returns a stored answer to a different question, and it does so silently and quickly. The only cheap defence is to run both on a small instance and compare, which is what the panel does on every keystroke.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the distinct arguments the recursion can be called with</h3><p>Not the calls &mdash; the arguments. Here it is the remaining amount, so there are <span class="math" data-say="k plus 1">k + 1</span> of them. If that count is comparable to the number of calls, there is nothing to save and a memo is overhead.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the calls, by running it</h3><p>Put a counter in the function and run it on the instance you have. The ratio of the two counts is the saving available, and it is a measurement on that input rather than a property of the problem.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose the state, and know what you have chosen</h3><p>The memo keys on the amount alone; the table keys on the amount and how many denominations are in play. Both are correct. The first has eighteen entries and the second has 76 cells, and that difference is a design decision you are making whether or not you notice it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check that the memoised and unmemoised answers agree before trusting either</h3><p>A memo keyed on too little state returns a stored answer to a different question, and it does so silently and quickly. The only cheap defence is to run both on a small instance and compare, which is what the panel does on every keystroke.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1374,7 +1374,7 @@ overlapping subproblems: the recursion tree has few DISTINCT nodes</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Where 22 089 calls go, and where 50 of them go</h3><p>The recursion is entered once per call, not once per distinct amount. Counting the top three levels of the unmemoised tree shows the duplication starting immediately.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">f(18)  asks for  f(17)   f(16)   f(13)
+      <article class="card card-pad prose"><h3>Where 22 089 calls go, and where 50 of them go</h3><p>The recursion is entered once per call, not once per distinct amount. Counting the top three levels of the unmemoised tree shows the duplication starting immediately.</p><div class="mathblock" data-say="f of 18, asks for, f of 17, f of 16, f of 13. f of 17, asks for, f of 16, f of 15, f of 12. f of 16, asks for, f of 15, f of 14, f of 11. f of 13, asks for, f of 12, f of 11, f of 8. f of 16 has already been asked for twice at depth two. f of 15 twice, f of 12 twice, f of 11 twice, minus, and the tree. is only three levels deep. totals on the panel, for coins 1, 2, 5 and an amount of 18. no memo, 22089 calls. with a memo, 50 calls, 18 distinct subproblems stored. the table, 76 cells, 106 reads. ratio, 22089 over 50, equals, 441.8 times fewer calls. answer, 5, from all three routes, 5 plus 5 plus 5 plus 2 plus 1" tabindex="0" role="region" aria-label="Mathematical notation">f(18)  asks for  f(17)   f(16)   f(13)
 f(17)  asks for  f(16)   f(15)   f(12)
 f(16)  asks for  f(15)   f(14)   f(11)
 f(13)  asks for  f(12)   f(11)   f(8)
@@ -1390,12 +1390,12 @@ totals on the panel, for coins 1, 2, 5 and an amount of 18
   the table          76 cells,  106 reads
 
   ratio  22089/50  =  441.8 times fewer calls
-  answer         5  from all three routes:  5 + 5 + 5 + 2 + 1</div><p>The duplication is not an artefact of a badly written recursion. It is structural: the argument is one number, so any two paths down the tree that have spent the same total reach the same subproblem, and there are many such pairs. A memo is the observation that the tree was a directed acyclic graph with eighteen interior nodes all along.</p><p>The reconstruction on the panel is a separate claim and is checked separately: the coins it reports are re-added, and the count of them is compared with the answer. <span class="math">5 + 5 + 5 + 2 + 1</span> is five coins adding to eighteen, and the panel says so rather than asserting that a reconstruction walked back correctly. Two lessons from here that check becomes the whole point of a page.</p><p>For a faded rehearsal, set the coins to 4 and 7 and the amount to 17. The supplied first move: 17 is odd and 4 is even, so any solution uses an odd number of 7s, which means one or three of them, leaving 10 or a negative amount. Decide what the panel will print before you look, and note that the answer is a result and not an error.</p></article>
+  answer         5  from all three routes:  5 + 5 + 5 + 2 + 1</div><p>The duplication is not an artefact of a badly written recursion. It is structural: the argument is one number, so any two paths down the tree that have spent the same total reach the same subproblem, and there are many such pairs. A memo is the observation that the tree was a directed acyclic graph with eighteen interior nodes all along.</p><p>The reconstruction on the panel is a separate claim and is checked separately: the coins it reports are re-added, and the count of them is compared with the answer. <span class="math" data-say="5 plus 5 plus 5 plus 2 plus 1">5 + 5 + 5 + 2 + 1</span> is five coins adding to eighteen, and the panel says so rather than asserting that a reconstruction walked back correctly. Two lessons from here that check becomes the whole point of a page.</p><p>For a faded rehearsal, set the coins to 4 and 7 and the amount to 17. The supplied first move: 17 is odd and 4 is even, so any solution uses an odd number of 7s, which means one or three of them, leaving 10 or a negative amount. Decide what the panel will print before you look, and note that the answer is a result and not an error.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the memo an optimisation and stopping there</strong><span>It is an optimisation, and describing it that way hides the number that makes it work. The saving is the ratio of calls to distinct arguments, and both are countable in advance. A reader who cannot say roughly what a memo will save before adding one cannot tell the case where it saves nothing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Keying the memo on too little state</strong><span>The memo here keys on the remaining amount because nothing else affects the answer. Add a constraint &mdash; at most two of each coin, say &mdash; and the amount alone is no longer enough, but the code still runs and still returns quickly. It returns a stored answer to a different question, and only comparing it with an unmemoised run on a small input will tell you.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math">22089/50</span> as a property of memoisation</strong><span>It is one instance. Change the amount to six and the ratio is <span class="math">18/7</span>; change the coin system and it moves again. The exact fraction is printed because the ratio is two integers, not because the number generalises.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the memo an optimisation and stopping there</strong><span>It is an optimisation, and describing it that way hides the number that makes it work. The saving is the ratio of calls to distinct arguments, and both are countable in advance. A reader who cannot say roughly what a memo will save before adding one cannot tell the case where it saves nothing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Keying the memo on too little state</strong><span>The memo here keys on the remaining amount because nothing else affects the answer. Add a constraint &mdash; at most two of each coin, say &mdash; and the amount alone is no longer enough, but the code still runs and still returns quickly. It returns a stored answer to a different question, and only comparing it with an unmemoised run on a small input will tell you.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math" data-say="22089 over 50">22089/50</span> as a property of memoisation</strong><span>It is one instance. Change the amount to six and the ratio is <span class="math" data-say="18 over 7">18/7</span>; change the coin system and it moves again. The exact fraction is printed because the ratio is two integers, not because the number generalises.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict a memo&#x27;s saving from two counts before you add it.</strong><p>You should be able to count the distinct arguments a recursion can take, count its calls by running it, explain the gap between the memo's entries and the table's cells as a choice of state, and name a recursion for which a memo would be pure overhead.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both routes so far have let the recursion decide what order to compute things in. The table does not: an order is chosen in advance, and the next lesson is about a table that finishes, prints a number, and is wrong because that order was chosen badly.</div></article>
       </div>
     </section>
@@ -1435,7 +1435,7 @@ totals on the panel, for coins 1, 2, 5 and an amount of 18
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math">n²2ⁿ</span> and <span class="math">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
+      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math" data-say="n squared 2 to the power n">n²2ⁿ</span> and <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -3396,6 +3396,178 @@ totals on the panel, for coins 1, 2, 5 and an amount of 18
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

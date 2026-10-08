@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">cost(i, j) = min over k of  cost(i, k) + cost(k+1, j) + p(i)·p(k+1)·p(j+1)
+        <div class="mathblock" data-say="cost of i, j equals the min over k of, cost of i, k plus cost of k plus 1, j plus p of i times p of the quantity k plus 1, times p of the quantity j plus 1. dimensions 30 35 15 5 10 20 25, which is six matrices. filled by interval length, 15125, and 42 bracketings agree. filled row by row, 9000, and 35 reads hit unwritten cells. an unwritten cell reads as nothing, and nothing plus a number is a number" tabindex="0" role="region" aria-label="Mathematical notation">cost(i, j) = min over k of  cost(i, k) + cost(k+1, j) + p(i)·p(k+1)·p(j+1)
 
 dimensions 30 35 15 5 10 20 25, which is six matrices
   filled by interval length    15 125     and 42 bracketings agree
@@ -1311,11 +1311,11 @@ an unwritten cell reads as nothing, and nothing plus a number is a number</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that reading a cell too early is not an error condition. It is a silent substitution of zero, and the table finishes looking exactly like a table that worked.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A cell covers an interval and reads two shorter ones</h3><p>The cell for the interval from <span class="math">i</span> to <span class="math">j</span> asks, for each split point <span class="math">k</span> inside it, what the two halves cost and what joining them costs, and keeps the best. Both halves are strictly shorter intervals. So every cell depends on cells nearer the diagonal, and an order that reaches a cell before both of its halves exist is reading something that has not been computed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>An unwritten cell is not an error; it is a zero in disguise</h3><p>The table filler returns nothing for a cell that has not been written yet, and adding nothing to a number in this language gives the number. So a recurrence that reads too early does not raise, does not print a blank and does not leave a gap. It computes a smaller total from a missing half and stores it, and every cell that later reads <em>that</em> cell inherits the error without noticing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The wrong order is cheaper-looking, which is what makes it dangerous</h3><p>Row-major reports 9 000 against the correct 15 125. A reader checking the arithmetic of one cell would find it consistent, and a reader who expected the optimum to be small would be encouraged. The only cheap defence is a second route: the lab enumerates all 42 bracketings and reports the smallest, and it is 15 125. The order that is wrong is the one that disagrees with the enumeration.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A cell covers an interval and reads two shorter ones</h3><p>The cell for the interval from <span class="math" data-say="i">i</span> to <span class="math" data-say="j">j</span> asks, for each split point <span class="math" data-say="k">k</span> inside it, what the two halves cost and what joining them costs, and keeps the best. Both halves are strictly shorter intervals. So every cell depends on cells nearer the diagonal, and an order that reaches a cell before both of its halves exist is reading something that has not been computed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>An unwritten cell is not an error; it is a zero in disguise</h3><p>The table filler returns nothing for a cell that has not been written yet, and adding nothing to a number in this language gives the number. So a recurrence that reads too early does not raise, does not print a blank and does not leave a gap. It computes a smaller total from a missing half and stores it, and every cell that later reads <em>that</em> cell inherits the error without noticing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The wrong order is cheaper-looking, which is what makes it dangerous</h3><p>Row-major reports 9 000 against the correct 15 125. A reader checking the arithmetic of one cell would find it consistent, and a reader who expected the optimum to be small would be encouraged. The only cheap defence is a second route: the lab enumerates all 42 bracketings and reports the smallest, and it is 15 125. The order that is wrong is the one that disagrees with the enumeration.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The recurrence, the two orders, and the reads that land on nothing</h2></div><p>What the chain problem asks, why the order is forced, what happens when it is not respected, and the count that catches it.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The matrix-chain problem</span><p>A chain of <span class="math">n</span> matrices is given by <span class="math">n + 1</span> dimensions: <span class="math">p(0), p(1), …, p(n)</span>, where matrix <span class="math">i</span> is <span class="math">p(i−1)</span> by <span class="math">p(i)</span>. Multiplying a <span class="math">p</span> by <span class="math">q</span> matrix with a <span class="math">q</span> by <span class="math">r</span> matrix costs <span class="math">p·q·r</span> scalar multiplications. The problem is to choose the bracketing &mdash; not the order of the matrices, which is fixed &mdash; that minimises the total.</p></div><p>Seven numbers describe six matrices. The lab loads <span class="math">30 35 15 5 10 20 25</span>, so the first matrix is 30 by 35, the second is 35 by 15, and so on. The product is the same matrix whatever the bracketing, because matrix multiplication is associative; only the cost of computing it changes, and on this chain it changes by a factor of nearly four between the best and worst bracketings.</p><div class="thm"><span class="label">Theorem &middot; The chain recurrence</span><p>Let <span class="math">cost(i, j)</span> be the fewest scalar multiplications needed to multiply matrices <span class="math">i</span> through <span class="math">j</span>, with <span class="math">cost(i, i) = 0</span>. Then for <span class="math">i &lt; j</span>, <span class="math">cost(i, j)</span> is the minimum over split points <span class="math">k</span> with <span class="math">i ≤ k &lt; j</span> of <span class="math">cost(i, k) + cost(k+1, j) + p(i)·p(k+1)·p(j+1)</span>.</p></div><div class="proof"><p>Any bracketing of matrices <span class="math">i</span> through <span class="math">j</span> has a last multiplication, which joins a bracketed product of <span class="math">i</span> through <span class="math">k</span> with a bracketed product of <span class="math">k+1</span> through <span class="math">j</span> for some <span class="math">k</span>. Those two products have dimensions determined by <span class="math">i</span>, <span class="math">k</span> and <span class="math">j</span> alone, so the cost of the join is <span class="math">p(i)·p(k+1)·p(j+1)</span> whatever the two halves did internally.</p><p>If either half were bracketed more cheaply, substituting it in would bracket the whole more cheaply, so each half of an optimal bracketing is itself optimal &mdash; optimal substructure, discharged. Taking the minimum over the <span class="math">j − i</span> possible values of <span class="math">k</span> therefore gives the optimum, and the recurrence is exact.</p><p><span class="qed">&#9633;</span></p></div><h3>The order the recurrence forces, and the order a reader writes</h3><p><span class="math">cost(i, j)</span> reads <span class="math">cost(i, k)</span> and <span class="math">cost(k+1, j)</span>, and both of those cover shorter intervals than <span class="math">i</span> to <span class="math">j</span>. So the cells have to be filled in increasing order of <span class="math">j − i</span>: all the zero-length intervals, then all the length-one intervals, and so on. That is a diagonal-by-diagonal sweep, and it fills 21 cells of the 36 in a six-by-six table, because only the upper triangle means anything.</p><p>The order a reader writes, because it is the order every other table in this course is filled in, is row by row. Row-major visits <span class="math">(0,0)</span>, <span class="math">(0,1)</span>, <span class="math">(0,2)</span> and so on across the whole first row before it has filled a single cell of the second. But <span class="math">(0,2)</span> needs <span class="math">(1,2)</span>, which is in the second row. It reads it anyway.</p><div class="example"><span class="label">Example &middot; The cell where row-major goes wrong, in full</span><p>Correct: <span class="math">cost(0,2) = min(cost(0,0) + cost(1,2) + 30·35·5, cost(0,1) + cost(2,2) + 30·15·5)</span> = <span class="math">min(0 + 2625 + 5250, 15750 + 0 + 2250)</span> = <span class="math">7875</span>. Row-major: when it reaches <span class="math">(0,2)</span>, the cell <span class="math">(1,2)</span> has not been written, so the first option evaluates to <span class="math">0 + 0 + 5250 = 5250</span>, which is smaller than 18 000, and 5250 is stored. The table now contains a number that no bracketing of those three matrices achieves.</p></div><p>The damage propagates. Every later cell that reads <span class="math">(0,2)</span> reads 5250, and the final answer in the corner comes out 9 000. Thirty-five reads over the whole fill land on cells that have not been written, and the lab counts them and paints them red. Fill by interval length and that count is zero.</p><h3>Why the wrong table does more work and still finishes</h3><p>Row-major writes all 36 cells; by-length writes 21. So the wrong order is not a shortcut &mdash; it does more work, produces a fuller-looking table, and reports a number two-fifths below the truth. Both orders make the same 70 reads, because the recurrence is the same recurrence; what differs is whether the read finds anything.</p><p>The measured counts here are 15 125 and 9 000 on one chain of six matrices, and 42 bracketings agreeing with the first of them. The proved bound is a different statement: the table has <span class="math">Θ(n²)</span> meaningful cells and each takes <span class="math">O(n)</span> work, so filling it is <span class="math">Θ(n³)</span>, against <span class="math">Catalan(n−1)</span> bracketings for the enumeration &mdash; 42 at six matrices, 132 at seven, 1 430 at nine. The enumeration is the only reason we know 15 125 is right, and it is also the thing that stops being runnable first.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The matrix-chain problem</span><p>A chain of <span class="math" data-say="n">n</span> matrices is given by <span class="math" data-say="n plus 1">n + 1</span> dimensions: <span class="math" data-say="p of 0, p of 1, and so on, p of n">p(0), p(1), …, p(n)</span>, where matrix <span class="math" data-say="i">i</span> is <span class="math" data-say="p of i minus 1">p(i−1)</span> by <span class="math" data-say="p of i">p(i)</span>. Multiplying a <span class="math" data-say="p">p</span> by <span class="math" data-say="q">q</span> matrix with a <span class="math" data-say="q">q</span> by <span class="math" data-say="r">r</span> matrix costs <span class="math" data-say="p times q times r">p·q·r</span> scalar multiplications. The problem is to choose the bracketing &mdash; not the order of the matrices, which is fixed &mdash; that minimises the total.</p></div><p>Seven numbers describe six matrices. The lab loads <span class="math" data-say="30 35 15 5 10 20 25">30 35 15 5 10 20 25</span>, so the first matrix is 30 by 35, the second is 35 by 15, and so on. The product is the same matrix whatever the bracketing, because matrix multiplication is associative; only the cost of computing it changes, and on this chain it changes by a factor of nearly four between the best and worst bracketings.</p><div class="thm"><span class="label">Theorem &middot; The chain recurrence</span><p>Let <span class="math" data-say="cost of i and j">cost(i, j)</span> be the fewest scalar multiplications needed to multiply matrices <span class="math" data-say="i">i</span> through <span class="math" data-say="j">j</span>, with <span class="math" data-say="cost of i and i equals 0">cost(i, i) = 0</span>. Then for <span class="math" data-say="i is less than j">i &lt; j</span>, <span class="math" data-say="cost of i and j">cost(i, j)</span> is the minimum over split points <span class="math" data-say="k">k</span> with <span class="math" data-say="i is less than or equal to k is less than j">i ≤ k &lt; j</span> of <span class="math" data-say="cost of i, k plus cost of k plus 1, j plus p of i times p of the quantity k plus 1, times p of the quantity j plus 1">cost(i, k) + cost(k+1, j) + p(i)·p(k+1)·p(j+1)</span>.</p></div><div class="proof"><p>Any bracketing of matrices <span class="math" data-say="i">i</span> through <span class="math" data-say="j">j</span> has a last multiplication, which joins a bracketed product of <span class="math" data-say="i">i</span> through <span class="math" data-say="k">k</span> with a bracketed product of <span class="math" data-say="k plus 1">k+1</span> through <span class="math" data-say="j">j</span> for some <span class="math" data-say="k">k</span>. Those two products have dimensions determined by <span class="math" data-say="i">i</span>, <span class="math" data-say="k">k</span> and <span class="math" data-say="j">j</span> alone, so the cost of the join is <span class="math" data-say="p of i times p of the quantity k plus 1, times p of the quantity j plus 1">p(i)·p(k+1)·p(j+1)</span> whatever the two halves did internally.</p><p>If either half were bracketed more cheaply, substituting it in would bracket the whole more cheaply, so each half of an optimal bracketing is itself optimal &mdash; optimal substructure, discharged. Taking the minimum over the <span class="math" data-say="j minus i">j − i</span> possible values of <span class="math" data-say="k">k</span> therefore gives the optimum, and the recurrence is exact.</p><p><span class="qed">&#9633;</span></p></div><h3>The order the recurrence forces, and the order a reader writes</h3><p><span class="math" data-say="cost of i and j">cost(i, j)</span> reads <span class="math" data-say="cost of i and k">cost(i, k)</span> and <span class="math" data-say="cost of k plus 1 and j">cost(k+1, j)</span>, and both of those cover shorter intervals than <span class="math" data-say="i">i</span> to <span class="math" data-say="j">j</span>. So the cells have to be filled in increasing order of <span class="math" data-say="j minus i">j − i</span>: all the zero-length intervals, then all the length-one intervals, and so on. That is a diagonal-by-diagonal sweep, and it fills 21 cells of the 36 in a six-by-six table, because only the upper triangle means anything.</p><p>The order a reader writes, because it is the order every other table in this course is filled in, is row by row. Row-major visits <span class="math" data-say="0, 0">(0,0)</span>, <span class="math" data-say="0, 1">(0,1)</span>, <span class="math" data-say="0, 2">(0,2)</span> and so on across the whole first row before it has filled a single cell of the second. But <span class="math" data-say="0, 2">(0,2)</span> needs <span class="math" data-say="1, 2">(1,2)</span>, which is in the second row. It reads it anyway.</p><div class="example"><span class="label">Example &middot; The cell where row-major goes wrong, in full</span><p>Correct: <span class="math" data-say="cost of 0 and 2 equals the min of cost of 0 and 0 plus cost of 1 and 2 plus 30 times 35 times 5 and cost of 0 and 1 plus cost of 2 and 2 plus 30 times 15 times 5">cost(0,2) = min(cost(0,0) + cost(1,2) + 30·35·5, cost(0,1) + cost(2,2) + 30·15·5)</span> = <span class="math" data-say="the min of 0 plus 2625 plus 5250 and 15750 plus 0 plus 2250">min(0 + 2625 + 5250, 15750 + 0 + 2250)</span> = <span class="math" data-say="7875">7875</span>. Row-major: when it reaches <span class="math" data-say="0, 2">(0,2)</span>, the cell <span class="math" data-say="1, 2">(1,2)</span> has not been written, so the first option evaluates to <span class="math" data-say="0 plus 0 plus 5250 equals 5250">0 + 0 + 5250 = 5250</span>, which is smaller than 18 000, and 5250 is stored. The table now contains a number that no bracketing of those three matrices achieves.</p></div><p>The damage propagates. Every later cell that reads <span class="math" data-say="0, 2">(0,2)</span> reads 5250, and the final answer in the corner comes out 9 000. Thirty-five reads over the whole fill land on cells that have not been written, and the lab counts them and paints them red. Fill by interval length and that count is zero.</p><h3>Why the wrong table does more work and still finishes</h3><p>Row-major writes all 36 cells; by-length writes 21. So the wrong order is not a shortcut &mdash; it does more work, produces a fuller-looking table, and reports a number two-fifths below the truth. Both orders make the same 70 reads, because the recurrence is the same recurrence; what differs is whether the read finds anything.</p><p>The measured counts here are 15 125 and 9 000 on one chain of six matrices, and 42 bracketings agreeing with the first of them. The proved bound is a different statement: the table has <span class="math" data-say="theta of n squared">Θ(n²)</span> meaningful cells and each takes <span class="math" data-say="big O of n">O(n)</span> work, so filling it is <span class="math" data-say="theta of n cubed">Θ(n³)</span>, against <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span> bracketings for the enumeration &mdash; 42 at six matrices, 132 at seven, 1 430 at nine. The enumeration is the only reason we know 15 125 is right, and it is also the thing that stops being runnable first.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>The order the cells are filled in is part of the algorithm</h2></div><p>By interval length against row by row, both against every bracketing</p></div>
@@ -1366,7 +1366,7 @@ an unwritten cell reads as nothing, and nothing plus a number is a number</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a fill order, and proving you chose it correctly</h2></div><p>The order is derived from the recurrence's reads, not from how the table looks on the page.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down, for one cell, exactly which cells it reads</h3><p>Not the shape of the dependency &mdash; the list. For the chain it is <span class="math">(i, k)</span> and <span class="math">(k+1, j)</span> for every split <span class="math">k</span>, which is two cells per split and <span class="math">j − i</span> splits. The lab records that list from the reads the recurrence actually performed, so it can be compared with yours.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find an order in which every cell&#x27;s reads come earlier</h3><p>Sort the cells by whatever quantity the dependencies decrease: interval length here, remaining amount in the coin table, prefix length in the string tables. That quantity is the thing the recurrence recurses on, and the order is always increasing in it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run the order you rejected as well</h3><p>A wrong order produces a complete table and a plausible number, so the way to see it is to run it. The lab keeps both on screen; away from the lab, fill the table twice and compare the corners.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the corner against something with no table in it</h3><p>Enumerate every bracketing while the chain is short enough &mdash; 42 at six matrices, 132 at seven, 429 at eight, which is the cap. If the two disagree, the table is wrong and the order is the first thing to suspect.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Count the reads that landed on nothing</h3><p>Zero is the only acceptable number, and it is a check you can make once rather than a property you have to argue about. Any positive count means the order is wrong even if the answer happened to come out right.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down, for one cell, exactly which cells it reads</h3><p>Not the shape of the dependency &mdash; the list. For the chain it is <span class="math" data-say="i, k">(i, k)</span> and <span class="math" data-say="k plus 1, j">(k+1, j)</span> for every split <span class="math" data-say="k">k</span>, which is two cells per split and <span class="math" data-say="j minus i">j − i</span> splits. The lab records that list from the reads the recurrence actually performed, so it can be compared with yours.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find an order in which every cell&#x27;s reads come earlier</h3><p>Sort the cells by whatever quantity the dependencies decrease: interval length here, remaining amount in the coin table, prefix length in the string tables. That quantity is the thing the recurrence recurses on, and the order is always increasing in it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run the order you rejected as well</h3><p>A wrong order produces a complete table and a plausible number, so the way to see it is to run it. The lab keeps both on screen; away from the lab, fill the table twice and compare the corners.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the corner against something with no table in it</h3><p>Enumerate every bracketing while the chain is short enough &mdash; 42 at six matrices, 132 at seven, 429 at eight, which is the cap. If the two disagree, the table is wrong and the order is the first thing to suspect.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Count the reads that landed on nothing</h3><p>Zero is the only acceptable number, and it is a check you can make once rather than a property you have to argue about. Any positive count means the order is wrong even if the answer happened to come out right.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1377,7 +1377,7 @@ an unwritten cell reads as nothing, and nothing plus a number is a number</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>The same table, filled two ways</h3><p>Rows and columns are matrices one to six; the cell in row i and column j is the cost of multiplying matrices i through j. Only the upper triangle carries meaning. The by-length fill leaves the lower triangle untouched; the row-major fill writes zeros into it and reads them.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">by interval length, shortest first
+      <article class="card card-pad prose"><h3>The same table, filled two ways</h3><p>Rows and columns are matrices one to six; the cell in row i and column j is the cost of multiplying matrices i through j. Only the upper triangle carries meaning. The by-length fill leaves the lower triangle untouched; the row-major fill writes zeros into it and reads them.</p><div class="mathblock" data-say="by interval length, shortest first. A 1, A 2, A 3, A 4, A 5, A 6. a table, shown on the page. A 4, times, times, times, 0, 1000, 3500. A 5, times, times, times, times, 0, 5000. A 6, times, times, times, times, times, 0. row by row, left to right. A 1, A 2, A 3, A 4, A 5, A 6. a table, shown on the page. enumerating all 42 bracketings, best 15125, worst 58000. the optimum is, A 1 times A 2 A 3 times A 4 A 5 A 6, and r e-costing that. tree from the dimensions alone gives 15125 again" tabindex="0" role="region" aria-label="Mathematical notation">by interval length, shortest first
 
          A1     A2     A3     A4     A5     A6
   A1      0  15750   7875   9375  11875  15125
@@ -1399,7 +1399,7 @@ row by row, left to right
 
 enumerating all 42 bracketings:   best 15125,   worst 58000
 the optimum is   ((A1(A2A3))((A4A5)A6))   and re-costing that
-tree from the dimensions alone gives 15125 again</div><p>Compare the two tables cell by cell and the divergence starts at <span class="math">(A1, A3)</span>: 7875 against 5250. Everything to its left agrees, because those cells read only the diagonal, which both orders have already written. Everything to its right is contaminated, and the corner is 9 000 instead of 15 125.</p><p>The second table's lower triangle is not empty, it is zeros, and those zeros are what the first row read. That is the mechanism in one sentence: the recurrence asked for a cell, the table had no value for it, and the arithmetic treated the absence as nothing rather than refusing. Any new recurrence written against this table filler has to know that, because a recurrence that reads too early will not tell you.</p><p>For a faded rehearsal, switch the dimensions to <span class="math">10 10 10 10 10</span> before you run it. The supplied first move: every matrix is 10 by 10, so every multiplication costs 1 000 and the total is three multiplications whatever the bracketing. Predict what by-length reports, predict what row-major reports, and check both &mdash; the answers are 3 000 and 1 000, and the enumeration of all five bracketings says the first.</p></article>
+tree from the dimensions alone gives 15125 again</div><p>Compare the two tables cell by cell and the divergence starts at <span class="math" data-say="A 1, A 3">(A1, A3)</span>: 7875 against 5250. Everything to its left agrees, because those cells read only the diagonal, which both orders have already written. Everything to its right is contaminated, and the corner is 9 000 instead of 15 125.</p><p>The second table's lower triangle is not empty, it is zeros, and those zeros are what the first row read. That is the mechanism in one sentence: the recurrence asked for a cell, the table had no value for it, and the arithmetic treated the absence as nothing rather than refusing. Any new recurrence written against this table filler has to know that, because a recurrence that reads too early will not tell you.</p><p>For a faded rehearsal, switch the dimensions to <span class="math" data-say="10 10 10 10 10">10 10 10 10 10</span> before you run it. The supplied first move: every matrix is 10 by 10, so every multiplication costs 1 000 and the total is three multiplications whatever the bracketing. Predict what by-length reports, predict what row-major reports, and check both &mdash; the answers are 3 000 and 1 000, and the enumeration of all five bracketings says the first.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1444,7 +1444,7 @@ tree from the dimensions alone gives 15125 again</div><p>Compare the two tables 
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math">n²2ⁿ</span> and <span class="math">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
+      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math" data-say="n squared 2 to the power n">n²2ⁿ</span> and <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1503,7 +1503,7 @@ tree from the dimensions alone gives 15125 again</div><p>Compare the two tables 
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Filled row by row, the chain table reports 9 000 where the correct answer is 15 125. Why does it not crash or leave a blank?", "a": ["Because the recurrence catches the missing cell and substitutes a default", "Because an unwritten cell reads as nothing, and nothing plus a number is that number", "Because row-major happens to fill the cells in dependency order for this chain", "Because the table is initialised to the correct values on the diagonal only"], "c": 1, "why": "The table filler returns nothing for a cell that is outside the table and for one inside it that has not been written, and the arithmetic then treats the absence as zero. Nothing catches it and nothing substitutes a default. Row-major is definitely not in dependency order here: 35 reads land on unwritten cells."}, {"q": "Which fact tells you the by-length answer is the right one, rather than merely the larger one?", "a": ["It is larger, and an optimum over costs is a minimum, so the larger of two candidate minima is the safer one", "It fills fewer cells, so it does less work", "Enumerating all 42 bracketings and re-costing the best one gives 15 125", "It makes zero reads on unwritten cells"], "c": 2, "why": "The enumeration has no table in it, so it cannot share the table's mistake, and re-costing the reconstructed tree from the dimensions is a third computation again. Zero early reads is good evidence and is the right thing to check, but it is a statement about the fill rather than about the answer; a recurrence can be wrong with a perfect order. Being larger is not evidence of anything."}, {"q": "How many cells does each order write, on six matrices?", "a": ["By length writes 21 and row-major writes 36: the wrong order does more work", "By length writes 36 and row-major writes 21: the wrong order takes a shortcut", "Both write 21; they differ only in the sequence", "Both write 36; the lower triangle is meaningless in either"], "c": 0, "why": "By-length visits only the upper triangle, which is 21 cells of the 36; row-major visits all of them and writes zeros below the diagonal. The wrong order is not a shortcut. It produces a fuller table, a smaller number, and more work, which is a combination worth remembering."}, {"q": "A different chain is filled row by row and the corner happens to match the enumeration. What follows?", "a": ["The order is correct for that shape of table", "Nothing about the order: it is one chain, and the early reads are still there to be counted", "Row-major is correct whenever the dimensions are increasing", "The recurrence must have been rewritten to read only leftward"], "c": 1, "why": "The lab's <span class=\"math\">10 100 5 50<\/span> instance is exactly this case: both orders report 7 500 and row-major still makes four reads on unwritten cells. An answer that comes out right through a fill that reads nothing is a coincidence of the numbers, and the count of early reads is what distinguishes it from a correct fill."}];
+  var QUIZ = [{"q": "Filled row by row, the chain table reports 9 000 where the correct answer is 15 125. Why does it not crash or leave a blank?", "a": ["Because the recurrence catches the missing cell and substitutes a default", "Because an unwritten cell reads as nothing, and nothing plus a number is that number", "Because row-major happens to fill the cells in dependency order for this chain", "Because the table is initialised to the correct values on the diagonal only"], "c": 1, "why": "The table filler returns nothing for a cell that is outside the table and for one inside it that has not been written, and the arithmetic then treats the absence as zero. Nothing catches it and nothing substitutes a default. Row-major is definitely not in dependency order here: 35 reads land on unwritten cells."}, {"q": "Which fact tells you the by-length answer is the right one, rather than merely the larger one?", "a": ["It is larger, and an optimum over costs is a minimum, so the larger of two candidate minima is the safer one", "It fills fewer cells, so it does less work", "Enumerating all 42 bracketings and re-costing the best one gives 15 125", "It makes zero reads on unwritten cells"], "c": 2, "why": "The enumeration has no table in it, so it cannot share the table's mistake, and re-costing the reconstructed tree from the dimensions is a third computation again. Zero early reads is good evidence and is the right thing to check, but it is a statement about the fill rather than about the answer; a recurrence can be wrong with a perfect order. Being larger is not evidence of anything."}, {"q": "How many cells does each order write, on six matrices?", "a": ["By length writes 21 and row-major writes 36: the wrong order does more work", "By length writes 36 and row-major writes 21: the wrong order takes a shortcut", "Both write 21; they differ only in the sequence", "Both write 36; the lower triangle is meaningless in either"], "c": 0, "why": "By-length visits only the upper triangle, which is 21 cells of the 36; row-major visits all of them and writes zeros below the diagonal. The wrong order is not a shortcut. It produces a fuller table, a smaller number, and more work, which is a combination worth remembering."}, {"q": "A different chain is filled row by row and the corner happens to match the enumeration. What follows?", "a": ["The order is correct for that shape of table", "Nothing about the order: it is one chain, and the early reads are still there to be counted", "Row-major is correct whenever the dimensions are increasing", "The recurrence must have been rewritten to read only leftward"], "c": 1, "why": "The lab's <span class=\"math\" data-say=\"10100 5 50\">10 100 5 50<\/span> instance is exactly this case: both orders report 7 500 and row-major still makes four reads on unwritten cells. An answer that comes out right through a fill that reads nothing is a coincidence of the numbers, and the count of early reads is what distinguishes it from a correct fill."}];
 
   (function () {
 
@@ -3404,6 +3404,178 @@ tree from the dimensions alone gives 15125 again</div><p>Compare the two tables 
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

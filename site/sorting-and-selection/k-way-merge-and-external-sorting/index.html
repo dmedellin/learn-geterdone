@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Sorting and Selection &middot; Selection, bounds and scale</span>
         <h1>k-Way Merging and Sorting in Practice</h1>
-        <p>A heap of <span class="math">k</span> run heads merges <span class="math">k</span> sorted runs in one pass over the data. It makes more comparisons than merging the runs two at a time, not fewer &mdash; a sift-down examines both children &mdash; and what it buys is the pass count: one instead of <span class="math">k − 1</span>. When the data lives on disk, a pass is the cost, which gives the external sort's pass formula; and the same runs-then-merges shape with insertion sort below a cutoff is what Timsort is.</p>
+        <p>A heap of <span class="math" data-say="k">k</span> run heads merges <span class="math" data-say="k">k</span> sorted runs in one pass over the data. It makes more comparisons than merging the runs two at a time, not fewer &mdash; a sift-down examines both children &mdash; and what it buys is the pass count: one instead of <span class="math" data-say="k minus 1">k − 1</span>. When the data lives on disk, a pass is the cost, which gives the external sort's pass formula; and the same runs-then-merges shape with insertion sort below a cutoff is what Timsort is.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">heap of k run heads: one extract and one insert per item, one pass over the data
+        <div class="mathblock" data-say="heap of k run heads, one extract and one insert per item, one pass over the data. 64 items in 8 runs, heap 302 comparisons, pairwise 180, 1 pass against 7. n times log base 2 k equals 192 is the order, a sift down compares both children, so about 2 times. N records, M in memory, B to a block, 1 plus the ceiling of log base the quantity M over B, times the quantity N over M, passes. 10 to the power 9 records, 10 to the power 6 in memory, blocks of 4, f A n-in 250000, 1000 runs, 2 passes. the same records with blocks of 500, f A n-in 2, and 21 passes" tabindex="0" role="region" aria-label="Mathematical notation">heap of k run heads: one extract and one insert per item, one pass over the data
 64 items in 8 runs:  heap 302 comparisons, pairwise 180  —  1 pass against 7
 n log₂ k = 192 is the order; a sift down compares both children, so about 2×
 N records, M in memory, B to a block:  1 + ⌈log_(M/B)(N/M)⌉ passes
@@ -1310,18 +1310,18 @@ the same records with blocks of 500:  fan-in 2, and 21 passes</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the cost model changes, and the algorithm that wins under the new one loses under the old.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>One pass through a heap, or k − 1 passes over the data</h3><p>Load the head of each of the <span class="math">k</span> runs into a min-heap, then repeatedly extract the smallest and push the next item from the run it came from. Every item is popped once, so the whole merge is a single sequential sweep of all <span class="math">n</span> items. Merging two runs at a time instead needs <span class="math">k − 1</span> rounds, and every round rereads the whole accumulated prefix: on eight runs of eight that is seven passes over the data against one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The heap makes more comparisons, not fewer</h3><p>This is the figure that surprises. On eight runs of eight, the heap merge makes 302 comparisons and the pairwise merges make 180. A two-way merge compares once per item taken; a sift-down compares the moved key with both children at every level, so the heap's count is about <span class="math">2n log₂ k</span> rather than <span class="math">n log₂ k</span>. <span class="math">n log₂ k</span> here is 192 and the measured 302 sits between that and 384, exactly as the extra child comparison predicts.</p></article><article class="card concept-card"><div class="icon">3</div><h3>When the unit is a pass, a comparison count is not the cost</h3><p>Sorting <span class="math">N</span> records with <span class="math">M</span> fitting in memory means writing <span class="math">N/M</span> sorted runs and then merging them with a fan-in of <span class="math">M/B</span>, where <span class="math">B</span> is the block size, which gives <span class="math">1 + ⌈log_(M/B)(N/M)⌉ passes</span>. A billion records with a million in memory and four to a block takes two passes. The same billion with blocks of five hundred leaves a fan-in of two and takes twenty-one. Nothing about the comparison count changed.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>One pass through a heap, or k − 1 passes over the data</h3><p>Load the head of each of the <span class="math" data-say="k">k</span> runs into a min-heap, then repeatedly extract the smallest and push the next item from the run it came from. Every item is popped once, so the whole merge is a single sequential sweep of all <span class="math" data-say="n">n</span> items. Merging two runs at a time instead needs <span class="math" data-say="k minus 1">k − 1</span> rounds, and every round rereads the whole accumulated prefix: on eight runs of eight that is seven passes over the data against one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The heap makes more comparisons, not fewer</h3><p>This is the figure that surprises. On eight runs of eight, the heap merge makes 302 comparisons and the pairwise merges make 180. A two-way merge compares once per item taken; a sift-down compares the moved key with both children at every level, so the heap's count is about <span class="math" data-say="2 n times log base 2 k">2n log₂ k</span> rather than <span class="math" data-say="n times log base 2 k">n log₂ k</span>. <span class="math" data-say="n times log base 2 k">n log₂ k</span> here is 192 and the measured 302 sits between that and 384, exactly as the extra child comparison predicts.</p></article><article class="card concept-card"><div class="icon">3</div><h3>When the unit is a pass, a comparison count is not the cost</h3><p>Sorting <span class="math" data-say="N">N</span> records with <span class="math" data-say="M">M</span> fitting in memory means writing <span class="math" data-say="N over M">N/M</span> sorted runs and then merging them with a fan-in of <span class="math" data-say="M over B">M/B</span>, where <span class="math" data-say="B">B</span> is the block size, which gives <span class="math" data-say="1 plus the ceiling of log base the quantity M over B, times the quantity N over M, passes">1 + ⌈log_(M/B)(N/M)⌉ passes</span>. A billion records with a million in memory and four to a block takes two passes. The same billion with blocks of five hundred leaves a fan-in of two and takes twenty-one. Nothing about the comparison count changed.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>One heap against k − 1 passes, and what a pass costs on disk</h2></div><p>The k-way merge and its real comparison count, the external sort's pass formula, and the cutoff that makes a hybrid.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; k-way merge</span><p>To <strong>merge</strong> <span class="math">k</span> sorted runs holding <span class="math">n</span> items in total: place the first item of each run into a min-heap of size <span class="math">k</span>, tagged with the run it came from. Repeatedly extract the minimum, append it to the output, and insert the next item of that run. Each item is inserted once and extracted once.</p></div><p>The heap holds <span class="math">k</span> items, not <span class="math">n</span>, so the extra memory is the fan-in rather than the data. Each extract costs a sift-down of depth <span class="math">⌊log₂ k⌋</span>, so the order of the comparison count is <span class="math">n log k</span> &mdash; but the constant deserves to be measured rather than assumed, and the lab measures it.</p><div class="example"><span class="label">Example &middot; Eight runs of eight, both ways</span><p>64 items. Through one heap: 302 comparisons, 64 pops, one pass over the data. Merging two runs at a time: 180 comparisons and seven passes, because each of the <span class="math">k − 1</span> rounds walks the whole accumulated prefix again. Both produce the same 64 items in the same order, and the lab checks that they agree rather than assuming it.</p></div><p>So in the comparison model the heap loses. <span class="math">n log₂ k = 192</span> at these sizes and the heap spends 302, which is between <span class="math">n log₂ k</span> and <span class="math">2n log₂ k = 384</span> &mdash; the extra factor being the comparison between the two children that a sift-down makes at every level before comparing with the parent. Heapsort paid the same factor in exactly the same place.</p><h3>Why anyone uses the heap anyway</h3><div class="defbox"><span class="label">Definition &middot; External merge sort</span><p>When <span class="math">N</span> records do not fit in the <span class="math">M</span> of memory available, sort in two phases. <strong>Run formation</strong>: read <span class="math">M</span> records at a time, sort them in memory, write them back as a sorted run, giving <span class="math">N/M</span> runs. <strong>Merging</strong>: repeatedly merge runs <span class="math">F</span> at a time, where the <strong>fan-in</strong> <span class="math">F</span> is <span class="math">M/B</span> for a block size of <span class="math">B</span>, since each open run needs one block of buffer.</p></div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">runs      = N/M
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; k-way merge</span><p>To <strong>merge</strong> <span class="math" data-say="k">k</span> sorted runs holding <span class="math" data-say="n">n</span> items in total: place the first item of each run into a min-heap of size <span class="math" data-say="k">k</span>, tagged with the run it came from. Repeatedly extract the minimum, append it to the output, and insert the next item of that run. Each item is inserted once and extracted once.</p></div><p>The heap holds <span class="math" data-say="k">k</span> items, not <span class="math" data-say="n">n</span>, so the extra memory is the fan-in rather than the data. Each extract costs a sift-down of depth <span class="math" data-say="the floor of log base 2 k">⌊log₂ k⌋</span>, so the order of the comparison count is <span class="math" data-say="n times log k">n log k</span> &mdash; but the constant deserves to be measured rather than assumed, and the lab measures it.</p><div class="example"><span class="label">Example &middot; Eight runs of eight, both ways</span><p>64 items. Through one heap: 302 comparisons, 64 pops, one pass over the data. Merging two runs at a time: 180 comparisons and seven passes, because each of the <span class="math" data-say="k minus 1">k − 1</span> rounds walks the whole accumulated prefix again. Both produce the same 64 items in the same order, and the lab checks that they agree rather than assuming it.</p></div><p>So in the comparison model the heap loses. <span class="math" data-say="n times log base 2 k equals 192">n log₂ k = 192</span> at these sizes and the heap spends 302, which is between <span class="math" data-say="n times log base 2 k">n log₂ k</span> and <span class="math" data-say="2 n times log base 2 k equals 384">2n log₂ k = 384</span> &mdash; the extra factor being the comparison between the two children that a sift-down makes at every level before comparing with the parent. Heapsort paid the same factor in exactly the same place.</p><h3>Why anyone uses the heap anyway</h3><div class="defbox"><span class="label">Definition &middot; External merge sort</span><p>When <span class="math" data-say="N">N</span> records do not fit in the <span class="math" data-say="M">M</span> of memory available, sort in two phases. <strong>Run formation</strong>: read <span class="math" data-say="M">M</span> records at a time, sort them in memory, write them back as a sorted run, giving <span class="math" data-say="N over M">N/M</span> runs. <strong>Merging</strong>: repeatedly merge runs <span class="math" data-say="F">F</span> at a time, where the <strong>fan-in</strong> <span class="math" data-say="F">F</span> is <span class="math" data-say="M over B">M/B</span> for a block size of <span class="math" data-say="B">B</span>, since each open run needs one block of buffer.</p></div><div class="mathblock" data-say="runs, equals N over M. f A n-in, F equals M over B. passes, equals 1 plus the ceiling of log base F of the quantity N over M, one to make the runs, then the merges. N equals 10 to the power 9, M equals 10 to the power 6, B equals 4, F equals 250000, runs equals 1000, 2 passes. N equals 10 to the power 9, M equals 10 cubed, B equals 4, F equals 250, runs equals 10 to the power 6, 4 passes. N equals 10 to the power 9, M equals 10 cubed, B equals 500, F equals 2, runs equals 10 to the power 6, 21 passes. N equals 10 to the power 7, M equals 10 to the power 7, everything fits, 1 pass, 0 merges" tabindex="0" role="region" aria-label="Mathematical notation">runs      = N/M
 fan-in    F = M/B
 passes    = 1 + ⌈log_F(N/M)⌉        one to make the runs, then the merges
 
 N = 10⁹, M = 10⁶, B = 4      F = 250 000, runs = 1000     2 passes
 N = 10⁹, M = 10³, B = 4      F = 250, runs = 10⁶          4 passes
 N = 10⁹, M = 10³, B = 500    F = 2,   runs = 10⁶         21 passes
-N = 10⁷, M = 10⁷             everything fits              1 pass, 0 merges</div><p>Read the third line against the second. The data is the same size, the algorithm is the same algorithm, and the pass count went from four to twenty-one because the fan-in &mdash; the base of the logarithm &mdash; fell from 250 to 2. A pass over a billion records is the expensive thing here, and the comparison count does not appear in the formula at all.</p><p>That is why the heap wins on disk and loses in the lab's comparison column: it makes <span class="math">k</span> runs into one in a single pass, so the number of passes is the logarithm of the run count in base <span class="math">F</span> rather than in base two. System Design's &ldquo;Sequential versus Random I/O&rdquo; prices exactly this count &mdash; it is the same number of sequential passes over the same data &mdash; and nothing on this page depends on that pricing.</p><h3>The cutoff, and the shape of a real library sort</h3><p>Merging singleton runs is wasteful: at the bottom of any merge sort the runs are tiny and insertion sort, which is <span class="math">Θ(m²)</span> but with a small constant and no allocation, beats it there. A hybrid insertion-sorts blocks of size <span class="math">c</span> and then merges them. On 64 shuffled keys the lab measures 594 comparisons at a cutoff of 1, 500 at 4, 448 at 11 and 527 at 20: the cheapest cutoff is strictly inside the range, which is what a crossover looks like.</p><p>Eleven is a measurement on one array, not a constant of nature. What generalises is the shape &mdash; form runs, insertion-sort below a cutoff, merge the runs &mdash; and that shape is Timsort's, which is the sort in the standard libraries of several languages. Timsort finds runs already present in the data rather than cutting fixed blocks, and merges them under a stack policy with galloping; neither of those is covered here.</p><p>Three figures on this page are of three different kinds, and the panel keeps them apart. 302 and 180 are comparison counts measured by running two merges on the same runs. <span class="math">1 + ⌈log_F(N/M)⌉</span> is arithmetic: a count of passes over records, computed rather than measured, and refused outright when memory is too small to hold two blocks. And 11 is the low point of a curve sampled at twenty cutoffs on one array.</p></article>
+N = 10⁷, M = 10⁷             everything fits              1 pass, 0 merges</div><p>Read the third line against the second. The data is the same size, the algorithm is the same algorithm, and the pass count went from four to twenty-one because the fan-in &mdash; the base of the logarithm &mdash; fell from 250 to 2. A pass over a billion records is the expensive thing here, and the comparison count does not appear in the formula at all.</p><p>That is why the heap wins on disk and loses in the lab's comparison column: it makes <span class="math" data-say="k">k</span> runs into one in a single pass, so the number of passes is the logarithm of the run count in base <span class="math" data-say="F">F</span> rather than in base two. System Design's &ldquo;Sequential versus Random I/O&rdquo; prices exactly this count &mdash; it is the same number of sequential passes over the same data &mdash; and nothing on this page depends on that pricing.</p><h3>The cutoff, and the shape of a real library sort</h3><p>Merging singleton runs is wasteful: at the bottom of any merge sort the runs are tiny and insertion sort, which is <span class="math" data-say="theta of m squared">Θ(m²)</span> but with a small constant and no allocation, beats it there. A hybrid insertion-sorts blocks of size <span class="math" data-say="c">c</span> and then merges them. On 64 shuffled keys the lab measures 594 comparisons at a cutoff of 1, 500 at 4, 448 at 11 and 527 at 20: the cheapest cutoff is strictly inside the range, which is what a crossover looks like.</p><p>Eleven is a measurement on one array, not a constant of nature. What generalises is the shape &mdash; form runs, insertion-sort below a cutoff, merge the runs &mdash; and that shape is Timsort's, which is the sort in the standard libraries of several languages. Timsort finds runs already present in the data rather than cutting fixed blocks, and merges them under a stack policy with galloping; neither of those is covered here.</p><p>Three figures on this page are of three different kinds, and the panel keeps them apart. 302 and 180 are comparison counts measured by running two merges on the same runs. <span class="math" data-say="1 plus the ceiling of log base F of the quantity N over M">1 + ⌈log_F(N/M)⌉</span> is arithmetic: a count of passes over records, computed rather than measured, and refused outright when memory is too small to hold two blocks. And 11 is the low point of a curve sampled at twenty cutoffs on one array.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Merging k runs at once</h2></div><p>One pass through a heap, against k − 1 passes over the data</p></div>
@@ -1337,7 +1337,7 @@ N = 10⁷, M = 10⁷             everything fits              1 pass, 0 merges</
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Merge the runs both ways, then choose a cutoff</h3>
-          <p>A heap of <span class="math">k</span> run heads does one extract and one insert per item, so <span class="math">k</span> runs merge in one pass. Merging them two at a time makes FEWER comparisons and rereads the accumulated prefix on every one of <span class="math">k − 1</span> passes. The pass count for <span class="math">N</span> items with <span class="math">M</span> of memory and blocks of <span class="math">B</span> is counted here, not computed from a logarithm.</p>
+          <p>A heap of <span class="math" data-say="k">k</span> run heads does one extract and one insert per item, so <span class="math" data-say="k">k</span> runs merge in one pass. Merging them two at a time makes FEWER comparisons and rereads the accumulated prefix on every one of <span class="math" data-say="k minus 1">k − 1</span> passes. The pass count for <span class="math" data-say="N">N</span> items with <span class="math" data-say="M">M</span> of memory and blocks of <span class="math" data-say="B">B</span> is counted here, not computed from a logarithm.</p>
         <div class="field" id="kwPresetField">
           <label for="kwPreset">Worked example</label>
           <select id="kwPreset"><option value="eight-runs" selected>eight runs of eight</option><option value="two-runs">two long runs</option><option value="many-short-runs">ten short runs</option></select>
@@ -1372,7 +1372,7 @@ N = 10⁷, M = 10⁷             everything fits              1 pass, 0 merges</
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a sort that does not fit in memory</h2></div><p>The first question is not which algorithm. It is what the cost model charges for.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide what the unit is</h3><p>In memory, a comparison. On disk, a pass over the data. The two rank the same two algorithms in opposite orders here, which is why naming the unit first is not pedantry: the heap merge makes 302 comparisons against 180 and is still the one to use.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Merge the runs both ways and count</h3><p>Set <span class="math">k</span> and the run lengths and read the two comparison columns, then the pass column. The heap's advantage is entirely in the last of those, and the lab checks that both methods produce the same merged sequence.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the pass count from <span class="math">N</span>, <span class="math">M</span> and <span class="math">B</span></h3><p>Runs are <span class="math">N/M</span>, the fan-in is <span class="math">M/B</span>, and the passes are <span class="math">1 + ⌈log_F(N/M)⌉</span>. Do it for two block sizes before choosing one; the block size enters only through the fan-in, and it is the base of a logarithm, which is where large changes come from.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check that the memory can hold two blocks at all</h3><p>If <span class="math">M/B</span> is below two there is no merge to perform, and the lab refuses rather than returning a number. A formula that keeps producing pass counts for a configuration that cannot run is worse than an error.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find the cutoff by measuring, and report it as a measurement</h3><p>Sweep the cutoff and read the total. The best value on the lab's 64-key array is 11; on another array it will be another number. Quote the shape as general and the number as local.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide what the unit is</h3><p>In memory, a comparison. On disk, a pass over the data. The two rank the same two algorithms in opposite orders here, which is why naming the unit first is not pedantry: the heap merge makes 302 comparisons against 180 and is still the one to use.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Merge the runs both ways and count</h3><p>Set <span class="math" data-say="k">k</span> and the run lengths and read the two comparison columns, then the pass column. The heap's advantage is entirely in the last of those, and the lab checks that both methods produce the same merged sequence.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the pass count from <span class="math" data-say="N">N</span>, <span class="math" data-say="M">M</span> and <span class="math" data-say="B">B</span></h3><p>Runs are <span class="math" data-say="N over M">N/M</span>, the fan-in is <span class="math" data-say="M over B">M/B</span>, and the passes are <span class="math" data-say="1 plus the ceiling of log base F of the quantity N over M">1 + ⌈log_F(N/M)⌉</span>. Do it for two block sizes before choosing one; the block size enters only through the fan-in, and it is the base of a logarithm, which is where large changes come from.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check that the memory can hold two blocks at all</h3><p>If <span class="math" data-say="M over B">M/B</span> is below two there is no merge to perform, and the lab refuses rather than returning a number. A formula that keeps producing pass counts for a configuration that cannot run is worse than an error.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find the cutoff by measuring, and report it as a measurement</h3><p>Sweep the cutoff and read the total. The best value on the lab's 64-key array is 11; on another array it will be another number. Quote the shape as general and the number as local.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1383,7 +1383,7 @@ N = 10⁷, M = 10⁷             everything fits              1 pass, 0 merges</
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Eight runs of eight, and a billion records on disk</h3><p>The runs are eight interleaved arithmetic sequences covering <span class="math">1 … 64</span>, so every run is sorted and no run dominates another. The two merges below are run on the same eight runs and produce the same 64 items.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">runs      8 runs of 8, 64 items in all
+      <article class="card card-pad prose"><h3>Eight runs of eight, and a billion records on disk</h3><p>The runs are eight interleaved arithmetic sequences covering <span class="math" data-say="1 and so on 64">1 … 64</span>, so every run is sorted and no run dominates another. The two merges below are run on the same eight runs and produce the same 64 items.</p><div class="mathblock" data-say="runs, 8 runs of 8, 64 items in all. method, comparisons, passes over the data. a table, shown on the page. pairwise, two runs at a time, 180, 7, equals k minus 1. n times log base 2 k, equals 64 times 3 equals 192, the order of the heap merge. 2 n times log base 2 k equals 384, a sift down compares both children. measured, 302, between the two, as that predicts. ON DISK, passes equals 1 plus the ceiling of log base the quantity M over B, times the quantity N over M. N, M, B, f A n-in, runs, passes. a table, shown on the page. THE CUTOFF, 64 shuffled keys, insertion sort below c then merge. a table, shown on the page. c equals 20, 527, cheapest at c equals 11, strictly inside the range" tabindex="0" role="region" aria-label="Mathematical notation">runs      8 runs of 8, 64 items in all
 
   method                     comparisons   passes over the data
   one heap of 8 run heads         302             1
@@ -1403,13 +1403,13 @@ ON DISK,  passes = 1 + ⌈log_(M/B)(N/M)⌉
 
 THE CUTOFF, 64 shuffled keys, insertion sort below c then merge
   c =  1   594          c =  4   500          c = 11   448
-  c = 20   527          cheapest at c = 11, strictly inside the range</div><p>The first table is the whole lesson in two rows. The heap loses the comparison column by 122 and wins the pass column by six, and which of those two facts is the cost depends on where the data lives. In memory the pairwise merge is the better choice; on disk seven passes over a billion records is not a choice at all.</p><p>The second table's third row is the one to keep. Same data, same memory, same algorithm, and five times the passes, because a block size of 500 leaves room for only two buffers and the fan-in is the base of the logarithm. The last row is the degenerate case worth checking a formula against: data that fits takes one pass and no merges at all.</p><p>For a faded rehearsal, work out the pass count for a hundred million records with ten thousand in memory and blocks of twenty. The supplied first move is the fan-in: <span class="math">M/B = 500</span>. Compute the run count, then the logarithm, then the passes &mdash; and then say what block size would bring it down by one, and whether that is a change you could actually make.</p></article>
+  c = 20   527          cheapest at c = 11, strictly inside the range</div><p>The first table is the whole lesson in two rows. The heap loses the comparison column by 122 and wins the pass column by six, and which of those two facts is the cost depends on where the data lives. In memory the pairwise merge is the better choice; on disk seven passes over a billion records is not a choice at all.</p><p>The second table's third row is the one to keep. Same data, same memory, same algorithm, and five times the passes, because a block size of 500 leaves room for only two buffers and the fan-in is the base of the logarithm. The last row is the degenerate case worth checking a formula against: data that fits takes one pass and no merges at all.</p><p>For a faded rehearsal, work out the pass count for a hundred million records with ten thousand in memory and blocks of twenty. The supplied first move is the fan-in: <span class="math" data-say="M over B equals 500">M/B = 500</span>. Compute the run count, then the logarithm, then the passes &mdash; and then say what block size would bring it down by one, and whether that is a change you could actually make.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the heap merge to make fewer comparisons</strong><span>It makes more: 302 against 180 on eight runs of eight, and the gap grows with <span class="math">k</span>. A two-way merge compares once per item taken, while a sift-down compares the two children with each other before comparing the winner with the parent. The heap's case rests entirely on the pass count, and saying so out loud is what keeps the argument honest.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading <span class="math">n log k</span> as a comparison count you can quote</strong><span>It is the order, and the constant is about two for a binary heap. At 64 items in eight runs, <span class="math">n log₂ k</span> is 192 and the measured count is 302. The lesson prints both because the gap is not noise: it is the second child comparison, the same constant heapsort paid.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the pass formula as a comparison count</strong><span><span class="math">1 + ⌈log_(M/B)(N/M)⌉</span> counts passes over records, and nothing in it mentions comparisons. That is the point of this lesson: the cost model changed, and an algorithm that is worse under the old unit is the right one under the new.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which unit a sort is being charged in, and choose accordingly.</strong><p>You should be able to merge <span class="math">k</span> runs through a heap by hand, explain why its comparison count is about twice <span class="math">n log₂ k</span>, compute the pass count for given <span class="math">N</span>, <span class="math">M</span> and <span class="math">B</span> and say what a change of block size does to it, and report a measured cutoff as the local number it is.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the course. It began with four promises that no complexity class supplies, worked through a randomised expectation that is exact and holds on every input, left the comparison model twice, found one order statistic without sorting, proved three bounds against every algorithm, and ended by changing the unit the cost is charged in. The habit worth keeping is the one every panel enforced: print the measured count and the proved bound side by side, and say which of the two is a claim about all inputs.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the heap merge to make fewer comparisons</strong><span>It makes more: 302 against 180 on eight runs of eight, and the gap grows with <span class="math" data-say="k">k</span>. A two-way merge compares once per item taken, while a sift-down compares the two children with each other before comparing the winner with the parent. The heap's case rests entirely on the pass count, and saying so out loud is what keeps the argument honest.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading <span class="math" data-say="n times log k">n log k</span> as a comparison count you can quote</strong><span>It is the order, and the constant is about two for a binary heap. At 64 items in eight runs, <span class="math" data-say="n times log base 2 k">n log₂ k</span> is 192 and the measured count is 302. The lesson prints both because the gap is not noise: it is the second child comparison, the same constant heapsort paid.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the pass formula as a comparison count</strong><span><span class="math" data-say="1 plus the ceiling of log base the quantity M over B, times the quantity N over M">1 + ⌈log_(M/B)(N/M)⌉</span> counts passes over records, and nothing in it mentions comparisons. That is the point of this lesson: the cost model changed, and an algorithm that is worse under the old unit is the right one under the new.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which unit a sort is being charged in, and choose accordingly.</strong><p>You should be able to merge <span class="math" data-say="k">k</span> runs through a heap by hand, explain why its comparison count is about twice <span class="math" data-say="n times log base 2 k">n log₂ k</span>, compute the pass count for given <span class="math" data-say="N">N</span>, <span class="math" data-say="M">M</span> and <span class="math" data-say="B">B</span> and say what a change of block size does to it, and report a measured cutoff as the local number it is.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the course. It began with four promises that no complexity class supplies, worked through a randomised expectation that is exact and holds on every input, left the comparison model twice, found one order statistic without sorting, proved three bounds against every algorithm, and ended by changing the unit the cost is charged in. The habit worth keeping is the one every panel enforced: print the measured count and the proved bound side by side, and say which of the two is a claim about all inputs.</div></article>
       </div>
     </section>
     </main>
@@ -1448,7 +1448,7 @@ THE CUTOFF, 64 shuffled keys, insertion sort below c then merge
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Sorting and Selection.</strong> Every comparison count on this course is produced by running the sort on the array shown. <span class="math">2(n+1)Hₙ − 4n</span> is evaluated as an exact fraction over BigInt, so the measured mean and the exact expectation can be compared as numbers rather than as decimals that nearly agree. The one place this course rounds is the plotted curve <span class="math">n log₂ n</span>, which is a drawing, not a claim.</p>
+      <p><strong>Sorting and Selection.</strong> Every comparison count on this course is produced by running the sort on the array shown. <span class="math" data-say="2 times the quantity n plus 1, times H sub n minus 4 n">2(n+1)Hₙ − 4n</span> is evaluated as an exact fraction over BigInt, so the measured mean and the exact expectation can be compared as numbers rather than as decimals that nearly agree. The one place this course rounds is the plotted curve <span class="math" data-say="n times log base 2 n">n log₂ n</span>, which is a drawing, not a claim.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1507,7 +1507,7 @@ THE CUTOFF, 64 shuffled keys, insertion sort below c then merge
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Merging eight sorted runs pairwise made 180 comparisons where one heap made 302. Why is the heap used for external sorting?", "a": ["Because the heap is faster in comparisons once <span class=\"math\">k<\/span> is large", "Because the pairwise merge makes <span class=\"math\">k \u2212 1 = 7<\/span> passes over the data, and on disk a pass is the cost", "Because the heap needs less memory than a pairwise merge", "Because the pairwise merge is not stable"], "c": 1, "why": "The comparison count is genuinely worse for the heap and stays worse as <span class=\"math\">k<\/span> grows, since a sift-down examines both children. What the heap buys is one sequential sweep instead of <span class=\"math\">k \u2212 1<\/span>, which is the quantity the external sort's pass formula counts."}, {"q": "A billion records, a million fitting in memory, four records to a block. How many passes?", "a": ["1", "2", "1 000", "21"], "c": 1, "why": "The runs are <span class=\"math\">N/M = 1000<\/span> and the fan-in is <span class=\"math\">M/B = 250 000<\/span>, so one merge pass suffices: <span class=\"math\">1 + \u2308log\u2082\u2085\u2080\u2080\u2080\u2080 1000\u2309 = 1 + 1 = 2<\/span>. One pass writes the runs and one merges them all at once."}, {"q": "The same billion records with a thousand in memory take four passes at a block size of four and twenty-one at a block size of five hundred. What changed?", "a": ["The data got larger", "The fan-in <span class=\"math\">M/B<\/span> fell from 250 to 2, and the fan-in is the base of the logarithm", "The runs got shorter", "The heap became too large to hold"], "c": 1, "why": "<span class=\"math\">N<\/span> and <span class=\"math\">M<\/span> are identical in both rows, so the run count is a million either way. Larger blocks mean fewer of them fit in memory, and with room for only two buffers the merge is binary: <span class=\"math\">log\u2082<\/span> of a million is twenty, plus the run-forming pass."}, {"q": "The cheapest cutoff for the hybrid on 64 keys was 11, giving 448 comparisons against 594 at a cutoff of 1. What kind of figure is 11?", "a": ["A proved optimum for merge-then-insertion hybrids", "A measured crossover on this array: the shape generalises, the number does not", "The block size the machine happens to use", "<span class=\"math\">log\u2082 64<\/span> rounded up"], "c": 1, "why": "It is the low point of a curve sampled at twenty cutoffs on one array of 64 keys, and another array gives another number. What does generalise is that the curve has an interior minimum at all, because insertion sort wins on small blocks and loses on large ones."}];
+  var QUIZ = [{"q": "Merging eight sorted runs pairwise made 180 comparisons where one heap made 302. Why is the heap used for external sorting?", "a": ["Because the heap is faster in comparisons once <span class=\"math\" data-say=\"k\">k<\/span> is large", "Because the pairwise merge makes <span class=\"math\" data-say=\"k minus 1 equals 7\">k \u2212 1 = 7<\/span> passes over the data, and on disk a pass is the cost", "Because the heap needs less memory than a pairwise merge", "Because the pairwise merge is not stable"], "c": 1, "why": "The comparison count is genuinely worse for the heap and stays worse as <span class=\"math\" data-say=\"k\">k<\/span> grows, since a sift-down examines both children. What the heap buys is one sequential sweep instead of <span class=\"math\" data-say=\"k minus 1\">k \u2212 1<\/span>, which is the quantity the external sort's pass formula counts."}, {"q": "A billion records, a million fitting in memory, four records to a block. How many passes?", "a": ["1", "2", "1 000", "21"], "c": 1, "why": "The runs are <span class=\"math\" data-say=\"N over M equals 1000\">N/M = 1000<\/span> and the fan-in is <span class=\"math\" data-say=\"M over B equals 250000\">M/B = 250 000<\/span>, so one merge pass suffices: <span class=\"math\" data-say=\"1 plus the ceiling of log base 250000 1000, equals 1 plus 1 equals 2\">1 + \u2308log\u2082\u2085\u2080\u2080\u2080\u2080 1000\u2309 = 1 + 1 = 2<\/span>. One pass writes the runs and one merges them all at once."}, {"q": "The same billion records with a thousand in memory take four passes at a block size of four and twenty-one at a block size of five hundred. What changed?", "a": ["The data got larger", "The fan-in <span class=\"math\" data-say=\"M over B\">M/B<\/span> fell from 250 to 2, and the fan-in is the base of the logarithm", "The runs got shorter", "The heap became too large to hold"], "c": 1, "why": "<span class=\"math\" data-say=\"N\">N<\/span> and <span class=\"math\" data-say=\"M\">M<\/span> are identical in both rows, so the run count is a million either way. Larger blocks mean fewer of them fit in memory, and with room for only two buffers the merge is binary: <span class=\"math\" data-say=\"log base 2\">log\u2082<\/span> of a million is twenty, plus the run-forming pass."}, {"q": "The cheapest cutoff for the hybrid on 64 keys was 11, giving 448 comparisons against 594 at a cutoff of 1. What kind of figure is 11?", "a": ["A proved optimum for merge-then-insertion hybrids", "A measured crossover on this array: the shape generalises, the number does not", "The block size the machine happens to use", "<span class=\"math\" data-say=\"log base 2 64\">log\u2082 64<\/span> rounded up"], "c": 1, "why": "It is the low point of a curve sampled at twenty cutoffs on one array of 64 keys, and another array gives another number. What does generalise is that the curve has an interior minimum at all, because insertion sort wins on small blocks and loses on large ones."}];
 
   (function () {
 
@@ -2924,6 +2924,178 @@ THE CUTOFF, 64 shuffled keys, insertion sort below c then merge
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

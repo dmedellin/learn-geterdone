@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">demand paging: every miss loads the page, so the only choice is what to evict
+        <div class="mathblock" data-say="demand paging, every miss loads the page, so the only choice is what to evict. farthest-in-future, evict the page whose next use is latest, needs the whole trace. twelve references, three slots, FIFO 3, LRU 2, farthest-in-future 5. the best any offline policy can do is 5, over 43 distinct position, cache states. FIFO as the cache grows 1 to 6, 0, 0, 3, 2, 7, 7, four slots lose a hit. LRU on the same trace, 0, 0, 2, 4, 7, 7, never falls" tabindex="0" role="region" aria-label="Mathematical notation">demand paging: every miss loads the page, so the only choice is what to evict
 farthest-in-future: evict the page whose next use is latest — needs the whole trace
 twelve references, three slots: FIFO 3, LRU 2, farthest-in-future 5
 the best any offline policy can do is 5, over 43 distinct (position, cache) states
@@ -1314,7 +1314,7 @@ LRU on the same trace: 0, 0, 2, 4, 7, 7 — never falls</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Three policies, a bound, and an anomaly</h2></div><p>The model, the three eviction rules, the proof that farthest-in-future is optimal, the independent search that confirms it, and the sweep where a bigger cache loses.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The paging problem</span><p>A cache holds <span class="math">k</span> pages. A <strong>trace</strong> is a sequence of page references. A reference to a resident page is a <strong>hit</strong>; a reference to an absent page is a <strong>miss</strong>, and the page is loaded, evicting one resident page if the cache is full. A policy is the rule for choosing which.</p></div><p>The lab opens on the trace <span class="math">1 2 3 4 1 2 5 1 2 3 4 5</span> with three slots: twelve references over five distinct pages. FIFO evicts the page that has been resident longest and gets 3 hits, a rate of <span class="math">1/4</span>. LRU evicts the page unused for longest and gets 2, a rate of <span class="math">1/6</span>. Farthest-in-future gets 5, a rate of <span class="math">5/12</span>.</p><p>LRU doing worse than FIFO here is worth a moment. LRU is the better policy on most workloads and it is not a theorem; on this trace, which was built to embarrass FIFO's cache-size behaviour, LRU happens to lose by one hit. Two measurements on one trace, and neither is a ranking.</p><div class="defbox"><span class="label">Definition &middot; Farthest-in-future</span><p>On a miss with a full cache, evict the resident page whose next reference is latest in the remaining trace; a page never referenced again is evicted first. This requires the whole trace in advance, so it is an <strong>offline</strong> policy.</p></div><div class="thm"><span class="label">Theorem &middot; Farthest-in-future is optimal</span><p>For every trace and every cache size, no policy &mdash; online or offline &mdash; achieves more hits than farthest-in-future under demand paging.</p></div><p>The proof is an exchange argument of exactly the shape performed earlier on this course. Take any optimal schedule of evictions and the first point at which it differs from farthest-in-future; show that its choice can be replaced by farthest-in-future's without losing a hit, by tracking the two caches, which differ in at most one page, until they coincide again. Repeating drives the first difference forward, and the schedule becomes farthest-in-future's.</p><p>The lab does not run that argument. It does something stronger for the instance on screen: it searches every eviction decision a cache of this size could make, memoised on the pair of position and cache contents, and reports the maximum hits reachable. On the opening trace that search visits 43 distinct states and returns 5, which is what farthest-in-future got. So the optimality claim is checked here rather than cited, by a search that knows nothing about looking ahead.</p><div class="example"><span class="label">Example &middot; Where the online policies cannot reach</span><p>On the thirteen-reference trace <span class="math">1 2 3 1 4 1 2 5 1 2 3 4 5</span> with three slots, FIFO and LRU both get 4 hits and farthest-in-future gets 6, confirmed by a search over 44 states. On the loop <span class="math">1 2 3 4</span> repeated three times with three slots, FIFO and LRU both get 0 &mdash; each evicts precisely the page about to be used &mdash; while the offline optimum is 6 of 12, because on every miss it discards the page whose turn comes last rather than the one whose turn comes next.</p></div><h3>Belady&#x27;s anomaly, swept rather than described</h3><p>The panel sweeps FIFO from one slot to six on whatever trace is loaded and prints the hit count at each size. On the opening trace that row reads 0, 0, 3, 2, 7, 7: going from three slots to four costs a hit. On the thirteen-reference trace it reads 0, 1, 4, 3, 8, 8, and the same step loses a hit again. This is Belady's anomaly, and the reader sees the row rather than the citation.</p><p>The same sweep under LRU on those two traces reads 0, 0, 2, 4, 7, 7 and 0, 1, 4, 5, 8, 8: never falling. That is not luck. LRU is a <em>stack</em> policy &mdash; the pages resident with <span class="math">k</span> slots are always a subset of those resident with <span class="math">k + 1</span> at the same point &mdash; and a stack policy cannot suffer the anomaly. FIFO is not a stack policy, and the two rows above are what that difference costs.</p><p>The sweep the panel draws is always FIFO's, whichever policy is selected for the chart, and the column that reads whether a bigger cache ever does worse is about FIFO alone. On two of the four shipped traces it reads no, and a reader who took that as a statement about caching in general would have generalised from a policy to a field.</p><h3>A caption to distrust</h3><p>The trace <span class="math">1 2 1 3 1 4 1 5 1 6 1 7</span> with two slots is captioned as one where every policy keeps the hot page and the differences between them disappear. The table above it reads FIFO 3, LRU 5, farthest-in-future 5. FIFO does not keep the hot page: it evicts by arrival order, and page 1 is reloaded and then evicted again on every cycle. The difference between the policies on that trace is two hits out of twelve, which is the largest relative gap between FIFO and LRU on any of the four.</p><p>Measured on this page: 12 references, 3 slots, FIFO 3, LRU 2, farthest-in-future 5, offline optimum 5 over 43 states, and a FIFO sweep of 0, 0, 3, 2, 7, 7. Proved on this page: farthest-in-future is optimal on every trace and every cache size. Not proved anywhere in this library: any bound on how far an online policy can fall behind it, which is the competitive analysis this course names and does not develop.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The paging problem</span><p>A cache holds <span class="math" data-say="k">k</span> pages. A <strong>trace</strong> is a sequence of page references. A reference to a resident page is a <strong>hit</strong>; a reference to an absent page is a <strong>miss</strong>, and the page is loaded, evicting one resident page if the cache is full. A policy is the rule for choosing which.</p></div><p>The lab opens on the trace <span class="math" data-say="1 2 3 4 1 2 5 1 2 3 4 5">1 2 3 4 1 2 5 1 2 3 4 5</span> with three slots: twelve references over five distinct pages. FIFO evicts the page that has been resident longest and gets 3 hits, a rate of <span class="math" data-say="1 over 4">1/4</span>. LRU evicts the page unused for longest and gets 2, a rate of <span class="math" data-say="1 over 6">1/6</span>. Farthest-in-future gets 5, a rate of <span class="math" data-say="5 over 12">5/12</span>.</p><p>LRU doing worse than FIFO here is worth a moment. LRU is the better policy on most workloads and it is not a theorem; on this trace, which was built to embarrass FIFO's cache-size behaviour, LRU happens to lose by one hit. Two measurements on one trace, and neither is a ranking.</p><div class="defbox"><span class="label">Definition &middot; Farthest-in-future</span><p>On a miss with a full cache, evict the resident page whose next reference is latest in the remaining trace; a page never referenced again is evicted first. This requires the whole trace in advance, so it is an <strong>offline</strong> policy.</p></div><div class="thm"><span class="label">Theorem &middot; Farthest-in-future is optimal</span><p>For every trace and every cache size, no policy &mdash; online or offline &mdash; achieves more hits than farthest-in-future under demand paging.</p></div><p>The proof is an exchange argument of exactly the shape performed earlier on this course. Take any optimal schedule of evictions and the first point at which it differs from farthest-in-future; show that its choice can be replaced by farthest-in-future's without losing a hit, by tracking the two caches, which differ in at most one page, until they coincide again. Repeating drives the first difference forward, and the schedule becomes farthest-in-future's.</p><p>The lab does not run that argument. It does something stronger for the instance on screen: it searches every eviction decision a cache of this size could make, memoised on the pair of position and cache contents, and reports the maximum hits reachable. On the opening trace that search visits 43 distinct states and returns 5, which is what farthest-in-future got. So the optimality claim is checked here rather than cited, by a search that knows nothing about looking ahead.</p><div class="example"><span class="label">Example &middot; Where the online policies cannot reach</span><p>On the thirteen-reference trace <span class="math" data-say="1 2 3 1 4 1 2 5 1 2 3 4 5">1 2 3 1 4 1 2 5 1 2 3 4 5</span> with three slots, FIFO and LRU both get 4 hits and farthest-in-future gets 6, confirmed by a search over 44 states. On the loop <span class="math" data-say="1 2 3 4">1 2 3 4</span> repeated three times with three slots, FIFO and LRU both get 0 &mdash; each evicts precisely the page about to be used &mdash; while the offline optimum is 6 of 12, because on every miss it discards the page whose turn comes last rather than the one whose turn comes next.</p></div><h3>Belady&#x27;s anomaly, swept rather than described</h3><p>The panel sweeps FIFO from one slot to six on whatever trace is loaded and prints the hit count at each size. On the opening trace that row reads 0, 0, 3, 2, 7, 7: going from three slots to four costs a hit. On the thirteen-reference trace it reads 0, 1, 4, 3, 8, 8, and the same step loses a hit again. This is Belady's anomaly, and the reader sees the row rather than the citation.</p><p>The same sweep under LRU on those two traces reads 0, 0, 2, 4, 7, 7 and 0, 1, 4, 5, 8, 8: never falling. That is not luck. LRU is a <em>stack</em> policy &mdash; the pages resident with <span class="math" data-say="k">k</span> slots are always a subset of those resident with <span class="math" data-say="k plus 1">k + 1</span> at the same point &mdash; and a stack policy cannot suffer the anomaly. FIFO is not a stack policy, and the two rows above are what that difference costs.</p><p>The sweep the panel draws is always FIFO's, whichever policy is selected for the chart, and the column that reads whether a bigger cache ever does worse is about FIFO alone. On two of the four shipped traces it reads no, and a reader who took that as a statement about caching in general would have generalised from a policy to a field.</p><h3>A caption to distrust</h3><p>The trace <span class="math" data-say="1 2 1 3 1 4 1 5 1 6 1 7">1 2 1 3 1 4 1 5 1 6 1 7</span> with two slots is captioned as one where every policy keeps the hot page and the differences between them disappear. The table above it reads FIFO 3, LRU 5, farthest-in-future 5. FIFO does not keep the hot page: it evicts by arrival order, and page 1 is reloaded and then evicted again on every cycle. The difference between the policies on that trace is two hits out of twelve, which is the largest relative gap between FIFO and LRU on any of the four.</p><p>Measured on this page: 12 references, 3 slots, FIFO 3, LRU 2, farthest-in-future 5, offline optimum 5 over 43 states, and a FIFO sweep of 0, 0, 3, 2, 7, 7. Proved on this page: farthest-in-future is optimal on every trace and every cache size. Not proved anywhere in this library: any bound on how far an online policy can fall behind it, which is the competitive analysis this course names and does not develop.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>The policy you cannot implement, and why it is still the answer</h2></div><p>FIFO, LRU and farthest-in-future against a search over every eviction</p></div>
@@ -1373,7 +1373,7 @@ LRU on the same trace: 0, 0, 2, 4, 7, 7 — never falls</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Twelve references, three slots, three policies</h3><p>The trace is <span class="math">1 2 3 4 1 2 5 1 2 3 4 5</span>. Three slots. Each column below shows the cache after the reference, with a star marking a hit.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">   ref    FIFO cache      LRU cache       farthest-in-future cache
+      <article class="card card-pad prose"><h3>Twelve references, three slots, three policies</h3><p>The trace is <span class="math" data-say="1 2 3 4 1 2 5 1 2 3 4 5">1 2 3 4 1 2 5 1 2 3 4 5</span>. Three slots. Each column below shows the cache after the reference, with a star marking a hit.</p><div class="mathblock" data-say="ref, FIFO cache, LRU cache, farthest-in-future cache. a table, shown on the page. hits, FIFO 3, LRU 2, farthest-in-future 5. a table, shown on the page. search over every eviction, 43 distinct position, cache states. best any offline policy can do, 5, minus so the bound is attained. a table, shown on the page. to the power four slots, fewer hits than three. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">   ref    FIFO cache      LRU cache       farthest-in-future cache
     1     1               1               1
     2     1 2             1 2             1 2
     3     1 2 3           1 2 3           1 2 3
@@ -1395,7 +1395,7 @@ best any offline policy can do   5    - so the bound is attained
 
 FIFO swept from 1 to 6 slots     0  0  3  2  7  7
                                        ^ four slots, fewer hits than three
-LRU swept the same way           0  0  2  4  7  7</div><p>Farthest-in-future's first interesting move is at reference 4. Pages 1, 2 and 3 are resident and page 4 arrives; page 3's next use is at position 10 and pages 1 and 2 are needed at 5 and 6, so 3 goes. Every later eviction is the same calculation, and the two pages evicted at the end are ones the trace never mentions again.</p><p>The sweep is the row to stare at. FIFO's hit count goes 0, 0, 3, 2, 7, 7: three slots beat four. The reason is that FIFO's eviction order depends on when pages arrived, and adding a slot changes the arrival order of everything downstream, so the resident set at each reference is not a superset of the smaller cache's. LRU's resident set always is, which is why its row never falls.</p><p>For a faded rehearsal, work out the loop trace <span class="math">1 2 3 4 1 2 3 4 1 2 3 4</span> with three slots before running it. The supplied first move is that after the first four references the cache holds 2, 3, 4 under both FIFO and LRU, and the next reference is 1. Say what FIFO and LRU each score, what the offline optimum is, and what happens to all three when the cache is given a fourth slot.</p></article>
+LRU swept the same way           0  0  2  4  7  7</div><p>Farthest-in-future's first interesting move is at reference 4. Pages 1, 2 and 3 are resident and page 4 arrives; page 3's next use is at position 10 and pages 1 and 2 are needed at 5 and 6, so 3 goes. Every later eviction is the same calculation, and the two pages evicted at the end are ones the trace never mentions again.</p><p>The sweep is the row to stare at. FIFO's hit count goes 0, 0, 3, 2, 7, 7: three slots beat four. The reason is that FIFO's eviction order depends on when pages arrived, and adding a slot changes the arrival order of everything downstream, so the resident set at each reference is not a superset of the smaller cache's. LRU's resident set always is, which is why its row never falls.</p><p>For a faded rehearsal, work out the loop trace <span class="math" data-say="1 2 3 4 1 2 3 4 1 2 3 4">1 2 3 4 1 2 3 4 1 2 3 4</span> with three slots before running it. The supplied first move is that after the first four references the cache holds 2, 3, 4 under both FIFO and LRU, and the next reference is 1. Say what FIFO and LRU each score, what the offline optimum is, and what happens to all three when the cache is given a fourth slot.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1440,7 +1440,7 @@ LRU swept the same way           0  0  2  4  7  7</div><p>Farthest-in-future's f
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Greedy Algorithms and Matroids.</strong> Every verdict on this course was computed twice: once by running the greedy rule, and once by a search that does not know what the rule is. The optima are exact &mdash; the best of every subset, every full binary tree on <span class="math">n</span> leaves against every assignment of the weights to its leaves, every one of the <span class="math">n!</span> matchings, every eviction decision a cache of that size could make, every weighting in <span class="math">{1, 2, 3}ⁿ</span>. Two quantities are genuinely fractional and both are printed as fractions first: a Huffman code's expected length, and the fractional knapsack's optimum. A decimal beside a fraction on these pages is a rounding of the printing at a stated number of places, and the fraction next to it is the number. Where a search would be too large the panel refuses and says so rather than printing a figure it cannot stand behind, and where a panel's own caption disagrees with the table above it, the lesson names the caption.</p>
+      <p><strong>Greedy Algorithms and Matroids.</strong> Every verdict on this course was computed twice: once by running the greedy rule, and once by a search that does not know what the rule is. The optima are exact &mdash; the best of every subset, every full binary tree on <span class="math" data-say="n">n</span> leaves against every assignment of the weights to its leaves, every one of the <span class="math" data-say="n factorial">n!</span> matchings, every eviction decision a cache of that size could make, every weighting in <span class="math" data-say="the set 1, 2, 3, to the power n">{1, 2, 3}ⁿ</span>. Two quantities are genuinely fractional and both are printed as fractions first: a Huffman code's expected length, and the fractional knapsack's optimum. A decimal beside a fraction on these pages is a rounding of the printing at a stated number of places, and the fraction next to it is the number. Where a search would be too large the panel refuses and says so rather than printing a figure it cannot stand behind, and where a panel's own caption disagrees with the table above it, the lesson names the caption.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1499,7 +1499,7 @@ LRU swept the same way           0  0  2  4  7  7</div><p>Farthest-in-future's f
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Why is farthest-in-future used as the yardstick even though no cache can run it?", "a": ["Because it is easy to compute offline", "Because it is optimal among all policies, so the gap to it isolates the cost of not knowing the future", "Because LRU approximates it closely on real workloads", "Because it never suffers Belady's anomaly"], "c": 1, "why": "The point of a bound is that nothing can beat it. When LRU reaches 2 and the bound is 5, the missing 3 hits are attributable to the information LRU lacks rather than to a defect in LRU. Ease of computation and LRU's behaviour on real workloads are not why it is the right comparison."}, {"q": "The panel reports that a search over 43 states also reaches 5 hits. What does that add to the claim that farthest-in-future is optimal?", "a": ["Nothing, since the theorem already says so", "It checks the theorem's conclusion on this trace by a search that knows nothing about looking ahead, so the two could have disagreed", "It proves the theorem for all traces of this length", "It replaces the theorem with a computation"], "c": 1, "why": "The search enumerates eviction decisions and shares no reasoning with the lookahead rule. Agreement is a real check &mdash; disagreement would be conclusive &mdash; and it is about this trace. The theorem covers the traces nobody typed."}, {"q": "FIFO's sweep on the opening trace reads 0, 0, 3, 2, 7, 7 and LRU's reads 0, 0, 2, 4, 7, 7. Which conclusion is safe?", "a": ["LRU is better than FIFO", "A bigger cache can reduce FIFO's hits; LRU's row never falls here, and for LRU that is guaranteed because it is a stack policy", "Both policies converge at five slots, so cache size stops mattering", "FIFO's anomaly disappears at larger cache sizes"], "c": 1, "why": "FIFO loses a hit from three slots to four, which is Belady's anomaly. LRU's row not falling is not luck: its resident set with <span class=\"math\">k<\/span> slots is always contained in its resident set with <span class=\"math\">k + 1<\/span>. FIFO at two slots beats LRU at two on another trace, so no ranking follows, and the rows merely happen to coincide at five."}, {"q": "One trace is captioned as one where every policy keeps the hot page and the differences disappear. The table reads FIFO 3, LRU 5, farthest-in-future 5. What is true?", "a": ["The caption is right; a two-hit difference over twelve references is negligible", "FIFO does not keep the hot page, because it evicts by arrival order rather than by use, so the difference is the largest relative gap on any shipped trace", "The caption refers to a different cache size", "LRU and farthest-in-future agreeing means the differences have disappeared"], "c": 1, "why": "FIFO reloads page 1 and then evicts it again on every cycle, because arrival order says nothing about reuse. Three hits against five is the measurement; the caption is prose that nothing in the build has ever checked against a run."}];
+  var QUIZ = [{"q": "Why is farthest-in-future used as the yardstick even though no cache can run it?", "a": ["Because it is easy to compute offline", "Because it is optimal among all policies, so the gap to it isolates the cost of not knowing the future", "Because LRU approximates it closely on real workloads", "Because it never suffers Belady's anomaly"], "c": 1, "why": "The point of a bound is that nothing can beat it. When LRU reaches 2 and the bound is 5, the missing 3 hits are attributable to the information LRU lacks rather than to a defect in LRU. Ease of computation and LRU's behaviour on real workloads are not why it is the right comparison."}, {"q": "The panel reports that a search over 43 states also reaches 5 hits. What does that add to the claim that farthest-in-future is optimal?", "a": ["Nothing, since the theorem already says so", "It checks the theorem's conclusion on this trace by a search that knows nothing about looking ahead, so the two could have disagreed", "It proves the theorem for all traces of this length", "It replaces the theorem with a computation"], "c": 1, "why": "The search enumerates eviction decisions and shares no reasoning with the lookahead rule. Agreement is a real check &mdash; disagreement would be conclusive &mdash; and it is about this trace. The theorem covers the traces nobody typed."}, {"q": "FIFO's sweep on the opening trace reads 0, 0, 3, 2, 7, 7 and LRU's reads 0, 0, 2, 4, 7, 7. Which conclusion is safe?", "a": ["LRU is better than FIFO", "A bigger cache can reduce FIFO's hits; LRU's row never falls here, and for LRU that is guaranteed because it is a stack policy", "Both policies converge at five slots, so cache size stops mattering", "FIFO's anomaly disappears at larger cache sizes"], "c": 1, "why": "FIFO loses a hit from three slots to four, which is Belady's anomaly. LRU's row not falling is not luck: its resident set with <span class=\"math\" data-say=\"k\">k<\/span> slots is always contained in its resident set with <span class=\"math\" data-say=\"k plus 1\">k + 1<\/span>. FIFO at two slots beats LRU at two on another trace, so no ranking follows, and the rows merely happen to coincide at five."}, {"q": "One trace is captioned as one where every policy keeps the hot page and the differences disappear. The table reads FIFO 3, LRU 5, farthest-in-future 5. What is true?", "a": ["The caption is right; a two-hit difference over twelve references is negligible", "FIFO does not keep the hot page, because it evicts by arrival order rather than by use, so the difference is the largest relative gap on any shipped trace", "The caption refers to a different cache size", "LRU and farthest-in-future agreeing means the differences have disappeared"], "c": 1, "why": "FIFO reloads page 1 and then evicts it again on every cycle, because arrival order says nothing about reuse. Three hits against five is the measurement; the caption is prose that nothing in the build has ever checked against a run."}];
 
   (function () {
 
@@ -3424,6 +3424,178 @@ LRU swept the same way           0  0  2  4  7  7</div><p>Farthest-in-future's f
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

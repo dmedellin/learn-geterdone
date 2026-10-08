@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">coins outside:   for each coin c:  for v = c to k:  ways(v) += ways(v − c)
+        <div class="mathblock" data-say="coins outside, for each coin c, for v equals c to k, ways of v plus equals ways of the quantity v minus c. amounts outside, for v equals 1 to k, for each coin c is less than or equal to v, ways of v plus equals ways of the quantity v minus c. coins 1, 2, 5 and an amount of 100. combinations, 541. ordered sequences, 91197869007632925819218. both loops, 295 reads, The cost is identical, the question is not" tabindex="0" role="region" aria-label="Mathematical notation">coins outside:   for each coin c:  for v = c to k:  ways(v) += ways(v − c)
 amounts outside: for v = 1 to k:   for each coin c ≤ v:  ways(v) += ways(v − c)
 
 coins 1, 2, 5 and an amount of 100
@@ -1312,11 +1312,11 @@ both loops: 295 reads. The cost is identical; the question is not.</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the loop nesting is the specification here, not an implementation choice: it is what fixes whether an ordering counts as a second way of paying.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Counting replaces the minimum with a sum, and the base case with a one</h3><p>The optimising recurrences on this course take the best of several options. A counting recurrence adds them: the number of ways to make <span class="math">v</span> is the sum, over the options, of the number of ways to make what is left. The empty amount has exactly one way of being made &mdash; take nothing &mdash; so the base case is 1 rather than 0, and getting that wrong makes every count zero.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Coin types outside counts each multiset once</h3><p>Running the coin loop outermost means every combination is assembled in one fixed order: all the ones, then all the twos, then all the fives. A multiset has exactly one such assembly, so it is counted exactly once, and the answer for 100 from 1, 2 and 5 is 541.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Amounts outside counts every ordering separately</h3><p>Running the amount loop outermost lets any coin be the last one added at any step, so <span class="math">1 then 2</span> and <span class="math">2 then 1</span> are two different histories and both are counted. That is a count of ordered sequences, and for 100 from the same three coins it is a twenty-three-digit number. Readers write this loop while meaning the other one, which is why both are on the panel.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Counting replaces the minimum with a sum, and the base case with a one</h3><p>The optimising recurrences on this course take the best of several options. A counting recurrence adds them: the number of ways to make <span class="math" data-say="v">v</span> is the sum, over the options, of the number of ways to make what is left. The empty amount has exactly one way of being made &mdash; take nothing &mdash; so the base case is 1 rather than 0, and getting that wrong makes every count zero.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Coin types outside counts each multiset once</h3><p>Running the coin loop outermost means every combination is assembled in one fixed order: all the ones, then all the twos, then all the fives. A multiset has exactly one such assembly, so it is counted exactly once, and the answer for 100 from 1, 2 and 5 is 541.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Amounts outside counts every ordering separately</h3><p>Running the amount loop outermost lets any coin be the last one added at any step, so <span class="math" data-say="1 then 2">1 then 2</span> and <span class="math" data-say="2 then 1">2 then 1</span> are two different histories and both are counted. That is a count of ordered sequences, and for 100 from the same three coins it is a twenty-three-digit number. Readers write this loop while meaning the other one, which is why both are on the panel.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two nestings, two questions, and the arithmetic that has to be exact</h2></div><p>The counting recurrences, why the loop order decides the question, what the objects look like at small amounts, and why the numbers are BigInt.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Combinations and ordered sequences</span><p>A <strong>combination</strong> is a multiset of coins adding to the amount: how many of each denomination, with no notion of order. An <strong>ordered sequence</strong> is a list of coins adding to the amount, where two lists differing only in order are different. Every combination corresponds to one or more ordered sequences, and the two counts are never equal once more than one denomination is used.</p></div><div class="thm"><span class="label">Theorem &middot; The two counting recurrences</span><p>Let <span class="math">C(i, v)</span> be the number of combinations of the first <span class="math">i</span> coin types adding to <span class="math">v</span>, with <span class="math">C(i, 0) = 1</span> and <span class="math">C(0, v) = 0</span> for <span class="math">v &gt; 0</span>. Then <span class="math">C(i, v) = C(i−1, v) + C(i, v − c(i))</span>, the second term omitted when <span class="math">c(i) &gt; v</span>. Let <span class="math">S(v)</span> be the number of ordered sequences adding to <span class="math">v</span>, with <span class="math">S(0) = 1</span>. Then <span class="math">S(v)</span> is the sum of <span class="math">S(v − c)</span> over all coins <span class="math">c ≤ v</span>.</p></div><div class="proof"><p>For combinations, split on how many copies of coin type <span class="math">i</span> are used. If none, the combination uses the first <span class="math">i−1</span> types and there are <span class="math">C(i−1, v)</span> of those. If at least one, remove exactly one copy and what remains is a combination of the first <span class="math">i</span> types adding to <span class="math">v − c(i)</span>, and this correspondence is a bijection. The two cases are disjoint and exhaustive, so the counts add.</p><p>For sequences, split on the last coin. Each sequence adding to <span class="math">v</span> has a final coin <span class="math">c</span>, and deleting it leaves a sequence adding to <span class="math">v − c</span>; conversely appending <span class="math">c</span> to such a sequence gives one adding to <span class="math">v</span>. That is a bijection for each <span class="math">c</span>, the cases are disjoint because the final coin differs, and summing over <span class="math">c</span> gives <span class="math">S(v)</span>. The single-row loop with the amounts outermost is exactly this recurrence, and the one with the coins outermost is exactly the other.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Five from 1, 2 and 5, with the objects listed</span><p>Four combinations: <span class="math">5</span>, <span class="math">2 + 2 + 1</span>, <span class="math">2 + 1 + 1 + 1</span>, <span class="math">1 + 1 + 1 + 1 + 1</span>. Nine ordered sequences: the five ones; <span class="math">1 1 1 2</span> and its three other arrangements; <span class="math">1 2 2</span>, <span class="math">2 1 2</span> and <span class="math">2 2 1</span>; and <span class="math">5</span>. Four and nine, and the lab lists both at this size so the difference is an object rather than a number.</p></div><p>Notice which objects multiplied. The combination <span class="math">2 + 2 + 1</span> has three arrangements and the combination <span class="math">2 + 1 + 1 + 1</span> has four, while <span class="math">5</span> and the five ones have one each: <span class="math">1 + 4 + 3 + 1 = 9</span>. The ratio between the two counts is not a constant and is not a factorial &mdash; it depends on how many copies of each denomination each combination uses.</p><h3>The cost is the same; the question is not</h3><p>On the lab's main instance &mdash; 1, 2 and 5 at an amount of 100 &mdash; both nestings read the table 295 times. Identical work, identical table, identical arithmetic per step. The only difference is which loop is outside, and the two answers differ by twenty orders of magnitude. There is no performance argument for either one and there is no way to tell them apart by watching them run.</p><p>This is the most direct version of a claim this course keeps making. A measurement of what an algorithm costs tells you nothing about what it computes, and here the two are completely decoupled: same reads, same cells, different question. The only defence is a second route, and the panel provides one &mdash; a memo-free recursion for each count, which at small amounts confirms both, and the objects themselves listed where they fit.</p><h3>Why these numbers are not held as doubles</h3><p><span class="math">91 197 869 007 632 925 819 218</span> has twenty-three digits, and the largest integer a double holds exactly is 9 007 199 254 740 992, which has sixteen. A page computing this count in floating point would print a number that is merely close &mdash; the leading digits right, the tail invented &mdash; and would look exactly like a page that had computed it. Every count of ways in this kit is an arbitrary-precision integer for that reason, and none is ever converted.</p><p>One consequence for the cost model, and it is the divergence this page closes on. The table makes 295 reads, and each read is followed by an addition; but those additions are on numbers of up to twenty-three digits, not on machine words. The bound <span class="math">Θ(nk)</span> counts arithmetic operations and treats each as constant, which is exactly what stops being true here. Measured: 295 reads. Proved: <span class="math">Θ(nk)</span> operations. What neither of them says is how long an addition takes when the numbers are as long as the answer, and on this instance it is the addition that dominates.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Combinations and ordered sequences</span><p>A <strong>combination</strong> is a multiset of coins adding to the amount: how many of each denomination, with no notion of order. An <strong>ordered sequence</strong> is a list of coins adding to the amount, where two lists differing only in order are different. Every combination corresponds to one or more ordered sequences, and the two counts are never equal once more than one denomination is used.</p></div><div class="thm"><span class="label">Theorem &middot; The two counting recurrences</span><p>Let <span class="math" data-say="i choose v">C(i, v)</span> be the number of combinations of the first <span class="math" data-say="i">i</span> coin types adding to <span class="math" data-say="v">v</span>, with <span class="math" data-say="i choose 0 equals 1">C(i, 0) = 1</span> and <span class="math" data-say="0 choose v equals 0">C(0, v) = 0</span> for <span class="math" data-say="v is greater than 0">v &gt; 0</span>. Then <span class="math" data-say="capital C of i, v equals capital C of i minus 1, v plus capital C of i, v minus c of i">C(i, v) = C(i−1, v) + C(i, v − c(i))</span>, the second term omitted when <span class="math" data-say="c of i is greater than v">c(i) &gt; v</span>. Let <span class="math" data-say="S of v">S(v)</span> be the number of ordered sequences adding to <span class="math" data-say="v">v</span>, with <span class="math" data-say="S of 0 equals 1">S(0) = 1</span>. Then <span class="math" data-say="S of v">S(v)</span> is the sum of <span class="math" data-say="S of the quantity v minus c">S(v − c)</span> over all coins <span class="math" data-say="c is less than or equal to v">c ≤ v</span>.</p></div><div class="proof"><p>For combinations, split on how many copies of coin type <span class="math" data-say="i">i</span> are used. If none, the combination uses the first <span class="math" data-say="i minus 1">i−1</span> types and there are <span class="math" data-say="i minus 1 choose v">C(i−1, v)</span> of those. If at least one, remove exactly one copy and what remains is a combination of the first <span class="math" data-say="i">i</span> types adding to <span class="math" data-say="v minus c of i">v − c(i)</span>, and this correspondence is a bijection. The two cases are disjoint and exhaustive, so the counts add.</p><p>For sequences, split on the last coin. Each sequence adding to <span class="math" data-say="v">v</span> has a final coin <span class="math" data-say="c">c</span>, and deleting it leaves a sequence adding to <span class="math" data-say="v minus c">v − c</span>; conversely appending <span class="math" data-say="c">c</span> to such a sequence gives one adding to <span class="math" data-say="v">v</span>. That is a bijection for each <span class="math" data-say="c">c</span>, the cases are disjoint because the final coin differs, and summing over <span class="math" data-say="c">c</span> gives <span class="math" data-say="S of v">S(v)</span>. The single-row loop with the amounts outermost is exactly this recurrence, and the one with the coins outermost is exactly the other.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Five from 1, 2 and 5, with the objects listed</span><p>Four combinations: <span class="math" data-say="5">5</span>, <span class="math" data-say="2 plus 2 plus 1">2 + 2 + 1</span>, <span class="math" data-say="2 plus 1 plus 1 plus 1">2 + 1 + 1 + 1</span>, <span class="math" data-say="1 plus 1 plus 1 plus 1 plus 1">1 + 1 + 1 + 1 + 1</span>. Nine ordered sequences: the five ones; <span class="math" data-say="1 1 1 2">1 1 1 2</span> and its three other arrangements; <span class="math" data-say="1 2 2">1 2 2</span>, <span class="math" data-say="2 1 2">2 1 2</span> and <span class="math" data-say="2 2 1">2 2 1</span>; and <span class="math" data-say="5">5</span>. Four and nine, and the lab lists both at this size so the difference is an object rather than a number.</p></div><p>Notice which objects multiplied. The combination <span class="math" data-say="2 plus 2 plus 1">2 + 2 + 1</span> has three arrangements and the combination <span class="math" data-say="2 plus 1 plus 1 plus 1">2 + 1 + 1 + 1</span> has four, while <span class="math" data-say="5">5</span> and the five ones have one each: <span class="math" data-say="1 plus 4 plus 3 plus 1 equals 9">1 + 4 + 3 + 1 = 9</span>. The ratio between the two counts is not a constant and is not a factorial &mdash; it depends on how many copies of each denomination each combination uses.</p><h3>The cost is the same; the question is not</h3><p>On the lab's main instance &mdash; 1, 2 and 5 at an amount of 100 &mdash; both nestings read the table 295 times. Identical work, identical table, identical arithmetic per step. The only difference is which loop is outside, and the two answers differ by twenty orders of magnitude. There is no performance argument for either one and there is no way to tell them apart by watching them run.</p><p>This is the most direct version of a claim this course keeps making. A measurement of what an algorithm costs tells you nothing about what it computes, and here the two are completely decoupled: same reads, same cells, different question. The only defence is a second route, and the panel provides one &mdash; a memo-free recursion for each count, which at small amounts confirms both, and the objects themselves listed where they fit.</p><h3>Why these numbers are not held as doubles</h3><p><span class="math" data-say="91197869007632925819218">91 197 869 007 632 925 819 218</span> has twenty-three digits, and the largest integer a double holds exactly is 9 007 199 254 740 992, which has sixteen. A page computing this count in floating point would print a number that is merely close &mdash; the leading digits right, the tail invented &mdash; and would look exactly like a page that had computed it. Every count of ways in this kit is an arbitrary-precision integer for that reason, and none is ever converted.</p><p>One consequence for the cost model, and it is the divergence this page closes on. The table makes 295 reads, and each read is followed by an addition; but those additions are on numbers of up to twenty-three digits, not on machine words. The bound <span class="math" data-say="theta of n k">Θ(nk)</span> counts arithmetic operations and treats each as constant, which is exactly what stops being true here. Measured: 295 reads. Proved: <span class="math" data-say="theta of n k">Θ(nk)</span> operations. What neither of them says is how long an addition takes when the numbers are as long as the answer, and on this instance it is the addition that dominates.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Two loops, and the one you put outside is the question you asked</h2></div><p>Combinations and ordered sequences, exact in BigInt, both checked twice</p></div>
@@ -1374,7 +1374,7 @@ both loops: 295 reads. The cost is identical; the question is not.</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>The table for an amount of five, both ways</h3><p>Three coin types, amounts zero to five. The first block adds one coin type per row, which counts combinations; the second is a single row swept once per amount, which counts ordered sequences.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">amount              0   1   2   3   4   5
+      <article class="card card-pad prose"><h3>The table for an amount of five, both ways</h3><p>Three coin types, amounts zero to five. The first block adds one coin type per row, which counts combinations; the second is a single row swept once per amount, which counts ordered sequences.</p><div class="mathblock" data-say="a table, shown on the page. coin types outside. a table, shown on the page. amounts outside. a table, shown on the page. the four combinations, the nine sequences. 5, 5. a table, shown on the page. 1 1 2 1, 1 1 1 2. 1 plus 1 plus 1 plus 1 plus 1, 1 1 1 1 1. at an amount of 100 the same two loops give. combinations, 541. ordered sequences, 91197869007632925819218. and both make 295 reads" tabindex="0" role="region" aria-label="Mathematical notation">amount              0   1   2   3   4   5
 
 coin types outside
   start             1   0   0   0   0   0
@@ -1440,7 +1440,7 @@ and both make 295 reads</div><p>The row for ordered sequences begins 1, 1, 2, 3,
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math">n²2ⁿ</span> and <span class="math">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
+      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math" data-say="n squared 2 to the power n">n²2ⁿ</span> and <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -3397,6 +3397,178 @@ and both make 295 reads</div><p>The row for ordered sequences begins 1, 1, 2, 3,
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

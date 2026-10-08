@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Replication and Consistency &middot; Consistency, counted</span>
         <h1>Conflict Resolution, Counted</h1>
-        <p>Given concurrent updates to one value, last-writer-wins keeps the register of whichever replica holds the largest timestamp and discards the rest: on a four-update trace worth <span class="math">10</span> it returns <span class="math">7</span>, throwing away <span class="math">2</span> updates worth <span class="math">3</span>. A counter CRDT keeps one component per replica, merges by elementwise maximum and sums, returning <span class="math">10</span> and discarding none. Accurate clocks change which update survives, never how many do.</p>
+        <p>Given concurrent updates to one value, last-writer-wins keeps the register of whichever replica holds the largest timestamp and discards the rest: on a four-update trace worth <span class="math" data-say="10">10</span> it returns <span class="math" data-say="7">7</span>, throwing away <span class="math" data-say="2">2</span> updates worth <span class="math" data-say="3">3</span>. A counter CRDT keeps one component per replica, merges by elementwise maximum and sums, returning <span class="math" data-say="10">10</span> and discarding none. Accurate clocks change which update survives, never how many do.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">trace   A:3:+2   B:5:+3   C:4:+1   B:9:+4     all four concurrent
+        <div class="mathblock" data-say="trace, A, 3, plus 2, B, 5, plus 3, C, 4, plus 1, B, 9, plus 4, all four concurrent. true total, every update applied, 10. last-writer-wins, B holds t equals 9, so B&#x27;s register wins, 7. 2 updates discarded, worth 3. counter CRDT, the set A equals 2, B equals 7, C equals 1, summed, 10, discarding 0. merge is elementwise max, commutative, associative, idempotent" tabindex="0" role="region" aria-label="Mathematical notation">trace   A:3:+2   B:5:+3   C:4:+1   B:9:+4     all four concurrent
 true total, every update applied                          10
 last-writer-wins: B holds t = 9, so B&#x27;s register wins       7
                   2 updates discarded, worth 3
@@ -1310,11 +1310,11 @@ merge is elementwise max: commutative, associative, idempotent</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One rule keeps a replica, the other keeps a component per replica, and the difference is not a matter of clock quality.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Last-writer-wins keeps one replica&#x27;s register and drops the rest</h3><p>The rule picks the update with the largest timestamp and takes the state of the replica that made it. That replica's register contains its own updates and nothing else, so every update made anywhere else during the partition is gone. On the trace here <span class="math">B</span> holds <span class="math">t = 9</span>, <span class="math">B</span>'s register is <span class="math">3 + 4 = 7</span>, and <span class="math">A</span>'s <span class="math">+2</span> and <span class="math">C</span>'s <span class="math">+1</span> are discarded — two updates worth three.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Accurate clocks change which update survives, not how many</h3><p>Make every timestamp perfectly correct and last-writer-wins still keeps one replica's register and still discards the others. All that changes is which replica is chosen. The count of discarded updates is a function of how many replicas were updated concurrently, and clock quality does not appear in it anywhere. This is the misconception the lesson exists to break.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The counter keeps one component per replica and merges by maximum</h3><p>State a counter as a vector of per-replica totals. A replica increments only its own component; merging two states takes the elementwise maximum; the value is the sum. Elementwise maximum is commutative, associative and idempotent, so every replica converges on the same value whatever order gossip arrives in, however often, and however many times a message is redelivered.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Last-writer-wins keeps one replica&#x27;s register and drops the rest</h3><p>The rule picks the update with the largest timestamp and takes the state of the replica that made it. That replica's register contains its own updates and nothing else, so every update made anywhere else during the partition is gone. On the trace here <span class="math" data-say="B">B</span> holds <span class="math" data-say="t equals 9">t = 9</span>, <span class="math" data-say="B">B</span>'s register is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>, and <span class="math" data-say="A">A</span>'s <span class="math" data-say="plus 2">+2</span> and <span class="math" data-say="C">C</span>'s <span class="math" data-say="plus 1">+1</span> are discarded — two updates worth three.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Accurate clocks change which update survives, not how many</h3><p>Make every timestamp perfectly correct and last-writer-wins still keeps one replica's register and still discards the others. All that changes is which replica is chosen. The count of discarded updates is a function of how many replicas were updated concurrently, and clock quality does not appear in it anywhere. This is the misconception the lesson exists to break.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The counter keeps one component per replica and merges by maximum</h3><p>State a counter as a vector of per-replica totals. A replica increments only its own component; merging two states takes the elementwise maximum; the value is the sum. Elementwise maximum is commutative, associative and idempotent, so every replica converges on the same value whatever order gossip arrives in, however often, and however many times a message is redelivered.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two merges, one trace, and the count each one loses</h2></div><p>What last-writer-wins does with concurrent updates, what a counter CRDT does instead, and the three properties that make the second one safe.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Concurrent updates, last-writer-wins, and a counter CRDT</span><p>Updates are <strong>concurrent</strong> when no chain of messages orders them — the condition “Vector Clocks and Concurrency” makes decidable. <strong>Last-writer-wins</strong> resolves them by keeping the state of the replica holding the largest timestamp. A <strong>counter CRDT</strong> holds one count per replica, merges two states by elementwise maximum and reports the sum.</p></div><p>Both rules produce a single answer from conflicting states, which is what a merge has to do. The difference is what each one is willing to throw away to get there, and that is a number rather than a matter of taste.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">four concurrent updates; no replica has seen any other&#x27;s
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Concurrent updates, last-writer-wins, and a counter CRDT</span><p>Updates are <strong>concurrent</strong> when no chain of messages orders them — the condition “Vector Clocks and Concurrency” makes decidable. <strong>Last-writer-wins</strong> resolves them by keeping the state of the replica holding the largest timestamp. A <strong>counter CRDT</strong> holds one count per replica, merges two states by elementwise maximum and reports the sum.</p></div><p>Both rules produce a single answer from conflicting states, which is what a merge has to do. The difference is what each one is willing to throw away to get there, and that is a number rather than a matter of taste.</p><div class="mathblock" data-say="four concurrent updates, no replica has seen any other&#x27;s. replica, timestamp, delta, under LWW, CRDT component. A, 3, plus 2, discarded, A equals 2. B, 5, plus 3, kept, B equals 3 plus 4 equals 7. C, 4, plus 1, discarded, C equals 1. a table, shown on the page. true total, 2 plus 3 plus 1 plus 4, equals, 10. last-writer-wins, B holds the largest timestamp, so B&#x27;s. register wins, equals, 7. 2 updates discarded, worth 3. counter CRDT, the set A equals 2, B equals 7, C equals 1, summed, equals, 10. 0 updates discarded" tabindex="0" role="region" aria-label="Mathematical notation">four concurrent updates; no replica has seen any other&#x27;s
 
   replica   timestamp   delta    under LWW     CRDT component
      A          3        +2      discarded     A = 2
@@ -1327,7 +1327,7 @@ merge is elementwise max: commutative, associative, idempotent</div>
                       register wins            =   7
                       2 updates discarded, worth 3
   counter CRDT        {A = 2, B = 7, C = 1}, summed  =  10
-                      0 updates discarded</div><p>Every one of those four updates was acknowledged to a client. Under last-writer-wins two of them stop existing at merge time, with no error raised anywhere, and the value a reader sees afterwards is <span class="math">7</span> for a sequence of increments totalling <span class="math">10</span>. That is not a bug in the implementation; it is what the rule says to do.</p><h3>The clocks are not the problem</h3><p>The standard response to this is that the timestamps must be made accurate. Suppose they are exact to the nanosecond. The rule still keeps one replica's register and still discards every update made elsewhere; the only thing that changes is which replica gets to be the winner. What is being lost is not precision in the ordering, it is the fact that there was no ordering to be precise about — the updates were concurrent, and last-writer-wins is a rule for picking one arbitrarily.</p><p>The deeper problem is that last-writer-wins treats an increment as a state to be overwritten rather than an operation to be applied. Once <span class="math">+2</span> has become “<span class="math">A</span>'s register reads <span class="math">2</span>”, there is no way to combine it with “<span class="math">B</span>'s register reads <span class="math">7</span>” except by choosing. The counter avoids the choice by never merging the two into one slot in the first place.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the merge is elementwise maximum on the component vectors
+                      0 updates discarded</div><p>Every one of those four updates was acknowledged to a client. Under last-writer-wins two of them stop existing at merge time, with no error raised anywhere, and the value a reader sees afterwards is <span class="math" data-say="7">7</span> for a sequence of increments totalling <span class="math" data-say="10">10</span>. That is not a bug in the implementation; it is what the rule says to do.</p><h3>The clocks are not the problem</h3><p>The standard response to this is that the timestamps must be made accurate. Suppose they are exact to the nanosecond. The rule still keeps one replica's register and still discards every update made elsewhere; the only thing that changes is which replica gets to be the winner. What is being lost is not precision in the ordering, it is the fact that there was no ordering to be precise about — the updates were concurrent, and last-writer-wins is a rule for picking one arbitrarily.</p><p>The deeper problem is that last-writer-wins treats an increment as a state to be overwritten rather than an operation to be applied. Once <span class="math" data-say="plus 2">+2</span> has become “<span class="math" data-say="A">A</span>'s register reads <span class="math" data-say="2">2</span>”, there is no way to combine it with “<span class="math" data-say="B">B</span>'s register reads <span class="math" data-say="7">7</span>” except by choosing. The counter avoids the choice by never merging the two into one slot in the first place.</p><div class="mathblock" data-say="the merge is elementwise maximum on the component vectors. commutative, A or B equals B or A. associative, the quantity A or B, or C equals A or the quantity B or C. idempotent, the quantity A or B, or the quantity A or B, equals A or B. so every replica converges on the same value regardless of. the order gossip arrives in, commutativity. how the exchanges are grouped, associativity. how often a message is redelivered, idempotence" tabindex="0" role="region" aria-label="Mathematical notation">the merge is elementwise maximum on the component vectors
 
   commutative    A ∨ B = B ∨ A
   associative    (A ∨ B) ∨ C = A ∨ (B ∨ C)
@@ -1383,7 +1383,7 @@ so every replica converges on the same value regardless of
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>One trace, two merges</h3><p>Three replicas are partitioned from one another and each accepts writes. Four increments are acknowledged during the partition. The partition heals, the replicas gossip, and the question is what the counter reads afterwards — under each of the two rules on offer.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the trace, replica:timestamp:delta
+      <article class="card card-pad prose"><h3>One trace, two merges</h3><p>Three replicas are partitioned from one another and each accepts writes. Four increments are acknowledged during the partition. The partition heals, the replicas gossip, and the question is what the counter reads afterwards — under each of the two rules on offer.</p><div class="mathblock" data-say="the trace, replica, timestamp, delta. A, 3, plus 2, B, 5, plus 3, C, 4, plus 1, B, 9, plus 4. no replica has seen any other&#x27;s update, so all four are concurrent. true total, 2 plus 3 plus 1 plus 4 equals 10. last-writer-wins. largest timestamp is 9, held by B. B&#x27;s register contains B&#x27;s own updates only, 3 plus 4 equals 7. value after merge, 7. discarded, A &#x27; s plus 2 and C &#x27; s plus 1. 2 updates, worth 3. counter CRDT. components, A equals 2, B equals 3 plus 4 equals 7, C equals 1. merge, elementwise maximum, in any order. value, 2 plus 7 plus 1 equals 10. discarded, 0. now make every clock exact and r e-run last-writer-wins. the winner may change from B to whoever truly wrote last. the count discarded does not, still 2 updates" tabindex="0" role="region" aria-label="Mathematical notation">the trace, replica:timestamp:delta
   A:3:+2    B:5:+3    C:4:+1    B:9:+4
 
 no replica has seen any other&#x27;s update, so all four are concurrent
@@ -1405,7 +1405,7 @@ counter CRDT
 
 now make every clock exact and re-run last-writer-wins
   the winner may change from B to whoever truly wrote last
-  the count discarded does not:  still 2 updates</div><p>Seven against ten, for a rule that raises no error and is the default in a great deal of software. The thirty per cent is not an edge case either — it is what happens whenever three replicas take writes and two of them are not the one holding the largest timestamp.</p><p>The last block is the one to argue with somebody about. Improving the clocks is the reflex fix and it changes the identity of the survivor without changing the arithmetic: two updates are still discarded, because two replicas other than the winner accepted writes. Clock accuracy is the answer to a question about ordering, and these updates were not ordered.</p><p>For a faded rehearsal, add a fifth update <span class="math">A:11:+5</span> to the trace. The supplied first move is that the largest timestamp is now <span class="math">11</span> and it is held by <span class="math">A</span>, so <span class="math">A</span>'s register wins. Work out the new last-writer-wins value, the number and worth of the updates it discards, and the CRDT's value — then say, before checking in the lab, whether the number discarded went up or down and why.</p></article>
+  the count discarded does not:  still 2 updates</div><p>Seven against ten, for a rule that raises no error and is the default in a great deal of software. The thirty per cent is not an edge case either — it is what happens whenever three replicas take writes and two of them are not the one holding the largest timestamp.</p><p>The last block is the one to argue with somebody about. Improving the clocks is the reflex fix and it changes the identity of the survivor without changing the arithmetic: two updates are still discarded, because two replicas other than the winner accepted writes. Clock accuracy is the answer to a question about ordering, and these updates were not ordered.</p><p>For a faded rehearsal, add a fifth update <span class="math" data-say="A, 11, plus 5">A:11:+5</span> to the trace. The supplied first move is that the largest timestamp is now <span class="math" data-say="11">11</span> and it is held by <span class="math" data-say="A">A</span>, so <span class="math" data-say="A">A</span>'s register wins. Work out the new last-writer-wins value, the number and worth of the updates it discards, and the CRDT's value — then say, before checking in the lab, whether the number discarded went up or down and why.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1509,7 +1509,7 @@ now make every clock exact and re-run last-writer-wins
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "On the trace <span class=\"math\">A:3:+2, B:5:+3, C:4:+1, B:9:+4<\/span>, what value does last-writer-wins return?", "a": ["<span class=\"math\">10<\/span>", "<span class=\"math\">7<\/span>", "<span class=\"math\">4<\/span>", "<span class=\"math\">6<\/span>"], "c": 1, "why": "<span class=\"math\">B<\/span> holds the largest timestamp, <span class=\"math\">9<\/span>, so <span class=\"math\">B<\/span>'s register wins \u2014 and it contains <span class=\"math\">B<\/span>'s own increments only, <span class=\"math\">3 + 4 = 7<\/span>. <span class=\"math\">10<\/span> is the true total and what the CRDT returns; <span class=\"math\">4<\/span> is the last increment alone, which is what you get by keeping the winning <em>update<\/em> rather than the winning replica's state; <span class=\"math\">6<\/span> is not produced by either rule."}, {"q": "The team proposes fitting every node with a high-accuracy clock so that last-writer-wins becomes safe. What happens to the number of discarded updates?", "a": ["It falls to zero, since the true order is now known", "It is unchanged \u2014 accurate clocks change which replica wins, not how many others are discarded", "It falls by half, since ties are eliminated", "It rises, because more updates become comparable"], "c": 1, "why": "The updates were concurrent: there is no true order for a better clock to reveal. The rule keeps one replica's state whatever the timestamps say, so every other replica that accepted a write during the partition still loses it. Clock accuracy answers an ordering question, and this is not one."}, {"q": "The counter CRDT returns <span class=\"math\">10<\/span> on the same trace. Why does it not have to choose a winner?", "a": ["Because it keeps one count per replica and merges by elementwise maximum, so no two updates ever compete for the same slot", "Because it uses the timestamps more carefully", "Because it applies the updates in timestamp order", "Because it discards the smallest updates instead of the latest"], "c": 0, "why": "Each replica's increments live in its own component, so merging is a maximum per component rather than a choice between states, and the value is the sum of all of them. Timestamps play no part in the merge at all \u2014 which is exactly why no clock quality is required for it to converge, and why redelivering a gossip message cannot double count."}];
+  var QUIZ = [{"q": "On the trace <span class=\"math\" data-say=\"A, 3, plus 2, B, 5, plus 3, C, 4, plus 1, B, 9, plus 4\">A:3:+2, B:5:+3, C:4:+1, B:9:+4<\/span>, what value does last-writer-wins return?", "a": ["<span class=\"math\" data-say=\"10\">10<\/span>", "<span class=\"math\" data-say=\"7\">7<\/span>", "<span class=\"math\" data-say=\"4\">4<\/span>", "<span class=\"math\" data-say=\"6\">6<\/span>"], "c": 1, "why": "<span class=\"math\" data-say=\"B\">B<\/span> holds the largest timestamp, <span class=\"math\" data-say=\"9\">9<\/span>, so <span class=\"math\" data-say=\"B\">B<\/span>'s register wins \u2014 and it contains <span class=\"math\" data-say=\"B\">B<\/span>'s own increments only, <span class=\"math\" data-say=\"3 plus 4 equals 7\">3 + 4 = 7<\/span>. <span class=\"math\" data-say=\"10\">10<\/span> is the true total and what the CRDT returns; <span class=\"math\" data-say=\"4\">4<\/span> is the last increment alone, which is what you get by keeping the winning <em>update<\/em> rather than the winning replica's state; <span class=\"math\" data-say=\"6\">6<\/span> is not produced by either rule."}, {"q": "The team proposes fitting every node with a high-accuracy clock so that last-writer-wins becomes safe. What happens to the number of discarded updates?", "a": ["It falls to zero, since the true order is now known", "It is unchanged \u2014 accurate clocks change which replica wins, not how many others are discarded", "It falls by half, since ties are eliminated", "It rises, because more updates become comparable"], "c": 1, "why": "The updates were concurrent: there is no true order for a better clock to reveal. The rule keeps one replica's state whatever the timestamps say, so every other replica that accepted a write during the partition still loses it. Clock accuracy answers an ordering question, and this is not one."}, {"q": "The counter CRDT returns <span class=\"math\" data-say=\"10\">10<\/span> on the same trace. Why does it not have to choose a winner?", "a": ["Because it keeps one count per replica and merges by elementwise maximum, so no two updates ever compete for the same slot", "Because it uses the timestamps more carefully", "Because it applies the updates in timestamp order", "Because it discards the smallest updates instead of the latest"], "c": 0, "why": "Each replica's increments live in its own component, so merging is a maximum per component rather than a choice between states, and the value is the sum of all of them. Timestamps play no part in the merge at all \u2014 which is exactly why no clock quality is required for it to converge, and why redelivering a gossip message cannot double count."}];
 
   (function () {
 
@@ -2893,6 +2893,178 @@ now make every clock exact and re-run last-writer-wins
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

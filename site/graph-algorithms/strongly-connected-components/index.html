@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">u ~ v   when u reaches v and v reaches u        an equivalence relation
+        <div class="mathblock" data-say="u is approximately v, when u reaches v and v reaches u, an equivalence relation. pass 1, depth-first walk on G, record finishing times. pass 2, walk the REVERSED arcs, vertices in decreasing finish order. each tree of pass 2 is one component. the condensation, one point per component, is always acyclic" tabindex="0" role="region" aria-label="Mathematical notation">u ~ v   when u reaches v and v reaches u        an equivalence relation
 pass 1  depth-first walk on G, record finishing times
 pass 2  walk the REVERSED arcs, vertices in decreasing finish order
 each tree of pass 2 is one component
@@ -1309,11 +1309,11 @@ the condensation, one point per component, is always acyclic</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is why the second pass runs on the reversed arcs. The relation and the condensation are the setup for it.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Mutual reachability partitions the vertices</h3><p>Write <span class="math">u ~ v</span> when there is a path from <span class="math">u</span> to <span class="math">v</span> and a path from <span class="math">v</span> to <span class="math">u</span>. It is reflexive by the empty path, symmetric by its own statement, and transitive by concatenating paths, so it is an equivalence relation and its classes partition the vertices. The lab computes those classes twice: once by the two-pass algorithm and once straight from the definition, by testing reachability from every vertex to every other, and compares the two partitions.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The condensation is acyclic, always</h3><p>Collapse each component to a single point and keep an arc between two points when some arc ran between their components. The result cannot have a cycle: a cycle among components would make every vertex on it mutually reachable with every other, so they would all have been one component. On the lab's opening graph the seven vertices collapse to three points joined in a line, and the panel reports the condensation acyclic rather than assuming it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The finishing order names a source, which is why the second pass reverses</h3><p>The vertex that finishes last in the first walk lies in a component that nothing points into &mdash; a source of the condensation. Walking forwards from there would reach everything downstream and swallow several components at once. Walking the REVERSED arcs from there reaches exactly its own component, because the arcs into the component became arcs out of it and lead nowhere in the reversed graph. The lab checks the claim by reporting the in-degree of that component in the condensation, and it is 0.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Mutual reachability partitions the vertices</h3><p>Write <span class="math" data-say="u is approximately v">u ~ v</span> when there is a path from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> and a path from <span class="math" data-say="v">v</span> to <span class="math" data-say="u">u</span>. It is reflexive by the empty path, symmetric by its own statement, and transitive by concatenating paths, so it is an equivalence relation and its classes partition the vertices. The lab computes those classes twice: once by the two-pass algorithm and once straight from the definition, by testing reachability from every vertex to every other, and compares the two partitions.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The condensation is acyclic, always</h3><p>Collapse each component to a single point and keep an arc between two points when some arc ran between their components. The result cannot have a cycle: a cycle among components would make every vertex on it mutually reachable with every other, so they would all have been one component. On the lab's opening graph the seven vertices collapse to three points joined in a line, and the panel reports the condensation acyclic rather than assuming it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The finishing order names a source, which is why the second pass reverses</h3><p>The vertex that finishes last in the first walk lies in a component that nothing points into &mdash; a source of the condensation. Walking forwards from there would reach everything downstream and swallow several components at once. Walking the REVERSED arcs from there reaches exactly its own component, because the arcs into the component became arcs out of it and lead nowhere in the reversed graph. The lab checks the claim by reporting the in-degree of that component in the condensation, and it is 0.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two passes, and why the second one runs backwards</h2></div><p>The relation, the algorithm, the reason the reversal is necessary rather than convenient, and the independent check.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Strongly connected component</span><p>A <strong>strongly connected component</strong> of a digraph is a maximal set of vertices in which every vertex reaches every other. Maximal matters: a single vertex is always mutually reachable with itself, so without maximality every vertex would be its own component and the definition would say nothing.</p></div><p>The classes of the relation are those maximal sets, so nothing further has to be checked: partition and maximality come together. The brute-force method is the definition made mechanical &mdash; compute reachability from every vertex, then group <span class="math">u</span> with <span class="math">v</span> when each appears in the other's set &mdash; and that is what the lab runs beside the fast method.</p><h3>The algorithm, in two passes</h3><ol><li>Run a depth-first walk on the digraph, restarting as needed, and record the finish time of every vertex.</li><li>Reverse every arc.</li><li>Walk the reversed digraph, starting each new tree at the undiscovered vertex with the largest finish time from the first pass.</li><li>The vertex set of each tree in the second pass is one component.</li></ol><p>Nothing about step 3 is arbitrary and everything about it is fragile. Taking the vertices in increasing finish order, or walking the original arcs in the second pass, both produce something &mdash; a partition of the vertices &mdash; and neither produces the components. The lab's independent check is the only thing on the page that can tell the difference.</p><div class="thm"><span class="label">Theorem &middot; The last vertex to finish is in a source component</span><p>Let <span class="math">v</span> have the largest finish time of a depth-first walk on a digraph. Then the component containing <span class="math">v</span> has in-degree 0 in the condensation: no arc enters it from another component.</p></div><div class="proof"><p>Suppose an arc ran from a component <span class="math">B</span> into the component <span class="math">A</span> of <span class="math">v</span>, and let <span class="math">b</span> be its tail. Since the condensation is acyclic, no path returns from <span class="math">A</span> to <span class="math">B</span>.</p><p>Consider which of <span class="math">A</span> and <span class="math">B</span> the walk enters first. If it enters <span class="math">B</span> first, then from inside <span class="math">b</span> it can reach <span class="math">A</span> along that arc, so every vertex of <span class="math">A</span> is discovered inside the call at <span class="math">b</span> and finishes before it, making <span class="math">f[b] &gt; f[v]</span>. If it enters <span class="math">A</span> first, then it cannot reach <span class="math">B</span> at all from <span class="math">A</span>, so <span class="math">B</span> is untouched while <span class="math">A</span> finishes, and <span class="math">b</span> is discovered afterwards, again giving <span class="math">f[b] &gt; f[v]</span>.</p><p>Either way something finishes later than <span class="math">v</span>, contradicting the choice of <span class="math">v</span>. So no such arc exists.</p><p><span class="qed">&#9633;</span></p></div><p>That theorem is the whole design. Standing in a source component and following the reversed arcs, everything reachable is inside the component: the reversed arcs that would take you out of it are the forward arcs that came in, and there are none. So the second pass's first tree is exactly one component. Remove it and the remaining condensation still has the same property, so the argument repeats.</p><div class="example"><span class="label">Example &middot; Seven vertices, three components</span><p>The lab opens on <span class="math">1>2, 2>3, 3>1, 3>4, 4>5, 5>6, 6>4, 5>7</span>. The first walk finishes the vertices in the order that makes the decreasing list <span class="math">1 2 3 4 5 7 6</span>. The second pass, on the reversed arcs, produces the components <span class="math">{1, 2, 3}</span>, <span class="math">{4, 5, 6}</span> and <span class="math">{7}</span>. The condensation has three points and two arcs, in a line, and is acyclic. Mutual reachability computed from the definition returns the same three sets, and the panel prints both partitions.</p></div><p>Two things in that example are easy to misread. The vertex 7 is its own component not because it is isolated &mdash; 5 points at it &mdash; but because nothing comes back from it. And the decreasing finish list puts 7 before 6 even though 6 is lower-numbered, because the walk reached 6 first from 5 and closed it before it ever opened 7.</p><h3>The cases at the two ends</h3><p>A single cycle through every vertex is one component: on <span class="math">1>2, 2>3, 3>4, 4>1</span> the lab reports one component of four vertices, and a condensation that is a single point with no arcs. An acyclic digraph is the other extreme: on <span class="math">1>2, 2>3, 1>3, 3>4</span> every vertex is its own component, there are four of them, and the condensation is the graph itself. Those are the two cases where the second pass has the least to do, and running them is the fastest way to convince yourself the algorithm is not doing something else.</p><p>The counts, beside the bound. On the opening graph the second pass reports 7 vertex visits and 8 arc reads; on the four-vertex cycle, 4 and 4; on the acyclic preset, 4 and 4. Each is <span class="math">V</span> and <span class="math">E</span> for that graph. The bound is that the whole algorithm is <span class="math">Θ(V + E)</span>, and it is two walks plus a reversal: the reversal itself is one pass over the arcs, and neither walk visits a vertex twice. What the measurement cannot show is that no input makes it worse, and that is what the argument is for.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Strongly connected component</span><p>A <strong>strongly connected component</strong> of a digraph is a maximal set of vertices in which every vertex reaches every other. Maximal matters: a single vertex is always mutually reachable with itself, so without maximality every vertex would be its own component and the definition would say nothing.</p></div><p>The classes of the relation are those maximal sets, so nothing further has to be checked: partition and maximality come together. The brute-force method is the definition made mechanical &mdash; compute reachability from every vertex, then group <span class="math" data-say="u">u</span> with <span class="math" data-say="v">v</span> when each appears in the other's set &mdash; and that is what the lab runs beside the fast method.</p><h3>The algorithm, in two passes</h3><ol><li>Run a depth-first walk on the digraph, restarting as needed, and record the finish time of every vertex.</li><li>Reverse every arc.</li><li>Walk the reversed digraph, starting each new tree at the undiscovered vertex with the largest finish time from the first pass.</li><li>The vertex set of each tree in the second pass is one component.</li></ol><p>Nothing about step 3 is arbitrary and everything about it is fragile. Taking the vertices in increasing finish order, or walking the original arcs in the second pass, both produce something &mdash; a partition of the vertices &mdash; and neither produces the components. The lab's independent check is the only thing on the page that can tell the difference.</p><div class="thm"><span class="label">Theorem &middot; The last vertex to finish is in a source component</span><p>Let <span class="math" data-say="v">v</span> have the largest finish time of a depth-first walk on a digraph. Then the component containing <span class="math" data-say="v">v</span> has in-degree 0 in the condensation: no arc enters it from another component.</p></div><div class="proof"><p>Suppose an arc ran from a component <span class="math" data-say="B">B</span> into the component <span class="math" data-say="A">A</span> of <span class="math" data-say="v">v</span>, and let <span class="math" data-say="b">b</span> be its tail. Since the condensation is acyclic, no path returns from <span class="math" data-say="A">A</span> to <span class="math" data-say="B">B</span>.</p><p>Consider which of <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> the walk enters first. If it enters <span class="math" data-say="B">B</span> first, then from inside <span class="math" data-say="b">b</span> it can reach <span class="math" data-say="A">A</span> along that arc, so every vertex of <span class="math" data-say="A">A</span> is discovered inside the call at <span class="math" data-say="b">b</span> and finishes before it, making <span class="math" data-say="f at b is greater than f at v">f[b] &gt; f[v]</span>. If it enters <span class="math" data-say="A">A</span> first, then it cannot reach <span class="math" data-say="B">B</span> at all from <span class="math" data-say="A">A</span>, so <span class="math" data-say="B">B</span> is untouched while <span class="math" data-say="A">A</span> finishes, and <span class="math" data-say="b">b</span> is discovered afterwards, again giving <span class="math" data-say="f at b is greater than f at v">f[b] &gt; f[v]</span>.</p><p>Either way something finishes later than <span class="math" data-say="v">v</span>, contradicting the choice of <span class="math" data-say="v">v</span>. So no such arc exists.</p><p><span class="qed">&#9633;</span></p></div><p>That theorem is the whole design. Standing in a source component and following the reversed arcs, everything reachable is inside the component: the reversed arcs that would take you out of it are the forward arcs that came in, and there are none. So the second pass's first tree is exactly one component. Remove it and the remaining condensation still has the same property, so the argument repeats.</p><div class="example"><span class="label">Example &middot; Seven vertices, three components</span><p>The lab opens on <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 1, 3 is greater than 4, 4 is greater than 5, 5 is greater than 6, 6 is greater than 4, 5 is greater than 7">1>2, 2>3, 3>1, 3>4, 4>5, 5>6, 6>4, 5>7</span>. The first walk finishes the vertices in the order that makes the decreasing list <span class="math" data-say="1 2 3 4 5 7 6">1 2 3 4 5 7 6</span>. The second pass, on the reversed arcs, produces the components <span class="math" data-say="the set 1, 2, 3">{1, 2, 3}</span>, <span class="math" data-say="the set 4, 5, 6">{4, 5, 6}</span> and <span class="math" data-say="the set 7">{7}</span>. The condensation has three points and two arcs, in a line, and is acyclic. Mutual reachability computed from the definition returns the same three sets, and the panel prints both partitions.</p></div><p>Two things in that example are easy to misread. The vertex 7 is its own component not because it is isolated &mdash; 5 points at it &mdash; but because nothing comes back from it. And the decreasing finish list puts 7 before 6 even though 6 is lower-numbered, because the walk reached 6 first from 5 and closed it before it ever opened 7.</p><h3>The cases at the two ends</h3><p>A single cycle through every vertex is one component: on <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 4, 4 is greater than 1">1>2, 2>3, 3>4, 4>1</span> the lab reports one component of four vertices, and a condensation that is a single point with no arcs. An acyclic digraph is the other extreme: on <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 1 is greater than 3, 3 is greater than 4">1>2, 2>3, 1>3, 3>4</span> every vertex is its own component, there are four of them, and the condensation is the graph itself. Those are the two cases where the second pass has the least to do, and running them is the fastest way to convince yourself the algorithm is not doing something else.</p><p>The counts, beside the bound. On the opening graph the second pass reports 7 vertex visits and 8 arc reads; on the four-vertex cycle, 4 and 4; on the acyclic preset, 4 and 4. Each is <span class="math" data-say="V">V</span> and <span class="math" data-say="E">E</span> for that graph. The bound is that the whole algorithm is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span>, and it is two walks plus a reversal: the reversal itself is one pass over the arcs, and neither walk visits a vertex twice. What the measurement cannot show is that no input makes it worse, and that is what the argument is for.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Strongly connected components, in two passes</h2></div><p>The finish order names a source component, which is why the second pass runs on the transpose</p></div>
@@ -1357,7 +1357,7 @@ the condensation, one point per component, is always acyclic</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Running the two passes by hand</h2></div><p>The first pass produces a schedule. The second pass consumes it, backwards.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Do the first pass for the finish times only</h3><p>Nothing else from that walk is used &mdash; not its forest, not its edge classes. Record the closing order and then put the walk aside; the list of vertices in decreasing finish time is the only output the second pass reads.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Reverse the arcs before you start the second pass</h3><p>Reversing is <span class="math">Θ(E)</span> and doing it lazily, by scanning for arcs that point at the current vertex, turns a linear algorithm into a quadratic one. Build the reversed arc list once.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the next start from the schedule, never from the numbering</h3><p>Each new tree of the second pass begins at the undiscovered vertex that finished LATEST in the first pass. Falling back on the lowest-numbered undiscovered vertex is the single change that quietly breaks this algorithm: it still terminates, still partitions the vertices, and no longer computes components.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Build the condensation and check it for a cycle</h3><p>It is <span class="math">Θ(E)</span> and it is the thing most downstream work actually wants. If it has a cycle, the components are wrong &mdash; that check is free and it catches the previous step having gone astray.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Do the first pass for the finish times only</h3><p>Nothing else from that walk is used &mdash; not its forest, not its edge classes. Record the closing order and then put the walk aside; the list of vertices in decreasing finish time is the only output the second pass reads.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Reverse the arcs before you start the second pass</h3><p>Reversing is <span class="math" data-say="theta of E">Θ(E)</span> and doing it lazily, by scanning for arcs that point at the current vertex, turns a linear algorithm into a quadratic one. Build the reversed arc list once.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the next start from the schedule, never from the numbering</h3><p>Each new tree of the second pass begins at the undiscovered vertex that finished LATEST in the first pass. Falling back on the lowest-numbered undiscovered vertex is the single change that quietly breaks this algorithm: it still terminates, still partitions the vertices, and no longer computes components.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Build the condensation and check it for a cycle</h3><p>It is <span class="math" data-say="theta of E">Θ(E)</span> and it is the thing most downstream work actually wants. If it has a cycle, the components are wrong &mdash; that check is free and it catches the previous step having gone astray.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1368,7 +1368,7 @@ the condensation, one point per component, is always acyclic</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Seven vertices, both passes</h3><p>The arcs are <span class="math">1>2, 2>3, 3>1, 3>4, 4>5, 5>6, 6>4, 5>7</span>. Arcs out of a vertex are taken in the order they were typed.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">pass 1, on the arcs as typed
+      <article class="card card-pad prose"><h3>Seven vertices, both passes</h3><p>The arcs are <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 1, 3 is greater than 4, 4 is greater than 5, 5 is greater than 6, 6 is greater than 4, 5 is greater than 7">1>2, 2>3, 3>1, 3>4, 4>5, 5>6, 6>4, 5>7</span>. Arcs out of a vertex are taken in the order they were typed.</p><div class="mathblock" data-say="pass 1, on the arcs as typed. open 1, 2, 3, 3 is greater than 1 is a back arc. from 3 open 4, 5, then 5 is greater than 6 opens 6, whose 6 is greater than 4 is a back arc, close 6. then 5 is greater than 7 opens 7, close 7, 5, 4, 3, 2, 1. a table, shown on the page. reverse every arc. 2 is greater than 1, 3 is greater than 2, 1 is greater than 3, 4 is greater than 3, 5 is greater than 4, 6 is greater than 5, 4 is greater than 6, 7 is greater than 5. pass 2, taking starts from the list above. start 1, reaches 3 via 1 is greater than 3 and 2 via 3 is greater than 2, component the set 1, 2, 3. next undiscovered in the list is 4. start 4, reaches 6 via 4 is greater than 6 and 5 via 6 is greater than 5, component the set 4, 5, 6. 4 is greater than 3 leads to a vertex already taken, and stops there. next undiscovered in the list is 7. start 7, 7 is greater than 5 leads to a vertex already taken, component the set 7. condensation, the set 1, 2, 3, to the set 4, 5, 6, to the set 7, 3 points, 2 arcs, acyclic. mutual reachability, computed from the definition, same three sets" tabindex="0" role="region" aria-label="Mathematical notation">pass 1, on the arcs as typed
   open 1, 2, 3; 3&gt;1 is a back arc
   from 3 open 4, 5; then 5&gt;6 opens 6, whose 6&gt;4 is a back arc; close 6
   then 5&gt;7 opens 7; close 7, 5, 4, 3, 2, 1
@@ -1386,12 +1386,12 @@ pass 2, taking starts from the list above
   start 7   7&gt;5 leads to a vertex already taken     component {7}
 
 condensation   {1,2,3} -&gt; {4,5,6} -&gt; {7}        3 points, 2 arcs, acyclic
-mutual reachability, computed from the definition: same three sets</div><p>Watch what the reversal bought at the very first step. Walking forwards from 1 would have reached all seven vertices and returned one component. Walking backwards from 1 reached exactly three, because the arc <span class="math">3>4</span>, which is the only way out of that component, became <span class="math">4>3</span> and points inwards.</p><p>Watch also the start at 4. In the reversed graph the arc <span class="math">4>3</span> exists and leads straight into a finished component; the walk simply finds 3 already discovered and stops, which is why no special handling is needed for arcs between components. The schedule guarantees that any component reached this way is already complete.</p><p>For a faded rehearsal, add the arc <span class="math">7>5</span> to the original graph and predict the new components before running it. The supplied first move is this: 5 already reaches 7, so the new arc makes 5 and 7 mutually reachable, and 7 joins whatever 5 is in. Say what the three components become, how many points the condensation then has, and whether it is still acyclic.</p></article>
+mutual reachability, computed from the definition: same three sets</div><p>Watch what the reversal bought at the very first step. Walking forwards from 1 would have reached all seven vertices and returned one component. Walking backwards from 1 reached exactly three, because the arc <span class="math" data-say="3 is greater than 4">3>4</span>, which is the only way out of that component, became <span class="math" data-say="4 is greater than 3">4>3</span> and points inwards.</p><p>Watch also the start at 4. In the reversed graph the arc <span class="math" data-say="4 is greater than 3">4>3</span> exists and leads straight into a finished component; the walk simply finds 3 already discovered and stops, which is why no special handling is needed for arcs between components. The schedule guarantees that any component reached this way is already complete.</p><p>For a faded rehearsal, add the arc <span class="math" data-say="7 is greater than 5">7>5</span> to the original graph and predict the new components before running it. The supplied first move is this: 5 already reaches 7, so the new arc makes 5 and 7 mutually reachable, and 7 joins whatever 5 is in. Say what the three components become, how many points the condensation then has, and whether it is still acyclic.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Starting the second pass at the lowest-numbered undiscovered vertex</strong><span>It is the default in every other traversal on this course, it terminates, it partitions the vertices, and it is wrong. Nothing about the output looks broken &mdash; the sets are disjoint and cover everything &mdash; which is why the lab computes the partition a second time from the definition rather than trusting the algorithm it is demonstrating.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a one-way arc as membership</strong><span>An arc from <span class="math">u</span> to <span class="math">v</span> says <span class="math">u</span> reaches <span class="math">v</span> and nothing else. On the lab's opening graph, 5 points at 7 and 7 is still its own component. Strong connectivity is the conjunction of two reachability facts, and half of a conjunction is not weak evidence for it, it is no evidence at all.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing the condensation is acyclic because the lesson said so</strong><span>It is proved, and it is also checked on every graph the panel is given, because the proof is about correct components and a cycle in the condensation is the signature of incorrect ones. Treat the check as a test of the run rather than as a restatement of the theorem, and it earns its cost.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Starting the second pass at the lowest-numbered undiscovered vertex</strong><span>It is the default in every other traversal on this course, it terminates, it partitions the vertices, and it is wrong. Nothing about the output looks broken &mdash; the sets are disjoint and cover everything &mdash; which is why the lab computes the partition a second time from the definition rather than trusting the algorithm it is demonstrating.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a one-way arc as membership</strong><span>An arc from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> says <span class="math" data-say="u">u</span> reaches <span class="math" data-say="v">v</span> and nothing else. On the lab's opening graph, 5 points at 7 and 7 is still its own component. Strong connectivity is the conjunction of two reachability facts, and half of a conjunction is not weak evidence for it, it is no evidence at all.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing the condensation is acyclic because the lesson said so</strong><span>It is proved, and it is also checked on every graph the panel is given, because the proof is about correct components and a cycle in the condensation is the signature of incorrect ones. Treat the check as a test of the run rather than as a restatement of the theorem, and it earns its cost.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run both passes by hand on a graph you have not seen and say why the second one reverses.</strong><p>You should be able to produce the finishing order from the first walk, reverse the arcs, take the starts from the schedule rather than from the numbering, build the condensation, and state the theorem about the last-finishing vertex that makes the whole thing work.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This is the last lesson built on one traversal. The next module keeps the graph and adds weights, and the question changes from what is reachable to what is cheapest: &ldquo;The Cut Property&rdquo; is the single lemma every minimum spanning tree algorithm is an instance of, and it is proved there against an enumeration of every spanning tree the graph has.</div></article>
       </div>
     </section>
@@ -1431,7 +1431,7 @@ mutual reachability, computed from the definition: same three sets</div><p>Watch
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Graph Algorithms.</strong> Every count on this course is produced by running the algorithm on the graph you typed. Distances, weights, low-links, cut capacities, matching sizes and component counts are integers, and no page here rounds anything. Three claims are checked against an independently written implementation from another Subject &mdash; bridges against delete-and-recount, the minimum tree against a second method, and the distances against a Dijkstra that knows nothing about this representation &mdash; and where a reader's graph has two edges between the same pair, that check declines rather than answering about a different graph. Four more are checked against a complete enumeration at a cap the page states: every spanning tree, every topological order, every cut, every subset of the pairs. Two columns are labelled for reference and carry no verdict: <span class="math">E</span> times the integer part of <span class="math">log₂ V</span>, on the two pages that print it.</p>
+      <p><strong>Graph Algorithms.</strong> Every count on this course is produced by running the algorithm on the graph you typed. Distances, weights, low-links, cut capacities, matching sizes and component counts are integers, and no page here rounds anything. Three claims are checked against an independently written implementation from another Subject &mdash; bridges against delete-and-recount, the minimum tree against a second method, and the distances against a Dijkstra that knows nothing about this representation &mdash; and where a reader's graph has two edges between the same pair, that check declines rather than answering about a different graph. Four more are checked against a complete enumeration at a cap the page states: every spanning tree, every topological order, every cut, every subset of the pairs. Two columns are labelled for reference and carry no verdict: <span class="math" data-say="E">E</span> times the integer part of <span class="math" data-say="log base 2 V">log₂ V</span>, on the two pages that print it.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -3103,6 +3103,178 @@ mutual reachability, computed from the definition: same three sets</div><p>Watch
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

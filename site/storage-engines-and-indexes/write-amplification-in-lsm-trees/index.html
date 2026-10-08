@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Storage Engines and Indexes &middot; The write side</span>
         <h1>Write Amplification in LSM Trees</h1>
-        <p>A levelled log-structured tree never writes randomly, and it writes everything about twenty-five times. Each of <span class="math">L</span> levels rewrites a byte passing through it about <span class="math">F/2</span> times, so <span class="math">WA ≈ L·F/2</span>; and a lookup that finds nothing has to try every level, so <span class="math">RA ≈ L</span> before any filter. Append-only describes the pattern of the writes, not their number.</p>
+        <p>A levelled log-structured tree never writes randomly, and it writes everything about twenty-five times. Each of <span class="math" data-say="L">L</span> levels rewrites a byte passing through it about <span class="math" data-say="F over 2">F/2</span> times, so <span class="math" data-say="WA is approximately L times F over 2">WA ≈ L·F/2</span>; and a lookup that finds nothing has to try every level, so <span class="math" data-say="RA is approximately L">RA ≈ L</span> before any filter. Append-only describes the pattern of the writes, not their number.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">WA ≈ L · F/2      each byte rewritten about F/2 times on each of L levels
+        <div class="mathblock" data-say="WA is approximately L times F over 2, each byte rewritten about F over 2 times on each of L levels. RA is approximately L, a miss has to be looked for on every level. F equals 10, L equals 5, WA equals 25 times, RA equals 5 probes. compaction bandwidth equals ingest times WA equals 50 megabytes per second times 25 equals 1.25 gigabytes per second" tabindex="0" role="region" aria-label="Mathematical notation">WA ≈ L · F/2      each byte rewritten about F/2 times on each of L levels
 RA ≈ L            a miss has to be looked for on every level
 
 F = 10, L = 5       WA = 25×        RA = 5 probes
@@ -1310,11 +1310,11 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One new idea — the F/2 — and two consequences of it that decide what hardware the engine needs.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A level rewrites about <span class="math">F/2</span> bytes for every byte that passes through it</h3><p>Merging a run into a level rewrites the part of that level it overlaps. When the merge happens, the level is on average about half full of the data it will eventually hold, so a byte crossing it is rewritten about <span class="math">F/2</span> times before it moves on. That is the <span class="math">F/2</span>, and it is an average over the level's filling cycle rather than a count of anything.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Every level charges it, so the total is <span class="math">L·F/2</span></h3><p>There are <span class="math">L</span> levels between the memtable and the bottom and a byte crosses all of them, so <span class="math">5</span> levels at <span class="math">F/2 = 5</span> rewrites each is <span class="math">25</span> bytes written for every byte the engine was handed. Every one of those writes was sequential. There were simply twenty-five times as many of them as the writer asked for.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read amplification is the level count, before filters</h3><p>A key that is not present has to be searched for on every level, because no level can prove the absence of a key that another might hold. That is <span class="math">RA ≈ L = 5</span> probes for a miss. It is the one number on this page that can be bought back cheaply, and “Bloom Filters: Bits per Key” is where it is bought.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A level rewrites about <span class="math" data-say="F over 2">F/2</span> bytes for every byte that passes through it</h3><p>Merging a run into a level rewrites the part of that level it overlaps. When the merge happens, the level is on average about half full of the data it will eventually hold, so a byte crossing it is rewritten about <span class="math" data-say="F over 2">F/2</span> times before it moves on. That is the <span class="math" data-say="F over 2">F/2</span>, and it is an average over the level's filling cycle rather than a count of anything.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Every level charges it, so the total is <span class="math" data-say="L times F over 2">L·F/2</span></h3><p>There are <span class="math" data-say="L">L</span> levels between the memtable and the bottom and a byte crosses all of them, so <span class="math" data-say="5">5</span> levels at <span class="math" data-say="F over 2 equals 5">F/2 = 5</span> rewrites each is <span class="math" data-say="25">25</span> bytes written for every byte the engine was handed. Every one of those writes was sequential. There were simply twenty-five times as many of them as the writer asked for.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read amplification is the level count, before filters</h3><p>A key that is not present has to be searched for on every level, because no level can prove the absence of a key that another might hold. That is <span class="math" data-say="RA is approximately L equals 5">RA ≈ L = 5</span> probes for a miss. It is the one number on this page that can be bought back cheaply, and “Bloom Filters: Bits per Key” is where it is bought.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>L levels at F/2 rewrites each, and the bandwidth that implies</h2></div><p>Why sequential writing is not the same as cheap writing, and what number to size a device against.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Write and read amplification</span><p><strong>Write amplification</strong> is the bytes an engine writes to durable storage for every byte the application hands it. <strong>Read amplification</strong> is the storage reads a single logical lookup performs.</p><p>For a levelled LSM tree with fanout <span class="math">F</span> and <span class="math">L</span> levels these are <span class="math">WA ≈ L·F/2</span> and <span class="math">RA ≈ L</span>. Both are counts, both are ratios, and neither is a latency.</p></div><p>The <span class="math">F/2</span> is the part worth slowing down for. It is not <span class="math">F</span>. A merge into a level rewrites whatever part of that level overlaps the incoming run, and a level spends its life filling from empty to full between merges — so averaged over that cycle, a byte passing through is rewritten about half of <span class="math">F</span> times rather than <span class="math">F</span> times. Every figure on this page inherits that word “about”.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">memtable 64 MB      F = 10      L = 5      ingest 50 MB/s
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Write and read amplification</span><p><strong>Write amplification</strong> is the bytes an engine writes to durable storage for every byte the application hands it. <strong>Read amplification</strong> is the storage reads a single logical lookup performs.</p><p>For a levelled LSM tree with fanout <span class="math" data-say="F">F</span> and <span class="math" data-say="L">L</span> levels these are <span class="math" data-say="WA is approximately L times F over 2">WA ≈ L·F/2</span> and <span class="math" data-say="RA is approximately L">RA ≈ L</span>. Both are counts, both are ratios, and neither is a latency.</p></div><p>The <span class="math" data-say="F over 2">F/2</span> is the part worth slowing down for. It is not <span class="math" data-say="F">F</span>. A merge into a level rewrites whatever part of that level overlaps the incoming run, and a level spends its life filling from empty to full between merges — so averaged over that cycle, a byte passing through is rewritten about half of <span class="math" data-say="F">F</span> times rather than <span class="math" data-say="F">F</span> times. Every figure on this page inherits that word “about”.</p><div class="mathblock" data-say="memtable 64 megabytes, F equals 10, L equals 5, ingest 50 megabytes per second. level, capacity equals memtable times F to the power L, rewrites a byte, bandwidth, cumulative. a table, shown on the page. WA equals L times F over 2 equals 5 times 5 equals 25, compaction equals 25 times 50 megabytes per second equals 1.25 gigabytes per second. RA equals L equals 5 probes on a miss" tabindex="0" role="region" aria-label="Mathematical notation">memtable 64 MB      F = 10      L = 5      ingest 50 MB/s
 
   level    capacity = memtable · Fᴸ    rewrites a byte    bandwidth    cumulative
     L1                    640.00 MB            5 ×      250.00 MB/s        5 ×
@@ -1324,7 +1324,7 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
     L5                      6.40 TB            5 ×      250.00 MB/s       25 ×
 
   WA = L · F/2 = 5 × 5 = 25        compaction = 25 × 50 MB/s = 1.25 GB/s
-  RA = L = 5 probes on a miss</div><p>The last column is the whole lesson. A device sized to the ingest rate needs <span class="math">50 MB/s</span>; the engine needs <span class="math">1.25 GB/s</span>, and it needs it whether or not anybody is reading. That factor of twenty-five is not overhead in the loose sense — it is the mechanism by which the writes became sequential in the first place.</p><div class="example"><span class="label">Example &middot; How many levels the data actually forces</span><p>The level count is not really a setting. Level capacities are <span class="math">memtable × Fᴸ</span>, so at a <span class="math">64 MB</span> memtable and <span class="math">F = 10</span> the levels hold <span class="math">640 MB</span>, <span class="math">6.40 GB</span>, <span class="math">64 GB</span>, <span class="math">640 GB</span> and <span class="math">6.40 TB</span>. A terabyte of data does not fit in four levels and does fit in five, so <span class="math">L = 5</span> — found by the same integer search that gives a B-tree its height, multiplying <span class="math">F</span> in until the capacity covers the data.</p></div><h3>The misconception: append-only means cheap</h3><p>It means <em>sequential</em>, which is a claim about the first term of the read-time formula and a good one: an LSM has no random writes at all on the ingest path, which is exactly what “The Write Cost of an Index” showed a B-tree paying <span class="math">k + 1</span> of. What it does not mean is few. The engine bought a better access pattern by agreeing to rewrite the data twenty-five times, and both halves of that sentence are the design.</p><p>Lowering the fanout lowers the write amplification and raises everything else. At <span class="math">F = 4</span> the same terabyte over the same memtable forces <span class="math">7</span> levels, so <span class="math">WA</span> falls to <span class="math">14</span> — <span class="math">700 MB/s</span> of compaction instead of <span class="math">1.25 GB/s</span> — and <span class="math">RA</span> rises from <span class="math">5</span> probes to <span class="math">7</span>. There is no setting of <span class="math">F</span> that improves both, which is the shape “The RUM Trade-off” draws as a triangle.</p><p>Two caveats the lab carries. <span class="math">WA ≈ L·F/2</span> describes levelled compaction; a tiered engine merges whole runs instead and pays <span class="math">L</span> rather than <span class="math">L·F/2</span>, in exchange for a much worse read amplification. And compaction is bursty: <span class="math">1.25 GB/s</span> is the average the device must sustain, while the instantaneous demand during a large merge is higher and the demand between merges is lower.</p></article>
+  RA = L = 5 probes on a miss</div><p>The last column is the whole lesson. A device sized to the ingest rate needs <span class="math" data-say="50 megabytes per second">50 MB/s</span>; the engine needs <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, and it needs it whether or not anybody is reading. That factor of twenty-five is not overhead in the loose sense — it is the mechanism by which the writes became sequential in the first place.</p><div class="example"><span class="label">Example &middot; How many levels the data actually forces</span><p>The level count is not really a setting. Level capacities are <span class="math" data-say="memtable times F to the power L">memtable × Fᴸ</span>, so at a <span class="math" data-say="64 megabytes">64 MB</span> memtable and <span class="math" data-say="F equals 10">F = 10</span> the levels hold <span class="math" data-say="640 megabytes">640 MB</span>, <span class="math" data-say="6.40 gigabytes">6.40 GB</span>, <span class="math" data-say="64 gigabytes">64 GB</span>, <span class="math" data-say="640 gigabytes">640 GB</span> and <span class="math" data-say="6.40 terabytes">6.40 TB</span>. A terabyte of data does not fit in four levels and does fit in five, so <span class="math" data-say="L equals 5">L = 5</span> — found by the same integer search that gives a B-tree its height, multiplying <span class="math" data-say="F">F</span> in until the capacity covers the data.</p></div><h3>The misconception: append-only means cheap</h3><p>It means <em>sequential</em>, which is a claim about the first term of the read-time formula and a good one: an LSM has no random writes at all on the ingest path, which is exactly what “The Write Cost of an Index” showed a B-tree paying <span class="math" data-say="k plus 1">k + 1</span> of. What it does not mean is few. The engine bought a better access pattern by agreeing to rewrite the data twenty-five times, and both halves of that sentence are the design.</p><p>Lowering the fanout lowers the write amplification and raises everything else. At <span class="math" data-say="F equals 4">F = 4</span> the same terabyte over the same memtable forces <span class="math" data-say="7">7</span> levels, so <span class="math" data-say="WA">WA</span> falls to <span class="math" data-say="14">14</span> — <span class="math" data-say="700 megabytes per second">700 MB/s</span> of compaction instead of <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span> — and <span class="math" data-say="RA">RA</span> rises from <span class="math" data-say="5">5</span> probes to <span class="math" data-say="7">7</span>. There is no setting of <span class="math" data-say="F">F</span> that improves both, which is the shape “The RUM Trade-off” draws as a triangle.</p><p>Two caveats the lab carries. <span class="math" data-say="WA is approximately L times F over 2">WA ≈ L·F/2</span> describes levelled compaction; a tiered engine merges whole runs instead and pays <span class="math" data-say="L">L</span> rather than <span class="math" data-say="L times F over 2">L·F/2</span>, in exchange for a much worse read amplification. And compaction is bursty: <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span> is the average the device must sustain, while the instantaneous demand during a large merge is higher and the demand between merges is lower.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Write amplification in an LSM tree</h2></div><p>L levels at F/2 rewrites each, and the compaction bandwidth that implies</p></div>
@@ -1340,7 +1340,7 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Set the fanout, the levels and the ingest rate</h3>
-          <p>Write amplification is <span class="math">L × F/2</span>, summed one level at a time in the table, and the compaction bandwidth is the ingest rate multiplied by it. Drop the fanout to <span class="math">4</span> and watch the amplification fall while the level count the data forces climbs — the two move in opposite directions and the table shows both.</p>
+          <p>Write amplification is <span class="math" data-say="L times F over 2">L × F/2</span>, summed one level at a time in the table, and the compaction bandwidth is the ingest rate multiplied by it. Drop the fanout to <span class="math" data-say="4">4</span> and watch the amplification fall while the level count the data forces climbs — the two move in opposite directions and the table shows both.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="lsF">Fanout F between levels</label><span class="range-value" id="lsFOut">10</span></div>
           <input id="lsF" type="range" min="2" max="20" step="1" value="10" />
@@ -1369,7 +1369,7 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a log-structured write</h2></div><p>Get the level count from the data before you trust the level count in the configuration.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the levels the data forces</h3><p>Multiply the memtable size by <span class="math">F</span> repeatedly until the capacity covers the dataset, and count the multiplications. A configured level count below that is not a smaller tree; it is a tree that will grow one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply <span class="math">L</span> by <span class="math">F/2</span></h3><p>That is the write amplification, and it is a pure ratio: bytes written per byte ingested, with no device in it yet. At <span class="math">F = 10</span> and <span class="math">L = 5</span> it is <span class="math">25</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply the ingest rate by the amplification</h3><p><span class="math">50 MB/s × 25 = 1.25 GB/s</span> of sustained write bandwidth. This is the number a device is chosen against, and it is the one nobody quotes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Write the read amplification down beside it</h3><p><span class="math">RA ≈ L</span> probes on a miss, before filters. Doing this in the same breath is what stops a fanout change from looking like a free improvement, because the two amplifications move in opposite directions.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the levels the data forces</h3><p>Multiply the memtable size by <span class="math" data-say="F">F</span> repeatedly until the capacity covers the dataset, and count the multiplications. A configured level count below that is not a smaller tree; it is a tree that will grow one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply <span class="math" data-say="L">L</span> by <span class="math" data-say="F over 2">F/2</span></h3><p>That is the write amplification, and it is a pure ratio: bytes written per byte ingested, with no device in it yet. At <span class="math" data-say="F equals 10">F = 10</span> and <span class="math" data-say="L equals 5">L = 5</span> it is <span class="math" data-say="25">25</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply the ingest rate by the amplification</h3><p><span class="math" data-say="50 megabytes per second times 25 equals 1.25 gigabytes per second">50 MB/s × 25 = 1.25 GB/s</span> of sustained write bandwidth. This is the number a device is chosen against, and it is the one nobody quotes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Write the read amplification down beside it</h3><p><span class="math" data-say="RA is approximately L">RA ≈ L</span> probes on a miss, before filters. Doing this in the same breath is what stops a fanout change from looking like a free improvement, because the two amplifications move in opposite directions.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1380,7 +1380,7 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A terabyte at F = 10, ingested at 50 MB/s</h3><p>The level count comes from the data, the amplification comes from the level count, and the bandwidth comes from the amplification.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">memtable 64 MB      F = 10      ingest 50 MB/s      data 1.00 TB
+      <article class="card card-pad prose"><h3>A terabyte at F = 10, ingested at 50 MB/s</h3><p>The level count comes from the data, the amplification comes from the level count, and the bandwidth comes from the amplification.</p><div class="mathblock" data-say="memtable 64 megabytes, F equals 10, ingest 50 megabytes per second, data 1.00 terabytes. level, capacity, rewrites a byte, bandwidth at 50 megabytes per second, cumulative WA. a table, shown on the page. 1.00 terabytes does not fit in L 4 640.00 gigabytes and fits in L 5, goes to, L equals 5. WA equals L times F over 2 equals 5 times 5, equals, 25 bytes written per byte in. compaction, equals 25 times 50 megabytes per second, equals, 1.25 gigabytes per second of sustained write bandwidth. RA equals L, equals, 5 probes on a lookup that misses" tabindex="0" role="region" aria-label="Mathematical notation">memtable 64 MB      F = 10      ingest 50 MB/s      data 1.00 TB
 
   level     capacity      rewrites a byte    bandwidth at 50 MB/s   cumulative WA
     L1     640.00 MB              5 ×              250.00 MB/s            5 ×
@@ -1393,13 +1393,13 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
 
   WA = L · F/2 = 5 × 5              =     25 bytes written per byte in
   compaction   = 25 × 50 MB/s       =  1.25 GB/s of sustained write bandwidth
-  RA = L                            =      5 probes on a lookup that misses</div><p>Two numbers describe the same engine and only one of them is ever on a dashboard. The ingest is <span class="math">50 MB/s</span>; the disk sees <span class="math">1.25 GB/s</span>. Sizing a device against the first figure is not a small error — it is off by a factor of twenty-five, and the symptom is an engine that keeps up until compaction falls behind and then never catches up again.</p><p>Lower the fanout to <span class="math">4</span> and the arithmetic moves the other way: the terabyte now forces <span class="math">7</span> levels, <span class="math">WA</span> falls to <span class="math">14</span> and the compaction bandwidth to <span class="math">700 MB/s</span>, while the read amplification rises from <span class="math">5</span> probes to <span class="math">7</span>. Cheaper writes, dearer reads, bought at a fixed exchange rate.</p><p>For a faded rehearsal, keep <span class="math">F = 10</span> and set the level count to <span class="math">3</span>. The supplied first move is that <span class="math">WA</span> falls to <span class="math">15</span>. Compute the compaction bandwidth at <span class="math">50 MB/s</span>, then read the capacity column and say what the largest dataset three levels can actually hold over a <span class="math">64 MB</span> memtable — which is the constraint the setting was hiding. Check both in the lab before opening the quiz.</p></article>
+  RA = L                            =      5 probes on a lookup that misses</div><p>Two numbers describe the same engine and only one of them is ever on a dashboard. The ingest is <span class="math" data-say="50 megabytes per second">50 MB/s</span>; the disk sees <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>. Sizing a device against the first figure is not a small error — it is off by a factor of twenty-five, and the symptom is an engine that keeps up until compaction falls behind and then never catches up again.</p><p>Lower the fanout to <span class="math" data-say="4">4</span> and the arithmetic moves the other way: the terabyte now forces <span class="math" data-say="7">7</span> levels, <span class="math" data-say="WA">WA</span> falls to <span class="math" data-say="14">14</span> and the compaction bandwidth to <span class="math" data-say="700 megabytes per second">700 MB/s</span>, while the read amplification rises from <span class="math" data-say="5">5</span> probes to <span class="math" data-say="7">7</span>. Cheaper writes, dearer reads, bought at a fixed exchange rate.</p><p>For a faded rehearsal, keep <span class="math" data-say="F equals 10">F = 10</span> and set the level count to <span class="math" data-say="3">3</span>. The supplied first move is that <span class="math" data-say="WA">WA</span> falls to <span class="math" data-say="15">15</span>. Compute the compaction bandwidth at <span class="math" data-say="50 megabytes per second">50 MB/s</span>, then read the capacity column and say what the largest dataset three levels can actually hold over a <span class="math" data-say="64 megabytes">64 MB</span> memtable — which is the constraint the setting was hiding. Check both in the lab before opening the quiz.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing the disk to the ingest rate</strong><span><span class="math">50 MB/s</span> in means <span class="math">1.25 GB/s</span> on the device at <span class="math">F = 10</span> and <span class="math">L = 5</span>. A device chosen against the ingest figure is undersized by the amplification factor, and the failure mode is delayed: everything works until compaction falls behind, at which point read amplification climbs too and the engine gets worse in both directions at once.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading “append-only” as “written once”</strong><span>Appending is how the data enters a level. Compaction is what happens to it afterwards, on every level, <span class="math">F/2</span> times each. The log-structured design converted random writes into sequential ones by agreeing to do a great many more of them, and only one half of that bargain is in the name.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Lowering the fanout and quoting only the improvement</strong><span>Halving <span class="math">F</span> from ten to five roughly halves the per-level rewrite count and raises the number of levels the data forces — so the read amplification goes up, and the write amplification falls by less than the fanout did. Any change to <span class="math">F</span> has to be quoted with both amplifications and the level count, or it is a claim with its cost removed.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what an engine writes as well as what it is given.</strong><p>You should be able to derive the level count from the memtable and the dataset, compute both amplifications from <span class="math">F</span> and <span class="math">L</span>, and turn the write amplification into the sustained device bandwidth the engine actually needs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The five probes a miss costs here are what a filter on every level removes almost entirely. “Bloom Filters: Bits per Key” sizes that filter — about ten bits a key at a one per cent false-positive rate, independent of how many keys there are — and turns a read amplification of <span class="math">5</span> into <span class="math">1.04</span>.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing the disk to the ingest rate</strong><span><span class="math" data-say="50 megabytes per second">50 MB/s</span> in means <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span> on the device at <span class="math" data-say="F equals 10">F = 10</span> and <span class="math" data-say="L equals 5">L = 5</span>. A device chosen against the ingest figure is undersized by the amplification factor, and the failure mode is delayed: everything works until compaction falls behind, at which point read amplification climbs too and the engine gets worse in both directions at once.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading “append-only” as “written once”</strong><span>Appending is how the data enters a level. Compaction is what happens to it afterwards, on every level, <span class="math" data-say="F over 2">F/2</span> times each. The log-structured design converted random writes into sequential ones by agreeing to do a great many more of them, and only one half of that bargain is in the name.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Lowering the fanout and quoting only the improvement</strong><span>Halving <span class="math" data-say="F">F</span> from ten to five roughly halves the per-level rewrite count and raises the number of levels the data forces — so the read amplification goes up, and the write amplification falls by less than the fanout did. Any change to <span class="math" data-say="F">F</span> has to be quoted with both amplifications and the level count, or it is a claim with its cost removed.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what an engine writes as well as what it is given.</strong><p>You should be able to derive the level count from the memtable and the dataset, compute both amplifications from <span class="math" data-say="F">F</span> and <span class="math" data-say="L">L</span>, and turn the write amplification into the sustained device bandwidth the engine actually needs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The five probes a miss costs here are what a filter on every level removes almost entirely. “Bloom Filters: Bits per Key” sizes that filter — about ten bits a key at a one per cent false-positive rate, independent of how many keys there are — and turns a read amplification of <span class="math" data-say="5">5</span> into <span class="math" data-say="1.04">1.04</span>.</div></article>
       </div>
     </section>
     </main>
@@ -1438,7 +1438,7 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math">h</span> with <span class="math">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math">9.585</span> rather than the <span class="math">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
+      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is greater than or equal to N">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math" data-say="9.585">9.585</span> rather than the <span class="math" data-say="9.57">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1497,7 +1497,7 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "A levelled LSM has fanout <span class=\"math\">F = 10<\/span> and <span class=\"math\">L = 5<\/span> levels. What is its write amplification?", "a": ["<span class=\"math\">5<\/span>, one per level", "<span class=\"math\">10<\/span>, the fanout", "<span class=\"math\">25<\/span>", "<span class=\"math\">50<\/span>, <span class=\"math\">L \u00d7 F<\/span>"], "c": 2, "why": "<span class=\"math\">WA \u2248 L\u00b7F/2 = 5 \u00d7 5 = 25<\/span>. <span class=\"math\">5<\/span> is the read amplification and <span class=\"math\">50<\/span> uses <span class=\"math\">F<\/span> where the merge costs <span class=\"math\">F/2<\/span>, because a level is on average half full of its eventual contents when the merge into it happens."}, {"q": "That engine ingests <span class=\"math\">50 MB/s<\/span>. What sustained write bandwidth does the device need?", "a": ["<span class=\"math\">50 MB/s<\/span>", "<span class=\"math\">250 MB/s<\/span>", "<span class=\"math\">1.25 GB/s<\/span>", "<span class=\"math\">2.50 GB/s<\/span>"], "c": 2, "why": "<span class=\"math\">ingest \u00d7 WA = 50 MB/s \u00d7 25 = 1.25 GB/s<\/span>. <span class=\"math\">250 MB/s<\/span> is what one level costs; there are five of them. Sizing the device to the <span class=\"math\">50 MB/s<\/span> of ingest is the misconception this lesson exists for."}, {"q": "Why is the per-level rewrite figure <span class=\"math\">F/2<\/span> rather than <span class=\"math\">F<\/span>?", "a": ["Because half of every merge is skipped when the keys do not overlap", "Because a level is on average about half full of its eventual contents when a merge into it happens", "Because compaction runs on two threads", "Because half of the data is already in the page cache"], "c": 1, "why": "A level fills from empty toward full between merges, so averaged over that cycle a byte crossing it is rewritten about <span class=\"math\">F/2<\/span> times rather than <span class=\"math\">F<\/span>. It is an average over the filling cycle, not a saving from skipped work or from concurrency."}, {"q": "An engine performs no random writes at all. Does that make its writes cheap?", "a": ["Yes \u2014 sequential writes run at the device's full bandwidth", "No \u2014 it says the writes are sequential, and here there are twenty-five times as many of them", "Yes, provided the memtable is large enough", "Only if read amplification is also <span class=\"math\">1<\/span>"], "c": 1, "why": "Sequential is a claim about the access pattern and a true one: an LSM has no random writes on the ingest path at all. The count is a separate question, and it is <span class=\"math\">25<\/span> bytes written per byte handed over. A larger memtable changes the level count, not the exchange rate."}];
+  var QUIZ = [{"q": "A levelled LSM has fanout <span class=\"math\" data-say=\"F equals 10\">F = 10<\/span> and <span class=\"math\" data-say=\"L equals 5\">L = 5<\/span> levels. What is its write amplification?", "a": ["<span class=\"math\" data-say=\"5\">5<\/span>, one per level", "<span class=\"math\" data-say=\"10\">10<\/span>, the fanout", "<span class=\"math\" data-say=\"25\">25<\/span>", "<span class=\"math\" data-say=\"50\">50<\/span>, <span class=\"math\" data-say=\"L times F\">L \u00d7 F<\/span>"], "c": 2, "why": "<span class=\"math\" data-say=\"WA is approximately L times F over 2 equals 5 times 5 equals 25\">WA \u2248 L\u00b7F/2 = 5 \u00d7 5 = 25<\/span>. <span class=\"math\" data-say=\"5\">5<\/span> is the read amplification and <span class=\"math\" data-say=\"50\">50<\/span> uses <span class=\"math\" data-say=\"F\">F<\/span> where the merge costs <span class=\"math\" data-say=\"F over 2\">F/2<\/span>, because a level is on average half full of its eventual contents when the merge into it happens."}, {"q": "That engine ingests <span class=\"math\" data-say=\"50 megabytes per second\">50 MB/s<\/span>. What sustained write bandwidth does the device need?", "a": ["<span class=\"math\" data-say=\"50 megabytes per second\">50 MB/s<\/span>", "<span class=\"math\" data-say=\"250 megabytes per second\">250 MB/s<\/span>", "<span class=\"math\" data-say=\"1.25 gigabytes per second\">1.25 GB/s<\/span>", "<span class=\"math\" data-say=\"2.50 gigabytes per second\">2.50 GB/s<\/span>"], "c": 2, "why": "<span class=\"math\" data-say=\"ingest times WA equals 50 megabytes per second times 25 equals 1.25 gigabytes per second\">ingest \u00d7 WA = 50 MB/s \u00d7 25 = 1.25 GB/s<\/span>. <span class=\"math\" data-say=\"250 megabytes per second\">250 MB/s<\/span> is what one level costs; there are five of them. Sizing the device to the <span class=\"math\" data-say=\"50 megabytes per second\">50 MB/s<\/span> of ingest is the misconception this lesson exists for."}, {"q": "Why is the per-level rewrite figure <span class=\"math\" data-say=\"F over 2\">F/2<\/span> rather than <span class=\"math\" data-say=\"F\">F<\/span>?", "a": ["Because half of every merge is skipped when the keys do not overlap", "Because a level is on average about half full of its eventual contents when a merge into it happens", "Because compaction runs on two threads", "Because half of the data is already in the page cache"], "c": 1, "why": "A level fills from empty toward full between merges, so averaged over that cycle a byte crossing it is rewritten about <span class=\"math\" data-say=\"F over 2\">F/2<\/span> times rather than <span class=\"math\" data-say=\"F\">F<\/span>. It is an average over the filling cycle, not a saving from skipped work or from concurrency."}, {"q": "An engine performs no random writes at all. Does that make its writes cheap?", "a": ["Yes \u2014 sequential writes run at the device's full bandwidth", "No \u2014 it says the writes are sequential, and here there are twenty-five times as many of them", "Yes, provided the memtable is large enough", "Only if read amplification is also <span class=\"math\" data-say=\"1\">1<\/span>"], "c": 1, "why": "Sequential is a claim about the access pattern and a true one: an LSM has no random writes on the ingest path at all. The count is a separate question, and it is <span class=\"math\" data-say=\"25\">25<\/span> bytes written per byte handed over. A larger memtable changes the level count, not the exchange rate."}];
 
   (function () {
 
@@ -2537,6 +2537,178 @@ compaction bandwidth = ingest × WA = 50 MB/s × 25 = 1.25 GB/s</div>
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    var voice = null;
+    function pickVoice() {
+      // The language of the page, not of the browser: a German browser must not read
+      // English with a German voice. A local voice first; a network voice
+      // sends the text to its vendor.
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
+        return v.lang.slice(0, 2) === lang; });
+      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
+        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>
