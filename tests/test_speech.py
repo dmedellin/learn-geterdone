@@ -12,6 +12,7 @@ Two questions, kept apart:
     python3 -m unittest tests.test_speech -v
 """
 
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -239,6 +240,16 @@ class TestCoverage(unittest.TestCase):
                     clashes.append((run, seen[run][0], path["slug"]))
                 seen.setdefault(run, (path["slug"], spoken))
         self.assertEqual(clashes, [])
+
+    def test_no_spoken_form_for_a_bare_tuple(self):
+        """Spoken forms are shared by every Subject, and a bare tuple means
+        different things in different places: `(a, b)` is a pair in a
+        relation and an open interval in Algebra. Calling it "the pair a, b"
+        everywhere misreads the interval, so a tuple keeps the rules' reading."""
+        tuple_run = re.compile(r"\(\s*[^(),]+\s*(,\s*[^(),]+\s*)+\)")
+        for path, overrides in self.subjects:
+            with self.subTest(path=path["slug"]):
+                self.assertEqual([run for run in overrides if tuple_run.fullmatch(run)], [])
 
     def test_nothing_is_guessed(self):
         """A run whose notation is ambiguous needs a spoken form, or the content
