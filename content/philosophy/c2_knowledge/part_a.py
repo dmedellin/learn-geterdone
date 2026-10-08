@@ -273,7 +273,7 @@ LESSONS = [
                   "on something false along the way: that Jones will get the job, "
                   "that the clock is running. Call the condition `L`, for “relies "
                   "on a false lemma”, and require it to be absent: `J ∧ T ∧ B ∧ ¬L`. "
-                  "The lab writes not as a tilde."),
+                  "In the lab’s list of candidate definitions, not is written as a tilde."),
             ("math", [
                 "case                   J   T   B   L   knows?",
                 "---------------------------------------------",

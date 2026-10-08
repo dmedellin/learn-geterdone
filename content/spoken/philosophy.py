@@ -63,8 +63,8 @@ SPOKEN = {
     'u(a, s): payoff of act a in state s': 'u of a and s is the payoff of act a in state s',
     'EU(a) = Σ P(s)·u(a, s)': 'the expected utility of a equals the sum over states s of the probability of s times the utility of a in s',
     'u(wealth) rises, but ever more slowly': 'the utility of wealth rises, but ever more slowly',
-    'u(0)': 'the utility of nothing',
-    'u(1M)': 'the utility of one million',
+    'u(0)': 'u of 0',
+    'u(1M)': 'u of one million',
     'u(5M)': 'the utility of five million',
     'u(0) = 0': 'the utility of nothing is 0',
     'u(1M) = 10': 'the utility of one million is 10',
@@ -129,11 +129,9 @@ SPOKEN = {
     # Paradoxes and Their Exits
     '∀x (Shaves(b, x) ↔ ¬Shaves(x, x))': 'for every x, the barber shaves x if and only if x does not shave x',
     '∀x (Villager(x) → (Shaves(b, x) ↔ ¬Shaves(x, x)))': 'for every x, if x is a villager then the barber shaves x if and only if x does not shave x',
-    '□': 'the box, read as it is known that',
     'p ∧ ¬□p': 'p and it is not known that p',
     '¬□p': 'it is not known that p',
     '□(p ∧ ¬□p)': 'it is known that p and it is not known that p',
     'Moore: p ∧ ¬□p, read as p but I do not know p': 'Moore. p and it is not known that p, read as p but I do not know p',
     '□(p ∧ ¬□p): true at no reflexive world': 'it is known that p and it is not known that p, is true at no reflexive world',
-    '□p → p': 'if it is known that p, then p',
 }

@@ -2,7 +2,7 @@
 
 Two questions, kept apart:
 
-* coverage -- every math run the five generated paths emit comes out as words
+* coverage -- every math run the six generated paths emit comes out as words
   a voice can say, with no symbol left over to be read as its Unicode name or
   dropped as punctuation;
 * correctness -- a reading that is all words can still be wrong (`¬(p ∧ q)`
@@ -194,7 +194,7 @@ class TestReaderScript(unittest.TestCase):
 
 
 class TestCoverage(unittest.TestCase):
-    """Every run on the five generated paths is spoken, and nothing is guessed."""
+    """Every run on the six generated paths is spoken, and nothing is guessed."""
 
     @classmethod
     def setUpClass(cls):
@@ -250,6 +250,15 @@ class TestCoverage(unittest.TestCase):
         for path, overrides in self.subjects:
             with self.subTest(path=path["slug"]):
                 self.assertEqual([run for run in overrides if tuple_run.fullmatch(run)], [])
+
+    def test_no_spoken_form_for_a_lone_symbol(self):
+        """A single symbol's reading belongs to speech.SYMBOLS, which every
+        Subject shares. Philosophy once keyed `□` to its epistemic gloss for
+        one lesson, which would have read the necessity of every modal lesson
+        as knowledge."""
+        for path, overrides in self.subjects:
+            with self.subTest(path=path["slug"]):
+                self.assertEqual([run for run in overrides if len(run.strip()) == 1], [])
 
     def test_nothing_is_guessed(self):
         """A run whose notation is ambiguous needs a spoken form, or the content
