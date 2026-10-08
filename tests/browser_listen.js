@@ -12,6 +12,7 @@ const OUT = process.env.LISTEN_OUT || fs.mkdtempSync('/tmp/listen-');
 const PAGES = [
   ['generated', '/sets-relations-functions/the-pigeonhole-principle/'],
   ['generated', '/sequences-and-series/infinite-geometric-series/'],
+  ['generated', '/arguments-and-validity/validity-by-truth-table/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];

@@ -88,7 +88,7 @@ class TestBrowserSelection(ProtocolTestCase):
     def test_empty_or_incompatible_selections_fail_before_launch(self):
         courses = [p for p in (ROOT / 'site').rglob('*.html')
                    if '<body data-page-kind="course">' in p.read_text()]
-        self.assertEqual(54, len(courses), 'mechanically derived course capability')
+        self.assertEqual(64, len(courses), 'mechanically derived course capability')
         route = '/' + courses[0].relative_to(ROOT / 'site').as_posix().removesuffix('index.html')
         cases = [(['--class=targets', '--fixtures-only'], 'fixture-only requires inventory or svg'),
                  (['--class=capstone', '--fixtures-only'], 'fixture-only requires inventory or svg'),

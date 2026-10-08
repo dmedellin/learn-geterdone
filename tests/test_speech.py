@@ -2,7 +2,7 @@
 
 Two questions, kept apart:
 
-* coverage -- every math run the five generated paths emit comes out as words
+* coverage -- every math run the six generated paths emit comes out as words
   a voice can say, with no symbol left over to be read as its Unicode name or
   dropped as punctuation;
 * correctness -- a reading that is all words can still be wrong (`¬(p ∧ q)`
@@ -12,6 +12,7 @@ Two questions, kept apart:
     python3 -m unittest tests.test_speech -v
 """
 
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -112,6 +113,9 @@ READINGS = {
     "≤": "less-than-or-equal",
     "&ge;": "greater-than-or-equal",
     "0 ≤ r < d": "0 is at most r is less than d",
+    "□p → p": "necessarily p implies p",
+    "◇p": "possibly p",
+    "A ≻ B": "A is preferred to B",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",
@@ -190,7 +194,7 @@ class TestReaderScript(unittest.TestCase):
 
 
 class TestCoverage(unittest.TestCase):
-    """Every run on the five generated paths is spoken, and nothing is guessed."""
+    """Every run on the six generated paths is spoken, and nothing is guessed."""
 
     @classmethod
     def setUpClass(cls):
@@ -236,6 +240,25 @@ class TestCoverage(unittest.TestCase):
                     clashes.append((run, seen[run][0], path["slug"]))
                 seen.setdefault(run, (path["slug"], spoken))
         self.assertEqual(clashes, [])
+
+    def test_no_spoken_form_for_a_bare_tuple(self):
+        """Spoken forms are shared by every Subject, and a bare tuple means
+        different things in different places: `(a, b)` is a pair in a
+        relation and an open interval in Algebra. Calling it "the pair a, b"
+        everywhere misreads the interval, so a tuple keeps the rules' reading."""
+        tuple_run = re.compile(r"\(\s*[^(),]+\s*(,\s*[^(),]+\s*)+\)")
+        for path, overrides in self.subjects:
+            with self.subTest(path=path["slug"]):
+                self.assertEqual([run for run in overrides if tuple_run.fullmatch(run)], [])
+
+    def test_no_spoken_form_for_a_lone_symbol(self):
+        """A single symbol's reading belongs to speech.SYMBOLS, which every
+        Subject shares. Philosophy once keyed `□` to its epistemic gloss for
+        one lesson, which would have read the necessity of every modal lesson
+        as knowledge."""
+        for path, overrides in self.subjects:
+            with self.subTest(path=path["slug"]):
+                self.assertEqual([run for run in overrides if len(run.strip()) == 1], [])
 
     def test_nothing_is_guessed(self):
         """A run whose notation is ambiguous needs a spoken form, or the content

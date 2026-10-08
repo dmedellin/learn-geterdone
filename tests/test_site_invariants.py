@@ -426,6 +426,7 @@ ALGEBRA_PATH_PAGE = "/paths/algebra/"
 SYSDESIGN_PATH_PAGE = "/paths/system-design/"
 ALGO_PATH_PAGE = "/paths/algorithms/"
 OR_PATH_PAGE = "/paths/operations-research/"
+PHIL_PATH_PAGE = "/paths/philosophy/"
 
 ALGEBRA_COURSE_1_HOME = "/algebra-foundations/"
 ALGEBRA_COURSE_1_LESSONS = (
@@ -874,8 +875,170 @@ OR_COURSES = (
 OR_PATH_COURSE_COUNT = 10
 OR_UPCOMING_COURSES = ()
 
+# The Philosophy path: ten courses, all published. Generated from
+# content/philosophy/ so these cannot disagree with what is built.
+PHIL_COURSE_1_HOME = "/arguments-and-validity/"
+PHIL_COURSE_1_LESSONS = (
+    "premises-conclusions-and-standard-form",
+    "validity-and-soundness",
+    "truth-values-and-the-connectives",
+    "the-conditional",
+    "validity-by-truth-table",
+    "equivalence-de-morgan-and-contraposition",
+    "consistency-and-belief-sets",
+    "categorical-statements-and-immediate-inference",
+    "the-square-of-opposition-and-existential-import",
+    "syllogisms-tested-by-venn-regions",
+    "quantifiers-and-their-order",
+    "fallacies-and-the-counterexample-method",
+)
+PHIL_COURSE_2_HOME = "/knowledge-and-evidence/"
+PHIL_COURSE_2_LESSONS = (
+    "belief-truth-and-justification",
+    "gettier-cases-and-the-fourth-condition",
+    "reliabilism-and-the-clairvoyant",
+    "skepticism-and-the-closure-argument",
+    "the-regress-of-justification",
+    "credence-and-the-dutch-book",
+    "conditional-credence-and-base-rates",
+    "updating-on-evidence",
+    "testimony-and-independent-witnesses",
+    "reference-classes-and-statistical-evidence",
+    "the-lottery-paradox",
+    "the-preface-paradox",
+)
+PHIL_COURSE_3_HOME = "/science-induction-and-causation/"
+PHIL_COURSE_3_LESSONS = (
+    "enumerative-induction-and-humes-problem",
+    "grue-and-the-new-riddle",
+    "confirmation-and-the-weight-of-evidence",
+    "falsification-and-what-a-theory-forbids",
+    "the-raven-paradox",
+    "the-duhem-quine-problem",
+    "mills-methods-and-the-common-factor",
+    "correlation-confounding-and-simpsons-paradox",
+    "counterfactual-causation-and-the-but-for-test",
+    "preemption-and-overdetermination",
+)
+PHIL_COURSE_4_HOME = "/decision-and-rationality/"
+PHIL_COURSE_4_LESSONS = (
+    "preference-transitivity-and-the-money-pump",
+    "the-decision-matrix-and-dominance",
+    "maximin-maximax-and-minimax-regret",
+    "expected-value-and-expected-utility",
+    "risk-aversion-and-the-value-of-information",
+    "the-allais-paradox-and-the-sure-thing-principle",
+    "ambiguity-and-the-ellsberg-urn",
+    "pascals-wager",
+    "newcombs-problem",
+    "the-st-petersburg-game",
+)
+PHIL_COURSE_5_HOME = "/games-and-the-social-contract/"
+PHIL_COURSE_5_LESSONS = (
+    "strategic-form-and-best-responses",
+    "the-prisoners-dilemma",
+    "nash-equilibrium-in-pure-and-mixed-strategies",
+    "coordination-conventions-and-the-stag-hunt",
+    "repeated-games-and-reciprocity",
+    "the-shadow-of-the-future",
+    "humes-farmers-and-convention",
+    "hobbes-and-the-state-of-nature",
+    "the-tragedy-of-the-commons",
+    "public-goods-and-free-riding",
+    "the-evolution-of-cooperation",
+)
+PHIL_COURSE_6_HOME = "/ethics-and-welfare/"
+PHIL_COURSE_6_LESSONS = (
+    "is-and-ought",
+    "defining-good-and-the-open-question",
+    "utilitarianism-and-the-sum-of-welfare",
+    "total-average-and-the-repugnant-conclusion",
+    "priority-equality-and-levelling-down",
+    "the-trolley-problem-as-a-decision-matrix",
+    "kant-and-the-universalisability-test",
+    "double-effect-means-and-side-effects",
+    "doing-allowing-and-omissions-as-causes",
+    "moral-dilemmas-and-deontic-consistency",
+    "virtue-ethics-and-the-function-argument",
+    "slippery-slopes-and-small-differences",
+)
+PHIL_COURSE_7_HOME = "/justice-and-collective-choice/"
+PHIL_COURSE_7_LESSONS = (
+    "the-original-position-and-maximin",
+    "the-difference-principle-and-leximin",
+    "entitlement-patterns-and-the-gini-coefficient",
+    "fairness-statistics-and-disparate-rates",
+    "majority-rule-and-the-condorcet-paradox",
+    "plurality-runoff-and-borda",
+    "independence-and-arrows-theorem",
+    "strategic-voting-and-manipulation",
+    "the-discursive-dilemma",
+    "the-condorcet-jury-theorem",
+)
+PHIL_COURSE_8_HOME = "/identity-modality-and-freedom/"
+PHIL_COURSE_8_LESSONS = (
+    "necessity-possibility-and-possible-worlds",
+    "frames-axioms-and-what-necessity-obeys",
+    "modal-fallacies-and-the-sea-battle",
+    "the-ontological-argument-in-s5",
+    "leibnizs-law-and-the-masked-man",
+    "the-ship-of-theseus",
+    "personal-identity-and-psychological-continuity",
+    "fission-and-what-matters",
+    "free-will-determinism-and-compatibility",
+    "the-consequence-argument",
+    "frankfurt-cases-and-the-ability-to-do-otherwise",
+    "the-problem-of-evil-as-an-inconsistent-set",
+)
+PHIL_COURSE_9_HOME = "/mind-language-and-meaning/"
+PHIL_COURSE_9_LESSONS = (
+    "dualism-and-the-conceivability-argument",
+    "behaviourism-and-the-turing-test",
+    "functionalism-and-multiple-realisability",
+    "the-chinese-room-and-the-lookup-table",
+    "the-knowledge-argument",
+    "compositional-truth-conditions",
+    "names-reference-and-identity-statements",
+    "definite-descriptions-and-the-king-of-france",
+    "scope-ambiguity-and-negation",
+    "vagueness-and-the-sorites",
+)
+PHIL_COURSE_10_HOME = "/paradoxes-and-their-exits/"
+PHIL_COURSE_10_LESSONS = (
+    "the-barber-and-the-anatomy-of-a-paradox",
+    "the-liar",
+    "zenos-dichotomy",
+    "achilles-and-the-tortoise",
+    "thomsons-lamp-and-supertasks",
+    "the-two-envelopes",
+    "sleeping-beauty",
+    "monty-hall",
+    "moores-paradox-and-what-cannot-be-believed",
+)
+
+PHIL_COURSES = (
+    ("Arguments and Validity", PHIL_COURSE_1_HOME, PHIL_COURSE_1_LESSONS),
+    ("Knowledge and Evidence", PHIL_COURSE_2_HOME, PHIL_COURSE_2_LESSONS),
+    ("Science, Induction and Causation",
+     PHIL_COURSE_3_HOME, PHIL_COURSE_3_LESSONS),
+    ("Decision and Rationality", PHIL_COURSE_4_HOME, PHIL_COURSE_4_LESSONS),
+    ("Games and the Social Contract",
+     PHIL_COURSE_5_HOME, PHIL_COURSE_5_LESSONS),
+    ("Ethics and the Arithmetic of Welfare",
+     PHIL_COURSE_6_HOME, PHIL_COURSE_6_LESSONS),
+    ("Justice and Collective Choice",
+     PHIL_COURSE_7_HOME, PHIL_COURSE_7_LESSONS),
+    ("Identity, Modality and Freedom",
+     PHIL_COURSE_8_HOME, PHIL_COURSE_8_LESSONS),
+    ("Mind, Language and Meaning", PHIL_COURSE_9_HOME, PHIL_COURSE_9_LESSONS),
+    ("Paradoxes and Their Exits", PHIL_COURSE_10_HOME, PHIL_COURSE_10_LESSONS),
+)
+
+PHIL_PATH_COURSE_COUNT = 10
+PHIL_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
-               + ALGO_COURSES + OR_COURSES)
+               + ALGO_COURSES + OR_COURSES + PHIL_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -994,7 +1157,8 @@ def source_of(url):
 # are published pages like any other, so every whole-tree invariant applies to
 # them -- but the per-course invariants do not, because neither is a course.
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
-                       SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE)
+                       SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
+                       PHIL_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1011,6 +1175,8 @@ PATHS = (
      ALGO_UPCOMING_COURSES),
     ("Operations Research", OR_PATH_PAGE, OR_COURSES, OR_PATH_COURSE_COUNT,
      OR_UPCOMING_COURSES),
+    ("Philosophy", PHIL_PATH_PAGE, PHIL_COURSES, PHIL_PATH_COURSE_COUNT,
+     PHIL_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -1190,6 +1356,11 @@ ALGO_DISCLAIMER_RE = re.compile(
 # that entity would pass or fail on the escaping rather than on the promise.
 OR_DISCLAIMER_RE = re.compile(
     r"(?i)optimal for the model you wrote down")
+# Philosophy promises that every verdict is computed from the premises the
+# lesson states, and warns that a verdict is only as good as those premises --
+# the part no lab can check. Stopping short of the em dash, for the same reason.
+PHIL_DISCLAIMER_RE = re.compile(
+    r"(?i)only as good as the premises")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -1203,6 +1374,8 @@ PATH_MATERIAL_DISCLAIMER = {
     ALGO_PATH_PAGE: ("the a-count-is-not-a-bound disclaimer", ALGO_DISCLAIMER_RE),
     OR_PATH_PAGE: ("the optimal-for-the-model-you-wrote-down disclaimer",
                    OR_DISCLAIMER_RE),
+    PHIL_PATH_PAGE: ("the only-as-good-as-the-premises disclaimer",
+                     PHIL_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -1512,8 +1685,14 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(OR_COURSES)
             + sum(len(slugs) for _t, _h, slugs in OR_COURSES)
         )
+        phil_tree = (
+            1  # the philosophy path page
+            + len(PHIL_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in PHIL_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
-                       + sysdesign_tree + algo_tree + or_tree)  # 1 for the index
+                       + sysdesign_tree + algo_tree + or_tree
+                       + phil_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -1551,9 +1730,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "+ 7 + 10 + 9 = 103 pages, got %d" % or_tree,
         )
         self.assertEqual(
-            715,
+            119,
+            phil_tree,
+            "the philosophy path is 1 + 10 + 12 + 12 + 10 + 10 + 11 + 12 + 10 + 12 "
+            "+ 10 + 9 = 119 pages, got %d" % phil_tree,
+        )
+        self.assertEqual(
+            834,
             course_tree,
-            "the site index plus all six path trees is 715 pages, got %d" % course_tree,
+            "the site index plus all seven path trees is 834 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -1564,9 +1749,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            719,
+            838,
             expected,
-            "715 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 719, "
+            "834 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 838, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -1778,6 +1963,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "system_design": getattr(smoke, "SYSDESIGN_COURSES", ()),
             "algorithms": getattr(smoke, "ALGO_COURSES", ()),
             "operations_research": getattr(smoke, "OR_COURSES", ()),
+            "philosophy": getattr(smoke, "PHIL_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -2190,9 +2376,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            708,
+            826,
             len(course_pages),
-            "fifty-four course homes and 654 lessons carry a material "
+            "sixty-four course homes and 762 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -3183,7 +3369,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(54, checked, "every published course must be checked")
+        self.assertEqual(64, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -3478,12 +3664,14 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
         try:
             from algebra import PATH as ALGEBRA
             from discrete_math import PATH as DISCRETE
+            from philosophy import PATH as PHILOSOPHY
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
         cls.generated = (
             ("discrete mathematics", MATH_COURSES, MATH_PATH_PAGE, DISCRETE),
             ("algebra", ALGEBRA_COURSES, ALGEBRA_PATH_PAGE, ALGEBRA),
+            ("philosophy", PHIL_COURSES, PHIL_PATH_PAGE, PHILOSOPHY),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -3613,10 +3801,11 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
         try:
             from algebra import PATH as ALGEBRA
             from discrete_math import PATH as DISCRETE
+            from philosophy import PATH as PHILOSOPHY
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
-        for path in (DISCRETE, ALGEBRA):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -3735,11 +3924,12 @@ class TestEveryLabBuilds(unittest.TestCase):
             from mathpath import labs
             from algebra import PATH as ALGEBRA
             from discrete_math import PATH as DISCRETE
+            from philosophy import PATH as PHILOSOPHY
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
-        for path in (DISCRETE, ALGEBRA):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

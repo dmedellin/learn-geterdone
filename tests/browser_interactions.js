@@ -9,7 +9,7 @@ assert(OUT&&path.resolve(OUT)!==ROOT&&!path.resolve(OUT).startsWith(ROOT+'/'),'e
 assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'local candidate runtime required');
 fs.mkdirSync(OUT,{recursive:true});assert(!fs.existsSync(path.join(OUT,'observations.jsonl')),'fresh evidence directory required');
 const corpus=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory())walk(f);else if(e.name.endsWith('.html'))corpus.push({file:f,source:fs.readFileSync(f,'utf8'),route:'/'+path.relative(path.join(ROOT,'site'),f).replace(/index\.html$/,'')});}}walk(path.join(ROOT,'site'));
-assert.equal(corpus.length,719);
+assert.equal(corpus.length,838);
 function routeFor(id){const pages=corpus.filter(p=>p.source.includes('id="'+id+'"'));assert(pages.length,'missing interactive capability '+id);return pages.sort((a,b)=>a.route.localeCompare(b.route))[0].route;}
 const inventory=fs.readFileSync(path.join(ROOT,'tests/interactive_targets.js'),'utf8'),functions=Object.values(contracts).map(f=>f.toString()).join('\n');
 const rows=[],states=[];

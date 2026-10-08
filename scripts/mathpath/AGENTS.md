@@ -3,7 +3,7 @@
 Root `AGENTS.md` applies. This adds what is specific to this directory.
 
 **There is no local change here.** One edit to `chrome.py`, `theme.py`,
-`render.py`, `progress.py` or `feedback.py` lands on all 654 lessons, and it
+`render.py`, `progress.py` or `feedback.py` lands on all 762 lessons, and it
 reaches the hand-written trading pages too, because
 `scripts/add_progress_marks.py` takes its CSS and scripts from `progress.py` and
 `feedback.py`. Check both families before calling anything done.

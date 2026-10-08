@@ -34,7 +34,7 @@ SYMBOLS = {
     "≥": "is at least", "≈": "is approximately",
     "≡": "is congruent to", "∝": "is proportional to", "~": "is approximately",
     "≪": "is much less than", "≫": "is much greater than",
-    "≅": "is isomorphic to", "≺": "precedes", "≼": "precedes or equals",
+    "≅": "is isomorphic to", "≼": "precedes or equals",
     # arithmetic
     "+": "plus", "±": "plus or minus", "∓": "minus or plus", "×": "times",
     "·": "times", "∗": "times", "÷": "divided by", "√": "the square root of",
@@ -70,7 +70,8 @@ SYMBOLS = {
     "Ω": "omega",
     # punctuation that is spoken as a pause or not at all
     "…": "and so on", "⋯": "and so on", "⋮": "and so on",
-    "′": "prime", "″": "double prime", "∠": "angle", "□": "end of proof",
+    "′": "prime", "″": "double prime", "∠": "angle", "□": "necessarily", "◇": "possibly", "◊": "possibly",
+    "≻": "is preferred to", "≽": "is weakly preferred to", "≺": "precedes",
     "∎": "end of proof", "✓": "check", "✗": "fails", "★": "star",
     "—": ",", "–": "to", "“": "", "”": "", "‘": "", "\\": "minus",
     "½": "one half", "⅓": "one third", "⅔": "two thirds", "¼": "one quarter",
@@ -235,7 +236,7 @@ def _script(plain, *, sup):
 
 
 def _logic(tokens):
-    return any(t in ("¬", "∧", "∨", "⊕") for _, t in tokens)
+    return any(t in ("¬", "∧", "∨", "⊕", "□", "◇", "◊") for _, t in tokens)
 
 
 def _arrow(tokens, i):
