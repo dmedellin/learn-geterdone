@@ -35,7 +35,7 @@ from html import unescape
 from html.parser import HTMLParser
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from mathpath import capstone, chrome, feedback, progress
+from mathpath import capstone, chrome, feedback, progress, readout
 import canvas_markup
 from mathpath.theme import UI_CSS  # noqa: E402
 
@@ -1025,7 +1025,8 @@ def prepare_lesson(before, relative, course, lesson, courses):
     text = ensure_feedback_panel(text, "%s/%s" % (course["slug"], lesson["slug"]),
                                  lesson["title"], course["title"])
     text = ensure_script(text, progress.PROGRESS_JS + (progress.LESSON_JS % lesson_id)
-                         + feedback.STORE_JS + feedback.LESSON_JS + SIGNIN_JS)
+                         + feedback.STORE_JS + feedback.LESSON_JS + SIGNIN_JS
+                         + readout.READOUT_JS)
     # Remove the curricular prefix from the footer before resolving references,
     # so "Course 8 · <title>" retains exactly one course identity.
     footer = element(text, "footer")

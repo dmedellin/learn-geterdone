@@ -2,9 +2,9 @@
 
 `learn-geterdone` is the repository, the application slug and the image
 title. What it publishes at `https://learn.geterdone.io/` is a **library of
-learning paths** — six paths, fifty-four interactive courses and 654 lessons
-today: trading, discrete mathematics, algebra, system design, algorithms and
-operations research, every one of them complete end to end. Every page is a single HTML file with its CSS, JavaScript and graphics
+learning paths** — seven paths, sixty-four interactive courses and 762 lessons
+today: trading, discrete mathematics, algebra, system design, algorithms,
+operations research and philosophy, every one of them complete end to end. Every page is a single HTML file with its CSS, JavaScript and graphics
 inline — it loads no fonts, no frameworks, no analytics, and no third-party
 requests of any kind.
 
@@ -580,14 +580,22 @@ and nothing is served at `/paths/` itself — the list of paths is the site inde
 Every course on the path has its own URLs; nothing on the path page is an entry
 without a page behind it.
 
-**359 pages and eight assets. Nothing else is served** — 357 pages of the course tree, plus the capstone's two pages, and the seven course schemas plus the capstone's dataset.
+**838 pages and eight assets. Nothing else is served** — 834 pages of the course tree (the site index and seven path trees), plus the capstone's two pages, the two sign-in pages (`/progress/` and `/oauth2/spa/callback/`), and the seven course schemas plus the capstone's dataset.
 
 The table below enumerates the **Trading** path, which is hand-authored and whose
-pages are its source of truth. The other two paths — **Discrete Mathematics**
-(`/paths/discrete-math/`, 8 courses, 106 lessons) and **Algebra**
-(`/paths/algebra/`, 8 courses, 105 lessons) — are GENERATED from
-`content/discrete_math/` and `content/algebra/` by `scripts/build_paths.py`, so
-their URL space is declared by the content packages rather than by a table here.
+pages are its source of truth. The other six paths are GENERATED from
+`content/<package>/` by `scripts/build_paths.py`, so their URL space is declared
+by the content packages rather than by a table here:
+
+| Path | Path page | Courses | Lessons | Pages | Package |
+| --- | --- | --- | --- | --- | --- |
+| Discrete Mathematics | `/paths/discrete-math/` | 8 | 106 | 115 | `content/discrete_math/` |
+| Algebra | `/paths/algebra/` | 9 | 112 | 122 | `content/algebra/` |
+| System Design | `/paths/system-design/` | 10 | 114 | 125 | `content/system_design/` |
+| Algorithms | `/paths/algorithms/` | 9 | 112 | 122 | `content/algorithms/` |
+| Operations Research | `/paths/operations-research/` | 10 | 92 | 103 | `content/operations_research/` |
+| Philosophy | `/paths/philosophy/` | 10 | 108 | 119 | `content/philosophy/` |
+
 `python3 scripts/build_paths.py --check` is the authority on it, and
 `scripts/generated-pages.txt` is the list that build writes. Never edit a page
 under one of their course slugs by hand; see AGENTS.md section 1a.
@@ -931,11 +939,11 @@ The normative rules live in `dmedellin/platform-ops`
 **Live on the Hetzner container platform.** `https://learn.geterdone.io/` is served
 by Caddy from an immutable GHCR digest, deployed through `platform-ops` and recorded
 in its app registry under the slug `learn-geterdone`. The published tree is this
-`site/` directory: the subject-agnostic site index, six path pages, 54 course
-homes, 654 lessons, the seven published schemas (trade journal, options trade plan,
+`site/` directory: the subject-agnostic site index, seven path pages, 64 course
+homes, 762 lessons, the seven published schemas (trade journal, options trade plan,
 indicator rule, volume and order flow rule, trading risk plan, trading system
 specification, and automated trading system), the dated real-data capstone with its
-dataset, `/progress/` and the sign-in redirect target. 719 pages and 8 assets; the
+dataset, `/progress/` and the sign-in redirect target. 838 pages and 8 assets; the
 trading path is complete at eight courses, the capstone is a worked example and not
 a ninth, and nothing in the library is announced without a page behind it.
 

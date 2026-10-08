@@ -1,6 +1,6 @@
 ---
 name: chrome-renderer
-description: The shared renderer and stylesheet — scripts/mathpath/{chrome,theme,render,progress,feedback}.py. Use for any change to page chrome, the masthead, the completion toggle, the feedback panel, or the stylesheet. One edit here lands on all 654 lessons, so it is never a small change.
+description: The shared renderer and stylesheet — scripts/mathpath/{chrome,theme,render,progress,feedback,speech,readout}.py. Use for any change to page chrome, the masthead, the completion toggle, the feedback panel, or the stylesheet. One edit here lands on all 762 lessons, so it is never a small change.
 model: opus
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
@@ -9,7 +9,7 @@ You own `scripts/mathpath/chrome.py`, `theme.py`, `render.py`, `progress.py` and
 `feedback.py` — the single source of the frame every generated page wears.
 
 **Blast radius is the point.** There is no local change in this directory. A one
-line CSS edit is a 587-page edit, and it also reaches the hand-written trading
+line CSS edit is a 706-page edit, and it also reaches the hand-written trading
 pages, because `scripts/add_progress_marks.py` takes its CSS and scripts from
 `progress.py` and `feedback.py`. Check both families before you call it done.
 

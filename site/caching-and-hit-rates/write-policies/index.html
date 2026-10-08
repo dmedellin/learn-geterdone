@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">write-through   backend writes = every write
+        <div class="mathblock" data-say="write-through, backend writes equals every write. write-back, backend writes equals distinct keys per flush window. trace, A B A C A B A D A B, flushed every 5 writes. 10 writes goes to 6 distinct, ratio 5 over 3, 1000 goes to 600 writes over s. largest dirty set 3 keys times 4 kB equals 12.00 kB at risk over 5.0 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">write-through   backend writes = every write
 write-back      backend writes = distinct keys per flush window
 
 trace  A B A C A B A D A B,  flushed every 5 writes
@@ -1310,11 +1310,11 @@ trace  A B A C A B A D A B,  flushed every 5 writes
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One rule each, and then a number that only exists for the second of them: what is lost if the process dies.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Write-through sends every write</h3><p>The write goes to the backend and to the cache, and it is not acknowledged until the backend has it. Backend write rate equals the application write rate exactly. Nothing is ever only in the cache, so a crash loses nothing and the loss window is zero.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write-back sends the distinct keys per flush</h3><p>The write goes to the cache and is acknowledged; the cache flushes dirty entries to the backend periodically. Repeated writes to the same key inside one flush window collapse into one backend write, so the backend sees the <em>distinct</em> keys per window. On <span class="math">A B A C A B A D A B</span> flushed every five writes, that is <span class="math">6</span> backend writes for <span class="math">10</span> application writes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The ratio is bought with a loss window</h3><p>Whatever is dirty when the process dies is gone. The right measure is the largest dirty set a flush interval ever holds, not the average: an average loss window is not what a crash takes. On that trace it is <span class="math">3</span> keys, which at <span class="math">4 kB</span> each is <span class="math">12.00 kB</span>, held for the <span class="math">5.0 ms</span> a flush interval lasts at <span class="math">1 000</span> writes a second.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Write-through sends every write</h3><p>The write goes to the backend and to the cache, and it is not acknowledged until the backend has it. Backend write rate equals the application write rate exactly. Nothing is ever only in the cache, so a crash loses nothing and the loss window is zero.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write-back sends the distinct keys per flush</h3><p>The write goes to the cache and is acknowledged; the cache flushes dirty entries to the backend periodically. Repeated writes to the same key inside one flush window collapse into one backend write, so the backend sees the <em>distinct</em> keys per window. On <span class="math" data-say="A B A C A B A D A B">A B A C A B A D A B</span> flushed every five writes, that is <span class="math" data-say="6">6</span> backend writes for <span class="math" data-say="10">10</span> application writes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The ratio is bought with a loss window</h3><p>Whatever is dirty when the process dies is gone. The right measure is the largest dirty set a flush interval ever holds, not the average: an average loss window is not what a crash takes. On that trace it is <span class="math" data-say="3">3</span> keys, which at <span class="math" data-say="4 kB">4 kB</span> each is <span class="math" data-say="12.00 kB">12.00 kB</span>, held for the <span class="math" data-say="5.0 milliseconds">5.0 ms</span> a flush interval lasts at <span class="math" data-say="1000">1 000</span> writes a second.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two policies, the coalescing ratio, and what is at risk</h2></div><p>The rules, the counting, and why the trace decides whether write-back is worth anything at all.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Write-through and write-back</span><p>Under <strong>write-through</strong>, every write is applied to the cache and to the backend before it is acknowledged. Under <strong>write-back</strong>, a write is applied to the cache, marked <strong>dirty</strong> and acknowledged; dirty entries are written to the backend on a periodic <strong>flush</strong>.</p><p>The <strong>coalescing ratio</strong> of a trace under write-back is the number of writes divided by the number of distinct keys written, counted per flush window. It is <span class="math">1</span> when every write in a window is to a different key, and it is the window length when they are all to the same key.</p></div><p>Both policies leave the cache correct. The difference is entirely about the backend: how many writes it receives, how quickly it learns about them, and what happens to the ones it has not learned about yet.</p><h3>Counting the ratio off a trace</h3><p>Take the write trace <span class="math">A B A C A B A D A B</span> and flush every five writes. The first window is <span class="math">A B A C A</span>: five writes, three distinct keys, so two writes to <span class="math">A</span> are coalesced away. The second is <span class="math">B A D A B</span>: five writes, three distinct keys again. Ten writes, six backend writes, a ratio of <span class="math">5/3</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">trace:   A B A C A | B A D A B          flush every 5 writes
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Write-through and write-back</span><p>Under <strong>write-through</strong>, every write is applied to the cache and to the backend before it is acknowledged. Under <strong>write-back</strong>, a write is applied to the cache, marked <strong>dirty</strong> and acknowledged; dirty entries are written to the backend on a periodic <strong>flush</strong>.</p><p>The <strong>coalescing ratio</strong> of a trace under write-back is the number of writes divided by the number of distinct keys written, counted per flush window. It is <span class="math" data-say="1">1</span> when every write in a window is to a different key, and it is the window length when they are all to the same key.</p></div><p>Both policies leave the cache correct. The difference is entirely about the backend: how many writes it receives, how quickly it learns about them, and what happens to the ones it has not learned about yet.</p><h3>Counting the ratio off a trace</h3><p>Take the write trace <span class="math" data-say="A B A C A B A D A B">A B A C A B A D A B</span> and flush every five writes. The first window is <span class="math" data-say="A B A C A">A B A C A</span>: five writes, three distinct keys, so two writes to <span class="math" data-say="A">A</span> are coalesced away. The second is <span class="math" data-say="B A D A B">B A D A B</span>: five writes, three distinct keys again. Ten writes, six backend writes, a ratio of <span class="math" data-say="5 over 3">5/3</span>.</p><div class="mathblock" data-say="trace, A B A C A divides B A D A B, flush every 5 writes. window 1, A B A C A, 5 writes goes to 3 distinct the set A, B, C. window 2, B A D A B, 5 writes goes to 3 distinct the set A, B, D. write-through, 10 backend writes, at 1000 w over s goes to 1000 w over s. write-back, 6 backend writes, at 1000 w over s goes to, 600 w over s. ratio, 10 over 6 equals 5 over 3. largest dirty set, 3 keys times 4 kB equals 12.00 kB, held for 5.0 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">trace:   A B A C A | B A D A B          flush every 5 writes
 
   window 1   A B A C A     5 writes → 3 distinct {A, B, C}
   window 2   B A D A B     5 writes → 3 distinct {A, B, D}
@@ -1323,7 +1323,7 @@ trace  A B A C A B A D A B,  flushed every 5 writes
   write-back       6 backend writes      at 1 000 w/s →   600 w/s
   ratio           10/6 = 5/3
 
-  largest dirty set: 3 keys × 4 kB = 12.00 kB, held for 5.0 ms</div><p>Widen the flush window to ten writes and the whole trace becomes one window: four distinct keys, a ratio of <span class="math">5/2</span>, and the backend sees <span class="math">400</span> writes a second instead of <span class="math">600</span>. The dirty set grows to <span class="math">4</span> keys and <span class="math">16.00 kB</span>, held for <span class="math">10.0 ms</span>. That is the trade in its entirety, and both ends of it moved together.</p><h3>What the trace decides</h3><p>The ratio is a property of the workload, not of the policy. A trace in which every write is to a different key inside its window &mdash; <span class="math">A B C D E F G H I J</span> &mdash; coalesces nothing at all: write-back sends ten writes, exactly as write-through does, and still carries the loss window. A trace of one key repeated ten times coalesces to one per window and buys a ratio of five.</p><p>So &ldquo;write-back is faster&rdquo; is not a general claim. It is a claim about a workload with repeated writes to the same keys inside a flush interval, and if you do not have that, write-back is a loss window with no compensating gain. Run your own trace before choosing.</p><h3>What is actually at risk</h3><p>The bytes at risk are the largest dirty set times the object size, and the exposure lasts a flush interval &mdash; <span class="math">w/λ_w</span> seconds, for a window of <span class="math">w</span> writes at <span class="math">λ_w</span> writes a second. At <span class="math">1 000</span> writes a second and a five-write window that is <span class="math">5.0 ms</span>, which sounds negligible until you multiply it by the number of processes you run and the number of times a year each of them dies.</p><p>The honest statement of the trade is arithmetic on both numbers at once: a flush window <span class="math">k</span> times wider improves the ratio by at most <span class="math">k</span> and grows both the dirty set and the exposure time. Whether the trade is acceptable is a durability question, and Availability and Failure is where losing things gets priced.</p></article>
+  largest dirty set: 3 keys × 4 kB = 12.00 kB, held for 5.0 ms</div><p>Widen the flush window to ten writes and the whole trace becomes one window: four distinct keys, a ratio of <span class="math" data-say="5 over 2">5/2</span>, and the backend sees <span class="math" data-say="400">400</span> writes a second instead of <span class="math" data-say="600">600</span>. The dirty set grows to <span class="math" data-say="4">4</span> keys and <span class="math" data-say="16.00 kB">16.00 kB</span>, held for <span class="math" data-say="10.0 milliseconds">10.0 ms</span>. That is the trade in its entirety, and both ends of it moved together.</p><h3>What the trace decides</h3><p>The ratio is a property of the workload, not of the policy. A trace in which every write is to a different key inside its window &mdash; <span class="math" data-say="A B C D E F G H I J">A B C D E F G H I J</span> &mdash; coalesces nothing at all: write-back sends ten writes, exactly as write-through does, and still carries the loss window. A trace of one key repeated ten times coalesces to one per window and buys a ratio of five.</p><p>So &ldquo;write-back is faster&rdquo; is not a general claim. It is a claim about a workload with repeated writes to the same keys inside a flush interval, and if you do not have that, write-back is a loss window with no compensating gain. Run your own trace before choosing.</p><h3>What is actually at risk</h3><p>The bytes at risk are the largest dirty set times the object size, and the exposure lasts a flush interval &mdash; <span class="math" data-say="w over lambda sub w">w/λ_w</span> seconds, for a window of <span class="math" data-say="w">w</span> writes at <span class="math" data-say="lambda sub w">λ_w</span> writes a second. At <span class="math" data-say="1000">1 000</span> writes a second and a five-write window that is <span class="math" data-say="5.0 milliseconds">5.0 ms</span>, which sounds negligible until you multiply it by the number of processes you run and the number of times a year each of them dies.</p><p>The honest statement of the trade is arithmetic on both numbers at once: a flush window <span class="math" data-say="k">k</span> times wider improves the ratio by at most <span class="math" data-say="k">k</span> and grows both the dirty set and the exposure time. Whether the trade is acceptable is a durability question, and Availability and Failure is where losing things gets priced.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Write policies</h2></div><p>The coalescing ratio, and the loss window it is bought with</p></div>
@@ -1372,7 +1372,7 @@ trace  A B A C A B A D A B,  flushed every 5 writes
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a write policy from a trace</h2></div><p>Count the distinct keys per window first. If the ratio is one, there is nothing to discuss.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take a real write trace and a flush interval</h3><p>A sequence of written keys in order, and how many writes a flush covers. The flush interval is usually configured in time; convert it with the write rate, since <span class="math">w = λ_w · flush seconds</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count distinct keys per window</h3><p>Not distinct keys overall: per window. A key written in two different windows is two backend writes. This is the only counting in the lesson and it is where the ratio comes from.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the ratio and the backend write rate</h3><p><span class="math">writes ÷ distinct</span> is the ratio, and <span class="math">λ_w × (distinct/writes)</span> is what the backend actually receives. On this trace, <span class="math">1 000</span> writes a second becomes <span class="math">600</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the bytes at risk, using the largest dirty set</h3><p>Peak, not mean: a crash takes whatever was dirty at that instant, and the instant is not chosen kindly. Multiply by the object size and state the exposure as bytes over a flush interval.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take a real write trace and a flush interval</h3><p>A sequence of written keys in order, and how many writes a flush covers. The flush interval is usually configured in time; convert it with the write rate, since <span class="math" data-say="w equals lambda sub w times flush seconds">w = λ_w · flush seconds</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count distinct keys per window</h3><p>Not distinct keys overall: per window. A key written in two different windows is two backend writes. This is the only counting in the lesson and it is where the ratio comes from.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the ratio and the backend write rate</h3><p><span class="math" data-say="writes divided by distinct">writes ÷ distinct</span> is the ratio, and <span class="math" data-say="lambda sub w times the quantity distinct over writes">λ_w × (distinct/writes)</span> is what the backend actually receives. On this trace, <span class="math" data-say="1000">1 000</span> writes a second becomes <span class="math" data-say="600">600</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the bytes at risk, using the largest dirty set</h3><p>Peak, not mean: a crash takes whatever was dirty at that instant, and the instant is not chosen kindly. Multiply by the object size and state the exposure as bytes over a flush interval.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1383,7 +1383,7 @@ trace  A B A C A B A D A B,  flushed every 5 writes
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A B A C A B A D A B, flushed every five writes</h3><p>Ten writes, two windows, and then the same trace at a wider flush so that both ends of the trade move where you can see them.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">trace:  A B A C A B A D A B      1 000 writes/s,  4 kB objects
+      <article class="card card-pad prose"><h3>A B A C A B A D A B, flushed every five writes</h3><p>Ten writes, two windows, and then the same trace at a wider flush so that both ends of the trade move where you can see them.</p><div class="mathblock" data-say="trace, A B A C A B A D A B, 1000 writes over s, 4 kB objects. flush every 5 writes. window 1, A B A C A, 5 writes, distinct the set A, B, C, equals 3. window 2, B A D A B, 5 writes, distinct the set A, B, D, equals 3. 10 writes, total, equals 6. write-through, 10 backend writes, 1000 writes over s. write-back, 6 backend writes, 600 writes over s. coalescing ratio, 10 over 6 equals 5 over 3. at risk, peak dirty set 3 keys times 4 kB equals 12.00 kB over 5.0 milliseconds. flush every 10 writes one window. distinct the set A, B, C, D, equals 4, ratio 10 over 4 equals 5 over 2, 400 writes over s. at risk, 4 keys times 4 kB equals 16.00 kB over 10.0 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">trace:  A B A C A B A D A B      1 000 writes/s,  4 kB objects
 
 flush every 5 writes:
   window 1   A B A C A     5 writes,  distinct {A,B,C} = 3
@@ -1397,12 +1397,12 @@ flush every 5 writes:
 
 flush every 10 writes (one window):
   distinct {A,B,C,D} = 4     ratio 10/4 = 5/2     400 writes/s
-  at risk   4 keys × 4 kB = 16.00 kB over 10.0 ms</div><p>Doubling the flush window improved the ratio from <span class="math">5/3</span> to <span class="math">5/2</span> &mdash; a further <span class="math">200</span> writes a second off the backend &mdash; and took the exposure from <span class="math">12.00 kB</span> over <span class="math">5.0 ms</span> to <span class="math">16.00 kB</span> over <span class="math">10.0 ms</span>. Both numbers moved, and a proposal that mentions only the first is not a proposal.</p><p>For a faded rehearsal, run <span class="math">A B C D E F G H I J</span> at a flush of five. The supplied first move is to count the distinct keys in the first window before computing anything; do that, then state the ratio, the backend write rate and the bytes at risk, and say in one sentence what write-back has bought on this trace.</p><p>The lab marks every repeated write inside a window as coalesced away and counts the rest, so you can see which writes the ratio is made of. Try the one-hot-key trace and the all-distinct trace before deciding what you believe about write-back.</p></article>
+  at risk   4 keys × 4 kB = 16.00 kB over 10.0 ms</div><p>Doubling the flush window improved the ratio from <span class="math" data-say="5 over 3">5/3</span> to <span class="math" data-say="5 over 2">5/2</span> &mdash; a further <span class="math" data-say="200">200</span> writes a second off the backend &mdash; and took the exposure from <span class="math" data-say="12.00 kB">12.00 kB</span> over <span class="math" data-say="5.0 milliseconds">5.0 ms</span> to <span class="math" data-say="16.00 kB">16.00 kB</span> over <span class="math" data-say="10.0 milliseconds">10.0 ms</span>. Both numbers moved, and a proposal that mentions only the first is not a proposal.</p><p>For a faded rehearsal, run <span class="math" data-say="A B C D E F G H I J">A B C D E F G H I J</span> at a flush of five. The supplied first move is to count the distinct keys in the first window before computing anything; do that, then state the ratio, the backend write rate and the bytes at risk, and say in one sentence what write-back has bought on this trace.</p><p>The lab marks every repeated write inside a window as coalesced away and counts the rest, so you can see which writes the ratio is made of. Try the one-hot-key trace and the all-distinct trace before deciding what you believe about write-back.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing write-back is free</strong><span>It costs a loss window: whatever is dirty when the process dies is gone. On the trace above that is <span class="math">12.00 kB</span> over <span class="math">5.0 ms</span> &mdash; small, until it is multiplied by a fleet. A proposal for write-back that does not name the peak dirty set and the exposure time has priced only the half it likes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting distinct keys over the whole trace</strong><span>The coalescing is per flush window. <span class="math">A B A C A B A D A B</span> has four distinct keys overall and six backend writes at a five-write flush, because a key written in two windows is written to the backend twice. Counting globally overstates the ratio by whatever the flush interval would have been.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming a coalescing ratio the workload does not have</strong><span>On <span class="math">A B C D E F G H I J</span> the ratio is <span class="math">1</span>: write-back sends every write, exactly as write-through does, and still carries the loss window. The ratio is a property of the trace, so measure it on yours before choosing the policy that depends on it.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing write-back is free</strong><span>It costs a loss window: whatever is dirty when the process dies is gone. On the trace above that is <span class="math" data-say="12.00 kB">12.00 kB</span> over <span class="math" data-say="5.0 milliseconds">5.0 ms</span> &mdash; small, until it is multiplied by a fleet. A proposal for write-back that does not name the peak dirty set and the exposure time has priced only the half it likes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting distinct keys over the whole trace</strong><span>The coalescing is per flush window. <span class="math" data-say="A B A C A B A D A B">A B A C A B A D A B</span> has four distinct keys overall and six backend writes at a five-write flush, because a key written in two windows is written to the backend twice. Counting globally overstates the ratio by whatever the flush interval would have been.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming a coalescing ratio the workload does not have</strong><span>On <span class="math" data-say="A B C D E F G H I J">A B C D E F G H I J</span> the ratio is <span class="math" data-say="1">1</span>: write-back sends every write, exactly as write-through does, and still carries the loss window. The ratio is a property of the trace, so measure it on yours before choosing the policy that depends on it.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would not accept a write-back proposal without a peak dirty set in it.</strong><p>You should be able to count distinct keys per flush window off a trace, convert that into a coalescing ratio and a backend write rate, compute the bytes at risk from the peak dirty set and the exposure from the flush interval, and say what a wider flush does to all four numbers.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The next two lessons are about caches that are not one cache. The first is a second level behind the first, where the rate you measure is not the rate you want: “Multi-level Caches” shows why the two miss rates multiply rather than add.</div></article>
       </div>
     </section>
@@ -1442,7 +1442,7 @@ flush every 10 writes (one window):
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Caching and Hit Rates.</strong> Hit rates, harmonic sums, stale fractions and policy hit counts on this course are exact fractions. The Zipf normaliser <span class="math">H(N, s)</span> is summed exactly for catalogues up to about fifty keys, which is where its exact form stays readable; past that the lab prints a rounded value and says so.</p>
+      <p><strong>Caching and Hit Rates.</strong> Hit rates, harmonic sums, stale fractions and policy hit counts on this course are exact fractions. The Zipf normaliser <span class="math" data-say="H of N and s">H(N, s)</span> is summed exactly for catalogues up to about fifty keys, which is where its exact form stays readable; past that the lab prints a rounded value and says so.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1501,7 +1501,7 @@ flush every 10 writes (one window):
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "On <span class=\"math\">A B A C A B A D A B<\/span> flushed every five writes, how many writes does a write-back cache send to the backend?", "a": ["<span class=\"math\">10<\/span>, one per write", "<span class=\"math\">6<\/span>", "<span class=\"math\">4<\/span>, the distinct keys in the whole trace", "<span class=\"math\">2<\/span>, one per flush"], "c": 1, "why": "Distinct keys are counted per window: <span class=\"math\">{A, B, C}<\/span> then <span class=\"math\">{A, B, D}<\/span>, three each, six in total. <span class=\"math\">4<\/span> is the distinct count over the whole trace, which would be right only if the whole trace were one flush window; <span class=\"math\">10<\/span> is what write-through sends."}, {"q": "A write trace is <span class=\"math\">A B C D E F G H I J<\/span>, flushed every five writes. What does write-back buy?", "a": ["A ratio of <span class=\"math\">2<\/span>, because there are two windows", "Nothing: every write is to a different key inside its window, so it still sends ten", "A ratio of <span class=\"math\">5/2<\/span>, as on the hot-key trace", "Half the backend writes, since flushes are batched"], "c": 1, "why": "Coalescing only removes repeats within a window, and there are none here: five distinct keys in each of two windows is ten backend writes, exactly what write-through sends. The loss window is still there. Batching writes into one flush does not reduce how many writes the backend must apply."}, {"q": "Why are the bytes at risk computed from the largest dirty set rather than the average one?", "a": ["Because the average is harder to compute", "Because a crash takes whatever is dirty at that instant, and nothing guarantees it is an average instant", "Because the peak is always double the average", "Because the flush interval is not constant"], "c": 1, "why": "Loss is not an expectation you get to average over: a process dies at one moment and takes what was dirty then. Sizing the exposure from the peak is the only version of the number that bounds what you can lose, and the peak bears no fixed relation to the mean."}, {"q": "A team widens the flush interval from five writes to ten and the ratio improves from <span class=\"math\">5/3<\/span> to <span class=\"math\">5/2<\/span>. What else changed?", "a": ["Nothing else; the ratio is the whole effect", "The peak dirty set grew from <span class=\"math\">3<\/span> keys to <span class=\"math\">4<\/span> and the exposure from <span class=\"math\">5.0 ms<\/span> to <span class=\"math\">10.0 ms<\/span>", "The application write rate fell", "The cache hit rate improved"], "c": 1, "why": "Widening the window holds more writes for longer, so both the amount at risk and the time it is at risk grow. The application write rate is an input and does not change, and read hit rate is a different measurement entirely."}];
+  var QUIZ = [{"q": "On <span class=\"math\" data-say=\"A B A C A B A D A B\">A B A C A B A D A B<\/span> flushed every five writes, how many writes does a write-back cache send to the backend?", "a": ["<span class=\"math\" data-say=\"10\">10<\/span>, one per write", "<span class=\"math\" data-say=\"6\">6<\/span>", "<span class=\"math\" data-say=\"4\">4<\/span>, the distinct keys in the whole trace", "<span class=\"math\" data-say=\"2\">2<\/span>, one per flush"], "c": 1, "why": "Distinct keys are counted per window: <span class=\"math\" data-say=\"the set A, B, C\">{A, B, C}<\/span> then <span class=\"math\" data-say=\"the set A, B, D\">{A, B, D}<\/span>, three each, six in total. <span class=\"math\" data-say=\"4\">4<\/span> is the distinct count over the whole trace, which would be right only if the whole trace were one flush window; <span class=\"math\" data-say=\"10\">10<\/span> is what write-through sends."}, {"q": "A write trace is <span class=\"math\" data-say=\"A B C D E F G H I J\">A B C D E F G H I J<\/span>, flushed every five writes. What does write-back buy?", "a": ["A ratio of <span class=\"math\" data-say=\"2\">2<\/span>, because there are two windows", "Nothing: every write is to a different key inside its window, so it still sends ten", "A ratio of <span class=\"math\" data-say=\"5 over 2\">5/2<\/span>, as on the hot-key trace", "Half the backend writes, since flushes are batched"], "c": 1, "why": "Coalescing only removes repeats within a window, and there are none here: five distinct keys in each of two windows is ten backend writes, exactly what write-through sends. The loss window is still there. Batching writes into one flush does not reduce how many writes the backend must apply."}, {"q": "Why are the bytes at risk computed from the largest dirty set rather than the average one?", "a": ["Because the average is harder to compute", "Because a crash takes whatever is dirty at that instant, and nothing guarantees it is an average instant", "Because the peak is always double the average", "Because the flush interval is not constant"], "c": 1, "why": "Loss is not an expectation you get to average over: a process dies at one moment and takes what was dirty then. Sizing the exposure from the peak is the only version of the number that bounds what you can lose, and the peak bears no fixed relation to the mean."}, {"q": "A team widens the flush interval from five writes to ten and the ratio improves from <span class=\"math\" data-say=\"5 over 3\">5/3<\/span> to <span class=\"math\" data-say=\"5 over 2\">5/2<\/span>. What else changed?", "a": ["Nothing else; the ratio is the whole effect", "The peak dirty set grew from <span class=\"math\" data-say=\"3\">3<\/span> keys to <span class=\"math\" data-say=\"4\">4<\/span> and the exposure from <span class=\"math\" data-say=\"5.0 milliseconds\">5.0 ms<\/span> to <span class=\"math\" data-say=\"10.0 milliseconds\">10.0 ms<\/span>", "The application write rate fell", "The cache hit rate improved"], "c": 1, "why": "Widening the window holds more writes for longer, so both the amount at risk and the time it is at risk grow. The application write rate is an input and does not change, and read hit rate is a different measurement entirely."}];
 
   (function () {
 
@@ -2587,6 +2587,213 @@ flush every 10 writes (one window):
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

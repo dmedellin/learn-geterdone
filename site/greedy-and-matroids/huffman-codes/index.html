@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">merge the two lightest weights; the merged node&#x27;s weight is their sum
+        <div class="mathblock" data-say="merge the two lightest weights, the merged node&#x27;s weight is their sum. n symbols, goes to, n minus 1 merges, goes to, a full binary tree, every internal node with 2 children. expected length equals total bits over total weight, an exact fraction. A, 45 b, 13 c, 12 d, 16 e, 9 f, 5, to, 224 bits over weight 100, to, 56 over 25. against 3 bits for a fixed-length code over six symbols, a saving of 19 over 25. prefix-free, checked pair by pair, and the message decodes back to itself" tabindex="0" role="region" aria-label="Mathematical notation">merge the two lightest weights; the merged node&#x27;s weight is their sum
 n symbols  →  n − 1 merges  →  a full binary tree, every internal node with 2 children
 expected length = total bits / total weight, an exact fraction
 a:45 b:13 c:12 d:16 e:9 f:5  →  224 bits over weight 100  →  56/25
@@ -1310,11 +1310,11 @@ prefix-free, checked pair by pair; and the message decodes back to itself</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas: what a prefix code buys, why the expected length is a fraction rather than a decimal, and why a round trip is worth more than a length.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A prefix code can be decoded without separators</h3><p>A code is <strong>prefix-free</strong> when no codeword is a prefix of another. That is what lets a decoder read a bit stream left to right and commit to a symbol the moment it has seen one: no lookahead, no separators, no ambiguity. Every full binary tree with the symbols at its leaves gives a prefix code, because a leaf's path cannot be a prefix of another leaf's path. The panel still checks it pairwise, because a check that trusts the construction checks nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The expected length is a ratio of two integers</h3><p>Multiply each symbol's weight by the length of its codeword, add, and divide by the total weight. On the opening alphabet that is 224 bits over a total weight of 100, which is <span class="math">56/25</span> exactly. The panel prints <span class="math">56/25</span> first and <span class="math">2.240</span> beside it as a rounding of the printing at three places. The fraction is the number; the decimal is a convenience, and on a path where two codes can differ in the third place that distinction earns its keep.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A round trip catches what a length cannot</h3><p>A shorter code is not a better code if it cannot be read back. The panel encodes a message you type, decodes the resulting bits, and prints whether what came out is what went in. On the opening alphabet <span class="math">abcdef</span> encodes to 18 bits and decodes back exactly. The check is cheap and it is the only thing on the page that would notice a code that was short because it was wrong.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A prefix code can be decoded without separators</h3><p>A code is <strong>prefix-free</strong> when no codeword is a prefix of another. That is what lets a decoder read a bit stream left to right and commit to a symbol the moment it has seen one: no lookahead, no separators, no ambiguity. Every full binary tree with the symbols at its leaves gives a prefix code, because a leaf's path cannot be a prefix of another leaf's path. The panel still checks it pairwise, because a check that trusts the construction checks nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The expected length is a ratio of two integers</h3><p>Multiply each symbol's weight by the length of its codeword, add, and divide by the total weight. On the opening alphabet that is 224 bits over a total weight of 100, which is <span class="math" data-say="56 over 25">56/25</span> exactly. The panel prints <span class="math" data-say="56 over 25">56/25</span> first and <span class="math" data-say="2.240">2.240</span> beside it as a rounding of the printing at three places. The fraction is the number; the decimal is a convenience, and on a path where two codes can differ in the third place that distinction earns its keep.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A round trip catches what a length cannot</h3><p>A shorter code is not a better code if it cannot be read back. The panel encodes a message you type, decodes the resulting bits, and prints whether what came out is what went in. On the opening alphabet <span class="math" data-say="abcdef">abcdef</span> encodes to 18 bits and decodes back exactly. The check is cheap and it is the only thing on the page that would notice a code that was short because it was wrong.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Merging upward, and the code that falls out</h2></div><p>The algorithm, the tree it builds, the exact expected length, and the three checks that stand between a short code and a correct one.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The coding problem</span><p>Given symbols with positive integer weights, assign each a binary codeword so that no codeword is a prefix of another, minimising the total <span class="math">Σ wᵢ · |cᵢ|</span> &mdash; the number of bits needed to write a text in which each symbol appears with its weight as a count. Dividing that total by <span class="math">Σ wᵢ</span> gives the <strong>expected codeword length</strong>.</p></div><div class="defbox"><span class="label">Definition &middot; Huffman&#x27;s algorithm</span><p>Put every symbol in a collection as a single-node tree with its weight. Repeatedly remove the two lightest trees, join them under a new node whose weight is their sum, and put that node back. After <span class="math">n - 1</span> merges one tree remains; label left edges 0 and right edges 1, and each leaf's root-to-leaf path is its codeword.</p></div><p>The greedy commitment is the merge. Once two trees have been joined, the symbols beneath them stay at the same depth relative to each other forever, and nothing later reconsiders it. What makes this an unusual greedy algorithm is the direction: the choice is made at the leaves, where the rarest symbols are, and the consequence &mdash; the codewords &mdash; is read off at the end.</p><div class="example"><span class="label">Example &middot; Six symbols, five merges</span><p>The lab opens on <span class="math">a:45, b:13, c:12, d:16, e:9, f:5</span>. The merges are <span class="math">f + e = 14</span>, then <span class="math">c + b = 25</span>, then <span class="math">14 + d = 30</span>, then <span class="math">25 + 30 = 55</span>, then <span class="math">a + 55 = 100</span>. The codewords come out <span class="math">a = 0</span>, <span class="math">c = 100</span>, <span class="math">b = 101</span>, <span class="math">f = 1100</span>, <span class="math">e = 1101</span>, <span class="math">d = 111</span>, with lengths 1, 3, 3, 4, 4 and 3. Total bits <span class="math">224</span>, total weight <span class="math">100</span>, expected length <span class="math">56/25</span>.</p></div><p>The heaviest symbol got the shortest codeword and the two lightest got the longest, which is the whole idea, and it is worth checking against the alternative: a fixed-length code over six symbols needs 3 bits each, so it spends 300 bits on the same text. The saving is <span class="math">19/25</span> of a bit per symbol, which the panel prints as a fraction as well.</p><h3>The saving is a fact about the distribution, not about the algorithm</h3><p>Run the same algorithm on four equal weights, <span class="math">a:10, b:10, c:10, d:10</span>. Every codeword comes out two bits, the expected length is exactly <span class="math">2</span>, a fixed-length code over four symbols is also 2, and the saving is <span class="math">0</span>. Huffman did nothing wrong; there was nothing to do. A reader who has only ever seen the skewed example carries away &ldquo;Huffman compresses&rdquo; as a property of the algorithm, and it is a property of the input.</p><p>The other direction is on the panel too. On <span class="math">a:60, b:20, c:10, d:5, e:5</span> the common symbol gets one bit and the two rarest get four, and the expected length falls to <span class="math">17/10</span> against a fixed-length cost of 3. Same algorithm, three different distributions, savings of <span class="math">19/25</span>, <span class="math">13/10</span> and <span class="math">0</span>.</p><h3>Where a preset&#x27;s caption is wrong</h3><p>The Fibonacci-weight instance, <span class="math">a:1, b:1, c:2, d:3, e:5</span>, produces the deepest tree five leaves can have: depths 4, 4, 3, 2, 1, so the tree is a path and the rarest symbols need four bits. Both of those are true and the panel prints them. The caption's reason is not: it says each merge is exactly the next weight, and the merged weights are <span class="math">2</span>, <span class="math">4</span>, <span class="math">7</span>, <span class="math">12</span> against symbol weights <span class="math">1, 1, 2, 3, 5</span>. Only the first merge matches. After <span class="math">1 + 1 = 2</span> the collection holds two twos, and the next merge takes both of them rather than the two and the three.</p><div class="thm"><span class="label">Theorem &middot; Kraft&#x27;s equality for a Huffman code</span><p>For a code produced by this algorithm on <span class="math">n</span> symbols with codeword lengths <span class="math">ℓ₁, …, ℓₙ</span>, the sum <span class="math">Σ 2^(−ℓᵢ)</span> equals exactly 1.</p></div><p>A prefix code can only ever satisfy <span class="math">Σ 2^(−ℓᵢ) ≤ 1</span> &mdash; each codeword of length <span class="math">ℓ</span> rules out a <span class="math">2^(−ℓ)</span> share of the space of infinite bit strings, and the shares are disjoint. Equality means nothing is left over: every bit string has a prefix that is a codeword. Huffman achieves equality because the tree it builds is full, every internal node having two children, and a full tree leaves no unused branch.</p><p>That gives a quick sanity check by hand. On the opening code the lengths are 1, 3, 3, 4, 4, 3 and the sum is <span class="math">1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8</span>, which is 1. On the equal-weight code four lengths of 2 give <span class="math">4 · 1/4 = 1</span>. A code whose lengths sum to less than 1 has a branch going nowhere and can be shortened; one that sums to more than 1 is not a prefix code at all.</p><h3>The three checks, and what each one would catch</h3><p><span class="math">codesPrefixFree</span> compares every pair of codewords, so a code that happened to be built wrongly would be caught even though the tree construction guarantees it. <span class="math">encodeSyms</span> and <span class="math">decodeBits</span> run the message out and back, and the panel prints the decoded text. And the decoder refuses rather than guesses: append a proper prefix of the longest codeword to a valid bit stream and it returns nothing, because the leftover bits cannot be spent.</p><p>Measured on this page: on the six-symbol alphabet, 224 bits over weight 100, expected length <span class="math">56/25</span>, saving <span class="math">19/25</span>, prefix-free confirmed pairwise, and <span class="math">abcdef</span> encoded to 18 bits and decoded back unchanged. Proved on this page: Kraft's sum is exactly 1 for any code this algorithm produces. What is not on this page is the claim that no code is shorter, and that is the next thing to establish rather than something the fraction above implies.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The coding problem</span><p>Given symbols with positive integer weights, assign each a binary codeword so that no codeword is a prefix of another, minimising the total <span class="math" data-say="the sum of w sub i times the absolute value of c sub i">Σ wᵢ · |cᵢ|</span> &mdash; the number of bits needed to write a text in which each symbol appears with its weight as a count. Dividing that total by <span class="math" data-say="the sum of w sub i">Σ wᵢ</span> gives the <strong>expected codeword length</strong>.</p></div><div class="defbox"><span class="label">Definition &middot; Huffman&#x27;s algorithm</span><p>Put every symbol in a collection as a single-node tree with its weight. Repeatedly remove the two lightest trees, join them under a new node whose weight is their sum, and put that node back. After <span class="math" data-say="n minus 1">n - 1</span> merges one tree remains; label left edges 0 and right edges 1, and each leaf's root-to-leaf path is its codeword.</p></div><p>The greedy commitment is the merge. Once two trees have been joined, the symbols beneath them stay at the same depth relative to each other forever, and nothing later reconsiders it. What makes this an unusual greedy algorithm is the direction: the choice is made at the leaves, where the rarest symbols are, and the consequence &mdash; the codewords &mdash; is read off at the end.</p><div class="example"><span class="label">Example &middot; Six symbols, five merges</span><p>The lab opens on <span class="math" data-say="A, 45, b, 13, c, 12, d, 16, e, 9, f, 5">a:45, b:13, c:12, d:16, e:9, f:5</span>. The merges are <span class="math" data-say="f plus e equals 14">f + e = 14</span>, then <span class="math" data-say="c plus b equals 25">c + b = 25</span>, then <span class="math" data-say="14 plus d equals 30">14 + d = 30</span>, then <span class="math" data-say="25 plus 30 equals 55">25 + 30 = 55</span>, then <span class="math" data-say="A plus 55 equals 100">a + 55 = 100</span>. The codewords come out <span class="math" data-say="A equals 0">a = 0</span>, <span class="math" data-say="c equals 100">c = 100</span>, <span class="math" data-say="b equals 101">b = 101</span>, <span class="math" data-say="f equals 1100">f = 1100</span>, <span class="math" data-say="e equals 1101">e = 1101</span>, <span class="math" data-say="d equals 111">d = 111</span>, with lengths 1, 3, 3, 4, 4 and 3. Total bits <span class="math" data-say="224">224</span>, total weight <span class="math" data-say="100">100</span>, expected length <span class="math" data-say="56 over 25">56/25</span>.</p></div><p>The heaviest symbol got the shortest codeword and the two lightest got the longest, which is the whole idea, and it is worth checking against the alternative: a fixed-length code over six symbols needs 3 bits each, so it spends 300 bits on the same text. The saving is <span class="math" data-say="19 over 25">19/25</span> of a bit per symbol, which the panel prints as a fraction as well.</p><h3>The saving is a fact about the distribution, not about the algorithm</h3><p>Run the same algorithm on four equal weights, <span class="math" data-say="A, 10, b, 10, c, 10, d, 10">a:10, b:10, c:10, d:10</span>. Every codeword comes out two bits, the expected length is exactly <span class="math" data-say="2">2</span>, a fixed-length code over four symbols is also 2, and the saving is <span class="math" data-say="0">0</span>. Huffman did nothing wrong; there was nothing to do. A reader who has only ever seen the skewed example carries away &ldquo;Huffman compresses&rdquo; as a property of the algorithm, and it is a property of the input.</p><p>The other direction is on the panel too. On <span class="math" data-say="A, 60, b, 20, c, 10, d, 5, e, 5">a:60, b:20, c:10, d:5, e:5</span> the common symbol gets one bit and the two rarest get four, and the expected length falls to <span class="math" data-say="17 over 10">17/10</span> against a fixed-length cost of 3. Same algorithm, three different distributions, savings of <span class="math" data-say="19 over 25">19/25</span>, <span class="math" data-say="13 over 10">13/10</span> and <span class="math" data-say="0">0</span>.</p><h3>Where a preset&#x27;s caption is wrong</h3><p>The Fibonacci-weight instance, <span class="math" data-say="A, 1, b, 1, c, 2, d, 3, e, 5">a:1, b:1, c:2, d:3, e:5</span>, produces the deepest tree five leaves can have: depths 4, 4, 3, 2, 1, so the tree is a path and the rarest symbols need four bits. Both of those are true and the panel prints them. The caption's reason is not: it says each merge is exactly the next weight, and the merged weights are <span class="math" data-say="2">2</span>, <span class="math" data-say="4">4</span>, <span class="math" data-say="7">7</span>, <span class="math" data-say="12">12</span> against symbol weights <span class="math" data-say="1, 1, 2, 3, 5">1, 1, 2, 3, 5</span>. Only the first merge matches. After <span class="math" data-say="1 plus 1 equals 2">1 + 1 = 2</span> the collection holds two twos, and the next merge takes both of them rather than the two and the three.</p><div class="thm"><span class="label">Theorem &middot; Kraft&#x27;s equality for a Huffman code</span><p>For a code produced by this algorithm on <span class="math" data-say="n">n</span> symbols with codeword lengths <span class="math" data-say="ell sub 1, and so on, ell sub n">ℓ₁, …, ℓₙ</span>, the sum <span class="math" data-say="the sum of 2 to the power the quantity negative ell sub i">Σ 2^(−ℓᵢ)</span> equals exactly 1.</p></div><p>A prefix code can only ever satisfy <span class="math" data-say="the sum of 2 to the power the quantity negative ell sub i, is at most 1">Σ 2^(−ℓᵢ) ≤ 1</span> &mdash; each codeword of length <span class="math" data-say="ell">ℓ</span> rules out a <span class="math" data-say="2 to the power the quantity negative ell">2^(−ℓ)</span> share of the space of infinite bit strings, and the shares are disjoint. Equality means nothing is left over: every bit string has a prefix that is a codeword. Huffman achieves equality because the tree it builds is full, every internal node having two children, and a full tree leaves no unused branch.</p><p>That gives a quick sanity check by hand. On the opening code the lengths are 1, 3, 3, 4, 4, 3 and the sum is <span class="math" data-say="1 over 2 plus 1 over 8 plus 1 over 8 plus 1 over 16 plus 1 over 16 plus 1 over 8">1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8</span>, which is 1. On the equal-weight code four lengths of 2 give <span class="math" data-say="4 times 1 over 4 equals 1">4 · 1/4 = 1</span>. A code whose lengths sum to less than 1 has a branch going nowhere and can be shortened; one that sums to more than 1 is not a prefix code at all.</p><h3>The three checks, and what each one would catch</h3><p><span class="math" data-say="codesPrefixFree">codesPrefixFree</span> compares every pair of codewords, so a code that happened to be built wrongly would be caught even though the tree construction guarantees it. <span class="math" data-say="encodeSyms">encodeSyms</span> and <span class="math" data-say="decodeBits">decodeBits</span> run the message out and back, and the panel prints the decoded text. And the decoder refuses rather than guesses: append a proper prefix of the longest codeword to a valid bit stream and it returns nothing, because the leftover bits cannot be spent.</p><p>Measured on this page: on the six-symbol alphabet, 224 bits over weight 100, expected length <span class="math" data-say="56 over 25">56/25</span>, saving <span class="math" data-say="19 over 25">19/25</span>, prefix-free confirmed pairwise, and <span class="math" data-say="abcdef">abcdef</span> encoded to 18 bits and decoded back unchanged. Proved on this page: Kraft's sum is exactly 1 for any code this algorithm produces. What is not on this page is the claim that no code is shorter, and that is the next thing to establish rather than something the fraction above implies.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Huffman&#x27;s code, and the proof that nothing shorter exists</h2></div><p>The merges, the exact expected length, and every tree it is measured against</p></div>
@@ -1362,7 +1362,7 @@ prefix-free, checked pair by pair; and the message decodes back to itself</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Building and checking a code by hand</h2></div><p>Five steps. The last two are the ones a reader in a hurry skips, and they are the ones that catch mistakes.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort, then merge the two lightest, then re-insert</h3><p>Write the weights in a row. Take the two smallest, write their sum above them joined by a fork, and put the sum back into the row. Repeat until one weight remains. Ties may be broken any way; different tie-breaks give different trees and the same total cost.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the codewords off the paths, not off the order of merging</h3><p>Label every left edge 0 and every right edge 1 and walk from the root to each leaf. The length of a codeword is the depth of its leaf, which is the number of merges that symbol was carried through.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the total as a sum of products, then divide</h3><p><span class="math">Σ wᵢ · ℓᵢ</span> first, as an integer; then divide by <span class="math">Σ wᵢ</span>. Doing it the other way round, averaging decimals, loses the exactness that lets two codes be compared.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check Kraft&#x27;s sum is exactly 1</h3><p>Add <span class="math">2^(−ℓᵢ)</span> over the symbols. Anything less than 1 means a wasted branch and a code you can shorten; anything more means the lengths do not describe a prefix code at all. This is a two-line check that catches an arithmetic slip in the depths.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Encode something and decode it back</h3><p>A length is a number and a round trip is a demonstration. Type a message into the panel and read the decoded line: it is the only check on the page that would notice a short code that cannot be read.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort, then merge the two lightest, then re-insert</h3><p>Write the weights in a row. Take the two smallest, write their sum above them joined by a fork, and put the sum back into the row. Repeat until one weight remains. Ties may be broken any way; different tie-breaks give different trees and the same total cost.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the codewords off the paths, not off the order of merging</h3><p>Label every left edge 0 and every right edge 1 and walk from the root to each leaf. The length of a codeword is the depth of its leaf, which is the number of merges that symbol was carried through.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the total as a sum of products, then divide</h3><p><span class="math" data-say="the sum of w sub i times ell sub i">Σ wᵢ · ℓᵢ</span> first, as an integer; then divide by <span class="math" data-say="the sum of w sub i">Σ wᵢ</span>. Doing it the other way round, averaging decimals, loses the exactness that lets two codes be compared.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check Kraft&#x27;s sum is exactly 1</h3><p>Add <span class="math" data-say="2 to the power the quantity negative ell sub i">2^(−ℓᵢ)</span> over the symbols. Anything less than 1 means a wasted branch and a code you can shorten; anything more means the lengths do not describe a prefix code at all. This is a two-line check that catches an arithmetic slip in the depths.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Encode something and decode it back</h3><p>A length is a number and a round trip is a demonstration. Type a message into the panel and read the decoded line: it is the only check on the page that would notice a short code that cannot be read.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1373,7 +1373,7 @@ prefix-free, checked pair by pair; and the message decodes back to itself</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>The six-symbol alphabet, merged by hand</h3><p>Weights <span class="math">a:45, b:13, c:12, d:16, e:9, f:5</span>. At each step take the two smallest remaining weights, whether they are symbols or earlier merges.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">   step   collection                     two lightest   merged
+      <article class="card card-pad prose"><h3>The six-symbol alphabet, merged by hand</h3><p>Weights <span class="math" data-say="A, 45, b, 13, c, 12, d, 16, e, 9, f, 5">a:45, b:13, c:12, d:16, e:9, f:5</span>. At each step take the two smallest remaining weights, whether they are symbols or earlier merges.</p><div class="mathblock" data-say="step, collection, two lightest, merged. a table, shown on the page. symbol, weight, codeword, bits, weight x bits. a table, shown on the page. expected length, 224 over 100, equals, 56 over 25, equals, 2.240 to three places. fixed length, 3 bits per symbol over six symbols, equals, 300 bits. saving, 3 minus 56 over 25, equals, 19 over 25 bits per symbol. Kraft, 1 over 2 plus 1 over 8 plus 1 over 8 plus 1 over 16 plus 1 over 16 plus 1 over 8, equals, 1" tabindex="0" role="region" aria-label="Mathematical notation">   step   collection                     two lightest   merged
     1     45 13 12 16  9  5              5 and 9        14      4 left
     2     45 13 12 16 14                 12 and 13      25      3 left
     3     45 16 25 14                    14 and 16      30      2 left
@@ -1392,13 +1392,13 @@ prefix-free, checked pair by pair; and the message decodes back to itself</div>
 expected length   224 / 100  =  56/25  =  2.240 to three places
 fixed length      3 bits per symbol over six symbols  =  300 bits
 saving            3 - 56/25  =  19/25 bits per symbol
-Kraft             1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8  =  1</div><p>Five merges for six symbols, and the count is not a coincidence: each merge reduces the collection by one and the process ends at one tree, so <span class="math">n</span> symbols always take <span class="math">n - 1</span> merges and produce a tree with <span class="math">n - 1</span> internal nodes.</p><p>Step 3 is the one worth watching. The lightest two are <span class="math">14</span>, a merged node, and <span class="math">16</span>, a symbol. Merged nodes compete with symbols on equal terms from the moment they are created, which is why the tree is not simply a sorted caterpillar and why the algorithm cannot be replaced by sorting the symbols once.</p><p>For a faded rehearsal, do <span class="math">a:1, b:1, c:2, d:3, e:5</span> by hand before running it. The supplied first move is <span class="math">1 + 1 = 2</span>, leaving <span class="math">2, 2, 3, 5</span>. Say what the remaining three merges are, what depth each symbol ends at, and what the expected length is as a fraction &mdash; and then say whether the merged weights reproduce the input sequence, which is what that instance's caption claims.</p></article>
+Kraft             1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8  =  1</div><p>Five merges for six symbols, and the count is not a coincidence: each merge reduces the collection by one and the process ends at one tree, so <span class="math" data-say="n">n</span> symbols always take <span class="math" data-say="n minus 1">n - 1</span> merges and produce a tree with <span class="math" data-say="n minus 1">n - 1</span> internal nodes.</p><p>Step 3 is the one worth watching. The lightest two are <span class="math" data-say="14">14</span>, a merged node, and <span class="math" data-say="16">16</span>, a symbol. Merged nodes compete with symbols on equal terms from the moment they are created, which is why the tree is not simply a sorted caterpillar and why the algorithm cannot be replaced by sorting the symbols once.</p><p>For a faded rehearsal, do <span class="math" data-say="A, 1, b, 1, c, 2, d, 3, e, 5">a:1, b:1, c:2, d:3, e:5</span> by hand before running it. The supplied first move is <span class="math" data-say="1 plus 1 equals 2">1 + 1 = 2</span>, leaving <span class="math" data-say="2, 2, 3, 5">2, 2, 3, 5</span>. Say what the remaining three merges are, what depth each symbol ends at, and what the expected length is as a fraction &mdash; and then say whether the merged weights reproduce the input sequence, which is what that instance's caption claims.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging the codeword lengths instead of weighting them</strong><span>The expected length is <span class="math">Σ wᵢ ℓᵢ / Σ wᵢ</span>, not the mean of the lengths. On the opening alphabet the mean length is <span class="math">18/6 = 3</span> and the expected length is <span class="math">56/25</span>, which is 2.24 &mdash; a difference of three quarters of a bit per symbol, and the entire point of the algorithm.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing Huffman always compresses</strong><span>On four equal weights the saving is exactly zero and the panel says so. The algorithm is optimal on every input and useful only on skewed ones, and those are different statements. Quoting a compression figure without quoting the distribution it came from is quoting a measurement as though it were a bound.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the Fibonacci caption&#x27;s reason at face value</strong><span>That instance really does produce the deepest tree five leaves allow, and the rarest symbols really do need four bits. But the merged weights are <span class="math">2, 4, 7, 12</span> and the caption says each merge is the next input weight, which stops being true at the second merge. Read the merge table: it is the run, and the caption is not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the tree, produce the exact expected length as a fraction, and check the result three ways without looking anything up.</strong><p>You should be able to merge by hand and get the same tree shape the panel draws, compute <span class="math">Σ wᵢ ℓᵢ</span> and divide, verify Kraft's sum is 1, explain what the round trip catches that a length does not, and say why a saving of zero on equal weights is not a failure.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything on this page is about the code the algorithm produced. None of it says that no other code is shorter, and the fraction <span class="math">56/25</span> is perfectly consistent with some cleverer tree reaching <span class="math">55/25</span>. Establishing that no such tree exists is a separate argument with two lemmas behind it, and &ldquo;Why Huffman Is Optimal&rdquo; both proves it and checks it against every tree.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging the codeword lengths instead of weighting them</strong><span>The expected length is <span class="math" data-say="the sum of w sub i ell sub i over the sum of w sub i">Σ wᵢ ℓᵢ / Σ wᵢ</span>, not the mean of the lengths. On the opening alphabet the mean length is <span class="math" data-say="18 over 6 equals 3">18/6 = 3</span> and the expected length is <span class="math" data-say="56 over 25">56/25</span>, which is 2.24 &mdash; a difference of three quarters of a bit per symbol, and the entire point of the algorithm.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing Huffman always compresses</strong><span>On four equal weights the saving is exactly zero and the panel says so. The algorithm is optimal on every input and useful only on skewed ones, and those are different statements. Quoting a compression figure without quoting the distribution it came from is quoting a measurement as though it were a bound.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the Fibonacci caption&#x27;s reason at face value</strong><span>That instance really does produce the deepest tree five leaves allow, and the rarest symbols really do need four bits. But the merged weights are <span class="math" data-say="2, 4, 7, 12">2, 4, 7, 12</span> and the caption says each merge is the next input weight, which stops being true at the second merge. Read the merge table: it is the run, and the caption is not.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the tree, produce the exact expected length as a fraction, and check the result three ways without looking anything up.</strong><p>You should be able to merge by hand and get the same tree shape the panel draws, compute <span class="math" data-say="the sum of w sub i ell sub i">Σ wᵢ ℓᵢ</span> and divide, verify Kraft's sum is 1, explain what the round trip catches that a length does not, and say why a saving of zero on equal weights is not a failure.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything on this page is about the code the algorithm produced. None of it says that no other code is shorter, and the fraction <span class="math" data-say="56 over 25">56/25</span> is perfectly consistent with some cleverer tree reaching <span class="math" data-say="55 over 25">55/25</span>. Establishing that no such tree exists is a separate argument with two lemmas behind it, and &ldquo;Why Huffman Is Optimal&rdquo; both proves it and checks it against every tree.</div></article>
       </div>
     </section>
     </main>
@@ -1437,7 +1437,7 @@ Kraft             1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8  =  1</div><p>Five merges 
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Greedy Algorithms and Matroids.</strong> Every verdict on this course was computed twice: once by running the greedy rule, and once by a search that does not know what the rule is. The optima are exact &mdash; the best of every subset, every full binary tree on <span class="math">n</span> leaves against every assignment of the weights to its leaves, every one of the <span class="math">n!</span> matchings, every eviction decision a cache of that size could make, every weighting in <span class="math">{1, 2, 3}ⁿ</span>. Two quantities are genuinely fractional and both are printed as fractions first: a Huffman code's expected length, and the fractional knapsack's optimum. A decimal beside a fraction on these pages is a rounding of the printing at a stated number of places, and the fraction next to it is the number. Where a search would be too large the panel refuses and says so rather than printing a figure it cannot stand behind, and where a panel's own caption disagrees with the table above it, the lesson names the caption.</p>
+      <p><strong>Greedy Algorithms and Matroids.</strong> Every verdict on this course was computed twice: once by running the greedy rule, and once by a search that does not know what the rule is. The optima are exact &mdash; the best of every subset, every full binary tree on <span class="math" data-say="n">n</span> leaves against every assignment of the weights to its leaves, every one of the <span class="math" data-say="n factorial">n!</span> matchings, every eviction decision a cache of that size could make, every weighting in <span class="math" data-say="the set 1, 2, 3, to the power n">{1, 2, 3}ⁿ</span>. Two quantities are genuinely fractional and both are printed as fractions first: a Huffman code's expected length, and the fractional knapsack's optimum. A decimal beside a fraction on these pages is a rounding of the printing at a stated number of places, and the fraction next to it is the number. Where a search would be too large the panel refuses and says so rather than printing a figure it cannot stand behind, and where a panel's own caption disagrees with the table above it, the lesson names the caption.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1496,7 +1496,7 @@ Kraft             1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8  =  1</div><p>Five merges 
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "The panel reports an expected length of <span class=\"math\">56/25<\/span> and, beside it, <span class=\"math\">2.240<\/span>. Which is the number?", "a": ["<span class=\"math\">2.240<\/span>, since the fraction is only a display convenience", "<span class=\"math\">56/25<\/span>; the decimal is a rounding of the printing at three stated places", "Both, since they are equal", "Neither, since the expected length depends on the message typed"], "c": 1, "why": "<span class=\"math\">56/25<\/span> is exactly <span class=\"math\">2.24<\/span>, so nothing is lost here &mdash; but the panel's rule is that the fraction is the value and the decimal is a rounding at a stated number of places, and on an alphabet whose expected length is <span class=\"math\">25/12<\/span> the decimal <span class=\"math\">2.083<\/span> is not the number. The expected length depends on the weights, not on the message."}, {"q": "On four equal weights the expected length is exactly 2 and the saving over a fixed-length code is 0. What does that show?", "a": ["That Huffman failed on this input", "That the algorithm needs at least one weight to dominate", "That the saving is a property of the distribution, not of the algorithm", "That equal weights are not a valid input"], "c": 2, "why": "Huffman produced an optimal code; there simply is no shorter one, because with equal weights every arrangement of four leaves at depth 2 costs the same. Compression comes from skew in the weights, and an algorithm cannot manufacture skew that is not there."}, {"q": "Why does the panel check the code prefix-free pairwise when the tree construction already guarantees it?", "a": ["Because ties in the merge order can break the guarantee", "Because a check that assumes the construction is correct checks nothing about the construction", "Because the codewords are assigned after the tree is built", "Because Kraft's inequality can fail with equality"], "c": 1, "why": "The guarantee is a fact about the algorithm as designed; the check is about the codewords actually on the page. If the two ever disagreed, only the independent check would say so. Ties change which tree is built and never make a leaf's path a prefix of another leaf's path."}, {"q": "A bit stream that decodes correctly is given one extra bit, a proper prefix of the longest codeword. What does the decoder do?", "a": ["Ignores the leftover bits and returns the message", "Returns the message with an extra symbol guessed from the partial codeword", "Refuses and returns nothing, because the leftover bits are not a codeword", "Pads the leftover bits with zeros until they match a codeword"], "c": 2, "why": "A proper prefix of a codeword is never itself a codeword in a prefix-free code, so the decoder ends holding bits it cannot spend and refuses. Guessing or ignoring would let a corrupted stream come back looking correct, which is the failure the round trip exists to catch."}];
+  var QUIZ = [{"q": "The panel reports an expected length of <span class=\"math\" data-say=\"56 over 25\">56/25<\/span> and, beside it, <span class=\"math\" data-say=\"2.240\">2.240<\/span>. Which is the number?", "a": ["<span class=\"math\" data-say=\"2.240\">2.240<\/span>, since the fraction is only a display convenience", "<span class=\"math\" data-say=\"56 over 25\">56/25<\/span>; the decimal is a rounding of the printing at three stated places", "Both, since they are equal", "Neither, since the expected length depends on the message typed"], "c": 1, "why": "<span class=\"math\" data-say=\"56 over 25\">56/25<\/span> is exactly <span class=\"math\" data-say=\"2.24\">2.24<\/span>, so nothing is lost here &mdash; but the panel's rule is that the fraction is the value and the decimal is a rounding at a stated number of places, and on an alphabet whose expected length is <span class=\"math\" data-say=\"25 over 12\">25/12<\/span> the decimal <span class=\"math\" data-say=\"2.083\">2.083<\/span> is not the number. The expected length depends on the weights, not on the message."}, {"q": "On four equal weights the expected length is exactly 2 and the saving over a fixed-length code is 0. What does that show?", "a": ["That Huffman failed on this input", "That the algorithm needs at least one weight to dominate", "That the saving is a property of the distribution, not of the algorithm", "That equal weights are not a valid input"], "c": 2, "why": "Huffman produced an optimal code; there simply is no shorter one, because with equal weights every arrangement of four leaves at depth 2 costs the same. Compression comes from skew in the weights, and an algorithm cannot manufacture skew that is not there."}, {"q": "Why does the panel check the code prefix-free pairwise when the tree construction already guarantees it?", "a": ["Because ties in the merge order can break the guarantee", "Because a check that assumes the construction is correct checks nothing about the construction", "Because the codewords are assigned after the tree is built", "Because Kraft's inequality can fail with equality"], "c": 1, "why": "The guarantee is a fact about the algorithm as designed; the check is about the codewords actually on the page. If the two ever disagreed, only the independent check would say so. Ties change which tree is built and never make a leaf's path a prefix of another leaf's path."}, {"q": "A bit stream that decodes correctly is given one extra bit, a proper prefix of the longest codeword. What does the decoder do?", "a": ["Ignores the leftover bits and returns the message", "Returns the message with an extra symbol guessed from the partial codeword", "Refuses and returns nothing, because the leftover bits are not a codeword", "Pads the leftover bits with zeros until they match a codeword"], "c": 2, "why": "A proper prefix of a codeword is never itself a codeword in a prefix-free code, so the decoder ends holding bits it cannot spend and refuses. Guessing or ignoring would let a corrupted stream come back looking correct, which is the failure the round trip exists to catch."}];
 
   (function () {
 
@@ -3448,6 +3448,213 @@ Kraft             1/2 + 1/8 + 1/8 + 1/16 + 1/16 + 1/8  =  1</div><p>Five merges 
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

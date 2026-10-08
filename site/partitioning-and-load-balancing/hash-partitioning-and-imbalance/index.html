@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Partitioning and Load Balancing &middot; Where the keys land</span>
         <h1>Hash Partitioning and Imbalance</h1>
-        <p>Hashing makes every shard equally likely to receive a key, which is not the same as making every shard receive the same number of keys. The mean is exactly <span class="math">m/N</span> and the maximum is whatever the stream produced, and the gap between them is the quantity a capacity plan has to be built on. This lesson measures that gap on a placement you can reproduce, and reseeds, because one placement is one sample of a distribution.</p>
+        <p>Hashing makes every shard equally likely to receive a key, which is not the same as making every shard receive the same number of keys. The mean is exactly <span class="math" data-say="m over N">m/N</span> and the maximum is whatever the stream produced, and the gap between them is the quantity a capacity plan has to be built on. This lesson measures that gap on a placement you can reproduce, and reseeds, because one placement is one sample of a distribution.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">mean = m/N          exact          max = whatever landed        measured
+        <div class="mathblock" data-say="mean equals m over N, exact, max equals whatever landed, measured. max over mean equals max times N over m, a ratio of two integers. 1200 keys, 12 shards, seed 7, max 122, mean 100, max over mean equals 61 over 50 equals 1.220. excess equals 122 minus 100 equals 22 equals 2.20 the square root of mean, the term that does not vanish. maximum load at m equals N is theta of the quantity log n over log log n, stated, not proved" tabindex="0" role="region" aria-label="Mathematical notation">mean = m/N          exact          max = whatever landed        measured
 max/mean = max · N / m                    a ratio of two integers
 
 1 200 keys, 12 shards, seed 7:  max 122, mean 100, max/mean = 61/50 = 1.220
@@ -1310,17 +1310,17 @@ maximum load at m = N is Θ(log n / log log n)      stated, not proved</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One hard idea, and it is a negative one: the property hashing gives you is about expectations, and a capacity plan is not built on expectations.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Hashing equalises the probability, not the counts</h3><p>A good hash makes each of the <span class="math">N</span> shards equally likely for each of the <span class="math">m</span> keys. That is a statement about one key at a time. The counts that result are a random vector whose mean is <span class="math">m/N</span> in every coordinate and whose maximum is above that mean essentially always — with 1 200 keys in 12 shards the fullest shard held 122 against a mean of 100.</p></article><article class="card concept-card"><div class="icon">2</div><h3>max/mean is an exact ratio of integers</h3><p><span class="math">max/mean = max · N / m</span>, and all three of those are counts, so the imbalance is a fraction rather than a float: <span class="math">122 × 12/1 200 = 61/50</span>. There is nothing to approximate and nothing to model. The lab counts the occupancies and divides, which is why the figure it prints is the same figure you would get by counting the placement by hand.</p></article><article class="card concept-card"><div class="icon">3</div><h3>One seed is one sample</h3><p>Across seeds 7 through 14 with the same 1 200 keys and 12 shards, the fullest shard ran from 112 to 122 and max/mean averaged 1.170. Quoting the 1.220 from a single run as “the imbalance” treats one draw as a property of the scheme. The lesson is about the distribution of the maximum, and that only becomes visible when you move the seed.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Hashing equalises the probability, not the counts</h3><p>A good hash makes each of the <span class="math" data-say="N">N</span> shards equally likely for each of the <span class="math" data-say="m">m</span> keys. That is a statement about one key at a time. The counts that result are a random vector whose mean is <span class="math" data-say="m over N">m/N</span> in every coordinate and whose maximum is above that mean essentially always — with 1 200 keys in 12 shards the fullest shard held 122 against a mean of 100.</p></article><article class="card concept-card"><div class="icon">2</div><h3>max/mean is an exact ratio of integers</h3><p><span class="math" data-say="max over mean equals max times N over m">max/mean = max · N / m</span>, and all three of those are counts, so the imbalance is a fraction rather than a float: <span class="math" data-say="122 times 12 over 1200 equals 61 over 50">122 × 12/1 200 = 61/50</span>. There is nothing to approximate and nothing to model. The lab counts the occupancies and divides, which is why the figure it prints is the same figure you would get by counting the placement by hand.</p></article><article class="card concept-card"><div class="icon">3</div><h3>One seed is one sample</h3><p>Across seeds 7 through 14 with the same 1 200 keys and 12 shards, the fullest shard ran from 112 to 122 and max/mean averaged 1.170. Quoting the 1.220 from a single run as “the imbalance” treats one draw as a property of the scheme. The lesson is about the distribution of the maximum, and that only becomes visible when you move the seed.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>What a hash actually gives you, and what it does not</h2></div><p>The placement, the two numbers that describe it, how the gap between them behaves as the load grows, and the one result here that this library states without proving.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Hash partitioning</span><p>Under <strong>hash partitioning</strong> the shard of a key <span class="math">k</span> is <span class="math">h(k) mod N</span> for a hash function <span class="math">h</span>. Keys near each other in the original key space are scattered, so range scans become expensive and the placement stops depending on what the keys mean. The <strong>occupancy</strong> of a shard is the number of keys assigned to it, and its <strong>mean</strong> over the fleet is <span class="math">m/N</span> whatever the hash does.</p></div><p>The claim under examination is the everyday one: that hashing spreads keys evenly. It spreads them <em>uniformly at random</em>, which is a different sentence. Uniform means no shard is favoured; it does not mean no shard is fuller, and the whole of this course's imbalance arithmetic lives in that distinction.</p><p>The placements here come from a seeded generator printed on the page, so “random” is reproducible: the stream is <span class="math">x → 16 807·x mod (2³¹ − 1)</span>, with the modulus prime on purpose. The generator used elsewhere on this library's paths has a modulus of <span class="math">2³¹</span>, and the low bits of such a stream are periodic — <span class="math">x mod 4</span> cycles <span class="math">0, 1, 2, 3</span> for ever. Taking that stream modulo 8 or 16 fills the shards perfectly level, which would demonstrate the opposite of this lesson's claim. The constants are on the page so you can check which generator drew your placement.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">m = 1 200 keys      N = 12 shards      seed 7
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Hash partitioning</span><p>Under <strong>hash partitioning</strong> the shard of a key <span class="math" data-say="k">k</span> is <span class="math" data-say="h of k mod N">h(k) mod N</span> for a hash function <span class="math" data-say="h">h</span>. Keys near each other in the original key space are scattered, so range scans become expensive and the placement stops depending on what the keys mean. The <strong>occupancy</strong> of a shard is the number of keys assigned to it, and its <strong>mean</strong> over the fleet is <span class="math" data-say="m over N">m/N</span> whatever the hash does.</p></div><p>The claim under examination is the everyday one: that hashing spreads keys evenly. It spreads them <em>uniformly at random</em>, which is a different sentence. Uniform means no shard is favoured; it does not mean no shard is fuller, and the whole of this course's imbalance arithmetic lives in that distinction.</p><p>The placements here come from a seeded generator printed on the page, so “random” is reproducible: the stream is <span class="math" data-say="x goes to 16807 times x mod 2 to the power 31 minus 1">x → 16 807·x mod (2³¹ − 1)</span>, with the modulus prime on purpose. The generator used elsewhere on this library's paths has a modulus of <span class="math" data-say="2 to the power 31">2³¹</span>, and the low bits of such a stream are periodic — <span class="math" data-say="x mod 4">x mod 4</span> cycles <span class="math" data-say="0, 1, 2, 3">0, 1, 2, 3</span> for ever. Taking that stream modulo 8 or 16 fills the shards perfectly level, which would demonstrate the opposite of this lesson's claim. The constants are on the page so you can check which generator drew your placement.</p><div class="mathblock" data-say="m equals 1200 keys, N equals 12 shards, seed 7. mean, equals 1200 over 12 equals 100, exact. fullest shard equals 122, counted. emptiest, equals 82, counted. max over mean, equals 122 times 12 over 1200 equals 61 over 50 equals 1.220. excess, equals 122 minus 100 equals 22 equals 2.20 times the square root of 100" tabindex="0" role="region" aria-label="Mathematical notation">m = 1 200 keys      N = 12 shards      seed 7
 
 mean          = 1 200/12 = 100        exact
 fullest shard = 122                   counted
 emptiest      = 82                    counted
 max/mean      = 122 × 12/1 200 = 61/50 = 1.220
-excess        = 122 − 100 = 22 = 2.20 × √100</div><h3>Why the excess is a square-root term</h3><p>Raise the load and max/mean improves: the same 12 shards with 12 000 keys came out at 1.046 and with 120 000 keys at 1.018. It is tempting to read that as the imbalance going away. It is not going away — it is being divided by a larger mean. The absolute excess over the mean went from 22 keys to 46 keys to 182 keys as the mean went from 100 to 1 000 to 10 000, which is growth like <span class="math">√mean</span> rather than a constant.</p><p>That is why the lab prints the excess in units of <span class="math">√mean</span> rather than as a percentage. Measured that way it stays a small number of order one — 2.20, 1.45, 1.82 on those three runs — instead of appearing to shrink. It is a noisy small number, and reseeding shows it moving between 1.20 and 2.20 on the default placement, which is the honest picture: a term of a fixed order of magnitude, not a constant.</p><div class="example"><span class="label">Example &middot; What this costs a capacity plan</span><p>Provision every shard for the mean and the fullest one is over its allocation by 22% on the default placement. Provision every shard for the fullest and 11 of the 12 are over-bought. The usable answer is neither: size for a maximum you have measured across several seeds — 1.170 on average and 1.220 at worst here — and treat the excess as a cost of hashing rather than as a defect to be engineered away.</p></div><h3>The result this lesson measures and does not prove</h3><p>When the number of keys equals the number of shards, the maximum occupancy is <span class="math">Θ(log n / log log n)</span>. That result is <strong>stated, not proved</strong> — not here and nowhere else in this library. Its proof needs Chernoff bounds, which the Algorithms path excludes from its own scope, so no lesson anywhere establishes it. What this lesson does is measure the maximum on placements you choose.</p><p>Two related quantities <em>are</em> computed exactly, and they are computed elsewhere. “Balls in Bins and the Birthday Bound”, on the Randomised Algorithms course of the Algorithms path, derives the expected number of colliding pairs as <span class="math">n(n − 1)/2m</span> and the expected number of empty bins as <span class="math">m(1 − 1/m)ⁿ</span>, both by linearity of expectation and both exact. Those are the expectations this lesson does not compute; the maximum is the thing it measures. The seeded generator itself is “Hashing and Pseudorandom Numbers” on the Discrete Mathematics path.</p><p>Keep the three statuses apart when you quote a figure from this course. The mean is exact. The maximum on a given placement is measured and reproducible. The growth rate of the maximum is stated. A design review that treats the third as though it had the standing of the first is the failure this paragraph exists to prevent.</p></article>
+excess        = 122 − 100 = 22 = 2.20 × √100</div><h3>Why the excess is a square-root term</h3><p>Raise the load and max/mean improves: the same 12 shards with 12 000 keys came out at 1.046 and with 120 000 keys at 1.018. It is tempting to read that as the imbalance going away. It is not going away — it is being divided by a larger mean. The absolute excess over the mean went from 22 keys to 46 keys to 182 keys as the mean went from 100 to 1 000 to 10 000, which is growth like <span class="math" data-say="the square root of mean">√mean</span> rather than a constant.</p><p>That is why the lab prints the excess in units of <span class="math" data-say="the square root of mean">√mean</span> rather than as a percentage. Measured that way it stays a small number of order one — 2.20, 1.45, 1.82 on those three runs — instead of appearing to shrink. It is a noisy small number, and reseeding shows it moving between 1.20 and 2.20 on the default placement, which is the honest picture: a term of a fixed order of magnitude, not a constant.</p><div class="example"><span class="label">Example &middot; What this costs a capacity plan</span><p>Provision every shard for the mean and the fullest one is over its allocation by 22% on the default placement. Provision every shard for the fullest and 11 of the 12 are over-bought. The usable answer is neither: size for a maximum you have measured across several seeds — 1.170 on average and 1.220 at worst here — and treat the excess as a cost of hashing rather than as a defect to be engineered away.</p></div><h3>The result this lesson measures and does not prove</h3><p>When the number of keys equals the number of shards, the maximum occupancy is <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span>. That result is <strong>stated, not proved</strong> — not here and nowhere else in this library. Its proof needs Chernoff bounds, which the Algorithms path excludes from its own scope, so no lesson anywhere establishes it. What this lesson does is measure the maximum on placements you choose.</p><p>Two related quantities <em>are</em> computed exactly, and they are computed elsewhere. “Balls in Bins and the Birthday Bound”, on the Randomised Algorithms course of the Algorithms path, derives the expected number of colliding pairs as <span class="math" data-say="n times the quantity n minus 1, over 2 m">n(n − 1)/2m</span> and the expected number of empty bins as <span class="math" data-say="m times the quantity 1 minus 1 over m, to the power n">m(1 − 1/m)ⁿ</span>, both by linearity of expectation and both exact. Those are the expectations this lesson does not compute; the maximum is the thing it measures. The seeded generator itself is “Hashing and Pseudorandom Numbers” on the Discrete Mathematics path.</p><p>Keep the three statuses apart when you quote a figure from this course. The mean is exact. The maximum on a given placement is measured and reproducible. The growth rate of the maximum is stated. A design review that treats the third as though it had the standing of the first is the failure this paragraph exists to prevent.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Hash partitioning and imbalance</h2></div><p>Measure max over mean on a seeded placement, then reseed and measure again</p></div>
@@ -1363,7 +1363,7 @@ excess        = 122 − 100 = 22 = 2.20 × √100</div><h3>Why the excess is a s
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring the imbalance rather than assuming it</h2></div><p>The order matters: compute what is exact first, so that everything measured afterwards has something to be measured against.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down the mean before you look at anything</h3><p><span class="math">m/N</span> is exact and needs no placement. It is the number every later figure is a ratio to, and having it first stops a large maximum from looking alarming when it is ordinary.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the fullest shard and divide</h3><p><span class="math">max · N / m</span> is max/mean as a fraction. Keep it as a fraction: <span class="math">61/50</span> says more than <span class="math">1.22</span> when you come to compare two placements, because you can see the counts it came from.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reseed at least half a dozen times</h3><p>One placement is one draw. Record the maximum from each and take both the average and the worst you saw. Eight seeds on the default placement give an average max/mean of 1.170 and a worst of 1.220, and those are two different numbers for two different purposes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Size on the measured maximum, and say what you measured</h3><p>Provisioning at the mean under-provisions the fullest shard by the excess. Quote the figure with its sample: “max/mean 1.17 on average over eight seeds, 1.22 at worst” is a defensible input to a capacity plan; “about 1.2” is not.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down the mean before you look at anything</h3><p><span class="math" data-say="m over N">m/N</span> is exact and needs no placement. It is the number every later figure is a ratio to, and having it first stops a large maximum from looking alarming when it is ordinary.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the fullest shard and divide</h3><p><span class="math" data-say="max times N over m">max · N / m</span> is max/mean as a fraction. Keep it as a fraction: <span class="math" data-say="61 over 50">61/50</span> says more than <span class="math" data-say="1.22">1.22</span> when you come to compare two placements, because you can see the counts it came from.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reseed at least half a dozen times</h3><p>One placement is one draw. Record the maximum from each and take both the average and the worst you saw. Eight seeds on the default placement give an average max/mean of 1.170 and a worst of 1.220, and those are two different numbers for two different purposes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Size on the measured maximum, and say what you measured</h3><p>Provisioning at the mean under-provisions the fullest shard by the excess. Quote the figure with its sample: “max/mean 1.17 on average over eight seeds, 1.22 at worst” is a defensible input to a capacity plan; “about 1.2” is not.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1374,7 +1374,7 @@ excess        = 122 − 100 = 22 = 2.20 × √100</div><h3>Why the excess is a s
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>1 200 keys into 12 shards, and then into 120</h3><p>One placement measured exactly, and then the same key count spread over ten times as many shards, which is where the ratio misleads.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">m = 1 200, N = 12, seed 7
+      <article class="card card-pad prose"><h3>1 200 keys into 12 shards, and then into 120</h3><p>One placement measured exactly, and then the same key count spread over ten times as many shards, which is where the ratio misleads.</p><div class="mathblock" data-say="m equals 1200, N equals 12, seed 7. mean, equals 1200 over 12 equals 100. fullest, equals 122, emptiest equals 82, empty shards equals 0. max over mean equals 122 times 12 over 1200 equals 1464 over 1200 equals 61 over 50 equals 1.220. excess, equals 22 keys equals 2.20 the square root of mean. m equals 1200, N equals 120, seed 7. mean, equals 1200 over 120 equals 10. fullest, equals 18. max over mean equals 18 times 120 over 1200 equals 1.800. excess, equals 8 keys equals 2.53 the square root of mean. the ratio got worse, the excess in root-means barely moved. 2.20 the square root of mean, goes to, 2.53 the square root of mean" tabindex="0" role="region" aria-label="Mathematical notation">m = 1 200, N = 12, seed 7
   mean     = 1 200/12 = 100
   fullest  = 122            emptiest = 82        empty shards = 0
   max/mean = 122 × 12/1 200 = 1464/1200 = 61/50 = 1.220
@@ -1387,13 +1387,13 @@ m = 1 200, N = 120, seed 7
   excess   = 8 keys = 2.53 √mean
 
 the ratio got worse; the excess in root-means barely moved
-  2.20 √mean  →  2.53 √mean</div><p>Ten times the shards made max/mean look much worse and did not really change the underlying quantity. That is the shape of the whole result: the excess tracks <span class="math">√mean</span>, so shrinking the mean by spreading keys thinner makes the ratio deteriorate even though nothing about the hashing changed.</p><p>For a faded rehearsal, keep 12 shards and take the key count to 12 000. The supplied first move is the mean, which is 1 000. Predict whether max/mean will be closer to or further from 1 than it was at 1 200 keys, then read the fullest shard off the lab, compute max/mean and the excess in root-means, and say which of the two figures actually told you something about the hash. Reseed three times before you commit to an answer.</p></article>
+  2.20 √mean  →  2.53 √mean</div><p>Ten times the shards made max/mean look much worse and did not really change the underlying quantity. That is the shape of the whole result: the excess tracks <span class="math" data-say="the square root of mean">√mean</span>, so shrinking the mean by spreading keys thinner makes the ratio deteriorate even though nothing about the hashing changed.</p><p>For a faded rehearsal, keep 12 shards and take the key count to 12 000. The supplied first move is the mean, which is 1 000. Predict whether max/mean will be closer to or further from 1 than it was at 1 200 keys, then read the fullest shard off the lab, compute max/mean and the excess in root-means, and say which of the two figures actually told you something about the hash. Reseed three times before you commit to an answer.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading “uniform” as “equal”</strong><span>A uniform hash makes every shard equally likely for every key. The counts that result are still a random vector, and its maximum is above its mean almost always. Every capacity figure on this course exists because those two sentences are not the same sentence.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting an imbalance from a single placement</strong><span>One seed produced 1.220 and eight seeds averaged 1.170 with a worst of 1.220. A figure from one run is a draw, not a property, and it is equally wrong to be reassured by a lucky one. Reseed, record, and quote the sample you took.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a falling max/mean as a disappearing problem</strong><span>Going from 1 200 keys to 120 000 on the same 12 shards moved max/mean from 1.220 to 1.018, while the absolute excess grew from 22 keys to 182. The ratio improved because its denominator grew. Nothing about the placement became more even.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would not accept an imbalance figure without being told how many seeds it came from.</strong><p>You should be able to compute the mean and max/mean from a placement, describe how the excess behaves as the mean grows, and say which of the figures on this page are exact, which are measured, and which are stated without proof.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two questions follow immediately. The first is what happens to this placement when <span class="math">N</span> changes, which is “Rehashing When N Changes” and has a sharper answer than the imbalance does. The second is whether a small change to the placement rule can make the maximum much better, and it can: “The Power of Two Choices” measures a rule that costs one extra lookup and collapses the maximum load.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would not accept an imbalance figure without being told how many seeds it came from.</strong><p>You should be able to compute the mean and max/mean from a placement, describe how the excess behaves as the mean grows, and say which of the figures on this page are exact, which are measured, and which are stated without proof.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two questions follow immediately. The first is what happens to this placement when <span class="math" data-say="N">N</span> changes, which is “Rehashing When N Changes” and has a sharper answer than the imbalance does. The second is whether a small change to the placement rule can make the maximum much better, and it can: “The Power of Two Choices” measures a rule that costs one extra lookup and collapses the maximum load.</div></article>
       </div>
     </section>
     </main>
@@ -1432,7 +1432,7 @@ the ratio got worse; the excess in root-means barely moved
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Partitioning and Load Balancing.</strong> The placements on this course are produced by a seeded generator defined on the page, so a “random” assignment is a computed one that you can reproduce and step through. The fractions of keys moved, the shard counts, the hot-key shares and the cross-shard probabilities are exact. The two maximum-load results — <span class="math">Θ(log n / log log n)</span> for one choice and <span class="math">≈ ln ln n</span> for two — are stated, not proved, and what the labs do is measure them.</p>
+      <p><strong>Partitioning and Load Balancing.</strong> The placements on this course are produced by a seeded generator defined on the page, so a “random” assignment is a computed one that you can reproduce and step through. The fractions of keys moved, the shard counts, the hot-key shares and the cross-shard probabilities are exact. The two maximum-load results — <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span> for one choice and <span class="math" data-say="is approximately the natural log of the natural log of n">≈ ln ln n</span> for two — are stated, not proved, and what the labs do is measure them.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1491,7 +1491,7 @@ the ratio got worse; the excess in root-means barely moved
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "1 200 keys are hashed into 12 shards and the fullest shard holds 122. What is max/mean?", "a": ["<span class=\"math\">1.22<\/span>", "<span class=\"math\">0.82<\/span>", "<span class=\"math\">10.17<\/span>", "<span class=\"math\">1.00<\/span>"], "c": 0, "why": "<span class=\"math\">max \u00b7 N/m = 122 \u00d7 12/1 200 = 61/50 = 1.22<\/span>. <span class=\"math\">0.82<\/span> is the emptiest shard over the mean \u2014 the other end of the same placement. <span class=\"math\">10.17<\/span> is <span class=\"math\">122/12<\/span>, the maximum divided by the shard count, which is not a ratio to anything. <span class=\"math\">1.00<\/span> is what a reader who believes hashing balances would predict, and the placement disagrees."}, {"q": "You change the seed and redraw the same 1 200 keys into the same 12 shards. What moves?", "a": ["Both the mean and the maximum move", "Neither moves, because the generator is seeded and therefore deterministic", "The maximum moves \u2014 112 to 122 over eight seeds \u2014 and the mean does not move at all", "The mean moves and the maximum does not"], "c": 2, "why": "The mean is <span class=\"math\">1 200/12 = 100<\/span> for every seed, because it is a property of the two counts and not of the placement. The maximum is a draw: it ran from 112 to 122 across seeds 7 to 14. Determinism is about reproducing one placement, not about the placements agreeing with each other."}, {"q": "What is the status on this path of the result that the maximum occupancy is <span class=\"math\">\u0398(log n / log log n)<\/span> when there are as many keys as shards?", "a": ["Proved in this lesson, from the occupancy counts", "Proved on the Algorithms path and quoted here", "Stated, not proved anywhere in this library \u2014 its proof needs Chernoff bounds, which no subject here teaches \u2014 and measured in the labs", "Disproved by the measurements, which show a maximum of 122"], "c": 2, "why": "The Algorithms path states the same result and computes the exact collision and empty-bin expectations, but its scope excludes Chernoff bounds, which the proof of the maximum-load result needs. So the result is stated in two places and proved in none of them, and what both paths do instead is measure it. The 122 is at 1 200 keys in 12 shards, which is not the <span class=\"math\">m = N<\/span> regime the result is about."}, {"q": "Provisioning every shard at the mean, what does the default placement cost you?", "a": ["Nothing; the mean is the correct capacity by definition", "The fullest shard is over its allocation by 22%", "The fullest shard is over its allocation by 2.2%", "Eleven of the twelve shards are over their allocation"], "c": 1, "why": "The fullest holds 122 against an allocation of 100. The <span class=\"math\">2.2<\/span> in the lab's other figure is the excess in root-means, <span class=\"math\">22/\u221a100<\/span>, which is a different quantity with a different unit. Eleven shards are <em>under<\/em> their allocation, which is the same fact seen from the cheap end."}];
+  var QUIZ = [{"q": "1 200 keys are hashed into 12 shards and the fullest shard holds 122. What is max/mean?", "a": ["<span class=\"math\" data-say=\"1.22\">1.22<\/span>", "<span class=\"math\" data-say=\"0.82\">0.82<\/span>", "<span class=\"math\" data-say=\"10.17\">10.17<\/span>", "<span class=\"math\" data-say=\"1.00\">1.00<\/span>"], "c": 0, "why": "<span class=\"math\" data-say=\"max times N over m equals 122 times 12 over 1200 equals 61 over 50 equals 1.22\">max \u00b7 N/m = 122 \u00d7 12/1 200 = 61/50 = 1.22<\/span>. <span class=\"math\" data-say=\"0.82\">0.82<\/span> is the emptiest shard over the mean \u2014 the other end of the same placement. <span class=\"math\" data-say=\"10.17\">10.17<\/span> is <span class=\"math\" data-say=\"122 over 12\">122/12<\/span>, the maximum divided by the shard count, which is not a ratio to anything. <span class=\"math\" data-say=\"1.00\">1.00<\/span> is what a reader who believes hashing balances would predict, and the placement disagrees."}, {"q": "You change the seed and redraw the same 1 200 keys into the same 12 shards. What moves?", "a": ["Both the mean and the maximum move", "Neither moves, because the generator is seeded and therefore deterministic", "The maximum moves \u2014 112 to 122 over eight seeds \u2014 and the mean does not move at all", "The mean moves and the maximum does not"], "c": 2, "why": "The mean is <span class=\"math\" data-say=\"1200 over 12 equals 100\">1 200/12 = 100<\/span> for every seed, because it is a property of the two counts and not of the placement. The maximum is a draw: it ran from 112 to 122 across seeds 7 to 14. Determinism is about reproducing one placement, not about the placements agreeing with each other."}, {"q": "What is the status on this path of the result that the maximum occupancy is <span class=\"math\" data-say=\"theta of the quantity log n over log log n\">\u0398(log n / log log n)<\/span> when there are as many keys as shards?", "a": ["Proved in this lesson, from the occupancy counts", "Proved on the Algorithms path and quoted here", "Stated, not proved anywhere in this library \u2014 its proof needs Chernoff bounds, which no subject here teaches \u2014 and measured in the labs", "Disproved by the measurements, which show a maximum of 122"], "c": 2, "why": "The Algorithms path states the same result and computes the exact collision and empty-bin expectations, but its scope excludes Chernoff bounds, which the proof of the maximum-load result needs. So the result is stated in two places and proved in none of them, and what both paths do instead is measure it. The 122 is at 1 200 keys in 12 shards, which is not the <span class=\"math\" data-say=\"m equals N\">m = N<\/span> regime the result is about."}, {"q": "Provisioning every shard at the mean, what does the default placement cost you?", "a": ["Nothing; the mean is the correct capacity by definition", "The fullest shard is over its allocation by 22%", "The fullest shard is over its allocation by 2.2%", "Eleven of the twelve shards are over their allocation"], "c": 1, "why": "The fullest holds 122 against an allocation of 100. The <span class=\"math\" data-say=\"2.2\">2.2<\/span> in the lab's other figure is the excess in root-means, <span class=\"math\" data-say=\"22 over the square root of 100\">22/\u221a100<\/span>, which is a different quantity with a different unit. Eleven shards are <em>under<\/em> their allocation, which is the same fact seen from the cheap end."}];
 
   (function () {
 
@@ -2812,6 +2812,213 @@ the ratio got worse; the excess in root-means barely moved
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

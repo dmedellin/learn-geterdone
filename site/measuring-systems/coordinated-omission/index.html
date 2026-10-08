@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">closed loop: the next request goes out when the last one returns
+        <div class="mathblock" data-say="closed loop, the next request goes out when the last one returns. A 1000 milliseconds stall on a 10 milliseconds schedule hides 99 requests. naive p 99 equals 2 milliseconds, corrected p 99 equals 990 milliseconds, times 495. the k-th missing request waited, stall minus k times interval. the correction adds no measurement, one stall, charged to all it delayed" tabindex="0" role="region" aria-label="Mathematical notation">closed loop: the next request goes out when the last one returns
 a 1 000 ms stall on a 10 ms schedule hides 99 requests
 naive p99 = 2 ms        corrected p99 = 990 ms        ×495
 the k-th missing request waited  stall − k·interval
@@ -1313,7 +1313,7 @@ the correction adds no measurement: one stall, charged to all it delayed</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The requests that were never sent, and where they belong in the sample</h2></div><p>Why a stall appears once in a closed-loop trace, what the imputed latencies are, and the arrival model each of the two answers assumes.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Coordinated omission</span><p><strong>Coordinated omission</strong> is the bias in which a measurement process suspends its own sampling during the events it exists to measure. In a closed-loop load generator, the next request is issued only after the previous reply, so a stall of duration <span class="math">S</span> on a schedule of one request every <span class="math">I</span> suppresses about <span class="math">S/I</span> requests &mdash; and every one of them would have been slow.</p></div><p>The name says the important part: the omission is <em>coordinated</em> with the fault. Requests are not dropped at random from the sample, which would be harmless; they are dropped precisely when the system is behaving worst, which is where the percentile you are reporting lives.</p><p>Consider a generator configured to send one request every 10 ms with a healthy service time of 2 ms. It sends a hundred requests and during one of them the service stalls for a full second. The trace it produces is ninety-nine requests at 2 ms and one at 1 000 ms.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">trace as recorded          99 × 2 ms      1 × 1 000 ms      n = 100
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Coordinated omission</span><p><strong>Coordinated omission</strong> is the bias in which a measurement process suspends its own sampling during the events it exists to measure. In a closed-loop load generator, the next request is issued only after the previous reply, so a stall of duration <span class="math" data-say="S">S</span> on a schedule of one request every <span class="math" data-say="I">I</span> suppresses about <span class="math" data-say="S over I">S/I</span> requests &mdash; and every one of them would have been slow.</p></div><p>The name says the important part: the omission is <em>coordinated</em> with the fault. Requests are not dropped at random from the sample, which would be harmless; they are dropped precisely when the system is behaving worst, which is where the percentile you are reporting lives.</p><p>Consider a generator configured to send one request every 10 ms with a healthy service time of 2 ms. It sends a hundred requests and during one of them the service stalls for a full second. The trace it produces is ninety-nine requests at 2 ms and one at 1 000 ms.</p><div class="mathblock" data-say="trace as recorded, 99 times 2 milliseconds, 1 times 1000 milliseconds, n equals 100. naive p 99, rank the ceiling of 0.99 times 100, equals 99 of 100, goes to, 2 milliseconds. schedule during the stall, one request due every 10 milliseconds. requests due inside 1000 milliseconds, not sent, 99. the k-th of them was due at k times 10 milliseconds into the stall and. waited until the stall cleared, 1000 minus 10 k ms. k equals 1 goes to 990 milliseconds, k equals 50 goes to 500 milliseconds, k equals 99 goes to 10 milliseconds. corrected sample, 99 times 2 milliseconds, plus, 990, 980, and so on, 10, plus, 1 times 1000 milliseconds. n equals 199. corrected p 99, rank the ceiling of 0.99 times 199, equals 198 of 199, goes to, 990 milliseconds. 990 divided by 2 equals 495" tabindex="0" role="region" aria-label="Mathematical notation">trace as recorded          99 × 2 ms      1 × 1 000 ms      n = 100
 
 naive p99   rank ⌈0.99×100⌉ = 99 of 100   →   2 ms
 
@@ -1379,7 +1379,7 @@ corrected p99   rank ⌈0.99×199⌉ = 198 of 199   →   990 ms
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Correcting a trace for the requests it does not contain</h2></div><p>Before any arithmetic, decide whether the correction applies at all. Steps two to four are mechanical once it does.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide whether your arrivals are open or closed</h3><p>Open means the request rate is set by something outside the system &mdash; users, a queue, a cron fleet &mdash; and does not slow down when the system does. Closed means a fixed population each waiting on its own reply. The correction belongs to the open case only, and applying it to a closed workload overstates the tail.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the intended schedule</h3><p>One request every <span class="math">I</span>, or whatever rate the generator was configured for. This is the piece of information that makes the correction possible: it is not inferred from the trace, it is what you told the generator to do.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the requests due inside each stall, and give each its wait</h3><p>A stall of <span class="math">S</span> starting when a request was due suppresses <span class="math">⌈S/I⌉ − 1</span> later requests. The <span class="math">k</span>-th is due <span class="math">k·I</span> into the stall and waits <span class="math">S − k·I</span> until it clears. Add those latencies to the sample; change nothing that was measured.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Recompute the percentile on the enlarged sample</h3><p>Same nearest-rank rule, larger <span class="math">n</span>, so the rank moves too. Report both numbers and the ratio, because the ratio is the finding: a factor of 495 is a statement about the measurement apparatus that the corrected number alone does not convey.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide whether your arrivals are open or closed</h3><p>Open means the request rate is set by something outside the system &mdash; users, a queue, a cron fleet &mdash; and does not slow down when the system does. Closed means a fixed population each waiting on its own reply. The correction belongs to the open case only, and applying it to a closed workload overstates the tail.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the intended schedule</h3><p>One request every <span class="math" data-say="I">I</span>, or whatever rate the generator was configured for. This is the piece of information that makes the correction possible: it is not inferred from the trace, it is what you told the generator to do.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the requests due inside each stall, and give each its wait</h3><p>A stall of <span class="math" data-say="S">S</span> starting when a request was due suppresses <span class="math" data-say="the ceiling of S over I, minus 1">⌈S/I⌉ − 1</span> later requests. The <span class="math" data-say="k">k</span>-th is due <span class="math" data-say="k times I">k·I</span> into the stall and waits <span class="math" data-say="S minus k times I">S − k·I</span> until it clears. Add those latencies to the sample; change nothing that was measured.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Recompute the percentile on the enlarged sample</h3><p>Same nearest-rank rule, larger <span class="math" data-say="n">n</span>, so the rank moves too. Report both numbers and the ratio, because the ratio is the finding: a factor of 495 is a statement about the measurement apparatus that the corrected number alone does not convey.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1390,7 +1390,7 @@ corrected p99   rank ⌈0.99×199⌉ = 198 of 199   →   990 ms
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A hundred requests, a one-second stall, and a p99 of 2 ms</h3><p>The trace is the lab&rsquo;s preset: a generator issuing one request every 10 ms against a service that normally answers in 2 ms, through a single stall of one second. Every number below comes from that one trace and the schedule it was generated from.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">configured    one request every I = 10 ms      healthy service 2 ms
+      <article class="card card-pad prose"><h3>A hundred requests, a one-second stall, and a p99 of 2 ms</h3><p>The trace is the lab&rsquo;s preset: a generator issuing one request every 10 ms against a service that normally answers in 2 ms, through a single stall of one second. Every number below comes from that one trace and the schedule it was generated from.</p><div class="mathblock" data-say="configured, one request every I equals 10 milliseconds, healthy service 2 milliseconds. observed, 99 requests at 2 milliseconds, 1 request at 1000 milliseconds, n equals 100. AS MEASURED. p 50, rank the ceiling of 0.50 times 100, equals 50, goes to, 2 milliseconds. p 99, rank the ceiling of 0.99 times 100, equals 99, goes to, 2 milliseconds. p 100, goes to 1000 milliseconds. WHAT THE SCHEDULE CALLED FOR. requests due during the 1000 milliseconds stall, never sent, 99. the k-th was due at 10 k ms in, and waited 1000 minus 10 k ms. k equals 1, goes to, 990 milliseconds. k equals 2, goes to, 980 milliseconds. and so on. k equals 99, goes to, 10 milliseconds. CORRECTED SAMPLE, n equals 100 plus 99 equals 199. 99 times 2 milliseconds, plus, the set 10, 20, and so on, 990, plus, 1 times 1000 milliseconds. sorted, positions, 1 to 99, equals, 2 milliseconds. positions 100 to 198, equals, 10, 20, and so on, 990 milliseconds. position, 199, equals, 1000 milliseconds. p 50, rank the ceiling of 0.50 times 199, equals 100, goes to, 10 milliseconds. p 99, rank the ceiling of 0.99 times 199, equals 198, goes to, 990 milliseconds. 990 divided by 2 equals 495" tabindex="0" role="region" aria-label="Mathematical notation">configured    one request every I = 10 ms      healthy service 2 ms
 observed      99 requests at 2 ms, 1 request at 1 000 ms      n = 100
 
 AS MEASURED
@@ -1416,7 +1416,7 @@ CORRECTED SAMPLE          n = 100 + 99 = 199
   p50   rank ⌈0.50×199⌉ = 100  →   10 ms
   p99   rank ⌈0.99×199⌉ = 198  →  990 ms
 
-  990 ÷ 2 = 495</div><p>Nothing in the corrected sample was measured twice and nothing was invented. The ninety-nine added entries are the schedule, and the schedule was an input to the experiment. If you object to them you are objecting to the configured request rate, not to the arithmetic.</p><p>The factor of 495 is not a general constant. It is <span class="math">S/I</span> scaled by where the ranks land: lengthen the stall and it grows, shorten the scheduled interval and it grows, and take the stall below one interval and it collapses to 1 because no request was due inside it. The lab lets you find the point where the two columns separate.</p><p>For faded practice, set the stall to 200 ms and the interval to 50 ms on the same hundred requests. The supplied first move is that three requests were due inside the stall, at 150, 100 and 50 ms of waiting. Predict both the naive and the corrected p99 before you touch the sliders, then check, and say in one sentence why this trace is so much less alarming than the first.</p></article>
+  990 ÷ 2 = 495</div><p>Nothing in the corrected sample was measured twice and nothing was invented. The ninety-nine added entries are the schedule, and the schedule was an input to the experiment. If you object to them you are objecting to the configured request rate, not to the arithmetic.</p><p>The factor of 495 is not a general constant. It is <span class="math" data-say="S over I">S/I</span> scaled by where the ranks land: lengthen the stall and it grows, shorten the scheduled interval and it grows, and take the stall below one interval and it collapses to 1 because no request was due inside it. The lab lets you find the point where the two columns separate.</p><p>For faded practice, set the stall to 200 ms and the interval to 50 ms on the same hundred requests. The supplied first move is that three requests were due inside the stall, at 150, 100 and 50 ms of waiting. Predict both the naive and the corrected p99 before you touch the sliders, then check, and say in one sentence why this trace is so much less alarming than the first.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1520,7 +1520,7 @@ CORRECTED SAMPLE          n = 100 + 99 = 199
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "A closed-loop generator sends one request every 10 ms, the service stalls for 1 000 ms, and the trace of 100 requests shows a p99 of 2 ms. Why is 2 ms the reported p99?", "a": ["Because the stalled request was excluded as an outlier", "Because with one slow request in a hundred, rank 99 of 100 does not reach it &mdash; so the p99 measures the healthy service", "Because the generator averages the latencies within each window", "Because 1 000 ms exceeds the generator's timeout"], "c": 1, "why": "Nearest rank at <span class=\"math\">\u23080.99 \u00d7 100\u2309<\/span> is position 99, and the single slow request is position 100. The reported 99th percentile is therefore a measurement of the service when it was working. Nothing was excluded or averaged &mdash; the arithmetic is right and the sample is wrong."}, {"q": "On that same trace, how many requests did the schedule call for during the stall, and what did the first of them wait?", "a": ["99 requests; the first waited 990 ms", "100 requests; the first waited 1 000 ms", "99 requests; the first waited 10 ms", "1 request; it waited 1 000 ms"], "c": 0, "why": "A 1 000 ms stall on a 10 ms schedule has 99 later requests due inside it. The <span class=\"math\">k<\/span>-th is due <span class=\"math\">10k<\/span> ms in and waits <span class=\"math\">1 000 \u2212 10k<\/span>, so the first waits 990 ms and the ninety-ninth waits 10 ms. The 100-request answer double-counts the request that was actually sent and recorded at 1 000 ms."}, {"q": "A team raises their load generator from one thread to two hundred so that a stall blocks only one of them. Does this remove coordinated omission?", "a": ["Yes &mdash; with enough threads, some are always issuing requests", "Yes, provided the thread count exceeds the concurrency of the system under test", "No &mdash; each thread is still a closed loop, and a service-wide stall blocks all of them at once", "No, because more threads increase the load and change the result"], "c": 2, "why": "Concurrency reduces the bias for faults that affect one connection and does nothing for faults that affect the service, which is the case being measured. The fix is to issue requests on a clock and to time each from its scheduled start rather than from when a thread was free."}, {"q": "A workload consists of exactly 50 batch clients, each of which submits a job, waits for the result, and then submits the next. The service stalls. Should the naive percentile be corrected?", "a": ["Yes &mdash; the correction applies to any stall", "No &mdash; these arrivals are genuinely closed, so the suppressed requests never existed and correcting double-counts", "Yes, but only for the slowest client", "No, because 50 clients is too few to compute a percentile"], "c": 1, "why": "The correction reconstructs requests an <em>open<\/em> arrival process would have generated. Here the clients themselves wait, so no request was suppressed and the naive figure is what happened. Deciding open against closed is a judgement about the workload, and it is the assumption the correction rests on."}];
+  var QUIZ = [{"q": "A closed-loop generator sends one request every 10 ms, the service stalls for 1 000 ms, and the trace of 100 requests shows a p99 of 2 ms. Why is 2 ms the reported p99?", "a": ["Because the stalled request was excluded as an outlier", "Because with one slow request in a hundred, rank 99 of 100 does not reach it &mdash; so the p99 measures the healthy service", "Because the generator averages the latencies within each window", "Because 1 000 ms exceeds the generator's timeout"], "c": 1, "why": "Nearest rank at <span class=\"math\" data-say=\"the ceiling of 0.99 times 100\">\u23080.99 \u00d7 100\u2309<\/span> is position 99, and the single slow request is position 100. The reported 99th percentile is therefore a measurement of the service when it was working. Nothing was excluded or averaged &mdash; the arithmetic is right and the sample is wrong."}, {"q": "On that same trace, how many requests did the schedule call for during the stall, and what did the first of them wait?", "a": ["99 requests; the first waited 990 ms", "100 requests; the first waited 1 000 ms", "99 requests; the first waited 10 ms", "1 request; it waited 1 000 ms"], "c": 0, "why": "A 1 000 ms stall on a 10 ms schedule has 99 later requests due inside it. The <span class=\"math\" data-say=\"k\">k<\/span>-th is due <span class=\"math\" data-say=\"10 k\">10k<\/span> ms in and waits <span class=\"math\" data-say=\"1000 minus 10 k\">1 000 \u2212 10k<\/span>, so the first waits 990 ms and the ninety-ninth waits 10 ms. The 100-request answer double-counts the request that was actually sent and recorded at 1 000 ms."}, {"q": "A team raises their load generator from one thread to two hundred so that a stall blocks only one of them. Does this remove coordinated omission?", "a": ["Yes &mdash; with enough threads, some are always issuing requests", "Yes, provided the thread count exceeds the concurrency of the system under test", "No &mdash; each thread is still a closed loop, and a service-wide stall blocks all of them at once", "No, because more threads increase the load and change the result"], "c": 2, "why": "Concurrency reduces the bias for faults that affect one connection and does nothing for faults that affect the service, which is the case being measured. The fix is to issue requests on a clock and to time each from its scheduled start rather than from when a thread was free."}, {"q": "A workload consists of exactly 50 batch clients, each of which submits a job, waits for the result, and then submits the next. The service stalls. Should the naive percentile be corrected?", "a": ["Yes &mdash; the correction applies to any stall", "No &mdash; these arrivals are genuinely closed, so the suppressed requests never existed and correcting double-counts", "Yes, but only for the slowest client", "No, because 50 clients is too few to compute a percentile"], "c": 1, "why": "The correction reconstructs requests an <em>open<\/em> arrival process would have generated. Here the clients themselves wait, so no request was suppressed and the naive figure is what happened. Deciding open against closed is a judgement about the workload, and it is the assumption the correction rests on."}];
 
   (function () {
 
@@ -2800,6 +2800,213 @@ CORRECTED SAMPLE          n = 100 + 99 = 199
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

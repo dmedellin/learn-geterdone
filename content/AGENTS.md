@@ -31,3 +31,32 @@ thing. `labcheck.js` catches this.
 
 Add the dict, run `python3 scripts/build_paths.py`, then add the URL to the five
 declarations named in root `AGENTS.md` §1. The suite tells you which are missing.
+
+## Write math a voice can read
+
+Lessons can be read aloud. `scripts/mathpath/speech.py` turns every math run into
+words at build time, and a few shapes of notation are ambiguous to it as they
+would be to a listener. Write new math so the reading is not a guess:
+
+- **Write a product as a product.** `λ·(r + 1)`, `p·(1 − p)`, `n·(n + 1)` — a
+  letter touching a bracket is read as a function: `x(t)` is "x of t". Leave
+  `f(x)`, `P(A)`, `T(n)`, `Θ(n)` and the like as they are.
+- **Write the multiplication between a group and a function.** `(n/2)·log₂ n`,
+  not `(n/2) log₂ n`.
+- **Bracket a fraction's denominator** when anything follows it: `3/(2x)` or
+  `(3/2)·x`, never `3/2x`.
+- **A table is a display block, not a line of prose.** `(1,1)=5 (1,2)=10 …`
+  written along one line is read as a run of numbers; put it in a `math` block
+  with one cell per column and it is announced as a table instead.
+
+When the notation must stay as it is, give the run a spoken form in
+`content/spoken/<subject>.py`, keyed by the exact run text:
+
+    SPOKEN = {
+        "λ(1 − π₅)": "lambda times the quantity 1 minus pi sub 5",
+    }
+
+It lives outside the subject packages, so it never touches the
+content-preservation contract. `python3 scripts/speechcheck.py` lists the runs
+still guessed at; `tests/test_speech.py` fails while any are, and when a spoken
+form outlives the math it was written for.

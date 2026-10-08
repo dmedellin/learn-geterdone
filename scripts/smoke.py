@@ -1200,6 +1200,168 @@ OR_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# The Philosophy path. Generated from content/philosophy/ and kept in the
+# same shape as the paths above it: one row per course, and the check ids built
+# from it so smoke and the invariant suite cannot probe different URL sets.
+PHIL_PATH_PAGE_PATH = "/paths/philosophy/"
+PHIL_MATERIAL_MARKER = "only as good as the premises"
+PHIL_COURSES = (
+    ("arguments-and-validity", "Arguments and Validity", (
+        "premises-conclusions-and-standard-form",
+        "validity-and-soundness",
+        "truth-values-and-the-connectives",
+        "the-conditional",
+        "validity-by-truth-table",
+        "equivalence-de-morgan-and-contraposition",
+        "consistency-and-belief-sets",
+        "categorical-statements-and-immediate-inference",
+        "the-square-of-opposition-and-existential-import",
+        "syllogisms-tested-by-venn-regions",
+        "quantifiers-and-their-order",
+        "fallacies-and-the-counterexample-method",
+    )),
+    ("knowledge-and-evidence", "Knowledge and Evidence", (
+        "belief-truth-and-justification",
+        "gettier-cases-and-the-fourth-condition",
+        "reliabilism-and-the-clairvoyant",
+        "skepticism-and-the-closure-argument",
+        "the-regress-of-justification",
+        "credence-and-the-dutch-book",
+        "conditional-credence-and-base-rates",
+        "updating-on-evidence",
+        "testimony-and-independent-witnesses",
+        "reference-classes-and-statistical-evidence",
+        "the-lottery-paradox",
+        "the-preface-paradox",
+    )),
+    ("science-induction-and-causation", "Science, Induction and Causation", (
+        "enumerative-induction-and-humes-problem",
+        "grue-and-the-new-riddle",
+        "confirmation-and-the-weight-of-evidence",
+        "falsification-and-what-a-theory-forbids",
+        "the-raven-paradox",
+        "the-duhem-quine-problem",
+        "mills-methods-and-the-common-factor",
+        "correlation-confounding-and-simpsons-paradox",
+        "counterfactual-causation-and-the-but-for-test",
+        "preemption-and-overdetermination",
+    )),
+    ("decision-and-rationality", "Decision and Rationality", (
+        "preference-transitivity-and-the-money-pump",
+        "the-decision-matrix-and-dominance",
+        "maximin-maximax-and-minimax-regret",
+        "expected-value-and-expected-utility",
+        "risk-aversion-and-the-value-of-information",
+        "the-allais-paradox-and-the-sure-thing-principle",
+        "ambiguity-and-the-ellsberg-urn",
+        "pascals-wager",
+        "newcombs-problem",
+        "the-st-petersburg-game",
+    )),
+    ("games-and-the-social-contract", "Games and the Social Contract", (
+        "strategic-form-and-best-responses",
+        "the-prisoners-dilemma",
+        "nash-equilibrium-in-pure-and-mixed-strategies",
+        "coordination-conventions-and-the-stag-hunt",
+        "repeated-games-and-reciprocity",
+        "the-shadow-of-the-future",
+        "humes-farmers-and-convention",
+        "hobbes-and-the-state-of-nature",
+        "the-tragedy-of-the-commons",
+        "public-goods-and-free-riding",
+        "the-evolution-of-cooperation",
+    )),
+    ("ethics-and-welfare", "Ethics and the Arithmetic of Welfare", (
+        "is-and-ought",
+        "defining-good-and-the-open-question",
+        "utilitarianism-and-the-sum-of-welfare",
+        "total-average-and-the-repugnant-conclusion",
+        "priority-equality-and-levelling-down",
+        "the-trolley-problem-as-a-decision-matrix",
+        "kant-and-the-universalisability-test",
+        "double-effect-means-and-side-effects",
+        "doing-allowing-and-omissions-as-causes",
+        "moral-dilemmas-and-deontic-consistency",
+        "virtue-ethics-and-the-function-argument",
+        "slippery-slopes-and-small-differences",
+    )),
+    ("justice-and-collective-choice", "Justice and Collective Choice", (
+        "the-original-position-and-maximin",
+        "the-difference-principle-and-leximin",
+        "entitlement-patterns-and-the-gini-coefficient",
+        "fairness-statistics-and-disparate-rates",
+        "majority-rule-and-the-condorcet-paradox",
+        "plurality-runoff-and-borda",
+        "independence-and-arrows-theorem",
+        "strategic-voting-and-manipulation",
+        "the-discursive-dilemma",
+        "the-condorcet-jury-theorem",
+    )),
+    ("identity-modality-and-freedom", "Identity, Modality and Freedom", (
+        "necessity-possibility-and-possible-worlds",
+        "frames-axioms-and-what-necessity-obeys",
+        "modal-fallacies-and-the-sea-battle",
+        "the-ontological-argument-in-s5",
+        "leibnizs-law-and-the-masked-man",
+        "the-ship-of-theseus",
+        "personal-identity-and-psychological-continuity",
+        "fission-and-what-matters",
+        "free-will-determinism-and-compatibility",
+        "the-consequence-argument",
+        "frankfurt-cases-and-the-ability-to-do-otherwise",
+        "the-problem-of-evil-as-an-inconsistent-set",
+    )),
+    ("mind-language-and-meaning", "Mind, Language and Meaning", (
+        "dualism-and-the-conceivability-argument",
+        "behaviourism-and-the-turing-test",
+        "functionalism-and-multiple-realisability",
+        "the-chinese-room-and-the-lookup-table",
+        "the-knowledge-argument",
+        "compositional-truth-conditions",
+        "names-reference-and-identity-statements",
+        "definite-descriptions-and-the-king-of-france",
+        "scope-ambiguity-and-negation",
+        "vagueness-and-the-sorites",
+    )),
+    ("paradoxes-and-their-exits", "Paradoxes and Their Exits", (
+        "the-barber-and-the-anatomy-of-a-paradox",
+        "the-liar",
+        "zenos-dichotomy",
+        "achilles-and-the-tortoise",
+        "thomsons-lamp-and-supertasks",
+        "the-two-envelopes",
+        "sleeping-beauty",
+        "monty-hall",
+        "moores-paradox-and-what-cannot-be-believed",
+    )),
+)
+
+PHIL_PATH_PAGE_MARKERS = (
+    canonical_marker(PHIL_PATH_PAGE_PATH),
+    PHIL_COURSES[0][1],
+    PHIL_COURSES[-1][1],
+    'href="../../%s/"' % PHIL_COURSES[-1][0],
+)
+
+PHIL_COURSE_HOMES = tuple(
+    (
+        "phil-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, PHIL_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, _lessons) in enumerate(PHIL_COURSES, start=1)
+)
+
+PHIL_COURSE_LESSONS = tuple(
+    (
+        "phil-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), PHIL_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, lessons) in enumerate(PHIL_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1293,6 +1455,7 @@ def path_page_targets(args):
         ("sysdesign-path", SYSDESIGN_PATH_PAGE_PATH, SYSDESIGN_PATH_PAGE_MARKERS),
         ("algo-path", ALGO_PATH_PAGE_PATH, ALGO_PATH_PAGE_MARKERS),
         ("or-path", OR_PATH_PAGE_PATH, OR_PATH_PAGE_MARKERS),
+        ("phil-path", PHIL_PATH_PAGE_PATH, PHIL_PATH_PAGE_MARKERS),
     ]
 
 
@@ -1313,7 +1476,8 @@ def course_home_targets(args):
     seen = {args.course_path}
     for check_id, path, markers in (COURSE_HOMES + MATH_COURSE_HOMES
                                     + ALGEBRA_COURSE_HOMES + SYSDESIGN_COURSE_HOMES
-                                    + ALGO_COURSE_HOMES + OR_COURSE_HOMES):
+                                    + ALGO_COURSE_HOMES + OR_COURSE_HOMES
+                                    + PHIL_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -1349,6 +1513,7 @@ def lesson_targets(args):
         + SYSDESIGN_COURSE_LESSONS
         + ALGO_COURSE_LESSONS
         + OR_COURSE_LESSONS
+        + PHIL_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

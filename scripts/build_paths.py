@@ -29,11 +29,13 @@ from algorithms import PATH as ALGORITHMS_PATH  # noqa: E402
 from discrete_math import PATH as DISCRETE_MATH_PATH  # noqa: E402
 from english import PATH as ENGLISH_PATH  # noqa: E402
 from operations_research import PATH as OPERATIONS_RESEARCH_PATH  # noqa: E402
+from philosophy import PATH as PHILOSOPHY_PATH  # noqa: E402
 from system_design import PATH as SYSTEM_DESIGN_PATH  # noqa: E402
 from mathpath import render  # noqa: E402
 
 GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
-                   ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, ENGLISH_PATH)
+                   ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, PHILOSOPHY_PATH,
+                   ENGLISH_PATH)
 
 SITE = REPO_ROOT / "site"
 # The list of pages this build produces, consumed by scripts/labcheck.js.
@@ -58,7 +60,7 @@ EXPECTATIONS = REPO_ROOT / "scripts" / "generated-expectations.json"
 KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "coping",
                           "dpkit", "dpseq", "strings", "geometry",
                           "markov", "schedule", "network", "graphkit", "flowkit",
-                          "english",)
+                          "argkit", "choicekit", "english",)
 
 
 def path_pages(path):

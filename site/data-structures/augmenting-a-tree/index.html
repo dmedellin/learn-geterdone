@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Data Structures &middot; Search trees</span>
         <h1>Augmenting a Tree</h1>
-        <p>Store the size of each subtree at its root and a search tree answers two new questions in <span class="math">O(log n)</span>: the rank of a key, and the i-th smallest key. The rule for what else can be added is sharp &mdash; any attribute computable from a node&rsquo;s own key and its two children&rsquo;s attributes in constant time. A median field is not one. And every rotation must update the field, or it goes quietly stale.</p>
+        <p>Store the size of each subtree at its root and a search tree answers two new questions in <span class="math" data-say="big O of log n">O(log n)</span>: the rank of a key, and the i-th smallest key. The rule for what else can be added is sharp &mdash; any attribute computable from a node&rsquo;s own key and its two children&rsquo;s attributes in constant time. A median field is not one. And every rotation must update the field, or it goes quietly stale.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">augment    size[x] = size[left] + size[right] + 1      one integer per node
+        <div class="mathblock" data-say="augment, size at x equals size at left plus size at right plus 1, one integer per node. select of i, left equals size at left, i equals left plus 1 goes to here, i is at most left goes to left, else i negative equals left plus 1, right. the rank of k, walk to k, adding size at left plus 1 at every RIGHT turn. both visit one root-to-leaf path, big O of height equals big O of log n in a balanced tree. maintainable, size, sum, min, max, NOT maintainable, a median field" tabindex="0" role="region" aria-label="Mathematical notation">augment    size[x] = size[left] + size[right] + 1      one integer per node
 
 select(i)    left = size[left];  i = left+1 → here;  i ≤ left → left;  else i −= left+1, right
 rank(k)      walk to k, adding size[left]+1 at every RIGHT turn
@@ -1312,11 +1312,11 @@ maintainable: size, sum, min, max     NOT maintainable: a median field</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One mechanism, one criterion, and one maintenance obligation. The criterion is what makes this a technique rather than a trick, and the obligation is where it breaks in practice.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Subtree size turns a search into counting</h3><p>At a node, the size of the left subtree tells you how many keys are smaller than this one within this subtree. That single number converts the search-tree walk into an arithmetic walk: <span class="math">select</span> subtracts as it goes right, <span class="math">rank</span> accumulates as it goes right, and both finish in one root-to-leaf path.</p></article><article class="card concept-card"><div class="icon">2</div><h3>An attribute can ride along if a node can compute it from its children</h3><p>The criterion is constant-time computability from the node&rsquo;s own key and the attribute values at its two children. Size qualifies: <span class="math">1 + left + right</span>. So do sum, min, max, and the count of keys satisfying a fixed predicate. A median does not: knowing the medians of two subtrees and one key does not determine the median of the whole, so maintaining it would cost more than a constant per node and the technique gives nothing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Every structural change must update the attribute</h3><p>An insertion increments the size at each node on its path. A rotation rearranges three subtrees and must recompute the sizes at the two nodes involved, bottom-up. Forget it and the field is wrong while the tree is correct, which means <span class="math">select</span> returns the wrong key and nothing complains. The lab rotates a size-annotated tree and prints the sizes before and after for exactly that reason.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Subtree size turns a search into counting</h3><p>At a node, the size of the left subtree tells you how many keys are smaller than this one within this subtree. That single number converts the search-tree walk into an arithmetic walk: <span class="math" data-say="select">select</span> subtracts as it goes right, <span class="math" data-say="rank">rank</span> accumulates as it goes right, and both finish in one root-to-leaf path.</p></article><article class="card concept-card"><div class="icon">2</div><h3>An attribute can ride along if a node can compute it from its children</h3><p>The criterion is constant-time computability from the node&rsquo;s own key and the attribute values at its two children. Size qualifies: <span class="math" data-say="1 plus left plus right">1 + left + right</span>. So do sum, min, max, and the count of keys satisfying a fixed predicate. A median does not: knowing the medians of two subtrees and one key does not determine the median of the whole, so maintaining it would cost more than a constant per node and the technique gives nothing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Every structural change must update the attribute</h3><p>An insertion increments the size at each node on its path. A rotation rearranges three subtrees and must recompute the sizes at the two nodes involved, bottom-up. Forget it and the field is wrong while the tree is correct, which means <span class="math" data-say="select">select</span> returns the wrong key and nothing complains. The lab rotates a size-annotated tree and prints the sizes before and after for exactly that reason.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two queries from one integer, and the rule for adding a third</h2></div><p>How select and rank walk, what a range count costs, which attributes are maintainable, and what a rotation has to do.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Size-augmented search tree</span><p>A search tree in which every node <span class="math">x</span> stores <span class="math">size[x] = size[left(x)] + size[right(x)] + 1</span>, the number of nodes in the subtree rooted at <span class="math">x</span>. An empty subtree has size <span class="math">0</span>.</p><p>The field costs one machine word per node and is maintained by insertion, deletion and rotation. Nothing else about the tree changes.</p></div><p><strong>select(i)</strong>, the i-th smallest key, counting from <span class="math">1</span>. At a node, let <span class="math">L</span> be the size of its left subtree. If <span class="math">i = L + 1</span> the answer is this node&rsquo;s key, because exactly <span class="math">L</span> keys in this subtree are smaller. If <span class="math">i ≤ L</span> the answer is in the left subtree at the same rank. Otherwise it is in the right subtree at rank <span class="math">i − (L + 1)</span>, because the left subtree and this node account for <span class="math">L + 1</span> of the keys below it.</p><p><strong>rank(k)</strong>, how many keys are at most <span class="math">k</span>. Walk toward <span class="math">k</span> from the root, keeping a running count. Each time the walk goes right, every key in the left subtree and the node itself are below <span class="math">k</span>, so add <span class="math">L + 1</span>. Each time it goes left, add nothing. When <span class="math">k</span> is found, add <span class="math">L + 1</span> one last time.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">tree from 50 25 75 12 37 62 87 6 18        sizes in brackets
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Size-augmented search tree</span><p>A search tree in which every node <span class="math" data-say="x">x</span> stores <span class="math" data-say="size at x equals size at left of x plus size at right of x plus 1">size[x] = size[left(x)] + size[right(x)] + 1</span>, the number of nodes in the subtree rooted at <span class="math" data-say="x">x</span>. An empty subtree has size <span class="math" data-say="0">0</span>.</p><p>The field costs one machine word per node and is maintained by insertion, deletion and rotation. Nothing else about the tree changes.</p></div><p><strong>select(i)</strong>, the i-th smallest key, counting from <span class="math" data-say="1">1</span>. At a node, let <span class="math" data-say="L">L</span> be the size of its left subtree. If <span class="math" data-say="i equals L plus 1">i = L + 1</span> the answer is this node&rsquo;s key, because exactly <span class="math" data-say="L">L</span> keys in this subtree are smaller. If <span class="math" data-say="i is at most L">i ≤ L</span> the answer is in the left subtree at the same rank. Otherwise it is in the right subtree at rank <span class="math" data-say="i minus the quantity L plus 1">i − (L + 1)</span>, because the left subtree and this node account for <span class="math" data-say="L plus 1">L + 1</span> of the keys below it.</p><p><strong>rank(k)</strong>, how many keys are at most <span class="math" data-say="k">k</span>. Walk toward <span class="math" data-say="k">k</span> from the root, keeping a running count. Each time the walk goes right, every key in the left subtree and the node itself are below <span class="math" data-say="k">k</span>, so add <span class="math" data-say="L plus 1">L + 1</span>. Each time it goes left, add nothing. When <span class="math" data-say="k">k</span> is found, add <span class="math" data-say="L plus 1">L + 1</span> one last time.</p><div class="mathblock" data-say="tree from 50 25 75 12 37 62 87 6 18, sizes in brackets. 50 9. 25 5, 75 3. 12 3, 37 1, 62 1, 87 1. 6 1, 18 1. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">tree from 50 25 75 12 37 62 87 6 18        sizes in brackets
 
                       50 [9]
               25 [5]           75 [3]
@@ -1324,7 +1324,7 @@ maintainable: size, sum, min, max     NOT maintainable: a median field</div>
      6 [1]  18 [1]
 
 in-order   6  12  18  25  37  50  62  75  87
-rank        1   2   3   4   5   6   7   8   9</div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">select(3):   at 50, L = 5,  3 ≤ 5              go left
+rank        1   2   3   4   5   6   7   8   9</div><div class="mathblock" data-say="select of 3, at 50, L equals 5, 3 is at most 5, go left. at 25, L equals 3, 3 is at most 3, go left. at 12, L equals 1, 3 is greater than 1 plus 1, goes to, i equals 1, go right. at 18, L equals 0, 1 equals 0 plus 1, ANSWER 18. 4 nodes visited. the rank of 62, at 50, 62 is greater than 50, to, add 5 plus 1 equals 6, go right. at 75, 62 is less than 75, goes to, add 0, go left. at 62, found, goes to, add 0 plus 1 equals 1, ANSWER 7. 3 nodes visited" tabindex="0" role="region" aria-label="Mathematical notation">select(3):   at 50, L = 5,  3 ≤ 5              go left
              at 25, L = 3,  3 ≤ 3              go left
              at 12, L = 1,  3 &gt; 1+1  →  i = 1  go right
              at 18, L = 0,  1 = 0+1            ANSWER 18
@@ -1333,7 +1333,7 @@ rank        1   2   3   4   5   6   7   8   9</div><div class="mathblock" tabind
 rank(62):    at 50, 62 &gt; 50  →  add 5+1 = 6,   go right
              at 75, 62 &lt; 75  →  add 0,         go left
              at 62, found    →  add 0+1 = 1,   ANSWER 7
-                                              3 nodes visited</div><p>Four nodes for <span class="math">select(3)</span> and three for <span class="math">rank(62)</span>, on a tree of height <span class="math">3</span>. Both walks are one path and nothing else, which is the whole claim: <span class="math">O(height)</span>, and <span class="math">O(log n)</span> once the tree is balanced. Without the size field, <span class="math">select(3)</span> would need an in-order traversal counting as it went &mdash; <span class="math">O(n)</span> &mdash; and <span class="math">rank</span> would need the same. The <span class="math">3</span> and the <span class="math">4</span> are counts on the tree drawn, whose height is <span class="math">3</span> because that insertion order was kind; the claim is <span class="math">O(height)</span>, and on the sorted order of the shape-problem lesson the identical queries would walk <span class="math">n</span>. The augmentation buys <span class="math">O(log n)</span> only on top of something that keeps the tree short, which is why an order-statistic tree is an AVL tree with a size field rather than a search tree with one.</p><h3>Counting a range, as two walks</h3><p>How many keys lie in <span class="math">[20, 70]</span>? Count the keys at most <span class="math">70</span> and subtract the keys below <span class="math">20</span>. Each count is a rank-style walk adding a subtree size at every right turn, so the query is two paths rather than a scan: the lab reports <span class="math">4</span> &mdash; <span class="math">25, 37, 50, 62</span> &mdash; from <span class="math">7</span> nodes visited across both walks. Listing the keys would of course cost the number of keys listed; counting them does not.</p><h3>What can be augmented, and what cannot</h3><div class="thm"><span class="label">Theorem &middot; The augmentation criterion</span><p>An attribute <span class="math">f</span> can be maintained on a search tree at constant extra cost per structural change if <span class="math">f(x)</span> is computable in constant time from the key at <span class="math">x</span> and the values <span class="math">f(left(x))</span> and <span class="math">f(right(x))</span>.</p><p>Insertion and deletion change <span class="math">f</span> only on one root-to-leaf path, and a rotation changes it only at the two nodes it rearranges; in each case recomputing bottom-up from the criterion costs a constant per node touched. Size satisfies it with <span class="math">1 + left + right</span>, sum with <span class="math">key + left + right</span>, min with <span class="math">min(key, left)</span>. A median does not: the median of a set is not a constant-time function of one key and the medians of two subsets, so the field would have to be rebuilt and the technique buys nothing.</p></div><p>That criterion is the reusable part of this lesson. It is why an interval tree can store the maximum endpoint in a subtree, why an order-statistic tree stores sizes, and why nobody stores a median. The question to ask about any proposed field is not whether it is useful but whether a node could recompute it from its two children without looking further down.</p><h3>The rotation that has to update the field</h3><p>Rotate left at <span class="math">25</span> in the tree above. The node <span class="math">37</span> rises, <span class="math">25</span> becomes its left child, and the sizes must be recomputed at <span class="math">25</span> first and then at <span class="math">37</span>:</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">before                         after rotating LEFT at 25
+                                              3 nodes visited</div><p>Four nodes for <span class="math" data-say="select of 3">select(3)</span> and three for <span class="math" data-say="the rank of 62">rank(62)</span>, on a tree of height <span class="math" data-say="3">3</span>. Both walks are one path and nothing else, which is the whole claim: <span class="math" data-say="big O of height">O(height)</span>, and <span class="math" data-say="big O of log n">O(log n)</span> once the tree is balanced. Without the size field, <span class="math" data-say="select of 3">select(3)</span> would need an in-order traversal counting as it went &mdash; <span class="math" data-say="big O of n">O(n)</span> &mdash; and <span class="math" data-say="rank">rank</span> would need the same. The <span class="math" data-say="3">3</span> and the <span class="math" data-say="4">4</span> are counts on the tree drawn, whose height is <span class="math" data-say="3">3</span> because that insertion order was kind; the claim is <span class="math" data-say="big O of height">O(height)</span>, and on the sorted order of the shape-problem lesson the identical queries would walk <span class="math" data-say="n">n</span>. The augmentation buys <span class="math" data-say="big O of log n">O(log n)</span> only on top of something that keeps the tree short, which is why an order-statistic tree is an AVL tree with a size field rather than a search tree with one.</p><h3>Counting a range, as two walks</h3><p>How many keys lie in <span class="math" data-say="20, 70">[20, 70]</span>? Count the keys at most <span class="math" data-say="70">70</span> and subtract the keys below <span class="math" data-say="20">20</span>. Each count is a rank-style walk adding a subtree size at every right turn, so the query is two paths rather than a scan: the lab reports <span class="math" data-say="4">4</span> &mdash; <span class="math" data-say="25, 37, 50, 62">25, 37, 50, 62</span> &mdash; from <span class="math" data-say="7">7</span> nodes visited across both walks. Listing the keys would of course cost the number of keys listed; counting them does not.</p><h3>What can be augmented, and what cannot</h3><div class="thm"><span class="label">Theorem &middot; The augmentation criterion</span><p>An attribute <span class="math" data-say="f">f</span> can be maintained on a search tree at constant extra cost per structural change if <span class="math" data-say="f of x">f(x)</span> is computable in constant time from the key at <span class="math" data-say="x">x</span> and the values <span class="math" data-say="f of left of x">f(left(x))</span> and <span class="math" data-say="f of right of x">f(right(x))</span>.</p><p>Insertion and deletion change <span class="math" data-say="f">f</span> only on one root-to-leaf path, and a rotation changes it only at the two nodes it rearranges; in each case recomputing bottom-up from the criterion costs a constant per node touched. Size satisfies it with <span class="math" data-say="1 plus left plus right">1 + left + right</span>, sum with <span class="math" data-say="k e y plus left plus right">key + left + right</span>, min with <span class="math" data-say="the min of key and left">min(key, left)</span>. A median does not: the median of a set is not a constant-time function of one key and the medians of two subsets, so the field would have to be rebuilt and the technique buys nothing.</p></div><p>That criterion is the reusable part of this lesson. It is why an interval tree can store the maximum endpoint in a subtree, why an order-statistic tree stores sizes, and why nobody stores a median. The question to ask about any proposed field is not whether it is useful but whether a node could recompute it from its two children without looking further down.</p><h3>The rotation that has to update the field</h3><p>Rotate left at <span class="math" data-say="25">25</span> in the tree above. The node <span class="math" data-say="37">37</span> rises, <span class="math" data-say="25">25</span> becomes its left child, and the sizes must be recomputed at <span class="math" data-say="25">25</span> first and then at <span class="math" data-say="37">37</span>:</p><div class="mathblock" data-say="before, after rotating LEFT at 25. 50 9, 50 9. 25 5, 75 3, 37 5, 75 3. 12 3, 37 1, 25 4. 12 3. 25, 3 plus 0 plus 1 equals 4, recomputed first, from its own children. 37, 4 plus 0 plus 1 equals 5, then the new subtree root. 50, 5 plus 3 plus 1 equals 9, unchanged, as it must be" tabindex="0" role="region" aria-label="Mathematical notation">before                         after rotating LEFT at 25
 
          50 [9]                        50 [9]
    25 [5]      75 [3]            37 [5]      75 [3]
@@ -1400,7 +1400,7 @@ rank(62):    at 50, 62 &gt; 50  →  add 5+1 = 6,   go right
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Querying and maintaining an augmented tree</h2></div><p>The walk is arithmetic, so the discipline is to write the arithmetic down at each node rather than following the shape by eye.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the left-subtree size at every node you visit</h3><p><span class="math">L</span> is the only thing either query needs from a node besides its key. Writing it down at each step is what makes the two rules mechanical instead of a guess about which way the target lies.</p></article><article class="card concept-card"><div class="icon">2</div><h3>For select, compare i with L + 1 and adjust when you go right</h3><p><span class="math">i = L + 1</span> stops. <span class="math">i ≤ L</span> goes left with <span class="math">i</span> unchanged. Otherwise go right with <span class="math">i</span> reduced by <span class="math">L + 1</span>. Forgetting the reduction is the standard error and it gives an answer that is too small by the number of keys skipped.</p></article><article class="card concept-card"><div class="icon">3</div><h3>For rank, accumulate L + 1 at every right turn and only there</h3><p>Going left passes over nothing that is below the target. Going right passes over the whole left subtree and the node, so add <span class="math">L + 1</span>. At the target, add <span class="math">L + 1</span> once more for the keys below it in its own left subtree, plus itself.</p></article><article class="card concept-card"><div class="icon">4</div><h3>After any structural change, recompute the field bottom-up</h3><p>An insertion increments along its path. A rotation recomputes at the descending node first and the rising node second. Then check the invariant <span class="math">size[x] = size[left] + size[right] + 1</span> somewhere, because nothing else in the structure will notice if it fails.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the left-subtree size at every node you visit</h3><p><span class="math" data-say="L">L</span> is the only thing either query needs from a node besides its key. Writing it down at each step is what makes the two rules mechanical instead of a guess about which way the target lies.</p></article><article class="card concept-card"><div class="icon">2</div><h3>For select, compare i with L + 1 and adjust when you go right</h3><p><span class="math" data-say="i equals L plus 1">i = L + 1</span> stops. <span class="math" data-say="i is at most L">i ≤ L</span> goes left with <span class="math" data-say="i">i</span> unchanged. Otherwise go right with <span class="math" data-say="i">i</span> reduced by <span class="math" data-say="L plus 1">L + 1</span>. Forgetting the reduction is the standard error and it gives an answer that is too small by the number of keys skipped.</p></article><article class="card concept-card"><div class="icon">3</div><h3>For rank, accumulate L + 1 at every right turn and only there</h3><p>Going left passes over nothing that is below the target. Going right passes over the whole left subtree and the node, so add <span class="math" data-say="L plus 1">L + 1</span>. At the target, add <span class="math" data-say="L plus 1">L + 1</span> once more for the keys below it in its own left subtree, plus itself.</p></article><article class="card concept-card"><div class="icon">4</div><h3>After any structural change, recompute the field bottom-up</h3><p>An insertion increments along its path. A rotation recomputes at the descending node first and the rising node second. Then check the invariant <span class="math" data-say="size at x equals size at left plus size at right plus 1">size[x] = size[left] + size[right] + 1</span> somewhere, because nothing else in the structure will notice if it fails.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1411,7 +1411,7 @@ rank(62):    at 50, 62 &gt; 50  →  add 5+1 = 6,   go right
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>select(5), rank(37), and the keys in [20, 70]</h3><p>Three queries on the same nine-node tree, with the node count for each. The in-order sequence is <span class="math">6 12 18 25 37 50 62 75 87</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">                      50 [9]
+      <article class="card card-pad prose"><h3>select(5), rank(37), and the keys in [20, 70]</h3><p>Three queries on the same nine-node tree, with the node count for each. The in-order sequence is <span class="math" data-say="6 12 18 25 37 50 62 75 87">6 12 18 25 37 50 62 75 87</span>.</p><div class="mathblock" data-say="50 9. 25 5, 75 3. 12 3, 37 1, 62 1, 87 1. 6 1, 18 1. select of 5, node, L, test, action. 50, 5, 5 is at most 5, go left. 25, 3, 5 is greater than 3 plus 1, goes to, i equals 1, go right. 37, 0, 1 equals 0 plus 1, ANSWER 37. 3 nodes visited. the rank of 37, node, running, action. 50, L equals 5, 37 is less than 50, add 0, go left. 25, L equals 3, 37 is greater than 25, add 3 plus 1 equals 4, go right. 37, L equals 0, found, add 0 plus 1 equals 5, ANSWER 5. 3 nodes visited. count 20, 70, equals keys is at most 70 minus keys is less than 20. equals, 7, minus, 3, equals 4. 7 nodes visited across the two walks. the four keys are 25 37 50 62" tabindex="0" role="region" aria-label="Mathematical notation">                      50 [9]
               25 [5]           75 [3]
         12 [3]      37 [1]   62 [1]  87 [1]
      6 [1]  18 [1]
@@ -1431,13 +1431,13 @@ rank(37)      node        running                action
 count [20, 70]   = (keys ≤ 70) − (keys &lt; 20)
                  =        7     −      3        = 4
               7 nodes visited across the two walks
-              the four keys are 25 37 50 62</div><p><span class="math">select(5)</span> and <span class="math">rank(37)</span> are inverse queries and both cost three nodes on this tree, which is the point of the pair: one integer per node bought two operations that a plain search tree cannot perform at all without a full traversal.</p><p>The range count is <span class="math">4</span> from seven nodes visited, and the seven is worth noticing: it is two independent walks down a tree of height <span class="math">3</span>, not a scan of the four keys. If the query had been to <em>list</em> the keys the cost would include them; counting them does not, and that asymmetry is exactly what the augmentation is for.</p><p>For a faded rehearsal, compute <span class="math">select(9)</span> and <span class="math">rank(62)</span> on the same tree. The supplied first step for <span class="math">select(9)</span> is that <span class="math">L = 5</span> at the root and <span class="math">9 > 6</span>, so the walk goes right with <span class="math">i = 3</span>. Finish both, predict the node counts, and check them in the lab &mdash; three each. Then rotate left at <span class="math">25</span> and write down the two sizes that change, in the order they must be recomputed.</p></article>
+              the four keys are 25 37 50 62</div><p><span class="math" data-say="select of 5">select(5)</span> and <span class="math" data-say="the rank of 37">rank(37)</span> are inverse queries and both cost three nodes on this tree, which is the point of the pair: one integer per node bought two operations that a plain search tree cannot perform at all without a full traversal.</p><p>The range count is <span class="math" data-say="4">4</span> from seven nodes visited, and the seven is worth noticing: it is two independent walks down a tree of height <span class="math" data-say="3">3</span>, not a scan of the four keys. If the query had been to <em>list</em> the keys the cost would include them; counting them does not, and that asymmetry is exactly what the augmentation is for.</p><p>For a faded rehearsal, compute <span class="math" data-say="select of 9">select(9)</span> and <span class="math" data-say="the rank of 62">rank(62)</span> on the same tree. The supplied first step for <span class="math" data-say="select of 9">select(9)</span> is that <span class="math" data-say="L equals 5">L = 5</span> at the root and <span class="math" data-say="9 is greater than 6">9 > 6</span>, so the walk goes right with <span class="math" data-say="i equals 3">i = 3</span>. Finish both, predict the node counts, and check them in the lab &mdash; three each. Then rotate left at <span class="math" data-say="25">25</span> and write down the two sizes that change, in the order they must be recomputed.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Forgetting to reduce <span class="math">i</span> when select goes right</strong><span>Going right means the left subtree and the current node have been passed over, so <span class="math">i</span> must drop by <span class="math">L + 1</span>. Without it the walk asks for the same rank in a smaller subtree and returns a key too far to the left. The symptom is an answer that is plausible and consistently too small, which is the hardest kind to notice.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding to the rank on a left turn</strong><span>Going left passes over nothing at all that is below the target &mdash; every key skipped is larger. Only a right turn passes keys, and it passes exactly <span class="math">L + 1</span> of them. Adding on both turns gives the number of nodes visited rather than the rank, and the two coincide often enough on small trees to be mistaken for correct.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the augmentation as free</strong><span>It costs a word per node, an increment along every insertion path, and a recomputation at every rotation &mdash; in the right order, the descending node before the rising one. Skip the rotation update and the field goes stale silently: the tree is correct, the queries are wrong, and no invariant in the structure is violated.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a proposed extra field prompts the question “could a node compute this from its two children?”</strong><p>You should be able to run <span class="math">select</span> and <span class="math">rank</span> on a drawn size-annotated tree writing the arithmetic at each node, count the nodes a range query visits and say why it is not proportional to the answer, state the augmentation criterion and apply it to size, sum, min and a median, and recompute the sizes after a rotation in the correct order.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every structure so far has been a container: it holds keys and answers questions about them. The last one is not. &ldquo;Union&ndash;Find&rdquo; maintains a partition of <span class="math">n</span> elements and answers only &ldquo;are these two in the same set&rdquo; &mdash; and the two rules that make it fast are so cheap that leaving one out is the natural mistake, which the lab punishes with a tree of depth <span class="math">11</span> on twelve elements.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Forgetting to reduce <span class="math" data-say="i">i</span> when select goes right</strong><span>Going right means the left subtree and the current node have been passed over, so <span class="math" data-say="i">i</span> must drop by <span class="math" data-say="L plus 1">L + 1</span>. Without it the walk asks for the same rank in a smaller subtree and returns a key too far to the left. The symptom is an answer that is plausible and consistently too small, which is the hardest kind to notice.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding to the rank on a left turn</strong><span>Going left passes over nothing at all that is below the target &mdash; every key skipped is larger. Only a right turn passes keys, and it passes exactly <span class="math" data-say="L plus 1">L + 1</span> of them. Adding on both turns gives the number of nodes visited rather than the rank, and the two coincide often enough on small trees to be mistaken for correct.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the augmentation as free</strong><span>It costs a word per node, an increment along every insertion path, and a recomputation at every rotation &mdash; in the right order, the descending node before the rising one. Skip the rotation update and the field goes stale silently: the tree is correct, the queries are wrong, and no invariant in the structure is violated.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a proposed extra field prompts the question “could a node compute this from its two children?”</strong><p>You should be able to run <span class="math" data-say="select">select</span> and <span class="math" data-say="rank">rank</span> on a drawn size-annotated tree writing the arithmetic at each node, count the nodes a range query visits and say why it is not proportional to the answer, state the augmentation criterion and apply it to size, sum, min and a median, and recompute the sizes after a rotation in the correct order.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every structure so far has been a container: it holds keys and answers questions about them. The last one is not. &ldquo;Union&ndash;Find&rdquo; maintains a partition of <span class="math" data-say="n">n</span> elements and answers only &ldquo;are these two in the same set&rdquo; &mdash; and the two rules that make it fast are so cheap that leaving one out is the natural mistake, which the lab punishes with a tree of depth <span class="math" data-say="11">11</span> on twelve elements.</div></article>
       </div>
     </section>
     </main>
@@ -1476,7 +1476,7 @@ count [20, 70]   = (keys ≤ 70) − (keys &lt; 20)
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Data Structures.</strong> Every count on this course is produced by executing the operation sequence on the structure drawn beside it. Expected chain lengths and load factors are exact fractions; <span class="math">Σ ⌈n/2ʰ⁺¹⌉·h</span> is evaluated exactly. Two numbers are approximations and say so: linear probing's <span class="math">½(1 + 1/(1−α)²)</span>, which is Knuth's and which the lab refuses to quote at all above <span class="math">α = 0.98</span>, and the <span class="math">2 ln n</span> expected depth of a random search tree, which is asymptotic and is printed beside the height and the mean depth that were measured.</p>
+      <p><strong>Data Structures.</strong> Every count on this course is produced by executing the operation sequence on the structure drawn beside it. Expected chain lengths and load factors are exact fractions; <span class="math" data-say="the sum of the ceiling of n over 2 to the power h plus 1, times h">Σ ⌈n/2ʰ⁺¹⌉·h</span> is evaluated exactly. Two numbers are approximations and say so: linear probing's <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span>, which is Knuth's and which the lab refuses to quote at all above <span class="math" data-say="alpha equals 0.98">α = 0.98</span>, and the <span class="math" data-say="2 times the natural log of n">2 ln n</span> expected depth of a random search tree, which is asymptotic and is printed beside the height and the mean depth that were measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1535,7 +1535,7 @@ count [20, 70]   = (keys ≤ 70) − (keys &lt; 20)
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "On a size-augmented tree, <span class=\"math\">select(i)<\/span> is at a node whose left subtree has size <span class=\"math\">L<\/span> and <span class=\"math\">i > L + 1<\/span>. What does it do?", "a": ["Go right with <span class=\"math\">i<\/span> unchanged", "Go right with <span class=\"math\">i<\/span> reduced by <span class=\"math\">L + 1<\/span>", "Go left with <span class=\"math\">i<\/span> reduced by <span class=\"math\">L<\/span>", "Return this node&rsquo;s key"], "c": 1, "why": "The left subtree holds <span class=\"math\">L<\/span> keys smaller than this node, and the node is one more, so <span class=\"math\">L + 1<\/span> keys have been passed over: the target is the <span class=\"math\">(i \u2212 L \u2212 1)<\/span>-th smallest in the right subtree. Going right without adjusting <span class=\"math\">i<\/span> returns a key that is too large by <span class=\"math\">L + 1<\/span> positions &mdash; the standard error here."}, {"q": "Which of these attributes cannot be maintained by an augmented search tree at constant cost per structural change?", "a": ["the sum of the keys in each subtree", "the minimum key in each subtree", "the median key in each subtree", "the number of even keys in each subtree"], "c": 2, "why": "The criterion is constant-time computability from the node&rsquo;s key and its two children&rsquo;s values. Sum is <span class=\"math\">key + left + right<\/span>; min is <span class=\"math\">min(key, left)<\/span>; a count of keys satisfying a fixed predicate is <span class=\"math\">left + right + [predicate holds here]<\/span>. The median of a set is not determined by one key and the medians of two subsets, so no constant-time recomputation exists."}, {"q": "A rotation is performed on a size-augmented tree and the size fields are not updated. What happens?", "a": ["The tree stops being a search tree", "The next insertion fails", "The tree is structurally correct and <span class=\"math\">select<\/span> returns wrong answers, with nothing reporting an error", "The sizes correct themselves on the next traversal"], "c": 2, "why": "A rotation preserves the search-tree invariant regardless of the augmentation, so the tree is fine and the in-order walk is still sorted. What is wrong is the arithmetic <span class=\"math\">select<\/span> and <span class=\"math\">rank<\/span> rely on, so they walk to the wrong node and return confidently. Nothing recomputes the field on its own, which is why the lab re-checks every size against a fresh count after rotating."}];
+  var QUIZ = [{"q": "On a size-augmented tree, <span class=\"math\" data-say=\"select of i\">select(i)<\/span> is at a node whose left subtree has size <span class=\"math\" data-say=\"L\">L<\/span> and <span class=\"math\" data-say=\"i is greater than L plus 1\">i > L + 1<\/span>. What does it do?", "a": ["Go right with <span class=\"math\" data-say=\"i\">i<\/span> unchanged", "Go right with <span class=\"math\" data-say=\"i\">i<\/span> reduced by <span class=\"math\" data-say=\"L plus 1\">L + 1<\/span>", "Go left with <span class=\"math\" data-say=\"i\">i<\/span> reduced by <span class=\"math\" data-say=\"L\">L<\/span>", "Return this node&rsquo;s key"], "c": 1, "why": "The left subtree holds <span class=\"math\" data-say=\"L\">L<\/span> keys smaller than this node, and the node is one more, so <span class=\"math\" data-say=\"L plus 1\">L + 1<\/span> keys have been passed over: the target is the <span class=\"math\" data-say=\"i minus L minus 1\">(i \u2212 L \u2212 1)<\/span>-th smallest in the right subtree. Going right without adjusting <span class=\"math\" data-say=\"i\">i<\/span> returns a key that is too large by <span class=\"math\" data-say=\"L plus 1\">L + 1<\/span> positions &mdash; the standard error here."}, {"q": "Which of these attributes cannot be maintained by an augmented search tree at constant cost per structural change?", "a": ["the sum of the keys in each subtree", "the minimum key in each subtree", "the median key in each subtree", "the number of even keys in each subtree"], "c": 2, "why": "The criterion is constant-time computability from the node&rsquo;s key and its two children&rsquo;s values. Sum is <span class=\"math\" data-say=\"k e y plus left plus right\">key + left + right<\/span>; min is <span class=\"math\" data-say=\"the min of key and left\">min(key, left)<\/span>; a count of keys satisfying a fixed predicate is <span class=\"math\" data-say=\"left plus right plus predicate holds here\">left + right + [predicate holds here]<\/span>. The median of a set is not determined by one key and the medians of two subsets, so no constant-time recomputation exists."}, {"q": "A rotation is performed on a size-augmented tree and the size fields are not updated. What happens?", "a": ["The tree stops being a search tree", "The next insertion fails", "The tree is structurally correct and <span class=\"math\" data-say=\"select\">select<\/span> returns wrong answers, with nothing reporting an error", "The sizes correct themselves on the next traversal"], "c": 2, "why": "A rotation preserves the search-tree invariant regardless of the augmentation, so the tree is fine and the in-order walk is still sorted. What is wrong is the arithmetic <span class=\"math\" data-say=\"select\">select<\/span> and <span class=\"math\" data-say=\"rank\">rank<\/span> rely on, so they walk to the wrong node and return confidently. Nothing recomputes the field on its own, which is why the lab re-checks every size against a fresh count after rotating."}];
 
   (function () {
 
@@ -2664,6 +2664,213 @@ count [20, 70]   = (keys ≤ 70) − (keys &lt; 20)
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

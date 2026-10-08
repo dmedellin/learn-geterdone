@@ -11,12 +11,12 @@ assert(OUT&&!path.resolve(OUT).startsWith(ROOT+'/'),'external evidence required'
 fs.mkdirSync(OUT,{recursive:true});assert(!fs.existsSync(path.join(OUT,'observations.jsonl')),'fresh evidence required');
 const capOnly=process.argv.includes('--capstones'),only=process.argv.find(a=>a.startsWith('--only='))?.slice(7);
 const corpus=[];function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())walk(file);else if(entry.name.endsWith('.html')){const source=fs.readFileSync(file,'utf8');corpus.push({file,route:'/'+path.relative(SITE,file).replace(/index\.html$/,''),kind:source.match(/<body data-page-kind="([^"]+)"/)?.[1]||'fallback',source});}}}walk(SITE);
-assert.equal(corpus.length,719,'complete corpus');
+assert.equal(corpus.length,838,'complete corpus');
 const caps=corpus.filter(p=>['slides','supplemental'].includes(p.kind));assert.equal(caps.length,2,'both capstone capabilities');
 const seen=new Set(),families=corpus.sort((a,b)=>a.route.localeCompare(b.route)).filter(p=>{
  if(p.kind!=='lesson')return true;
  const course=p.route.split('/')[1];if(seen.has(course))return false;seen.add(course);return true;
-});assert.equal(seen.size,54,'one Lesson from each Course');
+});assert.equal(seen.size,64,'one Lesson from each Course');
 const selected=only?corpus.filter(p=>p.route===only):capOnly?caps:families;
 assert(selected.length,'nonempty contrast selection');
 const server=http.createServer((req,res)=>{try{let file=path.join(SITE,decodeURIComponent(req.url.split('?')[0]));if(!file.startsWith(SITE+'/')&&file!==SITE)throw Error('outside site');if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');res.setHeader('Content-Type','text/html; charset=utf-8');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}});

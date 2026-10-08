@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">trace   1 2 3 4 1 2 5 1 2 3 4 5        12 references, 5 distinct keys
+        <div class="mathblock" data-say="trace, 1 2 3 4 1 2 5 1 2 3 4 5, 12 references, 5 distinct keys. hits, OPT, FIFO, LRU, LFU. a table, shown on the page. FIFO misses 9 at k equals 3 and 10 at k equals 4, Belady&#x27;s anomaly. OPT equals evict the key whose next use is farthest in the future" tabindex="0" role="region" aria-label="Mathematical notation">trace   1 2 3 4 1 2 5 1 2 3 4 5        12 references, 5 distinct keys
 
 hits      OPT       FIFO      LRU       LFU
 k = 3     5/12      1/4       1/6       1/6
@@ -1312,11 +1312,11 @@ OPT = evict the key whose next use is farthest in the future</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>A policy is a rule for choosing a victim. Three of these can be run by a cache; the fourth cannot, and that is what makes it useful.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A policy is measured on a trace, not argued about</h3><p>Give a policy a reference string and a number of slots and it produces a definite number of hits. FIFO evicts the oldest arrival, LRU the least recently used, LFU the least frequently used. On <span class="math">1 2 3 4 1 2 5 1 2 3 4 5</span> with three slots those give <span class="math">1/4</span>, <span class="math">1/6</span> and <span class="math">1/6</span> &mdash; and FIFO, the policy nobody defends, wins.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Farthest-in-future is the bound, and it cannot be run</h3><p>The offline optimum evicts the resident key whose next use is furthest ahead in the trace. It needs the rest of the trace, so no cache can execute it, and that is precisely why it is useful: no online policy beats it, so the gap between it and LRU is the most any policy change could possibly buy. On this trace with three slots it gets <span class="math">5/12</span> against LRU&rsquo;s <span class="math">1/6</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A bigger cache is not a guarantee</h3><p>LRU and farthest-in-future are stack algorithms: a cache of <span class="math">k+1</span> slots always contains everything a cache of <span class="math">k</span> slots would, so their miss counts cannot rise when the cache grows. FIFO has no such property, and on this trace it misses <span class="math">9</span> times with three slots and <span class="math">10</span> times with four.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A policy is measured on a trace, not argued about</h3><p>Give a policy a reference string and a number of slots and it produces a definite number of hits. FIFO evicts the oldest arrival, LRU the least recently used, LFU the least frequently used. On <span class="math" data-say="1 2 3 4 1 2 5 1 2 3 4 5">1 2 3 4 1 2 5 1 2 3 4 5</span> with three slots those give <span class="math" data-say="1 over 4">1/4</span>, <span class="math" data-say="1 over 6">1/6</span> and <span class="math" data-say="1 over 6">1/6</span> &mdash; and FIFO, the policy nobody defends, wins.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Farthest-in-future is the bound, and it cannot be run</h3><p>The offline optimum evicts the resident key whose next use is furthest ahead in the trace. It needs the rest of the trace, so no cache can execute it, and that is precisely why it is useful: no online policy beats it, so the gap between it and LRU is the most any policy change could possibly buy. On this trace with three slots it gets <span class="math" data-say="5 over 12">5/12</span> against LRU&rsquo;s <span class="math" data-say="1 over 6">1/6</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A bigger cache is not a guarantee</h3><p>LRU and farthest-in-future are stack algorithms: a cache of <span class="math" data-say="k plus 1">k+1</span> slots always contains everything a cache of <span class="math" data-say="k">k</span> slots would, so their miss counts cannot rise when the cache grows. FIFO has no such property, and on this trace it misses <span class="math" data-say="9">9</span> times with three slots and <span class="math" data-say="10">10</span> times with four.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Four policies, the bound, and the anomaly</h2></div><p>What each rule does, who proves the optimum is optimal, and the trace on which more memory costs hits.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Reference string and replacement policy</span><p>A <strong>reference string</strong> is the sequence of keys a cache is asked for. A <strong>replacement policy</strong> is the rule that chooses which resident key to evict when a miss arrives at a full cache of <span class="math">k</span> slots. Its <strong>hit rate on that string</strong> is hits divided by references.</p><p>The first reference to each key must miss whatever the policy and whatever <span class="math">k</span>: those are the <strong>compulsory misses</strong>, and on a trace of five distinct keys there are five of them.</p></div><ul><li><strong>FIFO</strong> evicts the key that entered the cache earliest, regardless of use since.</li><li><strong>LRU</strong> evicts the key that was used least recently.</li><li><strong>LFU</strong> evicts the key with the smallest use count, ties broken by insertion order; a count dies with the entry it belongs to.</li><li><strong>Farthest-in-future</strong> evicts the resident key whose next use is furthest ahead, or one that is never used again.</li></ul><h3>The bound, and whose proof it is</h3><p>Farthest-in-future &mdash; also called Belady&rsquo;s algorithm, or OPT &mdash; minimises misses over every possible policy on a given trace. It is <strong>offline</strong>: it reads the rest of the request sequence to choose a victim, which no cache can do. So it is not a policy anyone runs; it is a ceiling against which the policies people do run are measured.</p><p>That it is optimal is a theorem, proved by an exchange argument, and the proof is not this course&rsquo;s. It is Algorithms, in “Greedy Algorithms and Matroids”, in the lesson “Optimal Offline Caching” &mdash; <span class="math">algorithms/greedy-algorithms-and-matroids/optimal-caching</span> &mdash; which also draws the offline/online distinction properly. What this lesson does with the theorem is use it: the bound turns &ldquo;our hit rate is <span class="math">1/6</span>&rdquo; into &ldquo;the best any policy could have done on this trace is <span class="math">5/12</span>, and we are getting <span class="math">1/6</span>&rdquo;.</p><div class="example"><span class="label">Example &middot; Twelve references, five keys, three slots</span><p>On <span class="math">1 2 3 4 1 2 5 1 2 3 4 5</span> with <span class="math">k = 3</span>: farthest-in-future gets <span class="math">5</span> hits (<span class="math">5/12</span>), FIFO gets <span class="math">3</span> (<span class="math">1/4</span>), LRU gets <span class="math">2</span> (<span class="math">1/6</span>) and LFU gets <span class="math">2</span> (<span class="math">1/6</span>). The gap between the bound and LRU is <span class="math">1/4</span> of all references, which is the most that a better online policy could have recovered &mdash; and no online policy can recover all of it, because the bound reads the future.</p></div><h3>Belady&#x27;s anomaly: more memory, more misses</h3><p>Now give the same trace four slots instead of three. LRU improves from <span class="math">2</span> hits to <span class="math">4</span>, LFU from <span class="math">2</span> to <span class="math">4</span>, the optimum from <span class="math">5</span> to <span class="math">6</span>. FIFO goes from <span class="math">3</span> hits to <span class="math">2</span>: its miss count rises from <span class="math">9</span> to <span class="math">10</span>. A larger cache made it worse.</p><div class="thm"><span class="label">Theorem &middot; Stack algorithms, and what FIFO is not</span><p>A policy is a <strong>stack algorithm</strong> if, at every point of every trace, the contents of a <span class="math">k</span>-slot cache are a subset of the contents of a <span class="math">(k+1)</span>-slot cache. For such a policy every hit at <span class="math">k</span> is a hit at <span class="math">k+1</span>, so the miss count is non-increasing in the cache size.</p><p>LRU and farthest-in-future are stack algorithms; FIFO is not, because its eviction order depends on insertion times that change when the cache size changes. Having no such guarantee is not the same as always failing &mdash; FIFO is well behaved on most traces &mdash; but it means no trace is safe.</p></div><p>This is the misconception the lesson exists to kill, and it is a belief people genuinely hold: that adding memory to a cache can be neutral at worst. It cannot, unless you know which policy you are running and that it is a stack algorithm. The lab scans every cache size from <span class="math">1</span> to <span class="math">6</span> for all four policies on your own trace and reports where any of their miss counts rises, so the anomaly arrives as a measurement rather than as a claim.</p><p>Two limits on what a trace can tell you. A hit count on twelve references is a fact about twelve references and not about your system; policies are separated by workloads, and a trace with a hot key ranks them differently from a round robin. And nothing here is about cost: LRU needs bookkeeping that FIFO does not, and whether that is worth two per cent of hit rate is an implementation question this course leaves to Algorithms.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Reference string and replacement policy</span><p>A <strong>reference string</strong> is the sequence of keys a cache is asked for. A <strong>replacement policy</strong> is the rule that chooses which resident key to evict when a miss arrives at a full cache of <span class="math" data-say="k">k</span> slots. Its <strong>hit rate on that string</strong> is hits divided by references.</p><p>The first reference to each key must miss whatever the policy and whatever <span class="math" data-say="k">k</span>: those are the <strong>compulsory misses</strong>, and on a trace of five distinct keys there are five of them.</p></div><ul><li><strong>FIFO</strong> evicts the key that entered the cache earliest, regardless of use since.</li><li><strong>LRU</strong> evicts the key that was used least recently.</li><li><strong>LFU</strong> evicts the key with the smallest use count, ties broken by insertion order; a count dies with the entry it belongs to.</li><li><strong>Farthest-in-future</strong> evicts the resident key whose next use is furthest ahead, or one that is never used again.</li></ul><h3>The bound, and whose proof it is</h3><p>Farthest-in-future &mdash; also called Belady&rsquo;s algorithm, or OPT &mdash; minimises misses over every possible policy on a given trace. It is <strong>offline</strong>: it reads the rest of the request sequence to choose a victim, which no cache can do. So it is not a policy anyone runs; it is a ceiling against which the policies people do run are measured.</p><p>That it is optimal is a theorem, proved by an exchange argument, and the proof is not this course&rsquo;s. It is Algorithms, in “Greedy Algorithms and Matroids”, in the lesson “Optimal Offline Caching” &mdash; <span class="math" data-say="algorithms over greedy-algorithms-and-matroids over optimal-caching">algorithms/greedy-algorithms-and-matroids/optimal-caching</span> &mdash; which also draws the offline/online distinction properly. What this lesson does with the theorem is use it: the bound turns &ldquo;our hit rate is <span class="math" data-say="1 over 6">1/6</span>&rdquo; into &ldquo;the best any policy could have done on this trace is <span class="math" data-say="5 over 12">5/12</span>, and we are getting <span class="math" data-say="1 over 6">1/6</span>&rdquo;.</p><div class="example"><span class="label">Example &middot; Twelve references, five keys, three slots</span><p>On <span class="math" data-say="1 2 3 4 1 2 5 1 2 3 4 5">1 2 3 4 1 2 5 1 2 3 4 5</span> with <span class="math" data-say="k equals 3">k = 3</span>: farthest-in-future gets <span class="math" data-say="5">5</span> hits (<span class="math" data-say="5 over 12">5/12</span>), FIFO gets <span class="math" data-say="3">3</span> (<span class="math" data-say="1 over 4">1/4</span>), LRU gets <span class="math" data-say="2">2</span> (<span class="math" data-say="1 over 6">1/6</span>) and LFU gets <span class="math" data-say="2">2</span> (<span class="math" data-say="1 over 6">1/6</span>). The gap between the bound and LRU is <span class="math" data-say="1 over 4">1/4</span> of all references, which is the most that a better online policy could have recovered &mdash; and no online policy can recover all of it, because the bound reads the future.</p></div><h3>Belady&#x27;s anomaly: more memory, more misses</h3><p>Now give the same trace four slots instead of three. LRU improves from <span class="math" data-say="2">2</span> hits to <span class="math" data-say="4">4</span>, LFU from <span class="math" data-say="2">2</span> to <span class="math" data-say="4">4</span>, the optimum from <span class="math" data-say="5">5</span> to <span class="math" data-say="6">6</span>. FIFO goes from <span class="math" data-say="3">3</span> hits to <span class="math" data-say="2">2</span>: its miss count rises from <span class="math" data-say="9">9</span> to <span class="math" data-say="10">10</span>. A larger cache made it worse.</p><div class="thm"><span class="label">Theorem &middot; Stack algorithms, and what FIFO is not</span><p>A policy is a <strong>stack algorithm</strong> if, at every point of every trace, the contents of a <span class="math" data-say="k">k</span>-slot cache are a subset of the contents of a <span class="math" data-say="k plus 1">(k+1)</span>-slot cache. For such a policy every hit at <span class="math" data-say="k">k</span> is a hit at <span class="math" data-say="k plus 1">k+1</span>, so the miss count is non-increasing in the cache size.</p><p>LRU and farthest-in-future are stack algorithms; FIFO is not, because its eviction order depends on insertion times that change when the cache size changes. Having no such guarantee is not the same as always failing &mdash; FIFO is well behaved on most traces &mdash; but it means no trace is safe.</p></div><p>This is the misconception the lesson exists to kill, and it is a belief people genuinely hold: that adding memory to a cache can be neutral at worst. It cannot, unless you know which policy you are running and that it is a stack algorithm. The lab scans every cache size from <span class="math" data-say="1">1</span> to <span class="math" data-say="6">6</span> for all four policies on your own trace and reports where any of their miss counts rises, so the anomaly arrives as a measurement rather than as a claim.</p><p>Two limits on what a trace can tell you. A hit count on twelve references is a fact about twelve references and not about your system; policies are separated by workloads, and a trace with a hot key ranks them differently from a round robin. And nothing here is about cost: LRU needs bookkeeping that FIFO does not, and whether that is worth two per cent of hit rate is an implementation question this course leaves to Algorithms.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Replacement policies on a trace</h2></div><p>FIFO, LRU, LFU and the offline bound, at two cache sizes</p></div>
@@ -1366,7 +1366,7 @@ OPT = evict the key whose next use is farthest in the future</div>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Running a policy comparison honestly</h2></div><p>Two cache sizes, always. One size tells you which policy won a coin toss.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the trace and count the distinct keys</h3><p>The distinct count is the compulsory misses, the floor every policy shares. A comparison that does not subtract them exaggerates how close the policies are: on twelve references with five distinct keys, five of the misses were never anyone&rsquo;s fault.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Run the optimum first</h3><p>Farthest-in-future gives you the ceiling before you have any attachment to a policy. If the gap between the bound and your current policy is small, no replacement change will help and the answer is a bigger cache or a different workload.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run the runnable policies at two sizes</h3><p>FIFO, LRU and LFU at <span class="math">k</span> and at <span class="math">k+1</span>. Two sizes, because a single size is one sample and because the second size is where an anomaly becomes visible. Compare hit counts, not hit rates, if the traces differ in length.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check whether any miss count rose</h3><p>If a policy misses more with more slots, you have found Belady&rsquo;s anomaly and you have learned something about the policy rather than about the trace. LRU and the optimum cannot do this; FIFO and LFU carry no such guarantee.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the trace and count the distinct keys</h3><p>The distinct count is the compulsory misses, the floor every policy shares. A comparison that does not subtract them exaggerates how close the policies are: on twelve references with five distinct keys, five of the misses were never anyone&rsquo;s fault.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Run the optimum first</h3><p>Farthest-in-future gives you the ceiling before you have any attachment to a policy. If the gap between the bound and your current policy is small, no replacement change will help and the answer is a bigger cache or a different workload.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run the runnable policies at two sizes</h3><p>FIFO, LRU and LFU at <span class="math" data-say="k">k</span> and at <span class="math" data-say="k plus 1">k+1</span>. Two sizes, because a single size is one sample and because the second size is where an anomaly becomes visible. Compare hit counts, not hit rates, if the traces differ in length.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check whether any miss count rose</h3><p>If a policy misses more with more slots, you have found Belady&rsquo;s anomaly and you have learned something about the policy rather than about the trace. LRU and the optimum cannot do this; FIFO and LFU carry no such guarantee.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1377,7 +1377,7 @@ OPT = evict the key whose next use is farthest in the future</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>1 2 3 4 1 2 5 1 2 3 4 5 at three slots and at four</h3><p>Twelve references over five keys. The four-slot run is the one that matters, and it is the one most people would not bother with.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">trace:  1 2 3 4 1 2 5 1 2 3 4 5        12 references, 5 distinct keys
+      <article class="card card-pad prose"><h3>1 2 3 4 1 2 5 1 2 3 4 5 at three slots and at four</h3><p>Twelve references over five keys. The four-slot run is the one that matters, and it is the one most people would not bother with.</p><div class="mathblock" data-say="trace, 1 2 3 4 1 2 5 1 2 3 4 5, 12 references, 5 distinct keys. compulsory misses, 5, for any policy at any size. k equals 3 slots, hits, rate, misses. a table, shown on the page. k equals 4 slots, hits, rate, misses. a table, shown on the page. FIFO, 2, 1 over 6, 10, gets MORE misses than at k equals 3. a table, shown on the page. FIFO, 9 misses at k equals 3, to, 10 misses at k equals 4. gap at k equals 3, OPT 5 over 12 minus LRU 1 over 6 equals 1 over 4 of all references" tabindex="0" role="region" aria-label="Mathematical notation">trace:  1 2 3 4 1 2 5 1 2 3 4 5        12 references, 5 distinct keys
         compulsory misses: 5, for any policy at any size
 
 k = 3 slots        hits   rate     misses
@@ -1393,12 +1393,12 @@ k = 4 slots        hits   rate     misses
   LFU               4     1/3        8
 
 FIFO:   9 misses at k = 3  →  10 misses at k = 4
-gap at k = 3:  OPT 5/12 − LRU 1/6 = 1/4 of all references</div><p>Two results, and they point in different directions. At three slots FIFO beats LRU on this trace, which is a fact about this trace. At four slots FIFO gets worse than it was at three, which is a fact about FIFO: it is not a stack algorithm and has no guarantee to break.</p><p>For a faded rehearsal, run <span class="math">A B C A B D A B C D</span> at <span class="math">k = 3</span> and <span class="math">k = 4</span>. The supplied first move is that the optimum gets <span class="math">5</span> hits at three slots; find LRU and FIFO at both sizes, and then say which policy&rsquo;s ranking changed between the two cache sizes and whether any miss count rose. Report what that trace does and does not show about the anomaly.</p><p>The lab replays your own trace through all four policies, steps through the cache contents reference by reference so you can watch a policy make the eviction it is about to regret, and scans every cache size from one to six looking for a rise. It reports which policies it found one for and which it did not.</p></article>
+gap at k = 3:  OPT 5/12 − LRU 1/6 = 1/4 of all references</div><p>Two results, and they point in different directions. At three slots FIFO beats LRU on this trace, which is a fact about this trace. At four slots FIFO gets worse than it was at three, which is a fact about FIFO: it is not a stack algorithm and has no guarantee to break.</p><p>For a faded rehearsal, run <span class="math" data-say="A B C A B D A B C D">A B C A B D A B C D</span> at <span class="math" data-say="k equals 3">k = 3</span> and <span class="math" data-say="k equals 4">k = 4</span>. The supplied first move is that the optimum gets <span class="math" data-say="5">5</span> hits at three slots; find LRU and FIFO at both sizes, and then say which policy&rsquo;s ranking changed between the two cache sizes and whether any miss count rose. Report what that trace does and does not show about the anomaly.</p><p>The lab replays your own trace through all four policies, steps through the cache contents reference by reference so you can watch a policy make the eviction it is about to regret, and scans every cache size from one to six looking for a rise. It reports which policies it found one for and which it did not.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a bigger cache can never hurt</strong><span>It can, and the trace <span class="math">1 2 3 4 1 2 5 1 2 3 4 5</span> is where: FIFO misses <span class="math">9</span> times at three slots and <span class="math">10</span> at four. The guarantee people are reaching for is real but belongs to stack algorithms &mdash; LRU and farthest-in-future &mdash; and FIFO is not one. Before adding memory to a cache, know which policy it runs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing policies on one trace at one size</strong><span>FIFO beats LRU here at three slots and loses to it at four. A comparison that reports the first number and stops has measured the trace, not the policies. Two sizes at minimum, and a trace from the system you are actually asking about.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the bound as a target</strong><span>Farthest-in-future is what an oracle would achieve, and the gap between it and your policy is the most any online change could recover &mdash; not the amount one will. If the bound is <span class="math">5/12</span> and you have <span class="math">1/6</span>, a better policy might close part of that; nothing closes all of it, because nothing online reads the future.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a bigger cache can never hurt</strong><span>It can, and the trace <span class="math" data-say="1 2 3 4 1 2 5 1 2 3 4 5">1 2 3 4 1 2 5 1 2 3 4 5</span> is where: FIFO misses <span class="math" data-say="9">9</span> times at three slots and <span class="math" data-say="10">10</span> at four. The guarantee people are reaching for is real but belongs to stack algorithms &mdash; LRU and farthest-in-future &mdash; and FIFO is not one. Before adding memory to a cache, know which policy it runs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing policies on one trace at one size</strong><span>FIFO beats LRU here at three slots and loses to it at four. A comparison that reports the first number and stops has measured the trace, not the policies. Two sizes at minimum, and a trace from the system you are actually asking about.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the bound as a target</strong><span>Farthest-in-future is what an oracle would achieve, and the gap between it and your policy is the most any online change could recover &mdash; not the amount one will. If the bound is <span class="math" data-say="5 over 12">5/12</span> and you have <span class="math" data-say="1 over 6">1/6</span>, a better policy might close part of that; nothing closes all of it, because nothing online reads the future.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would not accept a policy comparison run at one cache size.</strong><p>You should be able to replay a short reference string through FIFO, LRU, LFU and farthest-in-future, count hits at two cache sizes, identify the compulsory misses, quote the bound as a bound, and recognise a rising miss count as Belady&rsquo;s anomaly rather than as a mistake.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the last of the three things which decide a hit rate: the skew, the size and the policy. The rest of the course is about the two things a cache does wrong even when its hit rate is excellent. The first is staleness, and “TTL and Staleness” prices it &mdash; along with what a shorter TTL costs in misses, which is the part that is usually left out.</div></article>
       </div>
     </section>
@@ -1438,7 +1438,7 @@ gap at k = 3:  OPT 5/12 − LRU 1/6 = 1/4 of all references</div><p>Two results,
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Caching and Hit Rates.</strong> Hit rates, harmonic sums, stale fractions and policy hit counts on this course are exact fractions. The Zipf normaliser <span class="math">H(N, s)</span> is summed exactly for catalogues up to about fifty keys, which is where its exact form stays readable; past that the lab prints a rounded value and says so.</p>
+      <p><strong>Caching and Hit Rates.</strong> Hit rates, harmonic sums, stale fractions and policy hit counts on this course are exact fractions. The Zipf normaliser <span class="math" data-say="H of N and s">H(N, s)</span> is summed exactly for catalogues up to about fifty keys, which is where its exact form stays readable; past that the lab prints a rounded value and says so.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1497,7 +1497,7 @@ gap at k = 3:  OPT 5/12 − LRU 1/6 = 1/4 of all references</div><p>Two results,
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "On <span class=\"math\">1 2 3 4 1 2 5 1 2 3 4 5<\/span>, FIFO misses <span class=\"math\">9<\/span> times with three slots and <span class=\"math\">10<\/span> times with four. What does this show?", "a": ["That the simulation has a bug, since a bigger cache cannot miss more", "Belady&rsquo;s anomaly: FIFO is not a stack algorithm, so its miss count need not fall when the cache grows", "That LRU is optimal and FIFO is not", "That the trace is too short to draw conclusions from"], "c": 1, "why": "FIFO evicts by insertion order, and changing the cache size changes which keys are resident and therefore that order &mdash; so a <span class=\"math\">k<\/span>-slot cache&rsquo;s contents need not be a subset of a <span class=\"math\">(k+1)<\/span>-slot cache&rsquo;s. LRU and farthest-in-future are stack algorithms and cannot do this; whether LRU is optimal is a different question, settled in Algorithms."}, {"q": "Why is farthest-in-future used as a bound rather than as a policy?", "a": ["Because it is too slow to compute", "Because it evicts by looking at the rest of the trace, which a running cache does not have", "Because it is only optimal for small caches", "Because it needs the popularity distribution in advance"], "c": 1, "why": "It is offline: choosing a victim requires knowing when each resident key is next referenced. Computing it is cheap once you have the trace, and it is optimal at every cache size &mdash; the exchange-argument proof is in Algorithms, in &ldquo;Optimal Offline Caching&rdquo;. What it cannot be is executed by a cache serving live traffic."}, {"q": "A trace has <span class=\"math\">12<\/span> references over <span class=\"math\">5<\/span> distinct keys. What is the largest possible hit rate at any cache size?", "a": ["<span class=\"math\">1<\/span>, with a big enough cache", "<span class=\"math\">7/12<\/span>", "<span class=\"math\">5/12<\/span>", "<span class=\"math\">1/2<\/span>, the optimum&rsquo;s rate at four slots"], "c": 1, "why": "The first reference to each distinct key must miss, so at least <span class=\"math\">5<\/span> of the <span class=\"math\">12<\/span> are compulsory misses and at most <span class=\"math\">7<\/span> can be hits: <span class=\"math\">7/12<\/span>. No cache size and no policy removes a compulsory miss. <span class=\"math\">5/12<\/span> is the optimum&rsquo;s actual rate at three slots, well below the ceiling."}, {"q": "At three slots on this trace, FIFO gets <span class=\"math\">1/4<\/span> and LRU gets <span class=\"math\">1/6<\/span>. What follows?", "a": ["FIFO is a better policy than LRU", "On this trace at this size FIFO does better, which is a fact about the trace rather than a ranking of the policies", "LRU must have been implemented incorrectly", "The workload must have no temporal locality at all"], "c": 1, "why": "A single trace at a single size is one measurement. At four slots the order reverses: LRU gets <span class=\"math\">1/3<\/span> and FIFO gets <span class=\"math\">1/6<\/span>. Policies are separated by workloads, which is why the method is two sizes and, in practice, a trace taken from the system you actually run."}];
+  var QUIZ = [{"q": "On <span class=\"math\" data-say=\"1 2 3 4 1 2 5 1 2 3 4 5\">1 2 3 4 1 2 5 1 2 3 4 5<\/span>, FIFO misses <span class=\"math\" data-say=\"9\">9<\/span> times with three slots and <span class=\"math\" data-say=\"10\">10<\/span> times with four. What does this show?", "a": ["That the simulation has a bug, since a bigger cache cannot miss more", "Belady&rsquo;s anomaly: FIFO is not a stack algorithm, so its miss count need not fall when the cache grows", "That LRU is optimal and FIFO is not", "That the trace is too short to draw conclusions from"], "c": 1, "why": "FIFO evicts by insertion order, and changing the cache size changes which keys are resident and therefore that order &mdash; so a <span class=\"math\" data-say=\"k\">k<\/span>-slot cache&rsquo;s contents need not be a subset of a <span class=\"math\" data-say=\"k plus 1\">(k+1)<\/span>-slot cache&rsquo;s. LRU and farthest-in-future are stack algorithms and cannot do this; whether LRU is optimal is a different question, settled in Algorithms."}, {"q": "Why is farthest-in-future used as a bound rather than as a policy?", "a": ["Because it is too slow to compute", "Because it evicts by looking at the rest of the trace, which a running cache does not have", "Because it is only optimal for small caches", "Because it needs the popularity distribution in advance"], "c": 1, "why": "It is offline: choosing a victim requires knowing when each resident key is next referenced. Computing it is cheap once you have the trace, and it is optimal at every cache size &mdash; the exchange-argument proof is in Algorithms, in &ldquo;Optimal Offline Caching&rdquo;. What it cannot be is executed by a cache serving live traffic."}, {"q": "A trace has <span class=\"math\" data-say=\"12\">12<\/span> references over <span class=\"math\" data-say=\"5\">5<\/span> distinct keys. What is the largest possible hit rate at any cache size?", "a": ["<span class=\"math\" data-say=\"1\">1<\/span>, with a big enough cache", "<span class=\"math\" data-say=\"7 over 12\">7/12<\/span>", "<span class=\"math\" data-say=\"5 over 12\">5/12<\/span>", "<span class=\"math\" data-say=\"1 over 2\">1/2<\/span>, the optimum&rsquo;s rate at four slots"], "c": 1, "why": "The first reference to each distinct key must miss, so at least <span class=\"math\" data-say=\"5\">5<\/span> of the <span class=\"math\" data-say=\"12\">12<\/span> are compulsory misses and at most <span class=\"math\" data-say=\"7\">7<\/span> can be hits: <span class=\"math\" data-say=\"7 over 12\">7/12<\/span>. No cache size and no policy removes a compulsory miss. <span class=\"math\" data-say=\"5 over 12\">5/12<\/span> is the optimum&rsquo;s actual rate at three slots, well below the ceiling."}, {"q": "At three slots on this trace, FIFO gets <span class=\"math\" data-say=\"1 over 4\">1/4<\/span> and LRU gets <span class=\"math\" data-say=\"1 over 6\">1/6<\/span>. What follows?", "a": ["FIFO is a better policy than LRU", "On this trace at this size FIFO does better, which is a fact about the trace rather than a ranking of the policies", "LRU must have been implemented incorrectly", "The workload must have no temporal locality at all"], "c": 1, "why": "A single trace at a single size is one measurement. At four slots the order reverses: LRU gets <span class=\"math\" data-say=\"1 over 3\">1/3<\/span> and FIFO gets <span class=\"math\" data-say=\"1 over 6\">1/6<\/span>. Policies are separated by workloads, which is why the method is two sizes and, in practice, a trace taken from the system you actually run."}];
 
   (function () {
 
@@ -2650,6 +2650,213 @@ gap at k = 3:  OPT 5/12 − LRU 1/6 = 1/4 of all references</div><p>Two results,
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

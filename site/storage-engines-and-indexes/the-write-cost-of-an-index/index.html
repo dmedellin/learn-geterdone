@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Storage Engines and Indexes &middot; The write side</span>
         <h1>The Write Cost of an Index</h1>
-        <p>An index has to contain the column it answers questions about, so inserting a row changes every index on the table. With <span class="math">k</span> of them an insert is <span class="math">k + 1</span> random writes and throughput is divided by <span class="math">k + 1</span> — not reduced by a percentage. A device doing ten thousand random writes a second carries two and a half thousand inserts a second once three indexes are on the table.</p>
+        <p>An index has to contain the column it answers questions about, so inserting a row changes every index on the table. With <span class="math" data-say="k">k</span> of them an insert is <span class="math" data-say="k plus 1">k + 1</span> random writes and throughput is divided by <span class="math" data-say="k plus 1">k + 1</span> — not reduced by a percentage. A device doing ten thousand random writes a second carries two and a half thousand inserts a second once three indexes are on the table.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">writes per insert = k + 1          the row, and one page in every index
+        <div class="mathblock" data-say="writes per insert equals k plus 1, the row, and one page in every index. inserts a second, equals device over the quantity k plus 1. device 10000 random writes a second. a table, shown on the page. the floor of 10000 over 2500, minus 1 equals 3, the most indexes a 2500 per second target allows" tabindex="0" role="region" aria-label="Mathematical notation">writes per insert = k + 1          the row, and one page in every index
 inserts a second  = device / (k + 1)
 
 device 10 000 random writes a second
@@ -1312,17 +1312,17 @@ k = 1   2 writes   5 000/s   50%     k = 4   5 writes  2 000/s  20.0%
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One addition and one division. The addition is obvious once it is said; the division is where the intuition goes wrong, because people expect a subtraction.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>An insert touches every index</h3><p>The row goes into the table and a key goes into each of the <span class="math">k</span> indexes, so an insert is <span class="math">k + 1</span> writes. Nothing here depends on the index being clever or badly designed: a structure that answers questions about a column has to contain that column, and inserting a row changes that column.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The writes are random, and that is the expensive word</h3><p>Each index is ordered on a different key, so where an insert lands in one index says nothing about where it lands in another. An insert that is perfectly sequential in the table is <span class="math">k</span> scattered page writes elsewhere. That is why the cost is <span class="math">k + 1</span> <em>random</em> writes rather than <span class="math">k + 1</span> bytes, and it is the seek term of the first lesson arriving on the write side.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Throughput divides, it does not decrease by a percentage</h3><p>If the device sustains <span class="math">D</span> random writes a second, inserts run at <span class="math">D/(k + 1)</span> and the share left is <span class="math">1/(k + 1)</span>: <span class="math">1/2</span> at one index, <span class="math">1/4</span> at three, <span class="math">1/9</span> at eight. The first index is the expensive one — it halves the write rate on its own — and every index after it costs less than the one before.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>An insert touches every index</h3><p>The row goes into the table and a key goes into each of the <span class="math" data-say="k">k</span> indexes, so an insert is <span class="math" data-say="k plus 1">k + 1</span> writes. Nothing here depends on the index being clever or badly designed: a structure that answers questions about a column has to contain that column, and inserting a row changes that column.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The writes are random, and that is the expensive word</h3><p>Each index is ordered on a different key, so where an insert lands in one index says nothing about where it lands in another. An insert that is perfectly sequential in the table is <span class="math" data-say="k">k</span> scattered page writes elsewhere. That is why the cost is <span class="math" data-say="k plus 1">k + 1</span> <em>random</em> writes rather than <span class="math" data-say="k plus 1">k + 1</span> bytes, and it is the seek term of the first lesson arriving on the write side.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Throughput divides, it does not decrease by a percentage</h3><p>If the device sustains <span class="math" data-say="D">D</span> random writes a second, inserts run at <span class="math" data-say="D over the quantity k plus 1">D/(k + 1)</span> and the share left is <span class="math" data-say="1 over the quantity k plus 1">1/(k + 1)</span>: <span class="math" data-say="1 over 2">1/2</span> at one index, <span class="math" data-say="1 over 4">1/4</span> at three, <span class="math" data-say="1 over 9">1/9</span> at eight. The first index is the expensive one — it halves the write rate on its own — and every index after it costs less than the one before.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>k + 1 random writes, and the throughput that leaves</h2></div><p>Why the first index is the expensive one, and how to turn a throughput target into a budget of indexes.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Write cost of an index</span><p>For a table carrying <span class="math">k</span> secondary indexes, one insert performs <span class="math">k + 1</span> <strong>random writes</strong>: one for the row and one for each index page the new key lands on. On a device sustaining <span class="math">D</span> random writes a second the insert rate is <span class="math">D/(k + 1)</span>, and the <strong>share of the bare rate</strong> is <span class="math">1/(k + 1)</span>.</p><p>The same count holds for a delete, and an update counts once for every index whose key it changes.</p></div><p>Nothing in that definition is about how a particular engine is built. It is what it means for an index to be an index. A query planner can choose not to use an index; the writer has no such choice, because an index that skipped an insert would be wrong.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">device       10 000 random writes a second
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Write cost of an index</span><p>For a table carrying <span class="math" data-say="k">k</span> secondary indexes, one insert performs <span class="math" data-say="k plus 1">k + 1</span> <strong>random writes</strong>: one for the row and one for each index page the new key lands on. On a device sustaining <span class="math" data-say="D">D</span> random writes a second the insert rate is <span class="math" data-say="D over the quantity k plus 1">D/(k + 1)</span>, and the <strong>share of the bare rate</strong> is <span class="math" data-say="1 over the quantity k plus 1">1/(k + 1)</span>.</p><p>The same count holds for a delete, and an update counts once for every index whose key it changes.</p></div><p>Nothing in that definition is about how a particular engine is built. It is what it means for an index to be an index. A query planner can choose not to use an index; the writer has no such choice, because an index that skipped an insert would be wrong.</p><div class="mathblock" data-say="device, 10000 random writes a second. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">device       10 000 random writes a second
 
 indexes k        0        1        2        3        4        5
 writes/insert    1        2        3        4        5        6
 inserts/s   10 000    5 000    3 333    2 500    2 000    1 667
 share            1      1/2      1/3      1/4      1/5      1/6
-              100%    50.0%    33.3%    25.0%    20.0%    16.7%</div><p>Read the last row from left to right. The first index costs fifty percentage points, the second seventeen, the third eight, the fourth five. <span class="math">1/(k + 1)</span> falls fastest at the start, so the question “can we afford one more index?” has a different answer depending on how many there already are — and the cheapest place to add one is a table that already has several.</p><div class="example"><span class="label">Example &middot; Three indexes on a ten-thousand-write device</span><p><span class="math">k = 3</span> makes an insert <span class="math">4</span> random writes, so a device doing <span class="math">10 000</span> random writes a second does <span class="math">2 500</span> inserts a second: <span class="math">25%</span> of its bare rate. The device did not get slower and the rows did not get bigger. Three quarters of its write budget is now being spent keeping indexes correct.</p></div><h3>Turning a target into a budget of indexes</h3><p>Run the division the other way. If the workload needs <span class="math">T</span> inserts a second on a device doing <span class="math">D</span> random writes a second, the writes available per insert are <span class="math">D/T</span> and the indexes you can afford are <span class="math">⌊D/T⌋ − 1</span>. At <span class="math">D = 10 000</span> and <span class="math">T = 2 500</span> that is <span class="math">3</span>. Raise the target by twenty per cent, to <span class="math">3 000</span>, and it falls to <span class="math">2</span>: the relation is a floor, so it moves in whole indexes, and every index is free until the division crosses an integer.</p><p>This is the arithmetic that makes an index a decision rather than an optimisation. An index that serves a query is worth it; an index that was added years ago for a report nobody runs is still being written on every insert, and the way to see that is to price it in the units above rather than in megabytes.</p><p>One honest caveat. An engine that buffers index updates — a change buffer, or an LSM's memtable — converts some of these random writes into sequential ones performed later, which is exactly the trade “Write Amplification in LSM Trees” prices. The <span class="math">k + 1</span> is the count of index pages that must eventually be written. When they are written, and how many times each, is a different question with a much larger answer.</p></article>
+              100%    50.0%    33.3%    25.0%    20.0%    16.7%</div><p>Read the last row from left to right. The first index costs fifty percentage points, the second seventeen, the third eight, the fourth five. <span class="math" data-say="1 over the quantity k plus 1">1/(k + 1)</span> falls fastest at the start, so the question “can we afford one more index?” has a different answer depending on how many there already are — and the cheapest place to add one is a table that already has several.</p><div class="example"><span class="label">Example &middot; Three indexes on a ten-thousand-write device</span><p><span class="math" data-say="k equals 3">k = 3</span> makes an insert <span class="math" data-say="4">4</span> random writes, so a device doing <span class="math" data-say="10000">10 000</span> random writes a second does <span class="math" data-say="2500">2 500</span> inserts a second: <span class="math" data-say="25 percent">25%</span> of its bare rate. The device did not get slower and the rows did not get bigger. Three quarters of its write budget is now being spent keeping indexes correct.</p></div><h3>Turning a target into a budget of indexes</h3><p>Run the division the other way. If the workload needs <span class="math" data-say="T">T</span> inserts a second on a device doing <span class="math" data-say="D">D</span> random writes a second, the writes available per insert are <span class="math" data-say="D over T">D/T</span> and the indexes you can afford are <span class="math" data-say="the floor of D over T, minus 1">⌊D/T⌋ − 1</span>. At <span class="math" data-say="D equals 10000">D = 10 000</span> and <span class="math" data-say="T equals 2500">T = 2 500</span> that is <span class="math" data-say="3">3</span>. Raise the target by twenty per cent, to <span class="math" data-say="3000">3 000</span>, and it falls to <span class="math" data-say="2">2</span>: the relation is a floor, so it moves in whole indexes, and every index is free until the division crosses an integer.</p><p>This is the arithmetic that makes an index a decision rather than an optimisation. An index that serves a query is worth it; an index that was added years ago for a report nobody runs is still being written on every insert, and the way to see that is to price it in the units above rather than in megabytes.</p><p>One honest caveat. An engine that buffers index updates — a change buffer, or an LSM's memtable — converts some of these random writes into sequential ones performed later, which is exactly the trade “Write Amplification in LSM Trees” prices. The <span class="math" data-say="k plus 1">k + 1</span> is the count of index pages that must eventually be written. When they are written, and how many times each, is a different question with a much larger answer.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>The write cost of an index</h2></div><p>k + 1 random writes an insert, and the throughput that leaves</p></div>
@@ -1338,7 +1338,7 @@ share            1      1/2      1/3      1/4      1/5      1/6
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Add indexes and watch the writer pay</h3>
-          <p>Insert throughput is the device's random-write rate divided by <span class="math">k + 1</span>, recomputed as you move <span class="math">k</span>. Start at three indexes, then take <span class="math">k</span> to zero one index at a time and watch which single step costs the most.</p>
+          <p>Insert throughput is the device's random-write rate divided by <span class="math" data-say="k plus 1">k + 1</span>, recomputed as you move <span class="math" data-say="k">k</span>. Start at three indexes, then take <span class="math" data-say="k">k</span> to zero one index at a time and watch which single step costs the most.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="ixK">Indexes on the table (k)</label><span class="range-value" id="ixKOut">3</span></div>
           <input id="ixK" type="range" min="0" max="8" step="1" value="3" />
@@ -1363,7 +1363,7 @@ share            1      1/2      1/3      1/4      1/5      1/6
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing the write side of an index</h2></div><p>Two of these steps are the calculation and two are the decision it is for.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the indexes, then add one</h3><p><span class="math">k</span> secondary indexes and the table itself: <span class="math">k + 1</span> random writes an insert. Count every index that exists, not every index the queries use — the writer pays for all of them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide the device&#x27;s random-write rate</h3><p><span class="math">D/(k + 1)</span> is the insert rate. Use the device's <em>random</em> write figure, not its sequential one; the two can differ by two orders of magnitude and only one of them is relevant here.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Hold it against what the workload needs</h3><p>If the required insert rate is above <span class="math">D/(k + 1)</span> the table is already over budget, and no amount of query tuning changes that: the shortfall is on the write path.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Invert it to get the index budget</h3><p><span class="math">⌊D/T⌋ − 1</span> is the most indexes a target of <span class="math">T</span> inserts a second allows. It is a floor, so it steps: knowing where the next step is tells you how much headroom the table actually has.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the indexes, then add one</h3><p><span class="math" data-say="k">k</span> secondary indexes and the table itself: <span class="math" data-say="k plus 1">k + 1</span> random writes an insert. Count every index that exists, not every index the queries use — the writer pays for all of them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide the device&#x27;s random-write rate</h3><p><span class="math" data-say="D over the quantity k plus 1">D/(k + 1)</span> is the insert rate. Use the device's <em>random</em> write figure, not its sequential one; the two can differ by two orders of magnitude and only one of them is relevant here.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Hold it against what the workload needs</h3><p>If the required insert rate is above <span class="math" data-say="D over the quantity k plus 1">D/(k + 1)</span> the table is already over budget, and no amount of query tuning changes that: the shortfall is on the write path.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Invert it to get the index budget</h3><p><span class="math" data-say="the floor of D over T, minus 1">⌊D/T⌋ − 1</span> is the most indexes a target of <span class="math" data-say="T">T</span> inserts a second allows. It is a floor, so it steps: knowing where the next step is tells you how much headroom the table actually has.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1374,7 +1374,7 @@ share            1      1/2      1/3      1/4      1/5      1/6
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Three indexes on a device that does 10 000 random writes a second</h3><p>One division, run across every plausible index count, and then run backwards from two throughput targets.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">device      10 000 random writes a second
+      <article class="card card-pad prose"><h3>Three indexes on a device that does 10 000 random writes a second</h3><p>One division, run across every plausible index count, and then run backwards from two throughput targets.</p><div class="mathblock" data-say="device, 10000 random writes a second. a table, shown on the page. target 2500 inserts over s, the floor of 10000 over 2500, minus 1, equals, 4 minus 1, equals, 3 indexes. target 3000 inserts over s, the floor of 10000 over 3000, minus 1, equals, 3 minus 1, equals, 2 indexes" tabindex="0" role="region" aria-label="Mathematical notation">device      10 000 random writes a second
 
 indexes k         0        1        2        3        4        5
 writes/insert     1        2        3        4        5        6
@@ -1384,13 +1384,13 @@ share             1      1/2      1/3      1/4      1/5      1/6
 cost of this index      −50.0    −16.7     −8.3     −5.0     −3.3  points
 
 target 2 500 inserts/s      ⌊10 000 / 2 500⌋ − 1  =  4 − 1  =  3 indexes
-target 3 000 inserts/s      ⌊10 000 / 3 000⌋ − 1  =  3 − 1  =  2 indexes</div><p>The index that halves throughput is the first one. Not the fifth, not the tenth: going from none to one costs fifty percentage points and going from three to four costs five, because <span class="math">1/(k + 1)</span> falls fastest at the start. Anyone who has ever said “one more index will not hurt” was right, and was right for a reason that stops applying at <span class="math">k = 0</span>.</p><p>Raising the required insert rate by twenty per cent, from <span class="math">2 500</span> to <span class="math">3 000</span>, costs an index. The budget is a floor function, so it changes in whole indexes at the points where the division crosses an integer, and between those points a target can move a long way for free.</p><p>For a faded rehearsal, take a device that sustains <span class="math">6 000</span> random writes a second and a workload needing <span class="math">1 000</span> inserts a second. The supplied first move is that the answer is a floor: <span class="math">⌊6 000/1 000⌋ − 1</span>. Compute it, then state the insert rate you actually get at that many indexes and how much headroom is left over. Run the lab at your numbers before opening the quiz.</p></article>
+target 3 000 inserts/s      ⌊10 000 / 3 000⌋ − 1  =  3 − 1  =  2 indexes</div><p>The index that halves throughput is the first one. Not the fifth, not the tenth: going from none to one costs fifty percentage points and going from three to four costs five, because <span class="math" data-say="1 over the quantity k plus 1">1/(k + 1)</span> falls fastest at the start. Anyone who has ever said “one more index will not hurt” was right, and was right for a reason that stops applying at <span class="math" data-say="k equals 0">k = 0</span>.</p><p>Raising the required insert rate by twenty per cent, from <span class="math" data-say="2500">2 500</span> to <span class="math" data-say="3000">3 000</span>, costs an index. The budget is a floor function, so it changes in whole indexes at the points where the division crosses an integer, and between those points a target can move a long way for free.</p><p>For a faded rehearsal, take a device that sustains <span class="math" data-say="6000">6 000</span> random writes a second and a workload needing <span class="math" data-say="1000">1 000</span> inserts a second. The supplied first move is that the answer is a floor: <span class="math" data-say="the floor of 6000 over 1000, minus 1">⌊6 000/1 000⌋ − 1</span>. Compute it, then state the insert rate you actually get at that many indexes and how much headroom is left over. Run the lab at your numbers before opening the quiz.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting an index&#x27;s cost in bytes</strong><span>An index entry may be sixteen bytes, which sounds free. The cost is not the bytes — it is that those sixteen bytes are somewhere else on the device, and the device is rate-limited on how many separate somewhere-elses it can reach in a second. Price an index in random writes and the number stops looking free.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing an unused index is free</strong><span>The planner can ignore an index; the writer cannot. An index that no query has touched in a year is still one of the <span class="math">k</span>, still one random write on every insert, and still dividing throughput. Dropping it is the only operation that removes it from the count.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math">k + 1</span> as a penalty to subtract</strong><span>It divides. Three indexes do not cost thirty per cent of the write rate; they cost seventy-five per cent of it, leaving <span class="math">1/4</span>. Anyone whose estimate of an index's cost is a small percentage has done a subtraction where the arithmetic is a division.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “add an index” sounds like a division rather than a favour.</strong><p>You should be able to state the writes an insert costs from the index count, convert that into an insert rate on a stated device, and invert it to say how many indexes a throughput target allows.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The <span class="math">k + 1</span> random writes here are exactly what a log-structured engine refuses to pay at insert time. The bill it pays instead is the subject of “Write Amplification in LSM Trees”: twenty-five bytes written for every byte handed over, on ordinary settings, and all of them sequential.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting an index&#x27;s cost in bytes</strong><span>An index entry may be sixteen bytes, which sounds free. The cost is not the bytes — it is that those sixteen bytes are somewhere else on the device, and the device is rate-limited on how many separate somewhere-elses it can reach in a second. Price an index in random writes and the number stops looking free.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing an unused index is free</strong><span>The planner can ignore an index; the writer cannot. An index that no query has touched in a year is still one of the <span class="math" data-say="k">k</span>, still one random write on every insert, and still dividing throughput. Dropping it is the only operation that removes it from the count.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math" data-say="k plus 1">k + 1</span> as a penalty to subtract</strong><span>It divides. Three indexes do not cost thirty per cent of the write rate; they cost seventy-five per cent of it, leaving <span class="math" data-say="1 over 4">1/4</span>. Anyone whose estimate of an index's cost is a small percentage has done a subtraction where the arithmetic is a division.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “add an index” sounds like a division rather than a favour.</strong><p>You should be able to state the writes an insert costs from the index count, convert that into an insert rate on a stated device, and invert it to say how many indexes a throughput target allows.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The <span class="math" data-say="k plus 1">k + 1</span> random writes here are exactly what a log-structured engine refuses to pay at insert time. The bill it pays instead is the subject of “Write Amplification in LSM Trees”: twenty-five bytes written for every byte handed over, on ordinary settings, and all of them sequential.</div></article>
       </div>
     </section>
     </main>
@@ -1429,7 +1429,7 @@ target 3 000 inserts/s      ⌊10 000 / 3 000⌋ − 1  =  3 − 1  =  2 indexes
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math">h</span> with <span class="math">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math">9.585</span> rather than the <span class="math">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
+      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math" data-say="9.585">9.585</span> rather than the <span class="math" data-say="9.57">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1488,7 +1488,7 @@ target 3 000 inserts/s      ⌊10 000 / 3 000⌋ − 1  =  3 − 1  =  2 indexes
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "A table has <span class=\"math\">4<\/span> indexes and the device sustains <span class=\"math\">10 000<\/span> random writes a second. What is the insert rate?", "a": ["<span class=\"math\">2 500<\/span> a second", "<span class=\"math\">2 000<\/span> a second", "<span class=\"math\">6 000<\/span> a second", "<span class=\"math\">10 000<\/span> a second, indexes are read structures"], "c": 1, "why": "<span class=\"math\">4<\/span> indexes make an insert <span class=\"math\">5<\/span> random writes, so <span class=\"math\">10 000/5 = 2 000<\/span> inserts a second. <span class=\"math\">2 500<\/span> is the answer for three indexes; <span class=\"math\">6 000<\/span> subtracts forty per cent rather than dividing by five. Indexes are read structures that have to be written."}, {"q": "Which single index costs the most insert throughput?", "a": ["The first", "The last", "Whichever has the largest keys", "They all cost the same fraction"], "c": 0, "why": "Throughput is <span class=\"math\">D/(k + 1)<\/span>, so the share falls <span class=\"math\">1 \u2192 1/2 \u2192 1/3 \u2192 1/4<\/span>: fifty percentage points for the first index, seventeen for the second, eight for the third. Key size changes how much data is written and not how many random writes there are, which is what the device is rate-limited on."}, {"q": "An insert appends a row to the end of a table. Why are the index writes random?", "a": ["Because indexes are stored on a different device", "Because each index is ordered on a different key, so the new entry lands in an unrelated place in each one", "Because the engine deliberately scatters writes to spread wear", "They are not; the index entries are appended too"], "c": 1, "why": "A table can be append-ordered while an index on a customer name and another on a timestamp put the same new row in two completely unrelated pages. That is what makes the cost <span class=\"math\">k + 1<\/span> seeks rather than <span class=\"math\">k + 1<\/span> bytes, and it is why the ordering of the table buys the indexes nothing."}, {"q": "The device does <span class=\"math\">10 000<\/span> random writes a second and the workload needs <span class=\"math\">3 000<\/span> inserts a second. How many indexes can the table carry?", "a": ["<span class=\"math\">1<\/span>", "<span class=\"math\">2<\/span>", "<span class=\"math\">3<\/span>", "<span class=\"math\">4<\/span>"], "c": 1, "why": "<span class=\"math\">\u230a10 000/3 000\u230b \u2212 1 = 3 \u2212 1 = 2<\/span>. At two indexes an insert is three writes and the rate is <span class=\"math\">3 333<\/span> a second, which clears the target; at three indexes it is <span class=\"math\">2 500<\/span>, which does not. <span class=\"math\">3<\/span> is the budget for a <span class=\"math\">2 500<\/span> target, which is a different question."}];
+  var QUIZ = [{"q": "A table has <span class=\"math\" data-say=\"4\">4<\/span> indexes and the device sustains <span class=\"math\" data-say=\"10000\">10 000<\/span> random writes a second. What is the insert rate?", "a": ["<span class=\"math\" data-say=\"2500\">2 500<\/span> a second", "<span class=\"math\" data-say=\"2000\">2 000<\/span> a second", "<span class=\"math\" data-say=\"6000\">6 000<\/span> a second", "<span class=\"math\" data-say=\"10000\">10 000<\/span> a second, indexes are read structures"], "c": 1, "why": "<span class=\"math\" data-say=\"4\">4<\/span> indexes make an insert <span class=\"math\" data-say=\"5\">5<\/span> random writes, so <span class=\"math\" data-say=\"10000 over 5 equals 2000\">10 000/5 = 2 000<\/span> inserts a second. <span class=\"math\" data-say=\"2500\">2 500<\/span> is the answer for three indexes; <span class=\"math\" data-say=\"6000\">6 000<\/span> subtracts forty per cent rather than dividing by five. Indexes are read structures that have to be written."}, {"q": "Which single index costs the most insert throughput?", "a": ["The first", "The last", "Whichever has the largest keys", "They all cost the same fraction"], "c": 0, "why": "Throughput is <span class=\"math\" data-say=\"D over the quantity k plus 1\">D/(k + 1)<\/span>, so the share falls <span class=\"math\" data-say=\"1 goes to 1 over 2 goes to 1 over 3 goes to 1 over 4\">1 \u2192 1/2 \u2192 1/3 \u2192 1/4<\/span>: fifty percentage points for the first index, seventeen for the second, eight for the third. Key size changes how much data is written and not how many random writes there are, which is what the device is rate-limited on."}, {"q": "An insert appends a row to the end of a table. Why are the index writes random?", "a": ["Because indexes are stored on a different device", "Because each index is ordered on a different key, so the new entry lands in an unrelated place in each one", "Because the engine deliberately scatters writes to spread wear", "They are not; the index entries are appended too"], "c": 1, "why": "A table can be append-ordered while an index on a customer name and another on a timestamp put the same new row in two completely unrelated pages. That is what makes the cost <span class=\"math\" data-say=\"k plus 1\">k + 1<\/span> seeks rather than <span class=\"math\" data-say=\"k plus 1\">k + 1<\/span> bytes, and it is why the ordering of the table buys the indexes nothing."}, {"q": "The device does <span class=\"math\" data-say=\"10000\">10 000<\/span> random writes a second and the workload needs <span class=\"math\" data-say=\"3000\">3 000<\/span> inserts a second. How many indexes can the table carry?", "a": ["<span class=\"math\" data-say=\"1\">1<\/span>", "<span class=\"math\" data-say=\"2\">2<\/span>", "<span class=\"math\" data-say=\"3\">3<\/span>", "<span class=\"math\" data-say=\"4\">4<\/span>"], "c": 1, "why": "<span class=\"math\" data-say=\"the floor of 10000 over 3000, minus 1 equals 3 minus 1 equals 2\">\u230a10 000/3 000\u230b \u2212 1 = 3 \u2212 1 = 2<\/span>. At two indexes an insert is three writes and the rate is <span class=\"math\" data-say=\"3333\">3 333<\/span> a second, which clears the target; at three indexes it is <span class=\"math\" data-say=\"2500\">2 500<\/span>, which does not. <span class=\"math\" data-say=\"3\">3<\/span> is the budget for a <span class=\"math\" data-say=\"2500\">2 500<\/span> target, which is a different question."}];
 
   (function () {
 
@@ -2523,6 +2523,213 @@ target 3 000 inserts/s      ⌊10 000 / 3 000⌋ − 1  =  3 − 1  =  2 indexes
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

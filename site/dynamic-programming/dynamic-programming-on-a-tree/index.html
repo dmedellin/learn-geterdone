@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">with(v)    = weight(v) + sum over children u of without(u)
+        <div class="mathblock" data-say="with of v, equals weight of v plus sum over children u of without of u. without of v equals sum over children u of the max of with of u and without of u. answer, equals the max of with of root and without of root. a spine 1 minus 2 minus 3 minus 4 with legs at 2, 3 and 4, weights 1 6 6 6 1 1 1. one pass, 13, 7 vertices visited, 12 reads. every subset, 13, 128 subsets examined" tabindex="0" role="region" aria-label="Mathematical notation">with(v)    = weight(v) + sum over children u of without(u)
 without(v) = sum over children u of max( with(u), without(u) )
 answer     = max( with(root), without(root) )
 
@@ -1311,11 +1311,11 @@ a spine 1-2-3-4 with legs at 2, 3 and 4, weights 1 6 6 6 1 1 1
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is that the fill order is the tree's own postorder, so it is forced by the structure rather than chosen &mdash; and the structure is what the argument depends on.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The state is a vertex and a yes-or-no, so the table is a pair per vertex</h3><p>For each vertex, the best total obtainable within its subtree if that vertex is in the chosen set, and the best if it is not. Taking a vertex forbids all its children, so <span class="math">with(v)</span> sums the children's <span class="math">without</span>. Declining it frees each child to do whichever is better for itself, so <span class="math">without(v)</span> sums the children's maxima. Two numbers, one recurrence each.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Postorder is the fill order, and the tree supplies it</h3><p>Every read is from a child, and postorder finishes every child before its parent, so no read lands on an unfilled entry. There is no ordering decision to get wrong here &mdash; which is worth noticing precisely because the matrix chain had one and got it wrong. The tree's shape is the order.</p></article><article class="card concept-card"><div class="icon">3</div><h3>It is a fact about trees, and the parser enforces that</h3><p>The argument uses that a child's subtree interacts with the rest of the graph only through its parent. In a graph with a cycle that is false, the subtrees overlap, and the same pass would still produce a number. So the lab refuses an edge list that is not a tree &mdash; a cycle, a self-loop, a forest &mdash; rather than answering about a graph its recurrence does not describe.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The state is a vertex and a yes-or-no, so the table is a pair per vertex</h3><p>For each vertex, the best total obtainable within its subtree if that vertex is in the chosen set, and the best if it is not. Taking a vertex forbids all its children, so <span class="math" data-say="with of v">with(v)</span> sums the children's <span class="math" data-say="without">without</span>. Declining it frees each child to do whichever is better for itself, so <span class="math" data-say="without of v">without(v)</span> sums the children's maxima. Two numbers, one recurrence each.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Postorder is the fill order, and the tree supplies it</h3><p>Every read is from a child, and postorder finishes every child before its parent, so no read lands on an unfilled entry. There is no ordering decision to get wrong here &mdash; which is worth noticing precisely because the matrix chain had one and got it wrong. The tree's shape is the order.</p></article><article class="card concept-card"><div class="icon">3</div><h3>It is a fact about trees, and the parser enforces that</h3><p>The argument uses that a child's subtree interacts with the rest of the graph only through its parent. In a graph with a cycle that is false, the subtrees overlap, and the same pass would still produce a number. So the lab refuses an edge list that is not a tree &mdash; a cycle, a self-loop, a forest &mdash; rather than answering about a graph its recurrence does not describe.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two numbers per vertex, one pass, and every subset beside it</h2></div><p>The problem, the pair recurrence and its proof, why the order is free here, and the two checks on what comes back.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Independent set, and its weighted version</span><p>A set of vertices is <strong>independent</strong> if no edge joins two of them. Given a weight on each vertex, the <strong>maximum weight independent set</strong> problem asks for an independent set of largest total weight. On a general graph this is NP-hard; on a tree it is one pass, and this lesson is about why the difference is the tree and not the cleverness.</p></div><div class="thm"><span class="label">Theorem &middot; The pair recurrence on a tree</span><p>Root the tree anywhere. For a vertex <span class="math">v</span> with children <span class="math">u</span>, let <span class="math">with(v)</span> be the largest total over independent sets in <span class="math">v</span>'s subtree containing <span class="math">v</span>, and <span class="math">without(v)</span> the largest over those not containing it. Then <span class="math">with(v) = weight(v) + sum of without(u)</span> and <span class="math">without(v) = sum of max(with(u), without(u))</span>, and the answer is <span class="math">max(with(root), without(root))</span>.</p></div><div class="proof"><p>Take an independent set <span class="math">S</span> in <span class="math">v</span>'s subtree that is largest among those containing <span class="math">v</span>. No child of <span class="math">v</span> is in <span class="math">S</span>, since each is adjacent to <span class="math">v</span>. For each child <span class="math">u</span>, the part of <span class="math">S</span> inside <span class="math">u</span>'s subtree is independent and avoids <span class="math">u</span>, and it must be largest among such sets &mdash; otherwise substituting a heavier one gives a heavier <span class="math">S</span>, and the substitution is legal because the subtrees are disjoint and share no edge. Summing gives the first equation.</p><p>If <span class="math">S</span> is largest among sets avoiding <span class="math">v</span>, each child is free, and the part of <span class="math">S</span> in <span class="math">u</span>'s subtree must be a heaviest independent set there with no constraint, which is <span class="math">max(with(u), without(u))</span>. Again the substitution is legal because distinct subtrees share no vertex and no edge. That disjointness is exactly what a tree provides and a cycle destroys, and it is where the proof would fail on a general graph.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is worth reading twice for that last sentence. Optimal substructure here is not a property of the objective; it is a property of the input's shape. The same objective on a graph with one extra edge has no such decomposition, and no amount of care with the recurrence recovers it.</p><div class="example"><span class="label">Example &middot; A spine with legs, and the two heavy vertices that cannot both go</span><p>The lab loads a tree on seven vertices: a path <span class="math">1-2-3-4</span> with extra leaves hanging off 2, 3 and 4, and weights <span class="math">1 6 6 6 1 1 1</span>. Vertices 2, 3 and 4 are the heavy ones and they form a path, so at most two of them can be chosen. The pass returns 13, choosing vertices 2, 4 and 6 &mdash; two of the three heavy ones and one leaf &mdash; and every one of the 128 subsets confirms 13.</p></div><h3>The two checks, and why both</h3><p>The chosen set is tested for independence against the edge list as it was typed, not against the adjacency structure the pass walked. That matters: a bug in building the adjacency map would make the pass and a structure-based check wrong in the same way, and the two would agree. Reading the raw edges is a route that shares nothing with the pass.</p><p>Then the set is re-weighed, and its total compared with the number the pass reported. Independence alone is not enough &mdash; the empty set is independent &mdash; and a matching total alone is not enough either, since a heavier but illegal set would also fail to be an answer. Both checks, separately, and the panel prints both verdicts.</p><h3>Where the greedy instinct goes, and what the counts say</h3><p>The instinct readers arrive with is to alternate: take every second level. On a path that is right, and the lab ships a path where it gives 15, the correct answer. On this tree, alternating from the root takes vertices 1, 3, 5 and 7 for a total of 9, against the optimum's 13 &mdash; and alternating the other way happens to give 13. A rule whose answer depends on which parity you start from is not a rule until that choice is made, and making it correctly is the problem again.</p><p>The measured counts are 7 vertex visits and 12 reads for the pass, against 128 subsets for the check, on a tree of seven vertices. The proved bounds are <span class="math">Θ(n)</span> and <span class="math">Θ(2ⁿ n)</span>. Here the measurement and the bound agree in order already at <span class="math">n = 7</span>, which is worth stating plainly because on three other pages of this course they do not &mdash; the coin table loses to a plain recursion at an amount of six, the chain table loses to enumeration at four matrices, and the last lesson of the course loses by a factor of forty.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Independent set, and its weighted version</span><p>A set of vertices is <strong>independent</strong> if no edge joins two of them. Given a weight on each vertex, the <strong>maximum weight independent set</strong> problem asks for an independent set of largest total weight. On a general graph this is NP-hard; on a tree it is one pass, and this lesson is about why the difference is the tree and not the cleverness.</p></div><div class="thm"><span class="label">Theorem &middot; The pair recurrence on a tree</span><p>Root the tree anywhere. For a vertex <span class="math" data-say="v">v</span> with children <span class="math" data-say="u">u</span>, let <span class="math" data-say="with of v">with(v)</span> be the largest total over independent sets in <span class="math" data-say="v">v</span>'s subtree containing <span class="math" data-say="v">v</span>, and <span class="math" data-say="without of v">without(v)</span> the largest over those not containing it. Then <span class="math" data-say="with of v equals weight of v plus sum of without of u">with(v) = weight(v) + sum of without(u)</span> and <span class="math" data-say="without of v equals sum of the max of with of u and without of u">without(v) = sum of max(with(u), without(u))</span>, and the answer is <span class="math" data-say="the max of with of root and without of root">max(with(root), without(root))</span>.</p></div><div class="proof"><p>Take an independent set <span class="math" data-say="S">S</span> in <span class="math" data-say="v">v</span>'s subtree that is largest among those containing <span class="math" data-say="v">v</span>. No child of <span class="math" data-say="v">v</span> is in <span class="math" data-say="S">S</span>, since each is adjacent to <span class="math" data-say="v">v</span>. For each child <span class="math" data-say="u">u</span>, the part of <span class="math" data-say="S">S</span> inside <span class="math" data-say="u">u</span>'s subtree is independent and avoids <span class="math" data-say="u">u</span>, and it must be largest among such sets &mdash; otherwise substituting a heavier one gives a heavier <span class="math" data-say="S">S</span>, and the substitution is legal because the subtrees are disjoint and share no edge. Summing gives the first equation.</p><p>If <span class="math" data-say="S">S</span> is largest among sets avoiding <span class="math" data-say="v">v</span>, each child is free, and the part of <span class="math" data-say="S">S</span> in <span class="math" data-say="u">u</span>'s subtree must be a heaviest independent set there with no constraint, which is <span class="math" data-say="the max of with of u and without of u">max(with(u), without(u))</span>. Again the substitution is legal because distinct subtrees share no vertex and no edge. That disjointness is exactly what a tree provides and a cycle destroys, and it is where the proof would fail on a general graph.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is worth reading twice for that last sentence. Optimal substructure here is not a property of the objective; it is a property of the input's shape. The same objective on a graph with one extra edge has no such decomposition, and no amount of care with the recurrence recovers it.</p><div class="example"><span class="label">Example &middot; A spine with legs, and the two heavy vertices that cannot both go</span><p>The lab loads a tree on seven vertices: a path <span class="math" data-say="1 minus 2 minus 3 minus 4">1-2-3-4</span> with extra leaves hanging off 2, 3 and 4, and weights <span class="math" data-say="1 6 6 6 1 1 1">1 6 6 6 1 1 1</span>. Vertices 2, 3 and 4 are the heavy ones and they form a path, so at most two of them can be chosen. The pass returns 13, choosing vertices 2, 4 and 6 &mdash; two of the three heavy ones and one leaf &mdash; and every one of the 128 subsets confirms 13.</p></div><h3>The two checks, and why both</h3><p>The chosen set is tested for independence against the edge list as it was typed, not against the adjacency structure the pass walked. That matters: a bug in building the adjacency map would make the pass and a structure-based check wrong in the same way, and the two would agree. Reading the raw edges is a route that shares nothing with the pass.</p><p>Then the set is re-weighed, and its total compared with the number the pass reported. Independence alone is not enough &mdash; the empty set is independent &mdash; and a matching total alone is not enough either, since a heavier but illegal set would also fail to be an answer. Both checks, separately, and the panel prints both verdicts.</p><h3>Where the greedy instinct goes, and what the counts say</h3><p>The instinct readers arrive with is to alternate: take every second level. On a path that is right, and the lab ships a path where it gives 15, the correct answer. On this tree, alternating from the root takes vertices 1, 3, 5 and 7 for a total of 9, against the optimum's 13 &mdash; and alternating the other way happens to give 13. A rule whose answer depends on which parity you start from is not a rule until that choice is made, and making it correctly is the problem again.</p><p>The measured counts are 7 vertex visits and 12 reads for the pass, against 128 subsets for the check, on a tree of seven vertices. The proved bounds are <span class="math" data-say="theta of n">Θ(n)</span> and <span class="math" data-say="theta of 2 to the power n n">Θ(2ⁿ n)</span>. Here the measurement and the bound agree in order already at <span class="math" data-say="n equals 7">n = 7</span>, which is worth stating plainly because on three other pages of this course they do not &mdash; the coin table loses to a plain recursion at an amount of six, the chain table loses to enumeration at four matrices, and the last lesson of the course loses by a factor of forty.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>A dynamic program with no table at all</h2></div><p>Two numbers per vertex, one pass, and every subset as the check</p></div>
@@ -1331,7 +1331,7 @@ a spine 1-2-3-4 with legs at 2, 3 and 4, weights 1 6 6 6 1 1 1
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Type a tree as an edge list, and a weight per vertex</h3>
-          <p>Edges are written <span class="math">1-2</span>, separated by commas, and anything that is not a tree is refused rather than answered about. The panel shows both numbers for every vertex, checks the chosen set against the edges you typed, and re-weighs it.</p>
+          <p>Edges are written <span class="math" data-say="1 minus 2">1-2</span>, separated by commas, and anything that is not a tree is refused rather than answered about. The panel shows both numbers for every vertex, checks the chosen set against the edges you typed, and re-weighs it.</p>
         <div class="field">
           <label for="trPreset">Tree</label>
           <select id="trPreset"><option value="star">a centre with four leaves</option><option value="path">a path of six</option><option value="binary">a small binary tree</option><option value="caterpillar" selected>a spine with legs</option></select>
@@ -1369,7 +1369,7 @@ a spine 1-2-3-4 with legs at 2, 3 and 4, weights 1 6 6 6 1 1 1
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Seven vertices, two numbers each, one pass</h3><p>The tree is the path 1-2-3-4 with a leaf 5 on vertex 2, a leaf 6 on vertex 3 and a leaf 7 on vertex 4. Weights are 1, 6, 6, 6, 1, 1, 1. Rooted at vertex 1, the postorder is 7, 4, 6, 3, 5, 2, 1.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">vertex   weight   children        with     without
+      <article class="card card-pad prose"><h3>Seven vertices, two numbers each, one pass</h3><p>The tree is the path 1-2-3-4 with a leaf 5 on vertex 2, a leaf 6 on vertex 3 and a leaf 7 on vertex 4. Weights are 1, 6, 6, 6, 1, 1, 1. Rooted at vertex 1, the postorder is 7, 4, 6, 3, 5, 2, 1.</p><div class="mathblock" data-say="vertex, weight, children, with, without. a table, shown on the page. answer equals the max of with of 1 and without of 1 equals the max of 9 and 13 equals 13. the set the pass chooses, 2, 4, 6. independent against the typed edges ?, yes. r e-weighed, 6 plus 6 plus 1 equals 13, which matches. every one of the 128 subsets agrees, 13. alternating levels from the root gives 1 plus 6 plus 1 plus 1 equals 9" tabindex="0" role="region" aria-label="Mathematical notation">vertex   weight   children        with     without
 
    7        1      -                 1           0
    4        6      7                 6           1
@@ -1386,7 +1386,7 @@ the set the pass chooses:   2, 4, 6
   re-weighed:   6 + 6 + 1 = 13,  which matches
 
 every one of the 128 subsets agrees: 13
-alternating levels from the root gives 1 + 6 + 1 + 1 = 9</div><p>Vertex 3 is the interesting line: <span class="math">with</span> and <span class="math">without</span> are both 7. Taking it costs its two children's freedom and gains its own 6; declining it lets vertex 4 take its 6 and vertex 6 take its 1. The tie means the pass could have gone either way at that vertex, and the answer above it is unaffected, which is a reminder that an optimum can be non-unique in shape while being unique in value.</p><p>Vertex 1's line shows where the answer comes from: it has weight 1 and one child, so taking it is worth <span class="math">1 + 8 = 9</span> and declining it is worth 13. The root is declined, and a reader who expected the root to matter is reading the weight rather than the structure. Switch the lab to the star and the same thing happens for the opposite reason: the centre is worth 3 and the four leaves together are worth 12.</p><p>For a faded rehearsal, keep the tree and set every weight to 1 before running it. The supplied first move: with equal weights the problem becomes the largest independent set by count, and the three leaves 5, 6 and 7 are pairwise non-adjacent, so the answer is at least 3. Work out whether it is more, then check &mdash; and note that the pass returns a set, not just a count, so you can see which one it picked.</p></article>
+alternating levels from the root gives 1 + 6 + 1 + 1 = 9</div><p>Vertex 3 is the interesting line: <span class="math" data-say="with">with</span> and <span class="math" data-say="without">without</span> are both 7. Taking it costs its two children's freedom and gains its own 6; declining it lets vertex 4 take its 6 and vertex 6 take its 1. The tie means the pass could have gone either way at that vertex, and the answer above it is unaffected, which is a reminder that an optimum can be non-unique in shape while being unique in value.</p><p>Vertex 1's line shows where the answer comes from: it has weight 1 and one child, so taking it is worth <span class="math" data-say="1 plus 8 equals 9">1 + 8 = 9</span> and declining it is worth 13. The root is declined, and a reader who expected the root to matter is reading the weight rather than the structure. Switch the lab to the star and the same thing happens for the opposite reason: the centre is worth 3 and the four leaves together are worth 12.</p><p>For a faded rehearsal, keep the tree and set every weight to 1 before running it. The supplied first move: with equal weights the problem becomes the largest independent set by count, and the three leaves 5, 6 and 7 are pairwise non-adjacent, so the answer is at least 3. Work out whether it is more, then check &mdash; and note that the pass returns a set, not just a count, so you can see which one it picked.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1431,7 +1431,7 @@ alternating levels from the root gives 1 + 6 + 1 + 1 = 9</div><p>Vertex 3 is the
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math">n²2ⁿ</span> and <span class="math">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
+      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math" data-say="n squared 2 to the power n">n²2ⁿ</span> and <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -3370,6 +3370,213 @@ alternating levels from the root gives 1 + 6 + 1 + 1 = 9</div><p>Vertex 3 is the
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

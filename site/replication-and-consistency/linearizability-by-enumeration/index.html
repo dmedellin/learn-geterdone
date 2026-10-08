@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Replication and Consistency &middot; Consistency, counted</span>
         <h1>Linearizability by Enumeration</h1>
-        <p>A history of operations, each occupying an interval, is linearizable exactly when some total order of them respects real time — an operation that finished before another started must come first — and replays legally against the object. So enumerate the orders and count the survivors. Three operations give <span class="math">6</span> orders, of which <span class="math">3</span> respect real time and <span class="math">0</span> are legal: a violation. Seven operations give <span class="math">5040</span>, and the lab refuses, because the refusal is the lesson.</p>
+        <p>A history of operations, each occupying an interval, is linearizable exactly when some total order of them respects real time — an operation that finished before another started must come first — and replays legally against the object. So enumerate the orders and count the survivors. Three operations give <span class="math" data-say="6">6</span> orders, of which <span class="math" data-say="3">3</span> respect real time and <span class="math" data-say="0">0</span> are legal: a violation. Seven operations give <span class="math" data-say="5040">5040</span>, and the lab refuses, because the refusal is the lesson.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">linearizable  ⟺  some total order is real-time respecting and legal
+        <div class="mathblock" data-say="linearizable, if and only if, some total order is real-time respecting and legal. real time, if a ends before b starts, a must come before b. legal, replay against the object and every read returns what was written. 3 operations, 6 orders, 3 allowed by real time, 0 legal to a violation. 6 operations, 720 orders, 7, 5040, and the lab refuses to enumerate them" tabindex="0" role="region" aria-label="Mathematical notation">linearizable  ⟺  some total order is real-time respecting and legal
 real time: if a ends before b starts, a must come before b
 legal: replay against the object and every read returns what was written
 3 operations:  6 orders,  3 allowed by real time,  0 legal → a violation
@@ -1313,14 +1313,14 @@ legal: replay against the object and every read returns what was written
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Two filters, a count, and the cap that is a lesson</h2></div><p>What linearizability asks, how the enumeration answers it, and why no real checker works this way.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; History, real-time order, and a linearization</span><p>A <strong>history</strong> is a set of operations, each with a start time, an end time and a return value. A <strong>linearization</strong> is a total order of those operations such that <span class="math">a</span> precedes <span class="math">b</span> whenever <span class="math">a</span> ended before <span class="math">b</span> started, and such that replaying them in that order against the object is <strong>legal</strong> — every read returns the most recently written value. A history is <strong>linearizable</strong> if at least one linearization exists.</p></div><p>The definition is an existence claim, and that is what makes the enumeration a decision procedure: generate every total order, apply the two filters, and count. A count of zero settles the question in the negative, and any count above zero settles it in the positive.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the register starts at 0
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; History, real-time order, and a linearization</span><p>A <strong>history</strong> is a set of operations, each with a start time, an end time and a return value. A <strong>linearization</strong> is a total order of those operations such that <span class="math" data-say="A">a</span> precedes <span class="math" data-say="b">b</span> whenever <span class="math" data-say="A">a</span> ended before <span class="math" data-say="b">b</span> started, and such that replaying them in that order against the object is <strong>legal</strong> — every read returns the most recently written value. A history is <strong>linearizable</strong> if at least one linearization exists.</p></div><p>The definition is an existence claim, and that is what makes the enumeration a decision procedure: generate every total order, apply the two filters, and count. A count of zero settles the question in the negative, and any count above zero settles it in the positive.</p><div class="mathblock" data-say="the register starts at 0. A, write 1, 0, 4. B, read goes to 1, 2, 6. C, read goes to 0, 5, 9. real time, A ends at 4 and C starts at 5, so A must precede C. A and B overlap, B and C overlap, no other constraint" tabindex="0" role="region" aria-label="Mathematical notation">the register starts at 0
 
   A   write 1    [0, 4]
   B   read → 1   [2, 6]
   C   read → 0   [5, 9]
 
 real time:  A ends at 4 and C starts at 5, so A must precede C
-            A and B overlap; B and C overlap; no other constraint</div><p>Nothing about this history looks wrong operation by operation. <span class="math">B</span> read <span class="math">1</span>, which was written. <span class="math">C</span> read <span class="math">0</span>, which was the initial value. Both are values the register genuinely held, and a system that checked each response individually would report no problem at all.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">order     real time      replay against a register starting at 0
+            A and B overlap; B and C overlap; no other constraint</div><p>Nothing about this history looks wrong operation by operation. <span class="math" data-say="B">B</span> read <span class="math" data-say="1">1</span>, which was written. <span class="math" data-say="C">C</span> read <span class="math" data-say="0">0</span>, which was the initial value. Both are values the register genuinely held, and a system that checked each response individually would report no problem at all.</p><div class="mathblock" data-say="order, real time, replay against a register starting at 0. A B C, A before C, w 1, r goes to 1 check, r goes to 0 fails, C reads 0 after the write. A C B, A before C, w 1, r goes to 0 fails. B A C, A before C, r goes to 1 fails, nothing written yet. B C A, C before A, rejected by real time. C A B, C before A, rejected by real time. C B A, C before A, rejected by real time. total orders, 6. allowed by real time, 3. legal, 0, the history is NOT linearizable" tabindex="0" role="region" aria-label="Mathematical notation">order     real time      replay against a register starting at 0
 
   A B C   A before C     w1,  r→1 ✓,  r→0 ✗   C reads 0 after the write
   A C B   A before C     w1,  r→0 ✗
@@ -1331,14 +1331,14 @@ real time:  A ends at 4 and C starts at 5, so A must precede C
 
   total orders                6
   allowed by real time        3
-  legal                       0      the history is NOT linearizable</div><p>The verdict comes from the combination. <span class="math">C</span> reading <span class="math">0</span> would be fine if it could be placed before the write, and real time forbids that because <span class="math">A</span> had already returned when <span class="math">C</span> was issued. <span class="math">B</span> reading <span class="math">1</span> would be fine anywhere after the write. It is the pair of constraints together that leaves nothing, which is why linearizability is a property of histories and not of responses.</p><h3>Why the lab stops at six operations</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">k       k!            what the enumeration costs
+  legal                       0      the history is NOT linearizable</div><p>The verdict comes from the combination. <span class="math" data-say="C">C</span> reading <span class="math" data-say="0">0</span> would be fine if it could be placed before the write, and real time forbids that because <span class="math" data-say="A">A</span> had already returned when <span class="math" data-say="C">C</span> was issued. <span class="math" data-say="B">B</span> reading <span class="math" data-say="1">1</span> would be fine anywhere after the write. It is the pair of constraints together that leaves nothing, which is why linearizability is a property of histories and not of responses.</p><h3>Why the lab stops at six operations</h3><div class="mathblock" data-say="k, k factorial, what the enumeration costs. 3, 6. 4, 24. 5, 120. a table, shown on the page. 10, 3628800. 20, 2.4 times 10 to the power 18" tabindex="0" role="region" aria-label="Mathematical notation">k       k!            what the enumeration costs
 3         6
 4        24
 5       120
 6       720           the cap the lab enforces
 7      5040           refused, with the number printed
 10  3 628 800
-20   2.4 × 10¹⁸</div><p>The growth is factorial, so the cap is not a limitation of the page, it is the shape of the problem. Real checkers do not enumerate: they search with pruning, commit operations greedily and backtrack, or check a weaker property that is cheaper to decide. The lab refuses a seventh operation and prints <span class="math">5040</span> rather than quietly truncating, because a silent truncation would teach the opposite of the thing worth learning.</p><div class="example"><span class="label">Example &middot; One return value makes it legal</span><p>Change <span class="math">C</span> to read <span class="math">1</span> instead of <span class="math">0</span> and nothing else about the history moves — same intervals, same real-time constraint. Now <span class="math">A B C</span> replays as <span class="math">w1, r→1, r→1</span>, which is legal, and <span class="math">A C B</span> does too. Two of the three real-time-respecting orders survive, the count is <span class="math">2</span>, and the history is linearizable. A single returned value flipped the verdict, which is the sense in which linearizability is a property of the whole history and a very sharp one.</p></div><p>It is worth being precise about what this buys. Linearizability is the guarantee that the system behaves as though there were one copy of the data and every operation took effect at a single instant between its call and its return. “Quorums Overlap” gave a much weaker property — no acknowledged write is missed entirely — and the gap between the two is the whole reason this lesson exists.</p></article>
+20   2.4 × 10¹⁸</div><p>The growth is factorial, so the cap is not a limitation of the page, it is the shape of the problem. Real checkers do not enumerate: they search with pruning, commit operations greedily and backtrack, or check a weaker property that is cheaper to decide. The lab refuses a seventh operation and prints <span class="math" data-say="5040">5040</span> rather than quietly truncating, because a silent truncation would teach the opposite of the thing worth learning.</p><div class="example"><span class="label">Example &middot; One return value makes it legal</span><p>Change <span class="math" data-say="C">C</span> to read <span class="math" data-say="1">1</span> instead of <span class="math" data-say="0">0</span> and nothing else about the history moves — same intervals, same real-time constraint. Now <span class="math" data-say="A B C">A B C</span> replays as <span class="math" data-say="w 1, r goes to 1, r goes to 1">w1, r→1, r→1</span>, which is legal, and <span class="math" data-say="A C B">A C B</span> does too. Two of the three real-time-respecting orders survive, the count is <span class="math" data-say="2">2</span>, and the history is linearizable. A single returned value flipped the verdict, which is the sense in which linearizability is a property of the whole history and a very sharp one.</p></div><p>It is worth being precise about what this buys. Linearizability is the guarantee that the system behaves as though there were one copy of the data and every operation took effect at a single instant between its call and its return. “Quorums Overlap” gave a much weaker property — no acknowledged write is missed entirely — and the gap between the two is the whole reason this lesson exists.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Linearizability by enumeration</h2></div><p>Count the legal total orders — and see why six is the cap</p></div>
@@ -1382,7 +1382,7 @@ real time:  A ends at 4 and C starts at 5, so A must precede C
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding a short history</h2></div><p>Two filters in a fixed sequence, and a verdict that is a count rather than an opinion.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each operation as an interval with its return value</h3><p>Start, end, what it did, what it returned. A history without return values cannot be checked, and a history without intervals has no real-time constraints to apply.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Derive the real-time constraints pairwise</h3><p>For every pair, if one ended before the other started, that order is forced. If the intervals overlap, both orders remain open. Write the forced pairs down; they are usually far fewer than the pairs.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Enumerate the total orders and keep those respecting the constraints</h3><p><span class="math">k!</span> orders, filtered by the forced pairs. For small <span class="math">k</span> this is a short list and worth writing out, because seeing which orders survive is what makes the next step meaningful.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Replay each survivor against the object and count the legal ones</h3><p>For a register: track the current value, and reject at the first read that disagrees with it. Zero survivors means the history is not linearizable. More than zero means it is, and the count itself has no further meaning.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each operation as an interval with its return value</h3><p>Start, end, what it did, what it returned. A history without return values cannot be checked, and a history without intervals has no real-time constraints to apply.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Derive the real-time constraints pairwise</h3><p>For every pair, if one ended before the other started, that order is forced. If the intervals overlap, both orders remain open. Write the forced pairs down; they are usually far fewer than the pairs.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Enumerate the total orders and keep those respecting the constraints</h3><p><span class="math" data-say="k factorial">k!</span> orders, filtered by the forced pairs. For small <span class="math" data-say="k">k</span> this is a short list and worth writing out, because seeing which orders survive is what makes the next step meaningful.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Replay each survivor against the object and count the legal ones</h3><p>For a register: track the current value, and reject at the first read that disagrees with it. Zero survivors means the history is not linearizable. More than zero means it is, and the count itself has no further meaning.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1393,7 +1393,7 @@ real time:  A ends at 4 and C starts at 5, so A must precede C
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Three operations, six orders, no explanation</h3><p>A register starting at zero. One client writes <span class="math">1</span>; two others read it, one returning <span class="math">1</span> and one returning <span class="math">0</span>. Every response is a value the register really held, and the system is nonetheless wrong. The question is how to demonstrate that rather than assert it.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">initial value 0
+      <article class="card card-pad prose"><h3>Three operations, six orders, no explanation</h3><p>A register starting at zero. One client writes <span class="math" data-say="1">1</span>; two others read it, one returning <span class="math" data-say="1">1</span> and one returning <span class="math" data-say="0">0</span>. Every response is a value the register really held, and the system is nonetheless wrong. The question is how to demonstrate that rather than assert it.</p><div class="mathblock" data-say="initial value 0. A, write 1, 0, 4. B, read goes to 1, 2, 6. C, read goes to 0, 5, 9. real-time constraints. A ends 4, C starts 5, A must precede C. A 0, 4 and B 2, 6 overlap, no constraint. B 2, 6 and C 5, 9 overlap, no constraint. the six total orders. A B C, real time ok, w 1 goes to r 1 check goes to r 0 fails. A C B, real time ok, w 1 goes to r 0 fails. B A C, real time ok, r 1 fails, register still 0. B C A, C before A, rejected. C A B, C before A, rejected. C B A, C before A, rejected. 6 orders, 3 survive real time, 0 survive the replay. verdict, NOT linearizable. change C&#x27;s return value from 0 to 1 and r e-r u n. A B C, w 1 goes to r 1 check goes to r 1 check, legal. A C B, w 1 goes to r 1 check goes to r 1 check, legal. B A C, r 1 fails. 2 legal orders, linearizable" tabindex="0" role="region" aria-label="Mathematical notation">initial value 0
 
   A   write 1     [0, 4]
   B   read → 1    [2, 6]
@@ -1420,12 +1420,12 @@ change C&#x27;s return value from 0 to 1 and re-run
   A B C    w1 → r1 ✓ → r1 ✓    legal
   A C B    w1 → r1 ✓ → r1 ✓    legal
   B A C    r1 ✗
-  2 legal orders — linearizable</div><p>The violation is <span class="math">C</span>, and it is worth saying exactly why rather than pointing at it. <span class="math">C</span> was issued after <span class="math">A</span> had already returned, so whatever instant <span class="math">C</span> took effect at, it was after the write took effect; and it returned the value from before the write. No amount of reordering the two overlapping reads changes that, which is what the three surviving orders demonstrate by all failing.</p><p>The second run is the faded half of the example and it is a single character's difference. Two legal orders exist, so the history is linearizable, and nothing about the timings changed. The lesson is that linearizability is decided by the combination of intervals and returned values, and that neither alone is enough to look at.</p><p>For a faded rehearsal, take the four-operation history with two concurrent writes: <span class="math">A w1[0,3]</span>, <span class="math">B w2[1,5]</span>, <span class="math">C r1[4,8]</span>, <span class="math">D r2[6,10]</span>. The supplied first move is that there are <span class="math">24</span> total orders and the forced pairs are <span class="math">A</span> before <span class="math">C</span> and <span class="math">A</span> before <span class="math">D</span>. Work out how many survive real time, predict whether any are legal, then check both in the lab and explain the result in one sentence about where <span class="math">B</span> had to be placed.</p></article>
+  2 legal orders — linearizable</div><p>The violation is <span class="math" data-say="C">C</span>, and it is worth saying exactly why rather than pointing at it. <span class="math" data-say="C">C</span> was issued after <span class="math" data-say="A">A</span> had already returned, so whatever instant <span class="math" data-say="C">C</span> took effect at, it was after the write took effect; and it returned the value from before the write. No amount of reordering the two overlapping reads changes that, which is what the three surviving orders demonstrate by all failing.</p><p>The second run is the faded half of the example and it is a single character's difference. Two legal orders exist, so the history is linearizable, and nothing about the timings changed. The lesson is that linearizability is decided by the combination of intervals and returned values, and that neither alone is enough to look at.</p><p>For a faded rehearsal, take the four-operation history with two concurrent writes: <span class="math" data-say="A w 1 0, 3">A w1[0,3]</span>, <span class="math" data-say="B w 2 1, 5">B w2[1,5]</span>, <span class="math" data-say="C r 1 4, 8">C r1[4,8]</span>, <span class="math" data-say="D r 2 6, 10">D r2[6,10]</span>. The supplied first move is that there are <span class="math" data-say="24">24</span> total orders and the forced pairs are <span class="math" data-say="A">A</span> before <span class="math" data-say="C">C</span> and <span class="math" data-say="A">A</span> before <span class="math" data-say="D">D</span>. Work out how many survive real time, predict whether any are legal, then check both in the lab and explain the result in one sentence about where <span class="math" data-say="B">B</span> had to be placed.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Checking operations one at a time</strong><span>Every response in the violating history is a value the register held, so per-operation checking passes it. Linearizability is a property of the history taken together, and the only way to refute it is to show that no total order explains all of it. That is why the output is a count over orders rather than a verdict on a response.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading overlapping intervals as permission to do anything</strong><span>An overlap removes a constraint, it does not add a freedom. The two overlapping reads in the worked history could be placed either way round and it made no difference, because the constraint that killed the history came from the non-overlapping pair. Look for the forced pairs first; they are where the verdict comes from.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting enumeration to be how this is checked in practice</strong><span><span class="math">k!</span> reaches five thousand at seven operations and <span class="math">2.4 × 10¹⁸</span> at twenty. Real checkers search with pruning and backtracking, commit operations as soon as the object's state permits, or check something weaker and cheaper. The enumeration here exists because it makes the definition concrete, and the cap exists to make sure you notice it could not scale.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Checking operations one at a time</strong><span>Every response in the violating history is a value the register held, so per-operation checking passes it. Linearizability is a property of the history taken together, and the only way to refute it is to show that no total order explains all of it. That is why the output is a count over orders rather than a verdict on a response.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading overlapping intervals as permission to do anything</strong><span>An overlap removes a constraint, it does not add a freedom. The two overlapping reads in the worked history could be placed either way round and it made no difference, because the constraint that killed the history came from the non-overlapping pair. Look for the forced pairs first; they are where the verdict comes from.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting enumeration to be how this is checked in practice</strong><span><span class="math" data-say="k factorial">k!</span> reaches five thousand at seven operations and <span class="math" data-say="2.4 times 10 to the power 18">2.4 × 10¹⁸</span> at twenty. Real checkers search with pruning and backtracking, commit operations as soon as the object's state permits, or check something weaker and cheaper. The enumeration here exists because it makes the definition concrete, and the cap exists to make sure you notice it could not scale.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “every replica returned a value it held” sounds like an answer to a different question.</strong><p>You should be able to write a history as intervals with return values, derive the forced pairs, enumerate and filter the total orders, replay the survivors against a register, report the count with zero as a violation, and say why the procedure does not scale.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Linearizability rules out disagreement by insisting there was only ever one story. Systems that accept writes in more than one place give that up on purpose, and then have to decide what to do with two updates that genuinely conflict. “Conflict Resolution, Counted” closes the course by counting what each answer throws away.</div></article>
       </div>
     </section>
@@ -1524,7 +1524,7 @@ change C&#x27;s return value from 0 to 1 and re-run
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "Every read in a history returned a value the register genuinely held at some point. Is the history linearizable?", "a": ["Yes \u2014 a read that returns a real value is a correct read", "Not necessarily: linearizability asks whether one total order explains all the operations at once, and the example on this page has no such order", "Yes, provided no two operations overlap", "Only if the reads happened after the write"], "c": 1, "why": "This is the misconception the lesson exists for. In the worked history, <span class=\"math\">B<\/span> returning <span class=\"math\">1<\/span> and <span class=\"math\">C<\/span> returning <span class=\"math\">0<\/span> are individually fine and jointly impossible, because real time forces the write before <span class=\"math\">C<\/span>. Checking responses one at a time cannot see that, which is why the check is over orders rather than over operations."}, {"q": "<span class=\"math\">A<\/span> occupies <span class=\"math\">[0,4]<\/span>, <span class=\"math\">B<\/span> occupies <span class=\"math\">[2,6]<\/span> and <span class=\"math\">C<\/span> occupies <span class=\"math\">[5,9]<\/span>. How many of the <span class=\"math\">6<\/span> total orders respect real time?", "a": ["<span class=\"math\">1<\/span>", "<span class=\"math\">2<\/span>", "<span class=\"math\">3<\/span>", "<span class=\"math\">6<\/span>"], "c": 2, "why": "Only one pair is forced: <span class=\"math\">A<\/span> ends at <span class=\"math\">4<\/span> before <span class=\"math\">C<\/span> starts at <span class=\"math\">5<\/span>, so <span class=\"math\">A<\/span> must precede <span class=\"math\">C<\/span>. Of the six permutations, three put <span class=\"math\">A<\/span> before <span class=\"math\">C<\/span> \u2014 <span class=\"math\">A B C<\/span>, <span class=\"math\">A C B<\/span> and <span class=\"math\">B A C<\/span>. The other two pairs overlap and constrain nothing, so the count is <span class=\"math\">3<\/span> rather than <span class=\"math\">1<\/span>."}, {"q": "Why does the lab refuse a seventh operation rather than sampling the orders?", "a": ["Because seven-operation histories are always linearizable", "Because the enumeration is factorial \u2014 <span class=\"math\">7! = 5040<\/span> against <span class=\"math\">6! = 720<\/span> \u2014 and hiding that behind a silent truncation would teach the opposite of why real checkers do not enumerate", "Because the browser cannot hold five thousand permutations", "Because sampling would give the wrong answer only rarely"], "c": 1, "why": "The refusal is deliberate and the number is printed with it. Five thousand permutations is trivial for any machine, so the limit is pedagogical rather than computational: the factorial is the reason production checkers search with pruning or check weaker properties, and a silent truncation would conceal exactly that."}];
+  var QUIZ = [{"q": "Every read in a history returned a value the register genuinely held at some point. Is the history linearizable?", "a": ["Yes \u2014 a read that returns a real value is a correct read", "Not necessarily: linearizability asks whether one total order explains all the operations at once, and the example on this page has no such order", "Yes, provided no two operations overlap", "Only if the reads happened after the write"], "c": 1, "why": "This is the misconception the lesson exists for. In the worked history, <span class=\"math\" data-say=\"B\">B<\/span> returning <span class=\"math\" data-say=\"1\">1<\/span> and <span class=\"math\" data-say=\"C\">C<\/span> returning <span class=\"math\" data-say=\"0\">0<\/span> are individually fine and jointly impossible, because real time forces the write before <span class=\"math\" data-say=\"C\">C<\/span>. Checking responses one at a time cannot see that, which is why the check is over orders rather than over operations."}, {"q": "<span class=\"math\" data-say=\"A\">A<\/span> occupies <span class=\"math\" data-say=\"0, 4\">[0,4]<\/span>, <span class=\"math\" data-say=\"B\">B<\/span> occupies <span class=\"math\" data-say=\"2, 6\">[2,6]<\/span> and <span class=\"math\" data-say=\"C\">C<\/span> occupies <span class=\"math\" data-say=\"5, 9\">[5,9]<\/span>. How many of the <span class=\"math\" data-say=\"6\">6<\/span> total orders respect real time?", "a": ["<span class=\"math\" data-say=\"1\">1<\/span>", "<span class=\"math\" data-say=\"2\">2<\/span>", "<span class=\"math\" data-say=\"3\">3<\/span>", "<span class=\"math\" data-say=\"6\">6<\/span>"], "c": 2, "why": "Only one pair is forced: <span class=\"math\" data-say=\"A\">A<\/span> ends at <span class=\"math\" data-say=\"4\">4<\/span> before <span class=\"math\" data-say=\"C\">C<\/span> starts at <span class=\"math\" data-say=\"5\">5<\/span>, so <span class=\"math\" data-say=\"A\">A<\/span> must precede <span class=\"math\" data-say=\"C\">C<\/span>. Of the six permutations, three put <span class=\"math\" data-say=\"A\">A<\/span> before <span class=\"math\" data-say=\"C\">C<\/span> \u2014 <span class=\"math\" data-say=\"A B C\">A B C<\/span>, <span class=\"math\" data-say=\"A C B\">A C B<\/span> and <span class=\"math\" data-say=\"B A C\">B A C<\/span>. The other two pairs overlap and constrain nothing, so the count is <span class=\"math\" data-say=\"3\">3<\/span> rather than <span class=\"math\" data-say=\"1\">1<\/span>."}, {"q": "Why does the lab refuse a seventh operation rather than sampling the orders?", "a": ["Because seven-operation histories are always linearizable", "Because the enumeration is factorial \u2014 <span class=\"math\" data-say=\"7 factorial equals 5040\">7! = 5040<\/span> against <span class=\"math\" data-say=\"6 factorial equals 720\">6! = 720<\/span> \u2014 and hiding that behind a silent truncation would teach the opposite of why real checkers do not enumerate", "Because the browser cannot hold five thousand permutations", "Because sampling would give the wrong answer only rarely"], "c": 1, "why": "The refusal is deliberate and the number is printed with it. Five thousand permutations is trivial for any machine, so the limit is pedagogical rather than computational: the factorial is the reason production checkers search with pruning or check weaker properties, and a silent truncation would conceal exactly that."}];
 
   (function () {
 
@@ -2951,6 +2951,213 @@ change C&#x27;s return value from 0 to 1 and re-run
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>

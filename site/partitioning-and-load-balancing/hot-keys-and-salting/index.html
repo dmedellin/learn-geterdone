@@ -1295,11 +1295,11 @@
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Partitioning and Load Balancing &middot; Skew</span>
         <h1>Hot Keys and Salting</h1>
-        <p>One key carrying a fraction <span class="math">f</span> of the traffic leaves the hottest shard at <span class="math">f·λ + (1 − f)λ/N</span>. The first term has no <span class="math">N</span> in it, so resharding cannot reach below <span class="math">f·λ</span> however far it is pushed — a thousand shards barely moved it in the lab. What does work is splitting the key into <span class="math">s</span> pieces, which turns <span class="math">f</span> into <span class="math">f/s</span>, and the price is paid on every read of that key.</p>
+        <p>One key carrying a fraction <span class="math" data-say="f">f</span> of the traffic leaves the hottest shard at <span class="math" data-say="f times lambda plus 1 minus f lambda over N">f·λ + (1 − f)λ/N</span>. The first term has no <span class="math" data-say="N">N</span> in it, so resharding cannot reach below <span class="math" data-say="f times lambda">f·λ</span> however far it is pushed — a thousand shards barely moved it in the lab. What does work is splitting the key into <span class="math" data-say="s">s</span> pieces, which turns <span class="math" data-say="f">f</span> into <span class="math" data-say="f over s">f/s</span>, and the price is paid on every read of that key.</p>
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">hottest = f·λ + (1 − f)λ/N        the first term is not a function of N
+        <div class="mathblock" data-say="hottest equals f times lambda plus 1 minus f lambda over N, the first term is not a function of N. floor, equals f times lambda, what no shard count reaches under. f equals 12 percent, lambda equals 100000 per second, floor equals 12000 per second. N equals 16, goes to, 17500 per second, N equals 1024, goes to, 12086 per second. salted into s, hot term becomes the quantity f over s, times lambda, s equals 8, to, 7000 per second. reads overall times the quantity 1 minus f plus f times s, equals 1.84 at f equals 12 percent, s equals 8" tabindex="0" role="region" aria-label="Mathematical notation">hottest = f·λ + (1 − f)λ/N        the first term is not a function of N
 floor   = f·λ                     what no shard count reaches under
 
 f = 12%, λ = 100 000/s:   floor = 12 000/s
@@ -1310,12 +1310,12 @@ reads overall × (1 − f + f·s) = 1.84 at f = 12%, s = 8</div>
       </div>
     </section>
     <section class="section">
-      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One expression with two terms, and everything on this page follows from which of the two terms contains <span class="math">N</span>.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The hot term does not contain <span class="math">N</span></h3><p>Split the load in two: the hot key's <span class="math">f·λ</span> and everybody else's <span class="math">(1 − f)λ</span>. The second is spread over the fleet and becomes <span class="math">(1 − f)λ/N</span> on each shard. The first goes wherever that one key hashes and stays there, whole. So the hottest shard carries <span class="math">f·λ + (1 − f)λ/N</span>, and taking <span class="math">N</span> to infinity drives the second term to zero and leaves the first exactly where it was.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Salting splits the key, not the traffic</h3><p>Write the key as <span class="math">key#0</span> through <span class="math">key#(s−1)</span>, choosing the suffix at random on each write. Those are <span class="math">s</span> distinct keys, so they hash to <span class="math">s</span> places and the hot term becomes <span class="math">(f/s)·λ</span> on each of them. At <span class="math">f = 12%</span> and <span class="math">s = 8</span> the hottest shard falls from <span class="math">17 500 /s</span> to <span class="math">7 000 /s</span>, which is close to the mean of <span class="math">6 250 /s</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The price is on every read of that key</h3><p>A read of a salted key has to visit all <span class="math">s</span> pieces and combine them, so reads of that key are multiplied by <span class="math">s</span>. Over the whole read stream the multiplier is <span class="math">1 − f + f·s</span>, because only the <span class="math">f</span> share fans out: at <span class="math">f = 12%</span> and <span class="math">s = 8</span> that is <span class="math">1.84</span> times the reads overall. Salting is a write-side fix bought with read-side work, and it is only worth it when reads of that key are rare or cheap.</p></article></div>
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One expression with two terms, and everything on this page follows from which of the two terms contains <span class="math" data-say="N">N</span>.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The hot term does not contain <span class="math" data-say="N">N</span></h3><p>Split the load in two: the hot key's <span class="math" data-say="f times lambda">f·λ</span> and everybody else's <span class="math" data-say="1 minus f lambda">(1 − f)λ</span>. The second is spread over the fleet and becomes <span class="math" data-say="1 minus f lambda over N">(1 − f)λ/N</span> on each shard. The first goes wherever that one key hashes and stays there, whole. So the hottest shard carries <span class="math" data-say="f times lambda plus 1 minus f lambda over N">f·λ + (1 − f)λ/N</span>, and taking <span class="math" data-say="N">N</span> to infinity drives the second term to zero and leaves the first exactly where it was.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Salting splits the key, not the traffic</h3><p>Write the key as <span class="math" data-say="key number 0">key#0</span> through <span class="math" data-say="key number s minus 1">key#(s−1)</span>, choosing the suffix at random on each write. Those are <span class="math" data-say="s">s</span> distinct keys, so they hash to <span class="math" data-say="s">s</span> places and the hot term becomes <span class="math" data-say="the quantity f over s, times lambda">(f/s)·λ</span> on each of them. At <span class="math" data-say="f equals 12 percent">f = 12%</span> and <span class="math" data-say="s equals 8">s = 8</span> the hottest shard falls from <span class="math" data-say="17500 per second">17 500 /s</span> to <span class="math" data-say="7000 per second">7 000 /s</span>, which is close to the mean of <span class="math" data-say="6250 per second">6 250 /s</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The price is on every read of that key</h3><p>A read of a salted key has to visit all <span class="math" data-say="s">s</span> pieces and combine them, so reads of that key are multiplied by <span class="math" data-say="s">s</span>. Over the whole read stream the multiplier is <span class="math" data-say="1 minus f plus f times s">1 − f + f·s</span>, because only the <span class="math" data-say="f">f</span> share fans out: at <span class="math" data-say="f equals 12 percent">f = 12%</span> and <span class="math" data-say="s equals 8">s = 8</span> that is <span class="math" data-say="1.84">1.84</span> times the reads overall. Salting is a write-side fix bought with read-side work, and it is only worth it when reads of that key are rare or cheap.</p></article></div>
     </section>
     <section class="section" id="read">
-      <div class="section-head"><div><p class="kicker">The material</p><h2>A load with a floor in it</h2></div><p>Where the two terms come from, what happens to each as <span class="math">N</span> grows, what salting changes, and what it costs on the read path.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Hot key</span><p>A <strong>hot key</strong> is a single key that receives a disproportionate share <span class="math">f</span> of the traffic to a dataset. Because every partitioning function maps one key to one shard, the whole of <span class="math">f·λ</span> arrives at one node no matter how the function is chosen or how many shards there are. The remaining <span class="math">(1 − f)λ</span> is spread by whatever the function does.</p></div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">hottest shard&#x27;s load, with one hot key
+      <div class="section-head"><div><p class="kicker">The material</p><h2>A load with a floor in it</h2></div><p>Where the two terms come from, what happens to each as <span class="math" data-say="N">N</span> grows, what salting changes, and what it costs on the read path.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Hot key</span><p>A <strong>hot key</strong> is a single key that receives a disproportionate share <span class="math" data-say="f">f</span> of the traffic to a dataset. Because every partitioning function maps one key to one shard, the whole of <span class="math" data-say="f times lambda">f·λ</span> arrives at one node no matter how the function is chosen or how many shards there are. The remaining <span class="math" data-say="1 minus f lambda">(1 − f)λ</span> is spread by whatever the function does.</p></div><div class="mathblock" data-say="hottest shard&#x27;s load, with one hot key. hottest of N equals f times lambda, plus, the quantity 1 minus f, times lambda over N. up, up. no N, goes to 0 as N grows. lambda equals 100000 per second, f equals 12 percent. N, mean, hottest, imbalance, above the floor. a table, shown on the page. floor equals f times lambda equals 12000 per second" tabindex="0" role="region" aria-label="Mathematical notation">hottest shard&#x27;s load, with one hot key
 
   hottest(N) = f·λ  +  (1 − f)·λ/N
                ↑         ↑
@@ -1330,7 +1330,7 @@ reads overall × (1 − f + f·s) = 1.84 at f = 12%, s = 8</div>
   128       781     12 688      16.24×             688
 1 024        98     12 086     123.76×              86
 
-  floor = f·λ = 12 000 /s</div><p>Read the last column down. Sixty-four times the shards took the hottest shard from <span class="math">17 500 /s</span> to <span class="math">12 086 /s</span>, a reduction of 31%, and the remaining <span class="math">12 086</span> is <span class="math">12 000</span> of hot key plus <span class="math">86</span> of everything else. Every further shard is buying a share of the <span class="math">86</span>. The imbalance column is going the other way — 2.80 times the mean at 16 shards and 123.76 times at 1 024 — because the mean is collapsing while the hottest shard is not.</p><p>This is the second of the three skews on this course that resharding does not fix, and it is the starkest. A hot range at least moves when you split it; a hot key does not move at all, because there is nothing in it to split. The asymptote is the shape “Graphs and Asymptotes” on the Algebra path describes: a curve falling toward a horizontal line it never meets, and the line is at <span class="math">f·λ</span>.</p><h3>Salting: making one key into several</h3><div class="defbox"><span class="label">Definition &middot; Salting</span><p><strong>Salting</strong> a key replaces it with <span class="math">s</span> derived keys — <span class="math">key#0, key#1, …, key#(s−1)</span> — choosing a suffix uniformly at random on each write. Writes to the original key are then spread over <span class="math">s</span> distinct keys, which hash independently. A read must fetch all <span class="math">s</span> pieces and combine them, so the operation the salt makes cheap is the write and the operation it makes expensive is the read.</p></div><p>The arithmetic is immediate: the hot term becomes <span class="math">(f/s)·λ</span> and the rest is unchanged, so the hottest shard holds <span class="math">(f/s)·λ + (1 − f)λ/N</span>. At <span class="math">f = 12%</span>, <span class="math">λ = 100 000 /s</span>, <span class="math">N = 16</span> and <span class="math">s = 8</span> that is <span class="math">1 500 + 5 500 = 7 000 /s</span>, against a mean of <span class="math">6 250 /s</span>. Where sixty-four times the shards bought a 31% reduction, eight salt pieces bought 60%.</p><div class="example"><span class="label">Example &middot; What the salt costs, stated two ways</span><p>Every read of the salted key now issues <span class="math">s = 8</span> requests instead of one, so reads <em>of that key</em> are 8 times as expensive. Across the whole read stream the multiplier is smaller, because only the hot key fans out: <span class="math">1 − f + f·s = 0.88 + 0.96 = 1.84</span>, so the fleet does 1.84 times the reads overall. Both numbers are true and they answer different questions — the first sizes the latency of a read of that key, the second sizes the fleet. Quoting only the second makes salting sound cheaper than it is for the request that actually touches the hot key.</p></div><p>Choose <span class="math">s</span> from the target, not from habit. The lab reports that at these numbers a salt of 4 already brings the hottest shard within <span class="math">1.5</span> times the mean, at a read multiplier of <span class="math">1.36</span> rather than <span class="math">1.84</span>. Going to <span class="math">s = 16</span> gets the hottest shard to <span class="math">6 250 /s</span> — the mean exactly — for a read multiplier of <span class="math">2.80</span>. The last increments of balance are the expensive ones.</p><h3>When not to salt</h3><p>Salting is one of three answers and it is the one with a running cost. If the hot key is read far more than it is written, a cache in front of it removes the load without touching the partitioning at all — “Hit Rate and Backend Load” prices that. If the key is hot because of one client, a rate limit is cheaper than either. Salt when the traffic is genuinely write-heavy on a key that genuinely has to be one key, and then write down the read multiplier you accepted.</p><p>One more property worth stating plainly: <span class="math">f</span> is measured, not assumed. It is the hot key's share of the traffic, and getting it from a sampled request log is usually easy. Everything on this page is a function of <span class="math">f</span>, <span class="math">λ</span>, <span class="math">N</span> and <span class="math">s</span>, so a designer who knows those four numbers can answer “will more shards help?” before anyone builds anything — and the answer, when <span class="math">f·λ</span> is already above one node's capacity, is no.</p></article>
+  floor = f·λ = 12 000 /s</div><p>Read the last column down. Sixty-four times the shards took the hottest shard from <span class="math" data-say="17500 per second">17 500 /s</span> to <span class="math" data-say="12086 per second">12 086 /s</span>, a reduction of 31%, and the remaining <span class="math" data-say="12086">12 086</span> is <span class="math" data-say="12000">12 000</span> of hot key plus <span class="math" data-say="86">86</span> of everything else. Every further shard is buying a share of the <span class="math" data-say="86">86</span>. The imbalance column is going the other way — 2.80 times the mean at 16 shards and 123.76 times at 1 024 — because the mean is collapsing while the hottest shard is not.</p><p>This is the second of the three skews on this course that resharding does not fix, and it is the starkest. A hot range at least moves when you split it; a hot key does not move at all, because there is nothing in it to split. The asymptote is the shape “Graphs and Asymptotes” on the Algebra path describes: a curve falling toward a horizontal line it never meets, and the line is at <span class="math" data-say="f times lambda">f·λ</span>.</p><h3>Salting: making one key into several</h3><div class="defbox"><span class="label">Definition &middot; Salting</span><p><strong>Salting</strong> a key replaces it with <span class="math" data-say="s">s</span> derived keys — <span class="math" data-say="key number 0, key number 1, and so on, key number s minus 1">key#0, key#1, …, key#(s−1)</span> — choosing a suffix uniformly at random on each write. Writes to the original key are then spread over <span class="math" data-say="s">s</span> distinct keys, which hash independently. A read must fetch all <span class="math" data-say="s">s</span> pieces and combine them, so the operation the salt makes cheap is the write and the operation it makes expensive is the read.</p></div><p>The arithmetic is immediate: the hot term becomes <span class="math" data-say="the quantity f over s, times lambda">(f/s)·λ</span> and the rest is unchanged, so the hottest shard holds <span class="math" data-say="the quantity f over s, times lambda plus 1 minus f lambda over N">(f/s)·λ + (1 − f)λ/N</span>. At <span class="math" data-say="f equals 12 percent">f = 12%</span>, <span class="math" data-say="lambda equals 100000 per second">λ = 100 000 /s</span>, <span class="math" data-say="N equals 16">N = 16</span> and <span class="math" data-say="s equals 8">s = 8</span> that is <span class="math" data-say="1500 plus 5500 equals 7000 per second">1 500 + 5 500 = 7 000 /s</span>, against a mean of <span class="math" data-say="6250 per second">6 250 /s</span>. Where sixty-four times the shards bought a 31% reduction, eight salt pieces bought 60%.</p><div class="example"><span class="label">Example &middot; What the salt costs, stated two ways</span><p>Every read of the salted key now issues <span class="math" data-say="s equals 8">s = 8</span> requests instead of one, so reads <em>of that key</em> are 8 times as expensive. Across the whole read stream the multiplier is smaller, because only the hot key fans out: <span class="math" data-say="1 minus f plus f times s equals 0.88 plus 0.96 equals 1.84">1 − f + f·s = 0.88 + 0.96 = 1.84</span>, so the fleet does 1.84 times the reads overall. Both numbers are true and they answer different questions — the first sizes the latency of a read of that key, the second sizes the fleet. Quoting only the second makes salting sound cheaper than it is for the request that actually touches the hot key.</p></div><p>Choose <span class="math" data-say="s">s</span> from the target, not from habit. The lab reports that at these numbers a salt of 4 already brings the hottest shard within <span class="math" data-say="1.5">1.5</span> times the mean, at a read multiplier of <span class="math" data-say="1.36">1.36</span> rather than <span class="math" data-say="1.84">1.84</span>. Going to <span class="math" data-say="s equals 16">s = 16</span> gets the hottest shard to <span class="math" data-say="6250 per second">6 250 /s</span> — the mean exactly — for a read multiplier of <span class="math" data-say="2.80">2.80</span>. The last increments of balance are the expensive ones.</p><h3>When not to salt</h3><p>Salting is one of three answers and it is the one with a running cost. If the hot key is read far more than it is written, a cache in front of it removes the load without touching the partitioning at all — “Hit Rate and Backend Load” prices that. If the key is hot because of one client, a rate limit is cheaper than either. Salt when the traffic is genuinely write-heavy on a key that genuinely has to be one key, and then write down the read multiplier you accepted.</p><p>One more property worth stating plainly: <span class="math" data-say="f">f</span> is measured, not assumed. It is the hot key's share of the traffic, and getting it from a sampled request log is usually easy. Everything on this page is a function of <span class="math" data-say="f">f</span>, <span class="math" data-say="lambda">λ</span>, <span class="math" data-say="N">N</span> and <span class="math" data-say="s">s</span>, so a designer who knows those four numbers can answer “will more shards help?” before anyone builds anything — and the answer, when <span class="math" data-say="f times lambda">f·λ</span> is already above one node's capacity, is no.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Hot keys and salting</h2></div><p>f·λ + (1−f)λ/N, and the first term is not a function of N</p></div>
@@ -1346,7 +1346,7 @@ reads overall × (1 − f + f·s) = 1.84 at f = 12%, s = 8</div>
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Make one key hot, then try to shard it away</h3>
-          <p>Take the shard count as high as it goes and watch the curve flatten onto <span class="math">f·λ</span> instead of falling. Then bring <span class="math">N</span> back and move the salt instead, and compare what the two dials cost: one of them is a fleet and the other is a read multiplier.</p>
+          <p>Take the shard count as high as it goes and watch the curve flatten onto <span class="math" data-say="f times lambda">f·λ</span> instead of falling. Then bring <span class="math" data-say="N">N</span> back and move the salt instead, and compare what the two dials cost: one of them is a fleet and the other is a read multiplier.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="shLam">Total load (requests a second)</label><span class="range-value" id="shLamOut">100000</span></div>
           <input id="shLam" type="range" min="1000" max="500000" step="1000" value="100000" />
@@ -1376,8 +1376,8 @@ reads overall × (1 − f + f·s) = 1.84 at f = 12%, s = 8</div>
       </div>
     </section>
     <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a hot key</h2></div><p>Measure <span class="math">f</span> first. Every other number on this page is a function of it, and an assumed <span class="math">f</span> makes the whole calculation decorative.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure <span class="math">f</span> from a request sample</h3><p><span class="math">f</span> is the hot key's share of requests, and a sampled log gives it directly. Do this before anything else: the difference between <span class="math">f = 2%</span> and <span class="math">f = 12%</span> is the difference between a problem more shards will handle and one they cannot touch.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the floor, <span class="math">f·λ</span>, and compare it with one node</h3><p><span class="math">f·λ</span> is what the hot shard carries after infinite resharding. If it is already above a node's capacity, resharding is not a candidate solution and there is no point pricing it. At <span class="math">f = 12%</span> and <span class="math">λ = 100 000 /s</span> the floor is <span class="math">12 000 /s</span>, which is more than the <span class="math">8 000 /s</span> node of “How Many Shards”.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the hottest shard at the <span class="math">N</span> you have, and at a much larger one</h3><p><span class="math">f·λ + (1 − f)λ/N</span> at both. The gap between them is the entire benefit resharding can deliver — <span class="math">17 500</span> to <span class="math">12 086</span> here, and the second figure needed sixty-four times the fleet.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Choose <span class="math">s</span> from a target multiple of the mean, and write down the read cost</h3><p>Pick the imbalance you will accept, solve for <span class="math">s</span>, and record <span class="math">1 − f + f·s</span> beside it. At these numbers <span class="math">s = 4</span> lands within <span class="math">1.5</span> times the mean for a <span class="math">1.36</span> read multiplier and <span class="math">s = 8</span> within <span class="math">1.12</span> for <span class="math">1.84</span>. The number you must not omit from the write-up is the second one.</p></article></div>
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a hot key</h2></div><p>Measure <span class="math" data-say="f">f</span> first. Every other number on this page is a function of it, and an assumed <span class="math" data-say="f">f</span> makes the whole calculation decorative.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure <span class="math" data-say="f">f</span> from a request sample</h3><p><span class="math" data-say="f">f</span> is the hot key's share of requests, and a sampled log gives it directly. Do this before anything else: the difference between <span class="math" data-say="f equals 2 percent">f = 2%</span> and <span class="math" data-say="f equals 12 percent">f = 12%</span> is the difference between a problem more shards will handle and one they cannot touch.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the floor, <span class="math" data-say="f times lambda">f·λ</span>, and compare it with one node</h3><p><span class="math" data-say="f times lambda">f·λ</span> is what the hot shard carries after infinite resharding. If it is already above a node's capacity, resharding is not a candidate solution and there is no point pricing it. At <span class="math" data-say="f equals 12 percent">f = 12%</span> and <span class="math" data-say="lambda equals 100000 per second">λ = 100 000 /s</span> the floor is <span class="math" data-say="12000 per second">12 000 /s</span>, which is more than the <span class="math" data-say="8000 per second">8 000 /s</span> node of “How Many Shards”.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the hottest shard at the <span class="math" data-say="N">N</span> you have, and at a much larger one</h3><p><span class="math" data-say="f times lambda plus 1 minus f lambda over N">f·λ + (1 − f)λ/N</span> at both. The gap between them is the entire benefit resharding can deliver — <span class="math" data-say="17500">17 500</span> to <span class="math" data-say="12086">12 086</span> here, and the second figure needed sixty-four times the fleet.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Choose <span class="math" data-say="s">s</span> from a target multiple of the mean, and write down the read cost</h3><p>Pick the imbalance you will accept, solve for <span class="math" data-say="s">s</span>, and record <span class="math" data-say="1 minus f plus f times s">1 − f + f·s</span> beside it. At these numbers <span class="math" data-say="s equals 4">s = 4</span> lands within <span class="math" data-say="1.5">1.5</span> times the mean for a <span class="math" data-say="1.36">1.36</span> read multiplier and <span class="math" data-say="s equals 8">s = 8</span> within <span class="math" data-say="1.12">1.12</span> for <span class="math" data-say="1.84">1.84</span>. The number you must not omit from the write-up is the second one.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1388,7 +1388,7 @@ reads overall × (1 − f + f·s) = 1.84 at f = 12%, s = 8</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>One key at 12% of 100 000 requests a second</h3><p>The hottest shard at the current fleet, then after a large reshard, then after a salt — with the read cost of the last one stated both ways.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">λ = 100 000 /s    f = 12%    N = 16
+      <article class="card card-pad prose"><h3>One key at 12% of 100 000 requests a second</h3><p>The hottest shard at the current fleet, then after a large reshard, then after a salt — with the read cost of the last one stated both ways.</p><div class="mathblock" data-say="lambda equals 100000 per second, f equals 12 percent, N equals 16. mean shard, equals 100000 over 16, equals 6250 per second. hot term, equals 0.12 times 100000, equals 12000 per second. everyone else, equals 0.88 times 100000 over 16, equals, 5500 per second. hottest shard, equals 12000 plus 5500, equals 17500 per second equals 2.80 times mean. reshard to N equals 1024. mean shard, equals 100000 over 1024, equals, 98 per second. hottest shard, equals 12000 plus 0.88 times 97.7, equals 12086 per second equals 123.76 times mean. bought, 17500 to 12086, A 31 percent reduction for 64 times the fleet. salt into s equals 8, back at N equals 16. hot term, equals the quantity 0.12 over 8, times 100000, equals, 1500 per second. hottest shard, equals 1500 plus 5500, equals, 7000 per second equals 1.12 times mean. reads of that key, times 8. reads overall, 1 minus 0.12 plus 0.12 times 8 equals 1.84, times 1.84" tabindex="0" role="region" aria-label="Mathematical notation">λ = 100 000 /s    f = 12%    N = 16
 
   mean shard      = 100 000/16                = 6 250 /s
   hot term        = 0.12 × 100 000            = 12 000 /s
@@ -1404,13 +1404,13 @@ salt into s = 8, back at N = 16
   hot term        = (0.12/8) × 100 000        =  1 500 /s
   hottest shard   = 1 500 + 5 500             =  7 000 /s = 1.12 × mean
   reads of that key            × 8
-  reads overall   1 − 0.12 + 0.12 × 8 = 1.84  × 1.84</div><p>Put the two middle blocks side by side. Sixty-four times the machines bought a 31% reduction; eight salt pieces bought 60% and left the fleet alone. That comparison is the lesson, and it is available before anything is built, from four numbers.</p><p>For a faded rehearsal, take <span class="math">f</span> to 30% with <span class="math">λ = 100 000 /s</span> and <span class="math">N = 16</span>. The supplied first move is the floor, <span class="math">f·λ = 30 000 /s</span>. Produce the hottest shard now, the hottest shard at <span class="math">N = 1 024</span>, and the salt <span class="math">s</span> that would bring the hottest shard within 1.5 times the mean; then state the read multiplier that <span class="math">s</span> costs overall and the multiplier it costs a read of that key. Say which of your answers would change if <span class="math">λ</span> doubled.</p></article>
+  reads overall   1 − 0.12 + 0.12 × 8 = 1.84  × 1.84</div><p>Put the two middle blocks side by side. Sixty-four times the machines bought a 31% reduction; eight salt pieces bought 60% and left the fleet alone. That comparison is the lesson, and it is available before anything is built, from four numbers.</p><p>For a faded rehearsal, take <span class="math" data-say="f">f</span> to 30% with <span class="math" data-say="lambda equals 100000 per second">λ = 100 000 /s</span> and <span class="math" data-say="N equals 16">N = 16</span>. The supplied first move is the floor, <span class="math" data-say="f times lambda equals 30000 per second">f·λ = 30 000 /s</span>. Produce the hottest shard now, the hottest shard at <span class="math" data-say="N equals 1024">N = 1 024</span>, and the salt <span class="math" data-say="s">s</span> that would bring the hottest shard within 1.5 times the mean; then state the read multiplier that <span class="math" data-say="s">s</span> costs overall and the multiplier it costs a read of that key. Say which of your answers would change if <span class="math" data-say="lambda">λ</span> doubled.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Answering a hot key with more shards</strong><span>The load on the hot shard is <span class="math">f·λ + (1 − f)λ/N</span> and only the second term responds. Sixty-four times the fleet bought 31% in the lab, and the remaining <span class="math">12 086 /s</span> is almost all hot key. If <span class="math">f·λ</span> is above one node's capacity, no shard count is a solution and the design has to change.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the fleet-wide read multiplier as the cost of a salt</strong><span><span class="math">1 − f + f·s = 1.84</span> is what the fleet does; a read of the salted key does <span class="math">s = 8</span> requests and waits for all of them. The second number is the one a latency budget needs, and it is the one that gets left out of the write-up.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Salting a key that is read far more than it is written</strong><span>Salting trades read work for write balance, so it is backwards for a read-heavy key — where a cache in front of that one key removes the load entirely and changes nothing about the partitioning. Establish the read/write mix on the key before reaching for the salt.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “will more shards help?” is a question you answer with arithmetic rather than an opinion.</strong><p>You should be able to compute the hottest shard's load at any <span class="math">N</span>, state the floor and compare it with one node's capacity, choose a salt from a target imbalance, and report both read multipliers the salt costs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two skews down, one to go. A hot range and a hot key are both about where the work lands; the third is about when it finishes, and it appears on any job that waits for all of its partitions. “Stragglers” shows that a job's time is the maximum of <span class="math">N</span> draws, which grows with <span class="math">N</span> even when nothing is skewed at all.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Answering a hot key with more shards</strong><span>The load on the hot shard is <span class="math" data-say="f times lambda plus 1 minus f lambda over N">f·λ + (1 − f)λ/N</span> and only the second term responds. Sixty-four times the fleet bought 31% in the lab, and the remaining <span class="math" data-say="12086 per second">12 086 /s</span> is almost all hot key. If <span class="math" data-say="f times lambda">f·λ</span> is above one node's capacity, no shard count is a solution and the design has to change.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the fleet-wide read multiplier as the cost of a salt</strong><span><span class="math" data-say="1 minus f plus f times s equals 1.84">1 − f + f·s = 1.84</span> is what the fleet does; a read of the salted key does <span class="math" data-say="s equals 8">s = 8</span> requests and waits for all of them. The second number is the one a latency budget needs, and it is the one that gets left out of the write-up.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Salting a key that is read far more than it is written</strong><span>Salting trades read work for write balance, so it is backwards for a read-heavy key — where a cache in front of that one key removes the load entirely and changes nothing about the partitioning. Establish the read/write mix on the key before reaching for the salt.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “will more shards help?” is a question you answer with arithmetic rather than an opinion.</strong><p>You should be able to compute the hottest shard's load at any <span class="math" data-say="N">N</span>, state the floor and compare it with one node's capacity, choose a salt from a target imbalance, and report both read multipliers the salt costs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two skews down, one to go. A hot range and a hot key are both about where the work lands; the third is about when it finishes, and it appears on any job that waits for all of its partitions. “Stragglers” shows that a job's time is the maximum of <span class="math" data-say="N">N</span> draws, which grows with <span class="math" data-say="N">N</span> even when nothing is skewed at all.</div></article>
       </div>
     </section>
     </main>
@@ -1449,7 +1449,7 @@ salt into s = 8, back at N = 16
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Partitioning and Load Balancing.</strong> The placements on this course are produced by a seeded generator defined on the page, so a “random” assignment is a computed one that you can reproduce and step through. The fractions of keys moved, the shard counts, the hot-key shares and the cross-shard probabilities are exact. The two maximum-load results — <span class="math">Θ(log n / log log n)</span> for one choice and <span class="math">≈ ln ln n</span> for two — are stated, not proved, and what the labs do is measure them.</p>
+      <p><strong>Partitioning and Load Balancing.</strong> The placements on this course are produced by a seeded generator defined on the page, so a “random” assignment is a computed one that you can reproduce and step through. The fractions of keys moved, the shard counts, the hot-key shares and the cross-shard probabilities are exact. The two maximum-load results — <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span> for one choice and <span class="math" data-say="is approximately the natural log of the natural log of n">≈ ln ln n</span> for two — are stated, not proved, and what the labs do is measure them.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1508,7 +1508,7 @@ salt into s = 8, back at N = 16
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "One key takes 12% of <span class=\"math\">100 000<\/span> requests a second, spread over 16 shards. What does the hottest shard carry?", "a": ["<span class=\"math\">6 250 /s<\/span>", "<span class=\"math\">12 000 /s<\/span>", "<span class=\"math\">17 500 /s<\/span>", "<span class=\"math\">5 500 /s<\/span>"], "c": 2, "why": "<span class=\"math\">f\u00b7\u03bb + (1 \u2212 f)\u03bb/N = 12 000 + 5 500 = 17 500 /s<\/span>. <span class=\"math\">12 000<\/span> is the hot term alone, which ignores the rest of the traffic on that shard. <span class=\"math\">5 500<\/span> is the rest of the traffic alone, which ignores the hot key. <span class=\"math\">6 250<\/span> is the mean shard, which is what the fleet would look like if no key were hot."}, {"q": "The same key, the same traffic, and the fleet is resharded to 1 024 shards. What does the hottest shard carry?", "a": ["<span class=\"math\">98 /s<\/span>", "<span class=\"math\">12 086 /s<\/span>", "<span class=\"math\">274 /s<\/span>", "<span class=\"math\">12 000 /s<\/span> exactly"], "c": 1, "why": "<span class=\"math\">12 000 + 0.88 \u00d7 100 000/1 024 = 12 000 + 86 = 12 086 /s<\/span>. <span class=\"math\">98 /s<\/span> is the mean shard at that count, which the hot shard is 123.76 times above. Exactly <span class=\"math\">12 000<\/span> is the floor, approached and not reached \u2014 there is always some ordinary traffic on that shard too."}, {"q": "Salting the key into 8 pieces brings the hottest shard to <span class=\"math\">7 000 /s<\/span>. What does it cost on the read path?", "a": ["Nothing; salting is a write-side change", "Reads of that key fan out to 8 shards, which is 1.84 times the reads over the whole stream", "All reads become 8 times as expensive", "Reads become 1.12 times as expensive, matching the imbalance"], "c": 1, "why": "A read of the salted key must fetch all 8 pieces, so that read is 8 times as expensive. Across the whole read stream only the <span class=\"math\">f<\/span> share fans out, so the fleet-wide multiplier is <span class=\"math\">1 \u2212 f + f\u00b7s = 1.84<\/span>. Both figures matter and they size different things \u2014 the latency of one read, and the capacity of the fleet."}, {"q": "Why does adding shards not fix a hot key?", "a": ["Because hash functions are not uniform enough", "Because the hot term <span class=\"math\">f\u00b7\u03bb<\/span> contains no <span class=\"math\">N<\/span>, so only the <span class=\"math\">(1 \u2212 f)\u03bb/N<\/span> part falls", "Because the hot key is always placed on the first shard", "Because resharding moves the key to a new shard each time"], "c": 1, "why": "One key maps to one shard under any partitioning function, so <span class=\"math\">f\u00b7\u03bb<\/span> arrives whole wherever it lands. Shards divide the other <span class=\"math\">(1 \u2212 f)\u03bb<\/span>, and that term goes to zero while the first stays fixed \u2014 which is why the lab's curve flattens onto <span class=\"math\">f\u00b7\u03bb<\/span> rather than falling. The hash function's quality is the subject of a different lesson and is not what is happening here."}];
+  var QUIZ = [{"q": "One key takes 12% of <span class=\"math\" data-say=\"100000\">100 000<\/span> requests a second, spread over 16 shards. What does the hottest shard carry?", "a": ["<span class=\"math\" data-say=\"6250 per second\">6 250 /s<\/span>", "<span class=\"math\" data-say=\"12000 per second\">12 000 /s<\/span>", "<span class=\"math\" data-say=\"17500 per second\">17 500 /s<\/span>", "<span class=\"math\" data-say=\"5500 per second\">5 500 /s<\/span>"], "c": 2, "why": "<span class=\"math\" data-say=\"f times lambda plus 1 minus f lambda over N equals 12000 plus 5500 equals 17500 per second\">f\u00b7\u03bb + (1 \u2212 f)\u03bb/N = 12 000 + 5 500 = 17 500 /s<\/span>. <span class=\"math\" data-say=\"12000\">12 000<\/span> is the hot term alone, which ignores the rest of the traffic on that shard. <span class=\"math\" data-say=\"5500\">5 500<\/span> is the rest of the traffic alone, which ignores the hot key. <span class=\"math\" data-say=\"6250\">6 250<\/span> is the mean shard, which is what the fleet would look like if no key were hot."}, {"q": "The same key, the same traffic, and the fleet is resharded to 1 024 shards. What does the hottest shard carry?", "a": ["<span class=\"math\" data-say=\"98 per second\">98 /s<\/span>", "<span class=\"math\" data-say=\"12086 per second\">12 086 /s<\/span>", "<span class=\"math\" data-say=\"274 per second\">274 /s<\/span>", "<span class=\"math\" data-say=\"12000 per second\">12 000 /s<\/span> exactly"], "c": 1, "why": "<span class=\"math\" data-say=\"12000 plus 0.88 times 100000 over 1024 equals 12000 plus 86 equals 12086 per second\">12 000 + 0.88 \u00d7 100 000/1 024 = 12 000 + 86 = 12 086 /s<\/span>. <span class=\"math\" data-say=\"98 per second\">98 /s<\/span> is the mean shard at that count, which the hot shard is 123.76 times above. Exactly <span class=\"math\" data-say=\"12000\">12 000<\/span> is the floor, approached and not reached \u2014 there is always some ordinary traffic on that shard too."}, {"q": "Salting the key into 8 pieces brings the hottest shard to <span class=\"math\" data-say=\"7000 per second\">7 000 /s<\/span>. What does it cost on the read path?", "a": ["Nothing; salting is a write-side change", "Reads of that key fan out to 8 shards, which is 1.84 times the reads over the whole stream", "All reads become 8 times as expensive", "Reads become 1.12 times as expensive, matching the imbalance"], "c": 1, "why": "A read of the salted key must fetch all 8 pieces, so that read is 8 times as expensive. Across the whole read stream only the <span class=\"math\" data-say=\"f\">f<\/span> share fans out, so the fleet-wide multiplier is <span class=\"math\" data-say=\"1 minus f plus f times s equals 1.84\">1 \u2212 f + f\u00b7s = 1.84<\/span>. Both figures matter and they size different things \u2014 the latency of one read, and the capacity of the fleet."}, {"q": "Why does adding shards not fix a hot key?", "a": ["Because hash functions are not uniform enough", "Because the hot term <span class=\"math\" data-say=\"f times lambda\">f\u00b7\u03bb<\/span> contains no <span class=\"math\" data-say=\"N\">N<\/span>, so only the <span class=\"math\" data-say=\"1 minus f lambda over N\">(1 \u2212 f)\u03bb/N<\/span> part falls", "Because the hot key is always placed on the first shard", "Because resharding moves the key to a new shard each time"], "c": 1, "why": "One key maps to one shard under any partitioning function, so <span class=\"math\" data-say=\"f times lambda\">f\u00b7\u03bb<\/span> arrives whole wherever it lands. Shards divide the other <span class=\"math\" data-say=\"1 minus f lambda\">(1 \u2212 f)\u03bb<\/span>, and that term goes to zero while the first stays fixed \u2014 which is why the lab's curve flattens onto <span class=\"math\" data-say=\"f times lambda\">f\u00b7\u03bb<\/span> rather than falling. The hash function's quality is the subject of a different lesson and is not what is happening here."}];
 
   (function () {
 
@@ -2839,6 +2839,213 @@ salt into s = 8, back at N = 16
       F.download('feedback-' + F.slugify(id) + '.md', body);
     });
     paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
   })();
   </script>
 </body>
