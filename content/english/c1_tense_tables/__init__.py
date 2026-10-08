@@ -73,7 +73,7 @@ COURSE = {
         "and no count on this page answers it. The labs say which boxes English "
         "writers use and how to build them; choosing between them is the work of "
         "reading and being corrected, which a page cannot do for you.",
-        "Speaking and listening. Nothing here makes a sound. The doubling rule "
+        "Speaking and listening. This course does not teach them. The doubling rule "
         "needs to know where the stress falls, and the page reads that from a "
         "printed list rather than pretending to say the word to you.",
         "Every irregular verb in English. The second course takes the ones that "

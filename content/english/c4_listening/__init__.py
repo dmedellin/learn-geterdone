@@ -17,8 +17,9 @@ COURSE = {
         "read."
     ),
     "summary": (
-        "This course cannot play you a sound, and says so on every page. What it "
-        "can do is mark, on real printed text, the two things a listener uses to "
+        "Press Listen at the top of any page here and the browser reads it out. "
+        "This course tells you what to listen FOR while it does: it marks, on "
+        "real printed text, the two things a listener uses to "
         "cut speech into words: which words get squashed, and where the strong "
         "part of each other word falls. Both are counted in your browser, both "
         "lists are printed, and together they explain why a learner who knows "
@@ -53,8 +54,8 @@ COURSE = {
          "452 of 949 words on the passage in the lab, which is 47.6%, counted in "
          "your browser."),
         ("Explain why they blur together",
-         "They are short and they nearly all use the same flat vowel, so they "
-         "sound alike as well as brief."),
+         "They are short and they nearly all use the same flat <dfn>vowel</dfn>, so "
+         "they sound the same as well as being short."),
         ("Find where a word begins",
          "Most words that carry meaning start on their strong part &mdash; 399 "
          "of 485 on the same page, which is 82.3%."),
@@ -70,15 +71,16 @@ COURSE = {
         "quicker win. Then where the other words begin."
     ),
     "not_covered": [
-        "The sounds themselves. No page on this site makes a noise, and this "
-        "course does not pretend otherwise. It tells you what to listen for and "
-        "where it will be; you need something that speaks to practise on.",
+        "Teaching you to make the sounds. The pages read themselves aloud with "
+        "your browser&rsquo;s voice, which is a reading voice and not a model to "
+        "copy. This course tells you what to listen for; it does not correct "
+        "your own speech, and nothing on a page could.",
         "Accents. The words that get squashed are much the same everywhere "
-        "English is spoken, but what they are squashed into is not, and nothing "
+        "English is spoken, but what they turn into is not, and nothing "
         "here measures that.",
-        "Fast speech beyond word shapes. Sounds also run into one another and "
-        "change at the join. That is real and it is not counted here, because "
-        "nothing on a page could check it.",
+        "Quick speech beyond word shapes. Sounds also run into one another and "
+        "change where they meet. That is real and it is not counted here, "
+        "because nothing on a page could check it.",
         "Which part of a word is the strong one, as a rule. There is no reliable "
         "rule from the spelling. The lab prints it for every word on its page and "
         "names that as a thing to learn with the word.",
@@ -93,8 +95,8 @@ COURSE = {
         "so a strong part means a new word",
     ],
     "footer_lead": (
-        "<strong>Educational course material.</strong> No sound is played on "
-        "this course. Every figure is counted in your browser over text printed "
+        "<strong>Educational course material.</strong> The reading voice is your "
+        "own browser&rsquo;s. Every figure is counted in your browser over text printed "
         "on the same page, with the word list printed beside it. Pronunciation "
         "data: CMUdict, BSD licence."
     ),

@@ -86,8 +86,9 @@ LESSONS = [
             "mode": "listening",
             "panel_title": "Mark the squashed words and count them",
             "panel_intro": (
-                "Nothing here makes a sound. What it does is mark every word on "
-                "a real page that gets squashed when the page is read aloud, "
+                "Press Listen at the top of this page and your browser reads it "
+                "aloud. This marks every word on a real page that gets "
+                "squashed when it is read, "
                 "count them, and list what each one turns into. The second "
                 "setting marks the other words instead, and that is the next "
                 "lesson."
@@ -223,15 +224,17 @@ LESSONS = [
              "That is why a run of small words can arrive as a single noise. "
              "There are four or five words in it, they are all from the same "
              "short list, and they are all wearing the same vowel."),
-            ("h3", "What this page cannot do"),
+            ("h3", "Hearing it, not only reading it"),
             ("p",
-             "It cannot play you the sound. Nothing on this site makes a noise, "
-             "and a lesson about listening has to be honest about that."),
+             "Press Listen at the top of the page and your browser will read it to "
+             "you. That voice is a reading voice rather than a person talking, so "
+             "it squashes less than a speaker would; what you hear is the slow "
+             "version of the thing this lesson is about."),
             ("p",
-             "What it can do is tell you exactly what to listen for, and show you "
-             "where it is. The lab marks every squashed word on a real page and "
-             "prints what each one becomes. Take that list to anything you are "
-             "already listening to, and the gaps stop being gaps."),
+             "What this lesson adds is knowing what to listen for, and where. The "
+             "lab marks every squashed word on a real page and prints what each "
+             "one becomes. Take that list to anything you are already listening "
+             "to, and the gaps stop being gaps."),
         ],
     },
 ]

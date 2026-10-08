@@ -844,7 +844,8 @@ def _irrshare(cfg):
 # ---------------------------------------------------------------------------
 # listening -- the one thing a page can teach about hearing English
 #
-# No sound is played. What a learner who says English is "too fast" is usually
+# The page reads itself aloud with the browser's voice; what this mode adds
+# is knowing what to listen for. A learner who says English is "too fast" is usually
 # failing at is not speed but WORD BOUNDARIES, and the two regularities native
 # listeners use to find them can both be printed:
 #
@@ -940,13 +941,13 @@ def _listening(cfg):
 """)
     return Lab(
         title="Why it sounds too fast, marked on the page",
-        subtitle="No sound is played here; what is printed is what to listen for",
+        subtitle="Press Listen above to hear the page; this marks what to listen for",
         markup=markup, controls=controls,
         panel_title=cfg.get("panel_title", "Mark the squashed words, then the strong parts"),
         panel_intro=cfg.get("panel_intro",
-            "Nothing on this page makes a sound. What it can do is show you which "
-            "words get squashed when people speak, and which part of every other "
-            "word is said hardest. Both are counted on the passage below, and the "
+            "Press Listen at the top of the page to hear it read. What this marks "
+            "is which words get squashed when people speak, and which part of "
+            "every other word is said hardest. Both are counted on the passage below, and the "
             "squashed words are listed with how they are actually said."),
         script=script, expect={"lsPreset": _expect(_LS_PRESETS)},
     )
