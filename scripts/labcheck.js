@@ -149,7 +149,10 @@ function selectsOf(markup) {
   while ((m = selectRe.exec(markup))) {
     const idm = /\bid="([^"]+)"/.exec(m[1]);
     if (!idm) continue;
-    out.set(idm[1], [...m[2].matchAll(/<option\b([^>]*)>/g)]
+    // A quoted attribute may hold a '>' (the truth-table kit ships formulas
+    // such as p -> ~p as option values), so the tag ends at the first '>'
+    // outside quotes, not at the first '>'.
+    out.set(idm[1], [...m[2].matchAll(/<option\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g)]
       .map((o) => { const v = /\bvalue="([^"]*)"/.exec(o[1]); return v ? v[1] : ''; }));
   }
   return out;
