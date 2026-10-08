@@ -30,8 +30,8 @@ import unicodedata
 SYMBOLS = {
     # relations
     "=": "equals", "≠": "is not equal to", "<": "is less than",
-    ">": "is greater than", "≤": "is less than or equal to",
-    "≥": "is greater than or equal to", "≈": "is approximately",
+    ">": "is greater than", "≤": "is at most",
+    "≥": "is at least", "≈": "is approximately",
     "≡": "is congruent to", "∝": "is proportional to", "~": "is approximately",
     "≪": "is much less than", "≫": "is much greater than",
     "≅": "is isomorphic to", "≺": "precedes", "≼": "precedes or equals",
@@ -84,8 +84,8 @@ SYMBOLS = {
 # ASCII spellings of the same relations. Longest first, so `<=>` is not read
 # as `<=` followed by `>`.
 ASCII_OPS = {
-    "<--": ",", "-->": ",", "<=>": "if and only if", "<=": "is less than or equal to",
-    ">=": "is greater than or equal to", "!=": "is not equal to",
+    "<--": ",", "-->": ",", "<=>": "if and only if", "<=": "is at most",
+    ">=": "is at least", "!=": "is not equal to",
     "==": "equals", "->": "to", "=>": "implies", ":=": "is defined as",
     "<-": "gets", "+=": "plus equals", "**": "to the power",
 }
@@ -665,8 +665,16 @@ def say(text, *, override=None):
     text = "".join(unicodedata.normalize("NFD", c)
                    if any(m in unicodedata.normalize("NFD", c) for m in "\u0304\u0302")
                    else c for c in text)
+    if text.strip() in RELATION_NAMES:
+        # "turn each `≤` into a `≥`": a lone symbol is named, not read as a relation
+        return RELATION_NAMES[text.strip()]
     text = _CHOOSE.sub(lambda m: "%s choose %s" % (m.group(1), m.group(2)), text)
     return _say(text)
+
+
+RELATION_NAMES = {"≤": "less-than-or-equal", "≥": "greater-than-or-equal", "<": "less-than",
+                  ">": "greater-than", "≠": "not-equal", "=": "equals sign", "<=": "less-than-or-equal",
+                  ">=": "greater-than-or-equal"}
 
 
 def unspoken(spoken):
