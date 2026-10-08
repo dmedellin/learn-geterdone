@@ -1311,7 +1311,7 @@
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One shape, repeated once per resource. The interesting content is in the slacks, and in one thing they cannot tell you.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A packing row has usage on the left and availability on the right</h3><p>Every <span class="math" data-say="is at most">≤</span> row in this family is the same sentence: what the plan consumes of one resource, at most what there is of it. The row belongs to the resource, not to the product, so three products and three shops give three rows and not nine.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The coefficients are per-unit rates, read down a column</h3><p>The assembly row <span class="math" data-say="3 C plus 2 T is at most 18">3C + 2T ≤ 18</span> takes its 3 from the chairs column of the assembly row of the table and its 2 from the tables column. Reading the table across instead of down transposes the model into a different, solvable, wrong one, which is why the lab prints the table beside the programme it produced.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Slack is the unused amount, in the resource’s own unit</h3><p>At <span class="math" data-say="2, 6">(2, 6)</span> the carpentry row has 2 bench hours left and the other two rows have nothing left. That number is not a score and not a percentage: it is hours, and the same optimum has a slack in each row measured in a different unit.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A packing row has usage on the left and availability on the right</h3><p>Every <span class="math" data-say="less-than-or-equal">≤</span> row in this family is the same sentence: what the plan consumes of one resource, at most what there is of it. The row belongs to the resource, not to the product, so three products and three shops give three rows and not nine.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The coefficients are per-unit rates, read down a column</h3><p>The assembly row <span class="math" data-say="3 C plus 2 T is at most 18">3C + 2T ≤ 18</span> takes its 3 from the chairs column of the assembly row of the table and its 2 from the tables column. Reading the table across instead of down transposes the model into a different, solvable, wrong one, which is why the lab prints the table beside the programme it produced.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Slack is the unused amount, in the resource’s own unit</h3><p>At <span class="math" data-say="2, 6">(2, 6)</span> the carpentry row has 2 bench hours left and the other two rows have nothing left. That number is not a score and not a percentage: it is hours, and the same optimum has a slack in each row measured in a different unit.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Packing rows, slack, and what tight does not mean</h2></div><p>One row per resource, read off a table; the slacks at the optimum; and the question this course deliberately cannot answer yet.</p></div>
@@ -3612,14 +3612,14 @@ check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is 
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
       + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
-      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
       + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
       + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
       + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
       + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
       + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
       + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
-      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
       + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
       + '@media print{.listen-bar,.listen-start{display:none}}';
     document.head.appendChild(css);
@@ -3696,7 +3696,10 @@ check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is 
     // machine. Rank by what the name says, best first; the reader can override,
     // and the choice is remembered. The language is the page language, not the
     // browser language: a German browser must not read English with a German voice.
-    var voice = null, voices = [];
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
     function quality(v) {
       if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
       if (/google|online/i.test(v.name)) return 2;
@@ -3706,14 +3709,17 @@ check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is 
       var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
       voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
       voices.sort(function (a, b) {
-        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0) || (a.name < b.name ? -1 : 1);
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
       });
       try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
       voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
       picker.textContent = '';
       voices.forEach(function (v) {
         var o = document.createElement('option');
-        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
         o.selected = v === voice;
         picker.appendChild(o);
       });
@@ -3723,6 +3729,7 @@ check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is 
     if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
     picker.addEventListener('change', function () {
       voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
       try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
       if (playing) say();
     });

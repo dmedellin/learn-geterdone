@@ -13,6 +13,7 @@ const PAGES = [
   ['generated', '/sets-relations-functions/the-pigeonhole-principle/'],
   ['generated', '/sequences-and-series/infinite-geometric-series/'],
   ['trading', '/market-structure/market-structure/'],
+  ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];
 // A recorder in place of window.speechSynthesis. Utterances end only when the
 // test says so (or immediately, in auto mode), so the controls can be driven.
@@ -113,6 +114,10 @@ async function main() {
       if (kind === 'generated') check(!symbols.length, tag + ': no raw math symbols reach the voice' + (symbols.length ? ' ' + JSON.stringify(symbols[0]) : ''));
       const long = heard.filter(t => t.length > 400);
       check(!long.length, tag + ': utterances are short enough for a network voice');
+      check(await c.evaluate(`(() => { document.querySelector('.listen-start').click();
+        const b = getComputedStyle(document.querySelector('.listen-bar')).backgroundColor;
+        document.querySelectorAll('.listen-bar button')[4].click();
+        return b !== 'rgba(0, 0, 0, 0)' && b !== 'transparent'; })()`), tag + ': the bar has an opaque background');
       check(!c.events.exceptions.length, tag + ': no script errors');
       check(c.events.requests.every(r => r.url === base + route), tag + ': no request beyond the document');
     }
@@ -133,7 +138,7 @@ async function main() {
     let v = await c.evaluate(`({voice: __voice, shown: !document.querySelector('.listen-voice').hidden,
       options: [...document.querySelectorAll('.listen-voice option')].map(o => o.textContent)})`);
     check(v.voice === 'aria', 'voices: a natural voice is chosen over eSpeak and the default (' + v.voice + ')');
-    check(v.shown && v.options.length === 4 && v.options[0] === 'Aria Online (Natural)' && v.options[3] === 'eSpeak English',
+    check(v.shown && v.options.length === 4 && v.options[0] === 'Aria Online (Natural)' && v.options[1] === 'US English (online)' && v.options[3] === 'eSpeak English',
           'voices: picker lists the page-language voices, best first ' + JSON.stringify(v.options));
     await c.evaluate(`(() => { const s = document.querySelector('.listen-voice'); s.selectedIndex = 2;
       s.dispatchEvent(new Event('change')); })()`); await sleep(30);

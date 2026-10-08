@@ -1391,7 +1391,7 @@ ranks:  q ≤ h → t_hit,  q &gt; h → t_miss
 now raise h to 99% = 99/100:
   mean   = (99/100)(1) + (1/100)(40) = 139/100 = 1.39 ms
   p99    99/100 ≥ 99/100             →   1 ms      it just flipped
-  p99.9  99/100 &lt; 999/1000           →  40 ms      unchanged</div><p>The <span class="math" data-say="p 95">p95</span> line is the one to look at twice. <span class="math" data-say="h equals q">h = q</span> exactly, and the rule is <span class="math" data-say="is at least">≥</span>, so the p95 is the hit latency &mdash; the boundary belongs to the hit. One tenth of a point lower and it is <span class="math" data-say="40 milliseconds">40 ms</span>.</p><p>For a faded rehearsal, take <span class="math" data-say="t sub hit equals 2 milliseconds">t_hit = 2 ms</span>, <span class="math" data-say="t sub miss equals 120 milliseconds">t_miss = 120 ms</span> and <span class="math" data-say="h equals 99 percent">h = 99%</span>. The supplied first move is that the mean is <span class="math" data-say="the quantity 99 over 100, times 2 plus the quantity 1 over 100, times 120">(99/100)(2) + (1/100)(120)</span>; finish it, then find the smallest hit rate in tenths of a per cent at which the p99.9 becomes the hit latency, and say what the mean is there. State which percentile you have <em>not</em> moved.</p><p>In the lab the staircase is drawn with the four percentile lines across it. Drag the hit rate slowly from <span class="math" data-say="95 percent">95%</span> upward and watch the mean slide while the p99 sits still, then jumps.</p></article>
+  p99.9  99/100 &lt; 999/1000           →  40 ms      unchanged</div><p>The <span class="math" data-say="p 95">p95</span> line is the one to look at twice. <span class="math" data-say="h equals q">h = q</span> exactly, and the rule is <span class="math" data-say="greater-than-or-equal">≥</span>, so the p95 is the hit latency &mdash; the boundary belongs to the hit. One tenth of a point lower and it is <span class="math" data-say="40 milliseconds">40 ms</span>.</p><p>For a faded rehearsal, take <span class="math" data-say="t sub hit equals 2 milliseconds">t_hit = 2 ms</span>, <span class="math" data-say="t sub miss equals 120 milliseconds">t_miss = 120 ms</span> and <span class="math" data-say="h equals 99 percent">h = 99%</span>. The supplied first move is that the mean is <span class="math" data-say="the quantity 99 over 100, times 2 plus the quantity 1 over 100, times 120">(99/100)(2) + (1/100)(120)</span>; finish it, then find the smallest hit rate in tenths of a per cent at which the p99.9 becomes the hit latency, and say what the mean is there. State which percentile you have <em>not</em> moved.</p><p>In the lab the staircase is drawn with the four percentile lines across it. Drag the hit rate slowly from <span class="math" data-say="95 percent">95%</span> upward and watch the mean slide while the p99 sits still, then jumps.</p></article>
       </div>
     </section>
     <section class="section">
@@ -2583,14 +2583,14 @@ now raise h to 99% = 99/100:
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
       + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
-      + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
       + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
       + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
       + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
       + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
       + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
       + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
-      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
       + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
       + '@media print{.listen-bar,.listen-start{display:none}}';
     document.head.appendChild(css);
@@ -2667,7 +2667,10 @@ now raise h to 99% = 99/100:
     // machine. Rank by what the name says, best first; the reader can override,
     // and the choice is remembered. The language is the page language, not the
     // browser language: a German browser must not read English with a German voice.
-    var voice = null, voices = [];
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
     function quality(v) {
       if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
       if (/google|online/i.test(v.name)) return 2;
@@ -2677,14 +2680,17 @@ now raise h to 99% = 99/100:
       var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
       voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
       voices.sort(function (a, b) {
-        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0) || (a.name < b.name ? -1 : 1);
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
       });
       try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
       voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
       picker.textContent = '';
       voices.forEach(function (v) {
         var o = document.createElement('option');
-        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
         o.selected = v === voice;
         picker.appendChild(o);
       });
@@ -2694,6 +2700,7 @@ now raise h to 99% = 99/100:
     if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
     picker.addEventListener('change', function () {
       voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
       try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
       if (playing) say();
     });

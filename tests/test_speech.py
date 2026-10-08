@@ -109,6 +109,9 @@ READINGS = {
     "n objects, k boxes, n > k   ⟹   some box has ≥ 2":
         "n objects, k boxes, n is greater than k, implies, some box has at least 2",
     "n ≥ 2": "n is at least 2",
+    "≤": "less-than-or-equal",
+    "&ge;": "greater-than-or-equal",
+    "0 ≤ r < d": "0 is at most r is less than d",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",
