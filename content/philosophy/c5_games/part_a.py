@@ -357,7 +357,7 @@ LESSONS = [
             ("Reading the equilibrium as the best the pair can do",
              "It is the cell where each is best-responding, which is a different thing. The cell passed over "
              "gives both players `3` against the `1` they reach, and the dilemma is that gap."),
-            ("Treating &ldquo;defect&rdquo; as a verdict on the players",
+            ("Treating “defect” as a verdict on the players",
              "Both strategies are names for columns in a table. The argument takes no view on who is wicked; "
              "it takes the payoffs as given and shows what follows."),
         ],

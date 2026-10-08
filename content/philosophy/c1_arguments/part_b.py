@@ -231,7 +231,7 @@ LESSONS = [
              "needs all three, and a larger set can need more. This is why a belief "
              "system can be inconsistent while every belief in it looks fine beside "
              "its neighbours."),
-            ("Reading &ldquo;consistent&rdquo; as &ldquo;true&rdquo;",
+            ("Reading “consistent” as “true”",
              "A consistent set has a model, a row, and a row is a description of a "
              "possible case. The set may be false of the actual world in every "
              "member. The lab checks that the beliefs could all be true; it cannot "
@@ -467,13 +467,13 @@ LESSONS = [
                     "for E and I, so the last choice is wrong in both directions."},
         ],
         "mistakes": [
-            ("Converting &ldquo;All `S` are `P`&rdquo; to &ldquo;All `P` are `S`&rdquo;",
+            ("Converting “All `S` are `P`” to “All `P` are `S`”",
              "The first empties `S` outside `P`; the second empties `P` outside "
              "`S`. All squares are rectangles is true, and all rectangles are squares "
              "is false of the two-by-one rectangle. The lab draws exactly that "
              "pattern as the counterexample, a region occupied that the premise "
              "never touches."),
-            ("Reading &ldquo;Some&rdquo; as &ldquo;some but not all&rdquo;",
+            ("Reading “Some” as “some but not all”",
              "Some `S` are `P` requires one occupied region and is silent about the "
              "rest. It is compatible with every `S` being a `P`, and Some `S` are "
              "`P` and Some `S` are not `P` can both be true at once. &ldquo;Some&rdquo; "
@@ -712,7 +712,7 @@ LESSONS = [
                     "conclusion holds."},
         ],
         "mistakes": [
-            ("Thinking &ldquo;All `S` are `P`&rdquo; implies &ldquo;Some `S` are `P`&rdquo;",
+            ("Thinking “All `S` are `P`” implies “Some `S` are `P`”",
              "It does only if some `S` exists. On the Boolean reading the lab finds "
              "the pattern with every region empty: the premise is true, the "
              "conclusion false. The step feels safe because the examples we reach for "
@@ -1214,7 +1214,7 @@ LESSONS = [
              "every row and no column true throughout. Reading the two quantifiers "
              "as if the order did not matter is the quantifier shift, and it is the "
              "mistake the cosmological argument is accused of."),
-            ("Reading &ldquo;everyone loves someone&rdquo; as a claim about one person",
+            ("Reading “everyone loves someone” as a claim about one person",
              "The English sentence is ambiguous and the formulas are not. "
              "`∀x ∃y` allows a different object of love for each person; `∃y ∀x` "
              "demands a single beloved. The grid makes you choose, and the choice "

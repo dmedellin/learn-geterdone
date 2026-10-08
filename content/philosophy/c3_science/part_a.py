@@ -402,7 +402,7 @@ LESSONS = [
              "Each green emerald examined before `t` has probability 1 under both hypotheses. The Bayes "
              "factor stays at exactly 1 after one emerald and after a hundred, and the posterior ratio "
              "is the prior ratio, so the count of green emeralds is no argument at all."),
-            ("Treating &ldquo;grue&rdquo; as a trick of language that the data can sweep aside",
+            ("Treating “grue” as a trick of language that the data can sweep aside",
              "The hypothesis is as well defined as green and fits as well. It is excluded by a judgement "
              "that colours are projectible and time-indexed colours are not, and that judgement is "
              "prior to the data."),

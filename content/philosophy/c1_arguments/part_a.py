@@ -210,7 +210,7 @@ LESSONS = [
              "and does not go into the standard form. The padding preset shows the "
              "same thing in the table: two extra premises, four extra rows, and not "
              "one more highlighted."),
-            ("Reading &ldquo;because&rdquo; as the mark of an argument",
+            ("Reading “because” as the mark of an argument",
              "&ldquo;The streets are wet because it rained&rdquo; may explain a fact "
              "that nobody doubts, rather than argue for a claim somebody does. An "
              "argument tries to give you a reason to accept something. An explanation "
@@ -428,7 +428,7 @@ LESSONS = [
              "valid, and its conclusion is false; validity allows that only because "
              "a premise is false too. A table cannot tell you that the conclusion is "
              "true; only that it cannot be false while every premise is true."),
-            ("Using &ldquo;valid&rdquo; to mean &ldquo;reasonable&rdquo;",
+            ("Using “valid” to mean “reasonable”",
              "&ldquo;That is a valid point&rdquo; praises a claim. In logic the word "
              "applies to arguments, never to sentences, and an argument with absurd "
              "premises can be perfectly valid. A sentence is true or false; an "
@@ -626,13 +626,13 @@ LESSONS = [
                     "false and the whole is false."},
         ],
         "mistakes": [
-            ("Reading &ldquo;or&rdquo; as exclusive",
+            ("Reading “or” as exclusive",
              "In logic `p ∨ q` is true when both parts are true: the first row of "
              "the table says T. An exclusive reading belongs to a different "
              "connective, `p ⊕ q`, and the two columns differ in that one row. "
              "Reading `∨` as &ldquo;one or the other but not both&rdquo; will make a "
              "valid argument look invalid later in this course."),
-            ("Treating &ldquo;but&rdquo; as something other than a conjunction",
+            ("Treating “but” as something other than a conjunction",
              "&ldquo;She is clever but lazy&rdquo; carries a contrast, and the table "
              "for `p ∧ q` does not record it. For truth value, the sentence is true "
              "exactly when she is clever and she is lazy. Whatever else it suggests "
@@ -844,7 +844,7 @@ LESSONS = [
              "And a general claim such as &ldquo;if a number is divisible by four it "
              "is even&rdquo; stays true at the numbers 3 and 6, where its "
              "antecedent is false."),
-            ("Reversing &ldquo;only if&rdquo;",
+            ("Reversing “only if”",
              "&ldquo;`p` only if `q`&rdquo; is `p → q`, not `q → p`. &ldquo;Only "
              "if&rdquo; names the requirement. Voting only if registered makes "
              "registration necessary, and does not make it enough."),
@@ -1283,7 +1283,7 @@ LESSONS = [
              "table. The converse and inverse each differ from it in two rows. "
              "&ldquo;If it is a square it has four sides&rdquo; is true and its "
              "converse is not."),
-            ("Treating &ldquo;not both&rdquo; and &ldquo;neither&rdquo; as one claim",
+            ("Treating “not both” and “neither” as one claim",
              "`¬(p ∧ q)` is true in three rows and `¬(p ∨ q)` in one. They differ "
              "when exactly one of `p`, `q` is true. A claim that she is not both "
              "rich and famous is made true by her being rich only."),
