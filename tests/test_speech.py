@@ -64,7 +64,7 @@ READINGS = {
     "√(2KDh)/2": "the square root of the quantity 2 K D h, over 2",
     "2⌊log₂ m⌋": "2 times the floor of log base 2 m",
     "Vₜ(i)": "V sub t of i",
-    "all c̄ᵢⱼ ≥ 0": "all c bar sub i j is greater than or equal to 0",
+    "all c̄ᵢⱼ ≥ 0": "all c bar sub i j is at least 0",
     "λ = 100 000 /s": "lambda equals 100000 per second",
     "scan 1 GB/s": "scan 1 gigabytes per second",
     "ρ = a/s < 1": "rho equals A over s is less than 1",
@@ -87,7 +87,7 @@ READINGS = {
     "[-2, inf)": "negative 2, infinity",
     # from the blind sample after the spoken-form passes
     "|ℕ| = |ℤ|": "the size of the natural numbers, equals the size of the integers",
-    "|h_L − h_R| ≤ 1": "the absolute value of h sub L minus h sub R, is less than or equal to 1",
+    "|h_L − h_R| ≤ 1": "the absolute value of h sub L minus h sub R, is at most 1",
     "aₙ = (n + 1)2ⁿ": "A sub n equals the quantity n plus 1, times 2 to the power n",
     "D(i, j−1) + 1        insert the j-th character":
         "D of i and j minus 1 plus 1, insert the j-th character",
@@ -108,7 +108,7 @@ READINGS = {
     "n-1": "n minus 1",
     "n objects, k boxes, n > k   ⟹   some box has ≥ 2":
         "n objects, k boxes, n is greater than k, implies, some box has at least 2",
-    "n ≥ 2": "n is greater than or equal to 2",
+    "n ≥ 2": "n is at least 2",
     # arrows depend on what surrounds them
     "¬p → ¬q": "not p implies not q",
     "f : ℝ → [0,∞)": "f, the reals to 0, infinity",
@@ -144,7 +144,7 @@ class TestReadings(unittest.TestCase):
         self.assertEqual(say_block(["x = 1", "", "  ─────", "y = 2"]), ["x equals 1", "y equals 2"])
 
     def test_markup_is_not_read(self):
-        self.assertEqual(say("w(e) &le; w(g)"), "w of e is less than or equal to w of g")
+        self.assertEqual(say("w(e) &le; w(g)"), "w of e is at most w of g")
 
 
 class TestProseIslands(unittest.TestCase):

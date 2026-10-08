@@ -1299,7 +1299,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock" data-say="Lomuto, pivot parked at the end, i starts one before lo. A at lo, i is less than or equal to pivot, A at i plus 1, j minus 1 is greater than pivot, A at j, hi minus 1 unexamined. for j equals lo to hi minus 1, if A at j is less than or equal to pivot, i equals i plus 1, swap A at i, A at j. then swap A at i plus 1, A at hi, the pivot lands at i plus 1 and never moves again. comparisons equals n minus 1, on every array of length n, whatever is in it" tabindex="0" role="region" aria-label="Mathematical notation">Lomuto, pivot parked at the end, i starts one before lo
+        <div class="mathblock" data-say="Lomuto, pivot parked at the end, i starts one before lo. A at lo, i is at most pivot, A at i plus 1, j minus 1 is greater than pivot, A at j, hi minus 1 unexamined. for j equals lo to hi minus 1, if A at j is at most pivot, i equals i plus 1, swap A at i, A at j. then swap A at i plus 1, A at hi, the pivot lands at i plus 1 and never moves again. comparisons equals n minus 1, on every array of length n, whatever is in it" tabindex="0" role="region" aria-label="Mathematical notation">Lomuto, pivot parked at the end, i starts one before lo
   a[lo..i] ≤ pivot     a[i+1..j−1] &gt; pivot     a[j..hi−1] unexamined
 for j = lo to hi − 1:   if a[j] ≤ pivot:  i = i + 1;  swap a[i], a[j]
 then swap a[i+1], a[hi]      the pivot lands at i + 1 and never moves again
@@ -1313,7 +1313,7 @@ comparisons = n − 1         on every array of length n, whatever is in it</div
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>One pass, and the invariant that makes it correct</h2></div><p>The loop, the three regions, the proof that the pivot is placed, and what Hoare does differently.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Partition</span><p>To <strong>partition</strong> <span class="math" data-say="A at lo, hi">a[lo..hi]</span> around a <strong>pivot</strong> value <span class="math" data-say="p">p</span> drawn from it is to rearrange the subarray so that <span class="math" data-say="p">p</span> sits at some index <span class="math" data-say="q">q</span> with <span class="math" data-say="A at lo, q minus 1 is less than or equal to p">a[lo..q−1] ≤ p</span> and <span class="math" data-say="A at q plus 1, hi is greater than p">a[q+1..hi] > p</span>. The index <span class="math" data-say="q">q</span> is returned; it is not chosen in advance and is not generally the middle.</p></div><p>Lomuto's scheme is the one this course counts. Swap the chosen pivot to the end of the subarray, walk <span class="math" data-say="j">j</span> from <span class="math" data-say="lo">lo</span> to <span class="math" data-say="h i minus 1">hi − 1</span>, and keep a second index <span class="math" data-say="i">i</span> marking the end of the at-most-pivot region. That is the whole algorithm, and the pseudocode of it is four lines in the block above.</p><div class="defbox"><span class="label">Definition &middot; Loop invariant</span><p>A <strong>loop invariant</strong> is a statement about the program's state that is true before the loop begins, and true after each iteration if it was true before that iteration. It is useful when its truth at the loop's exit, together with the exit condition, gives the postcondition you wanted.</p></div><p>The invariant here is the three regions. It holds before the loop because two of the regions are empty. It is preserved by each step, in the two cases the concept card gives. And at exit <span class="math" data-say="j equals h i">j = hi</span>, so the unexamined region is empty and the array is exactly <span class="math" data-say="at most divides above divides pivot">at most | above | pivot</span>, one swap away from what was wanted.</p><div class="thm"><span class="label">Theorem &middot; Partition places the pivot</span><p>When the loop exits, swapping <span class="math" data-say="A at i plus 1">a[i+1]</span> with <span class="math" data-say="A at hi">a[hi]</span> leaves the pivot at index <span class="math" data-say="i plus 1">i + 1</span> with every element of <span class="math" data-say="A at lo, i">a[lo..i]</span> at most it and every element of <span class="math" data-say="A at i plus 2, hi">a[i+2..hi]</span> above it. The pivot is therefore at its final position in the sorted array.</p></div><div class="proof"><p>At exit the invariant gives <span class="math" data-say="A at lo, i is less than or equal to p">a[lo..i] ≤ p</span> and <span class="math" data-say="A at i plus 1, hi minus 1 is greater than p">a[i+1..hi−1] > p</span>, with the pivot itself still at <span class="math" data-say="hi">hi</span>.</p><p>The final swap exchanges the pivot with <span class="math" data-say="A at i plus 1">a[i+1]</span>, which is above the pivot, so it lands in the region of elements above the pivot, where it belongs. The pivot lands at <span class="math" data-say="i plus 1">i + 1</span>. Every element to its left is at most it and every element to its right is above it, which is the definition of that position being its place in sorted order &mdash; and that is a property of the final array, not of this pass, so no later recursion can disturb it.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Twelve elements, pivot 24</span><p>The array is <span class="math" data-say="38 27 43 3 9 82 10 55 16 7 91 24">38 27 43 3 9 82 10 55 16 7 91 24</span> and the pivot is the last element, <span class="math" data-say="24">24</span>. Eleven comparisons and six swaps later the array is <span class="math" data-say="3 9 10 16 7 24 43 55 38 27 91 82">3 9 10 16 7 24 43 55 38 27 91 82</span>, with the pivot at position six. Five elements are at most <span class="math" data-say="24">24</span> and six are above it, and neither group is in order. The worked example below steps through all eleven comparisons.</p></div><h3>Hoare&#x27;s scheme, and what it buys</h3><p>Hoare's partition walks one index up from the left and one down from the right, swapping an out-of-place pair whenever both stop, and finishes when the indices cross. It does about a third as many swaps as Lomuto on typical data &mdash; four rather than six on the lab's array &mdash; and it does not place the pivot at a known index; it returns a boundary. Its comparison count is data-dependent, which is why the clean <span class="math" data-say="n minus 1">n − 1</span> above is stated for Lomuto and not for partition in general.</p><p>Both schemes send keys equal to the pivot to one side. That sounds like a detail and it is the subject of a counterexample two lessons from here: on an array whose keys are all equal, Lomuto splits <span class="math" data-say="n">n</span> into <span class="math" data-say="0">0</span> and <span class="math" data-say="n minus 1">n − 1</span> under every pivot rule there is, including a randomised one.</p><p>Two things are worth checking in the lab's step table. The <span class="math" data-say="i">i</span> and <span class="math" data-say="j">j</span> columns count from zero, which is why <span class="math" data-say="i">i</span> starts at <span class="math" data-say="negative 1">−1</span>: the at-most region is empty, and an index one before the start is how that is said. And the invariant column is evaluated on the array at that step rather than assumed, so a broken invariant would appear as the word BROKEN and not as a missing row.</p></article>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Partition</span><p>To <strong>partition</strong> <span class="math" data-say="A at lo, hi">a[lo..hi]</span> around a <strong>pivot</strong> value <span class="math" data-say="p">p</span> drawn from it is to rearrange the subarray so that <span class="math" data-say="p">p</span> sits at some index <span class="math" data-say="q">q</span> with <span class="math" data-say="A at lo, q minus 1 is at most p">a[lo..q−1] ≤ p</span> and <span class="math" data-say="A at q plus 1, hi is greater than p">a[q+1..hi] > p</span>. The index <span class="math" data-say="q">q</span> is returned; it is not chosen in advance and is not generally the middle.</p></div><p>Lomuto's scheme is the one this course counts. Swap the chosen pivot to the end of the subarray, walk <span class="math" data-say="j">j</span> from <span class="math" data-say="lo">lo</span> to <span class="math" data-say="h i minus 1">hi − 1</span>, and keep a second index <span class="math" data-say="i">i</span> marking the end of the at-most-pivot region. That is the whole algorithm, and the pseudocode of it is four lines in the block above.</p><div class="defbox"><span class="label">Definition &middot; Loop invariant</span><p>A <strong>loop invariant</strong> is a statement about the program's state that is true before the loop begins, and true after each iteration if it was true before that iteration. It is useful when its truth at the loop's exit, together with the exit condition, gives the postcondition you wanted.</p></div><p>The invariant here is the three regions. It holds before the loop because two of the regions are empty. It is preserved by each step, in the two cases the concept card gives. And at exit <span class="math" data-say="j equals h i">j = hi</span>, so the unexamined region is empty and the array is exactly <span class="math" data-say="at most divides above divides pivot">at most | above | pivot</span>, one swap away from what was wanted.</p><div class="thm"><span class="label">Theorem &middot; Partition places the pivot</span><p>When the loop exits, swapping <span class="math" data-say="A at i plus 1">a[i+1]</span> with <span class="math" data-say="A at hi">a[hi]</span> leaves the pivot at index <span class="math" data-say="i plus 1">i + 1</span> with every element of <span class="math" data-say="A at lo, i">a[lo..i]</span> at most it and every element of <span class="math" data-say="A at i plus 2, hi">a[i+2..hi]</span> above it. The pivot is therefore at its final position in the sorted array.</p></div><div class="proof"><p>At exit the invariant gives <span class="math" data-say="A at lo, i is at most p">a[lo..i] ≤ p</span> and <span class="math" data-say="A at i plus 1, hi minus 1 is greater than p">a[i+1..hi−1] > p</span>, with the pivot itself still at <span class="math" data-say="hi">hi</span>.</p><p>The final swap exchanges the pivot with <span class="math" data-say="A at i plus 1">a[i+1]</span>, which is above the pivot, so it lands in the region of elements above the pivot, where it belongs. The pivot lands at <span class="math" data-say="i plus 1">i + 1</span>. Every element to its left is at most it and every element to its right is above it, which is the definition of that position being its place in sorted order &mdash; and that is a property of the final array, not of this pass, so no later recursion can disturb it.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Twelve elements, pivot 24</span><p>The array is <span class="math" data-say="38 27 43 3 9 82 10 55 16 7 91 24">38 27 43 3 9 82 10 55 16 7 91 24</span> and the pivot is the last element, <span class="math" data-say="24">24</span>. Eleven comparisons and six swaps later the array is <span class="math" data-say="3 9 10 16 7 24 43 55 38 27 91 82">3 9 10 16 7 24 43 55 38 27 91 82</span>, with the pivot at position six. Five elements are at most <span class="math" data-say="24">24</span> and six are above it, and neither group is in order. The worked example below steps through all eleven comparisons.</p></div><h3>Hoare&#x27;s scheme, and what it buys</h3><p>Hoare's partition walks one index up from the left and one down from the right, swapping an out-of-place pair whenever both stop, and finishes when the indices cross. It does about a third as many swaps as Lomuto on typical data &mdash; four rather than six on the lab's array &mdash; and it does not place the pivot at a known index; it returns a boundary. Its comparison count is data-dependent, which is why the clean <span class="math" data-say="n minus 1">n − 1</span> above is stated for Lomuto and not for partition in general.</p><p>Both schemes send keys equal to the pivot to one side. That sounds like a detail and it is the subject of a counterexample two lessons from here: on an array whose keys are all equal, Lomuto splits <span class="math" data-say="n">n</span> into <span class="math" data-say="0">0</span> and <span class="math" data-say="n minus 1">n − 1</span> under every pivot rule there is, including a randomised one.</p><p>Two things are worth checking in the lab's step table. The <span class="math" data-say="i">i</span> and <span class="math" data-say="j">j</span> columns count from zero, which is why <span class="math" data-say="i">i</span> starts at <span class="math" data-say="negative 1">−1</span>: the at-most region is empty, and an index one before the start is how that is said. And the invariant column is evaluated on the array at that step rather than assumed, so a broken invariant would appear as the word BROKEN and not as a missing row.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Partition is one pass and one invariant</h2></div><p>Three regions, a pointer each, and the invariant evaluated after every comparison</p></div>
@@ -1369,7 +1369,7 @@ comparisons = n − 1         on every array of length n, whatever is in it</div
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>All eleven comparisons, with the indices</h3><p>The array is the lab's default and the pivot is its last element, <span class="math" data-say="24">24</span>. The indices are written as the lab writes them, counting from zero, so <span class="math" data-say="i equals negative 1">i = −1</span> means the at-most region is still empty. The array shown on each line is the array after that step.</p><div class="mathblock" data-say="pivot 24, i equals negative 1, j equals 0. step, A at j, is less than or equal to 24 ?, i, array. a table, shown on the page. final swap A at i plus 1 with A at hi, 82 if and only if 24. a table, shown on the page. comparisons 11 equals n minus 1, swaps 6, pivot at position 6" tabindex="0" role="region" aria-label="Mathematical notation">pivot 24, i = −1, j = 0
+      <article class="card card-pad prose"><h3>All eleven comparisons, with the indices</h3><p>The array is the lab's default and the pivot is its last element, <span class="math" data-say="24">24</span>. The indices are written as the lab writes them, counting from zero, so <span class="math" data-say="i equals negative 1">i = −1</span> means the at-most region is still empty. The array shown on each line is the array after that step.</p><div class="mathblock" data-say="pivot 24, i equals negative 1, j equals 0. step, A at j, is at most 24 ?, i, array. a table, shown on the page. final swap A at i plus 1 with A at hi, 82 if and only if 24. a table, shown on the page. comparisons 11 equals n minus 1, swaps 6, pivot at position 6" tabindex="0" role="region" aria-label="Mathematical notation">pivot 24, i = −1, j = 0
 
  step   a[j]  ≤ 24?   i    array
    1     38     no   −1    38 27 43  3  9 82 10 55 16  7 91 24
@@ -3506,9 +3506,12 @@ comparisons 11 = n − 1        swaps 6        pivot at position 6</div><p>Five 
       + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
       + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
       + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
       + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
       + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
-      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
       + '@media print{.listen-bar,.listen-start{display:none}}';
     document.head.appendChild(css);
 
@@ -3555,19 +3558,6 @@ comparisons 11 = n − 1        swaps 6        pivot at position 6</div><p>Five 
     var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
     try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
     if (RATES.indexOf(rate) < 0) rate = 1;
-    var voice = null;
-    function pickVoice() {
-      // The language of the page, not of the browser: a German browser must not read
-      // English with a German voice. A local voice first; a network voice
-      // sends the text to its vendor.
-      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
-        return v.lang.slice(0, 2) === lang; });
-      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
-        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
-    }
-    pickVoice();
-    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
-
     function btn(label, aria) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
@@ -3587,8 +3577,46 @@ comparisons 11 = n − 1        swaps 6        pivot at position 6</div><p>Five 
         next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
         stop = btn('Stop'), status = document.createElement('span');
     status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
-    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
     document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    var voice = null, voices = [];
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0) || (a.name < b.name ? -1 : 1);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
 
     var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -30,8 +30,8 @@ import unicodedata
 SYMBOLS = {
     # relations
     "=": "equals", "≠": "is not equal to", "<": "is less than",
-    ">": "is greater than", "≤": "is less than or equal to",
-    "≥": "is greater than or equal to", "≈": "is approximately",
+    ">": "is greater than", "≤": "is at most",
+    "≥": "is at least", "≈": "is approximately",
     "≡": "is congruent to", "∝": "is proportional to", "~": "is approximately",
     "≪": "is much less than", "≫": "is much greater than",
     "≅": "is isomorphic to", "≺": "precedes", "≼": "precedes or equals",
@@ -84,8 +84,8 @@ SYMBOLS = {
 # ASCII spellings of the same relations. Longest first, so `<=>` is not read
 # as `<=` followed by `>`.
 ASCII_OPS = {
-    "<--": ",", "-->": ",", "<=>": "if and only if", "<=": "is less than or equal to",
-    ">=": "is greater than or equal to", "!=": "is not equal to",
+    "<--": ",", "-->": ",", "<=>": "if and only if", "<=": "is at most",
+    ">=": "is at least", "!=": "is not equal to",
     "==": "equals", "->": "to", "=>": "implies", ":=": "is defined as",
     "<-": "gets", "+=": "plus equals", "**": "to the power",
 }

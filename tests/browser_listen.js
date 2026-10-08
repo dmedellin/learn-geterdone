@@ -24,6 +24,17 @@ const FAKE = `
     }, cancel() {}, pause() {}, resume() {}, addEventListener() {} };
   Object.defineProperty(window, 'speechSynthesis', {value: fake, configurable: true});
   window.__end = () => { const u = window.__last; u && u.onend && u.onend({}); };`;
+// Several voices of mixed quality, and an utterance class that accepts plain
+// objects as voices (the real one only takes SpeechSynthesisVoice instances).
+const VOICES = FAKE.replace('getVoices() { return []; }', `getVoices() { return [
+    {name: 'eSpeak English', lang: 'en', localService: true, default: true, voiceURI: 'espeak'},
+    {name: 'Microsoft Zira - English (United States)', lang: 'en-US', localService: true, voiceURI: 'zira'},
+    {name: 'Google US English', lang: 'en-US', localService: false, voiceURI: 'google'},
+    {name: 'Microsoft Aria Online (Natural) - English (United States)', lang: 'en-US', localService: false, voiceURI: 'aria'},
+    {name: 'Thomas', lang: 'fr-FR', localService: true, voiceURI: 'thomas'}]; }`)
+  + `window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+  const speak0 = window.speechSynthesis.speak;
+  window.speechSynthesis.speak = function (u) { window.__voice = u.voice && u.voice.voiceURI; speak0.call(this, u); };`;
 const NONE = `Object.defineProperty(window, 'speechSynthesis', {value: undefined, configurable: true});`;
 
 const server = http.createServer((req, res) => {
@@ -114,6 +125,35 @@ async function main() {
     check(fit, 'phone: the bar fits the viewport with no horizontal scroll');
     const shot = await c.send('Page.captureScreenshot', {format: 'png'});
     fs.writeFileSync(path.join(OUT, 'bar-phone-light.png'), Buffer.from(shot.data, 'base64'));
+
+    // Voice choice: the best-sounding voice in the page language first, the
+    // reader's choice applied and remembered across a reload.
+    await withScript(c, VOICES, () => c.navigate(PAGES[0][1], {width: 1440, height: 900}));
+    await c.evaluate(`document.querySelector('.listen-start').click()`); await sleep(30);
+    let v = await c.evaluate(`({voice: __voice, shown: !document.querySelector('.listen-voice').hidden,
+      options: [...document.querySelectorAll('.listen-voice option')].map(o => o.textContent)})`);
+    check(v.voice === 'aria', 'voices: a natural voice is chosen over eSpeak and the default (' + v.voice + ')');
+    check(v.shown && v.options.length === 4 && v.options[0] === 'Aria Online (Natural)' && v.options[3] === 'eSpeak English',
+          'voices: picker lists the page-language voices, best first ' + JSON.stringify(v.options));
+    await c.evaluate(`(() => { const s = document.querySelector('.listen-voice'); s.selectedIndex = 2;
+      s.dispatchEvent(new Event('change')); })()`); await sleep(30);
+    v = await c.evaluate(`({voice: __voice, stored: localStorage.getItem('learn-listen-voice')})`);
+    check(v.voice === 'zira' && v.stored === 'zira', 'voices: a chosen voice is applied and stored');
+    const kept = await withScript(c, VOICES, async () => {
+      await c.send('Page.reload'); await sleep(600);
+      await c.evaluate(`document.querySelector('.listen-start').click()`); await sleep(30);
+      return c.evaluate(`window.__voice`);
+    });
+    check(kept === 'zira', 'voices: the choice survives a reload (' + kept + ')');
+    const fits = await withScript(c, VOICES, async () => {
+      await c.navigate(PAGES[0][1], {width: 390, height: 844});
+      await c.evaluate(`document.querySelector('.listen-start').click()`); await sleep(50);
+      const shot = await c.send('Page.captureScreenshot', {format: 'png'});
+      fs.writeFileSync(path.join(OUT, 'bar-phone-voices.png'), Buffer.from(shot.data, 'base64'));
+      return c.evaluate(`(() => { const r = document.querySelector('.listen-bar').getBoundingClientRect();
+        return r.left >= 0 && r.right <= innerWidth && document.documentElement.scrollWidth <= innerWidth; })()`);
+    });
+    check(fits, 'voices: the bar with a picker fits a phone');
 
     // No speech engine: no button, no error.
     await withScript(c, NONE, () => c.navigate(PAGES[0][1], {width: 1440, height: 900}));

@@ -1314,7 +1314,7 @@ L = λW is an identity about one run&#x27;s own averages, not a model of anythin
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>A clock that jumps, and the average it leaves behind</h2></div><p>How the event loop works, what it produces, and how far one run of it is from the answer.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Discrete-event simulation</span><p>A simulation in which the state changes only at a countable set of <strong>event times</strong>. The simulator holds the current state, a <strong>calendar</strong> of events scheduled for future times, and a clock. Each step removes the earliest calendar entry, advances the clock to its time, applies its effect, and schedules any events the new state implies.</p></div><p>The model on this page is the single-server queue the earlier course solved exactly: in each slot an arrival occurs with probability <span class="math" data-say="p">p</span>, and a customer in service completes with probability <span class="math" data-say="q">q</span>, so a service duration is a geometric variate on <span class="math" data-say="the set 1, 2, 3, and so on">{1, 2, 3, …}</span>. Both are sampled by inverse transform from the seeded stream, so the run is reproducible and every figure it produces is a fraction.</p><div class="defbox"><span class="label">Definition &middot; Time average</span><p>For a quantity <span class="math" data-say="N of t">N(t)</span> that is constant between events, the <strong>time average</strong> over <span class="math" data-say="0, T">[0, T)</span> is <span class="math" data-say="1 over T the integral of N of t dt">(1/T)∫N(t) dt</span>, which for a step function is the sum of <span class="math" data-say="N">N</span> times the length of each interval, divided by <span class="math" data-say="T">T</span>. It is not the average of the values <span class="math" data-say="N">N</span> took; it is the average weighted by how long it took them.</p></div><p>That distinction costs people real errors. A queue that holds one customer for nine hundred slots and nine customers for one hundred has a time average of <span class="math" data-say="1.8">1.8</span> and an unweighted average over its two distinct states of <span class="math" data-say="5">5</span>. Only the first is the number anyone wants, and only the first is what the area under the curve gives you.</p><h3>One run, event by event</h3><div class="example"><span class="label">Example &middot; The first ten events at p = 2/5, q = 1/2, seed 1</span><p>Customer 1 arrives at slot <span class="math" data-say="3">3</span> and leaves at <span class="math" data-say="4">4</span>. Customer 2 arrives at <span class="math" data-say="5">5</span> with a service of three slots; customers 3 and 4 arrive at <span class="math" data-say="6">6</span> and <span class="math" data-say="7">7</span> and queue behind it. At clock <span class="math" data-say="8">8</span> two events share the instant: customer 2 departs and customer 5 arrives. The departure is taken first, so immediately after it the system holds two, and the arrival then takes it to three. Nothing whatever happens at slots <span class="math" data-say="0">0</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="2">2</span>, and the clock never visits them.</p></div><p>The tie at clock <span class="math" data-say="8">8</span> is not a detail. A simulator that answered &ldquo;who is in the system at time <span class="math" data-say="t">t</span>?&rdquo; by testing <span class="math" data-say="arrival is less than or equal to t is less than departure">arrival ≤ t &lt; departure</span> would count the arriving customer as present at the instant the departure is being processed, and its headcount would disagree with its own list of names. The rule &mdash; departures before arrivals at the same instant &mdash; has to be stated once and then obeyed by every part of the program that asks the question.</p><h3>The long run, and the exact value it is aiming at</h3><div class="mathblock" data-say="p equals 2 over 5, q equals 1 over 2, single server, first in first out. exact, from the chain, L equals 12 over 5 equals 2.4, rho equals p over q equals 4 over 5. one run of 2000 slots, seed 1. customers, 776. area under N of t, 4733 slot-customers. time average, 4733 over 2000 equals 2.3665. server busy, 1593 of 2000 slots equals 79.7 percent. gap to the exact value, 0.0335 below" tabindex="0" role="region" aria-label="Mathematical notation">  p = 2/5,  q = 1/2,  single server, first in first out
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Discrete-event simulation</span><p>A simulation in which the state changes only at a countable set of <strong>event times</strong>. The simulator holds the current state, a <strong>calendar</strong> of events scheduled for future times, and a clock. Each step removes the earliest calendar entry, advances the clock to its time, applies its effect, and schedules any events the new state implies.</p></div><p>The model on this page is the single-server queue the earlier course solved exactly: in each slot an arrival occurs with probability <span class="math" data-say="p">p</span>, and a customer in service completes with probability <span class="math" data-say="q">q</span>, so a service duration is a geometric variate on <span class="math" data-say="the set 1, 2, 3, and so on">{1, 2, 3, …}</span>. Both are sampled by inverse transform from the seeded stream, so the run is reproducible and every figure it produces is a fraction.</p><div class="defbox"><span class="label">Definition &middot; Time average</span><p>For a quantity <span class="math" data-say="N of t">N(t)</span> that is constant between events, the <strong>time average</strong> over <span class="math" data-say="0, T">[0, T)</span> is <span class="math" data-say="1 over T the integral of N of t dt">(1/T)∫N(t) dt</span>, which for a step function is the sum of <span class="math" data-say="N">N</span> times the length of each interval, divided by <span class="math" data-say="T">T</span>. It is not the average of the values <span class="math" data-say="N">N</span> took; it is the average weighted by how long it took them.</p></div><p>That distinction costs people real errors. A queue that holds one customer for nine hundred slots and nine customers for one hundred has a time average of <span class="math" data-say="1.8">1.8</span> and an unweighted average over its two distinct states of <span class="math" data-say="5">5</span>. Only the first is the number anyone wants, and only the first is what the area under the curve gives you.</p><h3>One run, event by event</h3><div class="example"><span class="label">Example &middot; The first ten events at p = 2/5, q = 1/2, seed 1</span><p>Customer 1 arrives at slot <span class="math" data-say="3">3</span> and leaves at <span class="math" data-say="4">4</span>. Customer 2 arrives at <span class="math" data-say="5">5</span> with a service of three slots; customers 3 and 4 arrive at <span class="math" data-say="6">6</span> and <span class="math" data-say="7">7</span> and queue behind it. At clock <span class="math" data-say="8">8</span> two events share the instant: customer 2 departs and customer 5 arrives. The departure is taken first, so immediately after it the system holds two, and the arrival then takes it to three. Nothing whatever happens at slots <span class="math" data-say="0">0</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="2">2</span>, and the clock never visits them.</p></div><p>The tie at clock <span class="math" data-say="8">8</span> is not a detail. A simulator that answered &ldquo;who is in the system at time <span class="math" data-say="t">t</span>?&rdquo; by testing <span class="math" data-say="arrival is at most t is less than departure">arrival ≤ t &lt; departure</span> would count the arriving customer as present at the instant the departure is being processed, and its headcount would disagree with its own list of names. The rule &mdash; departures before arrivals at the same instant &mdash; has to be stated once and then obeyed by every part of the program that asks the question.</p><h3>The long run, and the exact value it is aiming at</h3><div class="mathblock" data-say="p equals 2 over 5, q equals 1 over 2, single server, first in first out. exact, from the chain, L equals 12 over 5 equals 2.4, rho equals p over q equals 4 over 5. one run of 2000 slots, seed 1. customers, 776. area under N of t, 4733 slot-customers. time average, 4733 over 2000 equals 2.3665. server busy, 1593 of 2000 slots equals 79.7 percent. gap to the exact value, 0.0335 below" tabindex="0" role="region" aria-label="Mathematical notation">  p = 2/5,  q = 1/2,  single server, first in first out
 
   exact, from the chain:   L = 12/5 = 2.4       ρ = p/q = 4/5
 
@@ -1407,7 +1407,7 @@ slots 0, 1 and 2 are never visited: nothing is scheduled there.</div><p>Read the
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recomputing the state from the clock instead of walking the events</strong><span>Asking &ldquo;who satisfies <span class="math" data-say="arrival is less than or equal to t is less than departure">arrival ≤ t &lt; departure</span>?&rdquo; gives a different answer from the event loop at every instant that carries two events. On this run, clock <span class="math" data-say="8">8</span> carries a departure and an arrival, and the two methods disagree about whether the system holds two or three. Walking the one event list makes the count and the contents the same object by construction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reporting a single run as the answer</strong><span>One run of two thousand slots gave <span class="math" data-say="2.3665">2.3665</span>; three other seeds gave <span class="math" data-say="1.9660">1.9660</span>, <span class="math" data-say="2.7300">2.7300</span> and <span class="math" data-say="2.5300">2.5300</span>. Any of the four could have been the one that reached a report. The estimate is the average over replications with a standard error attached, and a single run is one observation of it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the time average with the average over customers</strong><span>The time average of the number in system and the average time in system per customer are different quantities with different units, and Little's Law is the statement that relates them. Quoting one where the other belongs is a factor of the arrival rate out, which on this run is about two and a half.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recomputing the state from the clock instead of walking the events</strong><span>Asking &ldquo;who satisfies <span class="math" data-say="arrival is at most t is less than departure">arrival ≤ t &lt; departure</span>?&rdquo; gives a different answer from the event loop at every instant that carries two events. On this run, clock <span class="math" data-say="8">8</span> carries a departure and an arrival, and the two methods disagree about whether the system holds two or three. Walking the one event list makes the count and the contents the same object by construction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reporting a single run as the answer</strong><span>One run of two thousand slots gave <span class="math" data-say="2.3665">2.3665</span>; three other seeds gave <span class="math" data-say="1.9660">1.9660</span>, <span class="math" data-say="2.7300">2.7300</span> and <span class="math" data-say="2.5300">2.5300</span>. Any of the four could have been the one that reached a report. The estimate is the average over replications with a standard error attached, and a single run is one observation of it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the time average with the average over customers</strong><span>The time average of the number in system and the average time in system per customer are different quantities with different units, and Little's Law is the statement that relates them. Quoting one where the other belongs is a factor of the arrival rate out, which on this run is about two and a half.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a single run&#x27;s average reads as one observation rather than as the answer.</strong><p>You should be able to run an event calendar by hand for ten events, state and obey a tie-breaking rule for simultaneous events, accumulate the area under the occupancy curve and turn it into a time average, read the same area as <span class="math" data-say="lambda">λ</span> times <span class="math" data-say="W">W</span>, and say what reseeding does to every figure the run produced.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This run started with nothing in the system, which is a choice and not a neutral one: it means the early slots are sampling a system that has not yet reached the behaviour the average is supposed to describe. &ldquo;Warm-Up and the Initial Transient&rdquo; computes exactly how much that costs, as theory rather than as a story about noise, and shows what removing it does and does not fix.</div></article>
       </div>
     </section>
@@ -2798,9 +2798,12 @@ slots 0, 1 and 2 are never visited: nothing is scheduled there.</div><p>Read the
       + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
       + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
       + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
       + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
       + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
-      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
       + '@media print{.listen-bar,.listen-start{display:none}}';
     document.head.appendChild(css);
 
@@ -2847,19 +2850,6 @@ slots 0, 1 and 2 are never visited: nothing is scheduled there.</div><p>Read the
     var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
     try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
     if (RATES.indexOf(rate) < 0) rate = 1;
-    var voice = null;
-    function pickVoice() {
-      // The language of the page, not of the browser: a German browser must not read
-      // English with a German voice. A local voice first; a network voice
-      // sends the text to its vendor.
-      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
-        return v.lang.slice(0, 2) === lang; });
-      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
-        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
-    }
-    pickVoice();
-    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
-
     function btn(label, aria) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
@@ -2879,8 +2869,46 @@ slots 0, 1 and 2 are never visited: nothing is scheduled there.</div><p>Read the
         next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
         stop = btn('Stop'), status = document.createElement('span');
     status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
-    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
     document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    var voice = null, voices = [];
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0) || (a.name < b.name ? -1 : 1);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
 
     var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;

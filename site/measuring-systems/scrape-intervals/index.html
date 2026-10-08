@@ -1310,11 +1310,11 @@ and 80 increments between the last read and the restart are unrecoverable</div>
     </section>
     <section class="section">
       <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>A monitoring interval is a sampling rate, and sampling rates have consequences that are arithmetic rather than opinion.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A scrape is a sample of an instant, not a summary of an interval</h3><p>A gauge read at <span class="math" data-say="t">t</span> reports the value at <span class="math" data-say="t">t</span>. Whatever the signal did between <span class="math" data-say="t minus I">t − I</span> and <span class="math" data-say="t">t</span> is not averaged, not maximised and not recorded &mdash; it is absent. Two reads fifteen seconds apart both showing a quiet system are two facts about two instants, and the graph drawn between them is a line your plotting library invented.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A spike is caught only if a read lands inside it</h3><p>Reads are <span class="math" data-say="I">I</span> apart, so a spike shorter than <span class="math" data-say="I">I</span> can contain at most one of them, and whether it contains one depends on where it starts. With the start uniform relative to the scrape clock, the chance is the fraction of the cycle the spike occupies: <span class="math" data-say="d over I">d/I</span>, capped at one when <span class="math" data-say="d is greater than or equal to I">d ≥ I</span>. Three seconds in fifteen is exactly <span class="math" data-say="1 over 5">1/5</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A counter that went down is the only trace of a restart</h3><p>Counters are read as differences, so a process restart that zeroes one turns the next difference into a large negative rate &mdash; or, if the counter has already climbed past the previous read, into a small positive one that looks like a quiet spell. The fix is to treat any decrease as a restart and take the new reading as the increment, which recovers the rate and loses whatever accumulated between the last read and the restart.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A scrape is a sample of an instant, not a summary of an interval</h3><p>A gauge read at <span class="math" data-say="t">t</span> reports the value at <span class="math" data-say="t">t</span>. Whatever the signal did between <span class="math" data-say="t minus I">t − I</span> and <span class="math" data-say="t">t</span> is not averaged, not maximised and not recorded &mdash; it is absent. Two reads fifteen seconds apart both showing a quiet system are two facts about two instants, and the graph drawn between them is a line your plotting library invented.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A spike is caught only if a read lands inside it</h3><p>Reads are <span class="math" data-say="I">I</span> apart, so a spike shorter than <span class="math" data-say="I">I</span> can contain at most one of them, and whether it contains one depends on where it starts. With the start uniform relative to the scrape clock, the chance is the fraction of the cycle the spike occupies: <span class="math" data-say="d over I">d/I</span>, capped at one when <span class="math" data-say="d is at least I">d ≥ I</span>. Three seconds in fifteen is exactly <span class="math" data-say="1 over 5">1/5</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A counter that went down is the only trace of a restart</h3><p>Counters are read as differences, so a process restart that zeroes one turns the next difference into a large negative rate &mdash; or, if the counter has already climbed past the previous read, into a small positive one that looks like a quiet spell. The fix is to treat any decrease as a restart and take the new reading as the increment, which recovers the rate and loses whatever accumulated between the last read and the restart.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The catch probability, the invisible spike, and the counter that went backwards</h2></div><p>Where <span class="math" data-say="the min of 1 and d over I">min(1, d/I)</span> comes from and what it assumes, what a run of spikes actually does, and the second thing an interval hides.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Scrape interval</span><p>The <strong>scrape interval</strong> <span class="math" data-say="I">I</span> is the period at which a monitoring system reads a target&rsquo;s current metric values. For a gauge, the value recorded is the one in effect at the instant of the read. For a counter, what is stored is the running total, and a <strong>rate</strong> is computed as the difference between two reads divided by the time between them.</p></div><div class="thm"><span class="label">Theorem &middot; The probability of catching a spike</span><p>Let a spike of duration <span class="math" data-say="d">d</span> begin at a time uniformly distributed relative to the scrape clock, and let reads occur every <span class="math" data-say="I">I</span>. If <span class="math" data-say="d is greater than or equal to I">d ≥ I</span> at least one read falls inside the spike and it is caught with certainty. If <span class="math" data-say="d is less than I">d &lt; I</span> the spike covers a fraction <span class="math" data-say="d over I">d/I</span> of the scrape cycle, so</p><p><span class="math" data-say="P of caught equals the min of 1 and d over I">P(caught) = min(1, d/I)</span>.</p><p>The assumption is the uniformity. It fails exactly when the spike is produced by something on a clock of its own &mdash; a cron job, a flush every sixty seconds, or the scrape itself &mdash; in which case the phase is fixed and the probability is not <span class="math" data-say="d over I">d/I</span> but zero or one, permanently.</p></div><p>That failure mode is worth more than the formula. A spike that is always missed is indistinguishable from no spike, and a periodic job whose period shares a factor with the scrape interval produces exactly that. If a graph is suspiciously flat, changing the interval to a value coprime with your suspicions is a cheap experiment.</p><div class="mathblock" data-say="I equals 15 seconds, d equals 3 seconds. P of caught equals 3 over 15 equals 1 over 5 equals 20 percent. so four spikes in five leave no trace at all. longest spike that can fall entirely between two reads. a spike of d seconds contains a read unless it fits strictly. inside one gap, which needs d is less than or equal to I minus 1 at one-second resolution. I equals 15 seconds, goes to, 14 seconds. I equals 60 seconds, goes to, 59 seconds. I equals, 1 seconds, goes to, 0 seconds, nothing can hide" tabindex="0" role="region" aria-label="Mathematical notation">I = 15 s,  d = 3 s
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Scrape interval</span><p>The <strong>scrape interval</strong> <span class="math" data-say="I">I</span> is the period at which a monitoring system reads a target&rsquo;s current metric values. For a gauge, the value recorded is the one in effect at the instant of the read. For a counter, what is stored is the running total, and a <strong>rate</strong> is computed as the difference between two reads divided by the time between them.</p></div><div class="thm"><span class="label">Theorem &middot; The probability of catching a spike</span><p>Let a spike of duration <span class="math" data-say="d">d</span> begin at a time uniformly distributed relative to the scrape clock, and let reads occur every <span class="math" data-say="I">I</span>. If <span class="math" data-say="d is at least I">d ≥ I</span> at least one read falls inside the spike and it is caught with certainty. If <span class="math" data-say="d is less than I">d &lt; I</span> the spike covers a fraction <span class="math" data-say="d over I">d/I</span> of the scrape cycle, so</p><p><span class="math" data-say="P of caught equals the min of 1 and d over I">P(caught) = min(1, d/I)</span>.</p><p>The assumption is the uniformity. It fails exactly when the spike is produced by something on a clock of its own &mdash; a cron job, a flush every sixty seconds, or the scrape itself &mdash; in which case the phase is fixed and the probability is not <span class="math" data-say="d over I">d/I</span> but zero or one, permanently.</p></div><p>That failure mode is worth more than the formula. A spike that is always missed is indistinguishable from no spike, and a periodic job whose period shares a factor with the scrape interval produces exactly that. If a graph is suspiciously flat, changing the interval to a value coprime with your suspicions is a cheap experiment.</p><div class="mathblock" data-say="I equals 15 seconds, d equals 3 seconds. P of caught equals 3 over 15 equals 1 over 5 equals 20 percent. so four spikes in five leave no trace at all. longest spike that can fall entirely between two reads. a spike of d seconds contains a read unless it fits strictly. inside one gap, which needs d is at most I minus 1 at one-second resolution. I equals 15 seconds, goes to, 14 seconds. I equals 60 seconds, goes to, 59 seconds. I equals, 1 seconds, goes to, 0 seconds, nothing can hide" tabindex="0" role="region" aria-label="Mathematical notation">I = 15 s,  d = 3 s
 
 P(caught) = 3/15 = 1/5 = 20%
 so four spikes in five leave no trace at all
@@ -1408,7 +1408,7 @@ unrecoverable     40 × (152 − 150)    =     80 increments</div><p>The correct
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Fifteen seconds, a three-second spike, and a counter that restarted</h3><p>Two independent calculations at the same interval. The first is the probability arithmetic, which is exact and needs no data. The second is a single restart, which needs two counter reads and a rule.</p><div class="mathblock" data-say="PART ONE, THE SPIKE. I equals 15 seconds, d equals 3 seconds. P of caught equals the min of 1 and d over I equals 3 over 15 equals 1 over 5 equals 20 percent. P of missed, equals 4 over 5 equals 80 percent. longest spike that can hide entirely, equals I minus 1 equals 14 seconds. twelve such spikes in five minutes. expected caught, 12 times 1 over 5 equals 2.4. a seeded run catches some integer near 2.4, not 2.4. drop the interval to 5 seconds, P equals 3 over 5 equals 60 percent, invisible is less than or equal to 4 seconds. drop the interval to 1 seconds, P equals 1, invisible is less than or equal to 0 seconds. PART TWO, THE COUNTER. counter climbing at 40 per second, read every 15 seconds, restart at t equals 152 seconds. t equals 150 seconds, value 40 times 150, equals 6000. t equals 165 seconds, value 40 times the quantity 165 minus 152, equals, 520. naive, the quantity 520 minus 6000, over 15 equals negative 5480 over 15 equals negative 365.33 per second. corrected, decrease implies restart implies 520 over 15, equals, plus 34.67 per second. true, 40.00 per second. lost, 40 times the quantity 152 minus 150, equals 80 increments, unrecoverable" tabindex="0" role="region" aria-label="Mathematical notation">PART ONE — THE SPIKE
+      <article class="card card-pad prose"><h3>Fifteen seconds, a three-second spike, and a counter that restarted</h3><p>Two independent calculations at the same interval. The first is the probability arithmetic, which is exact and needs no data. The second is a single restart, which needs two counter reads and a rule.</p><div class="mathblock" data-say="PART ONE, THE SPIKE. I equals 15 seconds, d equals 3 seconds. P of caught equals the min of 1 and d over I equals 3 over 15 equals 1 over 5 equals 20 percent. P of missed, equals 4 over 5 equals 80 percent. longest spike that can hide entirely, equals I minus 1 equals 14 seconds. twelve such spikes in five minutes. expected caught, 12 times 1 over 5 equals 2.4. a seeded run catches some integer near 2.4, not 2.4. drop the interval to 5 seconds, P equals 3 over 5 equals 60 percent, invisible is at most 4 seconds. drop the interval to 1 seconds, P equals 1, invisible is at most 0 seconds. PART TWO, THE COUNTER. counter climbing at 40 per second, read every 15 seconds, restart at t equals 152 seconds. t equals 150 seconds, value 40 times 150, equals 6000. t equals 165 seconds, value 40 times the quantity 165 minus 152, equals, 520. naive, the quantity 520 minus 6000, over 15 equals negative 5480 over 15 equals negative 365.33 per second. corrected, decrease implies restart implies 520 over 15, equals, plus 34.67 per second. true, 40.00 per second. lost, 40 times the quantity 152 minus 150, equals 80 increments, unrecoverable" tabindex="0" role="region" aria-label="Mathematical notation">PART ONE — THE SPIKE
 
   I = 15 s,   d = 3 s
 
@@ -2856,9 +2856,12 @@ PART TWO — THE COUNTER
       + 'background:var(--panel-solid);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
       + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
       + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
       + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
       + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
-      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex-basis:100%;text-align:center}}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
       + '@media print{.listen-bar,.listen-start{display:none}}';
     document.head.appendChild(css);
 
@@ -2905,19 +2908,6 @@ PART TWO — THE COUNTER
     var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
     try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
     if (RATES.indexOf(rate) < 0) rate = 1;
-    var voice = null;
-    function pickVoice() {
-      // The language of the page, not of the browser: a German browser must not read
-      // English with a German voice. A local voice first; a network voice
-      // sends the text to its vendor.
-      var lang = (document.documentElement.lang || 'en').slice(0, 2), vs = synth.getVoices().filter(function (v) {
-        return v.lang.slice(0, 2) === lang; });
-      voice = vs.filter(function (v) { return v.localService && v.default; })[0]
-        || vs.filter(function (v) { return v.localService; })[0] || vs[0] || null;
-    }
-    pickVoice();
-    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
-
     function btn(label, aria) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
@@ -2937,8 +2927,46 @@ PART TWO — THE COUNTER
         next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
         stop = btn('Stop'), status = document.createElement('span');
     status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
-    [prev, play, next, speed, stop, status].forEach(function (n) { bar.appendChild(n); });
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
     document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    var voice = null, voices = [];
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0) || (a.name < b.name ? -1 : 1);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
 
     var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
