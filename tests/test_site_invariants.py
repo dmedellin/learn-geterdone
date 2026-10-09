@@ -1404,6 +1404,11 @@ OR_DISCLAIMER_RE = re.compile(
 PHIL_DISCLAIMER_RE = re.compile(
     r"(?i)only as good as the premises")
 
+# English promises a hit rate the reader can RECOUNT, not one they are handed.
+# That is the whole claim of the Subject, so it is the sentence its pages carry.
+ENG_DISCLAIMER_RE = re.compile(
+    r"(?i)check by hand rather than something you are told")
+
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
 # rather than inheriting another subject's promise.
@@ -1418,6 +1423,7 @@ PATH_MATERIAL_DISCLAIMER = {
                    OR_DISCLAIMER_RE),
     PHIL_PATH_PAGE: ("the only-as-good-as-the-premises disclaimer",
                      PHIL_DISCLAIMER_RE),
+    ENG_PATH_PAGE: ("the check-it-by-hand disclaimer", ENG_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2423,7 +2429,7 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            841,
+            840,
             len(course_pages),
             "sixty-eight course homes and 772 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "

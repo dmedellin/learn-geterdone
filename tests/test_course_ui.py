@@ -182,7 +182,7 @@ class TestVisitorTaxonomy(unittest.TestCase):
                 scopes.append((self.SUBJECT_PATH,copy))
             found=sorted({m[0] for pattern,scope in scopes for m in pattern.finditer(scope)})
             if found:failures.append(url+": "+repr(found))
-        self.assertEqual(835,len(urls),"taxonomy sweep must cover every requested page")
+        self.assertEqual(850,len(urls),"taxonomy sweep must cover every requested page")
         self.assertEqual([],failures,"visitor taxonomy failures:\n"+"\n".join(failures[:45]))
 
 
@@ -351,7 +351,7 @@ class TestGeneratedCatalogUI(unittest.TestCase):
             self.assertFalse([f for r in visitor_copy.Document(markup).records for f in visitor_copy.findings(r)],
                              "subject catalog must not identify a Course or Lesson by number")
             checked += 1
-        self.assertEqual(6, checked)
+        self.assertEqual(7, checked)
 
     def test_course_overview_has_factual_identity_and_optional_navigation(self):
         checked = 0
