@@ -3718,6 +3718,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from algebra import PATH as ALGEBRA
             from discrete_math import PATH as DISCRETE
             from philosophy import PATH as PHILOSOPHY
+            from english import PATH as ENGLISH
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -3725,6 +3726,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("discrete mathematics", MATH_COURSES, MATH_PATH_PAGE, DISCRETE),
             ("algebra", ALGEBRA_COURSES, ALGEBRA_PATH_PAGE, ALGEBRA),
             ("philosophy", PHIL_COURSES, PHIL_PATH_PAGE, PHILOSOPHY),
+            ("english", ENG_COURSES, ENG_PATH_PAGE, ENGLISH),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -3855,10 +3857,11 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from algebra import PATH as ALGEBRA
             from discrete_math import PATH as DISCRETE
             from philosophy import PATH as PHILOSOPHY
+            from english import PATH as ENGLISH
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
-        for path in (DISCRETE, ALGEBRA, PHILOSOPHY):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -3978,11 +3981,12 @@ class TestEveryLabBuilds(unittest.TestCase):
             from algebra import PATH as ALGEBRA
             from discrete_math import PATH as DISCRETE
             from philosophy import PATH as PHILOSOPHY
+            from english import PATH as ENGLISH
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
-        for path in (DISCRETE, ALGEBRA, PHILOSOPHY):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]
