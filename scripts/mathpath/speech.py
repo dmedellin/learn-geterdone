@@ -817,15 +817,14 @@ _OPERATOR = re.compile(r"[=<>+−\-/*%(),.:;!]+|&(?:le|ge|ne|lt|gt);")
 # island too, and its words come from the Subject's spoken forms (a test
 # fails while one has none). So is a stress pattern such as s.S. (a dot for
 # a light part, S for the strongest), which a voice would read as initials.
-_IPA = re.compile(r"[əðθʃʒŋɪʊæɑɒɔɜʌːˈˌ]")
-_STRESS = re.compile(r"(?=.*S)(?=.*\.[^.]*$|.*\.(?!$))[sS.]{2,6}$")
+_IPA = re.compile(r"[əðʃʒŋɪʊæɑɒɔɜʌːˈˌ]")  # not θ: it is also a math symbol
+_STRESS = re.compile(r"(?=.*S)(?=.*\.(?!$))[sS.]{2,6}$")  # a dot before the end: s.S, not S.
 
 
 def _seed(token):
     """Does a prose token start an island: a math symbol, a sound, a stress mark?"""
     bare = token.strip(",;:!?\u201c\u201d\"'()")
-    return bool(_SYMBOL.search(token) or _IPA.search(bare)
-                or (_STRESS.match(bare) and bare.index(".") < len(bare) - 1))
+    return bool(_SYMBOL.search(token) or _IPA.search(bare) or _STRESS.match(bare))
 _ISLAND_TOKEN = re.compile(r"\S+")
 
 

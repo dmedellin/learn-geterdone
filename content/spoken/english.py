@@ -60,5 +60,5 @@ SPOKEN = {
     'tə': 'tuh',
     'fə': 'fuh',
     'fər': 'fur',
-    's.S': 'some weight, light, strong, light',
+    's.S.': 'some weight, light, strong, light',
 }

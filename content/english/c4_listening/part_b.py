@@ -130,7 +130,7 @@ LESSONS = [
                 "front pieces knows when to expect the strong part to arrive "
                 "second.",
                 "A small <em>s</em> in the lab marks a part with some weight but "
-                "not the most, as in <em>conversation</em>, marked s.S. The "
+                "not the most, as in <em>conversation</em>, marked `s.S.`. The "
                 "count here treats a word that begins that way as starting light, "
                 "which is the strict test. Many of the words that start strong "
                 "have only one part, and start strong by having nowhere else to "
