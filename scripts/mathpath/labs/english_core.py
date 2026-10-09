@@ -6,24 +6,24 @@ That is the whole claim of the course: a rule you can apply yourself beats a
 list you have to remember, and the only way to find out how much it beats it by
 is to run it over real words and count.
 
-WHAT THE RULES SCORED, measured offline over the 1,356 regular verbs of the
-NGSL against that list's own attested forms, and reproduced on the page:
-
-    -s     99.85%   residue: shelf, stomach
-    -ing   99.0%    residue: busing, counselling, formatting, inputting
-    -ed    98.7%    residue: bred, bused, counselled, formatted
+WHAT THE RULES SCORED is computed on the page, by `vbScoreSlot` below, over
+the regular verbs of the NGSL as cleaned by scripts/wordlists/clean_verbs.py
+(the raw list scored invented forms such as comed and offerring as right
+answers; that script records every row it drops and why). The figures live in
+the lab's pinned presets, not here, so they cannot drift from what the page
+prints.
 
 THE RULE THAT WAS REFUTED, kept because it is the lesson. The -s residue first
 read `radio -> radioes, shelf -> shelfs, stomach -> stomaches, video -> videoes`.
 Two fixes suggested themselves: -o takes -es only after a CONSONANT (potatoes,
 heroes) and not after a vowel (radios, videos); and f or fe becomes ves
 (shelf -> shelves). The first was right. The SECOND MADE THE RULES WORSE --
-99.7% to 99.6% -- because brief, golf, proof and roof are verbs that take -s,
-and f -> ves is a rule about NOUNS. Keeping only the first took -s to 99.85%.
+because brief, golf, proof and roof are verbs that take -s, and f -> ves is a
+rule about NOUNS. The lab scores all three versions on the same list.
 
 A rule that sounds right and costs accuracy is the thing a learner is never
-shown, and `vbRuleTrace` below exposes both versions so the page can print the
-comparison rather than assert it.
+shown, so `vbThirdBeforeFix` and `vbThirdWithVes` are kept and the page prints
+the comparison rather than asserting it.
 """
 
 ENGLISH_VERB_JS = r"""
@@ -135,17 +135,55 @@ var vbTable = function (v, thirdPerson) {
   return out;
 };
 
-/* Score a rule over the printed word list: hit rate, and the words it missed.
-   The residue is the point, so it is returned, not counted and thrown away. */
-var vbScore = function (pairs, fn) {
-  var hit = 0, miss = [], i;
-  for (i = 0; i < pairs.length; i++) {
-    if (fn(pairs[i][0]) === pairs[i][1]) hit++;
-    else miss.push(pairs[i][0] + ' → ' + fn(pairs[i][0]) +
-                   ' (attested ' + pairs[i][1] + ')');
+/* The -s rule before the -o fix: every -o takes -es (radioes, videoes). */
+var vbThirdBeforeFix = function (v) {
+  if (VB_IRREG[v] && VB_IRREG[v].third) return VB_IRREG[v].third;
+  if (/(s|sh|ch|x|z|o)$/.test(v)) return v + 'es';
+  if (/[^aeiou]y$/.test(v)) return v.slice(0, -1) + 'ies';
+  return v + 's';
+};
+
+/* The printed list, one verb per row: base, L if the stress is on the last
+   part (F if not), then every spelling the list records for -s, -ing and -ed. Stored as
+   one string, rows split by '|', fields by ' ', spellings by '/', and '~'
+   standing for the base, so 'stop L ~s ~ping ~ped' is stop, stops, stopping,
+   stopped. Decoding is the only thing done to it. */
+var vbDecodeList = function (text) {
+  var rows = [], parts = text.split('|'), i, f, k, forms, j;
+  for (i = 0; i < parts.length; i++) {
+    f = parts[i].split(' ');
+    var row = { base: f[0], last: f[1] === 'L', s: [], ing: [], ed: [] };
+    var slots = ['s', 'ing', 'ed'];
+    for (k = 0; k < 3; k++) {
+      forms = f[k + 2].split('/');
+      for (j = 0; j < forms.length; j++) {
+        row[slots[k]].push(forms[j].charAt(0) === '~' ? f[0] + forms[j].slice(1) : forms[j]);
+      }
+    }
+    rows.push(row);
   }
-  return { hit: hit, total: pairs.length, miss: miss,
-           pct: pairs.length ? R(BigInt(hit) * 10000n, BigInt(pairs.length)) : R(0n, 1n) };
+  return rows;
+};
+
+/* Score one rule on one slot: right when the rule's form is a spelling the
+   list records. The residue is the point, so it is returned in list order,
+   not counted and thrown away. */
+var vbScoreSlot = function (rows, slot, fn) {
+  var hit = 0, miss = [], i, said;
+  for (i = 0; i < rows.length; i++) {
+    said = fn(rows[i].base);
+    if (rows[i][slot].indexOf(said) >= 0) hit++;
+    else miss.push({ base: rows[i].base, said: said, list: rows[i][slot] });
+  }
+  return { hit: hit, total: rows.length, miss: miss };
+};
+
+/* A share to two decimal places, worked in whole numbers so the printed
+   figure is the division and not a floating-point artefact. */
+var vbPct2 = function (hit, total) {
+  if (!total) return '0.00%';
+  var t = Math.round(hit * 10000 / total), r = t % 100;
+  return Math.floor(t / 100) + '.' + (r < 10 ? '0' : '') + r + '%';
 };
 """
 

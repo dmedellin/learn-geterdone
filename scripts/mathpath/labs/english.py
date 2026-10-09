@@ -7,26 +7,73 @@ handed a filled table learns twelve strings; a learner who watches the rules
 fill it learns five rules and can fill the thirteenth themselves.
 
 WHAT IT MEASURES, and why the residue is printed rather than counted away. The
-forming rules are scored on the page against the attested forms of the printed
-verb list: -s 99.85%, -ing 98.97%, -ed 98.67%. The words they miss are the
-lesson -- busing, counselling, formatting, bred -- because a rule without its
-exceptions is the thing textbooks already give.
+forming rules are scored on the page against the recorded forms of the verb
+list the page carries (`table` mode's second menu), and the figures are pinned
+in that menu's presets. The words they miss are the lesson -- bus, format,
+panic -- because a rule without its exceptions is the thing textbooks give.
 
-THE REFUTED RULE. `rules` mode prints the -s rule against the variant that adds
-f -> ves, which sounds right and scores WORSE (brief, golf, proof and roof are
-verbs that take -s). The reader sees the comparison, not a claim about it.
+THE LIST IS CLEANED, AND SAYS HOW. The NGSL's lemma lists were generated, and
+scored raw they counted invented forms (comed, offerring) as right answers.
+scripts/wordlists/clean_verbs.py removes them by one stated test and records
+every row it drops; the page prints those rows with their reasons.
+
+THE REFUTED RULE. The scoring menu runs the -s rule against the variant that
+adds f -> ves, which sounds right and scores WORSE (brief, golf, proof and roof
+are verbs that take -s). The reader sees the comparison, not a claim about it.
+
+MARKUP. Tiles are `.kpi` with a `<span>` label and a `<strong>` value, as in
+every other kit; theme.py styles exactly that pair.
 """
 
+import json
+import pathlib
+
 from .common import Lab, cfg_literal
-from .algebra_core import RATIONAL_JS
 from .english_core import ENGLISH_VERB_JS
 
 MODES = ("table", "doubling", "svo", "adverbs", "questions",
          "irregular", "classes", "irrshare", "listening")
 
+_REPO = pathlib.Path(__file__).resolve().parents[3]
+
+
+def _data(name):
+    """Read a printed dataset from content/english/data/.
+
+    The data lives beside the content it belongs to rather than inside this
+    module: it is the text the page prints, not code, and a reviewer should be
+    able to read it without opening a lab kit.
+    """
+    return json.loads((_REPO / "content" / "english" / "data" / name).read_text())
+
+
+def _wordlist(name):
+    """Read a cleaned word list from scripts/wordlists/ (clean_verbs.py writes them)."""
+    return json.loads((_REPO / "scripts" / "wordlists" / name).read_text())
+
+
+def _kpis(items):
+    """[(label, element id, starting text)] -> the kpi grid every kit uses."""
+    return ('<div class="kpi-grid">'
+            + "".join('<div class="kpi"><span>%s</span><strong id="%s">%s</strong></div>'
+                      % (label, kid, start) for label, kid, start in items)
+            + '</div>')
+
+
+def _options(select_id, presets):
+    return ('<select id="%s">' % select_id
+            + "".join('<option value="%s">%s</option>' % (p["id"], p["label"])
+                      for p in presets)
+            + "</select>")
+
+
+def _expect(presets):
+    return {p["id"]: p["expect"] for p in presets}
+
 
 # ---------------------------------------------------------------------------
-# table -- type a verb, watch the rules fill the twelve cells
+# table -- type a verb, watch the rules fill the twelve cells; then score the
+# rules on the whole printed list
 # ---------------------------------------------------------------------------
 
 _TABLE_PRESETS = [
@@ -56,40 +103,86 @@ _TABLE_PRESETS = [
                 "tbRule": "irregular: looked up, not formed"}},
 ]
 
+# Scored on the printed list. Figures were read off the built page with
+# `labcheck.js --observe` and agree with scripts/wordlists/verbrules_check.js.
+_SCORE_PRESETS = [
+    {"id": "s", "label": "the -s rule (he / she / it)",
+     "expect": {"tbsHit": "1209 of 1210", "tbsPct": "99.92%", "tbsMiss": "1",
+                "tbsFirst": "stomach"}},
+    {"id": "oes", "label": "the -s rule before the -o fix (every -o takes -es)",
+     "expect": {"tbsHit": "1207 of 1210", "tbsPct": "99.75%", "tbsMiss": "3",
+                "tbsFirst": "radio, stomach, video"}},
+    {"id": "ves", "label": "the -s rule with f becoming -ves added",
+     "expect": {"tbsHit": "1205 of 1210", "tbsPct": "99.59%", "tbsMiss": "5",
+                "tbsFirst": "brief, golf, proof, roof, stomach"}},
+    {"id": "ing", "label": "the -ing rule",
+     "expect": {"tbsHit": "1202 of 1210", "tbsPct": "99.34%", "tbsMiss": "8",
+                "tbsFirst": "bus, format, initial, input, output, panic, traffic, up"}},
+    {"id": "ed", "label": "the past (-ed) rule",
+     "expect": {"tbsHit": "1201 of 1210", "tbsPct": "99.26%", "tbsMiss": "9",
+                "tbsFirst": "bus, counsel, format, initial, input, output, panic, traffic, up"}},
+]
 
-def _expect(presets):
-    return {p["id"]: p["expect"] for p in presets}
+
+def _verb_list_text(verbs):
+    """The cleaned list as the one string `vbDecodeList` reads.
+
+    Rows split by '|', fields by ' ', spellings by '/', and a leading '~'
+    standing for the base: 'stop L ~s ~ping ~ped'. The stress mark is a letter,
+    L when the last part is stressed and F otherwise, not a digit: 'course 1'
+    in the page's text reads to the copy guards as a numbered course. The
+    encoding only shortens the text; every recorded spelling is on the page.
+    """
+    slots = {slot: dict(verbs["cases"][slot]) for slot in ("s", "ing", "ed")}
+
+    def rel(base, form):
+        return "~" + form[len(base):] if form.startswith(base) else form
+
+    rows = []
+    for base, last in verbs["stress"].items():
+        rows.append(" ".join(
+            [base, "L" if last else "F"]
+            + ["/".join(rel(base, f) for f in slots[slot][base]) for slot in ("s", "ing", "ed")]))
+    return "|".join(rows)
 
 
 def _table(cfg):
+    verbs = _wordlist("verbrules_cases.json")
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">he / she / it</span>'
-        '<span class="kpi-value" id="tbThird">walks</span></div>'
-        '<div class="kpi"><span class="kpi-label">-ing form</span>'
-        '<span class="kpi-value" id="tbIng">walking</span></div>'
-        '<div class="kpi"><span class="kpi-label">past form</span>'
-        '<span class="kpi-value" id="tbEd">walked</span></div>'
-        '<div class="kpi"><span class="kpi-label">rule that fired</span>'
-        '<span class="kpi-value" id="tbRule">nothing special</span></div>'
-        '</div>'
-        '<div class="table-wrap"><table id="tbGrid"><thead><tr>'
+        _kpis([("he / she / it", "tbThird", "walks"), ("-ing form", "tbIng", "walking"),
+               ("past form", "tbEd", "walked"), ("rule that fired", "tbRule", "nothing special")])
+        + '<div class="table-wrap"><table id="tbGrid"><thead><tr>'
         '<th>time</th><th>simple</th><th>progressive</th>'
         '<th>perfect</th><th>perfect progressive</th>'
         '</tr></thead><tbody id="tbBody"></tbody></table></div>'
+        '<p class="small-copy" id="tbsHead">The rules scored on every regular verb in the '
+        'printed list below.</p>'
+        + _kpis([("rule", "tbsRule", "&mdash;"), ("right", "tbsHit", "&mdash;"),
+                 ("share right", "tbsPct", "&mdash;"), ("missed", "tbsMiss", "&mdash;"),
+                 ("the words it missed", "tbsFirst", "&mdash;")])
+        + '<div class="table-wrap" style="max-height:18rem;overflow-y:auto;">'
+        '<table id="tbsTable"><thead><tr id="tbsCols"></tr></thead>'
+        '<tbody id="tbsBody"></tbody></table></div>'
     )
     controls = (
         '<label for="tbVerb">A verb</label> '
         '<input id="tbVerb" type="text" value="walk" size="14" /> '
         '<label for="tbPreset">or one that shows a rule</label> '
-        '<select id="tbPreset">'
-        + "".join('<option value="%s">%s</option>' % (p["id"], p["label"])
-                  for p in _TABLE_PRESETS)
-        + "</select>"
+        + _options("tbPreset", _TABLE_PRESETS)
+        + ' <label for="tbScore">Score a rule on the list</label> '
+        + _options("tbScore", _SCORE_PRESETS)
+        + ' <label for="tbShow">List</label> '
+        '<select id="tbShow">'
+        '<option value="residue">the words the rule misses</option>'
+        '<option value="all">every verb in the list</option>'
+        '<option value="excluded">the words left out of the list, and why</option>'
+        '</select>'
     )
     script = (
-        RATIONAL_JS + ENGLISH_VERB_JS
+        ENGLISH_VERB_JS
         + cfg_literal("TB_PRESETS", _TABLE_PRESETS)
+        + cfg_literal("VB_LIST_TEXT", _verb_list_text(verbs))
+        + cfg_literal("VB_EXCLUDED", verbs["excluded"])
         + r"""
 (function () {
   var el = function (id) { return document.getElementById(id); };
@@ -104,9 +197,25 @@ def _table(cfg):
   };
   VB_FINAL_STRESS = { listen: false, open: false, happen: false, offer: false,
                       visit: false, enter: false, answer: false, travel: false };
+  /* The printed list carries a stress mark for every verb in it, so a verb
+     typed from the list doubles (or not) by its own stress, not by a guess. */
+  var VB_ROWS = vbDecodeList(VB_LIST_TEXT), r;
+  for (r = 0; r < VB_ROWS.length; r++) VB_FINAL_STRESS[VB_ROWS[r].base] = VB_ROWS[r].last;
 
-  var draw = function (verb) {
-    verb = (verb || '').toLowerCase().replace(/[^a-z]/g, '') || 'walk';
+  var draw = function (typed) {
+    var verb = (typed || '').replace(/^\s+|\s+$/g, '').toLowerCase();
+    /* Refused, visibly: a rule for words cannot be run on a number or on two
+       words, and silently cleaning the input would show a verb nobody typed. */
+    if (!/^[a-z]+$/.test(verb)) {
+      el('tbThird').textContent = '—';
+      el('tbIng').textContent = '—';
+      el('tbEd').textContent = '—';
+      el('tbRule').textContent = verb
+        ? 'not one word: type a single verb in letters, such as walk'
+        : 'type a verb, such as walk';
+      el('tbBody').innerHTML = '';
+      return;
+    }
     el('tbThird').textContent = vbThird(verb);
     el('tbIng').textContent = vbIng(verb);
     el('tbEd').textContent = vbEd(verb);
@@ -127,9 +236,50 @@ def _table(cfg):
     el('tbBody').innerHTML = html;
   };
 
+  /* The scoring view. Each rule is run on every verb in the printed list and
+     counted right when its form is a spelling the list records. */
+  var RULES = {
+    s:   ['s', vbThird, '-s, -es, -ies'],
+    oes: ['s', vbThirdBeforeFix, '-s, with -es after every -o'],
+    ves: ['s', vbThirdWithVes, '-s, with f becoming -ves'],
+    ing: ['ing', vbIng, '-ing'],
+    ed:  ['ed', vbEd, '-ed']
+  };
+  var scoreId = 's', show = 'residue';
+  var score = function () {
+    var rule = RULES[scoreId] || RULES.s, res = vbScoreSlot(VB_ROWS, rule[0], rule[1]);
+    var names = [], i, html = '', said, row;
+    for (i = 0; i < res.miss.length; i++) names.push(res.miss[i].base);
+    el('tbsRule').textContent = rule[2];
+    el('tbsHit').textContent = res.hit + ' of ' + res.total;
+    el('tbsPct').textContent = vbPct2(res.hit, res.total);
+    el('tbsMiss').textContent = String(res.miss.length);
+    el('tbsFirst').textContent = names.length ? names.join(', ') : 'none';
+    if (show === 'excluded') {
+      el('tbsCols').innerHTML = '<th>word</th><th>why it is not scored</th>';
+      var keys = Object.keys(VB_EXCLUDED);
+      for (i = 0; i < keys.length; i++) {
+        html += '<tr><td>' + keys[i] + '</td><td>' + VB_EXCLUDED[keys[i]] + '</td></tr>';
+      }
+    } else {
+      el('tbsCols').innerHTML = '<th>verb</th><th>the rule says</th>'
+        + '<th>the list records</th><th></th>';
+      var list = show === 'all' ? VB_ROWS : res.miss;
+      for (i = 0; i < list.length; i++) {
+        row = list[i];
+        said = show === 'all' ? rule[1](row.base) : row.said;
+        var recorded = show === 'all' ? row[rule[0]] : row.list;
+        html += '<tr><td>' + row.base + '</td><td>' + said + '</td><td>'
+              + recorded.join(' / ') + '</td><td>'
+              + (recorded.indexOf(said) >= 0 ? '' : 'missed') + '</td></tr>';
+      }
+    }
+    el('tbsBody').innerHTML = html;
+  };
+
   /* labcheck calls this after setting a control, and refuses the page without
      it: a lab whose figures cannot be re-driven from outside cannot be pinned. */
-  window.redrawLab = function () { draw(el('tbVerb').value); };
+  window.redrawLab = function () { draw(el('tbVerb').value); score(); };
 
   el('tbVerb').addEventListener('input', function () { draw(this.value); });
   el('tbPreset').addEventListener('change', function () {
@@ -142,7 +292,10 @@ def _table(cfg):
       }
     }
   });
-  draw('walk');
+  el('tbScore').addEventListener('change', function () { scoreId = this.value; score(); });
+  el('tbShow').addEventListener('change', function () { show = this.value; score(); });
+  draw(el('tbVerb').value);
+  score();
 }());
 """
     )
@@ -160,67 +313,60 @@ def _table(cfg):
             "check the answer against the reason for it.",
         ),
         script=script,
-        expect={"tbPreset": _expect(_TABLE_PRESETS)},
+        expect={"tbPreset": _expect(_TABLE_PRESETS), "tbScore": _expect(_SCORE_PRESETS)},
     )
-
-
 
 
 # ---------------------------------------------------------------------------
 # doubling -- the rule that needs the sound, and what it costs without it
 # ---------------------------------------------------------------------------
 
-# The 232 verbs of the NGSL that END consonant-vowel-consonant, which are the
-# only verbs the doubling rule can touch. Printed on the page, because a hit
-# rate the reader cannot recount is a hit rate they have to take on trust.
-# Each row: base, 1 if the stress falls on the last part, 1 if it doubles,
-# and the form the word list actually records.
-DOUBLING_VERBS = [["abandon",0,0,"abandoning"],["admit",1,1,"admitting"],["alter",0,0,"altering"],["anger",0,0,"angering"],["answer",0,0,"answering"],["author",0,0,"authoring"],["bag",1,1,"bagging"],["ban",1,1,"banning"],["bar",1,1,"barring"],["bed",1,1,"bedding"],["begin",1,1,"beginning"],["benefit",0,1,"benefitting"],["bet",1,1,"betting"],["bin",1,1,"binning"],["bit",1,1,"bitting"],["blog",1,1,"blogging"],["border",0,0,"bordering"],["bother",0,0,"bothering"],["bottom",0,0,"bottoming"],["budget",0,0,"budgeting"],["burden",0,0,"burdening"],["bus",1,0,"busing"],["button",0,0,"buttoning"],["can",1,1,"canning"],["cancel",0,1,"cancelling"],["cap",1,1,"capping"],["carpet",0,0,"carpeting"],["catalog",0,0,"cataloging"],["center",0,0,"centering"],["chamber",0,0,"chambering"],["channel",0,1,"channelling"],["chat",1,1,"chatting"],["chicken",0,0,"chickening"],["chip",1,1,"chipping"],["club",1,1,"clubbing"],["cluster",0,0,"clustering"],["color",0,0,"coloring"],["commit",1,1,"committing"],["consider",0,0,"considering"],["control",1,1,"controlling"],["corner",0,0,"cornering"],["council",0,1,"councilling"],["counsel",0,1,"counselling"],["counter",0,0,"countering"],["cover",0,0,"covering"],["credit",0,0,"crediting"],["crop",1,1,"cropping"],["cup",1,1,"cupping"],["cut",1,1,"cutting"],["deliver",0,0,"delivering"],["deposit",0,0,"depositing"],["develop",0,0,"developing"],["dialog",0,0,"dialoging"],["differ",0,0,"differing"],["dig",1,1,"digging"],["discover",0,0,"discovering"],["disorder",0,0,"disordering"],["doctor",0,0,"doctoring"],["dog",1,1,"dogging"],["drag",1,1,"dragging"],["drop",1,1,"dropping"],["drug",1,1,"drugging"],["edit",0,0,"editing"],["encounter",0,0,"encountering"],["enter",0,0,"entering"],["exhibit",0,0,"exhibiting"],["factor",0,0,"factoring"],["fan",1,1,"fanning"],["father",0,0,"fathering"],["favor",0,0,"favoring"],["filter",0,0,"filtering"],["finger",0,0,"fingering"],["fit",1,1,"fitting"],["flag",1,1,"flagging"],["flat",1,1,"flatting"],["flower",0,0,"flowering"],["focus",0,1,"focussing"],["format",0,1,"formatting"],["frighten",0,0,"frightening"],["further",0,0,"furthering"],["gap",1,1,"gapping"],["garden",0,0,"gardening"],["gas",1,1,"gassing"],["gather",0,0,"gathering"],["grab",1,1,"grabbing"],["grin",1,1,"grinning"],["gun",1,1,"gunning"],["happen",0,0,"happening"],["harbor",0,0,"harboring"],["hat",1,1,"hatting"],["hit",1,1,"hitting"],["honor",0,0,"honoring"],["hot",1,1,"hotting"],["humor",0,0,"humoring"],["hunger",0,0,"hungering"],["input",0,1,"inputting"],["interpret",0,0,"interpreting"],["iron",0,0,"ironing"],["journal",0,0,"journaling"],["kid",1,1,"kidding"],["label",0,1,"labelling"],["labor",0,0,"laboring"],["layer",0,0,"layering"],["leather",0,0,"leathering"],["leg",1,1,"legging"],["let",1,1,"letting"],["letter",0,0,"lettering"],["level",0,1,"levelling"],["limit",0,0,"limiting"],["lip",1,1,"lipping"],["listen",0,0,"listening"],["log",1,1,"logging"],["major",0,0,"majoring"],["man",1,1,"manning"],["map",1,1,"mapping"],["market",0,0,"marketing"],["master",0,0,"mastering"],["matter",0,0,"mattering"],["member",0,0,"membering"],["metal",0,1,"metalling"],["meter",0,0,"metering"],["minister",0,0,"ministering"],["mirror",0,0,"mirroring"],["model",0,1,"modelling"],["monitor",0,0,"monitoring"],["mother",0,0,"mothering"],["motor",0,0,"motoring"],["murder",0,0,"murdering"],["neighbor",0,0,"neighboring"],["net",1,1,"netting"],["number",0,0,"numbering"],["occur",1,1,"occurring"],["offer",0,1,"offerring"],["officer",0,0,"officering"],["open",0,0,"opening"],["order",0,0,"ordering"],["output",0,1,"outputting"],["panel",0,1,"panelling"],["panic",0,0,"panicking"],["paper",0,0,"papering"],["parallel",0,0,"paralleling"],["partner",0,0,"partnering"],["pen",1,1,"penning"],["permit",1,1,"permitting"],["pig",1,1,"pigging"],["pilot",0,0,"piloting"],["plan",1,1,"planning"],["plot",1,1,"plotting"],["pocket",0,0,"pocketing"],["pop",1,1,"popping"],["pot",1,1,"potting"],["power",0,0,"powering"],["prefer",1,1,"preferring"],["prison",0,0,"prisoning"],["profit",0,0,"profiting"],["program",0,1,"programming"],["put",1,1,"putting"],["quarter",0,0,"quartering"],["rat",1,1,"ratting"],["reason",0,0,"reasoning"],["reckon",0,0,"reckoning"],["recover",0,0,"recovering"],["red",1,1,"redding"],["refer",1,1,"referring"],["register",0,0,"registering"],["regret",1,1,"regretting"],["remember",0,0,"remembering"],["rid",1,1,"ridding"],["rival",0,1,"rivalling"],["scan",1,1,"scanning"],["season",0,0,"seasoning"],["set",1,1,"setting"],["shelter",0,0,"sheltering"],["ship",1,1,"shipping"],["shop",1,1,"shopping"],["shoulder",0,0,"shouldering"],["shower",0,0,"showering"],["shut",1,1,"shutting"],["signal",0,1,"signalling"],["silver",0,0,"silvering"],["skin",1,1,"skinning"],["slip",1,1,"slipping"],["snap",1,1,"snapping"],["son",1,1,"sonning"],["spirit",0,0,"spiriting"],["split",1,1,"splitting"],["sponsor",0,0,"sponsoring"],["spot",1,1,"spotting"],["star",1,1,"starring"],["stem",1,1,"stemming"],["step",1,1,"stepping"],["stir",1,1,"stirring"],["stop",1,1,"stopping"],["strengthen",0,0,"strengthening"],["strip",1,1,"stripping"],["submit",1,1,"submitting"],["suffer",0,1,"sufferring"],["sum",1,1,"summing"],["summer",0,0,"summering"],["sun",1,1,"sunning"],["swim",1,1,"swimming"],["tap",1,1,"tapping"],["target",0,0,"targeting"],["tender",0,0,"tendering"],["thin",1,1,"thinning"],["threaten",0,0,"threatening"],["ticket",0,0,"ticketing"],["tip",1,1,"tipping"],["top",1,1,"topping"],["total",0,1,"totalling"],["tower",0,0,"towering"],["traffic",0,0,"trafficking"],["transfer",1,1,"transferring"],["trap",1,1,"trapping"],["travel",0,1,"travelling"],["trigger",0,0,"triggering"],["trip",1,1,"tripping"],["twin",1,1,"twinning"],["upset",1,1,"upsetting"],["visit",0,0,"visiting"],["wander",0,0,"wandering"],["war",1,1,"warring"],["water",0,0,"watering"],["weather",0,0,"weathering"],["web",1,1,"webbing"],["wed",1,1,"wedding"],["wet",1,1,"wetting"],["whisper",0,0,"whispering"],["win",1,1,"winning"],["winter",0,0,"wintering"],["wonder",0,0,"wondering"],["wrap",1,1,"wrapping"]]
+# Every verb of the NGSL that ENDS consonant-vowel-consonant, the only verbs
+# the doubling rule can touch, built by scripts/wordlists/clean_verbs.py. Each
+# row: base, 1 if the stress falls on the last part, 1 if the list records a
+# doubled -ing spelling, every recorded -ing spelling, and the recorded
+# spellings removed as misspellings. The raw NGSL carried offerring and
+# sufferring (and offerred), which made offer and suffer look like exceptions
+# to a rule they obey, and gave council -- not a verb -- a councilling. Rows
+# with no correct -ing spelling, or that are not verbs, are left out; the page
+# prints them and why. Printed in full, because a hit rate the reader cannot
+# recount is a hit rate they have to take on trust.
+DOUBLING = _wordlist("doubling_verbs.json")
 
 _DB_PRESETS = [
     {"id": "stress", "label": "double when the last part is the strong part",
      "rule": "stress",
-     "expect": {"dbScore": "210 of 232", "dbPct": "90.5%", "dbWrong": "22"}},
+     "expect": {"dbScore": "199 of 217", "dbPct": "91.7%", "dbWrong": "18"}},
     {"id": "always", "label": "double every one of them",
      "rule": "always",
-     "expect": {"dbScore": "117 of 232", "dbPct": "50.4%", "dbWrong": "115"}},
+     "expect": {"dbScore": "107 of 217", "dbPct": "49.3%", "dbWrong": "110"}},
     {"id": "never", "label": "never double",
      "rule": "never",
-     "expect": {"dbScore": "115 of 232", "dbPct": "49.6%", "dbWrong": "117"}},
+     "expect": {"dbScore": "110 of 217", "dbPct": "50.7%", "dbWrong": "107"}},
 ]
 
 
 def _doubling(cfg):
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">right</span>'
-        '<span class="kpi-value" id="dbScore">210 of 232</span></div>'
-        '<div class="kpi"><span class="kpi-label">share</span>'
-        '<span class="kpi-value" id="dbPct">90.5%</span></div>'
-        '<div class="kpi"><span class="kpi-label">wrong</span>'
-        '<span class="kpi-value" id="dbWrong">22</span></div>'
-        '<div class="kpi"><span class="kpi-label">of those, ending in -l</span>'
-        '<span class="kpi-value" id="dbEl">13</span></div>'
-        '</div>'
-        '<div class="table-wrap"><table id="dbTable"><thead><tr>'
-        '<th>verb</th><th>strong part last?</th><th>rule says</th>'
-        '<th>word list says</th><th></th></tr></thead>'
+        _kpis([("right", "dbScore", "&mdash;"), ("share", "dbPct", "&mdash;"),
+               ("wrong", "dbWrong", "&mdash;"), ("of those, ending in -l", "dbEl", "&mdash;")])
+        + '<div class="table-wrap" style="max-height:24rem;overflow-y:auto;">'
+        '<table id="dbTable"><thead><tr id="dbCols"></tr></thead>'
         '<tbody id="dbBody"></tbody></table></div>'
     )
     controls = (
         '<label for="dbPreset">The rule to score</label> '
-        '<select id="dbPreset">'
-        + "".join('<option value="%s">%s</option>' % (p["id"], p["label"])
-                  for p in _DB_PRESETS)
-        + "</select> "
-        '<label for="dbShow">Show</label> '
+        + _options("dbPreset", _DB_PRESETS)
+        + ' <label for="dbShow">Show</label> '
         '<select id="dbShow">'
         '<option value="wrong">only the ones it gets wrong</option>'
         '<option value="all">every verb</option>'
+        '<option value="excluded">the words left out, and why</option>'
         '</select>'
     )
     script = (
-        cfg_literal("DB_VERBS", DOUBLING_VERBS)
+        cfg_literal("DB_VERBS", DOUBLING["verbs"])
+        + cfg_literal("DB_EXCLUDED", DOUBLING["excluded"])
         + cfg_literal("DB_PRESETS", _DB_PRESETS)
         + r"""
 (function () {
@@ -250,14 +396,27 @@ def _doubling(cfg):
     for (i = 0; i < wrong.length; i++) if (/l$/.test(wrong[i][0])) el_count++;
     el('dbEl').textContent = String(el_count);
 
-    var rowsToShow = show === 'all' ? DB_VERBS : wrong, html = '';
-    for (i = 0; i < rowsToShow.length && i < 240; i++) {
-      row = rowsToShow[i];
-      var says = predicts(row) ? row[0] + row[0].charAt(row[0].length - 1) + 'ing'
-                               : row[0] + 'ing';
-      html += '<tr><td>' + row[0] + '</td><td>' + (row[1] ? 'yes' : 'no')
-            + '</td><td>' + says + '</td><td>' + row[3] + '</td><td>'
-            + (says === row[3] ? '' : 'no') + '</td></tr>';
+    var html = '';
+    if (show === 'excluded') {
+      el('dbCols').innerHTML = '<th>word</th><th>why it is left out</th>';
+      var keys = Object.keys(DB_EXCLUDED);
+      for (i = 0; i < keys.length; i++) {
+        html += '<tr><td>' + keys[i] + '</td><td>' + DB_EXCLUDED[keys[i]] + '</td></tr>';
+      }
+    } else {
+      el('dbCols').innerHTML = '<th>verb</th><th>strong part last?</th><th>rule says</th>'
+        + '<th>word list says</th><th></th>';
+      var rowsToShow = show === 'all' ? DB_VERBS : wrong;
+      for (i = 0; i < rowsToShow.length; i++) {
+        row = rowsToShow[i];
+        var says = predicts(row) ? row[0] + row[0].charAt(row[0].length - 1) + 'ing'
+                                 : row[0] + 'ing';
+        html += '<tr><td>' + row[0] + '</td><td>' + (row[1] ? 'yes' : 'no')
+              + '</td><td>' + says + '</td><td>' + row[3].split('/').join(' / ')
+              + (row[4] ? ' (the raw list also has ' + row[4].split('/').join(', ')
+                          + ', a misspelling, removed)' : '')
+              + '</td><td>' + (predicts(row) === row[2] ? '' : 'wrong') + '</td></tr>';
+      }
     }
     el('dbBody').innerHTML = html;
   };
@@ -270,7 +429,7 @@ def _doubling(cfg):
 """
     )
     return Lab(
-        title="The doubling rule, scored three ways on the same 232 verbs",
+        title="The doubling rule, scored three ways on the same verbs",
         subtitle="Switch the stress condition off and watch the rule fall to a coin toss",
         markup=markup,
         controls=controls,
@@ -287,22 +446,6 @@ def _doubling(cfg):
     )
 
 
-
-
-def _data(name):
-    """Read a printed dataset from content/english/data/.
-
-    The data lives beside the content it belongs to rather than inside this
-    module: it is the text the page prints, not code, and a reviewer should be
-    able to read it without opening a lab kit.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(__file__).resolve()
-    root = here.parent.parent.parent.parent          # scripts/mathpath/labs -> repo
-    return json.loads((root / "content" / "english" / "data" / name).read_text())
-
-
 # ---------------------------------------------------------------------------
 # The word-order modes. One scanner, three rules, three printed datasets.
 #
@@ -316,6 +459,59 @@ def _data(name):
 WORDORDER_DATA = _data("wordorder_passage.json")
 ADVERB_DATA = _data("adverb_concordance.json")
 QUESTION_DATA = _data("question_concordance.json")
+
+
+def _modern_text(name):
+    """The article text of a modern document, without its provenance header."""
+    raw = (_REPO / "content" / "english" / "data" / name).read_text(encoding="utf-8")
+    return raw.split("\n---\n", 1)[1].strip()
+
+
+# The two modern public-domain documents the word-order lessons compare with
+# Austen. Printed on the page with their citations, and counted there: the
+# provenance of each (and why it is public domain) is in the data file header.
+MODERN_DATA = {
+    "docs": [
+        {"name": "Stanley v. City of Sanford, Florida, 606 U.S. 46 (2025), opinion "
+                 "of the Court, Parts I and II.A (excerpt)",
+         "text": _modern_text("scotus_stanley.txt")},
+        {"name": "\u201cU.S. Population Aging as Nation Turns 250\u201d, Luke T. Rogers "
+                 "and George M. Hayward, U.S. Census Bureau, April 9, 2026",
+         "text": _modern_text("census_aging.txt")},
+    ],
+}
+
+# What prints the modern documents under a lab: a closed <details>, so the
+# figures beside it can be checked word by word without the text taking the
+# page over.
+_MODERN_MARKUP = (
+    '<details><summary>The two modern documents, printed in full</summary>'
+    '<div class="mathblock" id="%sModern" style="font-size:0.8rem;"></div></details>'
+)
+
+MODERN_JS = r"""
+/* The two modern documents as one list of words, and the printed text. */
+var modernWords = function () {
+  var all = [], i;
+  for (i = 0; i < MODERN.docs.length; i++) all = all.concat(wordsOf(MODERN.docs[i].text));
+  return all;
+};
+var modernPrint = function (id) {
+  var node = document.getElementById(id), i, out = [];
+  if (!node) return;
+  for (i = 0; i < MODERN.docs.length; i++) {
+    out.push(MODERN.docs[i].name + '\n\n' + MODERN.docs[i].text);
+  }
+  node.style.whiteSpace = 'pre-wrap';
+  node.textContent = out.join('\n\n\n');
+};
+/* Occurrences per thousand words, to one decimal, in whole numbers. */
+var perThousand = function (hits, words) {
+  if (!words) return '0.0';
+  var t = Math.round(hits * 10000 / words);
+  return Math.floor(t / 10) + '.' + (t % 10);
+};
+"""
 
 SCAN_JS = r"""
 var wordsOf = function (s) { return s.match(/[A-Za-z][A-Za-z']*/g) || []; };
@@ -332,6 +528,11 @@ var setOf = function (list) {
 };
 /* A share printed to one decimal place, worked in whole numbers so the figure
    on the page is exactly the division and not a floating-point artefact. */
+var commas = function (n) {
+  var t = String(n);
+  while (/\d{4}/.test(t)) t = t.replace(/(\d)(\d{3})(?!\d)/, '$1,$2');
+  return t;
+};
 var share1 = function (hit, total) {
   if (!total) return '0.0%';
   var t = Math.round(hit * 1000 / total);
@@ -346,29 +547,26 @@ _SVO_PRESETS = [
      # Verified against an independent count, not copied from what the page
      # printed: 72 of 80 hold, one is the quotation-tag inversion, five have a
      # modifier between. Pinning whatever the lab says would make this vacuous.
-     "expect": {"soHit": "72 of 80", "soPct": "90.0%", "soBroken": "1"}},
+     "expect": {"soHit": "72 of 80", "soPct": "90.0%", "soBroken": "1", "soTimes": "6.1"}},
     {"id": "object", "label": "object pronouns: me, him, us, them",
      "kind": "object",
-     "expect": {"soHit": "16 of 18", "soPct": "88.9%", "soBroken": "0"}},
+     "expect": {"soHit": "16 of 18", "soPct": "88.9%", "soBroken": "0", "soTimes": "10.9"}},
 ]
 
 
 def _svo(cfg):
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">rule holds</span>'
-        '<span class="kpi-value" id="soHit">72 of 80</span></div>'
-        '<div class="kpi"><span class="kpi-label">share</span>'
-        '<span class="kpi-value" id="soPct">90.0%</span></div>'
-        '<div class="kpi"><span class="kpi-label">word order broken</span>'
-        '<span class="kpi-value" id="soBroken">0</span></div>'
-        '<div class="kpi"><span class="kpi-label">a modifier comes between</span>'
-        '<span class="kpi-value" id="soMod">0</span></div>'
-        '</div>'
-        '<div class="table-wrap"><table id="soTable"><thead><tr>'
+        _kpis([("rule holds", "soHit", "&mdash;"), ("share", "soPct", "&mdash;"),
+               ("word order broken", "soBroken", "&mdash;"),
+               ("a modifier comes between", "soMod", "&mdash;")])
+        + _kpis([("per 1,000 words, the passage", "soHereK", "&mdash;"),
+                 ("per 1,000 words, the modern documents", "soModK", "&mdash;"),
+                 ("the passage has, times as many", "soTimes", "&mdash;")])
+        + '<div class="table-wrap"><table id="soTable"><thead><tr>'
         '<th>pronoun</th><th>next word</th><th>what the rule says</th>'
         '</tr></thead><tbody id="soBody"></tbody></table></div>'
         '<div class="mathblock" id="soPassage" style="font-size:0.8rem;"></div>'
+        + _MODERN_MARKUP % "so"
     )
     controls = (
         '<label for="soPreset">Which pronouns</label> '
@@ -382,7 +580,8 @@ def _svo(cfg):
         '<option value="all">every one</option>'
         '</select>'
     )
-    script = SCAN_JS + cfg_literal("SO_DATA", WORDORDER_DATA) + cfg_literal("SO_PRESETS", _SVO_PRESETS) + r"""
+    script = (SCAN_JS + cfg_literal("SO_DATA", WORDORDER_DATA) + cfg_literal("MODERN", MODERN_DATA)
+              + MODERN_JS + cfg_literal("SO_PRESETS", _SVO_PRESETS)) + r"""
 (function () {
   var el = function (id) { return document.getElementById(id); };
   var verbs = setOf(SO_DATA.verbs), aux = setOf(SO_DATA.aux);
@@ -430,7 +629,21 @@ def _svo(cfg):
     }
     el('soBody').innerHTML = html;
     el('soPassage').textContent = SO_DATA.passage;
+
+    /* The same pronouns, counted per thousand words in the passage and in the
+       two modern documents printed below it. */
+    var target = kind === 'subject' ? SUBJ : OBJ, mw = lower(modernWords()), here = 0, there = 0;
+    for (i = 0; i < lw.length; i++) if (inSet(target, lw[i])) here++;
+    for (i = 0; i < mw.length; i++) if (inSet(target, mw[i])) there++;
+    el('soHereK').textContent = perThousand(here, lw.length) + ' (' + here + ' in ' + commas(lw.length) + ')';
+    el('soModK').textContent = perThousand(there, mw.length) + ' (' + there + ' in ' + commas(mw.length) + ')';
+    if (!there) el('soTimes').textContent = 'the modern documents have none';
+    else {
+      var t = Math.round(here * mw.length * 10 / (lw.length * there));
+      el('soTimes').textContent = Math.floor(t / 10) + '.' + (t % 10);
+    }
   };
+  modernPrint('soModern');
   window.redrawLab = scan;
   el('soPreset').addEventListener('change', function () { kind = this.value === 'object' ? 'object' : 'subject'; scan(); });
   el('soShow').addEventListener('change', function () { show = this.value; scan(); });
@@ -453,37 +666,41 @@ def _svo(cfg):
 
 _ADV_PRESETS = [
     {"id": "mid", "label": "the adverb sits in the middle",
-     "expect": {"avHit": "85 of 120", "avPct": "70.8%"}},
+     "expect": {"avHit": "85 of 120", "avPct": "70.8%", "avModN": "2 in 1,723 words"}},
 ]
+
+
+# The menu offers only adverbs the concordance has lines for: an adverb with
+# none (rarely) would score 0 of 0, a tile that says nothing. The modern-text
+# count still searches the whole list, rarely included.
+_ADV_MENU = [a for a in ADVERB_DATA["adverbs"]
+             if any(row[0] == a for row in ADVERB_DATA["rows"])]
 
 
 def _adverbs(cfg):
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">rule holds</span>'
-        '<span class="kpi-value" id="avHit">85 of 120</span></div>'
-        '<div class="kpi"><span class="kpi-label">share</span>'
-        '<span class="kpi-value" id="avPct">70.8%</span></div>'
-        '<div class="kpi"><span class="kpi-label">a preposition follows</span>'
-        '<span class="kpi-value" id="avPrep">6</span></div>'
-        '<div class="kpi"><span class="kpi-label">something else between</span>'
-        '<span class="kpi-value" id="avOther">29</span></div>'
-        '</div>'
-        '<div class="table-wrap"><table id="avTable"><thead><tr>'
+        _kpis([("rule holds", "avHit", "&mdash;"), ("share", "avPct", "&mdash;"),
+               ("a preposition follows", "avPrep", "&mdash;"),
+               ("something else between", "avOther", "&mdash;")])
+        + _kpis([("in the modern documents", "avModN", "&mdash;"),
+                 ("per 1,000 words there", "avModK", "&mdash;")])
+        + '<div class="table-wrap"><table id="avTable"><thead><tr>'
         '<th>adverb</th><th>the line it came from</th><th>verdict</th>'
         '</tr></thead><tbody id="avBody"></tbody></table></div>'
+        + _MODERN_MARKUP % "av"
     )
     controls = (
         '<label for="avWord">Which adverb</label> '
         '<select id="avWord"><option value="">all of them</option>'
-        + "".join('<option value="%s">%s</option>' % (a, a) for a in ADVERB_DATA["adverbs"])
+        + "".join('<option value="%s">%s</option>' % (a, a) for a in _ADV_MENU)
         + '</select> '
         '<label for="avPreset">Rule</label> '
         '<select id="avPreset">'
         + "".join('<option value="%s">%s</option>' % (p["id"], p["label"]) for p in _ADV_PRESETS)
         + '</select>'
     )
-    script = SCAN_JS + cfg_literal("AV_DATA", ADVERB_DATA) + cfg_literal("AV_PRESETS", _ADV_PRESETS) + r"""
+    script = (SCAN_JS + cfg_literal("AV_DATA", ADVERB_DATA) + cfg_literal("MODERN", MODERN_DATA)
+              + MODERN_JS + cfg_literal("AV_PRESETS", _ADV_PRESETS)) + r"""
 (function () {
   var el = function (id) { return document.getElementById(id); };
   var verbs = setOf(AV_DATA.verbs), aux = setOf(AV_DATA.aux);
@@ -515,7 +732,14 @@ def _adverbs(cfg):
             + '</td><td>' + rows[i][2] + '</td></tr>';
     }
     el('avBody').innerHTML = html;
+
+    /* The same adverbs (or the one chosen), counted in the modern documents. */
+    var mw = lower(modernWords()), want = only ? setOf([only]) : setOf(AV_DATA.adverbs), m = 0;
+    for (i = 0; i < mw.length; i++) if (inSet(want, mw[i])) m++;
+    el('avModN').textContent = m + ' in ' + commas(mw.length) + ' words';
+    el('avModK').textContent = perThousand(m, mw.length);
   };
+  modernPrint('avModern');
   window.redrawLab = scan;
   el('avWord').addEventListener('change', function () { only = this.value; scan(); });
   el('avPreset').addEventListener('change', function () { scan(); });
@@ -538,25 +762,22 @@ def _adverbs(cfg):
 
 _Q_PRESETS = [
     {"id": "aux", "label": "a question starts with an auxiliary, or a wh-word then one",
-     "expect": {"quHit": "48 of 90", "quPct": "53.3%"}},
+     "expect": {"quHit": "48 of 90", "quPct": "53.3%", "quConnPct": "13 of 42, 31.0%"}},
 ]
 
 
 def _questions(cfg):
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">rule holds</span>'
-        '<span class="kpi-value" id="quHit">48 of 90</span></div>'
-        '<div class="kpi"><span class="kpi-label">share</span>'
-        '<span class="kpi-value" id="quPct">53.3%</span></div>'
-        '<div class="kpi"><span class="kpi-label">starts with a joining word</span>'
-        '<span class="kpi-value" id="quConn">13</span></div>'
-        '<div class="kpi"><span class="kpi-label">something else</span>'
-        '<span class="kpi-value" id="quOther">21</span></div>'
-        '</div>'
-        '<div class="table-wrap"><table id="quTable"><thead><tr>'
+        _kpis([("rule holds", "quHit", "&mdash;"), ("share", "quPct", "&mdash;"),
+               ("starts with a joining word", "quConn", "&mdash;"),
+               ("joining words, share of the misses", "quConnPct", "&mdash;"),
+               ("something else", "quOther", "&mdash;")])
+        + _kpis([("questions in the modern documents", "quModQ", "&mdash;"),
+                 ("words in them", "quModW", "&mdash;")])
+        + '<div class="table-wrap"><table id="quTable"><thead><tr>'
         '<th>question</th><th>verdict</th></tr></thead>'
         '<tbody id="quBody"></tbody></table></div>'
+        + _MODERN_MARKUP % "qu"
     )
     controls = (
         '<label for="quPreset">Rule</label> '
@@ -569,7 +790,8 @@ def _questions(cfg):
         '<option value="all">every question</option>'
         '</select>'
     )
-    script = SCAN_JS + cfg_literal("QU_DATA", QUESTION_DATA) + cfg_literal("QU_PRESETS", _Q_PRESETS) + r"""
+    script = (SCAN_JS + cfg_literal("QU_DATA", QUESTION_DATA) + cfg_literal("MODERN", MODERN_DATA)
+              + MODERN_JS + cfg_literal("QU_PRESETS", _Q_PRESETS)) + r"""
 (function () {
   var el = function (id) { return document.getElementById(id); };
   var AUX = setOf(['is','are','was','were','be','am','have','has','had','do','does','did',
@@ -596,6 +818,14 @@ def _questions(cfg):
     el('quPct').textContent = share1(hit, rows.length);
     el('quConn').textContent = String(conn);
     el('quOther').textContent = String(other);
+    el('quConnPct').textContent = conn + ' of ' + (rows.length - hit) + ', '
+                                  + share1(conn, rows.length - hit);
+    /* A question in print ends with a question mark; the modern documents are
+       searched for one. */
+    var qs = 0, d;
+    for (d = 0; d < MODERN.docs.length; d++) qs += MODERN.docs[d].text.split('?').length - 1;
+    el('quModQ').textContent = String(qs);
+    el('quModW').textContent = commas(modernWords().length);
     var html = '';
     for (i = 0; i < rows.length; i++) {
       if (show === 'residue' && rows[i][1] === 'holds') continue;
@@ -603,6 +833,7 @@ def _questions(cfg):
     }
     el('quBody').innerHTML = html;
   };
+  modernPrint('quModern');
   window.redrawLab = scan;
   el('quPreset').addEventListener('change', function () { scan(); });
   el('quShow').addEventListener('change', function () { show = this.value; scan(); });
@@ -631,71 +862,102 @@ def _questions(cfg):
 
 IRREGULAR_DATA = _data("irregular_verbs.json")
 
+# The sorting questions of six-patterns-not-one-hundred-and-eighty, asked in
+# the lesson's order, run on the three printed forms of each verb. The class a
+# verb lands in is COMPUTED here; the `class` field in the data file is not
+# read by any page, and a test checks the two agree.
+IRCLASS_JS = r"""
+var IR_CLASSES = [
+  { id: 'all_same',       size: 'all three the same',              ex: 'put' },
+  { id: 'past_eq_pp',     size: 'past = form after have',          ex: 'bring' },
+  { id: 'base_eq_pp',     size: 'base = form after have',          ex: 'come' },
+  { id: 'base_eq_past',   size: 'base = past',                     ex: 'beat' },
+  { id: 'all_diff_n',     size: 'all differ, last ends in -n',     ex: 'know' },
+  { id: 'all_diff_other', size: 'all differ, last does not end in -n', ex: 'sing' }
+];
+/* A form written with a slash is two words (be: was/were), and a rule about
+   equal strings cannot sort it: it stands outside the six. */
+var irClassOf = function (v) {
+  if (v.past.indexOf('/') >= 0 || v.pp.indexOf('/') >= 0) return 'outside';
+  if (v.base === v.past && v.past === v.pp) return 'all_same';
+  if (v.past === v.pp) return 'past_eq_pp';
+  if (v.base === v.pp) return 'base_eq_pp';
+  if (v.base === v.past) return 'base_eq_past';
+  return /n$/.test(v.pp) ? 'all_diff_n' : 'all_diff_other';
+};
+/* The vowel pattern of sing, sang, sung: the first i of the base becomes a
+   in the past and u in the form after have, and nothing else changes. */
+var irIau = function (v) {
+  var k = v.base.indexOf('i');
+  if (k < 0) return false;
+  return v.past === v.base.slice(0, k) + 'a' + v.base.slice(k + 1)
+      && v.pp === v.base.slice(0, k) + 'u' + v.base.slice(k + 1);
+};
+var irCounts = function () {
+  var counts = {}, i;
+  for (i = 0; i < IR_DATA.verbs.length; i++) {
+    var c = irClassOf(IR_DATA.verbs[i]);
+    counts[c] = (counts[c] || 0) + 1;
+  }
+  return counts;
+};
+"""
+
 _IR_PRESETS = [
     {"id": "all", "label": "every verb on the list", "cls": "",
-     "expect": {"irCount": "133", "irClasses": "7", "irBiggest": "60"}},
+     "expect": {"irCount": "133", "irClasses": "6", "irBiggest": "60"}},
     {"id": "past_eq_pp", "label": "past and participle are the same word", "cls": "past_eq_pp",
-     "expect": {"irCount": "60", "irClasses": "7", "irBiggest": "60"}},
+     "expect": {"irCount": "60", "irClasses": "6", "irBiggest": "60"}},
     {"id": "all_same", "label": "all three forms the same", "cls": "all_same",
-     "expect": {"irCount": "21", "irClasses": "7", "irBiggest": "60"}},
+     "expect": {"irCount": "21", "irClasses": "6", "irBiggest": "60"}},
     {"id": "all_diff_n", "label": "all three differ, participle ends in -n", "cls": "all_diff_n",
-     "expect": {"irCount": "37", "irClasses": "7", "irBiggest": "60"}},
+     "expect": {"irCount": "37", "irClasses": "6", "irBiggest": "60"}},
     {"id": "all_diff_other", "label": "all three differ, participle does not end in -n",
      "cls": "all_diff_other",
-     "expect": {"irCount": "9", "irClasses": "7", "irBiggest": "60"}},
+     "expect": {"irCount": "9", "irClasses": "6", "irBiggest": "60"}},
 ]
 
 
-def _irregular_view(cfg, title, subtitle, panel_title, panel_intro):
+def _irregular(cfg):
+    """The whole list, narrowed by class: the lesson that introduces the list."""
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">verbs shown</span>'
-        '<span class="kpi-value" id="irCount">133</span></div>'
-        '<div class="kpi"><span class="kpi-label">patterns in all</span>'
-        '<span class="kpi-value" id="irClasses">7</span></div>'
-        '<div class="kpi"><span class="kpi-label">largest pattern</span>'
-        '<span class="kpi-value" id="irBiggest">60</span></div>'
-        '<div class="kpi"><span class="kpi-label">share of the list</span>'
-        '<span class="kpi-value" id="irPct">100.0%</span></div>'
-        '</div>'
-        '<div id="irRule" class="mathblock"></div>'
+        _kpis([("verbs shown", "irCount", "&mdash;"), ("classes", "irClasses", "&mdash;"),
+               ("largest class", "irBiggest", "&mdash;"), ("share of the list", "irPct", "&mdash;")])
+        + '<div id="irRule" class="mathblock"></div>'
         '<div class="table-wrap"><table id="irTable"><thead><tr>'
-        '<th>base</th><th>past</th><th>after <em>have</em></th><th>pattern</th>'
+        '<th>base</th><th>past</th><th>after <em>have</em></th><th>class</th>'
         '</tr></thead><tbody id="irBody"></tbody></table></div>'
     )
-    controls = (
-        '<label for="irPreset">Which verbs</label> <select id="irPreset">'
-        + "".join('<option value="{}">{}</option>'.format(p["id"], p["label"])
-                  for p in _IR_PRESETS)
-        + "</select>"
-    )
-    script = SCAN_JS + cfg_literal("IR_DATA", IRREGULAR_DATA) + cfg_literal("IR_PRESETS", _IR_PRESETS) + r"""
+    controls = '<label for="irPreset">Which verbs</label> ' + _options("irPreset", _IR_PRESETS)
+    script = (SCAN_JS + cfg_literal("IR_DATA", IRREGULAR_DATA) + IRCLASS_JS
+              + cfg_literal("IR_PRESETS", _IR_PRESETS) + r"""
 (function () {
   var el = function (id) { return document.getElementById(id); };
   var cls = '';
 
   var draw = function () {
-    var rows = [], i, v, classes = {}, biggest = 0;
+    var rows = [], i, v, counts = irCounts(), biggest = 0, six = 0, k;
     for (i = 0; i < IR_DATA.verbs.length; i++) {
       v = IR_DATA.verbs[i];
-      classes[v.class] = (classes[v.class] || 0) + 1;
-      if (!cls || v.class === cls) rows.push(v);
+      if (!cls || irClassOf(v) === cls) rows.push(v);
     }
-    var names = Object.keys(classes), k;
-    for (k = 0; k < names.length; k++) {
-      if (classes[names[k]] > biggest) biggest = classes[names[k]];
+    for (k = 0; k < IR_CLASSES.length; k++) {
+      if (counts[IR_CLASSES[k].id]) six++;
+      if ((counts[IR_CLASSES[k].id] || 0) > biggest) biggest = counts[IR_CLASSES[k].id];
     }
     el('irCount').textContent = String(rows.length);
-    el('irClasses').textContent = String(names.length);
+    el('irClasses').textContent = String(six);
     el('irBiggest').textContent = String(biggest);
     el('irPct').textContent = share1(rows.length, IR_DATA.verbs.length);
     el('irRule').textContent = cls && IR_DATA.classes[cls]
       ? IR_DATA.classes[cls].rule
-      : 'Every verb on the list, in every pattern.';
+      : 'Every verb on the list. ' + (counts.outside || 0)
+        + ' of them (be) stands outside the classes.';
     var html = '';
     for (i = 0; i < rows.length; i++) {
       html += '<tr><td>' + rows[i].base + '</td><td>' + rows[i].past
-            + '</td><td>' + rows[i].pp + '</td><td>' + rows[i].class + '</td></tr>';
+            + '</td><td>' + rows[i].pp + '</td><td>' + irClassOf(rows[i]).replace(/_/g, ' ')
+            + '</td></tr>';
     }
     el('irBody').innerHTML = html;
   };
@@ -708,58 +970,142 @@ def _irregular_view(cfg, title, subtitle, panel_title, panel_intro):
   });
   draw();
 }());
-"""
+""")
     return Lab(
-        title=title, subtitle=subtitle, markup=markup, controls=controls,
-        panel_title=cfg.get("panel_title", panel_title),
-        panel_intro=cfg.get("panel_intro", panel_intro),
+        title="Every irregular verb the course covers, with its three forms",
+        subtitle="133 verbs, and the class the sorting questions put each one in",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "The whole list, and how it divides"),
+        panel_intro=cfg.get("panel_intro",
+            "Every verb here is printed with its three forms. Choose a class and "
+            "the list narrows to the verbs that follow it, with the rule that "
+            "defines it printed above the table."),
         script=script, expect={"irPreset": _expect(_IR_PRESETS)},
     )
 
 
-def _irregular(cfg):
-    return _irregular_view(
-        cfg,
-        "Every irregular verb the course covers, with its three forms",
-        "133 verbs, and the pattern each one follows",
-        "The whole list, and how it divides",
-        "Every verb here is printed with its three forms. Choose a pattern and "
-        "the list narrows to the verbs that follow it, with the rule that "
-        "defines it printed above the table.",
-    )
+# The six classes, plus the one vowel pattern the lesson names. Each preset
+# pins how many verbs the questions put in it and where those verbs land.
+_CL_PRESETS = [
+    {"id": "past_eq_pp", "label": "past = form after have (bring)",
+     "expect": {"clCount": "60", "clWhere": "past = form after have: 60"}},
+    {"id": "all_diff_n", "label": "all three differ, last ends in -n (know)",
+     "expect": {"clCount": "37", "clWhere": "all differ, last ends in -n: 37"}},
+    {"id": "all_same", "label": "all three the same (put)",
+     "expect": {"clCount": "21", "clWhere": "all three the same: 21"}},
+    {"id": "all_diff_other", "label": "all three differ, last does not end in -n (go, sing)",
+     "expect": {"clCount": "9", "clWhere": "all differ, last does not end in -n: 9"}},
+    {"id": "base_eq_pp", "label": "base = form after have (come)",
+     "expect": {"clCount": "4", "clWhere": "base = form after have: 4"}},
+    {"id": "base_eq_past", "label": "base = past (beat)",
+     "expect": {"clCount": "1", "clWhere": "base = past: 1"}},
+    {"id": "iau", "label": "the vowels i, a, u (sing, sang, sung), whatever the class",
+     "expect": {"clCount": "7",
+                "clWhere": "all differ, last ends in -n: 1; all differ, last does not end in -n: 6"}},
+]
 
 
 def _classes(cfg):
-    return _irregular_view(
-        cfg,
-        "Six patterns, and the rule that decides each one",
-        "The rules work on the letters, not on the sound",
-        "Pick a pattern and read its rule",
-        "Each pattern is a rule about the three written forms. Choosing one "
-        "prints its rule and the verbs it holds, so you can check the rule "
-        "against every verb it claims.",
+    """Six string rules, run: a distinct widget from `irregular`'s list.
+
+    The lesson claims six classes of 60, 37, 21, 9, 4 and 1, with be outside,
+    and that the class of nine is the i-a-u verbs plus go, do and undergo,
+    while begin -- same vowels -- lands in the class of 37. Every one of those
+    counts is computed here from the three printed forms.
+    """
+    markup = (
+        _kpis([("verbs in this pattern", "clCount", "&mdash;"),
+               ("share of the sorted verbs", "clShare", "&mdash;"),
+               ("where the questions put them", "clWhere", "&mdash;"),
+               ("outside all six", "clOutside", "&mdash;")])
+        + '<div class="table-wrap"><table id="clSummary"><thead><tr>'
+        '<th>question</th><th>class</th><th>verbs</th><th>for example</th>'
+        '</tr></thead><tbody id="clSumBody"></tbody></table></div>'
+        '<div class="table-wrap"><table id="clTable"><thead><tr>'
+        '<th>base</th><th>past</th><th>after <em>have</em></th><th>class</th>'
+        '</tr></thead><tbody id="clBody"></tbody></table></div>'
+    )
+    controls = '<label for="clPreset">Which pattern</label> ' + _options("clPreset", _CL_PRESETS)
+    script = (SCAN_JS + cfg_literal("IR_DATA", IRREGULAR_DATA) + IRCLASS_JS
+              + cfg_literal("CL_PRESETS", _CL_PRESETS) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var pick = 'past_eq_pp';
+  var label = {}, k;
+  for (k = 0; k < IR_CLASSES.length; k++) label[IR_CLASSES[k].id] = IR_CLASSES[k].size;
+
+  var draw = function () {
+    var counts = irCounts(), sorted = IR_DATA.verbs.length - (counts.outside || 0);
+    var rows = [], where = {}, order = [], i, v, c, html = '';
+    for (i = 0; i < IR_DATA.verbs.length; i++) {
+      v = IR_DATA.verbs[i]; c = irClassOf(v);
+      if (pick === 'iau' ? irIau(v) : c === pick) {
+        rows.push(v);
+        if (!where[c]) { where[c] = 0; order.push(c); }
+        where[c]++;
+      }
+    }
+    /* Report the classes in the lesson's order, not the list's. */
+    var parts = [];
+    for (k = 0; k < IR_CLASSES.length; k++) {
+      if (where[IR_CLASSES[k].id]) parts.push(IR_CLASSES[k].size + ': ' + where[IR_CLASSES[k].id]);
+    }
+    el('clCount').textContent = String(rows.length);
+    el('clShare').textContent = share1(rows.length, sorted);
+    el('clWhere').textContent = parts.join('; ');
+    el('clOutside').textContent = String(counts.outside || 0);
+
+    var q = ['1. all three the same?', '2. past = form after have?', '3. base = one of the others?',
+             '3. base = one of the others?', '4. all differ: last letter -n?', '4. all differ: last letter -n?'];
+    for (k = 0; k < IR_CLASSES.length; k++) {
+      html += '<tr><td>' + q[k] + '</td><td>' + IR_CLASSES[k].size + '</td><td>'
+            + (counts[IR_CLASSES[k].id] || 0) + '</td><td>' + IR_CLASSES[k].ex + '</td></tr>';
+    }
+    el('clSumBody').innerHTML = html;
+    html = '';
+    for (i = 0; i < rows.length; i++) {
+      html += '<tr><td>' + rows[i].base + '</td><td>' + rows[i].past + '</td><td>'
+            + rows[i].pp + '</td><td>' + label[irClassOf(rows[i])] + '</td></tr>';
+    }
+    el('clBody').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('clPreset').addEventListener('change', function () { pick = this.value; draw(); });
+  draw();
+}());
+""")
+    return Lab(
+        title="Six patterns, and the rule that decides each one",
+        subtitle="The sorting questions run on every verb's three written forms",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Pick a pattern and read its rule"),
+        panel_intro=cfg.get("panel_intro",
+            "The four questions are asked of every verb's three written forms, in "
+            "order, and the table counts where each verb lands. Pick a class to "
+            "read its verbs, or the vowel pattern to see it cut across two classes."),
+        script=script, expect={"clPreset": _expect(_CL_PRESETS)},
     )
 
 
 _SH_PRESETS = [
     {"id": "with", "label": "count be, have and do as irregular verbs", "big": 1,
-     "expect": {"shCount": "106", "shPct": "11.2%"}},
+     "expect": {"shCount": "149", "shPct": "15.7%", "shBig": "91", "shBigPct": "61.1%"}},
     {"id": "without", "label": "leave be, have and do out", "big": 0,
-     "expect": {"shCount": "52", "shPct": "5.5%"}},
+     "expect": {"shCount": "58", "shPct": "6.1%", "shBig": "91", "shBigPct": "61.1%"}},
 ]
 
 
 def _irrshare(cfg):
     markup = (
         '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">irregular forms found</span>'
-        '<span class="kpi-value" id="shCount">106</span></div>'
-        '<div class="kpi"><span class="kpi-label">share of the passage</span>'
-        '<span class="kpi-value" id="shPct">11.2%</span></div>'
-        '<div class="kpi"><span class="kpi-label">be, have and do alone</span>'
-        '<span class="kpi-value" id="shBig">54</span></div>'
-        '<div class="kpi"><span class="kpi-label">their share of the irregulars</span>'
-        '<span class="kpi-value" id="shBigPct">50.9%</span></div>'
+        '<div class="kpi"><span>irregular forms found</span>'
+        '<strong id="shCount">149</strong></div>'
+        '<div class="kpi"><span>share of the passage</span>'
+        '<strong id="shPct">15.7%</strong></div>'
+        '<div class="kpi"><span>be, have and do alone</span>'
+        '<strong id="shBig">91</strong></div>'
+        '<div class="kpi"><span>their share of the irregulars</span>'
+        '<strong id="shBigPct">61.1%</strong></div>'
         '</div>'
         '<div class="table-wrap"><table id="shTable"><thead><tr>'
         '<th>verb</th><th>times it appears</th></tr></thead>'
@@ -772,7 +1118,7 @@ def _irrshare(cfg):
                   for p in _SH_PRESETS)
         + "</select>"
     )
-    script = (SCAN_JS + cfg_literal("SH_IRR", IRREGULAR_DATA)
+    script = (ENGLISH_VERB_JS + SCAN_JS + cfg_literal("SH_IRR", IRREGULAR_DATA)
               + cfg_literal("SH_TEXT", _data("wordorder_passage.json"))
               + cfg_literal("SH_PRESETS", _SH_PRESETS) + r"""
 (function () {
@@ -780,16 +1126,27 @@ def _irrshare(cfg):
   var BIG = setOf(['be', 'have', 'do']);
   var withBig = true;
 
+  /* Every written form of every verb on the printed list, mapped to its base.
+     The past and past-participle columns can hold more than one spelling
+     ('was/were'), so each is split. The present takes the -s rule and the
+     -ing form the spelling rules, both the ones the tense-table lesson
+     teaches (vbThird, vbIng: drop a silent e, double a stressed final
+     consonant). be and have are the two the rules cannot form, so their
+     present is written out here: am, is, are; has. */
+  VB_IRREG = { be: { third: 'is', ing: 'being' }, have: { third: 'has' } };
+  var SH_ALSO = { be: ['am', 'are'] };
   var form2base = {};
   (function () {
-    var i, v, b;
+    var i, j, k, v, b, forms;
     for (i = 0; i < SH_IRR.verbs.length; i++) {
       v = SH_IRR.verbs[i]; b = v.base;
-      form2base[b] = b;
-      if (v.past) form2base[v.past] = b;
-      if (v.pp) form2base[v.pp] = b;
-      form2base[b + 's'] = b;
-      form2base[b + 'ing'] = b;
+      forms = [b, vbThird(b), vbIng(b)].concat(SH_ALSO[b] || []);
+      if (v.past) forms = forms.concat(v.past.split('/'));
+      if (v.pp) forms = forms.concat(v.pp.split('/'));
+      for (j = 0; j < forms.length; j++) {
+        k = forms[j];
+        if (k) form2base[k] = b;
+      }
     }
   }());
 
@@ -860,7 +1217,8 @@ LISTENING_DATA = _data("listening.json")
 
 _LS_PRESETS = [
     {"id": "weak", "label": "mark the words that get squashed", "view": "weak",
-     "expect": {"lsWeak": "452 of 949", "lsWeakPct": "47.6%", "lsTypes": "51"}},
+     "expect": {"lsWeak": "388 of 949", "lsWeakPct": "40.9%", "lsTypes": "43",
+                "lsMixed": "42"}},
     {"id": "strong", "label": "mark where each other word is said hardest", "view": "strong",
      "expect": {"lsStrong": "399 of 485", "lsStrongPct": "82.3%"}},
 ]
@@ -868,28 +1226,19 @@ _LS_PRESETS = [
 
 def _listening(cfg):
     markup = (
-        '<div class="kpi-grid">'
-        '<div class="kpi"><span class="kpi-label">squashed words</span>'
-        '<span class="kpi-value" id="lsWeak">452 of 949</span></div>'
-        '<div class="kpi"><span class="kpi-label">share of the page</span>'
-        '<span class="kpi-value" id="lsWeakPct">47.6%</span></div>'
-        '<div class="kpi"><span class="kpi-label">different ones used</span>'
-        '<span class="kpi-value" id="lsTypes">51</span></div>'
-        '<div class="kpi"><span class="kpi-label">other words starting strong</span>'
-        '<span class="kpi-value" id="lsStrongPct">82.3%</span></div>'
-        '</div>'
-        '<div class="kpi-grid"><div class="kpi">'
-        '<span class="kpi-label">of the words that are not squashed</span>'
-        '<span class="kpi-value" id="lsStrong">399 of 485</span></div></div>'
-        '<div class="mathblock" id="lsText" style="font-size:0.84rem;line-height:2;"></div>'
+        _kpis([("words that can be squashed", "lsWeak", "&mdash;"),
+               ("share of the page", "lsWeakPct", "&mdash;"),
+               ("different ones used", "lsTypes", "&mdash;"),
+               ("of them that, have, has or had", "lsMixed", "&mdash;"),
+               ("other words starting strong", "lsStrongPct", "&mdash;")])
+        + _kpis([("of the other words, starting strong", "lsStrong", "&mdash;")])
+        + '<div class="mathblock" id="lsText" style="font-size:0.84rem;line-height:2;"></div>'
         '<div class="table-wrap"><table id="lsTable"><thead><tr>'
-        '<th>word</th><th>said as</th></tr></thead><tbody id="lsBody"></tbody></table></div>'
+        '<th>word</th><th>squashed, said as</th><th>times on the page</th>'
+        '</tr></thead><tbody id="lsBody"></tbody></table></div>'
     )
     controls = (
-        '<label for="lsPreset">What to mark</label> <select id="lsPreset">'
-        + "".join('<option value="%s">%s</option>' % (p["id"], p["label"])
-                  for p in _LS_PRESETS)
-        + '</select>'
+        '<label for="lsPreset">What to mark</label> ' + _options("lsPreset", _LS_PRESETS)
     )
     script = (SCAN_JS + cfg_literal("LS_DATA", LISTENING_DATA)
               + cfg_literal("LS_TEXT", _data("wordorder_passage.json"))
@@ -900,11 +1249,18 @@ def _listening(cfg):
 
   var draw = function () {
     var w = wordsOf(LS_TEXT.passage), lw = lower(w), i, t;
+    /* Every token of a word on the list is counted, so the count is of words
+       that CAN take a weak form. Demonstrative that ("that book") and have as
+       a main verb ("have tea") keep their full form; the tile below says how
+       many of the tokens are those four words, and the table lists every
+       word with its count, so the reader can see what was counted. */
+    var MIXED = setOf(['that', 'have', 'has', 'had']), mixed = 0;
     var weak = 0, types = {}, strong = 0, annotated = 0, out = [];
     for (i = 0; i < lw.length; i++) {
       t = lw[i];
       if (inSet(LS_DATA.weak, t)) {
-        weak++; types[t] = true;
+        weak++; types[t] = (types[t] || 0) + 1;
+        if (inSet(MIXED, t)) mixed++;
         out.push(view === 'weak' ? '[' + w[i] + ']' : w[i]);
       } else if (inSet(LS_DATA.stress, t)) {
         annotated++;
@@ -918,14 +1274,16 @@ def _listening(cfg):
     el('lsWeak').textContent = weak + ' of ' + lw.length;
     el('lsWeakPct').textContent = share1(weak, lw.length);
     el('lsTypes').textContent = String(Object.keys(types).length);
+    el('lsMixed').textContent = String(mixed);
     el('lsStrong').textContent = strong + ' of ' + annotated;
     el('lsStrongPct').textContent = share1(strong, annotated);
     el('lsText').textContent = out.join(' ');
 
     var names = Object.keys(types).sort(), html = '';
+    names.sort(function (a, b) { return types[b] - types[a] || (a < b ? -1 : 1); });
     for (i = 0; i < names.length; i++) {
       html += '<tr><td>' + names[i] + '</td><td>'
-            + (LS_DATA.weak[names[i]] || '') + '</td></tr>';
+            + (LS_DATA.weak[names[i]] || '') + '</td><td>' + types[names[i]] + '</td></tr>';
     }
     el('lsBody').innerHTML = html;
   };
