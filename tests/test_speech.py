@@ -193,6 +193,34 @@ class TestReaderScript(unittest.TestCase):
         self.assertNotIn('"', READOUT_JS)
 
 
+def _sound_islands(path):
+    """Every sound or stress-mark island in a Subject's prose (speech.islands)."""
+    from mathpath.speech import _IPA, _STRESS, islands
+    tag, span = re.compile(r"(<[^>]+>)"), re.compile(r"`[^`]*`")
+
+    def strings(node):
+        if isinstance(node, str):
+            yield node
+        elif isinstance(node, dict):
+            for key, value in node.items():
+                if key not in ("key", "lines"):
+                    yield from strings(value)
+        elif isinstance(node, (list, tuple)):
+            if not (isinstance(node, tuple) and len(node) == 2 and node[0] == "math"):
+                for item in node:
+                    yield from strings(item)
+
+    found = set()
+    for text in strings(path):
+        for piece in tag.split(span.sub(" ", text)):
+            if not piece.startswith("<"):
+                for start, end in islands(piece):
+                    island = piece[start:end]
+                    if _IPA.search(island) or _STRESS.match(island):
+                        found.add(island)
+    return found
+
+
 class TestCoverage(unittest.TestCase):
     """Every run on the six generated paths is spoken, and nothing is guessed."""
 
@@ -226,7 +254,7 @@ class TestCoverage(unittest.TestCase):
         """A spoken form keyed to a run the content no longer has is dead data,
         and the next edit to that line silently loses its reading."""
         for path, overrides in self.subjects:
-            present = {run for run, _, _ in self.runs(path)}
+            present = {run for run, _, _ in self.runs(path)} | _sound_islands(path)
             with self.subTest(path=path["slug"]):
                 self.assertEqual(sorted(set(overrides) - present), [])
 
@@ -259,6 +287,15 @@ class TestCoverage(unittest.TestCase):
         for path, overrides in self.subjects:
             with self.subTest(path=path["slug"]):
                 self.assertEqual([run for run in overrides if len(run.strip()) == 1], [])
+
+    def test_every_sound_in_prose_is_spoken(self):
+        """A pronunciation spelling (<dfn>tə</dfn>) or a stress pattern (s.S.)
+        written into prose becomes an island at build time, but the rules have
+        no words for it: a voice would read it letter by letter. Each needs a
+        spoken form in its Subject's file."""
+        for path, overrides in self.subjects:
+            with self.subTest(path=path["slug"]):
+                self.assertEqual(sorted(i for i in _sound_islands(path) if i not in overrides), [])
 
     def test_nothing_is_guessed(self):
         """A run whose notation is ambiguous needs a spoken form, or the content

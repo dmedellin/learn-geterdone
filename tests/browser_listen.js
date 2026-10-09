@@ -13,6 +13,7 @@ const PAGES = [
   ['generated', '/sets-relations-functions/the-pigeonhole-principle/'],
   ['generated', '/sequences-and-series/infinite-geometric-series/'],
   ['generated', '/arguments-and-validity/validity-by-truth-table/'],
+  ['generated', '/listening/why-it-sounds-too-fast/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];
@@ -111,7 +112,7 @@ async function main() {
         return [l.textContent, m.textContent]; })()`);
       const leaked = heard.filter(t => t.length > 25 && lab.includes(t) && !rest.includes(t));
       check(!leaked.length, tag + ': nothing from the lab is read' + (leaked.length ? ' ' + JSON.stringify(leaked[0]) : ''));
-      const symbols = heard.filter(t => /[∀∃∈∪∩≤≥≠√Σ∑⟹→ℕℤℝ²³ⁿ₁₂ₙ|^_]/.test(t));
+      const symbols = heard.filter(t => /[∀∃∈∪∩≤≥≠√Σ∑⟹→ℕℤℝ²³ⁿ₁₂ₙ|^_əðθʃʒŋɪʊæɑɒɔɜʌːˈˌ]/.test(t));
       if (kind === 'generated') check(!symbols.length, tag + ': no raw math symbols reach the voice' + (symbols.length ? ' ' + JSON.stringify(symbols[0]) : ''));
       const long = heard.filter(t => t.length > 400);
       check(!long.length, tag + ': utterances are short enough for a network voice');

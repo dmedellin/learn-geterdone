@@ -56,4 +56,9 @@ SPOKEN = {
     'MARket   S.      reTURN    .S': 'market, strong then light, return, light then strong',
     'HAPpiness S..    aNOTHer   .S.': 'happiness, strong then light then light, another, light then strong then light',
     '   the -ed rule builds both': 'the ed rule builds both',
+    # Sounds and stress marks written into prose (speech.islands), not math runs
+    'tə': 'tuh',
+    'fə': 'fuh',
+    'fər': 'fur',
+    's.S.': 'some weight, light, strong, light',
 }
