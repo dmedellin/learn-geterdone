@@ -811,6 +811,21 @@ _SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠�
                      r"⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿⁱᵀᴺᵏʲˣ₀₁₂₃₄₅₆₇₈₉₊₋ₐₑₒₓₖₗₘₙₚₛₜᵢⱼ"
                      r"αβγδεζηθκλμνξπρστφχψωΓΔΘΛΞΠΦΨΩ]|&(?:le|ge|ne|lt|gt);")
 _OPERATOR = re.compile(r"[=<>+−\-/*%(),.:;!]+|&(?:le|ge|ne|lt|gt);")
+
+# Sounds written into prose. A pronunciation spelling such as <dfn>tə</dfn> is
+# not math, but a voice reads it letter by letter all the same, so it is an
+# island too, and its words come from the Subject's spoken forms (a test
+# fails while one has none). So is a stress pattern such as s.S. (a dot for
+# a light part, S for the strongest), which a voice would read as initials.
+_IPA = re.compile(r"[əðθʃʒŋɪʊæɑɒɔɜʌːˈˌ]")
+_STRESS = re.compile(r"(?=.*S)(?=.*\.[^.]*$|.*\.(?!$))[sS.]{2,6}$")
+
+
+def _seed(token):
+    """Does a prose token start an island: a math symbol, a sound, a stress mark?"""
+    bare = token.strip(",;:!?\u201c\u201d\"'()")
+    return bool(_SYMBOL.search(token) or _IPA.search(bare)
+                or (_STRESS.match(bare) and bare.index(".") < len(bare) - 1))
 _ISLAND_TOKEN = re.compile(r"\S+")
 
 
@@ -841,13 +856,14 @@ def islands(text):
 
     out, i, floor = [], 0, 0
     while i < len(tokens):
-        if not _SYMBOL.search(tokens[i][2]):
+        if not _seed(tokens[i][2]):
             i += 1
             continue
         lo = hi = i
-        while lo > floor and mathy(tokens[lo - 1][2]):
+        grows = bool(_SYMBOL.search(tokens[i][2]))  # a sound or a stress mark stands alone
+        while grows and lo > floor and mathy(tokens[lo - 1][2]):
             lo -= 1
-        while hi + 1 < len(tokens) and mathy(tokens[hi + 1][2]):
+        while grows and hi + 1 < len(tokens) and mathy(tokens[hi + 1][2]):
             hi += 1
         start, end = tokens[lo][0], tokens[hi][1]
         # sentence punctuation at the island's edge is prose, not math
