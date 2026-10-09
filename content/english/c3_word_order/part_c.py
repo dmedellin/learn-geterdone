@@ -1,45 +1,51 @@
 # -*- coding: utf-8 -*-
-"""Lesson three of the word-order course: the rule that could not be made to work.
+"""Lesson three of the word-order course: the rule that covers only half.
 
-This lesson ships STATED and not computed, and says so. The rule was tried on
-printed text, scored 55.4%, and its largest group of misses is not a failure of
-the rule. A tile that looked like a measurement would claim more than we know.
+The lab scores the question rule on 90 lines from the novel, each printed with
+its verdict, and searches two modern public documents, printed beside them,
+for a question mark. An earlier draft shipped this lesson "stated, not
+computed"; the boxes are now counted in the browser, and the whole-novel
+figures that cannot be rebuilt on a page (55.4%, 45%) are kept only as quoted
+figures, labelled as such wherever they appear.
 """
 
 LESSONS = [
     {
         "slug": "asking-a-question",
-        "module": "The one rule we could not make work",
+        "module": "The one rule that covers only half",
         "title": "Asking a Question",
-        "one_line": "The rule for questions is real, our count of it was poor, and this lesson says so.",
+        "one_line": "The rule for questions is real, it covers about half of the questions people ask, and the other half is printed here.",
         "standard": (
-            "Finish when you can build a question in English, and say why "
-            "the number printed for this rule is stated and not computed.",
+            "Finish when you can build a question in English, and say what "
+            "the other half of real questions look like.",
             "You should be able to put a helping verb before the subject, "
-            "add do when there is no other helping verb, name the kinds of "
-            "question the rule did not catch, and explain why a poor score "
-            "on an old novel is not a reason to doubt the rule.",
+            "add do when there is no other helping verb, read the rule's "
+            "score off the 90 questions printed with this lesson, name the "
+            "kinds of question the rule did not catch, and say which figures "
+            "on the page are counted and which are quoted.",
         ),
         "summary": (
-            "Every other lesson in this course states a rule, scores it on "
-            "printed text and shows what is left. This one is different. The "
-            "rule for questions is old and well known: a helping verb moves "
-            "in front of the subject, and <em>do</em> is added if there is "
-            "none. Scored on <em>Pride and Prejudice</em> it matched 55.4% of "
-            "the questions. The largest group of misses was not a failure of "
-            "the rule, and we could not separate the groups by machine. So the "
-            "figures here are <strong>stated</strong>, not computed, and "
-            "the lesson explains why that is the honest choice."
+            "Every lesson in this course states a rule, scores it on printed "
+            "text and shows what is left. The rule for questions is old and "
+            "well known: a helping verb moves in front of the subject, and "
+            "<em>do</em> is added if there is none. It is a real rule, and you "
+            "should use it. Scored on 90 questions from <em>Pride and "
+            "Prejudice</em>, printed with this lesson, it covers 48, which is "
+            "53.3%. A run over the whole novel, quoted here because no page "
+            "can carry it, gave 55.4%. That is too low to call the rule good "
+            "and too high to call it wrong, and the lesson is about the other "
+            "half: what real questions look like when they do not open with a "
+            "helping verb."
         ),
-        "key_label": "The rule, and the figure we state",
+        "key_label": "The rule, and its score",
         "key": [
             "you know       ->  do you know?",
             "she went       ->  did she go?",
             "she can go     ->  can she go?",
             "she went where ->  where did she go?",
             "",
-            "rule matched 55.4% of questions",
-            "STATED, not computed in your browser",
+            "90 printed questions: 48 follow it    53.3%",
+            "whole novel, quoted                   55.4%",
         ],
         "concepts_intro": "Three ideas carry this lesson.",
         "concepts": [
@@ -51,27 +57,37 @@ LESSONS = [
                 "she go?</em> With a question word, the question word comes "
                 "first and the rest follows: <em>where did she go?</em> "
                 "Many languages ask a question by tone, by a small word at "
-                "the end, or by an ending on the verb. English moves "
-                "words, and that is why the rule is worth stating.",
+                "the end, or by an ending on the verb. English moves a "
+                "word, and that is why the rule is worth stating. The lab's "
+                "menu calls the helping verb an auxiliary and the question "
+                "word a wh-word; they are the same things.",
             ),
             (
-                "Scoring it was a different matter",
-                "On <em>Pride and Prejudice</em> the rule matched 55.4% of "
-                "the questions. That is too low to call the rule good, and "
-                "too high to call it wrong. Where the other lessons found a "
-                "small set of named misses, this one found a spread of "
-                "different kinds, and the largest of them is a result of "
-                "how people write, not of how English builds questions.",
+                "Half of real questions do not open that way",
+                "On the 90 printed questions the rule covers 48, which is "
+                "53.3%; on the whole novel, quoted, 55.4%. Where the other "
+                "lessons found a small set of named misses, this one finds a "
+                "spread. Of the 42 misses here, 13 begin with a joining word "
+                "such as <em>and</em> or <em>but</em>, 6 begin with a "
+                "question word that has no helping verb after it, 2 begin "
+                "with a small word of address such as <em>oh</em>, and 21 "
+                "the lab can only call something else. The largest kind is a "
+                "result of how people write, not of how English builds "
+                "questions.",
             ),
             (
-                "A figure you cannot rebuild should be called what it is",
-                "The other labs recompute their figures in your browser from "
-                "a passage you can read. This one does not, and the page "
-                "says so. The reason is that deciding what counts as a "
-                "question in print, and which group each miss belongs to, "
-                "came from reading the cases. A tile that looked like a "
-                "measurement would claim more than we know. We state the "
-                "figure, give its source, and let you judge it.",
+                "A counted figure and a quoted one are different things",
+                "The boxes are counted in your browser on the 90 lines you "
+                "can read. The figures 55.4% and 45% come from a single run "
+                "over the whole novel, which no page can carry, so they are "
+                "quoted, and the page says so each time. The two sets differ "
+                "a little, 53.3% against 55.4%, and 31.0% against 45%, because "
+                "90 lines are a sample. The <em>something else</em> box has "
+                "a limit of its own: 16 of its 21 lines begin in the middle "
+                "of a sentence, or of a word, because the line was cut a fixed "
+                "distance before the question mark, or at the full stop in "
+                "<em>Mr.</em> or <em>Mrs.</em> The table shows them, so you "
+                "can see what the count could not.",
             ),
         ],
         "steps_title": "Building a question",
@@ -101,59 +117,100 @@ LESSONS = [
                 "People in books and in life also ask questions by tone "
                 "alone, or open with a name, or begin with <em>and</em> or "
                 "<em>but</em>. Learn the rule first. Those forms are the "
-                "misses, and the next section names them.",
+                "misses, and the table below prints every one.",
             ),
         ],
         "lab": ("english", {
             "mode": "questions",
-            "panel_title": "The figures for questions, as stated",
+            "panel_title": "Score the rule on ninety real questions",
             "panel_intro": (
-                "The boxes in this panel are quoted from the measurement on "
-                "the whole novel. They are not recomputed in your browser, "
-                "and the panel is marked that way. The first box is the "
-                "55.4% hit rate. The second is the share of the misses that "
-                "begin with a joining word such as <em>and</em> or "
-                "<em>but</em>. Both come from 1810s English, and the way "
-                "people ask questions has changed since."
+                "The table holds 90 lines from the novel, each cut around a "
+                "question mark, and prints every one with its verdict. The "
+                "rule holds when the first word is a helping verb, or a "
+                "question word followed by one; the menu calls these an "
+                "auxiliary and a wh-word. The first two boxes are the hit "
+                "rate. The next two count the misses that begin with a "
+                "joining word such as <em>and</em> or <em>but</em>, and give "
+                "that count as a share of all the misses. The box called "
+                "<em>something else</em> holds the misses that fit no named "
+                "kind; read them, because 16 of the 21 begin in the middle "
+                "of a sentence or a word, where the line was cut short. The "
+                "eight misses in no box are the two kinds the verdict column "
+                "names: a question word with no helping verb after it, and a "
+                "small word of address first. The last two boxes search the "
+                "two modern documents printed below the table for a question "
+                "mark: the Supreme Court opinion <em>Stanley v. City of "
+                "Sanford</em>, 606 U.S. 46 (2025), and the Census Bureau "
+                "story &ldquo;U.S. Population Aging as Nation Turns "
+                "250&rdquo; (9 April 2026). The questions are 1810s English, "
+                "and the way people ask questions has changed since."
             ),
         }),
         "read_title": "What the rule did not catch",
         "read_intro": (
-            "Questions that did not follow the rule fell into four groups. "
-            "The first is the largest by a long way."
+            "On the 90 printed questions, 42 did not open with a helping "
+            "verb. Here is what they were, in order of size, with the one "
+            "share the whole-novel run measured beside them."
         ),
         "worked": {
             "title": "Four kinds of question that skipped the rule",
             "intro": [
-                "Only the first share was measured. The other three are "
-                "named, in the order of their size, without a share.",
+                "The first block is counted on the page. The lab prints a box "
+                "for the joining words and for the something else; the two "
+                "counts between them are read off the verdict column. The "
+                "second block is quoted from the run over the whole novel, "
+                "which this page cannot repeat, and only one share was "
+                "measured there.",
             ],
             "lines": [
+                "the 90 printed questions, counted on the page: 42 misses",
+                "joining word first: 13 of 42 misses    31.0%",
+                "  And what is your success?  But are you pleased, Jane?",
+                "question word, no helping verb after it   6",
+                "  What say you, Mary?  What made you so shy of me?",
+                "a small word of address first              2",
+                "  Oh, why is not everybody as happy?",
+                "something else                            21",
+                "  Miss Bennet, do you know who I am?",
+                "  If she does not object to it, why should we?",
+                "",
+                "the whole novel, quoted",
                 "joining word first         45% of misses",
-                "  And what ...  But why ...",
-                "a name or title first",
-                "  Mr. Darcy, do you ...",
-                "statement order",
-                "  You know him?",
-                "no do, in older English",
-                "  What say you?",
             ],
             "after": [
-                "The first group is a question that begins with <em>and</em> "
-                "or <em>but</em>. A check that looks for the helping verb "
-                "at the front misses these, because a joining word stands "
-                "first. In the cases we read, the rest of the question "
-                "did follow the rule. We did not read all of them.",
-                "The second group is a name or title at the start, called "
-                "a vocative. The third is a question with the order of a "
-                "statement, and tone alone makes it a question. The fourth "
-                "is a form older English used without <em>do</em>.",
+                "The first kind is a question that begins with <em>and</em>, "
+                "<em>but</em> or <em>or</em>. A check that looks for the "
+                "helping verb at the front misses these, because a joining "
+                "word stands first. In most of the thirteen the rest of the "
+                "question follows the rule: <em>And do you really know all "
+                "this?</em> In a few it does not: <em>But why all this "
+                "secrecy?</em> has no verb at all.",
+                "The second kind is a question word with no helping verb "
+                "after it. Three are a form older English used without "
+                "<em>do</em>: <em>What say you, Mary?</em> One has the "
+                "question word as its own subject, where nothing moves: "
+                "<em>What made you so shy of me?</em> One is a longer "
+                "question phrase, <em>what sort of girl is Miss King?</em>, "
+                "where the helping verb comes after the phrase and the scan "
+                "reads only the second word. One has no verb: <em>What, none "
+                "of you?</em>",
+                "The third kind opens with a small word of address or feeling, "
+                "<em>Oh</em> or <em>Well</em>, and then follows the rule. The "
+                "fourth is the mixed bag. Sixteen of its 21 lines begin "
+                "mid-sentence, so their first word is not the question's "
+                "first word. The five whole ones are two with a name first, "
+                "<em>Girls, can I do anything for you?</em>, two with a "
+                "clause first, <em>If she does not object to it, why should "
+                "we?</em>, and one statement with a question mark on it, "
+                "<em>I must ask whether you were surprised?</em>",
             ],
         },
         "note": (
-            "Only the 45% was counted. We do not print shares for the other "
-            "three groups because we did not count them. Writing a number we "
-            "had not measured would be a bigger fault than printing a low one."
+            "The boxes are counted on the 90 lines in your browser. The "
+            "55.4% and the 45% are quoted from a single run over the whole "
+            "novel and cannot be rebuilt here, and the lesson says so wherever "
+            "they appear. The two sets of figures differ because 90 lines are "
+            "a sample; the picture they give is the same."
         ),
         "mistakes": [
             (
@@ -172,10 +229,11 @@ LESSONS = [
             ),
             (
                 "Believing the low number means the rule is wrong",
-                "55.4% on an old novel is a fact about the novel and about "
-                "our count. Some of the misses are questions that follow the "
-                "rule after a joining word. Do not drop the rule. Do not "
-                "lean on the figure either.",
+                "53.3% on 90 old questions is a fact about how people write "
+                "questions and about how the lines were cut, not about how "
+                "English builds a question. Most of the misses that begin "
+                "with <em>and</em> or <em>but</em> follow the rule after it. "
+                "Do not drop the rule. Do not lean on the figure either.",
             ),
         ],
         "quiz_title": "Check yourself",
@@ -183,66 +241,69 @@ LESSONS = [
             {
                 "q": "How do you turn <em>she went</em> into a question with the standard rule?",
                 "a": [
-                    "<em>Did she go?</em>",
                     "<em>Went she?</em>",
                     "<em>She did went?</em>",
                     "<em>Do she went?</em>",
+                    "<em>Did she go?</em>",
                 ],
-                "c": 0,
+                "c": 3,
                 "why": (
                     "There is no helping verb, so <em>do</em> is added in the "
                     "past form, and the main verb goes back to its plain form."
                 ),
             },
             {
-                "q": "Why is the figure for questions stated and not computed?",
+                "q": "On the 90 printed questions, how many open the way the rule says?",
                 "a": [
-                    "Deciding what counts as a question and sorting the misses needed a person to read them",
-                    "English questions cannot be counted",
-                    "The novel has no questions",
-                    "The rule is known to be false",
+                    "All 90",
+                    "48, which is 53.3%",
+                    "None",
+                    "13, which is 31.0%",
                 ],
-                "c": 0,
+                "c": 1,
                 "why": (
-                    "A box that recomputed a number would look like a "
-                    "measurement of the rule. It would claim more than we "
-                    "know."
+                    "The lab counts 48 of 90 in your browser. The 13 is the "
+                    "number of misses that begin with a joining word, and "
+                    "31.0% is their share of the 42 misses."
                 ),
             },
             {
-                "q": "What was the largest group among the misses?",
+                "q": "What share of the 42 misses begin with a joining word such as <em>and</em> or <em>but</em>?",
                 "a": [
-                    "Questions that began with a joining word, such as <em>and</em> or <em>but</em>",
-                    "Questions with no verb",
-                    "Questions spoken by a child",
-                    "Questions in the past",
+                    "All 42",
+                    "About 90%",
+                    "13 of 42, which is 31.0%",
+                    "None",
                 ],
-                "c": 0,
+                "c": 2,
                 "why": (
-                    "It was 45% of the misses. The joining word stands first, "
-                    "so a check at the front of the sentence misses it."
+                    "The joining word stands first, so a check at the front "
+                    "of the sentence misses it. The whole-novel run, quoted, "
+                    "put this kind at 45% of its misses; the 90 lines are a "
+                    "sample and give 31.0%."
                 ),
             },
             {
-                "q": "What did the modern public documents show about questions?",
+                "q": "What does the lab find when it searches the two modern documents for a question mark?",
                 "a": [
-                    "None in 1,844 words, while Austen has one in about every 256",
-                    "More than Austen",
-                    "About the same as Austen",
+                    "None in 1,723 words",
+                    "More questions than the novel",
+                    "About one in every ten sentences",
                     "Only questions with <em>do</em>",
                 ],
                 "c": 0,
                 "why": (
-                    "A court opinion and a Census Bureau story, both free to "
-                    "use, carry no questions. Formal writing barely holds the "
-                    "form you most need in speech."
+                    "<em>Stanley v. City of Sanford</em> and the Census Bureau "
+                    "story, both free to use, carry no question at all in "
+                    "1,723 words. Formal writing barely holds the form you "
+                    "most need in speech."
                 ),
             },
         ],
         "body": [
             ("p",
-             "This is the one lesson where the method did not work, and the "
-             "failure is part of what it teaches."),
+             "This is the lesson where the rule covers only half of what "
+             "people actually say, and that is part of what it teaches."),
             ("h3", "The rule"),
             ("p",
              "Every learner is taught how to ask a question. A helping verb "
@@ -255,49 +316,65 @@ LESSONS = [
              "subject and verb may swap with no help word at all."),
             ("h3", "The score"),
             ("p",
-             "The rule was scored on <em>Pride and Prejudice</em>, and it "
-             "matched 55.4% of the questions. For a rule that is taught "
-             "first, that is a poor figure. It is worth asking why."),
+             "The lab holds 90 questions from <em>Pride and Prejudice</em>, "
+             "each a line cut from the novel around a question mark, and "
+             "prints every one. The rule covers 48 of them, which is 53.3%. "
+             "A run over the whole novel, quoted here because no page can "
+             "carry it, gave 55.4%. For a rule that is taught first, that is "
+             "a poor figure. It is worth asking why."),
             ("h3", "What the misses looked like"),
             ("ul", [
-                "<strong>A joining word first, 45% of the misses.</strong> "
-                "<em>And what do you mean? But why did she go?</em> A check "
-                "for the helping verb at the front misses these. In the "
-                "cases we read, the question follows the rule after the "
-                "joining word.",
-                "<strong>A name or title first.</strong> <em>Mr. Darcy, do "
-                "you know her?</em> The name comes before the helping verb "
-                "so a check at the front misses it.",
-                "<strong>Statement order.</strong> <em>You know him?</em> "
-                "Tone alone makes it a question. This is a real exception, "
-                "and it is common in speech today.",
-                "<strong>No do, in older English.</strong> <em>What say "
-                "you?</em> Austen wrote some questions in a form that has "
-                "gone out of use.",
+                "<strong>A joining word first, 13 of the 42 misses, "
+                "31.0%.</strong> <em>And what is your success? But why "
+                "should you wish to persuade me?</em> A check for the helping "
+                "verb at the front misses these. In most of them the question "
+                "follows the rule after the joining word.",
+                "<strong>A question word with no helping verb after it, "
+                "6.</strong> <em>What say you, Mary?</em> is a form older "
+                "English used without <em>do</em>, and three of the six are "
+                "that. <em>What made you so shy of me?</em> has the question "
+                "word as its subject, so nothing moves, and the rule itself "
+                "says so. <em>What sort of girl is Miss King?</em> puts a "
+                "longer question phrase first.",
+                "<strong>A small word of address first, 2.</strong> <em>Oh, "
+                "why is not everybody as happy?</em> The <em>oh</em> stands "
+                "in front, and the rule follows.",
+                "<strong>Something else, 21.</strong> Sixteen of these lines "
+                "begin in the middle of a sentence, or of a word, because the "
+                "line was cut a fixed distance before the question mark or at "
+                "the full stop in <em>Mr.</em> or <em>Mrs.</em>; their first "
+                "word is not the question's first word, and the count cannot "
+                "tell. The five whole ones are a name first, <em>Miss "
+                "Bennet, do you know who I am?</em>, a clause first, <em>If "
+                "she does not object to it, why should we?</em>, and a "
+                "statement with a question mark on it, <em>I must ask "
+                "whether you were surprised?</em>",
             ]),
             ("p",
-             "Only the first has a measured share. We did not count the "
-             "other three. We name them because we read them, and we leave "
-             "out their size because we did not measure it."),
-            ("h3", "Why this section is stated, not computed"),
+             "The whole-novel run, quoted, found the joining word in 45% of "
+             "its misses, and that is the only share it measured; the other "
+             "kinds were named there without a number. On the 90 lines the "
+             "share is 31.0%. The difference is what a sample of 90 looks "
+             "like against a novel, and the lesson gives both so you can see "
+             "that."),
+            ("h3", "Which figures are counted, and which are quoted"),
             ("p",
-             "The other two labs in this course find a rule's hits and "
-             "misses by machine, from a passage on the page. A question rule "
-             "would need the same. But what counts as a question in print "
-             "is hard to decide by machine, and the groups of misses came "
-             "from reading them. A box that showed a number would look "
-             "like the other boxes, and it would not be one."),
-            ("p",
-             "So the figures here are quoted from a single run on the whole "
-             "novel, and the lab says so. If you wish to doubt them, doubt "
-             "the 55.4% most. It is a poor figure for a rule that is "
-             "sound, and the reason is the way people write, not the rule."),
+             "Every box in the lab is counted in your browser from the 90 "
+             "lines printed under it, and you can read any line and disagree "
+             "with its verdict. The 55.4% and the 45% are quoted: they come "
+             "from one run over the whole novel, and a page cannot hold a "
+             "novel. Wherever this lesson gives a quoted figure it says so, "
+             "because a number that looks counted and is not would claim "
+             "more than we know."),
             ("h3", "What the modern documents show"),
             ("p",
-             "Two modern public documents, a US Supreme Court opinion and a "
-             "Census Bureau story, were read for questions. In 1,844 words "
-             "they have none. Austen has one in about every 256. Formal "
-             "writing hardly holds a question at all."),
+             "The lab searches two modern public documents, printed in full "
+             "under the table, for a question mark: the Supreme Court "
+             "opinion <em>Stanley v. City of Sanford</em>, 606 U.S. 46 "
+             "(2025), and the Census Bureau story &ldquo;U.S. Population "
+             "Aging as Nation Turns 250&rdquo; of 9 April 2026. In 1,723 "
+             "words they have none. Formal writing hardly holds a question "
+             "at all."),
             ("p",
              "That gap is the lesson in small. A learner who reads only "
              "reports and textbooks will almost never see the form they "
@@ -306,7 +383,7 @@ LESSONS = [
             ("h3", "How to use this"),
             ("p",
              "Use the rule. Expect to hear many questions that break it, "
-             "and learn the four kinds. Treat the 55.4% as a warning about "
+             "and learn the four kinds. Treat the 53.3% as a warning about "
              "counting, not about the rule."),
         ],
     },

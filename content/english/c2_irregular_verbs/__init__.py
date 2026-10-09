@@ -13,18 +13,19 @@ COURSE = {
     "blurb": (
         "<em>Tense Tables</em> built any verb from four rules. An <dfn>irregular</dfn> verb is "
         "one those rules do not reach. This is the list of them, and it is "
-        "shorter than it looks, because the "
-        "133 verbs here fall into six patterns, and three words carry more than "
-        "half of the trouble."
+        "shorter than it looks, because 132 of the "
+        "133 verbs here fall into six patterns, <em>be</em> stands alone "
+        "outside them, and three words carry more than half of the trouble."
     ),
     "summary": (
         "The verbs that break the rules are the ones you meet most often, which "
         "is why they feel like the whole language. This course prints all of "
         "them, sorts them into six patterns decided by the written forms alone, "
-        "and then counts how much of a real page they actually make up. The "
-        "honest answer means pulling <em>be</em>, <em>have</em> and "
-        "<em>do</em> out of the count, and the number changes a great deal when "
-        "you do."
+        "and then counts, in your browser, how much of a printed page they "
+        "actually make up. The honest answer means pulling <em>be</em>, "
+        "<em>have</em> and <em>do</em> out of the count, and the number falls "
+        "by more than half when you do. Figures for the whole novel are quoted beside "
+        "the page&rsquo;s own, and marked as quoted."
     ),
     "assumes_short": "Tense Tables, because an irregular verb is one the rules there do not reach.",
     "assumes_long": (
@@ -57,15 +58,17 @@ COURSE = {
          "Sixty of the 133 have the same past and <dfn>participle</dfn>, so one form fewer "
          "to remember for nearly half the list."),
         ("Count how much of a real page they are",
-         "About one word in nine on the printed passage, counted in the browser "
+         "About one word in six on the printed passage, counted in the browser "
          "against the printed list."),
         ("Take out the three that bend every count",
-         "<em>Be</em>, <em>have</em> and <em>do</em> are about half of these "
-         "words on the page. Taking them out halves the share."),
-        ("Doubt a figure that hides what it was divided by",
-         "The same list covers 87.65% or 73.89% of these words depending on "
-         "whether those three are counted, and the larger number is the one "
-         "usually quoted."),
+         "<em>Be</em>, <em>have</em> and <em>do</em> are about three in five of "
+         "these words on the printed passage, 91 of 149. Taking them out cuts "
+         "the share by more than half, 15.7% to 6.1%."),
+        ("Tell a figure the page computes from one it quotes",
+         "Over the whole novel, counted once and quoted, the top twenty "
+         "irregular verbs cover 87.65% or 73.89% of these words depending on "
+         "whether those three are counted. The larger number is the one "
+         "usually quoted, and the page cannot recount either."),
     ],
     "syllabus_intro": (
         "The list first, then the patterns inside it, then the question of how "
@@ -87,7 +90,7 @@ COURSE = {
         "choice.",
     ],
     "key": [
-        "133 verbs, six patterns",
+        "133 verbs: six patterns, and be",
         "",
         "past = the have-form     60",
         "all three differ, -n     37",
@@ -98,9 +101,11 @@ COURSE = {
     ],
     "footer_lead": (
         "<strong>Educational course material.</strong> The verb list on this "
-        "course is printed on the page and every share is counted in your "
-        "browser against it. Counts are taken over <em>Pride and Prejudice</em> "
-        "(1813), public domain, novel text only."
+        "course is printed on the page, and every share the lab prints is "
+        "counted in your browser against it, on a printed passage of "
+        "<em>Pride and Prejudice</em> (1813), public domain, novel text only. "
+        "Figures for the whole novel were counted once, offline, and the "
+        "lesson marks each one as quoted where it appears."
     ),
     "lessons": list(_A) + list(_B) + list(_C),
 }

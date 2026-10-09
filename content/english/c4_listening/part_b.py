@@ -19,16 +19,18 @@ LESSONS = [
             "Speech has no spaces in it. A listener has to work out where one "
             "word stops and the next starts, and English gives them a strong "
             "clue: most words that carry meaning begin with their strong part. "
-            "On the page in the lab that is true of 399 of 485 words, which is "
-            "82.3%. So a strong part is a good guess at a new word, and this "
-            "lesson counts how good."
+            "On the page in the lab, 485 words outside the list of small words "
+            "carry a mark for their strong part, and 399 of them start on it, "
+            "which is 82.3%. So a strong part is a good guess at a new word, and "
+            "this lesson counts how good."
         ),
         "key_label": "Counted on the same page as the last lesson",
         "key": [
-            "485 words that are not squashed",
+            "485 other words, strong part marked",
             "399 of them start strong    82.3%",
             "",
             "S = said hardest   . = said lightly",
+            "s = some weight, but not the most",
             "",
             "FAther  ANswer  CARriage",
             "beLIEVE  aGAIN  reTURN",
@@ -51,10 +53,11 @@ LESSONS = [
             ),
             (
                 "The two lessons work together",
-                "The last lesson said about half of what you hear is squashed. "
-                "This one says most of the other half announces itself with a "
-                "strong part. Those two facts between them are how the run of "
-                "sound gets cut into words.",
+                "The last lesson said about two words in five of what you hear are small words, "
+                "most of them <dfn>squashed</dfn> into a weak form. This one says "
+                "most of the rest announces itself with a strong part. "
+                "Those two facts between them are how the run of sound gets cut "
+                "into words.",
             ),
         ],
         "steps_title": "Using it on something you are listening to",
@@ -62,8 +65,8 @@ LESSONS = [
         "steps": [
             (
                 "Stop trying to catch every word",
-                "Half of them are squashed and you will not catch those first. "
-                "Let them go past.",
+                "Half of them are small words said short, and you will not catch "
+                "those first. Let them go past.",
             ),
             (
                 "Listen for the strong parts",
@@ -78,7 +81,7 @@ LESSONS = [
             (
                 "Fill the gaps afterwards",
                 "What sat between the strong parts was almost certainly from the "
-                "list of fifty in the last lesson, and you can often work out "
+                "list in the last lesson, and you can often work out "
                 "which without having heard it clearly at all.",
             ),
         ],
@@ -86,10 +89,15 @@ LESSONS = [
             "mode": "listening",
             "panel_title": "Mark the strong part of every word",
             "panel_intro": (
-                "Choose the second setting. Every word that is not squashed is "
-                "marked with where it is said hardest: <em>S</em> for the strong "
-                "part and a dot for a light one. The count at the top is how many "
-                "of those words start on their strong part."
+                "Choose the second setting. Every word outside the list of small "
+                "words is marked with where it is said hardest: <em>S</em> for "
+                "the strong part, a dot for a light one, and a small <em>s</em> "
+                "for a part with some weight but not the most. A few names and "
+                "rare words have no mark and are left as they are, and so do "
+                "a few short grammar words, such as <em>it</em>, <em>in</em> and "
+                "<em>with</em>, that are neither squashed nor marked. The count at "
+                "the top is how many of the marked words start on their strong "
+                "part."
             ),
         }),
         "read_title": "Where the guess fails",
@@ -115,25 +123,35 @@ LESSONS = [
             "after": [
                 "Most of the words that start light begin with a small piece "
                 "added to the front &mdash; <em>be-</em>, <em>a-</em>, "
-                "<em>re-</em>, <em>in-</em>, <em>de-</em>. Those pieces are "
-                "almost never said strongly.",
+                "<em>re-</em>, <em>un-</em>, <em>de-</em>, <em>con-</em>. Those "
+                "pieces are almost never said strongly.",
                 "So the guess fails in a group you can learn rather than at "
                 "random, which is what makes it useful. A listener who knows the "
                 "front pieces knows when to expect the strong part to arrive "
                 "second.",
+                "A small <em>s</em> in the lab marks a part with some weight but "
+                "not the most, as in <em>conversation</em>, marked s.S. The "
+                "count here treats a word that begins that way as starting light, "
+                "which is the strict test. Many of the words that start strong "
+                "have only one part, and start strong by having nowhere else to "
+                "put it.",
             ],
         },
         "note": (
-            "The 82.3% here is for written prose from 1813. Work on conversation "
-            "puts the figure closer to nine in ten, which is quoted from Cutler "
-            "and Carter rather than counted on this page."
+            "The 82.3% here is for written prose from 1813. Work on recorded "
+            "conversation puts the figure closer to nine in ten, which is quoted "
+            "from Cutler and Carter (1987) rather than counted on this page, and "
+            "their test was looser than the lab&rsquo;s: they counted any part "
+            "with a full <dfn>vowel</dfn> as strong, so a word like "
+            "<em>conversation</em> started strong for them and starts light "
+            "here."
         ),
         "mistakes": [
             (
                 "Trying to hear every word equally",
-                "Half of them are squashed and will not reward the effort. "
-                "Listening for the strong parts first is not cutting corners; it "
-                "is what a native listener does.",
+                "Half of them are small words said short, and they will not "
+                "reward the effort. Listening for the strong parts first is not "
+                "cutting corners; it is what a native listener does.",
             ),
             (
                 "Reading the strong part off the spelling",
@@ -153,21 +171,21 @@ LESSONS = [
             {
                 "q": "Why does a listener need help to find where words begin?",
                 "a": [
-                    "Speech has no gaps between words",
                     "People speak too quickly",
+                    "Speech has no gaps between words",
                     "Words change their spelling",
                     "English has too many words",
                 ],
-                "c": 0,
+                "c": 1,
                 "why": (
                     "Writing puts spaces in. Speech does not, so the run of sound "
                     "has to be cut up by the listener."
                 ),
             },
             {
-                "q": "On the page in the lab, how many of the unsquashed words start on their strong part?",
-                "a": ["About four in five", "About half", "About one in five", "Nearly all of them"],
-                "c": 0,
+                "q": "On the page in the lab, how many of the marked words outside the list of small words start on their strong part?",
+                "a": ["About half", "About one in five", "Nearly all of them", "About four in five"],
+                "c": 3,
                 "why": "399 of 485, which is 82.3%.",
             },
             {
@@ -202,8 +220,17 @@ LESSONS = [
              "<em>happiness</em> all lead with their strong part."),
             ("p",
              "So a strong part is a reasonable guess that a new word has just "
-             "started. On the page in the lab, 399 of the 485 unsquashed words "
-             "start that way: 82.3%."),
+             "started. On the page in the lab, 485 words outside the list of "
+             "small words carry a mark for their strong part, and 399 of them "
+             "start that way: 82.3%. A few names and rare words carry no mark "
+             "and are not counted either way, and nor are a few short grammar "
+             "words, such as <em>it</em>, <em>in</em> and <em>with</em>, that "
+             "keep their shape but carry no mark."),
+            ("p",
+             "The marks come from CMUdict, a list of American pronunciations. "
+             "British and American speakers put the strong part in the same "
+             "place in nearly every word, and the few words where they differ, "
+             "such as <em>address</em>, are not on this page."),
             ("h3", "Why that is enough to work with"),
             ("p",
              "Four times in five is not sure, and it does not need to be. A "
@@ -211,10 +238,10 @@ LESSONS = [
              "this help many times a second alongside everything else they know, "
              "and a guess that is right four times in five is very strong help."),
             ("p",
-             "It also fits with the last lesson. About half of what you hear is "
-             "squashed and carries little meaning. Most of the rest announces "
-             "itself by being said strongly at the front. Between them, the run "
-             "of sound has a shape."),
+             "It also fits with the last lesson. About two words in five of what you hear are "
+             "small words, said short and carrying little meaning. Most of the "
+             "rest announces itself by being said strongly at the front. Between "
+             "them, the run of sound has a shape."),
             ("h3", "Where it fails"),
             ("p",
              "Nearly one word in five starts on a light part instead: "
@@ -230,9 +257,9 @@ LESSONS = [
             ("h3", "What to do with this"),
             ("p",
              "Stop trying to catch everything. Listen for the strong parts, take "
-             "the meaning from the words carrying them, and let the squashed ones "
+             "the meaning from the words carrying them, and let the small words "
              "go by. Most of what sat between the strong parts came from the list "
-             "of fifty in the last lesson, and you can often work it out "
+             "in the last lesson, and you can often work it out "
              "afterwards without having heard it clearly at all."),
             ("p",
              "That is not a trick for people starting out. It is what a listener who grew "

@@ -93,10 +93,14 @@ LESSONS = [
             "mode": "classes",
             "panel_title": "Choose a class and read its verbs",
             "panel_intro": (
-                "Each class is a rule about the three forms of a verb. Pick "
-                "one and the lab lists every verb that follows it, with the "
-                "size of the class beside it. Try the class of nine and read "
-                "the last letter of the third form in every row."
+                "Each class is a rule about the three forms of a verb. The "
+                "four questions are asked of every printed row in your "
+                "browser, and the table above the list counts where each verb "
+                "lands. Pick a class and the lab lists every verb that follows "
+                "it, with the size of the class beside it. Try the class of "
+                "nine and read the last letter of the third form in every row; "
+                "then pick the vowel pattern and see <em>begin</em> fall in a "
+                "different class from <em>sing</em>."
             ),
         }),
         "read_title": "Reading the classes",
@@ -169,12 +173,12 @@ LESSONS = [
             {
                 "q": "<em>Cut</em>, <em>cut</em>, <em>cut</em> belongs to which class?",
                 "a": [
-                    "All three forms the same",
                     "Past matches the form after <em>have</em> only",
                     "All three differ, ends in <em>-n</em>",
                     "Base matches the past only",
+                    "All three forms the same",
                 ],
-                "c": 0,
+                "c": 3,
                 "why": (
                     "All three strings are equal, so it is in the class of "
                     "21 with <em>put</em> and <em>hit</em>."
@@ -183,12 +187,12 @@ LESSONS = [
             {
                 "q": "Why is <em>gone</em> not in the same class as <em>known</em>?",
                 "a": [
-                    "It does not end in <em>-n</em>",
                     "It has fewer letters",
+                    "It does not end in <em>-n</em>",
                     "Its base is not the same as its past",
                     "It is an older word",
                 ],
-                "c": 0,
+                "c": 1,
                 "why": (
                     "Both have three different forms. The rule for the "
                     "class of 37 asks for a last form ending in <em>-n</em>, "
@@ -198,12 +202,12 @@ LESSONS = [
             {
                 "q": "<em>Come</em>, <em>came</em>, <em>come</em> is in a class of four. What matches?",
                 "a": [
-                    "The base and the form after <em>have</em>",
                     "The base and the past",
                     "The past and the form after <em>have</em>",
+                    "The base and the form after <em>have</em>",
                     "Nothing matches",
                 ],
-                "c": 0,
+                "c": 2,
                 "why": (
                     "The first and third strings are both <em>come</em>. "
                     "<em>Become</em>, <em>overcome</em> and <em>run</em> do "
@@ -238,10 +242,13 @@ LESSONS = [
             ]),
             ("p",
              "That is six classes. The verb <em>be</em> stands outside "
-             "them. Its forms (<em>am</em>, <em>is</em>, <em>are</em>, "
-             "<em>was</em>, <em>were</em>, <em>been</em>) are not "
-             "variations on one base, so no rule about strings fits it. It "
-             "is the one verb that is handled by hand."),
+             "them. It has eight forms (<em>be</em>, <em>am</em>, <em>is</em>, "
+             "<em>are</em>, <em>being</em>, <em>was</em>, <em>were</em>, "
+             "<em>been</em>), with two in the past alone, and they are not "
+             "variations on one base, so no rule about three strings fits it. "
+             "The lab prints it with <em>was/were</em> in the past column and "
+             "counts it as outside all six. It is the one verb that is "
+             "handled by hand."),
             ("h3", "The near-miss"),
             ("p",
              "Look at <em>know</em>, <em>knew</em>, <em>known</em> and at "
@@ -254,8 +261,9 @@ LESSONS = [
              "This is a useful thing to see. A rule that says exactly what "
              "it covers also says exactly what it does not. <em>Gone</em> "
              "and <em>done</em> are not covered by the <em>-n</em> rule. "
-             "They are the two best-known verbs in English, and they sit "
-             "in the class of nine, with <em>undergo</em>."),
+             "<em>Go</em> and <em>do</em> are two of the commonest verbs in "
+             "English, and they sit in the class of nine, with "
+             "<em>undergo</em>."),
             ("h3", "A shape inside the class of nine"),
             ("p",
              "Six of the nine do something else. <em>Sing</em>, "

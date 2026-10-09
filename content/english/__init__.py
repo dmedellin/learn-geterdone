@@ -51,16 +51,17 @@ PATH = {
         "a rule, the share it gets right,",
         "and the words it misses",
         "",
-        "-s 99.85%    -ing 98.97%    -ed 98.67%",
+        "-s 99.92%    -ing 99.34%    -ed 99.26%",
         "",
-        "four of the twelve tense boxes",
-        "carry most of real writing",
+        "doubling: 49.3% as the books give it,",
+        "91.7% once the stress is added",
     ],
     "sequence_intro": (
-        "Four courses. The first three are in one order and each needs the last. The first builds any "
+        "Four courses. The first three are in one order, and each of them needs "
+        "the one before it. The first builds any "
         "verb's forms from rules. The second takes the verbs that break those "
         "rules. The third puts the verb in a sentence and asks where everything "
-        "else goes."
+        "else goes. The fourth stands on its own and can be read first."
     ),
     "why_order": [
         "Tense Tables comes first because every later lesson needs the forms it "
@@ -71,11 +72,16 @@ PATH = {
         "course keeps pointing at, and because it is short &mdash; the verbs that "
         "break the rules are few, and a small number of them carry most of the "
         "trouble.",
-        "Word Order comes last because it needs a verb before it can ask where "
+        "Word Order comes third because it needs a verb before it can ask where "
         "the verb goes, and because its method is borrowed from the first "
         "course: English marks who is doing the action in the little words like "
         "<em>he</em> and <em>him</em>, so the rule can be checked on printed "
         "words with nothing marked up by hand.",
+        "Listening comes fourth, and apart: it is about sound rather than form, "
+        "it needs nothing from the other three, and a reader who wants help "
+        "hearing English before anything else can start there. It is placed "
+        "last only so that the three courses that build on one another sit "
+        "together.",
     ],
     "prerequisites": [
         "The ability to read this page. The writing is kept inside the 2,800 "
@@ -86,16 +92,24 @@ PATH = {
         "than that, and no earlier course on this site is assumed.",
     ],
     "material": (
-        "every figure on this path is computed in your browser from the rule the "
-        "lesson states, run over the words printed on the page, so a hit rate is "
-        "something you can check by hand rather than something you are told"
+        "every figure counted on this path is computed in your browser from the "
+        "rule the lesson states, run over the words printed on the page, and the "
+        "few figures taken from a whole novel are marked as quoted where they "
+        "appear &mdash; so a hit rate is something you can check by hand rather "
+        "than something you are told"
     ),
     "footer_lead": (
-        "<strong>Educational course material.</strong> Every figure on this path "
-        "is computed in your browser from the rule the lesson states, run over "
-        "the words printed on the page. Word lists are the New General Service "
-        "List (Browne, Culligan and Phillips), CC BY-SA 4.0; pronunciations are "
-        "CMUdict; passages are public domain."
+        "<strong>Educational course material.</strong> Every figure counted on "
+        "this path is computed in your browser from the rule the lesson states, "
+        "run over the words printed on the page; the few figures taken from a "
+        "whole novel are marked as quoted where they appear. The word lists in "
+        "these pages are adapted from the New General Service List (Browne, "
+        "Culligan and Phillips) and, unlike the rest of this site, are shared "
+        "under CC BY-SA 4.0. Pronunciations are from CMUdict. The older passages "
+        "are public domain, and the two modern documents &mdash; <em>Stanley v. "
+        "City of Sanford</em>, 606 U.S. 46 (2025), and the U.S. Census "
+        "Bureau&rsquo;s &ldquo;U.S. Population Aging as Nation Turns 250&rdquo; "
+        "(9 April 2026) &mdash; are works of the U.S. government."
     ),
     "courses": [_C1, _C2, _C3, _C4],
 }

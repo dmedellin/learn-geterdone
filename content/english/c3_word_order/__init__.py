@@ -22,8 +22,9 @@ COURSE = {
         "say who did what, English will feel rigid. It is rigid, and this course "
         "measures how rigid. Three rules are stated and scored on printed text: "
         "where a pronoun sits beside its verb, where an <dfn>adverb</dfn> sits, and how a "
-        "question opens. Two of the three hold. The third does not, and the "
-        "course says so rather than quietly dropping it."
+        "question opens. Two of the three hold. The third covers only half of "
+        "the questions people actually ask, and the course prints the other "
+        "half rather than quietly dropping the rule."
     ),
     "assumes_short": "Tense Tables and Irregular Verbs, because a verb has to exist before you can ask where it goes.",
     "assumes_long": (
@@ -33,9 +34,11 @@ COURSE = {
         "counting and working out a share."
     ),
     "how_to": [
-        "Read the printed text before you read the number. Every figure here is "
-        "computed from words on the same page, and the point is that you can "
-        "check a row and disagree with it.",
+        "Read the printed text before you read the number. Every figure in a lab "
+        "here is counted from words printed on the same page, and the point is "
+        "that you can check a row and disagree with it. Where a lesson quotes a "
+        "count made over the whole novel, which no page can carry, it says so "
+        "beside the figure.",
         "Treat what is left over as the lesson. A rule that holds nine times in ten "
         "is only useful if you know what the tenth looks like, and each lesson "
         "names what is left rather than rounding it away.",
@@ -85,20 +88,22 @@ COURSE = {
         "almost none of these shapes, which is itself one of the findings.",
     ],
     "key": [
-        "he / him     she / her     they / them",
+        "he or him     she or her     they or them",
         "the word changes with the job",
         "",
-        "subject pronoun then its verb   91.9%",
-        "adverb in the middle           70.8%",
-        "question opens with a helper   53%",
+        "subject pronoun then its verb   90.0%",
+        "adverb in the middle            70.8%",
+        "question opens with a helper    53.3%",
         "",
         "what is left is words, not order",
     ],
     "footer_lead": (
-        "<strong>Educational course material.</strong> Every figure on this "
-        "course is counted in your browser over text printed on the same page. "
-        "The text is <em>Pride and Prejudice</em> (1813), public domain, novel "
-        "text only."
+        "<strong>Educational course material.</strong> Every figure in a lab on "
+        "this course is counted in your browser over text printed on the same "
+        "page; where a lesson quotes a count made over the whole novel, which no "
+        "page can carry, it says so beside the figure. The text is <em>Pride and "
+        "Prejudice</em> (1813), public domain, novel text only, and two modern "
+        "public-domain documents, named where they are counted."
     ),
     "lessons": list(_A) + list(_B) + list(_C),
 }

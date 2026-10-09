@@ -8,22 +8,25 @@ LESSONS = [
         "title": "The Verbs That Break the Rules",
         "one_line": "About 180 verbs ignore the -ed rule, and they are the verbs you use most.",
         "standard": (
-            "Finish when you can say what makes a verb irregular, give the size "
+            "Finish when you can test a verb against the -ed rule, give the size "
             "of the list, and explain why the list is short but the words are "
             "everywhere.",
-            "You should be able to test any verb against the <em>-ed</em> rule, "
-            "name the three forms that matter, say how many irregular verbs "
-            "there are and where that figure comes from, and explain why a "
-            "verb you use every day is far more likely to be irregular than "
-            "one you rarely meet.",
+            "You should be able to run the four-step test on any verb and say "
+            "regular or irregular, name the three forms that matter, say how "
+            "many irregular verbs there are and where that figure comes from, "
+            "and explain why a verb you use every day is far more likely to be "
+            "irregular than one you rarely meet.",
         ),
         "summary": (
             "<em>Tense Tables</em> gave four rules that build every regular verb, and "
-            "the rules were right about 99 times in 100. This course is about "
-            "the rest. An <dfn>irregular</dfn> verb does not make its past by "
-            "adding <em>-ed</em>. The lab holds 133 of them, sorted into six "
-            "classes by a rule a computer can check. The list is short, but "
-            "it is made of the words you say most."
+            "on the regular verbs the rules were right more than 99 times in "
+            "100. The <dfn>irregular</dfn> verbs were set aside before that "
+            "score was taken, because no rule makes their past: <em>bring</em> "
+            "does not become <em>bringed</em>. This course is about them. The "
+            "lab holds 133, printed with their three forms; 132 of them sort "
+            "into six classes by a rule a computer can check, and <em>be</em> "
+            "stands outside. The list is short, but it is made of the words "
+            "you say most."
         ),
         "key_label": "Three forms, regular and not",
         "key": [
@@ -34,7 +37,7 @@ LESSONS = [
             "bring / brought / brought",
             "   no rule builds these: learn them",
             "",
-            "133 verbs in the lab, in 6 classes",
+            "133 verbs in the lab: 132 in 6 classes, and be",
         ],
         "concepts_intro": "Three ideas, and the last one explains the other two.",
         "concepts": [
@@ -48,8 +51,9 @@ LESSONS = [
             ),
             (
                 "The list is short and it is counted",
-                "The lab holds 133 verbs, in six classes, and the largest class "
-                "has 60 of them. Pinker, who has written about this at length, "
+                "The lab holds 133 verbs. 132 of them fall into six classes, "
+                "the largest with 60, and <em>be</em> stands outside the "
+                "classes. Pinker, who has written about this at length, "
                 "puts the whole list at about 180. A list of 180 is a small "
                 "thing to learn next to a language of many thousands of "
                 "verbs.",
@@ -70,8 +74,10 @@ LESSONS = [
                 "Write the three forms",
                 "The base, the past, and the form used after <em>have</em>. "
                 "These three are enough. The other two forms, the <em>-s</em> "
-                "form and the <em>-ing</em> form, follow the rules from "
-                "that course even for irregular verbs.",
+                "form and the <em>-ing</em> form, follow the rules from that "
+                "course for every irregular verb but two: <em>have</em> makes "
+                "<em>has</em>, and <em>be</em> has <em>am</em>, <em>is</em> "
+                "and <em>are</em>.",
             ),
             (
                 "Build the past by the -ed rule",
@@ -94,45 +100,47 @@ LESSONS = [
             "mode": "irregular",
             "panel_title": "Every irregular verb in the list, in three forms",
             "panel_intro": (
-                "These are the verbs the lab holds, each with its base, its "
-                "past and its form after <em>have</em>, and the rule that "
-                "puts it in a class. Search for a verb you use every day and "
-                "see whether it is here. Then look at how the six classes "
-                "share out the whole list."
+                "These are the 133 verbs the lab holds, each with its base, its "
+                "past and its form after <em>have</em>, and the class the "
+                "sorting rule puts it in. Search for a verb you use every day "
+                "and see whether it is here. Then narrow the list to one class "
+                "and read how the six classes share out the whole list. The "
+                "counts in the tiles are made in your browser from the printed "
+                "rows."
             ),
         }),
-        "read_title": "Which verbs drop out of a common word list",
+        "read_title": "Running the test on three verbs",
         "read_intro": (
-            "Not every irregular verb is common. A list of 183 irregular "
-            "verbs was put together, and then checked against the 2,809 most "
-            "common words. This is what stayed and what went."
+            "The four steps above, on a regular verb, on a verb with one odd "
+            "form, and on a verb with two."
         ),
         "worked": {
-            "title": "183 irregular verbs, and the 51 that fall away",
+            "title": "Walk, show and bring",
             "intro": [
-                "132 of the 183 are in the common word list, which is 72.1%. "
-                "These are among the 51 that are not.",
+                "For each verb the guess is the base plus -ed, used for both "
+                "the past and the form after have. Beside it is what people "
+                "write.",
             ],
             "lines": [
-                "kept (in the common list):",
-                "  bring, break, buy, come, go, know",
+                "walk:   guess walked, walked",
+                "        written walked, walked      regular",
                 "",
-                "dropped (rare):",
-                "  weep, flee, creep, cling, shed,",
-                "  forgive, withstand",
+                "show:   guess showed, showed",
+                "        written showed, shown       irregular",
                 "",
-                "middle rank of the kept verbs: 697.5",
-                "in the top 500 words: 44% of them",
+                "bring:  guess bringed, bringed",
+                "        written brought, brought    irregular",
             ],
             "after": [
-                "Two things are true at once. Most of the irregular verbs are "
-                "common, and the rare ones, like <em>withstand</em>, are the "
-                "ones that fall away. The middle rank of 697.5 means half of "
-                "the kept verbs are among the 700 commonest words, and 44% "
-                "are in the top 500.",
-                "This agrees with the idea above, but it does not prove it. A "
-                "list built from one writer, or one century, would give "
-                "different numbers.",
+                "<em>Walk</em> passes both steps. <em>Show</em> passes the "
+                "past and fails the form after <em>have</em>, and one failure "
+                "is enough, so it is on the list. <em>Bring</em> fails both. "
+                "The test never asks how a verb sounds or how common it is; it "
+                "compares two spellings, which is what lets the lab print the "
+                "list without a judgement in it.",
+                "The lab shows the written forms for all 133. Pick any row, "
+                "build the guess yourself, and you will find the row is there "
+                "because the guess is wrong.",
             ],
         },
         "note": (
@@ -168,12 +176,12 @@ LESSONS = [
             {
                 "q": "Which pair shows a verb that is irregular?",
                 "a": [
-                    "<em>bring</em> and <em>brought</em>",
                     "<em>walk</em> and <em>walked</em>",
                     "<em>plan</em> and <em>planned</em>",
+                    "<em>bring</em> and <em>brought</em>",
                     "<em>stop</em> and <em>stopped</em>",
                 ],
-                "c": 0,
+                "c": 2,
                 "why": (
                     "<em>Brought</em> is not <em>bring</em> plus <em>-ed</em>. "
                     "The others are built by the <em>-ed</em> rule, with the "
@@ -184,12 +192,12 @@ LESSONS = [
             {
                 "q": "Why is a common verb more likely to be irregular than a rare one?",
                 "a": [
-                    "A word heard often is kept whole and escapes the rule",
                     "Common words are shorter",
+                    "A word heard often is kept whole and escapes the rule",
                     "Rare words were never given a past",
                     "Common words are newer",
                 ],
-                "c": 0,
+                "c": 1,
                 "why": (
                     "Frequency protects the old form. A rare word is built "
                     "from the rule each time, and the rule is the regular one."
@@ -198,12 +206,12 @@ LESSONS = [
             {
                 "q": "Pinker puts the number of irregular verbs at about 180. What kind of figure is that?",
                 "a": [
-                    "A count that depends on where you draw the edge",
                     "An exact figure with no doubt",
                     "A figure measured on one novel",
                     "A figure for the lab list alone",
+                    "A count that depends on where you draw the edge",
                 ],
-                "c": 0,
+                "c": 3,
                 "why": (
                     "The lab holds 133 and 183 were collected for the word "
                     "list check. The edge of the list moves with the "
@@ -227,10 +235,13 @@ LESSONS = [
         ],
         "body": [
             ("p",
-             "<em>Tense Tables</em> ended with a promise. Four rules build the five forms "
-             "of any regular verb, and they were right 99.85%, 98.97% and "
-             "98.67% of the time. The words they missed were a short list. "
-             "This course is that list."),
+             "<em>Tense Tables</em> ended with a score. Four rules build the five forms "
+             "of any regular verb, and on the 1,210 regular verbs of the word "
+             "list they were right 99.92%, 99.34% and 99.26% of the time. The "
+             "few they missed were regular verbs with a spelling twist, such "
+             "as <em>panic</em> and <em>panicking</em>. But before that score "
+             "was taken, a set of verbs was put aside, because no rule builds "
+             "their past at all. This course is that set."),
             ("h3", "What irregular means here"),
             ("p",
              "Every verb has a base form, a past, and a form used after "
@@ -246,8 +257,10 @@ LESSONS = [
              "these, and you cannot work them out from the base."),
             ("h3", "How many there are"),
             ("p",
-             "The lab holds 133 verbs. They fall into six classes, and the "
-             "biggest class has 60. The next lesson shows how the classes are "
+             "The lab holds 133 verbs, printed with their three forms. 132 of "
+             "them fall into six classes, and the biggest class has 60; the "
+             "tile that counts the classes reads 6, because <em>be</em> stands "
+             "outside them all. The next lesson shows how the classes are "
              "defined."),
             ("p",
              "The wider figure is Pinker&rsquo;s: about 180 irregular verbs "
@@ -257,16 +270,21 @@ LESSONS = [
              "exact total."),
             ("h3", "They are the common words"),
             ("p",
-             "The 183 verbs were checked against a list of the 2,809 most "
-             "common words in English. 132 of them were in it, which is "
-             "72.1%. The 51 that were not include <em>weep</em>, "
-             "<em>flee</em>, <em>creep</em>, <em>shed</em> and "
-             "<em>forgive</em>."),
+             "When this course was built, the 183 verbs were checked against "
+             "a list of the 2,809 most common words in English. 132 of them "
+             "were in it, which is 72.1%. The 51 that were not include "
+             "<em>weep</em>, <em>flee</em>, <em>creep</em>, <em>shed</em> and "
+             "<em>forgive</em>. That check was made once, and it is quoted "
+             "here: the page does not carry the 183, so it cannot redo it. "
+             "The lab holds 133, one more than the 132, because the list was "
+             "settled by hand after the check; every one of the 133 is in the "
+             "common list."),
             ("p",
-             "Look at the kept verbs by rank. The middle verb is at rank 697.5, so half of "
-             "them sit among the 700 commonest words in the list. And 44% "
-             "are in the top 500. The irregular verbs gather at the "
-             "frequent end."),
+             "Look at the kept verbs by rank in that common list. The middle "
+             "verb is at rank 697.5, so half of them sit among the 700 "
+             "commonest words, and 44% are in the top 500. These two figures "
+             "are quoted too: the page carries each word&rsquo;s band, not "
+             "its rank. The irregular verbs gather at the frequent end."),
             ("h3", "Why the common words are the odd ones"),
             ("p",
              "This is an observation more than a proof, and it is "
@@ -290,7 +308,7 @@ LESSONS = [
             ("p",
              "The rest of this course puts numbers on the list. Next comes "
              "its shape, six classes with a rule each. After that comes the "
-             "question of how much of a real book these verbs fill, and "
+             "question of how much of a real page these verbs fill, and "
              "there the first number you see turns out to need a fix."),
         ],
     },

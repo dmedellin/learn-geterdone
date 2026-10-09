@@ -79,35 +79,67 @@ before it was written into a lesson.
 
 | rule | hit rate | residue |
 |---|---|---|
-| `-s` | **99.85%** | shelf, stomach |
-| `-ing` | **98.97%** | busing, counselling, formatting, inputting |
-| `-ed` | **98.67%** | bred, bused, counselled, formatted |
+| `-s` | **99.92%** (1209/1210) | stomach |
+| `-ing` | **99.34%** (1202/1210) | bus, format, initial, input, output, panic, traffic, up |
+| `-ed` | **99.26%** (1201/1210) | bus, counsel, format, initial, input, output, panic, traffic, up |
 
-Measured over the 1,356 regular verbs of the NGSL against that list's own
-attested forms. The shipped JavaScript reproduces all three to the digit
-(`scripts/wordlists/verbrules_check.js`).
+Measured **in the browser** over the 1,210 regular verbs of the cleaned NGSL
+list (`scripts/wordlists/verbrules_cases.json`, inlined on the page) against
+that list's own recorded forms; the figures are pinned in the table lab's
+`Score a rule on the list` menu and `scripts/wordlists/verbrules_check.js`
+reproduces them with the same shipped code.
 
-**A rule that was refuted.** The `-s` residue first read `radio -> radioes,
-shelf -> shelfs`. Two fixes suggested themselves: `-o` takes `-es` only after a
-consonant, and `f`/`fe` becomes `ves`. The first was right. The second made the
-rules **worse**, 99.7% to 99.6%, because *brief*, *golf*, *proof* and *roof* are
-verbs that take `-s` and `f -> ves` is a rule about nouns. `vbThirdWithVes` keeps
-the refuted version so the page can print the comparison.
+**The list was cleaned first, and the lesson says so.** The raw NGSL lemma
+list (kept as `verbrules_raw.json`) was generated, and scored raw it counted
+invented forms as hits: 61 irregular verbs scored as `-ed` hits on *comed*,
+*maked*, *swimmed*; *offerring*, *sufferring*, *commiting*, *councilling*
+recorded as spellings; nouns and adjectives (*able*, *son*, *council*) given
+verb forms. `scripts/wordlists/clean_verbs.py` applies one test to every
+spelling (in SCOWL wamerican, or the British spelling of a word that is) and
+records every exclusion with its reason: 1,356 → 1,210, 146 left out (90
+irregular, 54 with no correct spelling for a slot, *shelf* and *half* not
+verbs). The page prints the exclusions under `List`. The earlier residues
+*shelf*, *bred*, *counselling*, *bused* were all artefacts of the raw list.
 
-**The doubling rule**, over the 232 verbs it can touch:
+**A rule that was refuted, now computed on the page.** Before the `-o` fix
+(every `-o` takes `-es`) the `-s` rule scores 1207/1210 = 99.75%, missing
+*radio* and *video*. With `f`/`fe` → `ves` added it scores 1205/1210 =
+99.59%, missing *brief*, *golf*, *proof*, *roof*: `f -> ves` is a rule about
+nouns. `vbThirdBeforeFix` and `vbThirdWithVes` keep both versions so the page
+prints the comparison rather than asserting it.
+
+**The doubling rule**, over the 217 CVC-final verbs of the cleaned list
+(`scripts/wordlists/doubling_verbs.json`; the list includes irregular verbs
+such as *begin* and *swim*, whose `-ing` follows the rule, so it is not a
+subset of the 1,210):
 
 | | |
 |---|---|
-| double every one *(the version most books print)* | 117/232 = **50.4%** |
-| double none | 115/232 = 49.6% |
-| double when the last part is the strong part | 210/232 = **90.5%** |
+| double every one *(the version most books print)* | 107/217 = **49.3%** |
+| double none | 110/217 = 50.7% |
+| double when the last part is the strong part | 199/217 = **91.7%** |
 
-Of the 22 still wrong, **13 end in `-l`** — the British doubling rule, which is a
-second rule rather than a list of oddities.
+Note the order flipped on cleaning: "double none" now scores slightly higher
+than "double all". Of the 18 still wrong, **11 end in `-l`** (cancel, channel,
+counsel, label, level, model, panel, rival, signal, total, travel) — the
+British doubling rule, a second rule rather than a list of oddities. The other
+seven: benefit, focus and program (both spellings recorded), format, input and
+output (double against the stress), bus (the one verb the rule doubles and the
+list does not). *offer*, *suffer* and *council* left the residue when their
+misspellings were removed; *metal* was dropped as a non-verb.
+
+**Two different scoring questions, said on the page.** The table lab counts a
+hit when the rule's form is any recorded spelling, so *traveling* is right
+there. The doubling lab asks whether the list ever records a doubled spelling,
+so *travel* is wrong there. The doubling lesson explains the difference
+explicitly, because a reader sees the same verb pass one page and fail the
+next.
 
 **Which cells English uses**, over 1,951 pronoun-subject verb phrases: present
 and past simple 73.5%, plus future/modal 87.1%, perfect 7.3%, **progressive
-1.4%**, future perfect progressive 0.1%.
+1.4%**, future perfect progressive 0.1%. Measured, but **not taught by any
+lesson**: no page computes it, so the course home and path key no longer
+promise it (the 2026-10-08 pedagogy pass removed "four of the twelve boxes").
 
 ### Course 2 — Irregular Verbs
 
@@ -128,19 +160,35 @@ twenty slots do far less work than the headline implies, and the lesson says so.
 
 ### Course 3 — Word Order
 
-Subject pronouns, novel only: **5,990 instances, 88.7% followed directly by a
-verb.** The residue is four named buckets, not one: a modifier between pronoun
-and verb 63% (*they both knew*, *we all*), lexicon gap 16%, **inversion 15%**,
-other 6%. Object pronouns score **93.2%**. Frequency adverbs in mid-position
-**81.8%**.
+Two kinds of figure, and the lessons say which is which. **Whole-novel figures
+are quoted** in the prose and labelled quoted, because no page can carry the
+novel: subject pronouns **5,990 instances, 88.7% followed directly by a verb**,
+residue a modifier between pronoun and verb 63% (*they both knew*, *we all*),
+lexicon gap 16%, **inversion 15%**, other 6%; object pronouns **93.2%**;
+frequency adverbs in mid-position **81.8%** of 577 (51 lexicon gap, 23 in a
+phrase, 10 end, 7 start, 14 other); questions **55.4%**, connective-fronted
+**45%** of the misses. These were recounted when written (2026-10-06) and
+nobody has re-run them since; the kit engineer did not dispute them and did
+not reproduce them.
+
+**Page figures are computed in the browser** on printed text, pinned in the
+kit's presets and read back with `labcheck.js --observe` (2026-10-08):
+
+| lab | printed text | rule holds | residue |
+|---|---|---|---|
+| `svo`, subject | 949-word passage, 80 pronouns | **72 of 80, 90.0%** | 5 modifier between, 2 next word not in list, 1 inverted (a speech tag; the tile is called *word order broken*) |
+| `svo`, object (*me, him, us, them*; *her* excluded as also possessive) | same passage, 18 | 16 of 18, 88.9% | 2 word before not in list |
+| `adverbs` | 120 concordance lines, 8 adverbs | **85 of 120, 70.8%** | 6 a preposition follows, 29 something else (5 lexicon gaps, 3 *as soon as*, 5 before an adjective, clause-start, clause-end, one lone *Sometimes.*); *rarely* has no rows, so the menu leaves it out; the modern-documents count still searches for it |
+| `questions` | 90 concordance lines | **48 of 90, 53.3%** | 13 joining word first (**13 of 42, 31.0%**), 6 wh-word with no auxiliary after it, 2 address word, 21 something else — **16 of the 21 are lines cut mid-sentence** (fixed window, or the full stop in *Mr.*/*Mrs.*) |
 
 **Genuine word-order violations: zero.** Every inversion is the quotation-tag
 device — *"But it is," returned she* — verified by sampling and by a surrounding
--window check (88% sit beside quoted speech).
+-window check (88% sit beside quoted speech, quoted). On the printed passage
+the one inversion is *"My dear sister," said he*.
 
-**Questions fail and ship stated-not-computed.** 55.4% on Austen, and the
-largest residue bucket is connective-fronted (*"And what…"*, *"But why…"*) at
-45%.
+**Questions no longer ship stated-not-computed.** The lab counts the 90
+printed questions; the whole-novel 55.4% and 45% are quoted beside the page's
+53.3% and 31.0%, with the sentence that 90 lines are a sample.
 
 ## 6. Two landmines, both found the hard way
 
@@ -155,9 +203,18 @@ acknowledged"` to the last `"uniting them."` — which gives 122,396 whitespace
 tokens against the commonly cited ~122k, and that agreement is the check.
 
 **Modern formal prose does not contain the structures this Subject teaches.**
-Two public-domain modern passages (a Supreme Court opinion and a Census Bureau
-story) carry **4.5× fewer** target pronouns per thousand words than Austen, 4.4×
-fewer frequency adverbs, and **zero questions in 1,844 words** against Austen's
-one every 256. That is not a reason to prefer Austen quietly — it is itself a
-finding worth teaching, because it explains why a learner who reads only formal
-writing is unprepared for speech.
+Two public-domain modern documents — *Stanley v. City of Sanford*, 606 U.S. 46
+(2025), opinion of the Court, Parts I and II.A, and the Census Bureau's "U.S.
+Population Aging as Nation Turns 250" (Rogers and Hayward, 2026-04-09) — are
+inlined and printed on the three word-order pages and counted there: **1,723
+letter-words** (1,843 whitespace tokens; the first draft's 1,844 counted
+numbers, the § sign and citation strings). Against the printed passage, the
+subject pronouns run **84.3 per 1,000 against 13.9, 6.1× fewer**, the object
+pronouns **19.0 against 1.7, 10.9× fewer**; the nine adverbs occur **2 times,
+1.2 per 1,000**; there are **zero question marks**. The first draft's 4.5×,
+4.4× and "one every 256" were whole-novel ratios that could not be reproduced
+(an offline re-run gave about 3.4×, 5.5× and 1 in 268, the last including
+Gutenberg front matter), and no lesson states them any more. That is not a
+reason to prefer Austen quietly — it is itself a finding worth teaching,
+because it explains why a learner who reads only formal writing is unprepared
+for speech.
