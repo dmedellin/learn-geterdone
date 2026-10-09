@@ -61,7 +61,10 @@ PATH = {
         "the one before it. The first builds any "
         "verb's forms from rules. The second takes the verbs that break those "
         "rules. The third puts the verb in a sentence and asks where everything "
-        "else goes. The fourth stands on its own and can be read first."
+        "else goes. The fourth stands on its own and can be read first. "
+        "These four are the whole Subject as published: a new course is added "
+        "only when its rule can be run over printed words and scored the same "
+        "way, and nothing is announced before its page exists."
     ),
     "why_order": [
         "Tense Tables comes first because every later lesson needs the forms it "

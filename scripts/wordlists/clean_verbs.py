@@ -129,7 +129,7 @@ def clean(raw, words, irregular):
         else:
             empty = [s for s in SLOTS if not slots[s]]
             if empty:
-                excluded[base] = "no correct spelling recorded for -%s (the list has %s)" % (
+                excluded[base] = "no -%s spelling the reference dictionary confirms (the list has %s)" % (
                     "/-".join(empty),
                     ", ".join(f for s in empty for f in cases[s][base]) or "nothing")
             else:
@@ -151,8 +151,10 @@ def clean(raw, words, irregular):
     }
 
     # The doubling rule needs only the -ing form, and irregular verbs take it
-    # by rule (begin -> beginning), so they stay. A row is dropped when the list
-    # records no correct -ing spelling, or the word is not a verb.
+    # by rule (begin -> beginning), so they stay. A row is dropped when no -ing
+    # spelling the list records is confirmed by the reference dictionary (which
+    # can mean the dictionary lacks a correct word, as with theme or version),
+    # or the word is not a verb.
     vowels = "aeiou"
 
     def cvc(v):
@@ -168,7 +170,7 @@ def clean(raw, words, irregular):
             continue
         good = ing_ok[base]
         if not good:
-            dbl_dropped[base] = "no correct -ing spelling recorded (the list has %s)" % (
+            dbl_dropped[base] = "no -ing spelling the reference dictionary confirms (the list has %s)" % (
                 ", ".join(cases["ing"][base]))
             continue
         doubled = base + base[-1] + "ing"

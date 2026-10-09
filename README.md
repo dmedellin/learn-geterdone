@@ -583,7 +583,7 @@ without a page behind it.
 **853 pages and eight assets. Nothing else is served** — 849 pages of the course tree (the site index and eight path trees), plus the capstone's two pages, the two sign-in pages (`/progress/` and `/oauth2/spa/callback/`), and the seven course schemas plus the capstone's dataset.
 
 The table below enumerates the **Trading** path, which is hand-authored and whose
-pages are its source of truth. The other six paths are GENERATED from
+pages are its source of truth. The other seven paths are GENERATED from
 `content/<package>/` by `scripts/build_paths.py`, so their URL space is declared
 by the content packages rather than by a table here:
 

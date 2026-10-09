@@ -97,8 +97,11 @@ recorded as spellings; nouns and adjectives (*able*, *son*, *council*) given
 verb forms. `scripts/wordlists/clean_verbs.py` applies one test to every
 spelling (in SCOWL wamerican, or the British spelling of a word that is) and
 records every exclusion with its reason: 1,356 → 1,210, 146 left out (90
-irregular, 54 with no correct spelling for a slot, *shelf* and *half* not
-verbs). The page prints the exclusions under `List`. The earlier residues
+irregular, 54 whose recorded spelling for a slot the reference dictionary
+does not confirm, *shelf* and *half* not verbs). Not all of the 54 are
+misspelt: for *theme*, *resource*, *version* and a few others the recorded
+forms are correct English that the dictionary simply lacks, and the page
+says "not confirmed" rather than "wrong". The page prints the exclusions under `List`. The earlier residues
 *shelf*, *bred*, *counselling*, *bused* were all artefacts of the raw list.
 
 **A rule that was refuted, now computed on the page.** Before the `-o` fix
@@ -126,7 +129,8 @@ British doubling rule, a second rule rather than a list of oddities. The other
 seven: benefit, focus and program (both spellings recorded), format, input and
 output (double against the stress), bus (the one verb the rule doubles and the
 list does not). *offer*, *suffer* and *council* left the residue when their
-misspellings were removed; *metal* was dropped as a non-verb.
+misspellings were removed; *metal* was dropped because the dictionary
+confirms neither *metalling* nor *metaling*.
 
 **Two different scoring questions, said on the page.** The table lab counts a
 hit when the rule's form is any recorded spelling, so *traveling* is right
@@ -218,3 +222,11 @@ Gutenberg front matter), and no lesson states them any more. That is not a
 reason to prefer Austen quietly — it is itself a finding worth teaching,
 because it explains why a learner who reads only formal writing is unprepared
 for speech.
+
+## Scope
+
+Four courses and ten lessons are the Subject as published, and the path page
+says so. It is narrow on purpose: §2's test admits only a rule that can be run
+over printed words and scored in the browser. A further course (for example
+articles, or prepositions of time) is added when its rule passes that test and
+its residue can be printed, and not before; nothing is announced without a page.
