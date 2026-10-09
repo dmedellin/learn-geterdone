@@ -66,8 +66,8 @@ class TestNeutralLessonLinks(unittest.TestCase):
                 titles[route] = kind, title
                 if kind == 'Lesson':
                     lessons[route] = markup
-        self.assertEqual(64, len(ALL_COURSES))
-        self.assertEqual(762, len(lessons), 'non-vacuous complete Lesson inventory')
+        self.assertEqual(68, len(ALL_COURSES))
+        self.assertEqual(772, len(lessons), 'non-vacuous complete Lesson inventory')
         failures = {route: errors for route, markup in lessons.items()
                     if (errors := navigation_errors(markup, route, titles))}
         self.assertEqual({}, failures, 'neutral Lesson links across the complete corpus')
