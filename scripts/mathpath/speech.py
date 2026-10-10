@@ -376,6 +376,16 @@ def _numeric_arg(inner):
     return kinds == ["num"] or (kinds == ["num", "other", "num"] and toks[1][1] == "/")
 
 
+def _signed_number(inner):
+    """One number with an optional leading minus: `0`, `−1`, never `1/2`.
+
+    `f(−1)` needs no "the quantity" to say where its argument ends, but
+    `f(3/2)` does: "f of 3 over 2" is also how f(3)/2 is said.
+    """
+    toks = [t for k, t in inner if k not in ("ws", "gap")]
+    return _numeric_arg(inner) and "/" not in toks
+
+
 def _time_call(tokens, i):
     """A single letter applied to time or to a number: `y(0)`, `x(t)`, `u(t − c)`."""
     kind, tok = tokens[i]
@@ -538,7 +548,7 @@ def _say(text):
             if paren_ctx and paren_ctx[-1] == "fncall" and pt and pt not in _OPERATORS:
                 paren_ctx[-1] = "prob" if pt in ("P", "Pr", "E") else "call"
                 if paren_ctx[-1] == "call" and i in brackets and _one_operation(tokens, i, brackets[i]) \
-                        and not (_time_call(tokens, i - 1) and _numeric_arg(tokens[i + 1:brackets[i]])):
+                        and not (_time_call(tokens, i - 1) and _signed_number(tokens[i + 1:brackets[i]])):
                     say("the quantity")  # f(2x + 6): where the argument ends
                     paren_ctx[-1] = "callq"
             elif i and (tokens[i - 1][0] == "sub" or tokens[i - 1][1] in ("'", "′", "⁻¹")) or (

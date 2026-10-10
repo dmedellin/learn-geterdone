@@ -72,7 +72,7 @@ SPOKEN = {
     "(eᵗ)′ = eᵗ": "the derivative of e to the power t equals e to the power t",
     "(bᵗ)′ = bᵗ": "the derivative of b to the power t equals b to the power t",
     "(bᵗ)′ = (a constant)·bᵗ": "the derivative of b to the power t equals a constant times b to the power t",
-    "(bᵗ)′ = bᵗ·(a constant); e makes it 1": "the derivative of b to the power t equals b to the power t times a constant; e makes it 1",
+    "(bᵗ)′ = bᵗ·(a constant); e makes it 1": "the derivative of b to the power t equals b to the power t times a constant, and e makes it 1",
 
     # Accumulation and the Integral
     "dt": "d t",

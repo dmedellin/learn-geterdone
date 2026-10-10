@@ -140,7 +140,9 @@ READINGS = {
     "y(tₙ)": "y of t sub n",
     "y(t + h)": "y of the quantity t plus h",
     "u(t − c)": "u of the quantity t minus c",
-    "y(1/2)": "y of 1 over 2",
+    # ...but a fraction keeps "the quantity": "y of 1 over 2" is also y(1)/2
+    "y(1/2)": "y of the quantity 1 over 2",
+    "f(3/2) = 9/4": "f of the quantity 3 over 2, equals 9 over 4",
     "f(−1) = −3": "f of negative 1 equals negative 3",
     # ...and the shapes that stay products
     "y(y − 2)": "y times the quantity y minus 2",
