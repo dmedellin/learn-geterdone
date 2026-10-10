@@ -273,9 +273,17 @@ class TheDerivedDataIsCurrent(unittest.TestCase):
     difference. The sources are downloaded (docs/english-v2/measure/fetch.sh)
     and never committed, so without them the check is skipped, loudly."""
 
+    # The SCOWL word list every script spells against is the system's
+    # /usr/share/dict/american-english (the wamerican package). A CI runner
+    # without it cannot rebuild the data, so the check is skipped there,
+    # loudly, as the downloaded sources are.
+    DICTIONARY = Path("/usr/share/dict/american-english")
+
     def check(self, script, needs_sources=True):
         if needs_sources and not (SOURCES / "cmudict.dict").exists():
             self.skipTest("the pinned sources are not in %s; run fetch.sh" % SOURCES)
+        if not self.DICTIONARY.exists():
+            self.skipTest("%s is not installed (the wamerican package)" % self.DICTIONARY)
         run = subprocess.run([sys.executable, str(WORDLISTS / script), "--check"],
                              capture_output=True, text=True, timeout=120)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
