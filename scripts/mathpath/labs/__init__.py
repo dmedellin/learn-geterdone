@@ -8,6 +8,8 @@ same control.
 
 from . import (
     algebra_basics,
+    calckit,
+    dekit,
     argkit,
     choicekit,
     algebra_equations,
@@ -161,6 +163,8 @@ REGISTRY = {
     "geometry": geometry.geometry_lab,
     "argkit": argkit.argkit_lab,
     "choicekit": choicekit.choicekit_lab,
+    "calckit": calckit.calckit_lab,
+    "dekit": dekit.dekit_lab,
 }
 
 
