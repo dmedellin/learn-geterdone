@@ -78,6 +78,7 @@ missing, malformed, timed-out, or unexpectedly redirected response is a failure.
 from __future__ import annotations
 
 import argparse
+import html
 import http.client
 import json
 from html.parser import HTMLParser
@@ -1457,6 +1458,153 @@ ENG_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Differential Equations, same shape. One course title carries an apostrophe,
+# which the renderer writes as &#x27;, so the markers carry the title as the
+# page escapes it rather than as it is spelt here.
+DE_PATH_PAGE_PATH = "/paths/differential-equations/"
+DE_MATERIAL_MARKER = "exact arithmetic applied to an approximate method"
+DE_COURSES = (
+    ("rates-of-change-and-the-derivative", "Rates of Change and the Derivative", (
+        "average-rate-of-change",
+        "the-quotient-as-a-polynomial-in-h",
+        "what-the-quotients-approach",
+        "the-derivative-at-a-point",
+        "the-derivative-of-one-over-t",
+        "the-derivative-as-a-function",
+        "where-the-rate-is-zero",
+        "the-product-rule",
+        "the-chain-rule",
+        "the-second-derivative",
+        "the-exponential-and-its-rate",
+    )),
+    ("accumulation-and-the-integral", "Accumulation and the Integral", (
+        "total-change-from-a-rate",
+        "left-and-right-sums",
+        "refining-the-partition",
+        "trapezoid-and-midpoint-rules",
+        "the-antiderivative-and-the-fundamental-theorem",
+        "the-constant-of-integration",
+        "the-integral-sign-and-its-rules",
+        "the-integral-of-one-over-t",
+    )),
+    ("differential-equations-and-eulers-method", "Differential Equations and Euler's Method", (
+        "what-a-differential-equation-is",
+        "checking-a-proposed-solution",
+        "initial-value-problems",
+        "slope-fields",
+        "reading-a-slope-field",
+        "eulers-method",
+        "eulers-error-and-the-step-size",
+        "the-improved-euler-method",
+        "runge-kutta-four-slopes-per-step",
+        "blow-up-and-the-interval-of-existence",
+    )),
+    ("separable-equations-growth-and-decay", "Separable Equations, Growth and Decay", (
+        "separable-equations",
+        "why-separation-works",
+        "implicit-and-explicit-solutions",
+        "exponential-growth",
+        "doubling-time-and-half-life",
+        "radioactive-decay-and-dating",
+        "newtons-law-of-cooling",
+        "mixing-problems",
+        "logistic-growth",
+        "harvesting-and-the-threshold",
+    )),
+    ("equilibria-stability-and-phase-lines", "Equilibria, Stability and Phase Lines", (
+        "autonomous-equations",
+        "the-phase-line",
+        "stable-unstable-and-semistable",
+        "linearisation-and-the-sign-of-f-prime",
+        "long-run-behaviour-without-solving",
+        "one-parameter-families",
+        "bifurcation-diagrams",
+        "sketching-solutions-from-the-phase-line",
+    )),
+    ("first-order-linear-equations", "First-Order Linear Equations", (
+        "the-standard-form",
+        "constant-coefficients-and-the-steady-state",
+        "the-integrating-factor",
+        "homogeneous-plus-particular",
+        "polynomial-forcing",
+        "exponential-and-sinusoidal-forcing",
+        "circuits-tanks-and-loans",
+        "stiffness-when-the-step-is-too-big",
+    )),
+    ("second-order-linear-equations", "Second-Order Linear Equations", (
+        "sine-cosine-and-their-rates",
+        "the-second-order-equation",
+        "the-characteristic-equation",
+        "real-distinct-roots",
+        "repeated-roots",
+        "complex-roots-and-oscillation",
+        "fitting-the-initial-conditions",
+        "superposition-and-the-wronskian",
+        "from-second-order-to-a-system",
+        "euler-on-an-oscillator",
+    )),
+    ("oscillators-damping-and-resonance", "Oscillators, Damping and Resonance", (
+        "the-mass-spring-model",
+        "amplitude-phase-and-period",
+        "energy-and-the-phase-ellipse",
+        "overdamped-critical-and-underdamped",
+        "underdamped-motion-and-the-envelope",
+        "critical-damping-and-design",
+        "forced-oscillation",
+        "resonance-and-beats",
+        "damped-forcing-and-the-amplitude-curve",
+    )),
+    ("systems-and-the-phase-plane", "Systems and the Phase Plane", (
+        "systems-of-two-equations",
+        "straight-line-solutions-and-eigenvectors",
+        "the-general-solution-of-a-linear-system",
+        "saddles-nodes-spirals-and-centres",
+        "stability-of-the-origin",
+        "nonlinear-systems-and-equilibria",
+        "linearisation-and-the-jacobian",
+        "predator-and-prey",
+        "competing-species",
+        "an-epidemic-model",
+    )),
+    ("laplace-transforms", "Laplace Transforms", (
+        "the-laplace-transform",
+        "linearity-and-the-table",
+        "the-transform-of-a-derivative",
+        "solving-an-initial-value-problem",
+        "partial-fractions-exactly",
+        "the-transfer-function-and-its-poles",
+        "the-unit-step-and-switched-forcing",
+        "three-methods-one-equation",
+    )),
+)
+
+DE_PATH_PAGE_MARKERS = (
+    canonical_marker(DE_PATH_PAGE_PATH),
+    html.escape(DE_COURSES[0][1]),
+    html.escape(DE_COURSES[-1][1]),
+    'href="../../%s/"' % DE_COURSES[-1][0],
+)
+
+DE_COURSE_HOMES = tuple(
+    (
+        "de-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, DE_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(DE_COURSES, start=1)
+)
+
+DE_COURSE_LESSONS = tuple(
+    (
+        "de-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), DE_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(DE_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1552,6 +1700,7 @@ def path_page_targets(args):
         ("or-path", OR_PATH_PAGE_PATH, OR_PATH_PAGE_MARKERS),
         ("phil-path", PHIL_PATH_PAGE_PATH, PHIL_PATH_PAGE_MARKERS),
         ("eng-path", ENG_PATH_PAGE_PATH, ENG_PATH_PAGE_MARKERS),
+        ("de-path", DE_PATH_PAGE_PATH, DE_PATH_PAGE_MARKERS),
     ]
 
 
@@ -1574,7 +1723,8 @@ def course_home_targets(args):
                                     + ALGEBRA_COURSE_HOMES + SYSDESIGN_COURSE_HOMES
                                     + ALGO_COURSE_HOMES + OR_COURSE_HOMES
                                     + PHIL_COURSE_HOMES
-                                    + ENG_COURSE_HOMES):
+                                    + ENG_COURSE_HOMES
+                                    + DE_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -1612,6 +1762,7 @@ def lesson_targets(args):
         + OR_COURSE_LESSONS
         + PHIL_COURSE_LESSONS
         + ENG_COURSE_LESSONS
+        + DE_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

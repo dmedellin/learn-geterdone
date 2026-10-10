@@ -14,6 +14,7 @@ const PAGES = [
   ['generated', '/sequences-and-series/infinite-geometric-series/'],
   ['generated', '/arguments-and-validity/validity-by-truth-table/'],
   ['generated', '/listening/why-it-sounds-too-fast/'],
+  ['generated', '/differential-equations-and-eulers-method/eulers-method/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];
