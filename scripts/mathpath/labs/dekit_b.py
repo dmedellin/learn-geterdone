@@ -1121,7 +1121,7 @@ def _oscillator(cfg):
     pick = dc.chosen(found, cfg, KIT, mode)
     first = table[str(pick["id"])]
     tiles = [("Motion", "osType"), ("c² − 4mk", "osDisc"), ("ω₀² = k/m", "osOmega0Sq"), ("ω₀", "osOmega0"),
-             ("Period, or beat period when forced", "osPeriod"), ("Amplitude squared A²", "osAmpSq"),
+             ("Undamped period 2π/ω₀, or beat period when forced", "osPeriod"), ("Amplitude squared A²", "osAmpSq"),
              ("Amplitude A", "osAmp"), ("Phase φ", "osPhase"), ("Critical damping c_crit = 2√(mk)", "osCcrit"),
              ("Pseudo-frequency squared", "osOmegaD"), ("Envelope", "osEnvelope"),
              ("Forced response", "osForced"), ("Resonant frequency", "osResonant"),

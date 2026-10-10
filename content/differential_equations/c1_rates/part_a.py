@@ -440,8 +440,8 @@ LESSONS = [
         "summary": (
             "A column of exact quotients for halving steps gets closer to one number, and the "
             "gap to it shrinks with the step. That number is what the rate at the place "
-            "means. The claim is about every step, not the rows on the page, and no row of a "
-            "table is ever equal to the number it heads for. For a polynomial the claim is "
+            "means. The claim is about every step, not the rows on the page, and a row of the "
+            "table need not equal the number it heads for. For a polynomial the claim is "
             "backed by the algebra of the previous lesson."
         ),
         "key": [
