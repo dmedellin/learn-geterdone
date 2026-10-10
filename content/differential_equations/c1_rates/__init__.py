@@ -18,7 +18,7 @@ COURSE = {
         "itself a multiple of the function."
     ),
     "blurb": (
-        "Every differential equation on this path is a sentence about a rate, so the rate "
+        "Every differential equation in this Subject is a sentence about a rate, so the rate "
         "has to be something you can compute and not only something you can recite. Here it "
         "is computed first and named second. The average rate of change over `[a, a + h]` is "
         "a fraction, and the lab prints it as one for a column of halving steps; the "
