@@ -187,4 +187,650 @@ var vbPct2 = function (hit, total) {
 };
 """
 
-__all__ = ["ENGLISH_VERB_JS"]
+
+
+# ---------------------------------------------------------------------------
+# The second instalment's rules (docs/english-v2/PLAN.md section D). Each is a
+# pure function over the printed data that returns the tiles a page writes,
+# so scripts/wordlists/english_check.js can run the shipped code under node
+# and print every figure a preset pins without a browser.
+# ---------------------------------------------------------------------------
+
+# The tokeniser every concordance mode shares. The typographic apostrophes
+# U+2018 and U+2019 are written as ' before matching, so I don't know is read
+# as don't and not as don; an apostrophe left hanging at the end of a word (a
+# closing quotation mark, the plural possessive Bennets') is taken off.
+# tokensOf also keeps digit runs, for the years of the time lines.
+SCAN_JS = r"""
+var normApos = function (s) { return String(s).replace(/[‘’]/g, '\''); };
+var trimApos = function (a) {
+  var i;
+  for (i = 0; i < a.length; i++) a[i] = a[i].replace(/'+$/, '');
+  return a;
+};
+var wordsOf = function (s) { return trimApos(normApos(s).match(/[A-Za-z][A-Za-z']*/g) || []); };
+var tokensOf = function (s) { return trimApos(normApos(s).match(/[A-Za-z][A-Za-z']*|[0-9]+/g) || []); };
+var lower = function (a) {
+  var o = [], i;
+  for (i = 0; i < a.length; i++) o.push(a[i].toLowerCase());
+  return o;
+};
+var inSet = function (set, w) { return Object.prototype.hasOwnProperty.call(set, w); };
+var setOf = function (list) {
+  var o = {}, i;
+  for (i = 0; i < list.length; i++) o[list[i]] = true;
+  return o;
+};
+/* A share printed to one decimal place, worked in whole numbers so the figure
+   on the page is exactly the division and not a floating-point artefact. */
+var commas = function (n) {
+  var t = String(n);
+  while (/\d{4}/.test(t)) t = t.replace(/(\d)(\d{3})(?!\d)/, '$1,$2');
+  return t;
+};
+var share1 = function (hit, total) {
+  if (!total) return '0.0%';
+  var t = Math.round(hit * 1000 / total);
+  return Math.floor(t / 10) + '.' + (t % 10) + '%';
+};
+var ofN = function (a, b) { return a + ' of ' + b; };
+/* A list tile: the words in list order, one entry per word, with how many
+   times it came up where that is more than once. */
+var listTile = function (words) {
+  var seen = {}, order = [], i, out = [];
+  for (i = 0; i < words.length; i++) {
+    if (!inSet(seen, words[i])) { seen[words[i]] = 0; order.push(words[i]); }
+    seen[words[i]]++;
+  }
+  for (i = 0; i < order.length; i++) out.push(order[i] + (seen[order[i]] > 1 ? ' (' + seen[order[i]] + ')' : ''));
+  return out.length ? out.join(', ') : 'none';
+};
+/* Rows stored as one string: rows split by |, fields by a space, spellings by
+   /, and a leading ~ standing for the row's first field. */
+var decodeRows = function (text) {
+  var rows = [], parts = text ? text.split('|') : [], i, f, k, j, forms;
+  for (i = 0; i < parts.length; i++) {
+    f = parts[i].split(' ');
+    for (k = 1; k < f.length; k++) {
+      forms = f[k].split('/');
+      for (j = 0; j < forms.length; j++) {
+        if (forms[j].charAt(0) === '~') forms[j] = f[0] + forms[j].slice(1);
+      }
+      f[k] = forms;
+    }
+    rows.push(f);
+  }
+  return rows;
+};
+"""
+
+# endings -- how -ed and -s are said, from the last sound of the word.
+ENDINGS_JS = r"""
+var EN_VOICELESS = setOf(['p', 'k', 'f', 'θ', 's', 'ʃ', 'tʃ', 't']);
+var EN_HISS = setOf(['s', 'z', 'ʃ', 'ʒ', 'tʃ', 'dʒ']);
+/* The class of a last sound, as the lesson names it. */
+var enClass = function (ph, rule) {
+  if (rule === 'ed' && (ph === 't' || ph === 'd')) return 't or d';
+  if (rule !== 'ed' && inSet(EN_HISS, ph)) return 'a hissing sound';
+  if (inSet(EN_VOICELESS, ph)) return 'voiceless';
+  return 'voiced';
+};
+var enEdSound = function (ph) {
+  if (ph === 't' || ph === 'd') return 'id';
+  return inSet(EN_VOICELESS, ph) ? 't' : 'd';
+};
+var enSSound = function (ph) {
+  if (inSet(EN_HISS, ph)) return 'iz';
+  return inSet(EN_VOICELESS, ph) ? 's' : 'z';
+};
+var EN_RULES = {
+  ed: ['-ed is id after t or d, t after another voiceless sound, d after a voiced one', 'ed'],
+  s: ['-s is iz after a hissing sound, s after another voiceless sound, z after a voiced one', 's'],
+  plural: ['the same -s rule, on the plurals of nouns', 'plural']
+};
+/* rows: [word, [form], last sound, the sound the dictionary gives the form]. */
+var enScore = function (data, rule) {
+  var rows = decodeRows(data[EN_RULES[rule][1]]), fn = rule === 'ed' ? enEdSound : enSSound;
+  var hit = 0, miss = [], all = [], i, r, says;
+  for (i = 0; i < rows.length; i++) {
+    r = rows[i];
+    says = fn(r[2][0]);
+    all.push({ word: r[0], form: r[1][0], last: r[2][0], cls: enClass(r[2][0], rule),
+               rule: says, dict: r[3][0], ok: says === r[3][0] });
+    if (says === r[3][0]) hit++; else miss.push(all[all.length - 1]);
+  }
+  return { hit: hit, total: rows.length, miss: miss, all: all };
+};
+var enTiles = function (data, rule) {
+  var res = enScore(data, rule), names = [], i;
+  for (i = 0; i < res.miss.length; i++) names.push(res.miss[i].form);
+  return {
+    enRule: EN_RULES[rule][0],
+    enHit: ofN(res.hit, res.total),
+    enPct: share1(res.hit, res.total),
+    enMiss: String(res.miss.length),
+    enFirst: names.length ? names.join(', ') : 'none',
+    enSkipped: String(Object.keys(data.skipped[EN_RULES[rule][1]]).length)
+  };
+};
+/* What the page says about one typed word, or why it cannot say anything. */
+var enWordSays = function (data, rule, typed) {
+  var w = String(typed || '').replace(/^\s+|\s+$/g, '').toLowerCase(), res, i;
+  if (!w) return 'type a word from the list, such as walk';
+  if (!/^[a-z]+$/.test(w)) return 'not one word: type a single word in letters, such as walk';
+  res = enScore(data, rule);
+  for (i = 0; i < res.all.length; i++) {
+    if (res.all[i].word === w || res.all[i].form === w) {
+      return res.all[i].word + ' ends in ' + res.all[i].last + ' (' + res.all[i].cls
+        + '), so the rule says ' + res.all[i].form + ' ends in ' + res.all[i].rule
+        + '; the dictionary says ' + res.all[i].dict;
+    }
+  }
+  if (inSet(data.skipped[EN_RULES[rule][1]], w)) return w + ': ' + data.skipped[EN_RULES[rule][1]][w] + ', so the page cannot hear it';
+  return 'not on the printed list: the page cannot hear it';
+};
+"""
+
+# wordrule -- a spelling rule scored on a word list against the forms a
+# dictionary confirms: noun plurals, and -ly adverbs.
+WORDRULE_JS = r"""
+var plR0 = function (w) {
+  if (/(s|sh|ch|x|z)$/.test(w)) return w + 'es';
+  if (/[^aeiou]y$/.test(w)) return w.slice(0, -1) + 'ies';
+  return w + 's';
+};
+var plR1 = function (w) {
+  if (/[^aeiou]o$/.test(w)) return w + 'es';
+  return plR0(w);
+};
+/* The refuted rule: f or fe becomes ves, as in vbThirdWithVes. */
+var plR2 = function (w) {
+  if (/(?:[^f]f|fe)$/.test(w)) return w.replace(/fe?$/, 'ves');
+  return plR1(w);
+};
+/* ves only for the short list the lesson can name. */
+var plR3 = function (w) {
+  if (/(lf|ife|eaf|olf)$/.test(w)) return w.replace(/fe?$/, 'ves');
+  return plR1(w);
+};
+var lyPlain = function (w) { return w + 'ly'; };
+var lyChanges = function (w) {
+  if (/ic$/.test(w) && w !== 'public') return w + 'ally';
+  if (/ll$/.test(w)) return w + 'y';
+  if (/[^aeiou]le$/.test(w) && w.length > 3) return w.slice(0, -1) + 'y';
+  if (/ue$/.test(w)) return w.slice(0, -1) + 'ly';
+  if (/[^aeiou]y$/.test(w)) return w.slice(0, -1) + 'ily';
+  return w + 'ly';
+};
+var WR_RULES = {
+  r0: [plR0, '-s; -es after s, sh, ch, x or z; a consonant then -y becomes -ies'],
+  r1: [plR1, 'the same, and a consonant then -o takes -es'],
+  r2: [plR2, 'the same as the -o rule, and f or fe becomes -ves'],
+  r3: [plR3, 'the same as the -o rule, and -ves only after -lf, -ife, -eaf, -olf'],
+  plain: [lyPlain, 'add -ly to the adjective'],
+  changes: [lyChanges, '-ly, with -y to -ily, -le to -ly, -ic to -ically, -ue to -uly, -ll to -lly']
+};
+var wrScore = function (data, rule) {
+  var rows = decodeRows(data.rows), fn = WR_RULES[rule][0], hit = 0, miss = [], all = [], i, said;
+  for (i = 0; i < rows.length; i++) {
+    said = fn(rows[i][0]);
+    all.push({ word: rows[i][0], said: said, list: rows[i][1], ok: rows[i][1].indexOf(said) >= 0 });
+    if (all[i].ok) hit++; else miss.push(all[i]);
+  }
+  return { hit: hit, total: rows.length, miss: miss, all: all };
+};
+var wrNoneList = function (data) { return data.noplural || data.none || []; };
+var wrTiles = function (data, rule) {
+  var res = wrScore(data, rule), names = [], i, none = wrNoneList(data);
+  for (i = 0; i < res.miss.length; i++) names.push(res.miss[i].word);
+  return {
+    wrRule: WR_RULES[rule][1],
+    wrHit: ofN(res.hit, res.total),
+    wrPct: share1(res.hit, res.total),
+    wrMiss: String(res.miss.length),
+    wrFirst: names.length ? names.join(', ') : 'none',
+    wrNone: String(none.length),
+    wrNoneOf: ofN(none.length, data.noplural ? data.noun_only : res.total + none.length)
+  };
+};
+"""
+
+# an -- a or an, by the next letter and by the next sound.
+AN_JS = r"""
+var AN_SOURCES = { all: ['w', 'm', 'p'], wilde: ['w'], modern: ['m'], passage: ['p'] };
+var anRows = function (rows, source) {
+  var want = setOf(AN_SOURCES[source] || AN_SOURCES.all), out = [], i;
+  for (i = 0; i < rows.length; i++) if (inSet(want, rows[i][0])) out.push(rows[i]);
+  return out;
+};
+/* What the rule says the article should be. null: the next word is not in
+   the dictionary, so the sound rule cannot be run and neither rule is scored. */
+var anSays = function (rule, next, sounds) {
+  var w = next.toLowerCase();
+  if (!inSet(sounds, w)) return null;
+  if (rule === 'letter') return /^[aeiou]/.test(w) ? 'an' : 'a';
+  return sounds[w].charAt(0) === 'V' ? 'an' : 'a';
+};
+var anScore = function (rows, sounds, rule, source) {
+  var lines = anRows(rows, source), hit = 0, miss = [], unknown = [], all = [], i, says, used;
+  for (i = 0; i < lines.length; i++) {
+    used = lines[i][2].toLowerCase();
+    says = anSays(rule, lines[i][3], sounds);
+    if (says === null) { unknown.push(lines[i][3]); all.push({ line: lines[i], says: null }); continue; }
+    all.push({ line: lines[i], says: says, ok: says === used });
+    if (says === used) hit++; else miss.push(lines[i][2] + ' ' + lines[i][3]);
+  }
+  return { hit: hit, scored: hit + miss.length, lines: lines.length, miss: miss, unknown: unknown, all: all };
+};
+var anTiles = function (rows, sounds, rule, source) {
+  var res = anScore(rows, sounds, rule, source);
+  return {
+    anRule: rule === 'letter' ? 'an before a vowel letter, a before any other'
+                              : 'an before a vowel sound, a before any other',
+    anN: ofN(res.scored, res.lines),
+    anHit: ofN(res.hit, res.scored),
+    anPct: share1(res.hit, res.scored),
+    anMiss: String(res.miss.length),
+    anFirst: listTile(res.miss),
+    anUnknown: listTile(res.unknown)
+  };
+};
+"""
+
+# the_super -- what stands before a superlative, same, next, most + adjective.
+SUPER_JS = r"""
+var TS_POSS = setOf(['my', 'your', 'his', 'her', 'its', 'our', 'their']);
+var TS_LABELS = { the: 'the', poss: 'a possessive', a: 'a or an', atvery: 'at or very', other: 'something else' };
+var tsClass = function (before) {
+  var w = lower(wordsOf(before)), p = w.length ? w[w.length - 1] : '';
+  if (p === 'the') return 'the';
+  if (inSet(TS_POSS, p) || /'s$/.test(p)) return 'poss';
+  if (p === 'a' || p === 'an') return 'a';
+  if (p === 'at' || p === 'very') return 'atvery';
+  return 'other';
+};
+var tsScore = function (rows, kind) {
+  var n = { the: 0, poss: 0, a: 0, atvery: 0, other: 0 }, all = [], i, c, total = 0;
+  for (i = 0; i < rows.length; i++) {
+    if (rows[i][0] !== kind) continue;
+    c = tsClass(rows[i][1]);
+    n[c]++; total++;
+    all.push({ row: rows[i], cls: c, ok: c === 'the' || c === 'poss' });
+  }
+  return { n: n, total: total, all: all };
+};
+var tsTiles = function (rows, kind) {
+  var r = tsScore(rows, kind), hit = r.n.the + r.n.poss;
+  return {
+    tsN: String(r.total),
+    tsHit: ofN(hit, r.total),
+    tsPct: share1(hit, r.total),
+    tsThe: String(r.n.the),
+    tsPoss: String(r.n.poss),
+    tsA: String(r.n.a),
+    tsOther: String(r.n.other + r.n.atvery)
+  };
+};
+"""
+
+# time_preps -- in, on or at before a time word.
+TIME_JS = r"""
+var TP_DAYS = setOf(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+var TP_MONTHS = setOf(['january', 'february', 'march', 'april', 'june', 'july', 'august',
+                       'september', 'october', 'november', 'december']);
+var TP_SEASONS = setOf(['spring', 'summer', 'autumn', 'winter']);
+var TP_PARTS = setOf(['morning', 'afternoon', 'evening']);
+var TP_POINTS = setOf(['night', 'noon', 'midnight']);
+var TP_FEASTS = setOf(['christmas', 'easter', 'michaelmas']);
+var TP_PARTICULAR = setOf(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
+                           'sunday', 'following', 'very', 'third', 'next', 'same', 'that']);
+var TP_KINDS = ['day', 'month', 'year', 'season', 'part of the day', 'night, noon or midnight',
+                'festival', 'clock time'];
+var tpKind = function (word) {
+  var w = String(word).toLowerCase();
+  if (inSet(TP_DAYS, w)) return 'day';
+  if (inSet(TP_MONTHS, w)) return 'month';
+  if (/^(1[5-9][0-9][0-9]|20[0-9][0-9])$/.test(w)) return 'year';
+  if (inSet(TP_SEASONS, w)) return 'season';
+  if (inSet(TP_PARTS, w)) return 'part of the day';
+  if (inSet(TP_POINTS, w)) return 'night, noon or midnight';
+  if (inSet(TP_FEASTS, w)) return 'festival';
+  if (w === 'o\'clock') return 'clock time';
+  return '';
+};
+/* The rule: on a day; in a month, a year, a season; in the morning,
+   afternoon or evening unless the words between name a particular day, then
+   on; at night, noon, midnight, a festival and a clock time. */
+var tpRule = function (kind, between) {
+  var w = lower(tokensOf(between)), i;
+  if (kind === 'day') return 'on';
+  if (kind === 'part of the day') {
+    for (i = 0; i < w.length; i++) if (inSet(TP_PARTICULAR, w[i])) return 'on';
+    return 'in';
+  }
+  if (kind === 'month' || kind === 'year' || kind === 'season') return 'in';
+  return 'at';
+};
+var TP_SOURCES = { all: ['a', 'w', 'm'], austen: ['a'], wilde: ['w'], modern: ['m'] };
+var tpScore = function (rows, source) {
+  var want = setOf(TP_SOURCES[source] || TP_SOURCES.all), all = [], miss = [], hit = 0, i, r, k, says;
+  var byKind = {};
+  for (i = 0; i < TP_KINDS.length; i++) byKind[TP_KINDS[i]] = { n: 0, hit: 0 };
+  for (i = 0; i < rows.length; i++) {
+    r = rows[i];
+    if (!inSet(want, r[0])) continue;
+    k = tpKind(r[3]);
+    if (!k) continue;
+    says = tpRule(k, r[2]);
+    all.push({ row: r, kind: k, says: says, ok: says === r[1] });
+    byKind[k].n++;
+    if (says === r[1]) { hit++; byKind[k].hit++; }
+    else miss.push(r[1] + ' ' + (r[2] ? r[2] + ' ' : '') + r[3]);
+  }
+  return { hit: hit, total: all.length, miss: miss, all: all, byKind: byKind };
+};
+var tpTiles = function (rows, source) {
+  var r = tpScore(rows, source);
+  return {
+    tpN: String(r.total),
+    tpHit: ofN(r.hit, r.total),
+    tpPct: share1(r.hit, r.total),
+    tpMiss: String(r.miss.length),
+    tpFirst: listTile(r.miss)
+  };
+};
+"""
+
+# questions -- the question rule and the five things a question that breaks
+# it starts with.
+QUESTION_JS = r"""
+var QU_AUX = setOf(['is', 'are', 'was', 'were', 'be', 'am', 'have', 'has', 'had', 'do', 'does',
+                    'did', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might',
+                    'must', 'cannot']);
+var QU_WH = setOf(['what', 'where', 'when', 'why', 'who', 'whom', 'whose', 'how', 'which']);
+var QU_CONN = setOf(['and', 'but', 'or', 'so', 'yet', 'for', 'then']);
+var QU_ADDR = setOf(['oh', 'well', 'pray', 'dear']);
+var QU_PRON = setOf(['i', 'you', 'he', 'she', 'it', 'we', 'they']);
+var QU_HOLDS = 'holds';
+var QU_VERDICTS = {
+  wh: 'a wh-word with no helping verb after it',
+  conn: 'starts with a joining word',
+  addr: 'a word of address first',
+  stmt: 'a pronoun first: a statement with a question mark',
+  frag: 'no verb at all',
+  other: 'something else'
+};
+var quIsAux = function (w) { return inSet(QU_AUX, w) || /n't$/.test(w); };
+var quVerdict = function (q, verbs, cast) {
+  var raw = wordsOf(q), lw = lower(raw), i, lead;
+  if (!lw.length) return '';
+  if (quIsAux(lw[0])) return QU_HOLDS;
+  if (inSet(QU_WH, lw[0]) && lw.length > 1 && quIsAux(lw[1])) return QU_HOLDS;
+  if (inSet(QU_WH, lw[0])) return 'wh';
+  if (inSet(QU_CONN, lw[0])) return 'conn';
+  /* A name from the play's cast list, after at most a title, then a comma. */
+  lead = /^[^A-Za-z]*(?:(?:Mr|Mrs|Miss|Dr|Lady|Uncle|Aunt)\.? )?([A-Za-z]+)\s*,/.exec(normApos(q));
+  if (inSet(QU_ADDR, lw[0]) || (lw[0] === 'my' && lw[1] === 'dear')
+      || (lead && inSet(cast, lead[1]))) return 'addr';
+  if (inSet(QU_PRON, lw[0])) return 'stmt';
+  for (i = 0; i < lw.length; i++) if (quIsAux(lw[i]) || inSet(verbs, lw[i])) return 'other';
+  return 'frag';
+};
+var quScore = function (data) {
+  var verbs = setOf(data.verbs || []), cast = setOf(data.cast || []), n = {}, rows = [], i, v, k;
+  for (k in QU_VERDICTS) if (inSet(QU_VERDICTS, k)) n[k] = 0;
+  n.holds = 0;
+  for (i = 0; i < data.questions.length; i++) {
+    v = quVerdict(data.questions[i], verbs, cast);
+    if (!v) continue;
+    n[v]++;
+    rows.push([data.questions[i], v === QU_HOLDS ? QU_HOLDS : QU_VERDICTS[v]]);
+  }
+  return { n: n, rows: rows };
+};
+var quTiles = function (data) {
+  var r = quScore(data), total = r.rows.length, misses = total - r.n.holds;
+  return {
+    quHit: ofN(r.n.holds, total),
+    quPct: share1(r.n.holds, total),
+    quConn: String(r.n.conn),
+    quConnPct: r.n.conn + ' of ' + misses + ', ' + share1(r.n.conn, misses),
+    quWh: String(r.n.wh),
+    quAddr: String(r.n.addr),
+    quStmt: String(r.n.stmt),
+    quFrag: String(r.n.frag),
+    quOther: String(r.n.other)
+  };
+};
+"""
+
+# auxchain -- six rules about helping verbs, on one printed chapter.
+AUX_JS = r"""
+var AX_MODAL = setOf(['can', 'could', 'may', 'might', 'must', 'shall', 'should', 'will', 'would']);
+var AX_BE = setOf(['am', 'is', 'are', 'was', 'were', 'be', 'been', 'being']);
+var AX_HAVE = setOf(['have', 'has', 'had', 'having']);
+var AX_DO = setOf(['do', 'does', 'did']);
+var AX_SUBJ = setOf(['i', 'you', 'he', 'she', 'it', 'we', 'they']);
+var AX_OBJ = setOf(['me', 'him', 'her', 'us', 'them']);
+var AX_DET = setOf(['a', 'an', 'the', 'no', 'my', 'your', 'his', 'her', 'its', 'our', 'their',
+  'some', 'any', 'much', 'many', 'more', 'most', 'little', 'few', 'every', 'each', 'this', 'that',
+  'these', 'those', 'such', 'what', 'which', 'all', 'both', 'another', 'other', 'one', 'two',
+  'three', 'several', 'nothing', 'something', 'anything', 'everything', 'great', 'good', 'very',
+  'so', 'too', 'half', 'enough']);
+var AX_PREP = setOf(['in', 'at', 'on', 'of', 'to', 'for', 'with', 'by', 'from', 'about', 'into',
+  'under', 'upon', 'over', 'near', 'out', 'up', 'down', 'off', 'away', 'here', 'there']);
+/* The adverbs the Word Order course lists, the degree and time adverbs the
+   skipping step passes over, and not. */
+var AX_ADV = setOf(['not', 'always', 'never', 'often', 'usually', 'sometimes', 'rarely', 'already',
+  'still', 'soon', 'ever', 'certainly', 'really', 'rather', 'quite', 'just', 'only', 'also', 'yet',
+  'even', 'scarcely', 'hardly', 'probably', 'perhaps', 'then', 'now', 'once', 'indeed', 'generally',
+  'almost', 'frequently', 'immediately', 'very', 'much']);
+var AX_JOIN = setOf(['or', 'and', 'but', 'if', 'whether', 'than', 'as', 'that', 'though']);
+var axClasses = function (data) {
+  var c = data.classes, o = {}, k;
+  for (k in c) if (inSet(c, k)) o[k] = setOf(c[k]);
+  o.sOnly = {};
+  for (k in o.third) if (inSet(o.third, k) && !inSet(o.base, k) && !inSet(o.past, k)) o.sOnly[k] = true;
+  o.sOnly.is = o.sOnly.has = o.sOnly.does = o.sOnly.was = true;
+  /* The adverbs the skipping step passes over: the listed ones, and the
+     words of the texts the Moby list tags only as adverbs. */
+  o.advs = {};
+  for (k in AX_ADV) if (inSet(AX_ADV, k)) o.advs[k] = true;
+  for (k in o.adv || {}) if (inSet(o.adv, k)) o.advs[k] = true;
+  return o;
+};
+var axHelper = function (w) { return inSet(AX_MODAL, w) || inSet(AX_BE, w) || inSet(AX_HAVE, w) || inSet(AX_DO, w); };
+/* Past not and the listed adverbs, at most two words; keep stops a word that
+   is also a verb form of the kind the rule is looking for. */
+var axSkip = function (lw, i, keep, C) {
+  var j = i + 1;
+  while (j < lw.length && j < i + 3 && inSet(C.advs, lw[j]) && !keep(lw[j])) j++;
+  return j;
+};
+var axRow = function (lw, i, j, verdict, hit) {
+  return { text: lw.slice(Math.max(0, i - 2), Math.min(lw.length, j + 2)).join(' '), verdict: verdict, hit: hit };
+};
+var axAgree = function (lw, C) {
+  var rows = [], hit = 0, scored = 0, broken = 0, n = 0, i, w, nxt, base, kind, ok;
+  for (i = 0; i + 1 < lw.length; i++) {
+    w = lw[i];
+    if (!inSet(AX_SUBJ, w)) continue;
+    n++; nxt = lw[i + 1];
+    base = inSet(C.base, nxt) && !inSet(C.past, nxt) && !inSet(AX_MODAL, nxt);
+    if (inSet(C.sOnly, nxt)) kind = 'third';
+    else if (nxt === 'are' || nxt === 'were' || nxt === 'have' || nxt === 'do') kind = 'plural';
+    else if (nxt === 'am') kind = 'am';
+    else if (base) kind = 'base';
+    else { rows.push(axRow(lw, i, i + 1, 'not a verb form the rule covers', null)); continue; }
+    scored++;
+    if (w === 'he' || w === 'she' || w === 'it') ok = kind === 'third';
+    else if (w === 'i') ok = nxt === 'am' || nxt === 'was' || nxt === 'have' || nxt === 'do' || kind === 'base';
+    else ok = kind === 'plural' || kind === 'base';
+    if (ok) hit++; else broken++;
+    rows.push(axRow(lw, i, i + 1, ok ? 'holds' : 'against the rule', ok));
+  }
+  return { tiles: { axN: String(n), axPairs: String(scored), axHit: ofN(hit, scored),
+                    axPct: share1(hit, scored), axBroken: String(broken) }, rows: rows };
+};
+var axModal = function (lw, C) {
+  var rows = [], n = 0, direct = 0, between = 0, q = 0, formed = 0, other = 0, i, j, t, v, h;
+  var bare = function (x) { return inSet(C.base, x) || inSet(AX_BE, x) || inSet(AX_HAVE, x) || inSet(AX_DO, x); };
+  var made = function (x) { return inSet(C.third, x) || inSet(C.past, x) || inSet(C.ing, x); };
+  for (i = 0; i + 1 < lw.length; i++) {
+    if (!inSet(AX_MODAL, lw[i])) continue;
+    n++; t = lw[i + 1]; j = i + 1; h = false;
+    if (bare(t)) { direct++; v = 'a bare verb next'; h = true; }
+    else if (inSet(AX_SUBJ, t)) { q++; v = 'a pronoun next: a question'; }
+    else if (inSet(C.advs, t)) {
+      j = axSkip(lw, i, function (x) { return inSet(C.base, x); }, C);
+      t = j < lw.length ? lw[j] : '';
+      if (bare(t)) { between++; v = 'not or an adverb, then a bare verb'; h = true; }
+      else if (inSet(AX_SUBJ, t)) { q++; v = 'a pronoun next: a question'; }
+      else if (made(t)) { formed++; v = 'a verb with an ending'; }
+      else { other++; v = 'something else'; }
+    }
+    else if (made(t)) { formed++; v = 'a verb with an ending'; }
+    else { other++; v = 'something else'; }
+    rows.push(axRow(lw, i, j, v, h));
+  }
+  return { tiles: { axN: String(n), axHit: ofN(direct + between, n), axPct: share1(direct + between, n),
+                    axBetween: String(between), axQ: String(q), axFormed: String(formed),
+                    axOther: String(other) }, rows: rows };
+};
+var axHave = function (lw, C) {
+  var rows = [], n = 0, perf = 0, to = 0, main = 0, q = 0, other = 0, i, j, t, v;
+  for (i = 0; i + 1 < lw.length; i++) {
+    if (!inSet(AX_HAVE, lw[i])) continue;
+    n++;
+    j = axSkip(lw, i, function (x) { return inSet(C.pp, x); }, C);
+    t = j < lw.length ? lw[j] : '';
+    if (inSet(C.pp, t) || t === 'been') { perf++; v = 'a participle: the helping verb'; }
+    else if (t === 'to') { to++; v = 'have to'; }
+    else if (inSet(AX_DET, t) || inSet(C.noun, t)) { main++; v = 'a noun phrase: the main verb'; }
+    else if (inSet(AX_SUBJ, t)) { q++; v = 'a pronoun next: a question'; }
+    else if (inSet(AX_OBJ, t)) { main++; v = 'a noun phrase: the main verb'; }
+    else { other++; v = 'something else'; }
+    rows.push(axRow(lw, i, j, v, v.indexOf('helping') >= 0));
+  }
+  return { tiles: { axN: String(n), axPerf: ofN(perf, n), axPct: share1(perf, n), axMain: ofN(main, n),
+                    axTo: String(to), axQ: String(q), axOther: String(other) }, rows: rows };
+};
+var axBe = function (lw, C) {
+  var rows = [], n = 0, k = { ing: 0, pp: 0, adj: 0, np: 0, prep: 0, q: 0, other: 0 }, i, j, t, v;
+  for (i = 0; i + 1 < lw.length; i++) {
+    if (!inSet(AX_BE, lw[i])) continue;
+    n++;
+    j = axSkip(lw, i, function (x) { return inSet(C.pp, x) || inSet(C.ing, x); }, C);
+    t = j < lw.length ? lw[j] : '';
+    if (inSet(C.ing, t)) { k.ing++; v = 'an -ing form'; }
+    else if (inSet(C.pp, t)) { k.pp++; v = 'a participle (passive, or an adjective)'; }
+    else if (inSet(C.adj, t)) { k.adj++; v = 'an adjective'; }
+    else if (inSet(AX_DET, t)) { k.np++; v = 'a noun phrase'; }
+    else if (inSet(AX_PREP, t)) { k.prep++; v = 'a preposition or a place word'; }
+    else if (inSet(AX_SUBJ, t)) { k.q++; v = 'a pronoun next: a question'; }
+    else if (inSet(C.noun, t)) { k.np++; v = 'a noun phrase'; }
+    else { k.other++; v = 'something else'; }
+    rows.push(axRow(lw, i, j, v, v === 'an -ing form'));
+  }
+  return { tiles: { axN: String(n), axIng: ofN(k.ing, n), axIngPct: share1(k.ing, n), axPP: ofN(k.pp, n),
+                    axAdj: String(k.adj), axNP: String(k.np), axPrep: String(k.prep), axQ: String(k.q),
+                    axOther: String(k.other) }, rows: rows };
+};
+var axNot = function (lw, C) {
+  var rows = [], n = 0, hit = 0, nt = 0, old = 0, q = 0, join = 0, other = 0, i, p, v, h;
+  var verb = function (x) { return inSet(C.base, x) || inSet(C.third, x) || inSet(C.past, x) || inSet(C.pp, x) || inSet(C.ing, x); };
+  for (i = 0; i < lw.length; i++) {
+    if (lw[i] !== 'not' && !/n't$/.test(lw[i])) continue;
+    n++; h = false;
+    if (/n't$/.test(lw[i])) { nt++; hit++; h = true; v = 'n\'t: on a helping verb'; }
+    else {
+      p = i ? lw[i - 1] : '';
+      if (axHelper(p)) { hit++; h = true; v = 'after a helping verb'; }
+      else if (inSet(AX_SUBJ, p) || inSet(AX_OBJ, p)) { q++; v = 'after a pronoun: a question'; }
+      else if (verb(p)) { old++; v = 'after a main verb: the old order'; }
+      else if (inSet(AX_JOIN, p)) { join++; v = 'after a joining word'; }
+      else { other++; v = 'something else'; }
+    }
+    rows.push(axRow(lw, i, i, v, h));
+  }
+  return { tiles: { axN: String(n), axHit: ofN(hit, n), axPct: share1(hit, n), axOld: String(old),
+                    axQ: String(q), axJoin: String(join), axOther: String(other), axNt: String(nt) },
+           rows: rows };
+};
+/* The twelve boxes and the rest, classified exactly as
+   docs/english-v2/measure/m_corpus.py classify_chain does. */
+var axChain = function (lw, i, C) {
+  var j = i + 1, c = [], t, main, mPP, mIng, mBase, rest;
+  while (j < lw.length && j < i + 6) {
+    t = lw[j];
+    if (t === 'not' || (inSet(C.advs, t) && !inSet(C.base, t) && !inSet(C.pp, t) && !inSet(C.ing, t))) { j++; continue; }
+    if (axHelper(t)) { c.push(t); j++; continue; }
+    break;
+  }
+  main = j < lw.length ? lw[j] : '';
+  mPP = inSet(C.pp, main); mIng = inSet(C.ing, main); mBase = inSet(C.base, main);
+  rest = c.slice(1).join(' ');
+  if (!c.length) {
+    if (inSet(C.sOnly, main) || (mBase && !inSet(C.past, main))) return ['present simple', j];
+    if (inSet(C.past, main)) return ['past simple', j];
+    return ['no verb found', j];
+  }
+  if (inSet(AX_MODAL, c[0])) {
+    if (rest === 'have' && mPP) return ['modal perfect', j];
+    if (rest === 'be' && mIng) return ['modal progressive', j];
+    if (rest === 'have been' && mIng) return ['modal perfect progressive', j];
+    if (rest === 'be' && mPP) return ['modal passive', j];
+    if (!rest && (mBase || main === 'be' || main === 'have' || main === 'do')) return ['modal simple (will, would, can)', j];
+    if (!rest && main === '') return ['modal, nothing after', j];
+    return ['modal, other', j];
+  }
+  if (inSet(AX_HAVE, c[0])) {
+    if (rest === 'been' && mIng) return [(c[0] === 'have' || c[0] === 'has' ? 'present' : 'past') + ' perfect progressive', j];
+    if (rest === 'been' && mPP) return ['perfect passive', j];
+    if (!rest && mPP) return [(c[0] === 'have' || c[0] === 'has' ? 'present' : 'past') + ' perfect', j];
+    if (!rest) return ['have as the main verb', j];
+    return ['have, other', j];
+  }
+  if (inSet(AX_BE, c[0])) {
+    if (c.length === 1 && mIng) return [(c[0] === 'am' || c[0] === 'is' || c[0] === 'are' ? 'present' : 'past') + ' progressive', j];
+    if (c.length === 1 && mPP) return ['be and a participle (passive, or an adjective)', j];
+    if (c.length === 1) return ['be as the main verb', j];
+    return ['be, other', j];
+  }
+  if (c.length === 1 && (mBase || main === 'not')) return [(c[0] !== 'did' ? 'present' : 'past') + ' simple with do', j];
+  return ['do, other', j];
+};
+var axBoxes = function (lw, C) {
+  var rows = [], n = 0, k = {}, i, r, b, simple = 0, prog = 0, perf = 0, modal = 0, pass = 0, none = 0;
+  for (i = 0; i + 1 < lw.length; i++) {
+    if (!inSet(AX_SUBJ, lw[i])) continue;
+    n++; r = axChain(lw, i, C); b = r[0];
+    k[b] = (k[b] || 0) + 1;
+    if (/simple/.test(b) && !/^modal/.test(b)) simple++;
+    if (/progressive/.test(b)) prog++;
+    if (/perfect/.test(b)) perf++;
+    if (/^modal/.test(b)) modal++;
+    if (/passive|participle/.test(b)) pass++;
+    if (b === 'no verb found') none++;
+    rows.push(axRow(lw, i, r[1], b, !/other|no verb|nothing/.test(b)));
+  }
+  var both = function (x) { return x + ' of ' + n + ', ' + share1(x, n); };
+  return { tiles: { axN: String(n), axSimple: both(simple), axProg: both(prog), axPerf: both(perf),
+                    axModal: both(modal), axPassive: both(pass), axNone: both(none) },
+           rows: rows, boxes: k };
+};
+var AX_RULES = {
+  agree: [axAgree, 'he, she and it take the -s form, is, has, does and was; I takes am; you, we and they take the plain form, are, were, have and do'],
+  modal: [axModal, 'after a modal the verb is bare: no -s, no -ed, no -ing'],
+  have: [axHave, 'have before a participle is the helping verb; before a noun phrase it is the main verb'],
+  be: [axBe, 'what follows a form of be'],
+  not: [axNot, 'not goes after the first helping verb'],
+  boxes: [axBoxes, 'every pronoun subject, sorted into the twelve boxes and the rest']
+};
+var axRun = function (rule, text, data) {
+  return AX_RULES[rule][0](lower(wordsOf(text)), axClasses(data));
+};
+"""
+
+__all__ = ["ENGLISH_VERB_JS", "SCAN_JS", "ENDINGS_JS", "WORDRULE_JS", "AN_JS", "SUPER_JS",
+           "TIME_JS", "QUESTION_JS", "AUX_JS"]

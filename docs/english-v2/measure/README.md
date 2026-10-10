@@ -26,3 +26,22 @@ These are design measurements, not the shipped computation. The kit engineer
 re-derives every figure from the page with `node scripts/labcheck.js
 --observe`, and the lessons state what the page prints. Where the two differ,
 the page wins and the plan is corrected, not the page.
+
+## The shipped data
+
+The files the pages read are not written by these scripts. They are written by
+committed scripts in `scripts/wordlists/` that read the same four sources from
+`data/` here (or `--sources DIR`), check each one's sha256 against the list
+above before using it, and have a `--check` mode that fails when a committed
+file is out of date:
+
+    /usr/bin/python3 scripts/wordlists/clean_nouns.py        # plural_nouns.json
+    /usr/bin/python3 scripts/wordlists/clean_adjectives.py   # ly_adjectives.json
+    /usr/bin/python3 scripts/wordlists/concordance.py        # content/english/data: the lines and the chapter
+    /usr/bin/python3 scripts/wordlists/sounds.py             # verb_sounds.json, an_sounds.json (after the two above)
+    node scripts/wordlists/english_check.js                  # every figure the new presets pin
+
+Where a shipped figure differs from a design figure in `PLAN.md`, the cause is
+in the script's docstring (a cut that now starts at a sentence boundary, a
+stoplist, the irregular-plural override); the page's figure is the one a lesson
+states.

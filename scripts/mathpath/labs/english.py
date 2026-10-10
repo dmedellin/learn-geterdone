@@ -29,10 +29,12 @@ import json
 import pathlib
 
 from .common import Lab, cfg_literal
-from .english_core import ENGLISH_VERB_JS
+from .english_core import (AN_JS, AUX_JS, ENDINGS_JS, ENGLISH_VERB_JS, QUESTION_JS, SCAN_JS,
+                           SUPER_JS, TIME_JS, WORDRULE_JS)
 
 MODES = ("table", "doubling", "svo", "adverbs", "questions",
-         "irregular", "classes", "irrshare", "listening")
+         "irregular", "classes", "irrshare", "listening",
+         "endings", "wordrule", "an", "the_super", "auxchain", "time_preps")
 
 _REPO = pathlib.Path(__file__).resolve().parents[3]
 
@@ -64,6 +66,16 @@ def _options(select_id, presets):
     return ('<select id="%s">' % select_id
             + "".join('<option value="%s">%s</option>' % (p["id"], p["label"])
                       for p in presets)
+            + "</select>")
+
+
+def _menu(select_id, items, chosen=None):
+    """A <select> of (value, label) pairs with `chosen` marked selected: the
+    value a lesson ships with. labcheck reads the selected option as the
+    control's starting value."""
+    return ('<select id="%s">' % select_id
+            + "".join('<option value="%s"%s>%s</option>'
+                      % (v, ' selected' if v == chosen else '', label) for v, label in items)
             + "</select>")
 
 
@@ -148,13 +160,18 @@ def _verb_list_text(verbs):
 
 def _table(cfg):
     verbs = _wordlist("verbrules_cases.json")
-    markup = (
+    focus = cfg.get("focus", "build")
+    if focus not in ("build", "score"):
+        raise ValueError("english_lab table: focus is build or score, not %r" % focus)
+    build = (
         _kpis([("he / she / it", "tbThird", "walks"), ("-ing form", "tbIng", "walking"),
                ("past form", "tbEd", "walked"), ("rule that fired", "tbRule", "nothing special")])
         + '<div class="table-wrap"><table id="tbGrid"><thead><tr>'
         '<th>time</th><th>simple</th><th>progressive</th>'
         '<th>perfect</th><th>perfect progressive</th>'
         '</tr></thead><tbody id="tbBody"></tbody></table></div>'
+    )
+    scoring = (
         '<p class="small-copy" id="tbsHead">The rules scored on every regular verb in the '
         'printed list below.</p>'
         + _kpis([("rule", "tbsRule", "&mdash;"), ("right", "tbsHit", "&mdash;"),
@@ -164,6 +181,10 @@ def _table(cfg):
         '<table id="tbsTable"><thead><tr id="tbsCols"></tr></thead>'
         '<tbody id="tbsBody"></tbody></table></div>'
     )
+    # focus: score puts the scoring half above the twelve cells; nothing else
+    # changes, so the two lessons that share this lab pin the same figures.
+    markup = scoring + build if focus == "score" else build + scoring
+    show = cfg.get("show", "residue")
     controls = (
         '<label for="tbVerb">A verb</label> '
         '<input id="tbVerb" type="text" value="walk" size="14" /> '
@@ -172,11 +193,9 @@ def _table(cfg):
         + ' <label for="tbScore">Score a rule on the list</label> '
         + _options("tbScore", _SCORE_PRESETS)
         + ' <label for="tbShow">List</label> '
-        '<select id="tbShow">'
-        '<option value="residue">the words the rule misses</option>'
-        '<option value="all">every verb in the list</option>'
-        '<option value="excluded">the words left out of the list, and why</option>'
-        '</select>'
+        + _menu("tbShow", [("residue", "the words the rule misses"),
+                           ("all", "every verb in the list"),
+                           ("excluded", "the words left out of the list, and why")], show)
     )
     script = (
         ENGLISH_VERB_JS
@@ -227,7 +246,7 @@ def _table(cfg):
     var html = '', times = ['present', 'past', 'future'],
         asp = ['simple', 'progressive', 'perfect', 'perfect progressive'];
     for (i = 0; i < times.length; i++) {
-      html += '<tr><th scope="row">' + times[i] + '</th>';
+      html += '<tr><th scope=row>' + times[i] + '</th>';
       for (t = 0; t < asp.length; t++) {
         html += '<td>' + (rows[times[i]][asp[t]] || '') + '</td>';
       }
@@ -245,7 +264,7 @@ def _table(cfg):
     ing: ['ing', vbIng, '-ing'],
     ed:  ['ed', vbEd, '-ed']
   };
-  var scoreId = 's', show = 'residue';
+  var scoreId = 's', show = el('tbShow').value;
   var score = function () {
     var rule = RULES[scoreId] || RULES.s, res = vbScoreSlot(VB_ROWS, rule[0], rule[1]);
     var names = [], i, html = '', said, row;
@@ -513,32 +532,8 @@ var perThousand = function (hits, words) {
 };
 """
 
-SCAN_JS = r"""
-var wordsOf = function (s) { return s.match(/[A-Za-z][A-Za-z']*/g) || []; };
-var lower = function (a) {
-  var o = [], i;
-  for (i = 0; i < a.length; i++) o.push(a[i].toLowerCase());
-  return o;
-};
-var inSet = function (set, w) { return Object.prototype.hasOwnProperty.call(set, w); };
-var setOf = function (list) {
-  var o = {}, i;
-  for (i = 0; i < list.length; i++) o[list[i]] = true;
-  return o;
-};
-/* A share printed to one decimal place, worked in whole numbers so the figure
-   on the page is exactly the division and not a floating-point artefact. */
-var commas = function (n) {
-  var t = String(n);
-  while (/\d{4}/.test(t)) t = t.replace(/(\d)(\d{3})(?!\d)/, '$1,$2');
-  return t;
-};
-var share1 = function (hit, total) {
-  if (!total) return '0.0%';
-  var t = Math.round(hit * 1000 / total);
-  return Math.floor(t / 10) + '.' + (t % 10) + '%';
-};
-"""
+# SCAN_JS (wordsOf, tokensOf, lower, setOf, share1, commas) lives in english_core.py
+# with every other rule function, and is imported above.
 
 
 _SVO_PRESETS = [
@@ -550,7 +545,7 @@ _SVO_PRESETS = [
      "expect": {"soHit": "72 of 80", "soPct": "90.0%", "soBroken": "1", "soTimes": "6.1"}},
     {"id": "object", "label": "object pronouns: me, him, us, them",
      "kind": "object",
-     "expect": {"soHit": "16 of 18", "soPct": "88.9%", "soBroken": "0", "soTimes": "10.9"}},
+     "expect": {"soHit": "15 of 17", "soPct": "88.2%", "soBroken": "0", "soTimes": "10.4"}},
 ]
 
 
@@ -760,21 +755,50 @@ def _adverbs(cfg):
     )
 
 
-_Q_PRESETS = [
-    {"id": "aux", "label": "a question starts with an auxiliary, or a wh-word then one",
-     "expect": {"quHit": "48 of 90", "quPct": "53.3%", "quConnPct": "13 of 42, 31.0%"}},
-]
+# The question rule on two sets of printed questions. `source` picks the set:
+# austen, the 90 questions from the novel (re-cut at sentence boundaries by
+# scripts/wordlists/concordance.py; the first cut started sixteen of its
+# misses mid-sentence), or wilde, every question of two words or more in the
+# play. The rule's misses are sorted five ways, each with its own tile.
+WILDE_QUESTIONS = _data("wilde_questions.json")
+
+_Q_SOURCES = {
+    "austen": {k: QUESTION_DATA[k] for k in ("source", "questions", "verbs")},
+    "wilde": {k: WILDE_QUESTIONS[k] for k in ("questions", "verbs", "cast")},
+}
+
+_Q_PRESETS = {
+    "austen": [
+        {"id": "aux", "label": "a question starts with a helping verb, or a wh-word then one",
+         "expect": {"quHit": "52 of 90", "quPct": "57.8%", "quConnPct": "16 of 38, 42.1%"}},
+    ],
+    "wilde": [
+        {"id": "aux", "label": "a question starts with a helping verb, or a wh-word then one",
+         "expect": {"quHit": "89 of 256", "quPct": "34.8%", "quFrag": "14"}},
+    ],
+}
 
 
 def _questions(cfg):
+    source = cfg.get("source", "austen")
+    if source not in _Q_SOURCES:
+        raise ValueError("english_lab questions: unknown source %r (austen or wilde)" % source)
+    data, presets = _Q_SOURCES[source], _Q_PRESETS[source]
+    n = len(data["questions"])
     markup = (
         _kpis([("rule holds", "quHit", "&mdash;"), ("share", "quPct", "&mdash;"),
                ("starts with a joining word", "quConn", "&mdash;"),
-               ("joining words, share of the misses", "quConnPct", "&mdash;"),
-               ("something else", "quOther", "&mdash;")])
+               ("joining words, share of the misses", "quConnPct", "&mdash;")])
+        + _kpis([("a wh-word, no helping verb after it", "quWh", "&mdash;"),
+                 ("a word of address first", "quAddr", "&mdash;"),
+                 ("a pronoun first: a statement", "quStmt", "&mdash;"),
+                 ("no verb at all", "quFrag", "&mdash;"),
+                 ("something else", "quOther", "&mdash;")])
         + _kpis([("questions in the modern documents", "quModQ", "&mdash;"),
                  ("words in them", "quModW", "&mdash;")])
-        + '<div class="table-wrap"><table id="quTable"><thead><tr>'
+        + '<p class="small-copy" id="quLimit"></p>'
+        '<div class="table-wrap" style="max-height:22rem;overflow-y:auto;">'
+        '<table id="quTable"><thead><tr>'
         '<th>question</th><th>verdict</th></tr></thead>'
         '<tbody id="quBody"></tbody></table></div>'
         + _MODERN_MARKUP % "qu"
@@ -782,7 +806,7 @@ def _questions(cfg):
     controls = (
         '<label for="quPreset">Rule</label> '
         '<select id="quPreset">'
-        + "".join('<option value="%s">%s</option>' % (p["id"], p["label"]) for p in _Q_PRESETS)
+        + "".join('<option value="%s">%s</option>' % (p["id"], p["label"]) for p in presets)
         + '</select> '
         '<label for="quShow">Show</label> '
         '<select id="quShow">'
@@ -790,45 +814,29 @@ def _questions(cfg):
         '<option value="all">every question</option>'
         '</select>'
     )
-    script = (SCAN_JS + cfg_literal("QU_DATA", QUESTION_DATA) + cfg_literal("MODERN", MODERN_DATA)
-              + MODERN_JS + cfg_literal("QU_PRESETS", _Q_PRESETS)) + r"""
+    limit = ("Words, not meanings: a line is sorted by its first word or two, and no verb at "
+             "all means no word of the line is a helping verb or on the printed verb lists. "
+             + ("The lines are from a play of 1895." if source == "wilde"
+                else "The lines are from a novel of 1813."))
+    script = (SCAN_JS + QUESTION_JS + cfg_literal("QU_DATA", data)
+              + cfg_literal("MODERN", MODERN_DATA) + MODERN_JS
+              + cfg_literal("QU_LIMIT", limit)) + r"""
 (function () {
   var el = function (id) { return document.getElementById(id); };
-  var AUX = setOf(['is','are','was','were','be','am','have','has','had','do','does','did',
-                   'will','would','shall','should','can','could','may','might','must','cannot']);
-  var WH = setOf(['what','where','when','why','who','whom','whose','how','which']);
-  var CONN = setOf(['and','but','or','so','yet','for','then']);
-  var FILLER = setOf(['pray','oh','well','my','dear']);
   var show = 'residue';
 
   var scan = function () {
-    var hit = 0, conn = 0, other = 0, rows = [], i;
-    for (i = 0; i < QU_DATA.questions.length; i++) {
-      var q = QU_DATA.questions[i], lw = lower(wordsOf(q)), verdict;
-      if (!lw.length) continue;
-      if (inSet(AUX, lw[0])) { verdict = 'holds'; hit++; }
-      else if (inSet(WH, lw[0]) && lw.length > 1 && inSet(AUX, lw[1])) { verdict = 'holds'; hit++; }
-      else if (inSet(WH, lw[0])) verdict = 'a wh-word with no auxiliary after it';
-      else if (inSet(CONN, lw[0])) { verdict = 'starts with a joining word'; conn++; }
-      else if (inSet(FILLER, lw[0])) verdict = 'starts with an address';
-      else { verdict = 'something else'; other++; }
-      rows.push([q, verdict]);
-    }
-    el('quHit').textContent = hit + ' of ' + rows.length;
-    el('quPct').textContent = share1(hit, rows.length);
-    el('quConn').textContent = String(conn);
-    el('quOther').textContent = String(other);
-    el('quConnPct').textContent = conn + ' of ' + (rows.length - hit) + ', '
-                                  + share1(conn, rows.length - hit);
+    var tiles = quTiles(QU_DATA), rows = quScore(QU_DATA).rows, k, i, html = '';
+    for (k in tiles) if (inSet(tiles, k)) el(k).textContent = tiles[k];
     /* A question in print ends with a question mark; the modern documents are
        searched for one. */
     var qs = 0, d;
     for (d = 0; d < MODERN.docs.length; d++) qs += MODERN.docs[d].text.split('?').length - 1;
     el('quModQ').textContent = String(qs);
     el('quModW').textContent = commas(modernWords().length);
-    var html = '';
+    el('quLimit').textContent = QU_LIMIT;
     for (i = 0; i < rows.length; i++) {
-      if (show === 'residue' && rows[i][1] === 'holds') continue;
+      if (show === 'residue' && rows[i][1] === QU_HOLDS) continue;
       html += '<tr><td>' + rows[i][0] + '</td><td>' + rows[i][1] + '</td></tr>';
     }
     el('quBody').innerHTML = html;
@@ -840,20 +848,23 @@ def _questions(cfg):
   scan();
 }());
 """
+    play = source == "wilde"
     return Lab(
-        title="Ninety real questions, and a rule that does not cover them",
+        title=("%d questions from a play, and a rule that covers a third" % n if play
+               else "Ninety real questions, and a rule that covers just over half"),
         subtitle="The rule is stated, scored, and shown to fail -- which is the lesson",
         markup=markup, controls=controls,
         panel_title=cfg.get("panel_title", "A rule that does not work, and why that is printed"),
         panel_intro=cfg.get("panel_intro",
-            "These are real questions from the book. The rule is scored against "
-            "them in your browser. It covers about half, and the half it misses is "
-            "printed so you can see what questions actually look like."),
+            ("These are the questions the characters ask in the play, each from where its "
+             "sentence starts. The rule is scored against them in your browser, and the "
+             "questions it misses are sorted by what they start with.") if play else
+            ("These are real questions from the book, each from where its sentence starts. "
+             "The rule is scored against them in your browser, and the half it misses is "
+             "printed so you can see what questions actually look like.")),
         script=script,
-        expect={"quPreset": _expect(_Q_PRESETS)},
+        expect={"quPreset": _expect(presets)},
     )
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -1089,9 +1100,11 @@ def _classes(cfg):
 
 _SH_PRESETS = [
     {"id": "with", "label": "count be, have and do as irregular verbs", "big": 1,
-     "expect": {"shCount": "149", "shPct": "15.7%", "shBig": "91", "shBigPct": "61.1%"}},
+     "expect": {"shCount": "149", "shPct": "15.9%", "shBig": "91", "shBigPct": "61.1%",
+                "shTop": "95.3%"}},
     {"id": "without", "label": "leave be, have and do out", "big": 0,
-     "expect": {"shCount": "58", "shPct": "6.1%", "shBig": "91", "shBigPct": "61.1%"}},
+     "expect": {"shCount": "58", "shPct": "6.2%", "shBig": "91", "shBigPct": "61.1%",
+                "shTop": "93.1%"}},
 ]
 
 
@@ -1099,13 +1112,15 @@ def _irrshare(cfg):
     markup = (
         '<div class="kpi-grid">'
         '<div class="kpi"><span>irregular forms found</span>'
-        '<strong id="shCount">149</strong></div>'
+        '<strong id="shCount">&mdash;</strong></div>'
         '<div class="kpi"><span>share of the passage</span>'
-        '<strong id="shPct">15.7%</strong></div>'
+        '<strong id="shPct">&mdash;</strong></div>'
         '<div class="kpi"><span>be, have and do alone</span>'
-        '<strong id="shBig">91</strong></div>'
+        '<strong id="shBig">&mdash;</strong></div>'
         '<div class="kpi"><span>their share of the irregulars</span>'
-        '<strong id="shBigPct">61.1%</strong></div>'
+        '<strong id="shBigPct">&mdash;</strong></div>'
+        '<div class="kpi"><span>the twenty commonest verbs, share of the irregular forms</span>'
+        '<strong id="shTop">&mdash;</strong></div>'
         '</div>'
         '<div class="table-wrap"><table id="shTable"><thead><tr>'
         '<th>verb</th><th>times it appears</th></tr></thead>'
@@ -1167,7 +1182,12 @@ def _irrshare(cfg):
        move when the menu does. */
     el('shBigPct').textContent = share1(big, withBig ? total : total + big);
     var names = Object.keys(counts);
-    names.sort(function (a, b) { return counts[b] - counts[a]; });
+    /* Commonest first, ties in alphabetical order, so the twenty are always
+       the same twenty; the tie at the edge cannot change the sum. */
+    names.sort(function (a, b) { return counts[b] - counts[a] || (a < b ? -1 : 1); });
+    var top = 0;
+    for (i = 0; i < names.length && i < 20; i++) top += counts[names[i]];
+    el('shTop').textContent = share1(top, total);
     var html = '';
     for (i = 0; i < names.length; i++) {
       html += '<tr><td>' + names[i] + '</td><td>' + counts[names[i]] + '</td></tr>';
@@ -1217,10 +1237,10 @@ LISTENING_DATA = _data("listening.json")
 
 _LS_PRESETS = [
     {"id": "weak", "label": "mark the words that get squashed", "view": "weak",
-     "expect": {"lsWeak": "388 of 949", "lsWeakPct": "40.9%", "lsTypes": "43",
-                "lsMixed": "42"}},
+     "expect": {"lsWeak": "387 of 936", "lsWeakPct": "41.3%", "lsTypes": "43", "lsMixed": "42",
+                "lsFinal": "24 of 387"}},
     {"id": "strong", "label": "mark where each other word is said hardest", "view": "strong",
-     "expect": {"lsStrong": "399 of 485", "lsStrongPct": "82.3%"}},
+     "expect": {"lsStrong": "390 of 474", "lsStrongPct": "82.3%"}},
 ]
 
 
@@ -1230,7 +1250,8 @@ def _listening(cfg):
                ("share of the page", "lsWeakPct", "&mdash;"),
                ("different ones used", "lsTypes", "&mdash;"),
                ("of them that, have, has or had", "lsMixed", "&mdash;"),
-               ("other words starting strong", "lsStrongPct", "&mdash;")])
+               ("other words starting strong", "lsStrongPct", "&mdash;"),
+               ("squashable words before . , ; : ? or !", "lsFinal", "&mdash;")])
         + _kpis([("of the other words, starting strong", "lsStrong", "&mdash;")])
         + '<div class="mathblock" id="lsText" style="font-size:0.84rem;line-height:2;"></div>'
         '<div class="table-wrap"><table id="lsTable"><thead><tr>'
@@ -1250,8 +1271,8 @@ def _listening(cfg):
   var draw = function () {
     var w = wordsOf(LS_TEXT.passage), lw = lower(w), i, t;
     /* Every token of a word on the list is counted, so the count is of words
-       that CAN take a weak form. Demonstrative that ("that book") and have as
-       a main verb ("have tea") keep their full form; the tile below says how
+       that CAN take a weak form. Demonstrative that (that book) and have as
+       a main verb (have tea) keep their full form; the tile below says how
        many of the tokens are those four words, and the table lists every
        word with its count, so the reader can see what was counted. */
     var MIXED = setOf(['that', 'have', 'has', 'had']), mixed = 0;
@@ -1262,15 +1283,26 @@ def _listening(cfg):
         weak++; types[t] = (types[t] || 0) + 1;
         if (inSet(MIXED, t)) mixed++;
         out.push(view === 'weak' ? '[' + w[i] + ']' : w[i]);
-      } else if (inSet(LS_DATA.stress, t)) {
+      } else if (inSet(LS_DATA.stress, t) || inSet(LS_DATA.stress, t.replace(/'s$/, ''))) {
+        /* A possessive is marked as its word: aunt's as aunt. */
         annotated++;
-        var pat = LS_DATA.stress[t];
+        var pat = LS_DATA.stress[inSet(LS_DATA.stress, t) ? t : t.replace(/'s$/, '')];
         if (pat.charAt(0) === 'S') strong++;
         out.push(view === 'strong' ? w[i] + '(' + pat + ')' : w[i]);
       } else {
         out.push(w[i]);
       }
     }
+    /* The listed words that stand last before a punctuation mark, where a
+       weak form is said in full: the scan looks at the character after each
+       word, past a closing quotation mark. */
+    var re = /[A-Za-z][A-Za-z']*/g, txt = normApos(LS_TEXT.passage), m, after, fin = 0;
+    while ((m = re.exec(txt)) !== null) {
+      if (!inSet(LS_DATA.weak, m[0].replace(/'+$/, '').toLowerCase())) continue;
+      after = txt.slice(re.lastIndex).replace(/^['”’]+/, '').charAt(0);
+      if ('.,;:?!'.indexOf(after) >= 0 && after !== '') fin++;
+    }
+    el('lsFinal').textContent = fin + ' of ' + weak;
     el('lsWeak').textContent = weak + ' of ' + lw.length;
     el('lsWeakPct').textContent = share1(weak, lw.length);
     el('lsTypes').textContent = String(Object.keys(types).length);
@@ -1311,10 +1343,719 @@ def _listening(cfg):
     )
 
 
+# ---------------------------------------------------------------------------
+# The second instalment (docs/english-v2/PLAN.md section D). Each mode ships
+# SCAN_JS, the rule block from english_core.py, the data it reads, and the
+# block below that writes the tiles the rule block returns. The figures in
+# the presets were read off rendered pages with labcheck.js --observe and
+# agree with scripts/wordlists/english_check.js, which runs the same blocks.
+# ---------------------------------------------------------------------------
+
+def _shipped(presets, cfg, key, default):
+    """The preset a lesson ships selected: cfg[key], which must be one of them."""
+    chosen = cfg.get(key, default)
+    if chosen not in [p["id"] for p in presets]:
+        raise ValueError("english_lab: %s %r is not one of %s"
+                         % (key, chosen, ", ".join(p["id"] for p in presets)))
+    return chosen
+
+
+def _restrict(presets, cfg):
+    """cfg['rules'] restricts a menu to the presets a lesson shows, in its order."""
+    if not cfg.get("rules"):
+        return presets
+    by_id = {p["id"]: p for p in presets}
+    missing = [r for r in cfg["rules"] if r not in by_id]
+    if missing:
+        raise ValueError("english_lab: unknown rules %s" % ", ".join(missing))
+    return [by_id[r] for r in cfg["rules"]]
+
+
+def _preset_menu(select_id, presets, chosen):
+    return _menu(select_id, [(p["id"], p["label"]) for p in presets], chosen)
+
+
+def _payload(data, *keys):
+    """Only the fields a page reads: the notes and sha256 pins stay in the
+    committed file, where a reviewer reads them, and off the wire."""
+    return {k: data[k] for k in keys if k in data}
+
+
+def _scroll_table(table_id, cols_id, body_id, rem=20):
+    return ('<div class="table-wrap" style="max-height:%drem;overflow-y:auto;">'
+            '<table id="%s"><thead><tr id="%s"></tr></thead><tbody id="%s"></tbody></table></div>'
+            % (rem, table_id, cols_id, body_id))
+
+
+# Every page that reads a CMUdict-derived file says where it came from.
+_CMUDICT_CREDIT = ("Sounds are from CMUdict (Carnegie Mellon University, BSD licence; the "
+                   "notice is in scripts/wordlists/CMUDICT_LICENSE).")
+
+# A shared tile writer: every rule block returns {tile id: text}.
+_WRITE_TILES = r"""
+var writeTiles = function (tiles) {
+  var k, node;
+  for (k in tiles) {
+    if (!inSet(tiles, k)) continue;
+    node = document.getElementById(k);
+    if (node) node.textContent = tiles[k];
+  }
+};
+"""
+
+
+# ---------------------------------------------------------------- endings
+
+VERB_SOUNDS = _wordlist("verb_sounds.json")
+
+_EN_PRESETS = [
+    {"id": "ed", "label": "the past ending, -ed",
+     "expect": {"enHit": "1111 of 1118", "enPct": "99.4%",
+                "enFirst": "abused, closed, excused, housed, legged, mouthed, used"}},
+    {"id": "s", "label": "the he, she and it ending, -s",
+     "expect": {"enHit": "1187 of 1189", "enPct": "99.8%", "enFirst": "knives, mouths"}},
+    {"id": "plural", "label": "the same -s rule on the plurals of nouns",
+     "expect": {"enHit": "1820 of 1823", "enPct": "99.8%", "enFirst": "mouths, paths, youths"}},
+]
+
+
+def _endings(cfg):
+    rule = _shipped(_EN_PRESETS, cfg, "rule", "ed")
+    show = cfg.get("show", "misses")
+    markup = (
+        _kpis([("the rule", "enRule", "&mdash;"), ("the rule is right", "enHit", "&mdash;"),
+               ("share", "enPct", "&mdash;"), ("it misses", "enMiss", "&mdash;"),
+               ("the words it misses", "enFirst", "&mdash;"),
+               ("not in the dictionary, not counted", "enSkipped", "&mdash;")])
+        + _kpis([("the word you typed", "enWordSays", "&mdash;")])
+        + '<p class="small-copy" id="enLimit"></p>'
+        + _scroll_table("enTable", "enCols", "enBody")
+    )
+    controls = (
+        '<label for="enPreset">The ending</label> ' + _preset_menu("enPreset", _EN_PRESETS, rule)
+        + ' <label for="enShow">List</label> '
+        + _menu("enShow", [("misses", "the words the rule misses"), ("all", "every word"),
+                           ("skipped", "the words the dictionary does not carry")], show)
+        + ' <label for="enWord">A word from the list</label> '
+        '<input id="enWord" type="text" value="walk" size="14" />'
+    )
+    script = (SCAN_JS + ENDINGS_JS + _WRITE_TILES + cfg_literal("EN_DATA", _payload(VERB_SOUNDS, "ed", "s", "plural", "skipped"))
+              + cfg_literal("EN_LIMIT", "The sounds are the dictionary's first pronunciation of "
+                            "each word, which is American; a word it does not carry is listed, "
+                            "not counted. " + _CMUDICT_CREDIT)) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var rule = el('enPreset').value, show = el('enShow').value;
+  var draw = function () {
+    var res = enScore(EN_DATA, rule), html = '', rows, i, r, keys;
+    writeTiles(enTiles(EN_DATA, rule));
+    el('enWordSays').textContent = enWordSays(EN_DATA, rule, el('enWord').value);
+    el('enLimit').textContent = EN_LIMIT;
+    if (show === 'skipped') {
+      el('enCols').innerHTML = '<th>word</th><th>why it is not counted</th>';
+      keys = Object.keys(EN_DATA.skipped[EN_RULES[rule][1]]);
+      for (i = 0; i < keys.length; i++) {
+        html += '<tr><td>' + keys[i] + '</td><td>' + EN_DATA.skipped[EN_RULES[rule][1]][keys[i]] + '</td></tr>';
+      }
+    } else {
+      el('enCols').innerHTML = '<th>word</th><th>form</th><th>last sound</th><th>which is</th>'
+        + '<th>the rule says</th><th>the dictionary says</th><th></th>';
+      rows = show === 'all' ? res.all : res.miss;
+      for (i = 0; i < rows.length; i++) {
+        r = rows[i];
+        html += '<tr><td>' + r.word + '</td><td>' + r.form + '</td><td>' + r.last + '</td><td>'
+              + r.cls + '</td><td>' + r.rule + '</td><td>' + r.dict + '</td><td>'
+              + (r.ok ? '' : 'missed') + '</td></tr>';
+      }
+    }
+    el('enBody').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('enPreset').addEventListener('change', function () { rule = this.value; draw(); });
+  el('enShow').addEventListener('change', function () { show = this.value; draw(); });
+  el('enWord').addEventListener('input', function () {
+    el('enWordSays').textContent = enWordSays(EN_DATA, rule, this.value);
+  });
+  draw();
+}());
+"""
+    return Lab(
+        title="How -ed and -s are said, from the last sound of the word",
+        subtitle="Two rules run on every verb in the printed list, and scored against the dictionary",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Score the two rules on the printed list"),
+        panel_intro=cfg.get("panel_intro",
+            "Each verb's last sound is looked up in a pronunciation dictionary. The rule says "
+            "what the ending should sound like; the dictionary says what it does. The table "
+            "prints both for every word, and the words where they differ."),
+        script=script, expect={"enPreset": _expect(_EN_PRESETS)},
+    )
+
+
+# ---------------------------------------------------------------- wordrule
+
+PLURAL_NOUNS = _wordlist("plural_nouns.json")
+LY_ADJECTIVES = _wordlist("ly_adjectives.json")
+
+_WR_PRESETS = {
+    "plurals": [
+        {"id": "r0", "label": "-s, -es after a hiss, -y to -ies",
+         "expect": {"wrHit": "1866 of 1887", "wrPct": "98.9%",
+                    "wrFirst": "analysis, chairman, child, crisis, die, emphasis, foot, gentleman, "
+                               "half, hypothesis, life, man, mouse, phenomenon, potato, self, shelf, "
+                               "stomach, tooth, wife, woman",
+                    "wrNone": "75", "wrNoneOf": "75 of 683"}},
+        {"id": "r1", "label": "the same, and a consonant then -o takes -es",
+         "expect": {"wrHit": "1864 of 1887", "wrPct": "98.8%",
+                    "wrFirst": "analysis, chairman, child, crisis, die, emphasis, foot, gentleman, "
+                               "half, hypothesis, life, man, mouse, phenomenon, photo, piano, pro, "
+                               "self, shelf, stomach, tooth, wife, woman"}},
+        {"id": "r2", "label": "the same, and f or fe becomes -ves",
+         "expect": {"wrHit": "1861 of 1887", "wrPct": "98.6%",
+                    "wrFirst": "analysis, belief, brief, chairman, chief, child, crisis, die, "
+                               "emphasis, foot, gentleman, golf, hypothesis, man, mouse, phenomenon, "
+                               "photo, piano, pro, proof, relief, roof, safe, stomach, tooth, woman"}},
+        {"id": "r3", "label": "the same, with -ves only after -lf, -ife, -eaf, -olf",
+         "expect": {"wrHit": "1868 of 1887", "wrPct": "99.0%",
+                    "wrFirst": "analysis, chairman, child, crisis, die, emphasis, foot, gentleman, "
+                               "golf, hypothesis, man, mouse, phenomenon, photo, piano, pro, "
+                               "stomach, tooth, woman"}},
+    ],
+    "ly": [
+        {"id": "plain", "label": "add -ly to the adjective",
+         "expect": {"wrHit": "98 of 126", "wrPct": "77.8%", "wrNone": "27",
+                    "wrFirst": "acceptable, angry, capable, comfortable, considerable, crazy, "
+                               "democratic, dramatic, economic, electronic, ethnic, extraordinary, "
+                               "flexible, genetic, guilty, healthy, historic, horrible, impossible, "
+                               "lazy, necessary, reasonable, reliable, remarkable, scientific, "
+                               "suitable, tall, terrible"}},
+        {"id": "changes", "label": "add -ly, with the spelling changes",
+         "expect": {"wrHit": "126 of 126", "wrPct": "100.0%", "wrNone": "27", "wrFirst": "none"}},
+    ],
+}
+
+
+def _wordrule(cfg):
+    lst = cfg.get("list", "plurals")
+    if lst not in _WR_PRESETS:
+        raise ValueError("english_lab wordrule: list is plurals or ly, not %r" % lst)
+    presets = _WR_PRESETS[lst]
+    rule = _shipped(presets, cfg, "rule", presets[0]["id"])
+    plurals = lst == "plurals"
+    data = PLURAL_NOUNS if plurals else LY_ADJECTIVES
+    none_value = "noplural" if plurals else "none"
+    shows = [("misses", "the words the rule misses"), ("all", "every word")]
+    shows.append((none_value, "nouns the dictionary gives no plural" if plurals
+                  else "adjectives with no -ly adverb in the dictionary"))
+    if plurals:
+        shows.append(("excluded", "the words set aside, and why"))
+    show = cfg.get("show", "misses")
+    if show not in [v for v, _l in shows]:
+        raise ValueError("english_lab wordrule: show %r is not offered for %s" % (show, lst))
+    markup = (
+        _kpis([("the rule", "wrRule", "&mdash;"), ("the rule is right", "wrHit", "&mdash;"),
+               ("share", "wrPct", "&mdash;"), ("it misses", "wrMiss", "&mdash;"),
+               ("the words it misses", "wrFirst", "&mdash;")])
+        + _kpis([("nouns with no plural" if plurals else "adjectives with no -ly adverb",
+                  "wrNone", "&mdash;"),
+                 ("of the nouns that are only nouns" if plurals else "of the adjectives",
+                  "wrNoneOf", "&mdash;")])
+        + '<p class="small-copy" id="wrLimit"></p>'
+        + _scroll_table("wrTable", "wrCols", "wrBody")
+    )
+    controls = (
+        '<label for="wrPreset">The rule</label> ' + _preset_menu("wrPreset", presets, rule)
+        + ' <label for="wrShow">List</label> ' + _menu("wrShow", shows, show)
+    )
+    limit = ("Spellings, not meanings: the dictionary says a word exists, not that it is the "
+             + ("plural of this noun. Which words are nouns comes from the Moby list, checked "
+                "against the dictionary; the list is not printed."
+                if plurals else
+                "adverb of this adjective (hardly is a word, and does not mean hard)."))
+    script = (SCAN_JS + WORDRULE_JS + _WRITE_TILES + cfg_literal("WR_DATA", _payload(data, "rows", "noun_only", "noplural", "none", "excluded"))
+              + cfg_literal("WR_LIMIT", limit)) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var rule = el('wrPreset').value, show = el('wrShow').value;
+  var draw = function () {
+    var res = wrScore(WR_DATA, rule), html = '', rows, i, keys, none;
+    writeTiles(wrTiles(WR_DATA, rule));
+    el('wrLimit').textContent = WR_LIMIT;
+    if (show === 'noplural' || show === 'none') {
+      el('wrCols').innerHTML = '<th>word</th>';
+      none = wrNoneList(WR_DATA);
+      for (i = 0; i < none.length; i++) html += '<tr><td>' + none[i] + '</td></tr>';
+    } else if (show === 'excluded') {
+      el('wrCols').innerHTML = '<th>word</th><th>why it is set aside</th>';
+      keys = Object.keys(WR_DATA.excluded || {});
+      for (i = 0; i < keys.length; i++) {
+        html += '<tr><td>' + keys[i] + '</td><td>' + WR_DATA.excluded[keys[i]] + '</td></tr>';
+      }
+    } else {
+      el('wrCols').innerHTML = '<th>word</th><th>the rule says</th><th>the dictionary has</th><th></th>';
+      rows = show === 'all' ? res.all : res.miss;
+      for (i = 0; i < rows.length; i++) {
+        html += '<tr><td>' + rows[i].word + '</td><td>' + rows[i].said + '</td><td>'
+              + rows[i].list.join(' / ') + '</td><td>' + (rows[i].ok ? '' : 'missed') + '</td></tr>';
+      }
+    }
+    el('wrBody').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('wrPreset').addEventListener('change', function () { rule = this.value; draw(); });
+  el('wrShow').addEventListener('change', function () { show = this.value; draw(); });
+  draw();
+}());
+"""
+    return Lab(
+        title=("The plural rule, scored on every noun in the list" if plurals
+               else "The -ly rule, scored on every adjective in the list"),
+        subtitle="Each word's form is made by the rule on the page and checked against a dictionary",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Score the rule on the printed list"),
+        panel_intro=cfg.get("panel_intro",
+            "The rule makes each word's form in your browser. A form counts as right when it "
+            "is one the dictionary has for that word, and every word the rule gets wrong is "
+            "printed with what the dictionary has instead."),
+        script=script, expect={"wrPreset": _expect(presets)},
+    )
+
+
+# ---------------------------------------------------------------- an
+
+AN_DATA = _data("an_concordance.json")
+AN_SOUNDS = _wordlist("an_sounds.json")["first"]
+
+_AN_PRESETS = [
+    {"id": "letter", "label": "an before a vowel letter",
+     "expect": {"anHit": "486 of 493", "anPct": "98.6%",
+                "anFirst": "a University, an hour (5), a utilitarian"}},
+    {"id": "sound", "label": "an before a vowel sound",
+     "expect": {"anHit": "493 of 493", "anPct": "100.0%", "anFirst": "none"}},
+]
+
+# What each rule prints when a lesson ships another text chosen in anSource.
+_AN_BY_SOURCE = {
+    "wilde": {"letter": {"anHit": "448 of 455", "anPct": "98.5%",
+                         "anFirst": "a University, an hour (5), a utilitarian"},
+              "sound": {"anHit": "455 of 455", "anPct": "100.0%", "anFirst": "none"}},
+    "modern": {"letter": {"anHit": "29 of 29", "anPct": "100.0%", "anFirst": "none"},
+               "sound": {"anHit": "29 of 29", "anPct": "100.0%", "anFirst": "none"}},
+    "passage": {"letter": {"anHit": "9 of 9", "anPct": "100.0%", "anFirst": "none"},
+                "sound": {"anHit": "9 of 9", "anPct": "100.0%", "anFirst": "none"}},
+}
+
+_AN_SOURCES = [("all", "all three texts"), ("wilde", "the play"),
+               ("modern", "the modern documents"), ("passage", "the passage from the novel")]
+_AN_CODES = {"w": "the play", "m": "the modern documents", "p": "the passage"}
+
+
+def _an(cfg):
+    rule = _shipped(_AN_PRESETS, cfg, "rule", "letter")
+    source = cfg.get("source", "all")
+    if source not in dict(_AN_SOURCES):
+        raise ValueError("english_lab an: unknown source %r" % source)
+    markup = (
+        _kpis([("the rule", "anRule", "&mdash;"), ("lines scored", "anN", "&mdash;"),
+               ("the rule is right", "anHit", "&mdash;"), ("share", "anPct", "&mdash;"),
+               ("it misses", "anMiss", "&mdash;"), ("the lines it misses", "anFirst", "&mdash;")])
+        + _kpis([("next word not in the dictionary, not scored", "anUnknown", "&mdash;")])
+        + '<p class="small-copy" id="anLimit"></p>'
+        + _scroll_table("anTable", "anCols", "anBody", 22)
+        + '<details><summary>Words that look like a but are not</summary>'
+        '<div class="table-wrap"><table><tbody id="anMarkers"></tbody></table></div></details>'
+    )
+    controls = (
+        '<label for="anPreset">The rule</label> ' + _preset_menu("anPreset", _AN_PRESETS, rule)
+        + ' <label for="anSource">Lines from</label> ' + _menu("anSource", _AN_SOURCES, source)
+    )
+    script = (SCAN_JS + AN_JS + _WRITE_TILES + cfg_literal("AN_ROWS", AN_DATA["rows"])
+              + cfg_literal("AN_MARKERS", AN_DATA["markers"]) + cfg_literal("AN_FIRST", AN_SOUNDS)
+              + cfg_literal("AN_CODES", _AN_CODES)
+              + cfg_literal("AN_LIMIT", "The sound is the dictionary's first pronunciation of the "
+                            "next word, which is American; a word it does not carry is listed and "
+                            "not scored. The play is English of 1895. " + _CMUDICT_CREDIT)) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var rule = el('anPreset').value, source = el('anSource').value;
+  var draw = function () {
+    var res = anScore(AN_ROWS, AN_FIRST, rule, source), html = '', i, a, verdict;
+    writeTiles(anTiles(AN_ROWS, AN_FIRST, rule, source));
+    el('anLimit').textContent = AN_LIMIT;
+    el('anCols').innerHTML = '<th>from</th><th>the line</th><th>the rule says</th><th></th>';
+    for (i = 0; i < res.all.length; i++) {
+      a = res.all[i];
+      verdict = a.says === null ? 'not in the dictionary' : (a.ok ? '' : 'missed');
+      html += '<tr><td>' + AN_CODES[a.line[0]] + '</td><td>' + a.line[1] + ' <strong>' + a.line[2]
+            + ' ' + a.line[3] + '</strong> ' + a.line[4] + '</td><td>' + (a.says || '') + '</td><td>'
+            + verdict + '</td></tr>';
+    }
+    el('anBody').innerHTML = html;
+    html = '';
+    for (i = 0; i < AN_MARKERS.length; i++) {
+      html += '<tr><td>' + AN_MARKERS[i][1] + '</td><td>' + AN_MARKERS[i][2] + '</td></tr>';
+    }
+    el('anMarkers').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('anPreset').addEventListener('change', function () { rule = this.value; draw(); });
+  el('anSource').addEventListener('change', function () { source = this.value; draw(); });
+  draw();
+}());
+"""
+    return Lab(
+        title="A or an, scored by the next letter and by the next sound",
+        subtitle="Every a and an in three printed texts, with the word after it",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Score both rules on the same lines"),
+        panel_intro=cfg.get("panel_intro",
+            "Each line is an a or an from the play, the modern documents or the passage, with "
+            "the word that follows it. The two rules are run on the same lines in your browser; "
+            "only the question changes."),
+        script=script,
+        expect={"anPreset": _expect(_AN_PRESETS) if source == "all" else _AN_BY_SOURCE[source]},
+    )
+
+
+# ---------------------------------------------------------------- the_super
+
+SUPERLATIVE_DATA = _data("superlative_concordance.json")
+
+_TS_PRESETS = [
+    {"id": "est", "label": "an -est adjective (eldest, greatest)",
+     "expect": {"tsHit": "127 of 142", "tsPct": "89.4%", "tsOther": "15"}},
+    {"id": "same", "label": "same",
+     "expect": {"tsHit": "69 of 69", "tsPct": "100.0%", "tsOther": "0"}},
+    {"id": "next", "label": "next",
+     "expect": {"tsHit": "49 of 72", "tsPct": "68.1%", "tsOther": "23"}},
+    {"id": "most", "label": "most and an adjective",
+     "expect": {"tsHit": "40 of 122", "tsPct": "32.8%", "tsOther": "37", "tsA": "45"}},
+]
+
+
+def _the_super(cfg):
+    rule = _shipped(_TS_PRESETS, cfg, "rule", "est")
+    markup = (
+        _kpis([("lines", "tsN", "&mdash;"), ("the or a possessive before it", "tsHit", "&mdash;"),
+               ("share", "tsPct", "&mdash;"), ("the", "tsThe", "&mdash;"),
+               ("a possessive", "tsPoss", "&mdash;"), ("a or an", "tsA", "&mdash;"),
+               ("something else", "tsOther", "&mdash;")])
+        + '<p class="small-copy" id="tsLimit"></p>'
+        + _scroll_table("tsTable", "tsCols", "tsBody", 22)
+    )
+    controls = '<label for="tsPreset">The word</label> ' + _preset_menu("tsPreset", _TS_PRESETS, rule)
+    script = (SCAN_JS + SUPER_JS + _WRITE_TILES + cfg_literal("TS_ROWS", SUPERLATIVE_DATA["rows"])
+              + cfg_literal("TS_LIMIT", "The word directly before is all the scan reads: it cannot "
+                            "tell a most that means very from one that means the most, except by "
+                            "the a in front of it. The lines are from a novel of 1813.")) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var rule = el('tsPreset').value;
+  var draw = function () {
+    var res = tsScore(TS_ROWS, rule), html = '', i, a;
+    writeTiles(tsTiles(TS_ROWS, rule));
+    el('tsLimit').textContent = TS_LIMIT;
+    el('tsCols').innerHTML = '<th>the line</th><th>the word before</th><th></th>';
+    for (i = 0; i < res.all.length; i++) {
+      a = res.all[i];
+      html += '<tr><td>' + a.row[1] + ' <strong>' + a.row[2] + '</strong> ' + a.row[3] + '</td><td>'
+            + TS_LABELS[a.cls] + '</td><td>' + (a.ok ? '' : 'not the rule') + '</td></tr>';
+    }
+    el('tsBody').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('tsPreset').addEventListener('change', function () { rule = this.value; draw(); });
+  draw();
+}());
+"""
+    return Lab(
+        title="What stands in front of the only one",
+        subtitle="Every superlative, same, next and most in the novel, and the word before it",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Read the word before each one"),
+        panel_intro=cfg.get("panel_intro",
+            "Each line is taken from the novel around one word. The scan reads the word "
+            "directly before it, and the rule holds when that word is the or a possessive "
+            "such as her or Darcy's."),
+        script=script, expect={"tsPreset": _expect(_TS_PRESETS)},
+    )
+
+
+# ---------------------------------------------------------------- time_preps
+
+TIME_DATA = _data("time_concordance.json")
+
+_TP_PRESETS = [
+    {"id": "all", "label": "all three texts",
+     "expect": {"tpN": "109", "tpHit": "103 of 109", "tpPct": "94.5%"}},
+    {"id": "austen", "label": "the novel (1813)",
+     "expect": {"tpN": "79", "tpHit": "77 of 79", "tpPct": "97.5%"}},
+    {"id": "wilde", "label": "the play (1895)",
+     "expect": {"tpN": "13", "tpHit": "9 of 13", "tpPct": "69.2%"}},
+    {"id": "modern", "label": "the modern documents",
+     "expect": {"tpN": "17", "tpHit": "17 of 17", "tpPct": "100.0%"}},
+]
+_TP_CODES = {"a": "the novel", "w": "the play", "m": "the modern documents"}
+
+
+def _time_preps(cfg):
+    source = _shipped(_TP_PRESETS, cfg, "source", "all")
+    show = cfg.get("show", "lines")
+    markup = (
+        _kpis([("lines scored", "tpN", "&mdash;"), ("the rule is right", "tpHit", "&mdash;"),
+               ("share", "tpPct", "&mdash;"), ("it misses", "tpMiss", "&mdash;"),
+               ("the lines it misses", "tpFirst", "&mdash;")])
+        + '<p class="small-copy" id="tpLimit"></p>'
+        '<div class="table-wrap"><table id="tpKinds"><thead><tr><th>kind of time word</th>'
+        '<th>the rule says</th><th>lines</th><th>right</th></tr></thead>'
+        '<tbody id="tpKindBody"></tbody></table></div>'
+        + _scroll_table("tpTable", "tpCols", "tpBody", 20)
+    )
+    controls = (
+        '<label for="tpPreset">Lines from</label> ' + _preset_menu("tpPreset", _TP_PRESETS, source)
+        + ' <label for="tpShow">List</label> '
+        + _menu("tpShow", [("lines", "every line"), ("misses", "the lines the rule misses"),
+                           ("bare", "time words with no in, on or at, not scored")], show)
+    )
+    script = (SCAN_JS + TIME_JS + _WRITE_TILES + cfg_literal("TP_ROWS", TIME_DATA["rows"])
+              + cfg_literal("TP_BARE", TIME_DATA["bare"]) + cfg_literal("TP_CODES", _TP_CODES)
+              + cfg_literal("TP_LIMIT", "Words, not meanings: a line is read only when in, on or "
+                            "at comes before the time word with nothing between but words such "
+                            "as the, next or a day name. May is left out, because it is also a "
+                            "helping verb.")) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var source = el('tpPreset').value, show = el('tpShow').value;
+  var SAYS = { 'day': 'on', 'month': 'in', 'year': 'in', 'season': 'in',
+               'part of the day': 'in, or on a named day', 'night, noon or midnight': 'at',
+               'festival': 'at', 'clock time': 'at' };
+  var draw = function () {
+    var res = tpScore(TP_ROWS, source), html = '', i, a, k, want = setOf(TP_SOURCES[source]);
+    writeTiles(tpTiles(TP_ROWS, source));
+    el('tpLimit').textContent = TP_LIMIT;
+    for (i = 0; i < TP_KINDS.length; i++) {
+      k = res.byKind[TP_KINDS[i]];
+      if (!k.n) continue;
+      html += '<tr><td>' + TP_KINDS[i] + '</td><td>' + SAYS[TP_KINDS[i]] + '</td><td>' + k.n
+            + '</td><td>' + k.hit + '</td></tr>';
+    }
+    el('tpKindBody').innerHTML = html;
+    html = '';
+    if (show === 'bare') {
+      el('tpCols').innerHTML = '<th>from</th><th>the time words</th><th>times</th>';
+      for (i = 0; i < TP_BARE.length; i++) {
+        if (!inSet(want, TP_BARE[i][0])) continue;
+        html += '<tr><td>' + TP_CODES[TP_BARE[i][0]] + '</td><td>' + TP_BARE[i][1] + '</td><td>'
+              + TP_BARE[i][2] + '</td></tr>';
+      }
+    } else {
+      el('tpCols').innerHTML = '<th>from</th><th>the line</th><th>kind</th><th>the rule says</th><th></th>';
+      for (i = 0; i < res.all.length; i++) {
+        a = res.all[i];
+        if (show === 'misses' && a.ok) continue;
+        html += '<tr><td>' + TP_CODES[a.row[0]] + '</td><td>' + a.row[4] + ' <strong>' + a.row[1]
+              + (a.row[2] ? ' ' + a.row[2] : '') + ' ' + a.row[3] + '</strong> ' + a.row[5]
+              + '</td><td>' + a.kind + '</td><td>' + a.says + '</td><td>' + (a.ok ? '' : 'missed')
+              + '</td></tr>';
+      }
+    }
+    el('tpBody').innerHTML = html;
+  };
+  window.redrawLab = draw;
+  el('tpPreset').addEventListener('change', function () { source = this.value; draw(); });
+  el('tpShow').addEventListener('change', function () { show = this.value; draw(); });
+  draw();
+}());
+"""
+    return Lab(
+        title="In, on or at, scored on every time word in three texts",
+        subtitle="The rule picks the word from the kind of time; the page checks it line by line",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Score the rule on the printed lines"),
+        panel_intro=cfg.get("panel_intro",
+            "Each line has in, on or at before a time word. The rule is run on the kind of "
+            "time word, and the table prints every line with what the rule says and what "
+            "the writer wrote."),
+        script=script, expect={"tpPreset": _expect(_TP_PRESETS)},
+    )
+
+
+# ---------------------------------------------------------------- auxchain
+
+LONG_PASSAGE = _data("long_passage.json")
+
+# What each rule prints on the two modern documents, for a lesson that ships
+# with the modern documents chosen; the chapter's figures are in _AX_PRESETS.
+_AX_MODERN = {
+    "agree": {"axHit": "14 of 14", "axPct": "100.0%", "axBroken": "0"},
+    "modal": {"axHit": "16 of 17", "axPct": "94.1%", "axFormed": "0"},
+    "have": {"axPerf": "16 of 23", "axPct": "69.6%", "axMain": "3 of 23"},
+    "be": {"axIng": "2 of 36", "axIngPct": "5.6%", "axPP": "5 of 36"},
+    "not": {"axHit": "8 of 10", "axPct": "80.0%", "axOld": "1"},
+    "boxes": {"axSimple": "14 of 34, 41.2%", "axProg": "0 of 34, 0.0%", "axPerf": "3 of 34, 8.8%"},
+}
+
+_AX_PRESETS = [
+    {"id": "agree", "label": "the -s belongs to he, she and it",
+     "expect": {"axHit": "74 of 75", "axPct": "98.7%", "axBroken": "1"}},
+    {"id": "modal", "label": "after a modal, the verb is bare",
+     "expect": {"axHit": "65 of 76", "axPct": "85.5%", "axFormed": "0"}},
+    {"id": "have", "label": "have: the helping verb or the main verb",
+     "expect": {"axPerf": "17 of 37", "axPct": "45.9%", "axMain": "10 of 37"}},
+    {"id": "be", "label": "be: what follows it",
+     "expect": {"axIng": "6 of 137", "axIngPct": "4.4%", "axPP": "13 of 137"}},
+    {"id": "not", "label": "not goes after the first helping verb",
+     "expect": {"axHit": "29 of 39", "axPct": "74.4%", "axOld": "5"}},
+    {"id": "boxes", "label": "which of the twelve boxes get used",
+     "expect": {"axSimple": "55 of 216, 25.5%", "axProg": "3 of 216, 1.4%",
+                "axPerf": "4 of 216, 1.9%"}},
+]
+
+# Which tiles each rule writes; the others are hidden while it is chosen.
+_AX_TILES = [
+    ("axN", "how many it looks at", None),
+    ("axHit", "the rule holds", ("agree", "modal", "not")),
+    ("axPct", "share", ("agree", "modal", "have", "not")),
+    ("axPairs", "pairs the rule covers", ("agree",)),
+    ("axBroken", "against the rule", ("agree",)),
+    ("axBetween", "not or an adverb between", ("modal",)),
+    ("axFormed", "a verb with an ending next", ("modal",)),
+    ("axPerf", "perfect: have and a participle", ("have", "boxes")),
+    ("axMain", "a noun phrase next: the main verb", ("have",)),
+    ("axTo", "have to", ("have",)),
+    ("axIng", "an -ing form next", ("be",)),
+    ("axIngPct", "share", ("be",)),
+    ("axPP", "a participle next", ("be",)),
+    ("axAdj", "an adjective next", ("be",)),
+    ("axNP", "a noun phrase next", ("be",)),
+    ("axPrep", "a preposition or place word next", ("be",)),
+    ("axOld", "after a main verb: the old order", ("not",)),
+    ("axJoin", "after a joining word", ("not",)),
+    ("axNt", "n't", ("not",)),
+    ("axQ", "a pronoun next: a question", ("modal", "have", "be", "not")),
+    ("axOther", "something else", ("modal", "have", "be", "not")),
+    ("axSimple", "simple, present and past", ("boxes",)),
+    ("axProg", "progressive, any time", ("boxes",)),
+    ("axModal", "with a modal", ("boxes",)),
+    ("axPassive", "be and a participle", ("boxes",)),
+    ("axNone", "no verb found", ("boxes",)),
+]
+
+_AX_LIMITS = {
+    "agree": "Only the word right after the pronoun is read, so it in to use it your father is read as a subject; every row is printed.",
+    "modal": "The adverbs the scan steps over are a fixed list and the words the Moby list calls adverbs.",
+    "have": "A noun phrase is a word such as the, a, his, or a word the Moby list calls a noun, leaving out the small words (I, by, as, all, well, better) it also lists as nouns.",
+    "be": "The scan cannot tell a passive from an adjective (was pleased), and counts both as a participle.",
+    "not": "The word right before not is read; the chapter is 1813 prose, which put not after a main verb.",
+    "boxes": "Every pronoun is read as a subject, and the boxes are sorted from the words after it; no verb found is printed row by row.",
+}
+
+
+def _auxchain(cfg):
+    presets = _restrict(_AX_PRESETS, cfg)
+    rule = _shipped(presets, cfg, "rule", presets[0]["id"])
+    source = cfg.get("source", "chapter")
+    if source not in ("chapter", "modern"):
+        raise ValueError("english_lab auxchain: source is chapter or modern, not %r" % source)
+    show = cfg.get("show", "residue")
+    shown = {p["id"] for p in presets}
+    tiles = []
+    for tid, label, rules in _AX_TILES:
+        if rules is None or set(rules) & shown:
+            tiles.append((label, tid, "&mdash;"))
+    markup = (
+        '<div class="kpi-grid">'
+        + "".join('<div id="axK_%s" style="display:contents;"><div class="kpi"><span>%s</span>'
+                  '<strong id="%s">%s</strong></div></div>'
+                  % (kid, label, kid, start) for label, kid, start in tiles)
+        + '</div>'
+        '<p class="small-copy" id="axLimit"></p>'
+        '<div class="table-wrap" id="axBoxWrap"><table><thead><tr><th>box</th><th>pronoun subjects</th>'
+        '<th>share</th></tr></thead><tbody id="axBoxBody"></tbody></table></div>'
+        + _scroll_table("axTable", "axCols", "axBody", 22)
+        + '<details><summary>The text the figures come from</summary>'
+        '<div class="mathblock" id="axText" style="font-size:0.8rem;white-space:pre-wrap;"></div></details>'
+    )
+    controls = (
+        '<label for="axPreset">The rule</label> ' + _preset_menu("axPreset", presets, rule)
+        + ' <label for="axSource">Text</label> '
+        + _menu("axSource", [("chapter", "Chapter XXVI of the novel (1813)"),
+                             ("modern", "the two modern documents")], source)
+        + ' <label for="axShow">Show</label> '
+        + _menu("axShow", [("residue", "only the rows the rule does not cover"),
+                           ("all", "every row")], show)
+    )
+    uses = {tid: list(rules) if rules else None for tid, _l, rules in _AX_TILES}
+    script = (SCAN_JS + AUX_JS + _WRITE_TILES
+              + cfg_literal("AX_DATA", _payload(LONG_PASSAGE, "passage", "classes")) + cfg_literal("MODERN", MODERN_DATA)
+              + cfg_literal("AX_USES", uses) + cfg_literal("AX_LIMITS", _AX_LIMITS)) + r"""
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var rule = el('axPreset').value, source = el('axSource').value, show = el('axShow').value;
+  var text = function () {
+    var out = [], d;
+    if (source === 'chapter') return AX_DATA.passage;
+    for (d = 0; d < MODERN.docs.length; d++) out.push(MODERN.docs[d].text);
+    return out.join('\n\n');
+  };
+  var draw = function () {
+    var t = text(), res = axRun(rule, t, AX_DATA), k, node, html = '', i, keys;
+    for (k in AX_USES) {
+      if (!inSet(AX_USES, k)) continue;
+      node = el('axK_' + k);
+      if (!node) continue;
+      /* A wrapper with display: contents leaves the tile in the grid. */
+      node.style.display = AX_USES[k] === null || AX_USES[k].indexOf(rule) >= 0 ? 'contents' : 'none';
+      el(k).textContent = '—';
+    }
+    writeTiles(res.tiles);
+    el('axLimit').textContent = AX_LIMITS[rule];
+    el('axBoxWrap').style.display = rule === 'boxes' ? '' : 'none';
+    if (res.boxes) {
+      keys = Object.keys(res.boxes);
+      keys.sort(function (a, b) { return res.boxes[b] - res.boxes[a] || (a < b ? -1 : 1); });
+      for (i = 0; i < keys.length; i++) {
+        html += '<tr><td>' + keys[i] + '</td><td>' + res.boxes[keys[i]] + '</td><td>'
+              + share1(res.boxes[keys[i]], res.rows.length) + '</td></tr>';
+      }
+    }
+    el('axBoxBody').innerHTML = html;
+    html = '';
+    el('axCols').innerHTML = '<th>the words</th><th>what the scan reads</th>';
+    for (i = 0; i < res.rows.length; i++) {
+      if (show === 'residue' && res.rows[i].hit) continue;
+      html += '<tr><td>' + res.rows[i].text + '</td><td>' + res.rows[i].verdict + '</td></tr>';
+    }
+    el('axBody').innerHTML = html;
+    el('axText').textContent = t;
+  };
+  window.redrawLab = draw;
+  el('axPreset').addEventListener('change', function () { rule = this.value; draw(); });
+  el('axSource').addEventListener('change', function () { source = this.value; draw(); });
+  el('axShow').addEventListener('change', function () { show = this.value; draw(); });
+  draw();
+}());
+"""
+    return Lab(
+        title="Helping verbs, counted on one chapter of a novel",
+        subtitle="Every pronoun, modal, have, be and not in the chapter, and what comes next",
+        markup=markup, controls=controls,
+        panel_title=cfg.get("panel_title", "Score the rule on the printed chapter"),
+        panel_intro=cfg.get("panel_intro",
+            "The chapter is printed under the table, and the word lists the scan uses are "
+            "built for its words. Choose a rule and the scan runs in your browser; switch to "
+            "the modern documents to see the same rule on writing from 2025 and 2026."),
+        script=script,
+        expect={"axPreset": {p["id"]: dict(_AX_MODERN[p["id"]] if source == "modern" else p["expect"])
+                             for p in presets}},
+    )
+
+
 _MODES = {"table": _table, "doubling": _doubling,
           "svo": _svo, "adverbs": _adverbs, "questions": _questions,
           "irregular": _irregular, "classes": _classes, "irrshare": _irrshare,
-          "listening": _listening}
+          "listening": _listening, "endings": _endings, "wordrule": _wordrule, "an": _an,
+          "the_super": _the_super, "auxchain": _auxchain, "time_preps": _time_preps}
 
 
 def english_lab(cfg):
