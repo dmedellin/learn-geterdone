@@ -1370,21 +1370,64 @@ ENG_MATERIAL_MARKER = "run over the words printed on the page"
 ENG_COURSES = (
     ("tense-tables", "Tense Tables", (
         "five-forms-and-the-whole-table",
+        "scoring-a-rule-on-real-verbs",
         "when-the-last-letter-doubles",
+        "how-ed-and-s-are-said",
     )),
     ("irregular-verbs", "Irregular Verbs", (
         "the-verbs-that-break-the-rules",
         "six-patterns-not-one-hundred-and-eighty",
         "how-much-of-english-is-irregular",
     )),
+    ("helping-verbs", "Helping Verbs", (
+        "the-s-belongs-to-he-she-and-it",
+        "after-a-modal-the-verb-is-bare",
+        "have-is-two-words",
+        "be-is-mostly-a-main-verb",
+        "where-not-goes",
+        "which-of-the-twelve-boxes-get-used",
+    )),
+    ("nouns-and-articles", "Nouns and Articles", (
+        "one-noun-two-nouns",
+        "nouns-with-no-plural",
+        "a-or-an-by-sound-not-by-letter",
+        "the-before-the-only-one",
+    )),
     ("word-order", "Word Order", (
         "who-does-what-to-whom",
         "where-the-adverb-goes",
         "asking-a-question",
+        "how-people-really-ask",
+    )),
+    ("small-words-and-comparisons", "Small Words and Comparisons", (
+        "in-on-at-for-time",
+        "bigger-or-more-big",
+        "happily-simply-truly",
+        "give-it-up-not-give-up-it",
+    )),
+    ("spelling-to-sound", "Spelling to Sound", (
+        "c-and-g-before-e-i-and-y",
+        "the-silent-e-and-the-vowels-name",
+        "i-before-e-and-its-failure-rate",
+        "letters-you-do-not-say",
+        "tion-sion-and-ture",
+    )),
+    ("word-stress", "Word Stress", (
+        "nouns-at-the-front-verbs-at-the-back",
+        "endings-that-pull-the-stress",
+        "endings-that-leave-it-alone",
+        "the-flat-vowel",
     )),
     ("listening", "Listening", (
         "why-it-sounds-too-fast",
         "where-a-word-begins",
+        "where-the-small-words-went",
+        "why-words-run-together",
+    )),
+    ("vocabulary-and-reading", "Vocabulary and Reading", (
+        "how-much-of-a-page-you-know",
+        "ten-words-are-a-quarter-of-the-page",
+        "word-or-word-family",
     )),
 )
 

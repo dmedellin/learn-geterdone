@@ -1043,7 +1043,9 @@ ENG_PATH_PAGE = "/paths/english/"
 ENG_COURSE_1_HOME = "/tense-tables/"
 ENG_COURSE_1_LESSONS = (
     "five-forms-and-the-whole-table",
+    "scoring-a-rule-on-real-verbs",
     "when-the-last-letter-doubles",
+    "how-ed-and-s-are-said",
 )
 
 ENG_COURSE_2_HOME = "/irregular-verbs/"
@@ -1053,27 +1055,86 @@ ENG_COURSE_2_LESSONS = (
     "how-much-of-english-is-irregular",
 )
 
-ENG_COURSE_3_HOME = "/word-order/"
+ENG_COURSE_3_HOME = "/helping-verbs/"
 ENG_COURSE_3_LESSONS = (
+    "the-s-belongs-to-he-she-and-it",
+    "after-a-modal-the-verb-is-bare",
+    "have-is-two-words",
+    "be-is-mostly-a-main-verb",
+    "where-not-goes",
+    "which-of-the-twelve-boxes-get-used",
+)
+
+ENG_COURSE_4_HOME = "/nouns-and-articles/"
+ENG_COURSE_4_LESSONS = (
+    "one-noun-two-nouns",
+    "nouns-with-no-plural",
+    "a-or-an-by-sound-not-by-letter",
+    "the-before-the-only-one",
+)
+
+ENG_COURSE_5_HOME = "/word-order/"
+ENG_COURSE_5_LESSONS = (
     "who-does-what-to-whom",
     "where-the-adverb-goes",
     "asking-a-question",
+    "how-people-really-ask",
 )
 
-ENG_COURSE_4_HOME = "/listening/"
-ENG_COURSE_4_LESSONS = (
+ENG_COURSE_6_HOME = "/small-words-and-comparisons/"
+ENG_COURSE_6_LESSONS = (
+    "in-on-at-for-time",
+    "bigger-or-more-big",
+    "happily-simply-truly",
+    "give-it-up-not-give-up-it",
+)
+
+ENG_COURSE_7_HOME = "/spelling-to-sound/"
+ENG_COURSE_7_LESSONS = (
+    "c-and-g-before-e-i-and-y",
+    "the-silent-e-and-the-vowels-name",
+    "i-before-e-and-its-failure-rate",
+    "letters-you-do-not-say",
+    "tion-sion-and-ture",
+)
+
+ENG_COURSE_8_HOME = "/word-stress/"
+ENG_COURSE_8_LESSONS = (
+    "nouns-at-the-front-verbs-at-the-back",
+    "endings-that-pull-the-stress",
+    "endings-that-leave-it-alone",
+    "the-flat-vowel",
+)
+
+ENG_COURSE_9_HOME = "/listening/"
+ENG_COURSE_9_LESSONS = (
     "why-it-sounds-too-fast",
     "where-a-word-begins",
+    "where-the-small-words-went",
+    "why-words-run-together",
+)
+
+ENG_COURSE_10_HOME = "/vocabulary-and-reading/"
+ENG_COURSE_10_LESSONS = (
+    "how-much-of-a-page-you-know",
+    "ten-words-are-a-quarter-of-the-page",
+    "word-or-word-family",
 )
 
 ENG_COURSES = (
     ("Tense Tables", ENG_COURSE_1_HOME, ENG_COURSE_1_LESSONS),
     ("Irregular Verbs", ENG_COURSE_2_HOME, ENG_COURSE_2_LESSONS),
-    ("Word Order", ENG_COURSE_3_HOME, ENG_COURSE_3_LESSONS),
-    ("Listening", ENG_COURSE_4_HOME, ENG_COURSE_4_LESSONS),
+    ("Helping Verbs", ENG_COURSE_3_HOME, ENG_COURSE_3_LESSONS),
+    ("Nouns and Articles", ENG_COURSE_4_HOME, ENG_COURSE_4_LESSONS),
+    ("Word Order", ENG_COURSE_5_HOME, ENG_COURSE_5_LESSONS),
+    ("Small Words and Comparisons", ENG_COURSE_6_HOME, ENG_COURSE_6_LESSONS),
+    ("Spelling to Sound", ENG_COURSE_7_HOME, ENG_COURSE_7_LESSONS),
+    ("Word Stress", ENG_COURSE_8_HOME, ENG_COURSE_8_LESSONS),
+    ("Listening", ENG_COURSE_9_HOME, ENG_COURSE_9_LESSONS),
+    ("Vocabulary and Reading", ENG_COURSE_10_HOME, ENG_COURSE_10_LESSONS),
 )
 
-ENG_PATH_COURSE_COUNT = 4
+ENG_PATH_COURSE_COUNT = 10
 # Every course of this Subject is published; nothing is promised without a page.
 ENG_UPCOMING_COURSES = ()
 
@@ -1802,9 +1863,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            853,
+            890,
             expected,
-            "849 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 853, "
+            "886 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 890, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2429,9 +2490,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            840,
+            877,
             len(course_pages),
-            "sixty-eight course homes and 772 lessons carry a material "
+            "seventy-four course homes and 803 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )

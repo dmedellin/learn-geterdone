@@ -141,9 +141,9 @@ class TestPublicCopy(unittest.TestCase):
 
     def test_rendered_inventory_has_no_ordinal_references(self):
         pages, records = copy.scan(SITE)
-        self.assertEqual(853, len(pages), 'visitor inventory must include every family')
-        self.assertEqual(68, sum(p.family == 'course' for p in pages.values()))
-        self.assertEqual(772, sum(p.family == 'lesson' for p in pages.values()))
+        self.assertEqual(890, len(pages), 'visitor inventory must include every family')
+        self.assertEqual(74, sum(p.family == 'course' for p in pages.values()))
+        self.assertEqual(803, sum(p.family == 'lesson' for p in pages.values()))
         self.assertGreater(len(records), 45000)
         focus = os.environ.get('AB_COURSE')
         if focus:
@@ -458,7 +458,7 @@ class TestAuthoredSemanticCopy(unittest.TestCase):
         registered = {c['slug'] for p in ui.build_paths.GENERATED_PATHS for c in p['courses']}
         registered.update(c['slug'] for c in trading)
         self.assertEqual(all_courses, registered)
-        self.assertEqual(len(all_courses), 68)
+        self.assertEqual(len(all_courses), 74)
         self.assertGreater(sum(len(p['clauses']) for p in semantic['pages'].values()), 5000)
         self.assertGreater(sum(len(p['source_records']) for p in semantic['pages'].values()), 2000)
         self.assertEqual([], authored_semantic_errors(SITE, contract))
