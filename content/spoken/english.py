@@ -177,4 +177,5 @@ SPOKEN = {
     'recollect (re- + collect)        one family': 'recollect, made from the re beginning plus collect, one family',
     'resides (re- + sides)            a spelling only': 'resides, cut as the re beginning plus sides, a spelling only',
     'endure (end + -ure)              a spelling only': 'endure, cut as end plus the u r e ending, a spelling only',
+    'notable (note + -able)           one family': 'notable, made from note plus the able ending, one family',
 }

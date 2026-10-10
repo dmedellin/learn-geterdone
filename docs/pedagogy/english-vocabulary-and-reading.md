@@ -309,8 +309,8 @@ to six points.
 - The `coverage` lab's family step tries the bare stem before the stem with
   *-e*, which is why *notable* prints as *not + -able*. Trying the longer
   stem first would print *note* and change no tile. Kit's call.
-- `tests/test_speech.py` still fails on the two Tense Tables runs noted in
-  `docs/pedagogy/english-nouns-and-articles.md`.
+- ~~`tests/test_speech.py` still fails on the two Tense Tables runs~~ —
+  resolved when the spoken forms were merged into `content/spoken/english.py`.
 
 ## Figures stated, and where each comes from
 

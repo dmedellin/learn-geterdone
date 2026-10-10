@@ -652,7 +652,10 @@ plural rule and irregular plurals of Nouns and Articles, the `-er/-est` and
 - **Per-mode script assembly**, as today: a page ships `SCAN_JS`, the data its
   mode reads, and that mode's block. Nothing else. Budget: ≤ 48 KB gzipped per
   English lesson page, measured with the snippet in `AGENTS.md` before the
-  kit is called done; the heaviest page today is 38.6 KB.
+  kit is called done; the heaviest page today is 38.6 KB. Shipped exception:
+  the three Vocabulary and Reading lessons are 51–52 KB, because the
+  `coverage` lab carries the headword list and three texts; accepted under
+  the library's 67 KB ceiling and recorded in AGENTS.md.
 - **The tokeniser.** `wordsOf` normalises U+2019 and U+2018 to `'` before
   matching (the `svo` residue changes and is re-read). A second tokeniser
   `tokensOf` keeps digit runs, for the year tokens of `time_preps`. A token

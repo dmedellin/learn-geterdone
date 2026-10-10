@@ -457,6 +457,5 @@ three modal rows: `m_corpus.py`'s modal section run with `PYTHONPATH` set to
   already asks the merge to delete; this course's forms are not yet merged
   into `english.py` (the preview reads every file in `content/spoken/`, so the
   pages are right; the test reads only `english.py`).
-- `__init__.py` still writes `"number": 3`; PLAN §A replaces it with the path's
-  numbering loop (orchestrator, §H.1); the value is the course's true
-  position, so nothing is wrong meanwhile.
+- ~~`__init__.py` still writes `"number": 3`~~ — resolved at wiring: course
+  numbers now come from the path's numbering loop.
