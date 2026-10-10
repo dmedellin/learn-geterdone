@@ -7,7 +7,6 @@ from .part_c import LESSONS as _C
 
 COURSE = {
     "slug": "irregular-verbs",
-    "number": 2,
     "title": "Irregular Verbs",
     "level": "Foundational",
     "blurb": (

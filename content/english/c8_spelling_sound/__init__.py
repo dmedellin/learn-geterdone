@@ -6,7 +6,6 @@ from .part_b import LESSONS as _B
 
 COURSE = {
     "slug": "spelling-to-sound",
-    "number": 7,
     "title": "Spelling to Sound",
     "level": "Foundational",
     "blurb": (

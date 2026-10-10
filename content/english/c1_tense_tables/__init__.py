@@ -6,7 +6,6 @@ from .part_b import LESSONS as _B
 
 COURSE = {
     "slug": "tense-tables",
-    "number": 1,
     "title": "Tense Tables",
     "level": "Foundational",
     "blurb": (
