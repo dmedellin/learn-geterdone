@@ -1138,8 +1138,154 @@ ENG_PATH_COURSE_COUNT = 10
 # Every course of this Subject is published; nothing is promised without a page.
 ENG_UPCOMING_COURSES = ()
 
+
+# The Differential Equations path: ten courses, all published. Generated from
+# content/differential_equations/ so these cannot disagree with what is built.
+DE_PATH_PAGE = "/paths/differential-equations/"
+
+DE_COURSE_1_HOME = "/rates-of-change-and-the-derivative/"
+DE_COURSE_1_LESSONS = (
+    "average-rate-of-change",
+    "the-quotient-as-a-polynomial-in-h",
+    "what-the-quotients-approach",
+    "the-derivative-at-a-point",
+    "the-derivative-of-one-over-t",
+    "the-derivative-as-a-function",
+    "where-the-rate-is-zero",
+    "the-product-rule",
+    "the-chain-rule",
+    "the-second-derivative",
+    "the-exponential-and-its-rate",
+)
+DE_COURSE_2_HOME = "/accumulation-and-the-integral/"
+DE_COURSE_2_LESSONS = (
+    "total-change-from-a-rate",
+    "left-and-right-sums",
+    "refining-the-partition",
+    "trapezoid-and-midpoint-rules",
+    "the-antiderivative-and-the-fundamental-theorem",
+    "the-constant-of-integration",
+    "the-integral-sign-and-its-rules",
+    "the-integral-of-one-over-t",
+)
+DE_COURSE_3_HOME = "/differential-equations-and-eulers-method/"
+DE_COURSE_3_LESSONS = (
+    "what-a-differential-equation-is",
+    "checking-a-proposed-solution",
+    "initial-value-problems",
+    "slope-fields",
+    "reading-a-slope-field",
+    "eulers-method",
+    "eulers-error-and-the-step-size",
+    "the-improved-euler-method",
+    "runge-kutta-four-slopes-per-step",
+    "blow-up-and-the-interval-of-existence",
+)
+DE_COURSE_4_HOME = "/separable-equations-growth-and-decay/"
+DE_COURSE_4_LESSONS = (
+    "separable-equations",
+    "why-separation-works",
+    "implicit-and-explicit-solutions",
+    "exponential-growth",
+    "doubling-time-and-half-life",
+    "radioactive-decay-and-dating",
+    "newtons-law-of-cooling",
+    "mixing-problems",
+    "logistic-growth",
+    "harvesting-and-the-threshold",
+)
+DE_COURSE_5_HOME = "/equilibria-stability-and-phase-lines/"
+DE_COURSE_5_LESSONS = (
+    "autonomous-equations",
+    "the-phase-line",
+    "stable-unstable-and-semistable",
+    "linearisation-and-the-sign-of-f-prime",
+    "long-run-behaviour-without-solving",
+    "one-parameter-families",
+    "bifurcation-diagrams",
+    "sketching-solutions-from-the-phase-line",
+)
+DE_COURSE_6_HOME = "/first-order-linear-equations/"
+DE_COURSE_6_LESSONS = (
+    "the-standard-form",
+    "constant-coefficients-and-the-steady-state",
+    "the-integrating-factor",
+    "homogeneous-plus-particular",
+    "polynomial-forcing",
+    "exponential-and-sinusoidal-forcing",
+    "circuits-tanks-and-loans",
+    "stiffness-when-the-step-is-too-big",
+)
+DE_COURSE_7_HOME = "/second-order-linear-equations/"
+DE_COURSE_7_LESSONS = (
+    "sine-cosine-and-their-rates",
+    "the-second-order-equation",
+    "the-characteristic-equation",
+    "real-distinct-roots",
+    "repeated-roots",
+    "complex-roots-and-oscillation",
+    "fitting-the-initial-conditions",
+    "superposition-and-the-wronskian",
+    "from-second-order-to-a-system",
+    "euler-on-an-oscillator",
+)
+DE_COURSE_8_HOME = "/oscillators-damping-and-resonance/"
+DE_COURSE_8_LESSONS = (
+    "the-mass-spring-model",
+    "amplitude-phase-and-period",
+    "energy-and-the-phase-ellipse",
+    "overdamped-critical-and-underdamped",
+    "underdamped-motion-and-the-envelope",
+    "critical-damping-and-design",
+    "forced-oscillation",
+    "resonance-and-beats",
+    "damped-forcing-and-the-amplitude-curve",
+)
+DE_COURSE_9_HOME = "/systems-and-the-phase-plane/"
+DE_COURSE_9_LESSONS = (
+    "systems-of-two-equations",
+    "straight-line-solutions-and-eigenvectors",
+    "the-general-solution-of-a-linear-system",
+    "saddles-nodes-spirals-and-centres",
+    "stability-of-the-origin",
+    "nonlinear-systems-and-equilibria",
+    "linearisation-and-the-jacobian",
+    "predator-and-prey",
+    "competing-species",
+    "an-epidemic-model",
+)
+DE_COURSE_10_HOME = "/laplace-transforms/"
+DE_COURSE_10_LESSONS = (
+    "the-laplace-transform",
+    "linearity-and-the-table",
+    "the-transform-of-a-derivative",
+    "solving-an-initial-value-problem",
+    "partial-fractions-exactly",
+    "the-transfer-function-and-its-poles",
+    "the-unit-step-and-switched-forcing",
+    "three-methods-one-equation",
+)
+
+DE_COURSES = (
+    ("Rates of Change and the Derivative", DE_COURSE_1_HOME, DE_COURSE_1_LESSONS),
+    ("Accumulation and the Integral", DE_COURSE_2_HOME, DE_COURSE_2_LESSONS),
+    ("Differential Equations and Euler's Method",
+     DE_COURSE_3_HOME, DE_COURSE_3_LESSONS),
+    ("Separable Equations, Growth and Decay", DE_COURSE_4_HOME, DE_COURSE_4_LESSONS),
+    ("Equilibria, Stability and Phase Lines", DE_COURSE_5_HOME, DE_COURSE_5_LESSONS),
+    ("First-Order Linear Equations", DE_COURSE_6_HOME, DE_COURSE_6_LESSONS),
+    ("Second-Order Linear Equations", DE_COURSE_7_HOME, DE_COURSE_7_LESSONS),
+    ("Oscillators, Damping and Resonance", DE_COURSE_8_HOME, DE_COURSE_8_LESSONS),
+    ("Systems and the Phase Plane", DE_COURSE_9_HOME, DE_COURSE_9_LESSONS),
+    ("Laplace Transforms", DE_COURSE_10_HOME, DE_COURSE_10_LESSONS),
+)
+
+DE_PATH_COURSE_COUNT = 10
+DE_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
-               + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES)
+               + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
+               + DE_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1259,7 +1405,7 @@ def source_of(url):
 # them -- but the per-course invariants do not, because neither is a course.
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
-                       PHIL_PATH_PAGE, ENG_PATH_PAGE)
+                       PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1280,6 +1426,8 @@ PATHS = (
      PHIL_UPCOMING_COURSES),
     ("English", ENG_PATH_PAGE, ENG_COURSES, ENG_PATH_COURSE_COUNT,
      ENG_UPCOMING_COURSES),
+    ("Differential Equations", DE_PATH_PAGE, DE_COURSES, DE_PATH_COURSE_COUNT,
+     DE_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -1469,6 +1617,11 @@ PHIL_DISCLAIMER_RE = re.compile(
 # That is the whole claim of the Subject, so it is the sentence its pages carry.
 ENG_DISCLAIMER_RE = re.compile(
     r"(?i)check by hand rather than something you are told")
+# Differential Equations promises exact fractions and warns that they are the
+# exact values of an APPROXIMATE method: Euler's polygon, not the curve. Stopping
+# short of the em dash and free of apostrophes, for the reason OR's gives.
+DE_DISCLAIMER_RE = re.compile(
+    r"(?i)exact arithmetic applied to an approximate method")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -1485,6 +1638,8 @@ PATH_MATERIAL_DISCLAIMER = {
     PHIL_PATH_PAGE: ("the only-as-good-as-the-premises disclaimer",
                      PHIL_DISCLAIMER_RE),
     ENG_PATH_PAGE: ("the check-it-by-hand disclaimer", ENG_DISCLAIMER_RE),
+    DE_PATH_PAGE: ("the exact-arithmetic-on-an-approximate-method disclaimer",
+                   DE_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -1804,9 +1959,14 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(ENG_COURSES)
             + sum(len(slugs) for _t, _h, slugs in ENG_COURSES)
         )
+        de_tree = (
+            1  # the Differential Equations path page
+            + len(DE_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in DE_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
-                       + phil_tree + eng_tree)  # 1 for the index
+                       + phil_tree + eng_tree + de_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -1856,9 +2016,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 52 pages, got %d" % eng_tree,
         )
         self.assertEqual(
-            886,
+            103,
+            de_tree,
+            "the Differential Equations path is 1 + 10 + 11 + 8 + 10 + 10 + 8 + 8 "
+            "+ 10 + 9 + 10 + 8 = 103 pages, got %d" % de_tree,
+        )
+        self.assertEqual(
+            989,
             course_tree,
-            "the site index plus all eight path trees is 886 pages, got %d" % course_tree,
+            "the site index plus all nine path trees is 989 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -1869,9 +2035,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            890,
+            993,
             expected,
-            "886 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 890, "
+            "989 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 993, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2084,6 +2250,8 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "algorithms": getattr(smoke, "ALGO_COURSES", ()),
             "operations_research": getattr(smoke, "OR_COURSES", ()),
             "philosophy": getattr(smoke, "PHIL_COURSES", ()),
+            "english": getattr(smoke, "ENG_COURSES", ()),
+            "differential_equations": getattr(smoke, "DE_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -2496,9 +2664,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            877,
+            979,
             len(course_pages),
-            "seventy-four course homes and 803 lessons carry a material "
+            "eighty-four course homes and 895 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -3489,7 +3657,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(74, checked, "every published course must be checked")
+        self.assertEqual(84, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -3786,6 +3954,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from discrete_math import PATH as DISCRETE
             from philosophy import PATH as PHILOSOPHY
             from english import PATH as ENGLISH
+            from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -3794,6 +3963,8 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("algebra", ALGEBRA_COURSES, ALGEBRA_PATH_PAGE, ALGEBRA),
             ("philosophy", PHIL_COURSES, PHIL_PATH_PAGE, PHILOSOPHY),
             ("english", ENG_COURSES, ENG_PATH_PAGE, ENGLISH),
+            ("differential equations", DE_COURSES, DE_PATH_PAGE,
+             DIFFERENTIAL_EQUATIONS),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -3925,10 +4096,11 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from discrete_math import PATH as DISCRETE
             from philosophy import PATH as PHILOSOPHY
             from english import PATH as ENGLISH
+            from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
-        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4077,11 +4249,12 @@ class TestEveryLabBuilds(unittest.TestCase):
             from discrete_math import PATH as DISCRETE
             from philosophy import PATH as PHILOSOPHY
             from english import PATH as ENGLISH
+            from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
-        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

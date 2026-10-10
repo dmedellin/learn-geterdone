@@ -70,7 +70,7 @@ SYMBOLS = {
     "Ω": "omega",
     # punctuation that is spoken as a pause or not at all
     "…": "and so on", "⋯": "and so on", "⋮": "and so on",
-    "′": "prime", "″": "double prime", "∠": "angle", "□": "necessarily", "◇": "possibly", "◊": "possibly",
+    "′": "prime", "″": "double prime", "‴": "triple prime", "∠": "angle", "□": "necessarily", "◇": "possibly", "◊": "possibly",
     "≻": "is preferred to", "≽": "is weakly preferred to", "≺": "precedes",
     "∎": "end of proof", "✓": "check", "✗": "fails", "★": "star",
     "—": ",", "–": "to", "“": "", "”": "", "‘": "", "\\": "minus",
@@ -80,6 +80,8 @@ SYMBOLS = {
     "⇏": "does not imply", "⟷": "corresponds to", "⟼": "maps to",
     "⊛": "convolved with", "¢": "cents", "£": "pounds", "€": "euros",
     "⌊": "the floor of", "⌋": ",", "⌈": "the ceiling of", "⌉": ",",
+    # ℒ[f] is written with square brackets, which say nothing after a symbol
+    "ℒ": "the Laplace transform of",
 }
 
 # ASCII spellings of the same relations. Longest first, so `<=>` is not read
@@ -99,7 +101,7 @@ FUNCTIONS = {
     "mod": "mod", "det": "the determinant", "rank": "the rank",
     "floor": "the floor", "ceil": "the ceiling", "sqrt": "the square root",
     "abs": "the absolute value", "Var": "the variance", "Cov": "the covariance",
-    "Pr": "the probability",
+    "Pr": "the probability", "tr": "the trace",
 }
 
 # Words that are not a product of variables even beside an operator.
@@ -147,7 +149,7 @@ _ARITH = set("=+−-·×/^<>≤≥≠≈≡±") | set(ASCII_OPS)
 # (`latency cap ≈ 14 s`). They are split into letters only when the run is
 # operator-bound on both sides, as `by` is in `ax + by`.
 COMMON_WORDS = set("""
-a an and are as at be but by can cap day do each end for get go has hi how if
+a an and are as at be but by can cap day do each end for get go has hi how if to
 in is it its key log low max min new no nor not now of off old on one or our
 out own per put row run set so ten the top two up use was way who why yes yet
 all any few her him his lot may met one sum six who add big bit cut due far
@@ -328,7 +330,7 @@ _PROSE_VERBS = {"has", "have", "holds", "hold", "needs", "need", "takes", "take"
                 "least", "most", "only", "costs", "waits", "wait", "sees", "see"}
 GREEK = set("αβγδεζηθικλμνξπρστυφχψωΓΔΘΛΞΠΣΦΨΩϕϵ")
 # Symbols that end a value: a minus after one subtracts (`⌈n/k⌉ − 1`, `λ − μ`).
-_VALUE_END = GREEK | set("⌋⌉∞∅ℕℤℚℝℂ′″½⅓⅔¼¾ℓ…")
+_VALUE_END = GREEK | set("⌋⌉∞∅ℕℤℚℝℂ′″‴½⅓⅔¼¾ℓ…")
 
 
 def _bound(tokens, i, step):
@@ -339,6 +341,67 @@ def _bound(tokens, i, step):
     if not 0 <= j < len(tokens) or tokens[j][0] == "gap":
         return None
     return tokens[j][1]
+
+
+_TIME_OPS = ("+", "−", "-", "/", "·", "×", "*", "^")
+
+
+def _time_arg(letter, inner):
+    """Is a bracket's content (tokens, spaces included) the argument of a
+    function of time or of a number: `t`, `tₙ`, `t + h`, `0`, `1/2`, `−1`?
+
+    `y(t)` and `y(0)` are a solution evaluated, not y times t: `y` is in
+    SINGLE_LETTER_PRODUCTS because `y(y − 2)` is a product, and the calling
+    letter inside the bracket is exactly what keeps that reading.
+    """
+    toks = [(k, t) for k, t in inner if k not in ("ws", "gap")]
+    if not toks:
+        return False
+    if toks[0] == ("word", "t"):
+        if any(k == "word" and t == letter for k, t in toks):
+            return False
+        rest = toks[1:]
+        if rest and rest[0][0] == "sub":
+            rest = rest[1:]
+        return not rest or (rest[0][1] in _TIME_OPS and len(rest) > 1)
+    return _numeric_arg(inner)
+
+
+def _numeric_arg(inner):
+    """One number, or a fraction of two, with an optional leading minus: `0`, `−1`, `1/2`."""
+    toks = [(k, t) for k, t in inner if k not in ("ws", "gap")]
+    if toks and toks[0][1] in ("−", "-"):
+        toks = toks[1:]
+    kinds = [k for k, _ in toks]
+    return kinds == ["num"] or (kinds == ["num", "other", "num"] and toks[1][1] == "/")
+
+
+def _signed_number(inner):
+    """One number with an optional leading minus: `0`, `−1`, never `1/2`.
+
+    `f(−1)` needs no "the quantity" to say where its argument ends, but
+    `f(3/2)` does: "f of 3 over 2" is also how f(3)/2 is said.
+    """
+    toks = [t for k, t in inner if k not in ("ws", "gap")]
+    return _numeric_arg(inner) and "/" not in toks
+
+
+def _time_call(tokens, i):
+    """A single letter applied to time or to a number: `y(0)`, `x(t)`, `u(t − c)`."""
+    kind, tok = tokens[i]
+    if kind != "word" or len(tok) != 1 or i + 1 >= len(tokens) or tokens[i + 1][1] != "(":
+        return False
+    if i and (tokens[i - 1][1] in ("_", "^") or tokens[i - 1][0] == "num"):
+        return False  # w_a(t + p_a) is a subscript; 3x(-2)² is a coefficient times x
+    close = _match(tokens).get(i + 1)
+    if close is None or not _time_arg(tok, tokens[i + 2:close]):
+        return False
+    after = tokens[close + 1] if close + 1 < len(tokens) else ("ws", " ")
+    if after[0] in ("word", "num") or after[1] == "(":
+        return False  # c(9/10)n: a bracket glued to what follows is a factor
+    inner = [t for k, t in tokens[i + 2:close] if k not in ("ws", "gap")]
+    # c(9/10)²: a fraction or a negative bracketed under a power is a factor too
+    return not (after[0] == "sup" and (inner[0] in ("−", "-") or "/" in inner))
 
 
 def _product(tokens, i, tok):
@@ -383,6 +446,10 @@ def _say(text):
             say(tok.replace(" ", ""))
         elif kind == "word":
             call = touching_next and tokens[i + 1][1] == "("
+            if re.fullmatch(r"d[a-z]", tok) and tok not in COMMON_WORDS \
+                    and any(t == "∫" for _, t in tokens[:i]):
+                say("d " + tok[1])  # ∫N(t) dt: the differential, d t
+                continue
             if tok == "inf":
                 say("infinity")
                 continue
@@ -412,7 +479,8 @@ def _say(text):
                 # `ax + by` is a product of letters, not the word "by"
                 for ch in tok:
                     say("A" if ch == "a" else ch)
-            elif call and tok in SINGLE_LETTER_PRODUCTS and tokens[i + 1][1] == "(" and pt != "_":
+            elif call and tok in SINGLE_LETTER_PRODUCTS and tokens[i + 1][1] == "(" and pt != "_" \
+                    and not _time_call(tokens, i):
                 # n(n + 1) is a product; f(x) is not
                 say("A" if tok == "a" else tok)
                 say("times")
@@ -479,7 +547,8 @@ def _say(text):
         elif tok == "(":
             if paren_ctx and paren_ctx[-1] == "fncall" and pt and pt not in _OPERATORS:
                 paren_ctx[-1] = "prob" if pt in ("P", "Pr", "E") else "call"
-                if paren_ctx[-1] == "call" and i in brackets and _one_operation(tokens, i, brackets[i]):
+                if paren_ctx[-1] == "call" and i in brackets and _one_operation(tokens, i, brackets[i]) \
+                        and not (_time_call(tokens, i - 1) and _signed_number(tokens[i + 1:brackets[i]])):
                     say("the quantity")  # f(2x + 6): where the argument ends
                     paren_ctx[-1] = "callq"
             elif i and (tokens[i - 1][0] == "sub" or tokens[i - 1][1] in ("'", "′", "⁻¹")) or (
@@ -592,6 +661,16 @@ def _say(text):
             say(", and so on,")
         elif tok in ("≥", "≤") and pk == "word" and len(pt) > 2 and pt.lower() in COMMON_WORDS | _PROSE_VERBS:
             say("at least" if tok == "≥" else "at most")  # some box has ≥ 2
+        elif tok == "∫" and i + 1 < len(tokens) and tokens[i + 1][0] == "sub":
+            # ∫ₐᵇ f(t) dt: the limits are where the integral runs, not a subscript
+            lower = _say("".join(SUB[c] for c in tokens[i + 1][1]))
+            if i + 2 < len(tokens) and tokens[i + 2][0] == "sup":
+                say("the integral from %s to %s of"
+                    % (lower, _say("".join(SUPER[c] for c in tokens[i + 2][1]))))
+                skip_to = i + 3
+            else:
+                say("the integral over %s of" % lower)
+                skip_to = i + 2
         elif tok in SYMBOLS:
             phrase = SYMBOLS[tok]
             if tok in "⌊⌈√∛" and i and tokens[i - 1][0] == "num":
@@ -754,6 +833,16 @@ def _settled_call(text, m):
     letter = m.group()[0]
     if letter in _FUNCTION_LETTERS:
         return True
+    # y(0), x(t), u(t − c): a letter applied to time or to a number reads as a
+    # call (speech._time_call), so the reading is settled
+    if m.group() == letter + "(" and letter.isascii():
+        tokens, at = [], None
+        for t in _TOKEN.finditer(text):
+            if t.start() == m.start():
+                at = len(tokens)
+            tokens.append((t.lastgroup, t.group()))
+        if at is not None and _time_call(tokens, at):
+            return True
     # n(n − 1), x(x − 2): the letter multiplies an expression in itself
     rest = text[m.end():]
     return bool(re.match(r"\s*%s\s*[−+\-]" % re.escape(letter), rest))
@@ -807,7 +896,7 @@ def all_overrides():
 
 # --- math written into prose without backticks ----------------------------------
 
-_SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠≈≡≢∝√∛∑∏Σ⟹⟺⇒⇔→←↦ℕℤℚℝℂ∞×·÷±∓∘¬∧∨⌊⌋⌈⌉|^_"
+_SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠≈≡≢∝√∛∑∏Σ⟹⟺⇒⇔→←↦ℕℤℚℝℂ∞×·÷±∓∘¬∧∨⌊⌋⌈⌉|^_′″‴"
                      r"⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿⁱᵀᴺᵏʲˣ₀₁₂₃₄₅₆₇₈₉₊₋ₐₑₒₓₖₗₘₙₚₛₜᵢⱼ"
                      r"αβγδεζηθκλμνξπρστφχψωΓΔΘΛΞΠΦΨΩ]|&(?:le|ge|ne|lt|gt);")
 _OPERATOR = re.compile(r"[=<>+−\-/*%(),.:;!]+|&(?:le|ge|ne|lt|gt);")
