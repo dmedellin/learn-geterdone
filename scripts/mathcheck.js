@@ -19629,6 +19629,121 @@ console.log('lab presets: the second sweep, over the kits nobody had reported');
 }
 
 
+// ==========================================================================
+// Differential Equations: de_core, the exact engine under calckit and dekit
+// ==========================================================================
+//
+// scripts/mathpath/labs/de_core.py holds polynomials in named variables
+// (MPOLY_JS), rational functions (RF_JS), exponential polynomials with their
+// exact derivative and Laplace transform (EP_JS) and the exact Euler, Heun and
+// RK4 steppers (STEP_JS). docs/differential-equations/PLAN.md section D.1 names
+// the five cases a wrong implementation passes by accident; they come first.
+// Every other case below was checked to FAIL when its function was broken on
+// purpose.
+//
+// The blocks run in a fresh vm context of their own, on algebra_core's four
+// always-shipped blocks and SURD_JS, exactly as de_core.script() assembles a
+// page. Several sections above eval blocks that define R, Rtext and friends
+// into this file's scope, and a later definition would silently replace the
+// one de_core is built on.
+console.log('differential equations: polynomials, rational functions, exponential polynomials, exact steppers');
+{
+  const vm = require('vm');
+  const DE_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'de_core.py');
+  const deSrc = fs.readFileSync(DE_SOURCE, 'utf8');
+  const deBlock = (n) => blockFrom(deSrc, n, DE_SOURCE);
+  const ctx = { console: console };
+  vm.createContext(ctx);
+  vm.runInContext(block('RATIONAL_JS') + block('POLY_JS') + block('EXPR_JS') + block('PLOT_JS')
+                  + block('SURD_JS') + deBlock('SHOW_JS') + deBlock('MPOLY_JS') + deBlock('RF_JS')
+                  + deBlock('EP_JS') + deBlock('STEP_JS'), ctx, { filename: 'de_core.py' });
+  const de = (expr) => {
+    try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; }
+  };
+
+  /* --- the five cases section D.1 asks for first ----------------------- */
+  eq(de("EPtext(EPderiv(EPparse('t e^(-2t)', {})))"), '−2·t·e^(−2t) + e^(−2t)',
+     'EPderiv on t·e^(−2t): the product rule inside the class, two terms and not one');
+  eq(de("RFtext(EPlaplace(EPparse('t e^(3t)', {})), 's', true)"), '1/(s − 3)²',
+     'EPlaplace on t·e^(3t) is 1/(s − 3)², the derivative of 1/(s − 3) with the sign flipped');
+  eq(de("RFpartialText(RFpartial(RFparse('1/(s(s+1)^2)', 's')), 's')"),
+     '1/s − 1/(s + 1) − 1/(s + 1)²',
+     'RFpartial on 1/(s(s + 1)²): the repeated factor gets a term for each power');
+  eq(de("(function () { var o = DE_rk4(MPparse('t^3', ['t', 'y']), R(0n, 1n), R(0n, 1n), R(1n, 4n), 4);"
+        + " return DE_q(o.rows[4].y) + ' ' + o.steps; })()"), '1/4 4',
+     "DE_rk4 on y′ = t³ over [0, 1] with h = 1/4 lands on 1/4 exactly: RK4 is Simpson's rule there, exact for a cubic");
+  eq(de("(function () { var o = DE_euler(MPparse('y^2', ['t', 'y']), R(0n, 1n), R(1n, 1n), R(1n, 4n), 40);"
+        + " return o.steps + ' ' + o.stopped + ' ' + o.rows.length; })()"), '11 true 12',
+     'DE_euler on y′ = y², y(0) = 1, h = 1/4 stops on the digit budget after step 11, keeping 12 rows');
+
+  /* --- MPOLY_JS ---------------------------------------------------------- */
+  eq(de("MPtext(MPadd(MPparse('t^2+y', ['t', 'y']), MPparse('-t^2+2y', ['t', 'y'])))"), '3y',
+     'MPadd cancels t² and merges like terms');
+  eq(de("MPtext(MPsub(MPparse('t y', ['t', 'y']), MPparse('t y', ['t', 'y'])))"), '0', 'MPsub of equals is 0');
+  eq(de("MPtext(MPmul(MPparse('t+y', ['t', 'y']), MPparse('t-y', ['t', 'y'])))"), 't² − y²',
+     'MPmul: the cross terms cancel');
+  eq(de("MPtext(MPscale(MPparse('2t - 4y', ['t', 'y']), R(-1n, 2n)))"), '−t + 2y', 'MPscale by −1/2');
+  eq(de("DE_q(MPeval(MPparse('t^2 y - y^3', ['t', 'y']), {t: R(1n, 2n), y: R(2n, 3n)}))"), '−7/54',
+     'MPeval is exact at a rational point: 1/6 − 8/27');
+  eq(de("MPtext(MPpartial(MPparse('t^2 y - y^3', ['t', 'y']), 'y'))"), 't² − 3y²', 'MPpartial in y');
+  eq(de("[MPdegree(MPparse('t^2 y^3 + t', ['t', 'y'])), MPdegree(MPparse('t^2 y^3 + t', ['t', 'y']), 'y')].join(' ')"),
+     '5 3', 'MPdegree: total, then in one variable');
+  eq(de("DE_ptext(MPtoPoly(MPparse('3t^2-12t+9', ['t', 'y']), 't'), 't')"), '3t² − 12t + 9',
+     'MPtoPoly to a one-variable list, printed in the library notation');
+  eq(de("MPtoPoly(MPparse('t^2 y', ['t', 'y']), 't')"), 'null', 'and null when another variable appears');
+  eq(de("MPtext(MPsubst(MPparse('y^2 - t', ['t', 'y']), 'y', MPparse('t+1', ['t', 'y'])))"), 't² + t + 1',
+     'MPsubst: (t + 1)² − t');
+  eq(de("MPparse('sin(t)', ['t', 'y'])"),
+     'THREW this lab steps polynomial right-hand sides exactly; sin(t) is not one',
+     'MPparse (through MPfromExpr) refuses a function call with the sentence section D.0 gives');
+
+  /* --- RF_JS ------------------------------------------------------------- */
+  eq(de("RFtext(RFadd(RFparse('1/s', 's'), RFparse('1/(s+1)', 's')), 's', true)"), '(2s + 1)/(s(s + 1))',
+     'RFadd over a common denominator, printed factored');
+  eq(de("RFtext(RFmul(RFparse('s/(s+2)', 's'), RFparse('(s+2)/(s^2)', 's')), 's')"), '1/s',
+     'RFmul reduces to lowest terms');
+  eq(de("RFtext(RFdiv(RFparse('1/s', 's'), RFparse('1/(s+1)', 's')), 's')"), '(s + 1)/s', 'RFdiv');
+  eq(de("RFtext(RFderiv(RFparse('1/(s+1)', 's')), 's')"), '−1/(s² + 2s + 1)', 'RFderiv: the quotient rule');
+  eq(de("RFeval(RFparse('1/(s-2)', 's'), R(2n, 1n))"), 'null', 'RFeval is null at a pole');
+  eq(de("DE_q(RFeval(RFparse('1/(s-2)', 's'), R(5n, 2n)))"), '2', 'and exact elsewhere');
+  eq(de("RFpartial(RFparse('1/(s^3+s+1)', 's')).refused"),
+     'the denominator has an irreducible factor of degree 3 or more',
+     'RFpartial refuses an irreducible cubic rather than guessing');
+
+  /* --- EP_JS ------------------------------------------------------------- */
+  eq(de("EPtext(EPadd(EPparse('2e^(-t)', {}), EPparse('-e^(-t) + t', {})))"), 't + e^(−t)',
+     'EPadd merges like terms');
+  eq(de("EPtext(EPscale(EPparse('cos(2t) + 3', {}), R(1n, 3n)))"), '1 + (1/3)·cos(2t)', 'EPscale');
+  eq(de("EPtext(EPmulpoly(EPparse('e^(t)', {}), [R(1n, 1n), R(1n, 1n)]))"), 't·e^t + e^t',
+     'EPmulpoly by 1 + t');
+  eq(de("EPtext(EPderiv(EPparse('e^(-t) cos(2t)', {})))"), '−e^(−t)·cos(2t) − 2·e^(−t)·sin(2t)',
+     'EPderiv of a damped cosine: the sine term carries −b');
+  eq(de("EPzero(EPsub(EPparse('e^(t)', {}), EPparse('e^(t)', {})))"), 'true', 'EPzero after EPsub');
+  eq(de("DE_q(EPevalExact(EPparse('3t^2 - t', {}), R(2n, 1n)))"), '10', 'EPevalExact on a polynomial');
+  eq(de("DE_q(EPevalExact(EPparse('e^(-t)+cos(2t)', {}), R(0n, 1n)))"), '2', 'and at t = 0');
+  eq(de("EPevalExact(EPparse('e^(-t)', {}), R(1n, 1n))"), 'null', 'and null where e^(−1) is irrational');
+  near(de("EPevalFloat(EPparse('e^(t)', {}), 1)"), Math.E, 1e-12, 'EPevalFloat');
+  eq(de("(function () { var F = EPfamily('C e^(-t) + D t e^(-t)');"
+        + " return [EPtext(F.base), EPtext(F.C), EPtext(F.D)].join(' | '); })()"), '0 | e^(−t) | t·e^(−t)',
+     'EPfamily splits a candidate into its C and D parts');
+  eq(de("RFtext(EPlaplace(EPparse('e^(-t) sin(2t)', {})), 's', true)"), '2/((s + 1)² + 4)',
+     'EPlaplace of a damped sine');
+  eq(de("EPtext(EPfromPartial(RFpartial(RFparse('1/(s^2+2s+5)', 's'))).ep)"), '(1/2)·e^(−t)·sin(2t)',
+     'EPfromPartial inverts the irreducible quadratic');
+
+  /* --- STEP_JS ----------------------------------------------------------- */
+  eq(de("DE_q(DE_euler(MPparse('y', ['t', 'y']), R(0n, 1n), R(1n, 1n), R(1n, 2n), 2).rows[2].y)"), '9/4',
+     'DE_euler on y′ = y with h = 1/2: (3/2)²');
+  eq(de("DE_q(DE_heun(MPparse('y', ['t', 'y']), R(0n, 1n), R(1n, 1n), R(1n, 2n), 2).rows[2].y)"), '169/64',
+     'DE_heun: (1 + h + h²/2)² = (13/8)²');
+  eq(de("DE_q(DE_rk4(MPparse('y', ['t', 'y']), R(0n, 1n), R(1n, 1n), R(1n, 1n), 1).rows[1].y)"), '65/24',
+     'DE_rk4 on y′ = y with h = 1: the Taylor polynomial of e to degree four');
+  eq(de("DE_eulerSys(MPparse('y', ['x', 'y']), MPparse('-x', ['x', 'y']), R(0n, 1n), R(1n, 1n), R(0n, 1n),"
+        + " R(1n, 2n), 2).rows.map(function (r) { return DE_q(r.x) + ',' + DE_q(r.y); }).join(' ')"),
+     '1,0 1,−1/2 3/4,−1', 'DE_eulerSys on the rotation x′ = y, y′ = −x');
+  eq(de("DE_digits([R(12345n, 7n), R(1n, 100n)])"), '5', 'DE_digits: the widest numerator or denominator');
+}
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the
