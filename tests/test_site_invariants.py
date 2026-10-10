@@ -1850,9 +1850,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "+ 10 + 9 = 119 pages, got %d" % phil_tree,
         )
         self.assertEqual(
-            849,
+            52,
+            eng_tree,
+            "the English path is 1 + 10 + 4 + 3 + 6 + 4 + 4 + 4 + 5 + 4 + 4 + 3 "
+            "= 52 pages, got %d" % eng_tree,
+        )
+        self.assertEqual(
+            886,
             course_tree,
-            "the site index plus all eight path trees is 849 pages, got %d" % course_tree,
+            "the site index plus all eight path trees is 886 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -3483,7 +3489,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(68, checked, "every published course must be checked")
+        self.assertEqual(74, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
