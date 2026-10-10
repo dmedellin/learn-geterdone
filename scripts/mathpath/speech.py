@@ -149,7 +149,7 @@ _ARITH = set("=+−-·×/^<>≤≥≠≈≡±") | set(ASCII_OPS)
 # (`latency cap ≈ 14 s`). They are split into letters only when the run is
 # operator-bound on both sides, as `by` is in `ax + by`.
 COMMON_WORDS = set("""
-a an and are as at be but by can cap day do each end for get go has hi how if
+a an and are as at be but by can cap day do each end for get go has hi how if to
 in is it its key log low max min new no nor not now of off old on one or our
 out own per put row run set so ten the top two up use was way who why yes yet
 all any few her him his lot may met one sum six who add big bit cut due far
@@ -896,7 +896,7 @@ def all_overrides():
 
 # --- math written into prose without backticks ----------------------------------
 
-_SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠≈≡≢∝√∛∑∏Σ⟹⟺⇒⇔→←↦ℕℤℚℝℂ∞×·÷±∓∘¬∧∨⌊⌋⌈⌉|^_"
+_SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠≈≡≢∝√∛∑∏Σ⟹⟺⇒⇔→←↦ℕℤℚℝℂ∞×·÷±∓∘¬∧∨⌊⌋⌈⌉|^_′″‴"
                      r"⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿⁱᵀᴺᵏʲˣ₀₁₂₃₄₅₆₇₈₉₊₋ₐₑₒₓₖₗₘₙₚₛₜᵢⱼ"
                      r"αβγδεζηθκλμνξπρστφχψωΓΔΘΛΞΠΦΨΩ]|&(?:le|ge|ne|lt|gt);")
 _OPERATOR = re.compile(r"[=<>+−\-/*%(),.:;!]+|&(?:le|ge|ne|lt|gt);")
