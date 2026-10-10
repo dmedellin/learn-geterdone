@@ -125,6 +125,28 @@ READINGS = {
     "latency cap ≈ 14 s": "latency cap is approximately 14 seconds",
     "(n − 3)² = 4,           a different quantity":
         "the quantity n minus 3, squared equals 4, a different quantity",
+    # Differential Equations (docs/differential-equations/PLAN.md section D.5)
+    "ℒ[f]": "the Laplace transform of f",
+    "ℒ[y′] = s·Y(s) − y(0)":
+        "the Laplace transform of y prime equals s times Y of s minus y of 0",
+    "tr(J)": "the trace of J",
+    "y‴ − y": "y triple prime minus y",
+    "∫ₐᵇ f(t) dt": "the integral from A to b of f of t d t",
+    "∫₁ˣ dt/t": "the integral from 1 to x of d t over t",
+    "(1/T)∫N(t) dt": "1 over T the integral of N of t d t",
+    # a letter applied to time or to a number is a call, not a product
+    "y(0) = 1": "y of 0 equals 1",
+    "x(t)": "x of t",
+    "y(tₙ)": "y of t sub n",
+    "y(t + h)": "y of the quantity t plus h",
+    "u(t − c)": "u of the quantity t minus c",
+    "y(1/2)": "y of 1 over 2",
+    "f(−1) = −3": "f of negative 1 equals negative 3",
+    # ...and the shapes that stay products
+    "y(y − 2)": "y times the quantity y minus 2",
+    "3x(-2)²": "3 x times the quantity negative 2, squared",
+    "c(9/10)n": "c times the quantity 9 over 10, times n",
+    "2y(0)": "2 y times 0",
 }
 
 
@@ -149,6 +171,18 @@ class TestReadings(unittest.TestCase):
                          ["speedup, 100.00 over 6.00, equals, 16.67 times"])
         # a blank spacer or a lone rule between formulas is silence, not a table
         self.assertEqual(say_block(["x = 1", "", "  ─────", "y = 2"]), ["x equals 1", "y equals 2"])
+
+    def test_time_calls_are_settled(self):
+        """`y(0)` and `x(t)` read as calls, so they are not guesses; a bracket
+        holding the calling letter, a subscript's bracket, and a coefficient
+        glued to the letter are still flagged."""
+        from mathpath.speech import ambiguous
+        for run in ("y(0)", "x(t) = x + t·d", "y(tₙ)", "u(t − c)", "y(−1/2)"):
+            with self.subTest(run=run):
+                self.assertEqual(ambiguous(run), [])
+        for run in ("y(t + y)", "w_a(t + p_a)", "t(the rest)", "μ(t)", "2y(0)", "c(9/10)²n"):
+            with self.subTest(run=run):
+                self.assertEqual(ambiguous(run), ["letter-call"])
 
     def test_markup_is_not_read(self):
         self.assertEqual(say("w(e) &le; w(g)"), "w of e is at most w of g")
