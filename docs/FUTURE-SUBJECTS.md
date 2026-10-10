@@ -135,6 +135,12 @@ discrete-and-algebraic treatment is possible and would be genuinely useful; it
 would also have to be explicit that it stops short of Maxwell, in the same way
 the Algebra path says it stops short of convergence tests.
 
+Since 2026-10-10 the library does teach calculus, in the Differential Equations
+Subject: the derivative and the integral from exact difference quotients and
+sums, ordinary differential equations, systems in the phase plane and the
+Laplace transform. A fields Subject could assume all of that, which leaves only
+the vector calculus — divergence, curl and flux — as new ground.
+
 ---
 
 ## If one of these is picked up
