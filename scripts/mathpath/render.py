@@ -464,8 +464,10 @@ def course_home(*, course, index, courses, path):
         # The two live paths never noticed because they wrote the field entirely
         # in lower case; the first course to name a sibling by title, which is
         # what the no-ordinals rule asks for, hit it immediately.
+        # escaped, then the `x` shorthand: a background that names `y′ = k·y`
+        # shipped its backticks on six Differential Equations course homes
         '<h2>Recommended background</h2><p>%s.</p></section>\n'
-        % esc(_first_upper(course["assumes_long"]).rstrip(".")),
+        % esc_inline(_first_upper(course["assumes_long"]).rstrip(".")),
         '    <section class="section">\n'
         '      <div class="grid-2">\n'
         '        <article class="card card-pad prose"><h3>Practice suggestions</h3>%s</article>\n'
