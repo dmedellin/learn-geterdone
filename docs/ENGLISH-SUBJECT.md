@@ -230,8 +230,8 @@ for speech.
 
 ## Scope
 
-Four courses and ten lessons are the Subject as published, and the path page
-says so. It is narrow on purpose: §2's test admits only a rule that can be run
-over printed words and scored in the browser. A further course (for example
-articles, or prepositions of time) is added when its rule passes that test and
-its residue can be printed, and not before; nothing is announced without a page.
+Ten courses and 41 lessons are the Subject as published (English v2,
+`docs/english-v2/PLAN.md`), and the path page says so. It is narrow on purpose:
+§2's test admits only a rule that can be run over printed words and scored in
+the browser. A further course is added when its rule passes that test and its
+residue can be printed, and not before; nothing is announced without a page.

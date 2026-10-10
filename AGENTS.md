@@ -15,14 +15,14 @@ were in the tree for months publishing nothing. All three are now in
 | Algorithms | **published** — 9 courses, 112 lessons, wired 2026-09-27 |
 | Operations Research | **published** — 10 courses, 92 lessons, wired 2026-09-27 (494 pages became 719) |
 | Philosophy | **published** — 10 courses, 108 lessons, 119 pages, wired 2026-10-08 (719 pages became 838) |
-| English | **published** — 4 courses, 10 lessons, 15 pages, wired 2026-10-09 (838 pages became 853) |
+| English | **published** — 10 courses, 41 lessons, 52 pages; first wired 2026-10-09 at 4 courses (838 pages became 853), widened by English v2 on 2026-10-10 (853 pages became 890) |
 
-85 lab modes are registered and all eighteen kits in
+98 lab modes are registered and all eighteen kits in
 `build_paths.KITS_WITH_EXPECTATIONS` now serve published pages: `node
-scripts/labcheck.js --generated` executes 721 generated pages, 232 of them with
+scripts/labcheck.js --generated` executes 758 generated pages, 263 of them with
 pinned figures, and compares every pinned tile string against what the page
 prints. Philosophy's two kits, `argkit` and `choicekit`, account for 98 of those
-pages and English's `english` kit for 10.
+pages and English's `english` kit for 41.
 Before the last two Subjects were wired it said "0 with pinned figures" — those
 expectations were written, verified against scratch renders, and then fired
 against nothing.
@@ -117,16 +117,16 @@ hand-authored and normalized at intake), **Discrete Mathematics** (8 courses, 10
 lessons), **Algebra** (9 courses, 112 lessons), **System Design** (10 courses,
 114 lessons), **Algorithms** (9 courses, 112 lessons), **Operations Research**
 (10 courses, 92 lessons), **Philosophy** (10 courses, 108 lessons) and **English**
-(4 courses, 10 lessons) — the last seven GENERATED from `content/<subject>/`. 68
-courses and 772 lessons in all. The
+(10 courses, 41 lessons) — the last seven GENERATED from `content/<subject>/`. 74
+courses and 803 lessons in all. The
 published URL space:
 
 | URL | Served from |
 | --- | --- |
 | `learn.geterdone.io/` | `site/index.html` — the site index: the paths, plus course search |
 | `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english` |
-| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 68 course homes |
-| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 772 lessons |
+| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 74 course homes |
+| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 803 lessons |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -137,7 +137,7 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 853-page map (plus eight published JSON assets) is in
+The full 890-page map (plus eight published JSON assets) is in
 [README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json` (and in
@@ -195,7 +195,7 @@ of truth. Edit them directly.
 **Discrete Mathematics**, **Algebra**, **System Design**, **Algorithms**,
 **Operations Research**, **Philosophy** and **English** are generated. `content/<subject>/` holds each of them as
 data — one Python module per course, with the lessons as dicts — and
-`scripts/build_paths.py` renders all 721 of their pages from `scripts/mathpath/`
+`scripts/build_paths.py` renders all 758 of their pages from `scripts/mathpath/`
 (one stylesheet, one chrome renderer, one lab kit per subject area). **Never
 edit a page under one of those course slugs by hand**: the next build reverts it,
 so the change appears to work and then vanishes.
@@ -284,6 +284,15 @@ bytes). Philosophy's 108 lessons are 116 KB / 133 KB raw and 30 KB / 36 KB
 gzipped, in Discrete Mathematics' range, so they have no row of their own; the
 heaviest is Justice and Collective Choice (`choicekit`'s voting modes), whose
 ten lessons are 35 KB / 36 KB gzipped.
+
+Re-measured 2026-10-10 when English v2 was wired. English's 41 lessons are
+134 KB / 176 KB raw and 36 KB / 52 KB gzipped. The kit's own budget
+(`docs/english-v2/PLAN.md` §D.0) is 48 KB gzipped per English lesson, and
+three pages are over it: the Vocabulary and Reading lessons, whose `coverage`
+lab ships the whole headword list (9 KB gzipped), the novel passage and the
+play excerpt (7 KB) and the two modern documents (5 KB) on every page, at
+51 KB to 52 KB. Every other English lesson is at or under 44 KB. The library
+ceiling below is unchanged.
 
 Re-derive them rather than trusting them; they go stale every time a lab grows:
 
@@ -527,7 +536,7 @@ small the diff looks.
 | agent | tier | Claude | Codex | owns | why this tier |
 | --- | --- | --- | --- | --- | --- |
 | `site-architect` | deep | opus | `-p deep` | URL space, cross-path design, retirements | one decision reshapes five declarations and the public URL space |
-| `chrome-renderer` | deep | opus | `-p deep` | `scripts/mathpath/{chrome,theme,render,progress,feedback,speech,readout}.py` | one edit lands on all 772 lessons at once |
+| `chrome-renderer` | deep | opus | `-p deep` | `scripts/mathpath/{chrome,theme,render,progress,feedback,speech,readout}.py` | one edit lands on all 803 lessons at once |
 | `lab-arithmetic` | deep | opus | `-p deep` | `scripts/mathpath/labs/`, `scripts/mathcheck.js` | exact rational arithmetic; a wrong answer is invisible to every other check |
 | `invariants` | deep | opus | `-p deep` | `tests/test_site_invariants.py` | a test that is wrong passes, and keeps passing |
 | `release-safety` | safety | opus | `-p safety` | `release/`, `Containerfile.release`, `.github/workflows/`, `deploy/` | irreversible and expensive; **read-only** |
