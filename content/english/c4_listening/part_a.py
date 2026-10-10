@@ -26,8 +26,8 @@ LESSONS = [
         ),
         "key_label": "Counted on the passage in the lab",
         "key": [
-            "949 words on the page",
-            "388 can take a weak form    40.9%",
+            "936 words on the page",
+            "387 can take a weak form    41.3%",
             "",
             "and only 43 different words",
             "are on that list",
@@ -46,7 +46,7 @@ LESSONS = [
             ),
             (
                 "They are two words in five of what you hear",
-                "On the page in the lab, 388 words out of 949 are on that list. "
+                "On the page in the lab, 387 words out of 936 are on that list. "
                 "So two words in every five coming at you are from one short list, and "
                 "most of them arrive in a shape you may never have been taught. "
                 "That is not speed. That is a short list you have not learned yet.",
@@ -160,8 +160,15 @@ LESSONS = [
             (
                 "Squashing every word on the list every time",
                 "The count is the most it could be, not the least. A word on "
-                "the list keeps its full shape when it is stressed or ends the "
-                "sentence: <em>who are you looking at?</em> And <em>that</em>, <em>have</em>, <em>has</em> "
+                "the list keeps its full shape when it is stressed, and a "
+                "helping verb or a small word such as <em>at</em> keeps it when "
+                "it is left standing at the end: <em>who are you looking "
+                "at?</em> The words for people do not: <em>him</em>, "
+                "<em>her</em> and <em>you</em> stay squashed even at the end "
+                "of a sentence. The lab counts 24 of the 387 standing last "
+                "before a comma, a full stop or another mark, and about half "
+                "of those are <em>him</em>, <em>her</em>, <em>he</em> or "
+                "<em>you</em>. And <em>that</em>, <em>have</em>, <em>has</em> "
                 "and <em>had</em> squash only when they do grammar work: "
                 "<em>the book that I read</em>, yes; <em>that book</em> and "
                 "<em>have tea</em>, no. The lab counts those four separately.",
@@ -174,7 +181,7 @@ LESSONS = [
                 "a": ["About a tenth", "About a fifth", "About two in five", "Nearly all of them"],
                 "c": 2,
                 "why": (
-                    "388 of 949, which is 40.9%. Two words in every five come "
+                    "387 of 936, which is 41.3%. Two words in every five come "
                     "from a list of fewer than fifty."
                 ),
             },
@@ -190,7 +197,7 @@ LESSONS = [
             {
                 "q": "Why do the squashed words run into one another?",
                 "a": [
-                    "They are said faster than other words",
+                    "They are said louder than the words around them",
                     "They are written differently when they are squashed",
                     "They are longer than the words around them",
                     "Most of them use the same flat vowel",
@@ -200,6 +207,26 @@ LESSONS = [
                     "The vowel in most of them reduces to the same flat sound, so "
                     "they are short and they also sound alike. The spelling never "
                     "changes, and nothing is said faster."
+                ),
+            },
+            {
+                "q": "In <em>who are you looking at?</em> the word <em>at</em> is on the list. Why is it likely to be said in full here?",
+                "a": [
+                    "It stands last before the question mark",
+                    "It is longer than the words around it",
+                    "Every word in a question is said in full",
+                    "<em>At</em> has no squashed form",
+                ],
+                "c": 0,
+                "why": (
+                    "A small word such as <em>at</em>, or a helping verb, is "
+                    "said in full when it is left standing at the end of the "
+                    "sentence or is stressed; only the words for people, "
+                    "<em>him</em>, <em>her</em>, <em>you</em>, stay squashed "
+                    "there. The lab counts 24 of the 387 listed words "
+                    "standing last before a mark. <em>At</em> is on the list, "
+                    "and it does have a squashed shape, which it takes in "
+                    "the middle of a sentence, as in <em>look at it</em>."
                 ),
             },
         ],
@@ -228,9 +255,9 @@ LESSONS = [
              "common, but they have no squashed form, so they are not on "
              "the list and the lab does not count them."),
             ("p",
-             "Now count how often they turn up. The page in the lab is 949 words "
-             "of a novel, and 388 of those words are on the list. That is "
-             "40.9%, and only 43 different words account for all of it."),
+             "Now count how often they turn up. The page in the lab is 936 words "
+             "of a novel, and 387 of those words are on the list. That is "
+             "41.3%, and only 43 different words account for all of it."),
             ("h3", "What that means for listening"),
             ("p",
              "Two words in every five reaching your ear come from that list, and "
@@ -244,20 +271,32 @@ LESSONS = [
              "not the spoken one."),
             ("h3", "What the count does and does not say"),
             ("p",
-             "The 388 is the most it could be: every word on the list, every "
+             "The 387 is the most it could be: every word on the list, every "
              "time it appears. A word on the list keeps its full shape when "
-             "it is stressed, or when it ends the sentence: <em>who are you "
-             "looking at?</em> says <em>at</em> in full. The table in the "
-             "lab prints every word it counted with its squashed shape and "
-             "its count, so you can check any of them against the page."),
+             "it is stressed, and most of them keep it when they are left "
+             "standing at the end of a sentence: <em>who are you looking "
+             "at?</em> says <em>at</em> in full, and <em>yes, I can</em> says "
+             "<em>can</em> in full. The words for people are the exception: "
+             "<em>I saw him</em> ends on the squashed <em>him</em>, and "
+             "<em>her</em> and <em>you</em> behave the same way. The lab "
+             "counts the end position on the page: 24 of the 387 listed "
+             "words stand last before a comma, a full stop, a question mark "
+             "or another mark. Half of those 24 are <em>him</em>, "
+             "<em>her</em>, <em>he</em> or <em>you</em>, which you can check "
+             "on the printed passage, so the number likely said in full is "
+             "smaller still. The table in the lab prints every word it "
+             "counted with its squashed shape and its count, so you can "
+             "check any of them against the page."),
             ("p",
              "Four more &mdash; <em>that</em>, <em>have</em>, <em>has</em>, "
              "<em>had</em> &mdash; squash only when they are doing grammar work. "
              "<em>That</em> pointing at something (<em>that book</em>) and "
              "<em>have</em> meaning to own or to eat (<em>have tea</em>) keep "
              "their full shape. The lab counts those four separately: 42 of the "
-             "388. So the figure to carry in your head is a little under two "
-             "in five, "
+             "387. <em>There</em> is the same kind of word, squashed in "
+             "<em>there was a time</em> and said in full when it points at a "
+             "place, and the lab does not count it apart. So the figure to "
+             "carry in your head is a little under two in five, "
              "and the list to carry is the printed one."),
             ("h3", "Why they blur together"),
             ("p",
@@ -278,7 +317,11 @@ LESSONS = [
              "What this lesson adds is knowing what to listen for, and where. The "
              "lab marks every word on a real page that can take a weak form and "
              "prints what each one becomes. Take that list to anything you are "
-             "already listening to, and the gaps stop being gaps."),
+             "already listening to, and the gaps stop being gaps. The other "
+             "words, the ones that carry the meaning, have a part that is "
+             "said hardest. Where it falls, and what moves it, is the "
+             "subject of Word Stress, and the next lesson here counts how "
+             "often it comes first."),
         ],
     },
 ]

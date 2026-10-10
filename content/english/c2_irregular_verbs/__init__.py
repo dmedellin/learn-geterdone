@@ -25,7 +25,8 @@ COURSE = {
         "actually make up. The honest answer means pulling <em>be</em>, "
         "<em>have</em> and <em>do</em> out of the count, and the number falls "
         "by more than half when you do. Figures for the whole novel are quoted beside "
-        "the page&rsquo;s own, and marked as quoted."
+        "the page&rsquo;s own, and marked as quoted, so you can see which way "
+        "a count moves when the text gets longer."
     ),
     "assumes_short": "Tense Tables, because an irregular verb is one the rules there do not reach.",
     "assumes_long": (
@@ -54,7 +55,7 @@ COURSE = {
         ("Sort a verb into one of six patterns",
          "Decided by the three written forms: all the same, past and the form "
          "after <em>have</em> the same, all three different, and so on."),
-        ("Know which pattern is worth learning first",
+        ("Name the pattern worth learning first",
          "Sixty of the 133 have the same past and <dfn>participle</dfn>, so one form fewer "
          "to remember for nearly half the list."),
         ("Count how much of a real page they are",
@@ -63,12 +64,13 @@ COURSE = {
         ("Take out the three that bend every count",
          "<em>Be</em>, <em>have</em> and <em>do</em> are about three in five of "
          "these words on the printed passage, 91 of 149. Taking them out cuts "
-         "the share by more than half, 15.7% to 6.1%."),
+         "the share by more than half, 15.9% to 6.2%."),
         ("Tell a figure the page computes from one it quotes",
          "Over the whole novel, counted once and quoted, the top twenty "
-         "irregular verbs cover 87.65% or 73.89% of these words depending on "
-         "whether those three are counted. The larger number is the one "
-         "usually quoted, and the page cannot recount either."),
+         "irregular verbs cover 87.66% or 73.90% of the irregular forms depending on "
+         "whether those three are counted. The page cannot recount either, "
+         "but it counts the same thing on its passage, 95.3% or 93.1%, and "
+         "you can say why the shorter text gives the higher share."),
     ],
     "syllabus_intro": (
         "The list first, then the patterns inside it, then the question of how "
@@ -82,12 +84,10 @@ COURSE = {
         "Why these verbs are the way they are. The history is real and this course does "
         "not teach it, because nothing on the page could check it. What can be "
         "checked is that they are common, and the course shows that.",
-        "British and American differences in full. Several past forms here have "
-        "two spellings, <em>learnt</em> and <em>learned</em> among them, and the "
-        "list records one. Where that matters the lesson says so.",
-        "Verbs that are both regular and irregular. A few, such as "
-        "<em>dream</em>, take either form. The list gives one and names the "
-        "choice.",
+        "Verbs with two pasts, such as <em>learnt</em> and <em>learned</em>, "
+        "or <em>dream</em>, which takes either form. The list gives one, "
+        "and no rule could be scored on a choice the dictionary allows "
+        "both ways.",
     ],
     "key": [
         "133 verbs: six patterns, and be",
@@ -97,14 +97,17 @@ COURSE = {
         "all three the same       21",
         "all three differ, other   9",
         "",
-        "be, have, do: half of the trouble",
+        "be, have, do: more than half of the trouble",
     ],
     "footer_lead": (
         "<strong>Educational course material.</strong> The verb list on this "
         "course is printed on the page, and every share the lab prints is "
         "counted in your browser against it, on a printed passage of "
-        "<em>Pride and Prejudice</em> (1813), public domain, novel text only. "
-        "Figures for the whole novel were counted once, offline, and the "
+        "<em>Pride and Prejudice</em> (1813), public domain, novel text only, "
+        "936 words of it. The text is old, and the lab says so where that "
+        "changes an answer. "
+        "Figures for the whole novel were counted once, offline, with the "
+        "same program over the novel text only, and the "
         "lesson marks each one as quoted where it appears."
     ),
     "lessons": list(_A) + list(_B) + list(_C),

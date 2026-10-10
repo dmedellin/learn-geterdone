@@ -13,14 +13,16 @@ COURSE = {
         "A book gives you twelve boxes and asks you to learn them. This course "
         "gives you five forms and four rules that build all twelve, then runs "
         "those rules over 1,210 real verbs in your browser and prints how often "
-        "they are right and every word they miss."
+        "they are right and every word they miss. It ends with the sound of the "
+        "two endings, which the spelling hides."
     ),
     "summary": (
         "The tense table is not twelve things to remember. It is five forms of a "
         "verb, four of which follow rules, placed behind <em>have</em>, "
         "<em>be</em> and <em>will</em>. This course states the rules, measures "
         "them on the page, and shows their exceptions &mdash; including the three "
-        "that turned out to be mistakes in the word list rather than in English."
+        "that turned out to be mistakes in the word list rather than in English "
+        "&mdash; and then says how <em>-ed</em> and <em>-s</em> are said."
     ),
     "assumes_short": "Nothing. You need to read English and to count.",
     "assumes_long": (
@@ -49,25 +51,29 @@ COURSE = {
         ("Say which rule made a form, not just what the form is",
          "Each ending named as it is applied &mdash; the hiss rule, the "
          "<em>-y</em> rule, the silent <em>-e</em>, the doubling rule and the "
-         "stress it depends on."),
-        ("Quote a hit rate for every rule you use",
+         "strong part it depends on."),
+        ("Quote a hit rate, and the misses, for every rule you use",
          "99.92% for <em>-s</em>, 99.34% for <em>-ing</em>, 99.26% for the past, "
-         "measured on the page against 1,210 verbs and their recorded forms."),
-        ("Name the words each rule misses",
-         "Short lists, printed, and several of them cases where British and "
-         "American spelling differ and no rule could choose."),
+         "measured on the page against 1,210 verbs, with each word the rule "
+         "misses printed beside it."),
         ("Tell a rule that helps from one that only sounds right",
          "The <em>-f</em> to <em>-ves</em> rule, added for good reasons, made "
          "the results worse. The count found it; the ear did not."),
         ("Tell a spelling difference from a mistake",
          "<em>Travelling</em> and <em>traveling</em> are both right. Eleven of "
          "the eighteen words the doubling rule still misses are this, and three "
-         "words it once seemed to miss were wrong spellings in the list itself."),
+         "words it once seemed to miss were mistakes in the list itself."),
+        ("Say how -ed and -s are said",
+         "From the last sound of the verb: <em>t</em>, <em>d</em> or <em>id</em> "
+         "for the past, <em>s</em>, <em>z</em> or <em>iz</em> for the other. The "
+         "rule is right for 1111 of 1118 past forms and 1187 of 1189 forms with "
+         "<em>-s</em>."),
     ],
     "syllabus_intro": (
         "The forms first, because every later lesson puts them behind a small "
-        "word. Then the one rule that needs the sound of the word, scored on "
-        "every verb it can touch."
+        "word. Then the rules scored on every verb they can touch, the one rule "
+        "that needs the strong part of the word, and last the sounds of the two "
+        "endings."
     ),
     "not_covered": [
         "When to choose one box over another. That is a question about meaning, "
@@ -75,9 +81,11 @@ COURSE = {
         "box and how often the rules that build it are right; choosing between "
         "boxes is the work of reading and being corrected, which a page cannot "
         "do for you.",
-        "Speaking and listening. This course does not teach them. The doubling rule "
-        "needs to know where the stress falls, and the page reads that from a "
-        "printed list rather than pretending to say the word to you.",
+        "Sound beyond the two endings. This course says how <em>-ed</em> and "
+        "<em>-s</em> are said and where the doubling rule needs the strong "
+        "part. How spellings turn into sounds, where the strong part falls and "
+        "how fast speech squashes words are the courses called Spelling to "
+        "Sound, Word Stress and Listening.",
         "Every irregular verb in English. The second course takes the ones that "
         "appear often enough to matter and says plainly how far down the list it "
         "goes.",
@@ -99,7 +107,11 @@ COURSE = {
         "<strong>Educational course material.</strong> Every form on this course "
         "is built in your browser by the rule named beside it, and every hit rate "
         "is counted on the page against the word list printed there. Word list: "
-        "the New General Service List (Browne, Culligan and Phillips), CC BY-SA 4.0."
+        "the New General Service List (Browne, Culligan and Phillips), CC BY-SA 4.0. "
+        "Sounds are from CMUdict (Carnegie Mellon University, BSD licence). The "
+        "list of nouns was cut at build time with the help of the Moby "
+        "Part-of-Speech list (public domain) and checked against a dictionary; "
+        "no page carries either list."
     ),
     "lessons": list(_A) + list(_B),
 }

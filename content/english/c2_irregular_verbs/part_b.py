@@ -217,7 +217,7 @@ LESSONS = [
         ],
         "body": [
             ("p",
-             "The last lesson ended on a number, about 180 verbs. That is a "
+             "The last lesson gave a number, about 180 verbs. That is a "
              "long list, and a long list is hard to hold. This lesson shows "
              "that the list is not as long as it looks, because the verbs "
              "come in a few shapes."),
@@ -286,7 +286,13 @@ LESSONS = [
              "60, 4 and 1, and three for the 46. It does not tell you which "
              "verbs belong in each class, and it does not give you the "
              "letters. <em>Bought</em> and <em>brought</em> are in one "
-             "class, and each is still a form to learn."),
+             "class, and each is still a form to learn. The classes do tell "
+             "you where the commonest error with these verbs can happen. "
+             "<em>Have went</em>, <em>have saw</em>, <em>have came</em> put "
+             "the past where the participle belongs, and only a verb whose "
+             "past and participle differ can be got wrong that way: the 46, "
+             "the four and <em>beat</em>, 51 verbs. For the 60 and the 21 the "
+             "two forms are one word, and the error cannot happen."),
             ("p",
              "What the classes do give you is a place to put each new verb. "
              "You learn a form once, and you know what kind of form it is. "

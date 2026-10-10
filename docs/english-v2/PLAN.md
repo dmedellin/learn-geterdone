@@ -155,7 +155,7 @@ Three decisions widen what the Subject can honestly compute.
   the novel and the two modern documents are short of: 13.1 question marks
   per 1,000 words against Austen's 3.9 and the modern documents' 0.0 (m);
   54% of its *not*s are *n't* against 0.9% in the novel (m). It is cut into
-  a 1,975-word excerpt (printed) and a 167-line question concordance.
+  a 1,975-word excerpt (printed) and a 256-question concordance.
   A longer Austen passage, Chapter XXVI (2,338 words, 216 pronoun subjects,
   76 modals (m)), carries the Helping Verbs course.
 
@@ -371,7 +371,7 @@ Modules unchanged.
    - No change. Pins unchanged (60 / 37 / 21 / 9 / 4 / 1; the vowel preset 7).
 
 3. **how-much-of-english-is-irregular** — How Much of English Is Irregular — **rewrite**
-   - Change: the `irrshare` mode gains `shTop` (the share of the passage's irregular forms covered by its top twenty verbs, under the menu's with/without choice) so the lesson's central comparison — 87.65% against 73.89%, quoted from the novel — has a computed counterpart on the page. The worked example gains one line per menu option; the quiz's fourth question asks which figure the page computes. Pinned figures (149, 15.7%, 91, 61.1%, 58, 6.1%) unchanged; `shTop` (k).
+   - Change: the `irrshare` mode gains `shTop` (the share of the passage's irregular forms covered by its top twenty verbs, under the menu's with/without choice) so the lesson's central comparison — 87.66% against 73.90%, quoted from the novel (recounted 2026-10-10 with the page's tokeniser over 122,294 words, captions removed: 15,147 forms, 12.39% with be/have/do and 5.01% without; the earlier 12.29%, 4.98% and 123,611 split every typographic apostrophe) — has a computed counterpart on the page. The worked example gains one line per menu option; the quiz's fourth question asks which figure the page computes. Pinned figures (149, 15.7%, 91, 61.1%, 58, 6.1%) unchanged; `shTop` (k).
 
 ### Course 3 — Helping Verbs (`helping-verbs`, 6)
 
@@ -386,7 +386,7 @@ each lesson says so where a figure depends on it.
    - Lab: `auxchain`, cfg `rule: "agree"`. Pin `axHit`, `axPct`, `axBroken`.
    - Misconception: the *-s* marks the plural, as it does on nouns — on a verb it marks *he, she, it*.
    - Worked: *she was*, *he has*, *it does* against *they were*, *you have*, *we do*; the rows against the rule in the whole novel are *if it were*, *she were*, *he were* (m) — the old wish form, which the lesson names and sets aside.
-   - Figures (m, novel-wide, quoted): after *he/she/it*, 1,152 third-person forms against 37 other; after *you/we/they*, 487 plural forms against 5 third-person. Page figures on the chapter (k).
+   - Figures (m, novel-wide, quoted): after *he/she/it*, 1,214 third-person forms against 37 other (1,214 of 1,251; measure/out/corpus.txt, 1,081 + 133); after *you/we/they*, 487 plural forms against 5 third-person. Page figures on the chapter (k).
 
 2. **after-a-modal-the-verb-is-bare** — After a Modal, the Verb Is Bare — *One verb, one helper* — **new**
    - Do: name the nine modals, state that the verb after one takes no ending, allow *not* or an adverb between, and read off the printed chapter what actually follows a modal.
@@ -407,7 +407,7 @@ each lesson says so where a figure depends on it.
    - Lab: `auxchain`, cfg `rule: "be"`. Pin `axIng`, `axIngPct`, `axPP`.
    - Misconception: *be* is the progressive's helper first and a verb second. On the novel the *-ing* form follows it 4.7% of the time (m).
    - Worked: *is a truth*, *was humbled*, *were very happy*, *is in town*, *was going*: five rows, one of them progressive.
-   - Figures (m, quoted): 5,858 forms of *be* in the novel: noun phrase 23.5%, participle (passive or adjective) 20.8%, noun or name 14.3%, preposition 12.6%, adjective 10.4%, *-ing* form 4.7%, a pronoun next 2.4%; the play 5.6% *-ing*. Chapter (k): 137 forms, 5 followed directly by an *-ing* word (m). The lesson says the scan cannot tell a passive from an adjective (*was pleased*) and prints both as one class.
+   - Figures (m, quoted): 5,858 forms of *be* in the novel: noun phrase 23.5%, participle (passive or adjective) 20.8%, noun or name 14.3%, preposition 12.6%, adjective 10.4%, *-ing* form 4.7%, a pronoun next 2.4%; the play 5.6% *-ing*. Chapter (page): 137 forms, 6 followed directly by an *-ing* word (4.4%), 7 by hand. The lesson says the scan cannot tell a passive from an adjective (*was pleased*) and prints both as one class.
 
 5. **where-not-goes** — Where Not Goes, and When Do Arrives — *Not, do and the boxes* — **new**
    - Do: put *not* after the first helping verb, add *do* when there is none, and read off the chapter how often *not* sits where the rule says and what the other rows are.
@@ -421,7 +421,7 @@ each lesson says so where a figure depends on it.
    - Lab: `auxchain`, cfg `rule: "boxes"`. Pin `axSimple`, `axProg`, `axPerf`.
    - Misconception: the progressive is the ordinary present — the box drilled hardest in classrooms is about one phrase in seventy in the novel (m).
    - Worked: *she had been*, *I am sure*, *they will come*, *he was reading*: past perfect, *be* as main verb, future simple, past progressive.
-   - Figures (m, novel-wide, quoted; 8,864 pronoun subjects): past simple 18.2%, present simple 12.5%, *be* as main verb 15.5%, modal or future simple 8.4%, past perfect 2.8%, present perfect 1.8%, all progressives together 1.5%, passive 3.3%, no verb found 17.7% (lexicon gaps and *it* before a non-verb — the rows are printed). The 2026-10-08 design record's "progressive 1.4% over 1,951 phrases" is consistent and is superseded by what the page prints. Chapter (k): 216 pronoun subjects.
+   - Figures (m, novel-wide, quoted; 8,864 pronoun subjects): past simple 18.2%, present simple 12.5%, *be* as main verb 15.5%, modal or future simple 8.4%, past perfect 2.8%, present perfect 1.8%, all progressives together 143 of 8,864, 1.6% (the 1.5% first written here summed rounded shares), passive 3.3%, no verb found 17.7% (lexicon gaps and *it* before a non-verb — the rows are printed). The 2026-10-08 design record's "progressive 1.4% over 1,951 phrases" is consistent and is superseded by what the page prints. Chapter (k): 216 pronoun subjects.
 
 ### Course 4 — Nouns and Articles (`nouns-and-articles`, 4)
 
@@ -446,7 +446,7 @@ Modules: *One and more than one* (1–2), *A, an and the* (3–4).
    - Lab: `an` (new, §D). Presets `anPreset`: `letter` (an before a vowel letter), `sound` (an before a vowel sound). `anSource` redraw-only: all / the play / the modern documents / the passage; shipped `all`. Pin `anHit`, `anPct`, `anFirst`.
    - Misconception: *an* goes before a vowel letter — *an university*, *a hour*.
    - Worked: *a University*, *a utilitarian*, *an hour* are the three lines the letter rule misses and the sound rule gets (m); *an union* is Austen's 1813 habit, which the page quotes and the sound rule marks wrong.
-   - Figures (m, to be re-read with the "(a)" list markers skipped, §D): the play, 455 lines, letter 448 (98.5%) against sound 455 (100.0%); the two modern documents 39 lines; the passage 9 lines, both rules 9 of 9. Quoted from the novel: 2,266 lines, letter 98.8%, sound 99.9%, the three sound misses *an union* (twice) and *an uniform*; *such a one*, *many a one*, *a history*, *a hundred* as the letter rule's other losses.
+   - Figures (m, to be re-read with the "(a)" list markers skipped, §D): the play, 455 lines, letter 448 (98.5%) against sound 455 (100.0%); the two modern documents 39 lines; the passage 9 lines, both rules 9 of 9. Quoted from the novel: 2,266 lines, letter 98.8%, sound 99.9%, the three sound misses *an union* (twice) and *an uniform*; *such a one*, *many a one*, and, on the novel, *hour*, *honour*, *honourable* and *one* as the letter rule's other losses (measure/out/cmudict.txt; the letter rule gets *a history* and *a hundred* right).
 
 4. **the-before-the-only-one** — The Before the Only One — *A, an and the* — **new**
    - Do: put *the* (or a possessive) before a superlative, *same* and *next*; read the rule's score off the printed lines; and name what else stands there — *at first*, *at last*, *a most* as an intensifier.
@@ -469,15 +469,15 @@ Modules: *Pronouns and verbs* (1), *The middle place* (2), *Questions* (3–4).
    - Data: `question_concordance.json` re-cut by `scripts/wordlists/concordance.py` at sentence boundaries (a question starts after `.`, `!`, `?` or an opening quotation mark, never after the full stop of *Mr.*, *Mrs.*, *Miss*, *Dr.*, *St.*), 90 lines kept. Kit: `questions` gains tiles `quWh` (a wh-word with no helping verb after it), `quAddr` (a word of address first), `quFrag` (no verb at all) and `quStmt` (a pronoun first: a statement with a question mark) so the four-way sort the lesson teaches has four tiles. Every figure re-read (k); the lesson no longer explains cut lines because there are none.
 
 4. **how-people-really-ask** — How People Really Ask — *Questions* — **new**
-   - Do: score the same question rule on 167 questions from a play, read that it covers about a third, and name the five kinds of question that make up the rest.
+   - Do: score the same question rule on 256 questions from a play, read that it covers about a third, and name the five kinds of question that make up the rest.
    - Lab: `questions`, cfg `source: "wilde"`. Preset `quPreset`: `aux` as today. Pin `quHit`, `quPct`, `quFrag`.
    - Misconception: the low score means the rule is wrong; the score means most spoken questions are not full sentences.
    - Worked: *A hand-bag?*, *Gwendolen, will you marry me?*, *You don't mean to say that…?*, *Finished what, may I ask?* — a fragment, a name first, a statement with a question mark, an echo.
-   - Figures (m, to be re-read with the new verdict classes): 167 questions; helping verb first 38 (22.8%), wh-word then a helper 17 (10.2%), together 55 (32.9%); wh-word with no helper after it 18, a joining word first 18, a pronoun first 17, something else (names, fragments) 59. Austen's 90 questions, re-cut (k), beside them; question marks per 1,000 words: play 13.1, novel 3.9, modern documents 0.0 (m).
+   - Figures (page, `wilde_questions.json` as shipped): 256 questions of two words or more, the rule holds for 89 (34.8%); joining word first 35 (21.0% of the 167 misses), pronoun first 27, wh-word with no helper after it 24, word of address 20, no verb 14, something else 47. Design figures, superseded (167 questions): helping verb first 38 (22.8%), wh-word then a helper 17 (10.2%), together 55 (32.9%); wh-word with no helper after it 18, a joining word first 18, a pronoun first 17, something else (names, fragments) 59. Austen's 90 questions, re-cut (k), beside them; question marks per 1,000 words: play 13.1, novel 3.9, modern documents 0.0 (m).
 
 ### Course 6 — Small Words and Comparisons (`small-words-and-comparisons`, 4)
 
-Modules: *Prepositions and particles* (1, 4), *Making a comparison* (2–3).
+Modules: *Prepositions and particles* (1, 4), *Making a comparison* (2), *Making an adverb* (3).
 
 1. **in-on-at-for-time** — In, On or At: Time — *Prepositions and particles* — **new**
    - Do: state the three-part rule (*at* a clock time, *night*, *noon* and a festival; *on* a day, and on a particular day's morning or evening; *in* a month, a year, a season and the unspecified morning, afternoon or evening), read its score off every printed line, and name the residue.
@@ -493,7 +493,7 @@ Modules: *Prepositions and particles* (1, 4), *Making a comparison* (2–3).
    - Worked: *bigger*, *happier*, *more beautiful*; *handsomer* and *pleasanter* (Austen) against *more handsome*, *more pleasant* (now).
    - Figures (m, to be re-read): novel 367 tokens, rule A 91.8%, rule B 92.9%; residue *pleasanter* (4), *handsomest* (4), *handsomer* (3), *oftener* (3, an adverb), *pleasantest* (2), *quieter, stupider, commonest, minutest, gentlest, nobler, more strange, more angry, most likely*; the play 49 tokens, 89.8% / 91.8%; the modern documents 32 tokens, 100%. The syllable count is CMUdict's and the lesson says so.
 
-3. **happily-simply-truly** — Happily, Simply, Truly: Making an Adverb — *Making a comparison* — **new**
+3. **happily-simply-truly** — Happily, Simply, Truly: Making an Adverb — *Making an adverb* — **new**
    - Do: make the *-ly* adverb from an adjective with the four spelling changes (*-y → -ily*, *-le → -ly*, *-ic → -ically*, *-ue → -uly*, plus *full → fully*), read the rule's score against the dictionary, and name the adjectives that have no *-ly* adverb at all.
    - Lab: `wordrule`, cfg `list: "ly"`. Presets `wrPreset`: `plain` (adjective + *ly*), `changes` (with the spelling changes). Shipped `wrShow = misses`. Pin `wrHit`, `wrPct`, `wrFirst`; `wrNone` on both.
    - Misconception: add *-ly* and you are done — *happyly*, *simplely*, *basicly* are the errors, and *publicly* is the one *-ic* adjective that does not take *-ically* (m).
@@ -525,14 +525,14 @@ each lesson's cfg `rules` lists only its own presets.
    - Lab: `letters`, cfg `rules: ["magic", "magic_r"]`. Pin `ltHit`, `ltPct`, `ltFirst`.
    - Misconception: the exceptions are rare words — they are *have, give, come, some, love, none, lose, move, prove* (m), among the commonest in the language.
    - Worked: *hop → hope*, *bit → bite*, *cut → cute*; *have* keeps its short vowel because English does not end a word in *v*.
-   - Figures (m, to be re-read): 131 of 140 (93.6%) with *r* excluded; the 19 *-re* words (*care, more, sure, there, where*…) scored apart under `magic_r` because *r* changes every vowel before it (k).
+   - Figures (m, to be re-read): 131 of 140 (93.6%) with *r* excluded; the 19 *-re* words (*care, more, sure, there, where*…) scored apart under `magic_r` because *r* changes every vowel before it; the page prints 1 of 19 for `magic_r`.
 
 3. **i-before-e-and-its-failure-rate** — I Before E, and Its Failure Rate — *The famous rule* — **new**
    - Do: apply "i before e except after c" to every *ie* and *ei* in the 2,800 words, read its score, and sort the residue into the groups that make it fail (*eigh*, *ei* said /aɪ/ or /eɪ/, *cie* in *-cient*/*science*).
    - Lab: `letters`, cfg `rules: ["ie", "ie_ee"]`. Pin `ltHit`, `ltPct`, `ltFirst`.
    - Misconception: the rule is a rule — at 62% on common words it is a coin with a bias.
    - Worked: *believe, friend, receive* follow; *their, weight, height, foreign, either, science, society, species, sufficient* do not.
-   - Figures (m, to be re-read): 36 of 58 occurrences (62.1%); restricted to words with an /iː/ sound, 23 of 31 (74.2%) (`ie_ee`, k for the exact definition the kit uses).
+   - Figures (m, to be re-read): 36 of 58 occurrences (62.1%); restricted to the spots where the word's vowel is /iː/ by one-to-one alignment (`ie_ee`), the page prints 14 of 18; the design's rough 23 of 31 counted words with /iː/ anywhere.
 
 4. **letters-you-do-not-say** — Letters You Do Not Say — *Letters you do not say* — **new**
    - Do: apply five silent-letter rules (*gh* after a vowel is silent or /f/; *kn-*, *wr-*, *-mb*, *-mn*, *-lk*, *-lm* drop a letter; *h* is said except in three words) and read what *ough* does across ten words.
@@ -581,24 +581,24 @@ is not used.
    - Lab: `stress`, cfg `rules: ["schwa"]`. Pin `stSchwa`, `stPct`, `stIy`.
    - Misconception: a vowel letter is said as itself in every part of a word — in the weak part, *a, e, i, o, u* mostly collapse to one sound.
    - Worked: *about, taken, pencil, lemon, circus* — five spellings, one sound; Listening's small words do the same.
-   - Figures (m, to be re-read): 2,628 weak parts in the 2,800 words of two or more parts; the flat vowel 1,387 (52.8%); the *r*-coloured flat vowel 400 (15.2%); /ɪ/ 352 (13.4%); /iː/ 348 (13.2%, the *-y* endings); other 4.8%.
+   - Figures (m, to be re-read): 2,628 weak parts in the 2,800 words of two or more parts; the flat vowel 1,387 (52.8%); the *r*-coloured flat vowel 400 (15.2%); /ɪ/ 352 (13.4%); /iː/ 348 (13.2%, the *-y* endings); other 141 of 2,628, 5.4% (the page's figure; 4.8% was written here first).
 
 ### Course 9 — Listening (`listening`, 4)
 
 Modules unchanged for 1–2; *Where the small words went* (3), *No gaps* (4).
 
 1. **why-it-sounds-too-fast** — Why It Sounds Too Fast — **rewrite**
-   - Change: `listening` gains `lsFinal` (listed words standing last before a punctuation mark, the position where a weak form is said in full); the "most it could be" paragraph quotes it. Cross-reference Word Stress by title. Pins unchanged (388 of 949, 40.9%, 43, 42); `lsFinal` (k).
+   - Change: `listening` gains `lsFinal` (listed words standing last before a punctuation mark, the position where a weak form is said in full); the "most it could be" paragraph quotes it. Cross-reference Word Stress by title. Pins now 387 of 936 (41.3%), 43, 42, `lsFinal` 24 of 387, after the passage was re-cut without its Gutenberg furniture (was 388 of 949, 40.9%, 43, 42); `lsFinal` (k).
 
 2. **where-a-word-begins** — Where a Word Begins — **rewrite**
    - Change: the sentence "there is no reliable rule from the spelling" becomes a pointer to Word Stress by title (there are rules by part of speech and by ending, and they are scored there). Pins unchanged (399 of 485, 82.3%).
 
 3. **where-the-small-words-went** — Where the Small Words Went — *Where the small words went* — **new**
    - Do: expand every contraction to its full form (*n't* → *not*; *'ll* → *will*; *'m* → *am*; *'re* → *are*; *'ve* → *have*; *'d* → *would* or *had*; *'s* → *is*, *has* or a possessive), read off three printed texts how much of *not* is *n't*, and say which kind of text contracts.
-   - Lab: `contractions` (new, §D). Presets `coPreset`: `wilde` (the 1,975-word excerpt), `austen` (the 949-word passage), `modern`. Pin `coNt`, `coPct`, `coK`.
+   - Lab: `contractions` (new, §D). Presets `coPreset`: `wilde` (the 1,975-word excerpt), `austen` (the 936-word passage), `modern`. Pin `coNt`, `coPct`, `coK`.
    - Misconception: contractions are careless English — in the play a majority of *not*s are *n't*, in the novel almost none, and the difference is speech against print.
    - Worked: *don't, isn't, it's, I'm, won't, can't, I'll*: the seven commonest in the play (m); *won't* is the one whose full form is not inside it.
-   - Figures (m, to be re-read): the excerpt, 22 *n't* against 13 *not* (62.9%), 36 contractions, 8 question tags among them; the passage (k); the modern documents 0 *n't* against 10 *not*. Quoted: the whole play 168 against 143 (54.0%), 14.7 contractions per 1,000 words; the whole novel 12 against 1,397 (0.9%), of its 644 *'s* nearly all possessives (*Bingley's*, *Darcy's*).
+   - Figures (m, to be re-read): the excerpt, 22 *n't* against 14 *not* (61.1%; *cannot* counted as a *not*, page figure), 36 contractions, 8 question tags among them; the passage (k); the modern documents 0 *n't* against 10 *not*. Quoted: the whole play 168 against 143 (54.0%), 14.7 contractions per 1,000 words; the whole novel 12 against 1,397 (0.9%), of its 644 *'s* nearly all possessives (*Bingley's*, *Darcy's*).
 
 4. **why-words-run-together** — Why Words Run Together — *No gaps* — **new**
    - Do: mark the word boundaries on a printed passage where a final consonant meets a first vowel (and is said as the start of the next word), where two vowels meet, and where the same consonant ends one word and begins the next (and is said once); read the three shares.
@@ -620,22 +620,22 @@ plural rule and irregular plurals of Nouns and Articles, the `-er/-est` and
    - Do: compute the share of a printed page covered by the first 1,000, 2,000 and 2,800 headwords; compare it with the 98% a reader needs (Nation, quoted) and the 92% the NGSL claims for general text (Browne, Culligan and Phillips, quoted); and paste a text of your own.
    - Lab: `coverage`. Presets `cvPreset`: `passage`, `wilde`, `modern`, `own` (a textarea; refused below fifty words). Pin `cvB1`, `cvB3`, `cvNames`.
    - Misconception: 2,800 words is enough to read — on these pages it is 88–91% by word and 93–95% once names are counted, and the lesson says what the missing five points cost (m).
-   - Worked: the passage, 944 words: band 1 84.0%, bands 1–2 88.5%, bands 1–3 90.6%, with names 94.6% (m); the unknown words printed as the list to learn next.
-   - Figures (m, to be re-read): the passage as above; the modern documents 75.5 / 83.7 / 86.2 / 93.3%; the play excerpt (k); quoted: the novel 80.7 / 86.1 / 88.4 / 93.0%. Nation's 98% and the NGSL's published 92% are quoted with sources and never embedded. The kit engineer measures and the lesson states the gap between coverage by the shipped forms list and coverage by the rules (k).
+   - Worked: the passage, 936 words: band 1 85.0%, bands 1–2 89.2%, bands 1–3 91.0%, with names 94.3% (page; the design's 84.0/88.5/90.6/94.6 are superseded); the unknown words printed as the list to learn next.
+   - Figures (m, to be re-read): the passage as above; the modern documents 76.0 / 84.7 / 87.3 / 92.7% (page); the play excerpt 79.5 / 83.9 / 85.9 / 94.6% (page); quoted: the novel 80.7 / 86.1 / 88.4 / 93.0%. Nation's 98% and the NGSL's published 92% are quoted with sources and never embedded. The kit engineer measures and the lesson states the gap between coverage by the shipped forms list and coverage by the rules (k).
 
 2. **ten-words-are-a-quarter-of-the-page** — Ten Words Are a Quarter of the Page — *The commonest words* — **new**
    - Do: rank the words of a printed page by how often they appear and read what share the top ten, fifty and hundred cover; name them as the grammar words Listening squashes.
    - Lab: `coverage`, shipped `cvShow = top`. Pin `cvTop10`, `cvTop50`, `cvTop100`.
    - Misconception: the commonest words are the ones worth learning first because they carry the meaning — they are *the, to, of, and, a, in, was, I, she, it*, and they carry the grammar.
-   - Worked: on the passage the top ten cover 25.4%, the top fifty 54.4%, the top hundred 67.6% (m).
-   - Figures (m, to be re-read): the passage as above; the modern documents 24.5 / 47.3 / 60.7%; quoted: the novel 22.4 / 48.1 / 58.9%, 6,308 distinct words.
+   - Worked: on the passage the top ten cover 25.6%, the top fifty 54.5%, the top hundred 67.7% (page).
+   - Figures (m, to be re-read): the passage as above; the modern documents 24.7 / 47.3 / 60.6% (page); quoted: the novel 22.4 / 48.1 / 58.9%, 6,308 distinct words.
 
 3. **word-or-word-family** — Word or Word Family — *Word and family* — **new**
    - Do: say what a flemma (a headword with its inflections) and a family (a headword with its derived forms: *-ly, -ness, -ment, un-, re-*) each count, switch the lab between them, and read how many points the family adds to coverage.
    - Lab: `coverage`, shipped `cvShow = family`. Pin `cvB3`, `cvFam`.
    - Misconception: the published thresholds and the page's figure measure the same thing — Nation counts families, the NGSL counts flemmas, and the gap is three to six points on general text (quoted from `docs/ENGLISH-SUBJECT.md` §4) and 1–2 points on these pages (m).
    - Worked: *happiness*, *unhappy*, *carefully* are three words to a flemma count and one family to Nation.
-   - Figures (m, to be re-read): the passage 94.6% → 96.0% (+1.4); the modern documents 93.3% → 94.4% (+1.1); quoted: the novel 93.0% → 94.6%.
+   - Figures (m, to be re-read): the passage 94.3% → 95.6% (+1.3); the modern documents 92.7% → 93.7% (+1.0); the play 94.6% → 95.4% (+0.8) (page); quoted: the novel 93.0% → 94.6%.
 
 ---
 
@@ -700,7 +700,8 @@ files they write are committed.
 | --- | --- | --- | --- |
 | `clean_nouns.py` | `ngsl.tsv`, Moby POS, `/usr/share/dict/american-english` | `plural_nouns.json` — every NGSL headword Moby tags as a noun, with the dictionary-confirmed plural forms the NGSL records; a hand list of irregular plurals (`men, women, children, feet, teeth, mice, geese, oxen, lice, dice, pence, people` and the `-men` compounds) that OVERRIDES a dictionary-confirmed regular form (`mans`, `foots`, `mouses` are verb forms or rarities); a stoplist of the function words Moby mis-tags (`and, as, at, for, of, nor, per, he, she, i, you, who, few, many, none, six…`), each set aside with its reason; `noplural` for the noun-only headwords with nothing confirmed (99 before the stoplist (m)) | ≈ 12 KB |
 | `clean_adjectives.py` | the same | `ly_adjectives.json` — the 153 adjective-only headwords with every confirmed `-ly` spelling, and the 27 with none | ≈ 2 KB |
-| `sounds.py` | CMUdict (first pronunciation unless the rule says otherwise), `verbrules_cases.json`, `plural_nouns.json`, `ngsl.tsv`, Moby POS, the printed texts | `verb_sounds.json` (base, final-sound class, `-ed` sound, `-s` sound; the noun plurals likewise; skipped words listed); `letters.json` (one row set per rule in D.3 `letters`); `stress.json` (word, parts, index of the strong part, class N/V/A, last-primary index, weak-vowel counts); `passage_sounds.json` (first- and last-sound class and phoneme for every word of the 949-word passage); `an_sounds.json` (first-sound class for every word that follows *a*/*an* in the printed texts) | 4 KB; 6 KB; 5–10 KB; 2 KB; 1 KB |
+| `sounds.py` | CMUdict (first pronunciation unless the rule says otherwise), `verbrules_cases.json`, `plural_nouns.json`, `ngsl.tsv`, Moby POS, the printed texts | `verb_sounds.json` (base, final-sound class, `-ed` sound, `-s` sound; the noun plurals likewise; skipped words listed); `letters.json` (one row set per rule in D.3 `letters`); `stress.json` (word, parts, index of the strong part, class N/V/A, last-primary index, weak-vowel counts); `passage_sounds.json` (first- and last-sound class and phoneme for every word of the 936-word passage); `an_sounds.json` (first-sound class for every word that follows *a*/*an* in the printed texts) | 4 KB; 6 KB; 5–10 KB; 2 KB; 1 KB |
+| `en_passage.py` | the novel as `en_sources.novel()` gives it (captions removed) | `content/english/data/wordorder_passage.json` — the printed passage, from *very ungracious sensation* to the *Mr.* after *nothing else to do.*, with the chapter heading (*CHAPTER LIII.*) cut out too, so every printed word is Austen's; 936 words as the page counts them; `--check` exits 1 if stale | (m) |
 | `concordance.py` | the novel (sliced on its first and last sentence, illustration captions removed), the play (the three acts), the two modern documents | `content/english/data/long_passage.json` (Chapter XXVI: from "Mrs. Gardiner's caution to Elizabeth was punctually and kindly given" to "as well as the plain."), with the verb-form lists restricted to its words; `wilde_excerpt.json` (the 1,975-word run of Act II from "CECILY. Oh, I merely came back to water the roses." to "if I may speak candidly—", at speech boundaries); `wilde_questions.json` (167 lines); `question_concordance.json` re-cut; `an_concordance.json`; `superlative_concordance.json` (`-est`, `most` + adjective, `same`, `next`); `time_concordance.json`; `compare_concordance.json`; `phrasal_concordance.json` | 5.7; 4.7; 2.5; ≈3; ≈11; ≈9; ≈2; ≈8; ≈7 KB |
 
 Each JSON's `note` names the text, the edition, the slice, and the licence,
@@ -834,7 +835,7 @@ refusals; data; which lessons it serves. Expected strings are read with
 - Purpose: what meets at a word boundary.
 - cfg: `rule` (`cv` | `vv` | `same`).
 - Controls: `lkPreset`.
-- Computation: over the 949-word passage, every pair of words with only a space between (418); from `passage_sounds.json` the last sound class of the first and the first sound class of the second; `cv`: consonant then vowel; `vv`: vowel then vowel; `same`: the same consonant phoneme on both sides. Boundaries with a word CMUdict lacks are counted in `lkUnknown` and not scored. The passage is printed with the chosen boundaries marked (`‿`).
+- Computation: over the 936-word passage, every pair of words with only a space between (418); from `passage_sounds.json` the last sound class of the first and the first sound class of the second; `cv`: consonant then vowel; `vv`: vowel then vowel; `same`: the same consonant phoneme on both sides. Boundaries with a word CMUdict lacks are counted in `lkUnknown` and not scored. The passage is printed with the chosen boundaries marked (`‿`).
 - Tiles: `lkN` (`408 of 418 scored`); `lkCount`; `lkPct`; `lkUnknown`.
 - Data: `passage_sounds.json`, `wordorder_passage.json`.
 - Serves: 9.4.
@@ -1138,7 +1139,7 @@ four existing courses change number: Word Order is `eng-course5-…`, Listening
 | Moby Part-of-Speech (Gutenberg #3203) | which headwords are nouns, verbs, adjectives | public domain | build time only; nothing shipped |
 | SCOWL wamerican 2020.12.07 | confirms a recorded form is a word | permissive (SCOWL); facts only | `/usr/share/dict/american-english`, sha pinned in `clean_verbs.py` |
 | *Pride and Prejudice* (1813; Gutenberg #1342, 1894 edition — slice on the novel's first and last sentence, never on the Gutenberg markers) | the passage, Chapter XXVI, every Austen concordance | public domain | `content/english/data/` |
-| *The Importance of Being Earnest* (1895; Gutenberg #844) | the excerpt, 167 questions, *a/an* lines, comparatives, phrasal verbs | public domain | `content/english/data/` |
+| *The Importance of Being Earnest* (1895; Gutenberg #844) | the excerpt, 256 questions, *a/an* lines, comparatives, phrasal verbs | public domain | `content/english/data/` |
 | *Stanley v. City of Sanford* (2025); "U.S. Population Aging as Nation Turns 250" (2026) | the modern comparison, as today | U.S. government works | `content/english/data/` |
 | Nation (2006), Laufer (1989), Cutler and Carter (1987), Pinker (1999) | thresholds and figures | quoted, never embedded | prose only |
 

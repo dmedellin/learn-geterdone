@@ -153,12 +153,16 @@ participle` 37, `all three the same` 21, `all different, other` 9,
 `base = participle` 4, `base = past` 1.
 
 **The denominator, because a share needs one.** The token figures below are
-over **123,611 word tokens** (letters and apostrophes only), not the 122,396
-whitespace tokens the same text gives. 15,192/123,611 = 12.29%; 15,192/122,396
-would be 12.41%. An agent caught the two not dividing to the printed figure.
+over **122,294 word tokens**, counted with the page's own tokeniser (a typographic
+apostrophe is part of the word) over the novel text with the 154 illustration
+captions removed: **15,147 irregular forms, 12.39%**, and **5.01%** without
+be/have/do (recounted 2026-10-10; recipe in docs/pedagogy/english-irregular-verbs.md).
+The earlier 15,192/123,611 = 12.29% and 4.98% came from a `[A-Za-z]+` count of
+the raw Gutenberg slice, which split every U+2019 apostrophe and kept the
+captions; they are withdrawn.
 
 **The overclaim this Subject must not make.** "The top 20 cover most of it" is
-87.65% of irregular tokens *including* be/have/do — but **73.89%** without them,
+87.66% of irregular tokens *including* be/have/do — but **73.90%** without them,
 and be/have/do alone are **59.5%** of the irregular total. Seventeen of the
 twenty slots do far less work than the headline implies, and the lesson says so.
 
@@ -180,10 +184,11 @@ kit's presets and read back with `labcheck.js --observe` (2026-10-08):
 
 | lab | printed text | rule holds | residue |
 |---|---|---|---|
-| `svo`, subject | 949-word passage, 80 pronouns | **72 of 80, 90.0%** | 5 modifier between, 2 next word not in list, 1 inverted (a speech tag; the tile is called *word order broken*) |
-| `svo`, object (*me, him, us, them*; *her* excluded as also possessive) | same passage, 18 | 16 of 18, 88.9% | 2 word before not in list |
+| `svo`, subject | 936-word passage, 80 pronouns | **72 of 80, 90.0%** | 5 modifier between, 2 next word not in list, 1 inverted (a speech tag; the tile is called *word order broken*) |
+| `svo`, object (*me, him, us, them*; *her* excluded as also possessive) | same passage, 17 | 15 of 17, 88.2% | 2 word before not in list |
 | `adverbs` | 120 concordance lines, 8 adverbs | **85 of 120, 70.8%** | 6 a preposition follows, 29 something else (5 lexicon gaps, 3 *as soon as*, 5 before an adjective, clause-start, clause-end, one lone *Sometimes.*); *rarely* has no rows, so the menu leaves it out; the modern-documents count still searches for it |
-| `questions` | 90 concordance lines | **48 of 90, 53.3%** | 13 joining word first (**13 of 42, 31.0%**), 6 wh-word with no auxiliary after it, 2 address word, 21 something else — **16 of the 21 are lines cut mid-sentence** (fixed window, or the full stop in *Mr.*/*Mrs.*) |
+| `questions` | 90 concordance lines, re-cut at sentence boundaries | **52 of 90, 57.8%** | 16 joining word first (**16 of 38, 42.1%**), 7 wh-word with no auxiliary after it, 2 address word, 4 pronoun first, 9 something else |
+| `questions`, play | 256 questions of two words or more | **89 of 256, 34.8%** | 35 joining word first (21.0% of the misses), 27 pronoun first, 24 wh-word alone, 20 address, 14 no verb, 47 something else |
 
 **Genuine word-order violations: zero.** Every inversion is the quotation-tag
 device — *"But it is," returned she* — verified by sampling and by a surrounding
@@ -192,7 +197,7 @@ the one inversion is *"My dear sister," said he*.
 
 **Questions no longer ship stated-not-computed.** The lab counts the 90
 printed questions; the whole-novel 55.4% and 45% are quoted beside the page's
-53.3% and 31.0%, with the sentence that 90 lines are a sample.
+57.8% and 42.1%, with the sentence that 90 lines are a sample.
 
 ## 6. Two landmines, both found the hard way
 

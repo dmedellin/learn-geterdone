@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "the-verbs-that-break-the-rules",
         "module": "The exception list Tense Tables kept pointing at",
         "title": "The Verbs That Break the Rules",
-        "one_line": "About 180 verbs ignore the -ed rule, and they are the verbs you use most.",
+        "one_line": "About 180 verbs ignore the -ed rule, and they include most of the verbs you use every day.",
         "standard": (
             "Finish when you can test a verb against the -ed rule, give the size "
             "of the list, and explain why the list is short but the words are "
@@ -76,8 +76,8 @@ LESSONS = [
                 "These three are enough. The other two forms, the <em>-s</em> "
                 "form and the <em>-ing</em> form, follow the rules from that "
                 "course for every irregular verb but two: <em>have</em> makes "
-                "<em>has</em>, and <em>be</em> has <em>am</em>, <em>is</em> "
-                "and <em>are</em>.",
+                "<em>has</em>, and <em>be</em> has <em>am</em>, <em>is</em>, "
+                "<em>are</em> and <em>being</em>.",
             ),
             (
                 "Build the past by the -ed rule",
