@@ -48,7 +48,6 @@ build below **98%**. The first course teaches that 98% coverage is what a reader
 needs; a page that teaches it and misses it has failed its own lesson.
 
 Measured on the 52 published pages of the second version: every page between 98.3% and 100.0% (`python3 scripts/bandcheck.py --report`).
-(`consonant`, `vowel`), course home 98.5%, path page 99.4%.
 
 **Five tokeniser bugs were found in `bandcheck.py` by running it, and every one
 made the number look WORSE than the truth** — the direction that passes for
