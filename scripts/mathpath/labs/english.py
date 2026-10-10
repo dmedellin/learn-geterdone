@@ -1319,13 +1319,16 @@ _MODES = {"table": _table, "doubling": _doubling,
 
 def english_lab(cfg):
     """The tense course's kit. `cfg["mode"]` chooses the lesson; unknown raises."""
+    from . import english_b  # the second half of the kit; see its docstring
+
     mode = (cfg or {}).get("mode")
-    if mode not in _MODES:
+    build = _MODES.get(mode) or english_b.MODES.get(mode)
+    if build is None:
         raise ValueError(
             "english_lab: unknown mode %r; this kit serves %s"
-            % (mode, ", ".join(sorted(_MODES)))
+            % (mode, ", ".join(sorted(set(_MODES) | set(english_b.MODES))))
         )
-    return _MODES[mode](cfg or {})
+    return build(cfg or {})
 
 
 __all__ = ["english_lab", "MODES"]

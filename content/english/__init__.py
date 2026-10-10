@@ -26,10 +26,21 @@ counts -- are QUOTED in the prose and never embedded as data, which keeps every
 shipped byte permissively licensed.
 """
 
-from .c1_tense_tables import COURSE as _C1
-from .c2_irregular_verbs import COURSE as _C2
-from .c3_word_order import COURSE as _C3
-from .c4_listening import COURSE as _C4
+from .c1_tense_tables import COURSE as _C1_TENSE_TABLES
+from .c2_irregular_verbs import COURSE as _C2_IRREGULAR_VERBS
+from .c5_helping_verbs import COURSE as _C5_HELPING_VERBS
+from .c6_nouns_articles import COURSE as _C6_NOUNS_ARTICLES
+from .c3_word_order import COURSE as _C3_WORD_ORDER
+from .c7_small_words import COURSE as _C7_SMALL_WORDS
+from .c8_spelling_sound import COURSE as _C8_SPELLING_SOUND
+from .c9_word_stress import COURSE as _C9_WORD_STRESS
+from .c4_listening import COURSE as _C4_LISTENING
+from .c10_vocabulary import COURSE as _C10_VOCABULARY
+
+# Path order (docs/english-v2/PLAN.md): Helping Verbs before Word Order, which
+# assumes it. A course still being authored exports COURSE = None and is
+# filtered here, so it is visible in the source and cannot be forgotten.
+_ORDER = [_C1_TENSE_TABLES, _C2_IRREGULAR_VERBS, _C5_HELPING_VERBS, _C6_NOUNS_ARTICLES, _C3_WORD_ORDER, _C7_SMALL_WORDS, _C8_SPELLING_SOUND, _C9_WORD_STRESS, _C4_LISTENING, _C10_VOCABULARY]
 
 PATH = {
     "slug": "english",
@@ -114,5 +125,5 @@ PATH = {
         "Bureau&rsquo;s &ldquo;U.S. Population Aging as Nation Turns 250&rdquo; "
         "(9 April 2026) &mdash; are works of the U.S. government."
     ),
-    "courses": [_C1, _C2, _C3, _C4],
+    "courses": [c for c in _ORDER if c is not None],
 }
