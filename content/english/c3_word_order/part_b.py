@@ -10,7 +10,7 @@ quoted and labelled as quoted.
 LESSONS = [
     {
         "slug": "where-the-adverb-goes",
-        "module": "The small word that has a home of its own",
+        "module": "The middle place",
         "title": "Where the Adverb Goes",
         "one_line": "Words like always and never sit in the middle of the verb, and a count shows how often.",
         "standard": (
@@ -27,8 +27,8 @@ LESSONS = [
             "English has a favourite home for them. A word that tells how "
             "often, called a frequency <dfn>adverb</dfn>, sits in the middle "
             "of the verb phrase: before the main verb, after the first "
-            "<dfn>helping verb</dfn> &mdash; <em>have</em>, <em>be</em> and "
-            "<em>will</em> from Tense Tables, and their kind, <em>can, could, "
+            "helping verb, as Helping Verbs calls them &mdash; <em>have</em>, "
+            "<em>be</em> and <em>will</em>, and their kind, <em>can, could, "
             "do, did, must</em> &mdash; or after <em>be</em> on its own. On "
             "120 lines from <em>Pride and Prejudice</em>, printed with this "
             "lesson, that held in 85, which is 70.8%. On the whole novel, in "
@@ -77,12 +77,15 @@ LESSONS = [
                 "The misses are named groups, and the largest is not a failure",
                 "In the whole-novel run, of the 105 cases outside the rule, 51 "
                 "are verbs the tool did not know, 23 sit in a phrase such as "
-                "<em>never in my life</em>, 10 are at the end, 7 are at the "
-                "start, and 14 are other. The first two are not mistakes in "
-                "place. Only the last three are cases of a different place, "
-                "and they total 31. The lab on this page sorts its 35 misses "
-                "two ways, a preposition follows or something else does, and "
-                "prints every line so you can sort the rest by eye.",
+                "<em>never in my life</em>, 10 are at the end of their "
+                "<dfn>clause</dfn>, the group of words built around one verb, "
+                "7 are at its start, and 14 are other. The first two are not "
+                "mistakes in place. Only the last three are cases of a "
+                "different place, and they total 31. The lab on this page "
+                "sorts its 35 misses two ways: a <dfn>preposition</dfn> "
+                "follows, a small word such as <em>in</em>, <em>to</em> or "
+                "<em>with</em>, or something else does. It prints every line "
+                "so you can sort the rest by eye.",
             ),
         ],
         "steps_title": "Putting a frequency word",
@@ -122,9 +125,11 @@ LESSONS = [
                 "which the page carries. The rule holds when a helping verb or <em>be</em> "
                 "comes before the adverb, or a verb comes after it. The "
                 "first two boxes are the hit rate. The next two sort the "
-                "misses: a preposition follows the adverb, as in <em>never "
-                "in my life</em>, or something else does, and the verdict "
-                "beside each line lets you sort the something else yourself. "
+                "misses: a preposition from the lab&rsquo;s short list of "
+                "seven, <em>in, at, on, of, to, for, with</em>, follows the "
+                "adverb, as in <em>never in my life</em>, or something else "
+                "does, and the verdict beside each line lets you sort the "
+                "something else yourself. "
                 "The first menu scores one adverb at a time. "
                 "The last two boxes count the same adverbs in the two modern "
                 "documents printed below the table: the Supreme Court "
@@ -182,12 +187,16 @@ LESSONS = [
                 "and <em>already</em> that are not about how often. We did not "
                 "read all 14, so we do not claim to know how many are real "
                 "differences in place. On this page you can read all 29 of "
-                "the <em>something else</em> lines: three are <em>as soon "
-                "as</em>, several put the adverb before an adjective, as in "
-                "<em>more than usually insolent</em> and <em>still better</em>, "
-                "a few are at the end, <em>what is strong already</em>, or at "
-                "the start of a clause, <em>and still they admired her</em>, "
-                "and one is <em>Sometimes.</em> on its own.",
+                "the <em>something else</em> lines, and they sort into seven "
+                "kinds: five verbs the list does not hold; three <em>as soon "
+                "as</em>; five adverbs before an adjective, as in <em>more "
+                "than usually insolent</em> and <em>still better</em>; four at "
+                "the end of their clause, <em>what is strong already</em>; "
+                "five at the start of one, <em>and still they admired "
+                "her</em>; six with a word after the adverb that the "
+                "lab&rsquo;s short list does not hold, <em>often without</em>, "
+                "<em>so soon after</em>, <em>how soon</em>; and one "
+                "<em>Sometimes.</em> on its own.",
             ],
         },
         "note": (
@@ -345,19 +354,24 @@ LESSONS = [
              "cases and that most of the rest are not failures of place."),
             ("h3", "What the 35 misses on this page are"),
             ("p",
-             "The lab sorts them two ways. Six have a preposition straight "
-             "after the adverb: <em>never in my life</em>, <em>still to "
-             "think</em>, <em>so often to Miss Watson&rsquo;s</em>. The other "
-             "29 it calls <em>something else between</em>, and they are the "
-             "whole-novel groups in small. Five are a verb the list does "
-             "not hold. Three are <em>as soon as</em>. Five put the "
+             "The lab sorts them two ways. Six have a preposition from its "
+             "short list straight after the adverb: <em>never in my life</em>, "
+             "<em>still to think</em>, <em>so often to Miss Watson&rsquo;s</em>. "
+             "The other 29 it calls <em>something else between</em>, and they "
+             "are the whole-novel groups in small. Five are a verb the list "
+             "does not hold: <em>they always contrived</em>, <em>who still "
+             "resides</em>. Three are <em>as soon as</em>. Five put the "
              "adverb before an adjective rather than a verb: <em>more than "
              "usually insolent</em>, <em>still more interesting</em>, "
-             "<em>often absent</em>. A few are at the end of the clause, "
-             "<em>and me never</em>, or at the start of one, <em>and "
-             "sometimes the refusal is repeated</em>. One is the single word "
-             "<em>Sometimes.</em> Read the verdict column and you will find "
-             "very few that a speaker would call wrong."),
+             "<em>often absent</em>. Four are at the end of their clause, "
+             "<em>and me never</em>, and five at the start of one, <em>and "
+             "sometimes the refusal is repeated</em>. Six have a word after "
+             "the adverb that the short list does not hold, <em>often without "
+             "any attention</em>, <em>so soon after his arrival</em>, or sit "
+             "in a phrase of their own, <em>how soon</em>, <em>soon "
+             "afterwards</em>. One is the single word <em>Sometimes.</em> "
+             "Read the verdict column and you will find very few that a "
+             "speaker would call wrong."),
             ("h3", "Why a novel, and what it costs"),
             ("p",
              "The lab also counts the same adverbs, and <em>rarely</em> too, in two modern public "

@@ -21,7 +21,7 @@ const enabled=name=>!wanted||wanted===name;
 const only=process.argv.find(a=>a.startsWith('--only='))?.slice(7);
 function pages(dir=SITE) {return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?pages(path.join(dir,e.name)):e.name.endsWith('.html')?[path.join(dir,e.name)]:[]);}
 const corpus=pages().sort().map(file=>({file,route:'/'+path.relative(SITE,file).replace(/index\.html$/,''),source:fs.readFileSync(file,'utf8')}));
-assert.equal(corpus.length,853,'full non-vacuous published HTML corpus');
+assert.equal(corpus.length,890,'full non-vacuous published HTML corpus');
 selection(!only||corpus.some(p=>p.route===only),'no matching browser route');
 const caps=corpus.filter(p=>/class="deck"/.test(p.source)||/id="as-of"/.test(p.source));
 assert.equal(caps.length,2,'derive both supplemental layouts from content capability');

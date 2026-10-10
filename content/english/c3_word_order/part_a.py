@@ -3,7 +3,7 @@
 
 The rule is scored on raw printed text with nothing marked up by hand, because
 English shows the subject of an action in the pronoun itself (I/me, he/him).
-The lab counts the rule on a 949-word passage printed on the page, and counts
+The lab counts the rule on a 936-word passage printed on the page, and counts
 the same pronouns per thousand words in two modern public documents printed
 beside it. Figures from a run over the whole novel, which no page can carry,
 are quoted and labelled as quoted wherever they appear.
@@ -12,7 +12,7 @@ are quoted and labelled as quoted wherever they appear.
 LESSONS = [
     {
         "slug": "who-does-what-to-whom",
-        "module": "Why English can afford to be strict about order",
+        "module": "Pronouns and verbs",
         "title": "Who Does What to Whom",
         "one_line": "English shows the subject in the pronoun, and a count shows how exactly the order holds.",
         "standard": (
@@ -103,8 +103,8 @@ LESSONS = [
             ),
             (
                 "If there is no pronoun, use the order",
-                "With nouns, the one before the verb is the subject and the one "
-                "after is what it happens to. This is the rule your own "
+                "In a plain statement with nouns, the one before the verb is the "
+                "subject and the one after is what it happens to. This is the rule your own "
                 "language may not use, so say it to yourself slowly at first.",
             ),
             (
@@ -124,11 +124,11 @@ LESSONS = [
             "mode": "svo",
             "panel_title": "Score the rule on the passage yourself",
             "panel_intro": (
-                "The lab scans a 949-word stretch of the novel, printed under "
+                "The lab scans a 936-word stretch of the novel, printed under "
                 "the table. It finds each of the 80 subject pronouns and "
                 "checks the word after it against a list of the 141 verb forms "
-                "the passage contains, plus 25 small verbs such as <em>had</em>, "
-                "<em>was</em> and <em>could</em>; the table shows every pronoun, the word "
+                "the passage contains, plus 25 helping verbs, the small verbs that Helping Verbs "
+                "names, such as <em>had</em>, <em>was</em> and <em>could</em>; the table shows every pronoun, the word "
                 "beside it, and the verdict. The first two boxes are the hit "
                 "rate. The box called <em>word order broken</em> counts the "
                 "one pronoun whose verb came before it: a speech tag, "
@@ -184,9 +184,10 @@ LESSONS = [
                 "belong together. The second is a gap in the word list, not "
                 "in the text: Austen used <em>beg</em> and <em>inquired</em> "
                 "where a list of common words has none, and on this page the "
-                "scan does not know <em>interrupt</em>, and reads <em>I "
-                "don&rsquo;t know</em> as <em>I don</em>, because its idea of "
-                "a word stops at the apostrophe Austen's printer used. The "
+                "scan does not know <em>interrupt</em>. It reads <em>I "
+                "don&rsquo;t know</em> as the pronoun <em>I</em> and the word "
+                "<em>don&rsquo;t</em>, a helping verb with <em>n&rsquo;t</em> "
+                "on it, and the printed list holds no word like that. The "
                 "third is one "
                 "device. Every case we read was a speech tag, and a second "
                 "check, also quoted from the whole-novel run, found 88% of "
@@ -269,7 +270,7 @@ LESSONS = [
                 ],
                 "c": 3,
                 "why": (
-                    "The lab counts them. The passage has 84.3 subject pronouns "
+                    "The lab counts them. The passage has 85.5 subject pronouns "
                     "per thousand words; the two modern documents, "
                     "<em>Stanley v. City of Sanford</em> and the Census Bureau "
                     "story, have 13.9, about 6.1 times fewer. They are not a "
@@ -317,7 +318,7 @@ LESSONS = [
              "word. Nobody has to mark up the page first."),
             ("h3", "The score"),
             ("p",
-             "The lab runs the rule over a 949-word passage from <em>Pride "
+             "The lab runs the rule over a 936-word passage from <em>Pride "
              "and Prejudice</em>, printed on this page. It finds 80 of <em>I, "
              "he, she, we</em> and <em>they</em>, and in 72 of them, 90.0%, "
              "the next word is a verb. The passage also holds 46 of "
@@ -345,8 +346,9 @@ LESSONS = [
                 "Austen wrote <em>beg</em> and <em>inquired</em> where the "
                 "list has neither, and on this page <em>I interrupt</em> is "
                 "scored a miss because the scan does not know "
-                "<em>interrupt</em>. This is a limit of the tool, not of the "
-                "sentence.",
+                "<em>interrupt</em>, and so is <em>I don&rsquo;t</em>, "
+                "because the list holds no word with <em>n&rsquo;t</em> on "
+                "it. This is a limit of the tool, not of the sentence.",
                 "<strong>A speech tag, 15%, and 1 of the 8 here.</strong> "
                 "<em>&ldquo;But it is,&rdquo; returned she. &ldquo;My dear "
                 "sister,&rdquo; said he.</em> This is a fixed device of "
@@ -382,11 +384,11 @@ LESSONS = [
              "the US Supreme Court in <em>Stanley v. City of Sanford</em>, "
              "606 U.S. 46 (2025), and the Census Bureau story &ldquo;U.S. "
              "Population Aging as Nation Turns 250&rdquo; of 9 April 2026. "
-             "Both are free to use. The passage has 84.3 subject pronouns "
-             "for every thousand words, 80 in 949; the two documents have "
+             "Both are free to use. The passage has 85.5 subject pronouns "
+             "for every thousand words, 80 in 936; the two documents have "
              "13.9, 24 in 1,723. That is about 6.1 times fewer. For the "
-             "object forms the gap is wider still: 19.0 against 1.7 per "
-             "thousand, about 10.9 times fewer. Formal modern writing is "
+             "object forms the gap is wider still: 18.2 against 1.7 per "
+             "thousand, about 10.4 times fewer. Formal modern writing is "
              "mostly nouns, and the structures a speaker needs are thin on "
              "the page."),
             ("p",
