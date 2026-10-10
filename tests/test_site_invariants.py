@@ -3958,6 +3958,34 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
                     )
 
 
+class TestCourseFieldsCarryNoHtml(unittest.TestCase):
+    """The course home escapes some course fields too, and nothing checked them.
+
+    An outcome title written as `Say <em>record</em> both ways` reached a course
+    home as six visible characters of markup, and Listen read the tag aloud.
+    Every generated Subject is checked, not only the two the lesson-shape
+    tests import.
+    """
+
+    def test_escaped_course_fields_carry_no_html(self):
+        import re
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        sys.path.insert(0, str(REPO_ROOT / "content"))
+        from build_paths import GENERATED_PATHS
+        suspicious = re.compile(r"&[a-z]+;|&#\d+;|<[a-z/][^>]*>")
+        for path in GENERATED_PATHS:
+            for course in path["courses"]:
+                fields = [("title", course["title"]), ("level", course["level"]),
+                          ("assumes_long", course["assumes_long"])]
+                fields += [("outcomes[%d].title" % i, t) for i, (t, _b) in enumerate(course["outcomes"])]
+                for name, value in fields:
+                    with self.subTest(course=course["slug"], field=name):
+                        hit = suspicious.search(value)
+                        self.assertIsNone(
+                            hit, "%s %s contains %r, which the course home shows literally"
+                            % (course["slug"], name, hit.group(0) if hit else ""))
+
+
 class TestEveryLabBuilds(unittest.TestCase):
     """Every (lab, mode) a lesson asks for must actually produce a lab.
 
