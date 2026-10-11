@@ -358,6 +358,33 @@ PROGRESS_BODY = """    <noscript>
       </div>
     </noscript>
 
+    <!-- Sign-in opens the page. It used to follow the full By subject list,
+         so reaching it meant scrolling past every lesson, and even below the
+         hero it fell under the fold on a phone. -->
+    <div class="card" id="account">
+      <div class="pg-account">
+        <div>
+          <strong id="who">Not signed in</strong>
+          <p class="muted" style="margin:4px 0 0;" id="whoNote">Marks are saved in this browser only.</p>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="signin" type="button">Sign in with Microsoft</button>
+          <button class="btn" id="signout" type="button" hidden>Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="syncCard" hidden>
+      <h2 style="margin-top:0;">Carry your marks between devices</h2>
+      <p>Your marks are written to <strong>your own OneDrive</strong>, in this application's private folder,
+      as one small JSON file. They are not stored on this server. Syncing merges both sides, so a lesson
+      ticked on either device stays ticked.</p>
+      <p class="btn-row">
+        <button class="btn" id="sync" type="button">Sync now</button>
+        <span class="muted" id="syncNote"></span>
+      </p>
+    </div>
+
     <section class="hero" data-ui="hero">
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>Your progress</span>
@@ -405,30 +432,6 @@ PROGRESS_BODY = """    <noscript>
       <span class="fb-count" id="fbTotals"></span>
     </div>
     <div id="feedback"></div>
-
-    <div class="card" id="account">
-      <div class="pg-account">
-        <div>
-          <strong id="who">Not signed in</strong>
-          <p class="muted" style="margin:4px 0 0;" id="whoNote">Marks are saved in this browser only.</p>
-        </div>
-        <div class="btn-row">
-          <button class="btn primary" id="signin" type="button">Sign in with Microsoft</button>
-          <button class="btn" id="signout" type="button" hidden>Sign out</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" id="syncCard" hidden>
-      <h2 style="margin-top:0;">Carry your marks between devices</h2>
-      <p>Your marks are written to <strong>your own OneDrive</strong>, in this application's private folder,
-      as one small JSON file. They are not stored on this server. Syncing merges both sides, so a lesson
-      ticked on either device stays ticked.</p>
-      <p class="btn-row">
-        <button class="btn" id="sync" type="button">Sync now</button>
-        <span class="muted" id="syncNote"></span>
-      </p>
-    </div>
 
     <div class="card">
       <h2 style="margin-top:0;">What signing in does not do</h2>
