@@ -142,6 +142,16 @@ function idsOf(markup) {
 /* Every <select> on the page, with the values of its options in document
    order. One parser, used by the control sweep, by the expectation pass and by
    the gate that says an option without an expectation is a page failure. */
+/* An attribute value as the browser hands it to script: character references
+   decoded. The truth-table kit escapes formulas such as p -> ~p into its
+   option values (value="p -&gt; ~p"), and select.value in a browser is the
+   decoded text; passing the raw markup to the lab would sweep a formula the
+   parser rejects, which passes silently and tests nothing. */
+function attrText(raw) {
+  return raw.replace(/&(lt|gt|quot|apos|amp|#39|#x27);/g, (_, name) =>
+    ({lt: '<', gt: '>', quot: '"', apos: "'", amp: '&', '#39': "'", '#x27': "'"})[name]);
+}
+
 function selectsOf(markup) {
   const out = new Map();
   const selectRe = /<select\b([^>]*)>([\s\S]*?)<\/select>/gi;
@@ -153,7 +163,7 @@ function selectsOf(markup) {
     // such as p -> ~p as option values), so the tag ends at the first '>'
     // outside quotes, not at the first '>'.
     out.set(idm[1], [...m[2].matchAll(/<option\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g)]
-      .map((o) => { const v = /\bvalue="([^"]*)"/.exec(o[1]); return v ? v[1] : ''; }));
+      .map((o) => { const v = /\bvalue="([^"]*)"/.exec(o[1]); return v ? attrText(v[1]) : ''; }));
   }
   return out;
 }

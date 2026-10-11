@@ -1,5 +1,7 @@
 """Labs for course 1: propositional and predicate logic."""
 
+import html
+
 from .common import Lab, cfg_literal
 
 # --------------------------------------------------------------------------
@@ -207,6 +209,66 @@ QUANT_EVAL_JS = r"""
 """
 
 
+# --------------------------------------------------------------------------
+# Two notations, one meaning. The reader can TYPE the ASCII forms, but the table
+# always PRINTS the glyphs, and `^` is the trap between them: in this library it
+# is exclusive or (as in most programming languages), while the glyph it looks
+# like, `∧`, is AND. So every place a reader sees an ASCII formula -- a menu
+# option, the text box -- also shows the glyph form the table will print, and
+# the key under the text box says in so many words that `^` is not AND.
+#
+# Longest token first, so `<->` is not read as `<` followed by `->`.
+# --------------------------------------------------------------------------
+_ASCII_GLYPHS = (("<->", "↔"), ("->", "→"), ("&", "∧"), ("|", "∨"),
+                 ("^", "⊕"), ("~", "¬"), ("!", "¬"))
+
+# (glyph, what you can type for it, name) -- the order the parser binds them.
+_OPERATOR_KEY = (
+    ("¬", "~", "not"),
+    ("∧", "&", "and"),
+    ("∨", "|", "or"),
+    ("⊕", "^", "xor (exactly one)"),
+    ("→", "->", "implies"),
+    ("↔", "<->", "iff"),
+)
+
+
+def glyph_form(formula):
+    """`~p & ~q` -> `¬p ∧ ¬q`: the same formula in the table's notation."""
+    out, i = [], 0
+    while i < len(formula):
+        for ascii_op, glyph in _ASCII_GLYPHS:
+            if formula.startswith(ascii_op, i):
+                out.append(glyph)
+                i += len(ascii_op)
+                break
+        else:
+            out.append(formula[i])
+            i += 1
+    return "".join(out)
+
+
+def _formula_option(formula, selected=False):
+    """A menu option that reads in both notations: `p ⊕ q   (p ^ q)`."""
+    shown = glyph_form(formula)
+    text = shown if shown == formula else "%s   (%s)" % (shown, formula)
+    return '<option value="%s"%s>%s</option>' % (
+        html.escape(formula), ' selected="selected"' if selected else "", html.escape(text))
+
+
+def _operator_key():
+    items = "".join(
+        '<li><span class="math">%s</span> or <span class="math">%s</span> %s</li>'
+        % (glyph, html.escape(typed), name)
+        for glyph, typed, name in _OPERATOR_KEY
+    )
+    return ('<ul class="small-copy" id="ttKey" aria-label="Operator key" '
+            'style="margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px;">'
+            + items + '</ul>'
+            '<p class="small-copy" style="margin:0;">Careful: <span class="math">^</span> is xor here, '
+            'not <span class="math">∧</span>. Type <span class="math">&amp;</span> for and.</p>')
+
+
 def truth_table(cfg):
     """Build the truth table of a formula, column by column.
 
@@ -218,9 +280,7 @@ def truth_table(cfg):
     """
     formulas = cfg["formulas"]
     default_b = cfg.get("compare_with")
-    options = "".join(
-        '<option value="%s">%s</option>' % (f, f) for f in formulas
-    )
+    options = "".join(_formula_option(f) for f in formulas)
     markup = """      <div class="lab-toolbar">
         <div class="lab-title"><strong>Truth table</strong><span id="ttCaption">Every assignment, every subexpression</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>T</span><span class="tone-red"><i class="legend-swatch"></i>F</span><span class="tone-cyan"><i class="legend-swatch"></i>Whole formula</span></div>
@@ -242,8 +302,10 @@ def truth_table(cfg):
           <select id="ttB">%s</select>
         </div>
         <div class="field">
-          <label for="ttCustom">Or type your own (variables p q r s; operators ~ &amp; | -&gt; &lt;-&gt; ^)</label>
-          <input id="ttCustom" type="text" placeholder="p -&gt; (q | r)" autocomplete="off" spellcheck="false" />
+          <label for="ttCustom">Or type your own (variables p q r s; either notation)</label>
+          <input id="ttCustom" type="text" placeholder="p -&gt; (q | r)" autocomplete="off" spellcheck="false" aria-describedby="ttPreview ttKey" />
+          <p class="small-copy" id="ttPreview" aria-live="polite" style="margin:0;" hidden></p>
+          %s
         </div>
         <div class="kpi-grid">
           <div class="kpi"><span>Rows</span><strong id="ttRows">&mdash;</strong></div>
@@ -253,11 +315,8 @@ def truth_table(cfg):
         <div class="status-banner" id="ttStatus">Pick a formula.</div>""" % (
         ' selected="selected"' if cfg.get("mode") == "two" else "",
         options,
-        "".join(
-            '<option value="%s"%s>%s</option>'
-            % (f, ' selected="selected"' if f == default_b else "", f)
-            for f in formulas
-        ),
+        "".join(_formula_option(f, f == default_b) for f in formulas),
+        _operator_key(),
     )
 
     script = PARSER_JS + """
@@ -269,6 +328,7 @@ def truth_table(cfg):
   var rowsOut = document.getElementById('ttRows'), trueOut = document.getElementById('ttTrue');
   var verdictOut = document.getElementById('ttVerdict'), status = document.getElementById('ttStatus');
   var caption = document.getElementById('ttCaption');
+  var preview = document.getElementById('ttPreview');
 
   function cell(v) { return '<td class="' + (v ? 't' : 'f') + '">' + (v ? 'T' : 'F') + '</td>'; }
 
@@ -367,11 +427,24 @@ def truth_table(cfg):
       if (two) treeB = parse(selB.value);
     } catch (e) {
       custom.style.borderColor = 'var(--red)';
+      preview.hidden = false;
+      preview.textContent = 'Reads as: not yet a formula';
       status.innerHTML = '<strong>That is not a well-formed formula.</strong> '
-        + 'Use variables p q r s and the operators ~ &amp; | -&gt; &lt;-&gt; ^, with balanced parentheses.';
+        + 'Use variables p q r s, the operators in the key under the box (either notation), '
+        + 'and balanced parentheses.';
       return;
     }
     custom.style.borderColor = '';
+    /* The box echoes the typed formula in the table's notation, so ^ is seen
+       to become ⊕ (not ∧) before the reader goes looking for it in a header. */
+    preview.hidden = !typed;
+    preview.textContent = typed ? 'Reads as: ' : '';
+    if (typed) {
+      var shown = document.createElement('span');
+      shown.className = 'math';
+      shown.textContent = show(treeA, true);
+      preview.appendChild(shown);
+    }
     if (two) renderTwo(treeA, treeB); else renderOne(treeA);
   }
 

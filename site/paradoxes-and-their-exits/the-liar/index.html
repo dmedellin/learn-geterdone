@@ -1338,15 +1338,17 @@ Tarski&#x27;s exit: no sentence says of itself
         </div>
         <div class="field">
           <label for="ttA">Formula A</label>
-          <select id="ttA"><option value="p <-> ~p">p <-> ~p</option><option value="p -> ~p">p -> ~p</option><option value="~p -> p">~p -> p</option><option value="p | ~p">p | ~p</option></select>
+          <select id="ttA"><option value="p &lt;-&gt; ~p">p ↔ ¬p   (p &lt;-&gt; ~p)</option><option value="p -&gt; ~p">p → ¬p   (p -&gt; ~p)</option><option value="~p -&gt; p">¬p → p   (~p -&gt; p)</option><option value="p | ~p">p ∨ ¬p   (p | ~p)</option></select>
         </div>
         <div class="field" id="ttBWrap" hidden>
           <label for="ttB">Formula B</label>
-          <select id="ttB"><option value="p <-> ~p">p <-> ~p</option><option value="p -> ~p">p -> ~p</option><option value="~p -> p">~p -> p</option><option value="p | ~p">p | ~p</option></select>
+          <select id="ttB"><option value="p &lt;-&gt; ~p">p ↔ ¬p   (p &lt;-&gt; ~p)</option><option value="p -&gt; ~p">p → ¬p   (p -&gt; ~p)</option><option value="~p -&gt; p">¬p → p   (~p -&gt; p)</option><option value="p | ~p">p ∨ ¬p   (p | ~p)</option></select>
         </div>
         <div class="field">
-          <label for="ttCustom">Or type your own (variables p q r s; operators ~ &amp; | -&gt; &lt;-&gt; ^)</label>
-          <input id="ttCustom" type="text" placeholder="p -&gt; (q | r)" autocomplete="off" spellcheck="false" />
+          <label for="ttCustom">Or type your own (variables p q r s; either notation)</label>
+          <input id="ttCustom" type="text" placeholder="p -&gt; (q | r)" autocomplete="off" spellcheck="false" aria-describedby="ttPreview ttKey" />
+          <p class="small-copy" id="ttPreview" aria-live="polite" style="margin:0;" hidden></p>
+          <ul class="small-copy" id="ttKey" aria-label="Operator key" style="margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px;"><li><span class="math">¬</span> or <span class="math">~</span> not</li><li><span class="math">∧</span> or <span class="math">&amp;</span> and</li><li><span class="math">∨</span> or <span class="math">|</span> or</li><li><span class="math">⊕</span> or <span class="math">^</span> xor (exactly one)</li><li><span class="math">→</span> or <span class="math">-&gt;</span> implies</li><li><span class="math">↔</span> or <span class="math">&lt;-&gt;</span> iff</li></ul><p class="small-copy" style="margin:0;">Careful: <span class="math">^</span> is xor here, not <span class="math">∧</span>. Type <span class="math">&amp;</span> for and.</p>
         </div>
         <div class="kpi-grid">
           <div class="kpi"><span>Rows</span><strong id="ttRows">&mdash;</strong></div>
@@ -1623,6 +1625,7 @@ which premise to give up is the open question</div><p>The table settles that the
   var rowsOut = document.getElementById('ttRows'), trueOut = document.getElementById('ttTrue');
   var verdictOut = document.getElementById('ttVerdict'), status = document.getElementById('ttStatus');
   var caption = document.getElementById('ttCaption');
+  var preview = document.getElementById('ttPreview');
 
   function cell(v) { return '<td class="' + (v ? 't' : 'f') + '">' + (v ? 'T' : 'F') + '</td>'; }
 
@@ -1721,11 +1724,24 @@ which premise to give up is the open question</div><p>The table settles that the
       if (two) treeB = parse(selB.value);
     } catch (e) {
       custom.style.borderColor = 'var(--red)';
+      preview.hidden = false;
+      preview.textContent = 'Reads as: not yet a formula';
       status.innerHTML = '<strong>That is not a well-formed formula.</strong> '
-        + 'Use variables p q r s and the operators ~ &amp; | -&gt; &lt;-&gt; ^, with balanced parentheses.';
+        + 'Use variables p q r s, the operators in the key under the box (either notation), '
+        + 'and balanced parentheses.';
       return;
     }
     custom.style.borderColor = '';
+    /* The box echoes the typed formula in the table's notation, so ^ is seen
+       to become ⊕ (not ∧) before the reader goes looking for it in a header. */
+    preview.hidden = !typed;
+    preview.textContent = typed ? 'Reads as: ' : '';
+    if (typed) {
+      var shown = document.createElement('span');
+      shown.className = 'math';
+      shown.textContent = show(treeA, true);
+      preview.appendChild(shown);
+    }
     if (two) renderTwo(treeA, treeB); else renderOne(treeA);
   }
 
