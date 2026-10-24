@@ -22,7 +22,9 @@ LESSONS = [
     # fraction), l. 3609 (purchase by the working class), l. 3627 (commodities
     # which do not represent any capital), l. 3639 (prime promoter), l. 3676
     # (checks are not money), l. 3993-3995 (the two departments, Ch. 20 §2),
-    # l. 4419 (Proudhon; the stock company), l. 4150 (homogeneous for both).
+    # l. 4419 (Proudhon; the aggregate capitalist; the stock company), l. 3943
+    # (Proudhon appropriated Say's discovery), l. 3633 (belongs in a later
+    # part), l. 4150 (homogeneous for both).
     {
         "slug": "the-object-of-the-inquiry",
         "title": "The Object of the Inquiry",
@@ -120,16 +122,20 @@ LESSONS = [
                   "capitalist will buy them to produce with. The marx-totals preset enters Marx's "
                   "own totals from Chapter 20, 6,000 of means of production and 3,000 of means of "
                   "consumption, the figures the rest of this course takes apart."),
-            ("p", "One tempting shortcut is to treat society as a single firm, with all the inputs on "
-                  "one side and all the output on the other. Marx names Proudhon as one who did, "
-                  "looking at society &ldquo;as though a society with a capitalist mode of "
-                  "production would lose its specific historical and economic characteristics by "
-                  "being taken as a unit&rdquo;. If society is to be treated as one capitalist, he "
-                  "says, then it is a stock company, and it &ldquo;shares with many other stock "
-                  "companies the peculiarity that every one knows what he puts in, but not what he "
-                  "will get out of it&rdquo;."),
-            ("p", "The chapter's second section, which Engels' note says belongs later but is placed "
-                  "here, is about money. Money capital is the form in which every capital enters the "
+            ("p", "One tempting shortcut is to suppose that once society is added up as a whole, the "
+                  "distinctions that matter to a single firm drop out: what is capital for one is "
+                  "revenue for another, so for society as a whole the entire product is income. Say "
+                  "drew that conclusion, and Marx notes in Chapter 19 that Proudhon took it over "
+                  "from him. In Chapter 20 he rejects the manner &ldquo;copied by Proudhon from "
+                  "bourgeois economy&rdquo;, which looks at society &ldquo;as though a society with a "
+                  "capitalist mode of production would lose its specific historical and economic "
+                  "characteristics by being taken as a unit&rdquo;. Taken as a unit, Marx replies, "
+                  "it is still capitalist: &ldquo;We have, in that case, to deal with the aggregate "
+                  "capitalist.&rdquo; Society is then one stock company, and it &ldquo;shares with "
+                  "many other stock companies the peculiarity that every one knows what he puts in, "
+                  "but not what he will get out of it&rdquo;."),
+            ("p", "The chapter's second section, which the text says belongs later in the Part but "
+                  "takes up at once, is about money. Money capital is the form in which every capital enters the "
                   "scene, &ldquo;the prime promoter, giving the first impetus to the entire "
                   "process&rdquo;. But the money advanced does not fix how much is produced: the same "
                   "workers can be worked longer or harder, and a shorter turnover sets the same "
@@ -261,14 +267,16 @@ LESSONS = [
                     "the departments are defined by use, not by the kind of thing."},
         ],
         "mistakes": [
-            ("Thinking of the economy as one big firm",
-             "It is tempting to add up society the way a firm adds up its books: inputs on one "
-             "side, output on the other, nothing to explain in between. Marx finds this in "
-             "Proudhon, who treats society as if it lost its capitalist character by being taken "
-             "as a unit. A firm sells its product to others; society has nobody outside to sell to, "
-             "and its product comes in two kinds. The marx-totals preset shows the consequence: of "
-             "9,000 of product, only 3,000 can go into any household, so all the wages and surplus "
-             "value of the year, whatever they add up to, can be spent on that 3,000 alone."),
+            ("Thinking that, for society as a whole, the whole product is income",
+             "It is tempting to think that the distinctions of a single firm cancel out when "
+             "society is added up: one firm's capital is another's revenue, so for society the "
+             "whole product is income. Say drew that conclusion, and Marx says Proudhon took it "
+             "from him, treating society as if it lost its capitalist character by being taken as "
+             "a unit. Marx's reply is that, taken as a unit, society is the aggregate capitalist, "
+             "and its product still comes in two kinds. The marx-totals preset shows the "
+             "consequence: of 9,000 of product, only 3,000 can go into any household, so all the "
+             "wages and surplus value of the year, whatever they add up to, can be spent on that "
+             "3,000 alone."),
             ("Sorting by what a thing is rather than by its use",
              "Coal, grain and cloth are not means of production or of consumption by nature. The "
              "misclassified preset files kitchen coal as means of production and moves 50 from "
@@ -301,7 +309,8 @@ LESSONS = [
     # dissolves), l. 3818 (a fourth portion), l. 3820 (one line of production to
     # another), l. 3838 (the first mistake; merely re-appears), l. 3771 (lacked
     # but little), l. 3939 (the Says and Mac-Cullochs), l. 3941 (Say), l. 3945
-    # (Storch), l. 3842 (did not create all the value).
+    # (Storch), l. 3842 (did not create all the value), l. 3820-3822 (a specious
+    # subterfuge; Scotch pebbles).
     {
         "slug": "former-presentations",
         "title": "Former Discussions: Quesnay and Smith",
@@ -415,10 +424,15 @@ LESSONS = [
             ("p", "Smith's defenders have a stronger reply than Smith gave. Follow the horse back: "
                   "its price is wages, profit, rent and some fodder; the fodder's price is wages, "
                   "profit, rent and some seed; each step back leaves a smaller remainder of means "
-                  "of production. Piero Sraffa made this exact in 1960 as the reduction of a price "
-                  "to dated quantities of labour, in which the remainder can be made as small as "
-                  "you like by going back far enough. Marx wrote against Smith, not Sraffa. What in "
-                  "the chapter bears on the regress is the period it asks about: one year's "
+                  "of production. Marx states the condition on which that regress would hold: it "
+                  "would not be &ldquo;a specious subterfuge&rdquo; only if Smith could show that it "
+                  "ends in products made with labour alone, using no means of production at all. "
+                  "Smith's example of such labour, the collectors of Scotch pebbles, was no proof, "
+                  "Marx says, and they use baskets and sacks besides. Piero Sraffa made the regress exact in 1960 as the reduction "
+                  "of a price to dated quantities of labour: the remainder never reaches zero, but "
+                  "it can be made as small as you like by going back far enough. Marx wrote against "
+                  "Smith, not Sraffa. Besides that condition, what in the chapter bears on the "
+                  "regress is the period it asks about: one year's "
                   "product, out of which the £6,000 of means of production used up that year must "
                   "be replaced, however the regress into earlier years comes out. National accounts today draw a similar line: the year's wages, "
                   "profits, interest and rents add up to less than gross output, by the "
@@ -832,9 +846,10 @@ LESSONS = [
     # (Mr. X's spinning machine), l. 4610 (1800; would not return), l. 4631
     # (fall from the clouds), l. 4723 (would seem to be a law), l. 4733 and
     # l. 4753 (220 and 180; commodities valued at 40), l. 4796 (new to them),
-    # l. 4794 (continuous relative overproduction; anarchy), l. 4790 (not an
-    # evil in itself), l. 4792 (wider sphere), l. 4565 (suspended), l. 4831
-    # (simple reproduction includes hoarding).
+    # l. 4794 (continuous relative overproduction; anarchy; the same as among
+    # men), l. 4790 (not an evil in itself), l. 4792 (wider sphere), l. 4565
+    # (suspended), l. 4831 (simple reproduction includes hoarding), l. 4655-4657
+    # (Mr. X out of his own pocket; only seemingly absurd), l. 4796 (convincing).
     {
         "slug": "simple-reproduction-fixed-capital-and-money",
         "title": "Simple Reproduction: Fixed Capital and Money",
@@ -885,11 +900,11 @@ LESSONS = [
                   "and tear of fixed capital, is not reconverted into that component part of "
                   "productive capital whose loss in value it makes good. It settles down beside the "
                   "productive capital and retains the form of money.&rdquo;"),
-            ("p", "Marx's own example is a spinner he calls Mr. X. What his spinning machine loses in "
-                  "wear reappears in the value of his yarn. When the yarn is sold, that part of the "
-                  "price is put by, year after year, and spent only when the machine has to be "
-                  "replaced, all at once. For one capitalist this is ordinary prudence. The question "
-                  "is what it does to the scheme of the last lesson, where Department I's `v + s` had "
+            ("p", "Marx's own illustration is a spinner he calls Mr. X. What his spinning machine "
+                  "loses in wear reappears in the value of his yarn. When the yarn is sold, that part "
+                  "of the price is to be put by in money, year after year, and spent only when the "
+                  "machine has to be replaced, all at once. The question is what this does to the "
+                  "scheme of the last lesson, where Department I's `v + s` had "
                   "to be exchanged in full against Department II's `c`."),
             ("p", "Here is the difficulty. Department II's 2,000 of constant capital includes wear, "
                   "say 200, that it wants to keep as money this year rather than turn into means of "
@@ -899,7 +914,10 @@ LESSONS = [
                   "Department I would be left with 200 of its own surplus product unsold. Assuming "
                   "that Department I simply supplies the money, Marx says, is as legitimate as "
                   "assuming &ldquo;that 200 p. st. fall every year from the clouds&rdquo;."),
-            ("p", "His solution is that Department II is not one capitalist. Its fixed capitals are of "
+            ("p", "The only source left is Department II itself, and for one capitalist that looks "
+                  "absurd: Mr. X would lose 200 by the wear of his machine and put up another 200 "
+                  "out of his own pocket. Marx's solution is that Department II is not one "
+                  "capitalist. Its fixed capitals are of "
                   "different ages. One group, section 1, has machines that expire this year and "
                   "spends its hoard on new ones, buying from Department I and selling nothing back. "
                   "Another, section 2, sells the part of its product that carries wear and keeps the "
@@ -925,7 +943,7 @@ LESSONS = [
             ("p", "<strong>Volume II, Chapter 20, §11.</strong> &ldquo;The result would be a "
                   "crisis&mdash;a crisis in production&mdash;in spite of the fact that reproduction "
                   "had taken place on the same scale.&rdquo;"),
-            ("p", "Marx is pleased with this. A disproportion between fixed and circulating capital "
+            ("p", "Marx calls this illustration &ldquo;convincing&rdquo;. A disproportion between fixed and circulating capital "
                   "was a favourite explanation of crises among economists, but always as a "
                   "disturbance of growth. &ldquo;That such a disproportion can and must arise even "
                   "when the fixed capital is merely preserved by renewal is new to them.&rdquo; In a "
@@ -940,9 +958,11 @@ LESSONS = [
                   "whose machines are of every age, the machines expiring in a year and the wear set "
                   "aside will usually be close, while banks lend one firm's depreciation fund to "
                   "another firm that is renewing. On that view the gap is a ripple, absorbed by "
-                  "credit and inventories. Marx's claim is narrower: that the balance is not "
-                  "guaranteed even under the strictest assumptions, and that an industry equipped all "
-                  "at once will renew all at once. Section 12 adds a related point about money: "
+                  "credit and inventories. Marx's claim is not about the size of the gap: it is "
+                  "that the mismatch arises under his strictest assumptions, with no growth, no "
+                  "credit and no change in productivity, because the fixed capital that expires "
+                  "varies from year to year, above or below the average, &ldquo;the same as among "
+                  "men&rdquo;. He does not say how large the swings are. Section 12 adds a related point about money: "
                   "with gold mined at home, even simple reproduction, Marx concludes, "
                   "&ldquo;inevitably includes the accumulation, or hoarding, of money&rdquo;."),
             ("p", "So far the hoards have been funds for replacement. The next lesson, “Accumulation "
@@ -1088,7 +1108,8 @@ LESSONS = [
     # Kerr vol. 2, l. 4998 (the passage). Inline: l. 4998 (simple hoard),
     # l. 5002 (not an addition to the social wealth), l. 5004 (where the buyers
     # are to come from), l. 5018 (each exclusively in one role), l. 5038 (an
-    # accident), l. 5126 (overproduction in II), l. 5024 (loanable capital),
+    # accident), l. 5032 (bare exchange of commodity for commodity), l. 5010
+    # (this seeming difficulty), l. 5126 (overproduction in II), l. 5024 (loanable capital),
     # l. 5070 (dead weight), l. 5496 (Engels' note: latent and potential).
     {
         "slug": "accumulation-and-money",
@@ -1121,8 +1142,9 @@ LESSONS = [
              "it waits."),
             ("Sellers who do not buy",
              "A capitalist who is building a hoard sells his surplus product and makes no purchase "
-             "against it. If every capitalist did so at once, Marx says, it would be inexplicable "
-             "where the buyers were to come from."),
+             "against it. If every capitalist did so at once, Marx says, it would seem inexplicable "
+             "where the buyers were to come from, a difficulty he calls only seeming and then "
+             "resolves."),
             ("Buyers who do not sell",
              "Another group, whose hoards are now large enough, buys means of production with money "
              "saved earlier and sells nothing against it. Balance requires the two one-sided acts "
@@ -1163,7 +1185,9 @@ LESSONS = [
                   "says that saving is not a leak, because what one person saves another borrows and "
                   "spends on investment. If Say is right, A's hoard is a passing moment of no "
                   "consequence."),
-            ("p", "The section does not name Say, but it bears on his law. Department I's capitalists are at different "
+            ("p", "The section does not name Say, but it bears on his law. The disposal of the year's "
+                  "product, Marx writes, is not a &ldquo;bare exchange of commodity for commodity, as "
+                  "the political economists assume&rdquo;. Department I's capitalists are at different "
                   "stages. While A, A′ and A″ are building hoards, others, B, B′ and B″, have hoards "
                   "big enough to invest, and they buy A's surplus product with money saved earlier: "
                   "the two groups &ldquo;meet as buyers and sellers, each one of them exclusively in "
@@ -1387,8 +1411,8 @@ LESSONS = [
         ],
         "read_title": "The rule first, then four years of it",
         "read_intro": (
-            "Marx's schemes run for pages of arithmetic. The passage is the rule he draws after the "
-            "first year of it, before he runs the second."
+            "Marx's schemes run for pages of arithmetic. The passage is the rule he draws partway "
+            "through, once the first year is done and the capitals for the second are arranged."
         ),
         "body": [
             ("p", "<strong>Volume II, Chapter 21, §3.</strong> &ldquo;If things are to proceed "
@@ -1424,14 +1448,20 @@ LESSONS = [
                   "8,784 + 4,249, so it carries the same slip; summed from the parts it would be "
                   "13,043, within a unit of the exact figure. After the "
                   "first year both departments grow by a tenth a year; in the first, Department II "
-                  "grows by a fifteenth and Department I by a tenth."),
+                  "grows by a fifteenth and Department I by a tenth. So the passage's rule, read "
+                  "literally, is not what Marx's own figures show: in them Department II's capital "
+                  "never grows faster than Department I's. What the figures do show is the "
+                  "dependence the rule turns on: each year Department II must accumulate whatever "
+                  "Department I's growing `I(v + s)` requires of `IIc`. The chapter does not comment "
+                  "on the difference."),
             ("p", "The marx-second preset is Marx's second illustration, with a higher composition, "
                   "five to one: I 5,000c + 1,000v + 1,000s and II 1,430c + 285v + 285s. Marx rounds "
                   "to whole numbers and gets I 5,417c + 1,083v and II 1,583c + 316v after the first "
                   "year; the lab keeps the fractions, and its tile reads I 16,250/3c + 3,250/3v; II "
                   "4,750/3c + 947/3v, that is 5,416⅔ and 1,083⅓, 1,583⅓ and 315⅔. Marx runs this "
                   "illustration for three years, and the lab's table agrees with his rounded figures "
-                  "throughout, with one exception that is the printer's: Kerr gives Department I's "
+                  "to within a unit, the rounding he carries forward, with one exception that is "
+                  "the printer's: Kerr gives Department I's "
                   "constant capital after the third year as 6,385, where 5,869 + 489 = 6,358, the "
                   "figure Marx's own total of 7,629 uses. The ii-short preset gives Department II a surplus value of only 100 "
                   "against Marx's 750. Balance needs Department II to accumulate 150, 100 of constant "
@@ -1456,8 +1486,9 @@ LESSONS = [
                   "the same year, and Nikolai Bukharin in 1924. All of them wrote after Marx's death "
                   "in 1883. What in the chapter bears on their dispute is the rule this lesson "
                   "opened with: Marx states what accumulation in Department II must do &ldquo;If "
-                  "things are to proceed normally&rdquo;, and his figures show that it can, but the "
-                  "chapter does not show what makes it do so. The lab takes the rule as given, "
+                  "things are to proceed normally&rdquo;, and his figures show a path on which the "
+                  "two departments stay in balance, but the chapter does not show what makes "
+                  "Department II keep to it. The lab takes the rule as given, "
                   "Department II following Department I, which is exactly the step Luxemburg "
                   "disputed."),
             ("p", "Volume II ends a few pages later, where the manuscript does, on where Department "
