@@ -10,6 +10,7 @@ from . import (
     algebra_basics,
     calckit,
     dekit,
+    capkit,
     argkit,
     choicekit,
     algebra_equations,
@@ -165,6 +166,7 @@ REGISTRY = {
     "choicekit": choicekit.choicekit_lab,
     "calckit": calckit.calckit_lab,
     "dekit": dekit.dekit_lab,
+    "capkit": capkit.capkit_lab,
 }
 
 
