@@ -177,11 +177,11 @@ LESSONS = [
              "Let n be the number of different commodities brought to market, one owner "
              "each."),
             ("Count the pairs for barter",
-             "Each pair of commodities needs its own ratio: n·(n − 1)/2. The product "
-             "n·(n − 1) counts every pair twice, once from each end, so it is halved."),
+             "Each pair of commodities needs its own ratio: `n·(n − 1)/2`. The product "
+             "`n·(n − 1)` counts every pair twice, once from each end, so it is halved."),
             ("Count the ratios with one equivalent",
              "Every commodity but the equivalent needs one ratio, its price in the "
-             "equivalent: n − 1. Any ratio between two other commodities follows from "
+             "equivalent: `n − 1`. Any ratio between two other commodities follows from "
              "theirs."),
             ("Name what the count leaves out",
              "The count is the same whichever commodity is the equivalent. Which one it is, "
@@ -239,12 +239,13 @@ LESSONS = [
              "a": ["Adding a seventh commodity",
                    "Choosing gold instead of cattle as the equivalent",
                    "Removing two commodities",
-                   "Trading with no equivalent at all"],
+                   "Taking the cattle out of the market altogether"],
              "c": 1,
              "why": "Both counts depend only on how many commodities there are, so swapping "
                     "one equivalent for another changes neither. Adding or removing "
-                    "commodities changes both, and trading with no equivalent is what the "
-                    "barter tile already counts."},
+                    "commodities changes both, and the equivalent is a commodity like the "
+                    "rest: take the cattle away and five remain, needing 10 ratios by barter "
+                    "and 4 with whichever commodity now serves as the equivalent."},
         ],
         "mistakes": [
             ("Thinking money is a mere symbol fixed by convention",
@@ -392,10 +393,15 @@ LESSONS = [
                   "multiplied, prices would rise in the same proportion. It is a powerful "
                   "argument, and it fits what people saw after the American silver and gold "
                   "flowed into Europe: more metal, higher prices. Marx argues that for gold "
-                  "coin the causation runs the other way. Cheaper gold raised prices, and "
-                  "higher prices drew more gold into circulation. Hume's reading, he says, "
-                  "came from &ldquo;a one-sided observation&rdquo; of the same facts. Any gold "
-                  "that circulation does not need is withdrawn into hoards."),
+                  "coin the causation runs the other way: given the sum of values and the "
+                  "velocity, &ldquo;the quantity of precious metal current as money depends on "
+                  "the value of that precious metal&rdquo;. Cheaper gold raised prices, and "
+                  "higher prices drew more gold into circulation. The opposite opinion, he "
+                  "says, rested on &ldquo;the absurd hypothesis that commodities are without a "
+                  "price, and money without a value, when they first enter into "
+                  "circulation&rdquo;; the footnote that names Hume names Jacob Vanderlint and "
+                  "Nicholas Barbon before him. Any gold that circulation does not need is "
+                  "withdrawn into hoards."),
             ("p", "For paper, Marx agrees with a version of the quantity rule. Paper issued by "
                   "the state stands for gold, and if twice as much is issued as the gold it "
                   "replaces would amount to, &ldquo;£1 would be the money-name not of ¼ of an "
@@ -576,7 +582,7 @@ LESSONS = [
         "key": [
             "hoard: money withdrawn from circulation",
             "credit sale: goods now, money later",
-            "need = prices − credit + due − cancelled",
+            "need = prices − credit + payable − cancelled",
             "then divide by the velocity",
             "a broken chain needs hard cash",
         ],
@@ -812,8 +818,10 @@ LESSONS = [
         "note": (
             "The money-needed formula is the lab's formalisation of Marx's sentence, which "
             "speaks of subtracting the circuits a coin makes rather than dividing by a "
-            "velocity; the two agree when each coin does the same number of jobs. The "
-            "dealers and their £100 bills are illustrative."
+            "velocity; the two agree when each coin does the same number of jobs. In the "
+            "broken preset the unpaid bill is counted as no longer falling due, so that the "
+            "formula and the netting of the bills return the same £100. The dealers and "
+            "their £100 bills are illustrative."
         ),
     },
     # ---------------------------------------------------------------- 08
@@ -832,7 +840,7 @@ LESSONS = [
         "key": [
             "abroad, money returns to bullion",
             "chief use: settling balances",
-            "out = imports − exports − other receipts",
+            "bullion out = imports − exports − receipts",
             "a payment owed abroad deepens the drain",
         ],
         "key_label": "Money of the world",

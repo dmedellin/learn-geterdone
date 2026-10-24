@@ -69,8 +69,8 @@ COURSE = {
         "and then goes back through them a phrase at a time, so the passage is worth a "
         "second reading once the lesson is done. Quotations are from the Kerr editions "
         "in the Online Library of Liberty, hosted by Liberty Fund, Inc.",
-        "Expect Chapter 1 to be slow. Marx said himself that beginnings are difficult, "
-        "and the four lessons on it take one section each for that reason. “The Form of "
+        "Expect Chapter 1 to be slow. Marx said himself that “every beginning is "
+        "difficult”, and the four lessons on it take one section each for that reason. “The Form of "
         "Value” is the hardest; if it does not land the first time, read “The Fetishism "
         "of Commodities” and come back to it.",
         "Use the labs to change one thing at a time. Each preset changes a single figure "

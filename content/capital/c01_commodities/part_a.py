@@ -25,7 +25,7 @@ LESSONS = [
             "see what a slow weaver's extra hours are worth: much less than he spent."
         ),
         "key": [
-            "use-value: a useful thing, by its body",
+            "a use-value: a useful thing, by its body",
             "value: abstract labour, counted in time",
             "time per unit = total hours / total output",
             "value of a lot = units × time per unit",
@@ -39,7 +39,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Use-value",
-             "A commodity is first a thing that satisfies a want, whether the want "
+             "A commodity is first a thing that satisfies a want, whether such wants "
              "&ldquo;spring from the stomach or from fancy&rdquo;. Its usefulness belongs "
              "to its body: iron is useful as iron, linen as linen. Use-values are the "
              "material of all wealth, in any society."),
@@ -86,7 +86,7 @@ LESSONS = [
                   "must be worth the same as one another, and Marx concludes that exchange "
                   "value is &ldquo;the phenomenal form, of something contained in it, yet "
                   "distinguishable from it&rdquo;. Write any exchange as `1 quarter corn = x "
-                  "cwt. iron` and the equation says that two different things are equal in "
+                  "hundredweight iron` and the equation says that two different things are equal in "
                   "some third respect. It cannot be weight or colour or usefulness, because "
                   "exchange ignores exactly those. Take them away and one property is left: "
                   "each is a product of labour. Not of weaving or mining in particular, but "
@@ -134,7 +134,12 @@ LESSONS = [
                   "Slow C down to 5 hours a yard and the average rises to `11/5`, by exactly "
                   "his share: 40 extra hours spread over 100 yards. His own yards are worth "
                   "`11/5` hours each, not 5. Of his 40 extra hours, his twenty yards carry 8; "
-                  "the other 32 are spread over yards that other weavers made."),
+                  "the other 32 are spread over yards that other weavers made. The power-loom "
+                  "preset runs Marx's example on the same three weavers: A and B halve their "
+                  "hours, C works exactly as before, and the yard falls to `6/5` of an hour. "
+                  "C's 3 hours a yard now count as `6/5`, so each hour he works represents "
+                  "`2/5` of an hour of social labour where it represented `3/5`. In Marx's own "
+                  "case the whole trade halves its time, and the hour falls to exactly half."),
             ("p", "The rest of the section follows from the definition. The more productive "
                   "labour is, the less time an article needs and the less it is worth: "
                   "Marx imagines carbon turned cheaply into diamonds, whose value &ldquo;might "
@@ -380,7 +385,12 @@ LESSONS = [
                   "&ldquo;multiplied simple labour&rdquo;, an hour of it equal to several "
                   "hours of the simple kind, and then, for simplicity, treats every hour as "
                   "simple from here on. The book never computes that multiplier from "
-                  "anything, and neither does this lesson."),
+                  "anything, and neither does this lesson. Böhm-Bawerk pressed on exactly this "
+                  "point: if the only evidence for how many simple hours a skilled hour counts "
+                  "as is the ratio at which the two kinds of product exchange, then the "
+                  "reduction uses the exchange ratios it was meant to explain. The chapter's "
+                  "answer is only that the proportions &ldquo;are established by a social "
+                  "process that goes on behind the backs of the producers&rdquo;."),
             ("p", "The two sides part company the moment productivity changes, and that is "
                   "the passage the whole distinction exists for:"),
             ("p", "<strong>Volume I, Chapter 1, §2.</strong> &ldquo;An increase in the "
@@ -615,11 +625,13 @@ LESSONS = [
                   "is &ldquo;something purely social&rdquo;. Yet because it is the coat's own "
                   "body that does the expressing, being exchangeable looks like a property of "
                   "the coat. That appearance is the seed of the next lesson."),
-            ("p", "Then the arithmetic. Marx takes four cases. If the linen's value doubles "
-                  "and the coat's does not, 20 yards fetch 2 coats. If the coat's value doubles "
-                  "and the linen's does not, 20 yards fetch half a coat. If both change in the "
-                  "same proportion, nothing in the equation moves. And the case the lab is "
-                  "built around:"),
+            ("p", "Then the arithmetic. Marx takes four cases: the linen's value changes, the "
+                  "coat's changes, both change in the same proportion, both change by "
+                  "different amounts. If the linen's value doubles and the coat's does not, 20 "
+                  "yards fetch 2 coats. If the coat's value doubles and the linen's does not, "
+                  "20 yards fetch half a coat. If both change in the same proportion, nothing "
+                  "in the equation moves. Inside the second case is the one the lab is built "
+                  "around:"),
             ("p", "<strong>Volume I, Chapter 1, §3.</strong> &ldquo;If, on the other hand, the "
                   "value of the coat sinks by one half, then 20 yards of linen=2 coats. "
                   "&hellip; The relative value of a commodity may vary, although its value "
