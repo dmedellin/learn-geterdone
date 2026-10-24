@@ -341,7 +341,8 @@ LESSONS = [
                   "obligations&rdquo;, while in the recovery loan capital &ldquo;is demanded for "
                   "the purpose of buying&rdquo;. Read the second clause as <em>not a demand for "
                   "money as a means of purchase</em> and the passage says what that contrast "
-                  "says. This lesson reads it so, and flags the reading as its own."),
+                  "says. This lesson reads it so. Marx's German has <em>Kaufmittel</em>, a means "
+                  "of purchase, so the slip is the translation's, not the manuscript's."),
             ("p", "The lab settles one chain of bills three ways. In the prosperity preset A owes "
                   "B £100, B owes C £100 and C owes A £100, every bill for goods delivered. Set "
                   "off, they cancel: cash needed £0. In the crisis preset A cannot pay B. Nothing "
@@ -472,13 +473,13 @@ LESSONS = [
             ],
             "lines": [
                 "before:  A 0,  B 0,  C 0;  cash needed £0",
-                "A fails:  A +100,  B 0,  C −100",
+                "A fails:  A +100,  B −100,  C 0",
                 "cash needed:  £100",
                 "goods and prices:  unchanged, £300",
             ],
             "after": [
                 "Nothing real was lost between the two lines. What appeared was a demand for £100 "
-                "of means of payment, which C must find before the day the bill falls due.",
+                "of means of payment, which B must find before the day his bill to C falls due.",
             ],
         },
         "quiz_title": "Means of payment in a crisis",
@@ -842,7 +843,7 @@ LESSONS = [
             "suspending the Act changed."
         ),
         "key": [
-            "cap = fixed issue + gold in the Bank",
+            "the Act's cap = fixed issue + gold in the Bank",
             "gold out: the cap falls by as much",
             "unmet = demand less the cap",
             "suspended: 25 October 1847",
@@ -1336,7 +1337,7 @@ LESSONS = [
         ),
         "note": (
             "The balanced and harvest-failure figures are illustrative; the india preset is "
-            "Newmarch's 1855 figures as the Kerr text gives them at 1786. The lab nets one "
+            "Newmarch's 1855 figures as the Kerr text gives them in his answer to question 1786. The lab nets one "
             "period's payments and ignores the timing Marx stresses: credit given on exports and "
             "taken on imports can turn the exchanges for months with no change in the balance."
         ),

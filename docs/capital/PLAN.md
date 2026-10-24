@@ -763,7 +763,7 @@ bare numbers, as Marx does; only lesson 2 prices in pounds. All six lessons are 
    - Read: "This total process comprises both the productive consumption…" (Kerr l. 3609).
    - Do: sort a society's product into means of production and means of consumption and say why the individual capital's circuit cannot answer the social question.
    - Lab: `schemes`, view `sort`. Presets: `two-dept` (machines 300, mill coal 100, bread 150, kitchen coal 50, illustrative: `scDeptI` `400: machines, coal for a mill`, `scDeptII` `200: bread, coal for kitchens`), `misclassified` (kitchen coal filed as means of production: 450, 150), `marx-totals` (Marx's 6,000 and 3,000). Pin `scDeptI`, `scDeptII`.
-   - Misconception: the economy is one big firm (Proudhon, Kerr l. 4419).
+   - Misconception: for society as a whole the entire product is income, the distinctions of the single capital cancelling out (Say, taken over by Proudhon, Kerr l. 3941-3943; Marx's reply at l. 4419: taken as a unit, society is "the aggregate capitalist", not a body that has lost its capitalist character). Corrected in the second review: Marx does not reject treating society as one unit, which he does himself, so "the economy is one big firm" was not Proudhon's error as Marx states it.
    - Worked: the same coal is Department I sold to a mill and Department II sold to a kitchen.
 
 2. **former-presentations** — Former Discussions: Quesnay and Smith — *Chapter 19 · Former Discussions of the Subject*
@@ -1044,7 +1044,7 @@ Instances as authored (2026-10-24). Corrections the Kerr text forced are marked 
 8. **money-capital-and-real-capital-iii** — Money Capital and Real Capital III — *Chapter 32*
    - Read: the demand for means of payment in times of crisis.
    - Do: compute the cash a chain of payments needs before and after one default, with the sum of prices unchanged.
-   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears: £0), `crisis` (bill 1 defaulted, Course 1's `broken` chain: £100), `cash-only` (credit stopped, every sale in cash at velocity 1: £300; replaces `recovery`, since Chapter 32's recovery is borrowing to buy, which this view cannot show). Pin `moNeeded`, `moNetted`. Read: Kerr l. 4486; its second clause, "by no means a demand for money as a means of payment", reads as a slip for means of purchase, and the lesson says the reading is its own.
+   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears: £0), `crisis` (bill 1 defaulted, Course 1's `broken` chain: £100), `cash-only` (credit stopped, every sale in cash at velocity 1: £300; replaces `recovery`, since Chapter 32's recovery is borrowing to buy, which this view cannot show). Pin `moNeeded`, `moNetted`. Read: Kerr l. 4486; its second clause, "by no means a demand for money as a means of payment", reads as a slip for means of purchase (Marx's German has *Kaufmittel*), and the lesson says the slip is the translation's.
    - Misconception: in a crisis capital is scarce.
    - Worked: the same commodities and prices need £0 of cash while the chain holds and £100 once it breaks: what is scarce is money as means of payment, not capital.
 

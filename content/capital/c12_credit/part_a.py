@@ -385,8 +385,9 @@ LESSONS = [
                   "saying it here is Samuel Jones Loyd, Lord Overstone, banker, chief theorist of "
                   "the Bank Act of 1844, and one of the richest men in England. His position "
                   "deserves to be put at its strongest. Interest is the price of capital. Capital "
-                  "is the stock of things used in production. When trade expands, as it had from "
-                  "45 to 120 million pounds of exports under the Act, more of those things are "
+                  "is the stock of things used in production. When trade expands, as English commerce "
+                  "had, Overstone told the committee, from 45 to 120 million pounds in the thirteen "
+                  "years of the Act, more of those things are "
                   "wanted, their &ldquo;value&rdquo; rises, and the rate of interest records it. A "
                   "high rate is then a sign of prosperity, not a burden on it."),
             ("p", "Marx's reply is in the next sentence: &ldquo;the rate of profit may hold itself "
@@ -397,13 +398,13 @@ LESSONS = [
                   "high rate of profit stops the first share from growing at the expense of the "
                   "second."),
             ("p", "The lab does that division. A manufacturer works £100 of borrowed capital at "
-                  "an average rate of profit of 10%; Marx's examiners put the ordinary rate at "
+                  "an average rate of profit of 10%; the committee's examiner put the average rate at "
                   "&ldquo;from 7 to 10%&rdquo;, and the figure is illustrative. In the low preset "
-                  "interest is 3%, the Bank's rate in January 1847: £3 goes to the lender and £7 "
-                  "stays as profit of enterprise. In the high preset interest is 8%, near the top "
-                  "of the examiner's question, &ldquo;from 2% to 7 or 8%&rdquo;: £8 to the lender, "
-                  "£2 left. In the crisis preset it is 10%, the Bank's rate in November 1847, and "
-                  "profit of enterprise is £0. The rate of profit never moved."),
+                  "interest is 3%, where the Bank's rate began in January 1847: £3 goes to the lender "
+                  "and £7 stays as profit of enterprise. In the high preset interest is 8%, near the "
+                  "top of the examiner's question, &ldquo;from 2% to 7 or 8%&rdquo;: £8 to the lender, "
+                  "£2 left. In the crisis preset it is 10%, where the Bank's rate peaked in November "
+                  "1847, and profit of enterprise is £0. The rate of profit never moved."),
             ("p", "This is not hypothetical. Tooke told the Lords' committee that in the "
                   "Warwickshire and Staffordshire metal trades &ldquo;very many orders were rejected "
                   "in 1847, because the rate of interest, which the manufacturer had to pay for "
@@ -431,7 +432,7 @@ LESSONS = [
                   "single rate of interest for borrowers in every trade, whatever the state of "
                   "the cotton or the iron market, is a price of money capital, set in the money "
                   "market, and the chapter's point is that it moves on its own."),
-            ("p", "Marx is very angry in this chapter, and he lets the committee's examiners make "
+            ("p", "Marx is at his most sarcastic in this chapter, and he lets the committee's examiners make "
                   "his jokes. Disraeli asks a director of the Bank what its dividend was in 1844: "
                   "7%. And in 1847, the year of the crisis? &ldquo;Nine per cent.&rdquo; Overstone, "
                   "pressed on what exactly he means by capital, finally declines to answer, "
@@ -579,8 +580,9 @@ LESSONS = [
             "The lab holds the rate of profit fixed so that only the division moves. In 1847 the "
             "rate of profit fell as well, which Marx says made the rise in interest harder to "
             "bear; the lab does not model a falling profit. The 10% rate of profit is "
-            "illustrative; the 3% and 10% are the Bank of England's rates in January and "
-            "November 1847 as the chapter lists them."
+            "illustrative; the 3% and 10% are the two ends of the Bank of England's rate as the "
+            "chapter lists it month by month for 1847, 3 to 3½% in January and 7 to 10% in "
+            "November."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -785,11 +787,11 @@ LESSONS = [
                     "and rent does not enter the chapter's account of the company."},
             {"q": "A dealer works £1,000 at 15%, of which £900 is borrowed at 5%. What does he make "
                   "on his own £100?",
-             "a": ["15%", "105%", "60%", "150%"],
+             "a": ["15%", "105%", "45%", "150%"],
              "c": 1,
              "why": "Profit is £150 and interest `900 · 5/100 = 45`, so he keeps £105 on £100 of his "
                     "own. Fifteen per cent is the rate on the whole capital; 150% forgets the "
-                    "interest, and 60% has no derivation from these figures."},
+                    "interest, and 45% is the interest alone, reckoned on his own £100."},
             {"q": "What does Marx mean by calling the stock company &ldquo;the abolition of the "
                   "capitalist mode of production within capitalist production itself&rdquo;?",
              "a": ["That stock companies pay no profit",
@@ -895,13 +897,14 @@ LESSONS = [
                   "same note: &ldquo;the same price of money, for instance a five pound note, "
                   "passes from one sphere to the other and performs alternately both "
                   "functions&rdquo;. (The word &ldquo;price&rdquo; there is a misprint in the Kerr text "
-                  "for &ldquo;piece&rdquo;.)"),
+                  "for &ldquo;piece&rdquo;: Marx's German is <em>Geldstück</em>, a piece of money.)"),
             ("p", "Who were Tooke and Fullarton? Thomas Tooke, a Russia merchant turned historian "
                   "of prices, and John Fullarton, a banker who had worked in India, led the "
                   "<em>Banking School</em> against Overstone's Currency School in the 1840s. "
                   "They argued, from the record, that a bank cannot force notes into circulation: "
-                  "the public holds what trade needs and returns the rest. Marx agrees, and the "
-                  "lesson after next is his version of it. But Tooke also divided money into "
+                  "the public holds what trade needs and returns the rest. Marx agrees, and “The "
+                  "Medium of Circulation in the Credit System” is his version of it. But Tooke also "
+                  "divided money into "
                   "&ldquo;currency&rdquo;, the notes in the public's pockets, and &ldquo;capital&rdquo;, "
                   "the funds bankers lend, and that, Marx says, &ldquo;indiscriminately confounds&rdquo; "
                   "three different things."),
