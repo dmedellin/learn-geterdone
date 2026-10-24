@@ -400,7 +400,7 @@ LESSONS = [
                   "by it&rdquo;. Underneath, he says, is the distinction from “The Twofold Character "
                   "of Labour”: Smith does not separate labour that makes useful things, which made "
                   "every one of the year's products, from labour that creates value, which created "
-                  "only a third of their value."),
+                  "only part of their value: a third of it, in the scheme of Chapter 20."),
             ("p", "Smith came close. He noticed that the workers who make machines are paid wages "
                   "that are their income, though nothing they make can be eaten, and that a "
                   "shopkeeper's stock is his capital and other people's consumption. Had he summed "
@@ -678,8 +678,9 @@ LESSONS = [
                   "until markets clear will point out that the scheme, holding every price at value, "
                   "has left out exactly the mechanism that would do the adjusting. Leontief's "
                   "input–output analysis and the later two-sector models take the condition as one "
-                  "line of a larger system. Marx's own view, stated in the next chapter, is that in "
-                  "this mode of production such a balance comes about only by accident."),
+                  "line of a larger system. Marx's own remark, in the next chapter, about the "
+                  "one-sided sales and purchases that money brings into the scheme is that under "
+                  "this mode of production &ldquo;a balance is an accident&rdquo;."),
             ("p", "Department II's own exchange hides a subdivision, between necessities and the "
                   "luxuries only capitalists buy, which this course leaves aside. The scheme so far "
                   "also treats all constant capital as used up within the year. The next lesson, "
@@ -1332,8 +1333,10 @@ LESSONS = [
             "The lab splits Department I's accumulating capitalists into two groups by a share you "
             "choose, and assumes the investors' money was hoarded earlier; it has no credit, no "
             "interest rate and no Department II. It shows what follows when the two one-sided acts "
-            "are unequal, not how often they are. Department I is Marx's; the shares are "
-            "illustrative."
+            "are unequal, not how often they are: in the all-invest preset the 500 of demand is "
+            "money hoarded in earlier years that meets no one-sided seller this year, and the lab "
+            "counts nothing but the two one-sided acts against each other. Department I is Marx's; "
+            "the shares are illustrative."
         ),
     },
     # ---------------------------------------------------------------- 06
@@ -1385,7 +1388,7 @@ LESSONS = [
         "read_title": "The rule first, then four years of it",
         "read_intro": (
             "Marx's schemes run for pages of arithmetic. The passage is the rule he draws after the "
-            "second year of it."
+            "first year of it, before he runs the second."
         ),
         "body": [
             ("p", "<strong>Volume II, Chapter 21, §3.</strong> &ldquo;If things are to proceed "
@@ -1394,8 +1397,8 @@ LESSONS = [
                   "otherwise grow more rapidly than II c, for which it can alone be exchanged.&rdquo;"),
             ("p", "Marx starts from what he calls the initial diagram for accumulation on an "
                   "expanded scale:"),
-            ("math", "I.  4000c + 1000v + 1000s = 6000"),
-            ("math", "II.  1500c + 750v + 750s = 3000"),
+            ("math", ["I.  4000c + 1000v + 1000s = 6000",
+                      "II.  1500c + 750v + 750s = 3000"]),
             ("p", "The total is the same 9,000 as the simple scheme, and Department I is the same. "
                   "What has changed is Department II, and with it the balance: `I(v + s) = 2000` "
                   "against `IIc = 1500`, a gap of 500, exactly the half of Department I's surplus "
@@ -1417,14 +1420,20 @@ LESSONS = [
                   "from 9,000 to 65,219/5, that is 13,043⅘, a growth of 20,219/45,000 or 44.93%. "
                   "Marx's own products are 9,800, 10,780, 11,858 and then 13,033: for the fourth year "
                   "he rounds off fractions, and the Kerr text's total for Department II in that year, "
-                  "4,249, is ten short of its own parts, 2,129 + 1,065 + 1,065 = 4,259. After the "
+                  "4,249, is ten short of its own parts, 2,129 + 1,065 + 1,065 = 4,259. The 13,033 is "
+                  "8,784 + 4,249, so it carries the same slip; summed from the parts it would be "
+                  "13,043, within a unit of the exact figure. After the "
                   "first year both departments grow by a tenth a year; in the first, Department II "
                   "grows by a fifteenth and Department I by a tenth."),
             ("p", "The marx-second preset is Marx's second illustration, with a higher composition, "
                   "five to one: I 5,000c + 1,000v + 1,000s and II 1,430c + 285v + 285s. Marx rounds "
                   "to whole numbers and gets I 5,417c + 1,083v and II 1,583c + 316v after the first "
                   "year; the lab keeps the fractions, and its tile reads I 16,250/3c + 3,250/3v; II "
-                  "4,750/3c + 947/3v, that is 5,416⅔ and 1,083⅓, 1,583⅓ and 315⅔. The ii-short preset gives Department II a surplus value of only 100 "
+                  "4,750/3c + 947/3v, that is 5,416⅔ and 1,083⅓, 1,583⅓ and 315⅔. Marx runs this "
+                  "illustration for three years, and the lab's table agrees with his rounded figures "
+                  "throughout, with one exception that is the printer's: Kerr gives Department I's "
+                  "constant capital after the third year as 6,385, where 5,869 + 489 = 6,358, the "
+                  "figure Marx's own total of 7,629 uses. The ii-short preset gives Department II a surplus value of only 100 "
                   "against Marx's 750. Balance needs Department II to accumulate 150, 100 of constant "
                   "and 50 of variable capital, and it has only 100 to accumulate from: the tiles read "
                   "refused in period 1."),
@@ -1569,7 +1578,9 @@ LESSONS = [
             ("Reading Marx's rounded figures as exact",
              "Marx rounds off fractions in the fourth year, and one printed sum carries a slip. "
              "The lab keeps every fraction, so its fourth-year product, 13,043⅘, differs from the "
-             "13,033 Kerr prints; the exact figure is the one that follows from the rule."),
+             "13,033 Kerr prints, a total that includes Department II's misprinted 4,249; rounding "
+             "alone could not move the figure by ten. The exact figure is the one that follows "
+             "from the rule."),
         ],
         "standard": (
             "Finish when you can run a two-department scheme of accumulation and compute its growth.",

@@ -1078,82 +1078,71 @@ Instances as authored (2026-10-24). Corrections the Kerr text forced are marked 
 
 ### Course 13 — Ground Rent (`capital-ground-rent`, 11)
 
+Instances as authored (2026-10-24). Corrections the Kerr text forced are marked **Text:**; other changes are marked **Changed:**. Every preset was checked against Marx's printed tables (images in `tables/volume-3/`, Kerr pp. 764–858) as well as the sentences around them. **Changed:** the `dr1`/`dr2` labs reckon in shillings throughout (`money_unit` s, `qty_unit` quarter): Marx's £2½ is 50s and his £3 a quarter is 60s; `price`, `waterfall` and `absolute` stay in £.
+
 1. **introductory-remarks-on-rent** — Introductory Remarks on Ground Rent — *Chapter 37*
-   - Read: "it is nothing but the capitalised income from the lease of the land" (Kerr wording to be checked).
+   - Read: **Text:** Kerr l. 5379, "Ground-rent so capitalised forms the purchase price or value of the land, a category which is on its face irrational…"; the §C phrase is Kerr's at l. 5393 ("is nothing but the capitalised income from the lease of the land") and is quoted inline.
    - Do: compute the price of land from rent and the rate of interest, and separate true rent from interest on capital sunk in the land.
-   - Lab: `rent`, view `price`. Presets: `marx` (Marx's figures: rent £200 at 5%), `improvements` (part of the payment is interest on drains and buildings), `rate-falls`. Pin `rtPrice`, `rtTrueRent`.
+   - Lab: `rent`, view `price`. Presets: `marx` (£200 at 5%: `£4,000`, `£200`), `rate-falls` (4%: `£5,000`), `improvements` (£50 of the £200 is interest on land-capital: `£4,000`, true rent `£150`). Pin `rtPrice`, `rtTrueRent`.
    - Misconception: rent is the return on the land's value.
    - Worked: £200 a year at 5% is a price of £4,000; when the rate falls to 4% the same land costs £5,000.
 
 2. **differential-rent-general** — Differential Rent: General Remarks — *Chapter 38*
-   - Read: the waterfall: the factory driven by water against those on steam.
+   - Read: Kerr l. 5545, "The natural power is not the source of the surplus profit, but only its natural basis…".
    - Do: compute the surplus profit of the capital with a monopolisable natural advantage both ways Marx does, and the rent it becomes.
-   - Lab: `rent`, view `waterfall`. Presets: `marx` (Marx's figures: cost price 100 on steam, 90 on water, price of production 115), `two-falls`, `steam-cheapens`. Pin `rtSurplusProfit`.
+   - Lab: `rent`, view `waterfall`. Presets: `marx` (100 on steam, 90 on water, 15%: `£115`; `£10 … ; £11½ …`), `two-falls` (cost 80: £20; £23), `steam-cheapens` (steam's cost falls to 90: `£207/2`, surplus £0). Pin `rtPrice`, `rtSurplusProfit`.
    - Misconception: the waterfall creates the surplus profit.
-   - Worked: the water-driven factory sells at 115 with a cost of 90: a profit of 25 against the steam user's 15, a surplus profit of 10 (Marx's figure); measured against its own individual price of production of 103½ it is 11½. The tile prints both and says which rule gives which.
+   - Worked: as planned (115 − 90 − 15 = 10; 115 − 103½ = 11½).
 
 3. **differential-rent-i** — Differential Rent I — *Chapter 39*
-   - Read: the table of soils A, B, C, D.
-   - Do: compute rent on each of four soils from equal capitals and unequal yields at the price regulated by the worst soil, and the total rent.
-   - Lab: `rent`, view `dr1`. Presets: `marx` (Marx's figures: 1, 2, 3, 4 quarters; 60s a quarter), `descending` (worse soil added last), `better-added`. Pin `rtRents`, `rtTotal`.
-   - Misconception: rent arises because the worst land is too poor to farm without it.
-   - Worked: at 60s a quarter, A pays no rent, B 60s, C 120s, D 180s; 360s of rent in all.
+   - Read: Table I, Kerr p. 764, read with l. 5600–5610.
+   - Do: as planned.
+   - Lab: `rent`, view `dr1`. Presets: `marx` (Table I: `60s a quarter`, `0s, 60s, 120s, 180s`, `360s`), `descending` (D, C, B in use, the middle step of Marx's descending succession: 30s; 0s, 30s, 60s; 90s), `better-added` (Table II, p. 768, four of its seven soils: A at 1⅓ quarters, B, C, D: 45s; 0s, 30s, 75s, 120s; 225s), `improved` (Table III, p. 768: 2, 4, 7, 10 quarters: 30s; 0s, 60s, 150s, 240s; 450s). **Changed:** `improved` added because Table III is printed in full. Pin `rtPrice`, `rtRents`, `rtTotal`.
+   - **Text:** Table II has seven soils (A 1⅓, A′ 1⅔, B 2, B′ 2⅓, B″ 2⅔, C 3, D 4; rent 345s); the lab holds six, so the lesson gives the other three in prose. Kerr l. 5651 says Table III's rental rises "from 18 pounds sterling to 22, a growth of 22 1/9%" and that rent is "doubled upon C"; the table prints 450s (£22½, +25%) and C's rent goes from 120s to 150s. The lesson names both slips.
+   - Misconception: as planned.
+   - Worked: as planned.
 
 4. **differential-rent-ii** — Differential Rent II — *Chapter 40*
-   - Read: successive investments of capital "on the same land".
-   - Do: compute rent from successive equal investments on one plot with falling or rising yields, against the regulating price.
-   - Lab: `rent`, view `dr2`. Presets: `diminishing`, `constant`, `increasing`. Pin `rtRents`, `rtTotal`.
-   - Misconception: DR II is a different source of rent from DR I.
-   - Worked: two investments on soil D yielding 4 and 3 quarters pay 180s and 120s of surplus profit at 60s.
+   - Read: Kerr l. 5823 ("differential rent No. II is but a different expression of differential rent No. I").
+   - Lab: `rent`, view `dr2`. **Changed:** presets `side-by-side` (Table I: 360s), `same-acre` (Marx's four £2½ portions on one acre of D yielding 4, 3, 2, 1: rent `360s`), `second-on-d` (A–D with a second 50s on D yielding 3: 0s, 60s, 120s, 300s; 480s) replace `diminishing`, `constant`, `increasing`, because Marx's own test in this chapter is the same capital laid side by side or on one acre. The §C worked example (180s and 120s on D's two doses) holds in `second-on-d`.
+   - **Text:** Kerr l. 5833 reckons D's rent as "10-2 = 8 quarters … or 12 pounds sterling", setting four doses against one; dose by dose at £1½ it is £3. The lesson says so.
+   - Misconception, Worked: as planned.
 
 5. **dr-ii-constant-price** — Differential Rent II at a Constant Price of Production — *Chapter 41*
-   - Read: "First case: constant price of production".
-   - Do: compute total rent when added capital raises output and the regulating price does not change.
-   - Lab: `rent`, view `dr2`, `price_case = constant`. Presets: `proportional`, `faster`, `slower`. Pin `rtTotal`.
-   - Misconception: more output always lowers rent per acre.
-   - Worked: doubling the capital on each rent-bearing soil at the same productivity doubles the rent per acre.
+   - Lab: `rent`, view `dr2`, `price_case = constant`. Presets: `proportional` (Table II, p. 802: 0s, 120s, 240s, 360s; 720s), `slower` (Table III, p. 803: second doses 1½, 2, 3½ on B, C, D: 0s, 90s, 180s, 330s; 600s, Marx's £30), `faster` (illustrative: 3, 4, 5: 900s). Pin `rtPrice`, `rtRents`, `rtTotal`.
+   - **Text:** D's second dose has three yields in the text: Ch. 40 (l. 5884) says D raises 6 quarters in all, its own rents (l. 5884–5886, table p. 800) need 7, and Ch. 41's Table III prints 7½. The lab follows Table III; the lesson and `mistakes[2]` explain.
+   - Misconception, Worked: as planned (worked on B: 60s → 90s, 120% → 90%).
 
 6. **dr-ii-falling-price** — Differential Rent II at a Falling Price of Production — *Chapter 42*
-   - Read: "Second case: falling price of production".
-   - Do: compute rents when the additional investment is more productive and the regulating price falls.
-   - Lab: `rent`, view `dr2`, `price_case = falling`. Presets: `a-drops-out`, `rent-rises`, `rent-falls`. Pin `rtTotal`, `rtPrice`.
-   - Misconception: a falling price must lower total rent.
-   - Worked: the lab prints a case in which price falls and total rent still rises.
+   - Lab: `rent`, view `dr2`, `price_case = falling`. **Changed:** presets `a-drops-out` (Table IV, p. 811: Table II's soils, market 18 quarters: 30s; 0s, 0s, 60s, 120s; 180s), `iv-d` (Table IV d, p. 814: D five doses: 360s), `rent-rises` (table p. 817: D 44 quarters from £27½, market 54: C 60s, D 660s; 720s). `rent-falls` is dropped: `a-drops-out` is the falling case. D's eleven doses exceed the kit's six, so `rent-rises` enters D as one 550s capital yielding 44 quarters, the same 15s a quarter. Pin `rtPrice`, `rtRents`, `rtTotal`.
+   - **Text:** Kerr l. 5956 says "D and its price of production of 30 shillings" would regulate; it is B (Table IV). The p. 817 table prints C's grain rent as 3 and the grain total as 25 (2 and 24). Table V (p. 820) prices B at its average over two doses (1 5/7) and is described, not computed.
+   - Misconception, Worked: as planned.
 
 7. **dr-ii-rising-price** — Differential Rent II at a Rising Price of Production — *Chapter 43*
-   - Read: "Third case: rising price of production. Results".
-   - Do: compute rents when the additional investment is less productive and the regulating price rises.
-   - Lab: `rent`, view `dr2`, `price_case = rising`. Presets: `worse-investment`, `new-soil`, `results`. Pin `rtTotal`, `rtPrice`.
-   - Misconception: rent is the cause of high food prices.
-   - Worked: price rises because the least productive investment regulates it; rent follows the price, not the other way round.
+   - Read: **Text:** the chapter's opening is Engels' (it begins at l. 6094 in Engels' brackets; the manuscript had "only its title", l. 6123); the Read passage is Marx's conclusion, l. 6398–6400. Engels' twenty-one tables (VII–X a, XI–XXIV, pp. 829–839) mostly price a soil at its average and are described, not computed.
+   - Lab: `rent`, view `dr2`, `price_case = rising`. **Changed:** presets `worse-investment` (B's further £5 yields 1½ at £4, Marx's table p. 849, entered as two ¾-quarter doses: 80s; 20s, 160s; 180s), `new-soil` (A−1 and A−2, l. 6352: 120s; 60s, 300s, 60s, 0s; 420s), `ricardo-case` (illustrative ¾ quarter on D: 80s; 560s). `results` dropped: the chapter's "Results" are argument, not a table.
+   - Misconception, Worked: as planned (worked on A−1, A−2).
 
 8. **rent-on-the-worst-soil** — Differential Rent Also on the Worst Cultivated Soil — *Chapter 44*
-   - Read: the case in which the least productive investment is on a better soil.
-   - Do: compute when the worst soil A pays a differential rent because price is regulated by a second, less productive investment elsewhere.
-   - Lab: `rent`, view `dr2`, `price_case = worst-soil`. Presets: `marx`, `none`, `both`. Pin `rtRents`.
-   - Misconception: the worst soil can never pay differential rent.
-   - Worked: if the regulating investment is a second dose on B yielding less than A's first, A pays rent too.
+   - Read: Kerr l. 6418.
+   - Lab: `rent`, view `dr2`, `price_case = worst-soil`. Presets: `marx` (Marx's second table, p. 858: A 1, B 2 + 1½ + extra dose at £3½ (entered as 6/7 quarter on 50s), C 3 + 2½, D 4 + 3½: 70s; 10s, 125s, 265s, 405s; 805s = £40¼), `on-a` (A's own second dose at £3¾: 75s; 15s, 142s 6d, 292s 6d, 442s 6d), `both` (both extra doses offered, market 257/14 quarters: as `marx`). **Changed:** `none` dropped: the worst-soil case check refuses a preset in which A pays no rent. Pin `rtPrice`, `rtRents`, `rtTotal`.
+   - **Text:** Engels' bracketed correction (l. 6422–6424) prices B's whole product at its average including the old rent: A pays 1/9 pound, B stays £4½. Kerr prints that average as "3½ pounds sterling" twice; 14/4½ is 3 1/9. The lesson states both rules; the lab computes Marx's.
+   - Misconception, Worked: as planned.
 
 9. **absolute-ground-rent** — Absolute Ground Rent — *Chapter 45*
-   - Read: "Landed property hinders such an equalisation among capitals, invested in land" (Kerr wording to be checked).
-   - Do: compute value and price of production for agriculture with a lower composition, and the absolute rent the difference allows.
-   - Lab: `rent`, view `absolute`. Presets: `marx` (Marx's figures: non-agricultural 85c + 15v against agricultural 75c + 25v at 100%), `average-composition` (agriculture at the social average: no absolute rent), `market-limited`. Pin `rtAbsolute`.
-   - Misconception: absolute rent is a monopoly price that can be set at will.
-   - Worked: agricultural value 125 against a price of production of 120 equalised over both: up to 5 of absolute rent without any price above value; at the average composition, as Marx says, it "would disappear".
+   - Read: **Text:** Kerr l. 6641, "Private property in land prevents such an equalization among capitals invested in the soil…" (the §C wording is not Kerr's).
+   - Lab: `rent`, view `absolute`. Presets: `marx` (`£120`, `up to £5`), `average-composition` (`£115`, `up to £0`), `market-limited` (market bears 122: `up to £2`). Pin `rtPrice`, `rtAbsolute`.
+   - Misconception, Worked: as planned; "would disappear" is Kerr l. 6591.
 
 10. **building-rent-mining-rent-land-price** — Building Rent, Mining Rent, the Price of Land — *Chapter 46*
-    - Read: the landowner "exploiting the progress of social development, toward which he contributes nothing and for which he risks nothing" (Kerr wording to be checked).
-    - Do: compute a building plot's rent and price as the city grows, and a mine's rent from its deposit.
-    - Lab: `rent`, view `price`. Presets: `town-grows`, `mine`, `speculation`. Pin `rtPrice`.
-    - Misconception: a rising land price reflects improvements made by the owner.
-    - Worked: a plot's rent rises from £50 to £150 as the town reaches it; at 5% its price goes from £1,000 to £3,000.
+    - Read: **Text:** Kerr l. 6651, "toward which he contributes nothing and for which he risks nothing" (wording confirmed), quoted inline; the opening block is l. 6651's "This form of rent is distinguished…".
+    - Lab: `rent`, view `price`. **Changed:** presets `town-before` (£50 at 5%: `£1,000`), `town-grows` (£150: `£3,000`), `capps` (Capps's ground, £300 raised to £400, l. 6655: `£8,000`), `mine` (Smith's Scottish mine that pays no rent: `£0`); `speculation` became `capps`, Marx's own builder. Pin `rtPrice`, `rtTrueRent`.
+    - Misconception, Worked: as planned.
 
 11. **genesis-of-capitalist-ground-rent** — Genesis of Capitalist Ground Rent — *Chapter 47*
-    - Read: §2, labour rent: the direct producer's labour for himself "is still separated in space and time from his labour for the landlord" (Kerr wording to be checked).
-    - Do: compute the rate of exploitation in labour rent (days on the lord's land against days on one's own), and compare rent in kind and money rent.
-    - Lab: `workday`, view `corvee`. Presets: `three-three` (3 days for the lord, 3 for oneself), `four-two`, `money-rent`. Pin `wdRate`.
-    - Misconception: the wage-worker, unlike the serf, gives no unpaid labour.
-    - Worked: 3 days for the lord and 3 for oneself is visibly 100%; on the chapter's accounting the wage-worker's 6 hours in 12 is the same rate, with nothing to show it.
+    - Read: **Text:** Kerr l. 6769 reads "is still separated by space and time from his labor for the landlord" ("by", not "in"); the opening block is l. 6769.
+    - Lab: `workday`, view `corvee`, `money_unit` hours. **Changed:** presets `two-days` (Marx's two days a week for the lord, l. 6779: `1/2 = 50%`), `three-three` (`1 = 100%`), `four-two` (`2 = 200%`); `money-rent` dropped because the corvée view cannot express rent in kind or money rent, which the lesson treats in prose. Pin `wdSurplus`, `wdRate`.
+    - Misconception, Worked: as planned.
 
 ### Course 14 — Revenues and Their Sources (`capital-revenues-and-their-sources`, 5)
 

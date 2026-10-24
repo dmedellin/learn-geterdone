@@ -1067,8 +1067,8 @@ LESSONS = [
                   "workers advances 300s and gets 300s. That is the whole of the first law: the "
                   "mass is the variable capital times the rate, or the number of workers times "
                   "the value of one labour-power times the rate."),
-            ("math", "mass of surplus value = variable capital × s/v"),
-            ("math", "variable capital = workers × value of one labour-power"),
+            ("math", ["mass of surplus value = variable capital × s/v",
+                      "variable capital = workers × value of one labour-power"]),
             ("p", "Read the passage's last clause again: a &ldquo;compound ratio&rdquo; of "
                   "two factors, how many workers and how hard each is exploited. Because it is "
                   "a product, either factor can make up for the other. Marx's example: 100 "

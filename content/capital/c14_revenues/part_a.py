@@ -86,7 +86,8 @@ LESSONS = [
                   "that the chapter is made of three fragments found in different places of the "
                   "manuscript, and the Kerr text marks one gap, where &ldquo;one folio sheet of the "
                   "manuscript is missing&rdquo;, and one place where the manuscript &ldquo;stops "
-                  "short&rdquo; in mid-argument. What survives is an argument with a clear shape, "
+                  "short&rdquo; in mid-argument; the chapter's own last sentence is left unfinished "
+                  "too. What survives is an argument with a clear shape, "
                   "and the lessons in this course read it as Engels printed it."),
             ("p", "Go back to the passage. In the first version capital yields profit, made of "
                   "profit of enterprise plus interest. Then the formula shrinks: interest stands "
@@ -107,7 +108,7 @@ LESSONS = [
                   "wages, are all quantities of the same thing, value, and can be added together. "
                   "Three incomparable sources, one comparable product: that mismatch is the clue."),
             ("p", "The formula has a long history. Adam "
-                  "Smith wrote, in a sentence Marx quotes, that &ldquo;Wages, profit, and rent are "
+                  "Smith wrote, in a sentence Marx quotes in a footnote, that &ldquo;Wages, profit, and rent are "
                   "the three original sources of all revenue, as well as of all exchangeable "
                   "value&rdquo;. Jean-Baptiste Say, the French economist whose <em>Treatise</em> of "
                   "1803 made Smith's ideas a system, went further: labour, capital and land each "
@@ -157,8 +158,8 @@ LESSONS = [
             ("p", "Marx is enjoying himself, and he means it. In the German edition the pair are "
                   "Monsieur le Capital and Madame la Terre, in French, a couple out of a fairy tale, and the joke carries the "
                   "argument: a social relation has been given the body of a thing, and a thing has "
-                  "been given the manners of a person. He credits the classical economists, Smith "
-                  "and above all Ricardo, with having seen through this, &ldquo;by reducing "
+                  "been given the manners of a person. He credits what he calls classic economy, "
+                  "the school of Smith and Ricardo, with having seen through this, &ldquo;by reducing "
                   "interest to a portion of profit, and rent to the surplus above the average "
                   "profit, so that both of them meet in surplus-value&rdquo;, and he adds that even "
                   "they stayed partly inside the illusion they had taken apart."),
@@ -374,8 +375,8 @@ LESSONS = [
                   "to an error that has run through political economy since Adam Smith."),
             ("p", "The answer is the scheme of simple reproduction from Volume II, Chapter 20, "
                   "which Marx copies out:"),
-            ("math", "I:  4000c + 1000v + 1000s = 6000"),
-            ("math", "II:  2000c + 500v + 500s = 3000"),
+            ("math", ["I:  4000c + 1000v + 1000s = 6000",
+                      "II:  2000c + 500v + 500s = 3000"]),
             ("p", "Read it the way the chapter does. Department II's workers, capitalists and "
                   "landlords spend their `500v + 500s` on Department II's own consumer goods. "
                   "Department I's revenue, `1000v + 1000s`, cannot be eaten in its own form, "
@@ -642,7 +643,10 @@ LESSONS = [
                   "and the rate of profit from 30 to `18 2/11` per cent, so the rate of profit "
                   "falls more than the mass of surplus value and less than its rate. Marx sets "
                   "the two cases side by side in a small table on page 996 of the Kerr edition: "
-                  "product 650 and new value 250 in both. None of this moves the 650."),
+                  "product 650 and new value 250 in both. The table's rate columns are misprinted "
+                  "as well, 80 per cent for the first rate of gross profit and sixty-six and one "
+                  "eighth for the second rate of surplus value, where his text has 30 and "
+                  "`66 2/3`; the figures above are the text's. None of this moves the 650."),
             ("p", "The lab's wage-rise preset is Marx's example. Wages go from £100 to £150 and "
                   "the profit of enterprise tile from £75 to £50. The lab keeps rent at half of s, "
                   "so rent falls to £50 too, where Marx's text splits the 100 as 45 and 55; the "
@@ -780,8 +784,10 @@ LESSONS = [
              "a": ["700", "650", "600", "675"],
              "c": 1,
              "why": "The same labour adds the same 250, so the product is `400 + 250 = 650`, now "
-                    "divided as 150v + 100s. 700 adds the wage rise on top. 600 is Marx's case of "
-                    "cheaper means of production, 350c, and 675 matches nothing in the chapter."},
+                    "divided as 150v + 100s. 700 adds the wage rise on top; it is also Marx's "
+                    "figure when the means of production rise to 450c with wages unchanged. 600 is "
+                    "his case of cheaper means of production, 350c, and 675 matches nothing in the "
+                    "chapter."},
             {"q": "In the same example, what is the rate of surplus value after the wage rise, "
                   "as a fraction?",
              "a": ["3/2", "2/11", "2/3", "1"],
@@ -1331,9 +1337,10 @@ LESSONS = [
                    "That England has exactly three classes"],
              "c": 2,
              "why": "The chapter raises the question, tries the source-of-revenue answer, objects "
-                    "to it, and stops. The relation to the means of production is a later "
-                    "reader's answer, not the chapter's, and the chapter says England's classes "
-                    "are blurred by middle and transitional layers."},
+                    "to it, and stops. It names the three classes by what their members own, "
+                    "labour-power, capital and land, but it does not say that ownership is what "
+                    "constitutes a class; that answer is a later reader's. And it says England's "
+                    "classes are blurred by middle and transitional layers."},
         ],
         "mistakes": [
             ("Thinking a class is defined by its source of income alone",
@@ -1361,7 +1368,9 @@ LESSONS = [
             "is the question the manuscript leaves open. Answers have been given since, by "
             "Lenin in 1919, by a group's place in a system of production and its relation to "
             "the means of production, and by Max Weber, by a group's situation in the market. "
-            "Neither is in the text, and this lesson does not choose between them. The people "
+            "The chapter names its three classes by what their members own and does not say "
+            "whether that is what makes them classes; neither later answer is in the text, and "
+            "this lesson does not choose between them. The people "
             "are illustrative; the physician, the official and the five kinds of landlord are "
             "Marx's."
         ),
