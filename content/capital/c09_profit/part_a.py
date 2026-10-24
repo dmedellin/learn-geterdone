@@ -602,10 +602,12 @@ LESSONS = [
                   "value does not change at all."),
             ("p", "Second case: hold the composition fixed and change s′. Marx's capital "
                   "`80c + 20v + 40s` has s′ = 200% and p′ = 40%; `80c + 20v + 10s` has 50% and "
-                  "10%. With v/C fixed, p′ moves in exactly the same proportion as s′. This, Marx "
-                  "says, is the only case in which David Ricardo was right that &ldquo;profits "
-                  "would be high or low, exactly in proportion as wages would be low or "
-                  "high&rdquo;. Ricardo, the stockbroker whose <em>Principles</em> of 1817 "
+                  "10%. With v/C fixed, p′ moves in exactly the same proportion as s′. Marx says "
+                  "s′ can differ between capitals of the same composition in three ways, through "
+                  "wages, the intensity of labour or the length of the day, and that the first, "
+                  "with the other two held constant, is the only case in which David Ricardo was "
+                  "right that &ldquo;profits would be high or low, exactly in proportion as wages "
+                  "would be low or high&rdquo;. Ricardo, the stockbroker whose <em>Principles</em> of 1817 "
                   "dominated English economics for a generation, reasoned as if the composition "
                   "of capital stood still. The vary-s preset is Marx's 200% capital."),
             ("p", "Third, both at once. Marx starts from `80c + 20v + 20s` and lets wages fall "

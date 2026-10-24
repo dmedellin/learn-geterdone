@@ -850,7 +850,7 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
 7. **supplementary-remarks-on-profit** — Supplementary Remarks on Profit — *Chapter 7*
    - Read: the chapter's opening, Kerr l. 1544-1546, "Nevertheless the bourgeois will not consider his profit as identical with the surplus-value…" (the phrase "practical notion" is not in the Kerr chapter).
    - Do: reconcile the capitalist's book-keeping view (profit on capital, cost price) with Marx's categories for the same numbers.
-   - Lab: `profit`, view `books`. Presets: `ledger` (ch. 1's 400c + 100v + 100s sold at value: profit 100, 20%), `business-a` (Marx's 9,000c + 1,000v + 1,000s: 10%), `business-b` (11,000c + 1,000v + 1,000s: 1/12), `gold` (Marx's £100 earning £20 re-priced as £150, 120c + 30v + 30s: profit 30, 20%). Pin `prProfit`, `prRate`.
+   - Lab: `profit`, view `books`. Presets: `ledger` (ch. 1's 400c + 100v + 100s sold at value: profit 100, 20%), `business-a` (Marx's 9,000c + 1,000v + 1,000s: 10%), `business-b` (11,000c + 1,000v + 1,000s: 1/12), `gold` (Marx's £100 earning £20 re-priced as £150, 120c + 30v + 30s: profit 30, 20%; Marx gives no split of the £150 into c and v, so the split is illustrative and the lesson says so). Pin `prProfit`, `prRate`.
    - Misconception: a capitalist who sells at value makes no profit.
    - Worked: sold at its value of 600, the commodity yields a profit of 100 over its cost price of 500; the books and the analysis agree on every figure and disagree only about what the 100 is.
 

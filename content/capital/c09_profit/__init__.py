@@ -77,9 +77,10 @@ COURSE = {
         "of Liberty, hosted by Liberty Fund, Inc.",
         "Know what kind of book Volume III is. Marx wrote its main manuscript in the 1860s and "
         "did not finish it; Engels edited it from his drafts and published it in 1894, eleven "
-        "years after Marx's death. For Part I Engels had a fuller draft than for much of the "
-        "rest, and a later manuscript of equations for Chapter 3. Chapter 4 is Engels' own "
-        "text: Marx left only its title, and the lesson on it says so.",
+        "years after Marx's death. Part I gave him the most trouble: his preface says the main "
+        "manuscript served it only with considerable restrictions, so Chapter 1 comes from two "
+        "attempts at rewriting, Chapter 3 from a later manuscript of equations, and Chapter 4 "
+        "is Engels' own text: Marx left only its title, and the lesson on it says so.",
         "Keep Volume I's letters in view. Part I takes c, v and s exactly as Volume I left them "
         "and measures them a different way. Marx's capital of 400c + 100v + 100s appears in "
         "several lessons, so that one change at a time can be seen against it.",
