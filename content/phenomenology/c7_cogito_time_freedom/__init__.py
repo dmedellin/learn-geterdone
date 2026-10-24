@@ -80,7 +80,7 @@ COURSE = {
         "reading before answering it, and Freedom opens with pages in the voice of the "
         "theory of absolute freedom. Each lesson says whose view a sentence states.",
         "Take the labs for what they say they compute. One is propositional logic, one "
-        "school geometry, three are the lesson's models of the chapter's images, and two "
+        "school geometry, four are the lesson's models of the chapter's images, and two "
         "count the lesson's coding of the cases. None computes an experience, a moment of "
         "time or anyone's freedom.",
         "Expect disputes. The tacit cogito was called impossible by Merleau-Ponty himself in "
@@ -104,7 +104,8 @@ COURSE = {
         "Every figure in this course is computed in your browser from what a lesson states: "
         "a truth table from sentence letters, a triangle's angles from two given angles, a "
         "river's past and future from positions, the depths of Husserl's diagram from a list "
-        "of moments, and a count over the lesson's coding of the cases. The models are the "
+        "of moments, obstacles from rock heights and two thresholds, and a count over the "
+        "lesson's coding of the cases. The models are the "
         "lessons' and the heights illustrative. None of them is a moment of time or an act of "
         "freedom, which is what Part Three is about."
     ),

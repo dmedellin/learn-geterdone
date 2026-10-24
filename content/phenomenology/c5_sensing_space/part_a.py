@@ -94,8 +94,9 @@ LESSONS = [
                   "habitual views into it only because I know that one and the same embodied "
                   "subject can look from one position after another. That is what the "
                   "passage means by a system: the body and the spectacle it keeps alive."),
-            ("p", "Then he lets an objector speak, and the next paragraph is in the objector's "
-                  "voice, not his. From my body's point of view, the objector says, I never "
+            ("p", "Then he lets an objector speak, and the rest of that first paragraph, which "
+                  "runs on to page 236, is in the objector's voice, not his. From my body's "
+                  "point of view, the objector says, I never "
                   "see the six sides of a cube as equal, even if it is made of glass, and yet "
                   "the word cube has a meaning: the cube in reality has six equal sides. As I "
                   "walk round it the front face changes shape and disappears while the others "
@@ -293,32 +294,33 @@ LESSONS = [
                     "the length, and no oblique view draws a face whole."},
             {"q": "In the introduction, whose claim is it that the cube in reality has six "
                   "equal sides, and that the views are only occasions for conceiving it?",
-             "a": ["An objector's, which the next paragraph answers",
-                   "Merleau-Ponty's own conclusion",
+             "a": ["Merleau-Ponty's own conclusion",
+                   "An objector's, which the next paragraph answers",
                    "Stratton's, from the inverting spectacles",
                    "Aristotle's, from the crossed fingers"],
-             "c": 0,
-             "why": "The paragraph begins &ldquo;It will perhaps be objected&rdquo; and states "
-                    "the view in the objector's voice; the reply follows on pages 236 and 237. "
+             "c": 1,
+             "why": "The sentence on page 235 begins &ldquo;It will perhaps be objected&rdquo; "
+                    "and the rest of the paragraph states the view in the objector's voice; "
+                    "the reply follows on pages 236 and 237. "
                     "Stratton and Aristotle's illusion come later, as cases, and neither says "
                     "anything about the cube."},
             {"q": "What does the introduction call the cube with six equal sides?",
-             "a": ["The limiting idea by which I express the cube's material presence",
-                   "What the cube looks like once the distortions of perspective are corrected",
+             "a": ["What the cube looks like once the distortions of perspective are corrected",
                    "A sum of the views, added up by the mind",
+                   "The limiting idea by which I express the cube's material presence",
                    "A projection the body constructs to explain the views"],
-             "c": 0,
+             "c": 2,
              "why": "Those are nearly the text's words, on page 237. The corrected look is the "
                     "objector's reading, and the reply says the six-sided cube is not seen at "
                     "all. The introduction also denies that I construct a projection to account "
                     "for the views, and nothing in it treats the cube as a sum."},
             {"q": "On the introduction's account, why do crossed fingers feel two marbles?",
-             "a": ["The crossed position lies outside what the fingers can do by their own "
-                   "movement, so they cannot explore one object together",
-                   "The position is rare, so the two touches have never been associated",
+             "a": ["The position is rare, so the two touches have never been associated",
                    "The mind judges wrongly from two correct sensations",
-                   "Each finger sends a separate image to the brain"],
-             "c": 0,
+                   "Each finger sends a separate image to the brain",
+                   "The crossed position lies outside what the fingers can do by their own "
+                   "movement, so they cannot explore one object together"],
+             "c": 3,
              "why": "The text grants the old explanation, that the position is unaccustomed or "
                     "statistically rare, only to replace it: the crossing is imposed on the "
                     "fingers and cannot be aimed at in a project of movement. A judgement from "
@@ -445,14 +447,15 @@ LESSONS = [
                   "from the body in the patient than in a healthy person, and green brings it "
                   "nearer. With a green field the patient measures a length accurately with "
                   "a finger; with red he overshoots. These are patients, and what the chapter "
-                  "has is their physicians' reports; the lab below codes the reports, not the "
-                  "patients."),
+                  "has is their physicians' reports; the lab's centimetres below are "
+                  "illustrative, not the patients' measurements."),
             ("p", "The pattern holds across the experiments: each colour always acts with the "
                   "same tendency, so that a definite motor value can be assigned to it. Red "
                   "and yellow favour abduction, movement away from the body's midline, and "
                   "blue and green adduction, movement towards it. If you check this in your "
-                  "copy, page 243 prints <em>abduction</em> twice, the second time where "
-                  "adduction is plainly meant, a slip the lesson does not quote. The chapter "
+                  "copy, page 243 prints <em>abduction</em> for both, where the second is "
+                  "plainly adduction, and makes the same slip in the next sentence; the lesson "
+                  "quotes neither. The chapter "
                   "reads the two directions as two attitudes: in abduction the organism turns "
                   "towards the stimulus and is drawn by the world, in adduction it turns "
                   "away and withdraws to its centre."),
@@ -495,7 +498,7 @@ LESSONS = [
                      "The character a quality presents at once as a way of moving or of "
                      "holding oneself, as a face presents its character, before any judgement "
                      "about what caused it.")),
-            ("p", "The strongest evidence is a test anyone's account must meet. Heinz Werner, "
+            ("p", "The next evidence comes from another psychologist. Heinz Werner, "
                   "a developmental psychologist then working in Hamburg, showed colours "
                   "too faint or too brief to be seen. Before the colour is seen, the chapter "
                   "reports, it gives itself away through a bodily attitude fitted only to it. "
@@ -509,12 +512,12 @@ LESSONS = [
                   "quality, with no motor effect of its own: whatever the colour, the arm "
                   "should rest where it started. In the <code>red-green</code> preset the arm "
                   "starts at 0 cm under both colours, so the predicted difference tile prints "
-                  "`0 − 0 = 0` cm. The reported-difference tile prints 6 cm, outward under red "
+                  "`0` cm, since `0 − 0 = 0`. The reported-difference tile prints 6 cm, outward under red "
                   "against inward under green; the figure is illustrative, since the chapter "
                   "gives directions, not centimetres. The gap tile is reported minus "
                   "predicted, 6 cm. The <code>same</code> preset puts green against green: "
                   "0, 0 and a gap of 0. The <code>faint</code> preset is red against green "
-                  "too faint to be named, with an illustrative 4 cm reported: the prediction "
+                  "too faint to be seen, with an illustrative 4 cm reported: the prediction "
                   "is still 0 and the gap 4 cm. That preset is the chapter's weak-stimulus "
                   "evidence turned into a figure, and the chapter reports bodily attitudes "
                   "there, not measurements."),
@@ -558,7 +561,7 @@ LESSONS = [
                  "a": 0, "b": 0, "unit": "cm", "reported": 0,
                  "expect": {"stPredicted": "0 cm", "stReported": "0 cm", "stGap": "0 cm"}},
                 {"id": "faint",
-                 "label": "Red against green, too faint to be named: reported 4 cm (illustrative)",
+                 "label": "Red against green, too faint to be seen: reported 4 cm (illustrative)",
                  "a": 0, "b": 0, "unit": "cm", "reported": 4,
                  "expect": {"stPredicted": "0 cm", "stGap": "4 cm"}},
             ],
@@ -613,20 +616,20 @@ LESSONS = [
             {"q": "Under a pure-quality account the arm starts at 0 cm under both colours. "
                   "The reports put it 4 cm outward under red and 2 cm inward under green. "
                   "What is the gap between the reported and the predicted difference?",
-             "a": ["6 cm", "2 cm", "0 cm", "8 cm"],
-             "c": 0,
+             "a": ["2 cm", "6 cm", "0 cm", "8 cm"],
+             "c": 1,
              "why": "The predicted difference is `0 − 0 = 0`. Outward 4 and inward 2 from the "
                     "same start are 6 cm apart, so the gap is `6 − 0 = 6` cm. Two centimetres "
                     "subtracts deviations that go opposite ways, 0 is the prediction itself, "
                     "and 8 doubles one of them."},
             {"q": "Which observation does the chapter use against the view that the motor "
                   "effects are effects of light on the body as physics describes it?",
-             "a": ["A blue produced by contrast, with no physical phenomenon corresponding to "
-                   "it, has the same motor halo",
-                   "Red can accentuate reactions without the patient being aware of it",
+             "a": ["Red can accentuate reactions without the patient being aware of it",
                    "Green brings the arm's resting position nearer the body",
+                   "A blue produced by contrast, with no physical phenomenon corresponding to "
+                   "it, has the same motor halo",
                    "In healthy people the effects are hardly seen"],
-             "c": 0,
+             "c": 2,
              "why": "If the effect came from wavelength and intensity, a contrast blue with no "
                     "physical counterpart could not produce it. Red acting without awareness is "
                     "used against the other exit, that the effects come from a quality clearly "
@@ -634,11 +637,11 @@ LESSONS = [
                     "its cause, and the weak effect in healthy people is the chapter's starting "
                     "point."},
             {"q": "What, on the chapter's reading, do Werner's faint and brief colours show?",
-             "a": ["The colour gives itself away in a bodily attitude before it is seen",
-                   "Faint colours have no effect on the body",
+             "a": ["Faint colours have no effect on the body",
                    "The subject infers the colour from a faint sensation of it",
-                   "The bodily effect follows once the colour has been seen"],
-             "c": 0,
+                   "The bodily effect follows once the colour has been seen",
+                   "The colour gives itself away in a bodily attitude before it is seen"],
+             "c": 3,
              "why": "One subject knows the colour is blue from a slipping feeling, though he sees "
                     "no blue; another knows yellow from clenched teeth. The effect is there "
                     "before the colour is seen, which rules out the last answer and the second, "
@@ -797,9 +800,9 @@ LESSONS = [
                   "senses and the sensible, the chapter says, it cannot be held that one acts "
                   "while the other suffers the action, or that one gives the other its "
                   "significance. Apart from the probing of eye or hand the sensible is only a "
-                  "vague beckoning; one of Werner's subjects, trying to see blue while holding "
-                  "the bodily attitude of red, felt a kind of spasm that stopped when he took "
-                  "up blue's attitude. The sensible sets the body a muddled problem, and yet "
+                  "vague beckoning; Werner reports that a subject who tries to see blue while "
+                  "holding the bodily attitude of red feels a kind of spasm, which stops when he "
+                  "takes up blue's attitude. The sensible sets the body a muddled problem, and yet "
                   "the body's attitude alone never makes it see blue. &ldquo;The sensible gives "
                   "back to me what I lent to it, but this is only what I took from it in the "
                   "first place.&rdquo;"),
@@ -938,21 +941,21 @@ LESSONS = [
         "quiz": [
             {"q": "In the activity preset, empiricism is coded n and n, and intellectualism y "
                   "and n. What do the survivors and split tiles print?",
-             "a": ["survivors none; split the sensible beckons until taken up",
-                   "survivors intellectualism; split none",
+             "a": ["survivors intellectualism; split none",
                    "survivors none; split none",
+                   "survivors none; split the sensible beckons until taken up",
                    "survivors none; split both observations"],
-             "c": 0,
+             "c": 2,
              "why": "Each account fails at least one observation, so nothing survives. The split "
                     "lists the observations where one account absorbs and the other fails: only "
                     "the second has y against n. Intellectualism fails the third, so it does "
                     "not survive, and the third is n against n, so it is not in the split."},
             {"q": "On observation one alone, the survivors tile prints empiricism. What follows?",
-             "a": ["Nothing about the chapter: on the full table empiricism fails two of three",
-                   "The chapter agrees that sensation is an impression undergone",
+             "a": ["The chapter agrees that sensation is an impression undergone",
                    "The lesson coded empiricism to win",
-                   "Intellectualism has no answer to any observation"],
-             "c": 0,
+                   "Intellectualism has no answer to any observation",
+                   "Nothing about the chapter: on the full table empiricism fails two of three"],
+             "c": 3,
              "why": "One observation is not the chapter's case, and on all three empiricism "
                     "fails the second and third. The chapter denies that sensation is merely "
                     "undergone: the sensible needs the body's attitude. The coding gives "
@@ -970,12 +973,12 @@ LESSONS = [
                     "given one. Thinking, dreaming and other people are not the contrast drawn "
                     "on page 250."},
             {"q": "Why, on the chapter's account, can sensation be anonymous?",
-             "a": ["Because it is incomplete: the self that sees is a specialized self, "
+             "a": ["Because it is caused by stimuli outside my control",
+                   "Because it is incomplete: the self that sees is a specialized self, "
                    "open on one sector of being",
-                   "Because it is caused by stimuli outside my control",
                    "Because the transcendental Ego is the true perceiver",
                    "Because it is forgotten as soon as it passes"],
-             "c": 0,
+             "c": 1,
              "why": "The second answer on page 251 says so in those terms: sensation can be "
                     "anonymous only because it is incomplete. Causation by stimuli is the "
                     "empiricist's reason for passivity, the transcendental Ego is the "
@@ -1116,7 +1119,7 @@ LESSONS = [
                   "the visual space he has just entered, and beside it touch seems so poor "
                   "that he will grant he never had space before. At first he sees colours as we "
                   "smell an odour, enveloping and acting on him without a definite shape; to "
-                  "tell a circle from a square he runs his eyes round the outline as he would a "
+                  "tell a circle from a rectangle he runs his eyes round the outline as he would a "
                   "hand; one patient, blind for eighteen years, tries to touch a ray of "
                   "sunlight. And yet he reaches out for the objects shown to him, which would "
                   "make no sense if touch opened on no space at all. The chapter's conclusion "
@@ -1133,11 +1136,12 @@ LESSONS = [
                   "fear being wrong or want to study the spectacle. Beneath it Werner found a "
                   "primary layer of sense experience before its division among the senses, "
                   "in which a colour may become a vibration felt through the whole body, and "
-                  "under mescalin a flute's sound gives a bluish-green colour. The chapter's "
+                  "in the mescalin reports of the chapter's other sources a flute's sound gives "
+                  "a bluish-green colour. The chapter's "
                   "verdict is general: &ldquo;Synaesthetic perception is the rule&rdquo;, and "
                   "we are unaware of it because science has taught us to deduce what we "
                   "should see from the body and the physicist's world."),
-            ("p", "Now the passage. Each colour, the paragraph before it says, is the inner "
+            ("p", "Now the passage. Each colour, the sentences just before it say, is the inner "
                   "structure of the thing showing itself: the brilliance of gold shows its "
                   "uniform make-up, the dull colour of wood its mixed one. So the senses "
                   "communicate through the thing. One sees the hardness and brittleness of "
@@ -1267,8 +1271,8 @@ LESSONS = [
         "quiz": [
             {"q": "Four variants are coded: hard brittle clear; hard cold; hard rings; hard "
                   "brittle tinkles, all marked yes. What is the core?",
-             "a": ["hard", "hard, brittle", "none", "hard, brittle, clear"],
-             "c": 0,
+             "a": ["hard, brittle", "none", "hard, brittle, clear", "hard"],
+             "c": 3,
              "why": "Only hard is in all four. Brittle is missing from the second and third, "
                     "clear from all but the first, so the core is not empty and has one "
                     "quality."},
@@ -1285,23 +1289,23 @@ LESSONS = [
                     "reaching says nothing about colours."},
             {"q": "Perception brings the senses into one world, the chapter says, not as "
                   "scientific colligation gathers phenomena but as what?",
-             "a": ["As binocular vision grasps one object",
-                   "As Venus is the common ground of the Morning and Evening Star",
+             "a": ["As Venus is the common ground of the Morning and Evening Star",
+                   "As binocular vision grasps one object",
                    "As a judgement joins two premises",
                    "As the brain's visual centre fuses two excitations"],
-             "c": 0,
+             "c": 1,
              "why": "Binocular vision is the chapter's model. Venus is the view it reports and "
                     "rejects, which would make perception an incipient science; a judgement is "
                     "intellectualism's unity, and the chapter denies that one visual centre "
                     "explains the single object, since double vision also occurs."},
             {"q": "On the chapter's account, when does a separate sensible quality appear, "
                   "such as the grey of a shaded sheet of paper?",
-             "a": ["When an analytic attitude isolates part of the field, as through a "
-                   "reduction screen",
-                   "Whenever the stimulus is weak",
+             "a": ["Whenever the stimulus is weak",
                    "Before any attitude, as the first stage of every perception",
+                   "When an analytic attitude isolates part of the field, as through a "
+                   "reduction screen",
                    "Only under mescalin"],
-             "c": 0,
+             "c": 2,
              "why": "The shaded papers look white with the rest until they are cut off from the "
                     "field; the quality is the product of an attitude of curiosity or "
                     "observation. It is not the first stage of perception, which is the classical "

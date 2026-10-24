@@ -117,9 +117,9 @@ LESSONS = [
                      "direction.")),
             ("p", "The case is George Stratton's. Stratton, an American psychologist, wore "
                   "spectacles that inverted the image on the retina, which the eye's lens "
-                  "normally inverts already. In a first short experiment the landscape looked "
+                  "normally inverts already. In a first short experiment, in 1896, the landscape looked "
                   "unreal and upside down, and on the second day normal perception began to "
-                  "return while his body felt upside down. In a second, lasting a week, "
+                  "return while his body felt upside down. In a second, in 1897, lasting a week, "
                   "things looked inverted at first; from the second day the landscape was no "
                   "longer inverted but the body felt wrongly placed; from the third day to the "
                   "seventh the body gradually righted itself, above all when he was active. "
@@ -159,7 +159,7 @@ LESSONS = [
                   "period. The <code>wertheimer</code> preset has an image tilted 45° and a "
                   "level of 0° that jumps to 45° at period 3; the series tile prints 45°, 45°, "
                   "0°, 0°, 0°. The period is illustrative; the suddenness is the book's. The "
-                  "perceived-tilt and level tiles show the period the slider is set to, 45° "
+                  "predicted-tilt and level tiles show the period the slider is set to, 45° "
                   "and 0° at period 1. The <code>stratton</code> preset has an image turned "
                   "180° and a level that moves half the remaining way each period, so the "
                   "series is 180°, 90°, 45°, 45/2°, 45/4°; the halving is the lesson's "
@@ -173,17 +173,21 @@ LESSONS = [
                   "could not explain why hearing and the unseen body lagged behind. So I go "
                   "from one system of positions to the other without the key to either, the "
                   "chapter says, as someone with no knowledge of music sings in another key a "
-                  "tune he has heard. Notice what Stratton reported and the model does not: no "
-                  "single moment at which the world turned back over. The chapter takes his "
-                  "descriptions and sets aside his interpretation, and how far the reports "
-                  "support its reading of them is something later readers still argue about."),
+                  "tune he has heard. Notice that under the share rule the model never reaches "
+                  "0°, and that the chapter's summary of Stratton gives no moment at which the "
+                  "world turned back over either: a landscape no longer inverted from the "
+                  "second day, a body righting itself over the five days after, hearing and "
+                  "the unseen parts of the body never fully caught up. The chapter takes his "
+                  "descriptions and sets aside his interpretation, and how far Stratton's own "
+                  "reports support its reading of them is something later readers still argue "
+                  "about."),
             ("p", "The section ends by turning the question round. For a thinking subject a face "
                   "the right way up and the same face upside down are indistinguishable; for "
                   "the perceiving subject the inverted face is unrecognizable. Look for long "
                   "enough at someone lying on a bed from the head of the bed, and the face "
                   "becomes terrifying, eyelashes and eyebrows taking on a strange materiality. "
                   "&ldquo;To invert an object is to deprive it of its significance.&rdquo; The "
-                  "French word <em>sens</em>, the translator notes, means both sense and "
+                  "French word <em>sens</em>, the chapter points out, means both sense and "
                   "direction. And a level always presupposes an earlier one: &ldquo;space "
                   "always precedes itself&rdquo;. The first level can be anchored nowhere, so "
                   "my first hold on the world must be the resumption of a pre-personal "
@@ -273,29 +277,29 @@ LESSONS = [
                     "not the switch."},
             {"q": "In the stratton preset the image is turned 180° and the level moves half the "
                   "remaining way each period. What does the model give at period 4?",
-             "a": ["45/2°", "45°", "90°", "0°"],
-             "c": 0,
+             "a": ["45°", "45/2°", "90°", "0°"],
+             "c": 1,
              "why": "The series halves: 180, 90, 45, then `45/2`. Forty-five is period 3, ninety "
                     "period 2, and under a share the model never reaches 0°."},
             {"q": "Why does the chapter call the associationist interpretation of Stratton "
                   "unintelligible?",
-             "a": ["Head and feet in the image would need a direction of their own to give "
-                   "one to the field",
-                   "Stratton's subject never adapted at all",
+             "a": ["Stratton's subject never adapted at all",
                    "Associations take longer than a week to form",
+                   "Head and feet in the image would need a direction of their own to give "
+                   "one to the field",
                    "The spectacles did not really invert the image"],
-             "c": 0,
+             "c": 2,
              "why": "The interpretation makes up and down follow the apparent position of head "
                     "and feet, and the chapter replies that no content is upright or inverted "
                     "in itself. Stratton's subject did adapt, the chapter makes nothing of how "
                     "long associations take, and it does not dispute that the image was "
                     "inverted."},
             {"q": "What does Wertheimer's mirror show that Stratton's spectacles do not?",
-             "a": ["Up and down redistributed at once, without any exploration by movement",
-                   "That the body's own orientation fixes the vertical",
+             "a": ["That the body's own orientation fixes the vertical",
                    "That the spatial level never changes",
-                   "That up is wherever the top of the retinal image is"],
-             "c": 0,
+                   "That up is wherever the top of the retinal image is",
+                   "Up and down redistributed at once, without any exploration by movement"],
+             "c": 3,
              "why": "The chapter says the experiment's advantage is an instantaneous "
                     "redistribution of high and low without motor exploration. It shows the "
                     "visual field imposing an orientation that is not the body's, the level does "
@@ -416,7 +420,8 @@ LESSONS = [
                   "spectacle, so depth has no means of being recorded; and if one objects that "
                   "after the criticism of the constancy hypothesis, the assumption that each "
                   "point of the stimulus gives one fixed sensation, we cannot judge what we see "
-                  "by the retinal image, Berkeley would reply that depth still cannot be seen, "
+                  "by the retinal image, Berkeley would probably reply, the chapter supposes, "
+                  "that depth still cannot be seen, "
                   "because it is not spread out before the eyes but appears to them only "
                   "foreshortened. Analytical reflection reaches the same verdict for "
                   "theoretical reasons: even a recorded depth would be a multiplicity that "
@@ -444,9 +449,10 @@ LESSONS = [
                   "Malebranche, Descartes's follower, and the picture goes back to Descartes's "
                   "<em>Optics</em> of 1637, where the eyes are like a blind man's two sticks "
                   "that run together as the object comes near. The Cartesians called the "
-                  "calculation a natural geometry. Berkeley denied that anyone performs a "
-                  "geometry and put in its place signs learned by experience: a feeling of the "
-                  "eyes turning that custom has joined to distance."),
+                  "calculation a natural geometry. Berkeley, in his own book rather than in "
+                  "anything the chapter quotes, denied that anyone performs a geometry and put "
+                  "in its place signs learned by experience: a feeling of the eyes turning "
+                  "that custom has joined to distance."),
             ("p", "The chapter's reply is that the signs presuppose what they are meant to "
                   "give. I can go back from apparent size to distance only if I already know "
                   "there is a world of undistortable objects and that my body stands before "
@@ -468,7 +474,8 @@ LESSONS = [
                   "`13/51000`, one eighty-fifth of the near figure. The <code>equal</code> "
                   "preset puts both at 50 cm, and the disparity is 0."),
             ("p", "These are the figures the theory says the mind uses, and the chapter's first "
-                  "objection is that nobody has them. I am not expressly aware of my eyes' "
+                  "objection, an observation it takes from the Gestalt psychologists, is that "
+                  "nobody has them. I am not expressly aware of my eyes' "
                   "convergence or of an apparent size when I see something far off. The "
                   "second is that the disparity the theory starts from is not there to start "
                   "from: &ldquo;there is disparity only for a subject who tries to fuse "
@@ -586,24 +593,24 @@ LESSONS = [
         "quiz": [
             {"q": "With the eyes 6.5 cm apart, what convergence does the classical theory give "
                   "for a point 65 cm away?",
-             "a": ["1/10 rad", "10 rad", "13/100 rad", "1/65 rad"],
-             "c": 0,
+             "a": ["10 rad", "1/10 rad", "13/100 rad", "1/65 rad"],
+             "c": 1,
              "why": "`6.5 / 65 = 1/10`. Ten radians is the ratio upside down, `13/100` is the "
                     "figure for 50 cm, and `1/65` forgets the separation."},
             {"q": "With the eyes 6.5 cm apart, what disparity does the classical theory give for "
                   "points at 50 cm and 100 cm?",
-             "a": ["13/200 rad", "13/100 rad", "13/300 rad", "0 rad"],
-             "c": 0,
+             "a": ["13/100 rad", "13/300 rad", "13/200 rad", "0 rad"],
+             "c": 2,
              "why": "The convergences are `13/100` and `13/200`, and the difference is `13/200`. "
                     "`13/100` is the nearer convergence alone, `13/300` uses the sum of the "
                     "distances, and 0 needs both points at one distance."},
             {"q": "On the chapter's reading, what do Berkeley and analytical reflection share "
                   "about depth?",
-             "a": ["Both tacitly equate depth with breadth seen from the side",
-                   "Both hold that depth is directly visible",
+             "a": ["Both hold that depth is directly visible",
                    "Both derive depth from the physiology of the brain",
-                   "Both treat convergence as a motive"],
-             "c": 0,
+                   "Both treat convergence as a motive",
+                   "Both tacitly equate depth with breadth seen from the side"],
+             "c": 3,
              "why": "That is the passage's second sentence. Both deny that depth is visible, the "
                     "brain is the Gestalt psychologists' resort, and the motive is the chapter's "
                     "own alternative."},
@@ -617,7 +624,8 @@ LESSONS = [
              "why": "The chapter says they are neither signs nor causes, and compares them to a "
                     "motive in a decision. Signs are the classical theory, causes the Gestalt "
                     "psychologists', and the chapter grants that they do enter into the "
-                    "perception of distance, as the stereoscope shows."},
+                    "perception of distance, as the stereoscope, which gives each eye its own "
+                    "picture, shows."},
         ],
         "mistakes": [
             ("Thinking we see depth by calculating from convergence",
@@ -764,8 +772,9 @@ LESSONS = [
                   "keep it in view, and the impression of movement disappears."),
             ("def", ("Stroboscopic movement",
                      "Movement seen between two stationary lights flashed one after the other, "
-                     "with nothing shown in between. Wertheimer called the pure case, in "
-                     "which movement is seen and no moving thing, the phi phenomenon.")),
+                     "with nothing shown in between. Wertheimer named the seen movement phi, "
+                     "and its pure case, movement seen with no moving thing, pure phi; on "
+                     "p. 316, in the logician's voice, Smith prints it phenomenon ø.")),
             ("p", "The lab computes Wertheimer's bands as later textbooks report them; the "
                   "thresholds are not in Merleau-Ponty. Below an interval of about 30 ms the "
                   "two lights are seen together, above about 200 ms one after the other, and "
@@ -784,8 +793,8 @@ LESSONS = [
                   "figure is the model's, and what the band tile names is what the textbooks "
                   "report subjects saying, not anything the lab sees."),
             ("p", "Then the logician answers the psychologist. The chapter's logician is Paul "
-                  "Linke, a German philosopher of Husserl's school who wrote on phenomenology "
-                  "and the experiments on seen movement. All movement must be movement of something: if "
+                  "Linke, a German philosopher close to Husserl's phenomenology who wrote on "
+                  "phenomenology and experiment in the perception of movement. All movement must be movement of something: if "
                   "my watch vanished from the table and reappeared a few seconds later in the "
                   "next room, nobody would say it had moved. When a fakir changes an egg into a "
                   "handkerchief there must be one something presented in two forms. To speak "
@@ -887,20 +896,20 @@ LESSONS = [
         "quiz": [
             {"q": "Two lights 6 cm apart flash 120 ms apart, with the lab's thresholds of 30 ms "
                   "and 200 ms. What are the implied speed and the band?",
-             "a": ["1/20 cm per ms; motion", "20 cm per ms; motion",
-                   "1/20 cm per ms; seen in succession", "1/20 cm per ms; seen together"],
-             "c": 0,
+             "a": ["20 cm per ms; motion", "1/20 cm per ms; seen in succession",
+                   "1/20 cm per ms; motion", "1/20 cm per ms; seen together"],
+             "c": 2,
              "why": "`6 / 120 = 1/20` cm per ms, and 120 ms lies between 30 and 200, so the band "
                     "is motion. Twenty is the ratio upside down; succession needs more than "
                     "200 ms and simultaneity less than 30."},
             {"q": "Which observation does the chapter report to show that movement is not the "
                   "successive occupation of every position between two extremes?",
-             "a": ["A short rod placed between A and B is never completed by the passing "
-                   "movement",
-                   "A watch that vanishes and reappears in the next room",
+             "a": ["A watch that vanishes and reappears in the next room",
                    "A stone found again on the ground where it fell",
-                   "Two lights flashed at the same moment"],
-             "c": 0,
+                   "Two lights flashed at the same moment",
+                   "A short rod placed between A and B is never completed by the passing "
+                   "movement"],
+             "c": 3,
              "why": "The rod is the chapter's case: the movement passes and the rod is not "
                     "filled in. The watch is the logician's example of no movement at all, the "
                     "stone found on the ground is the objective idea's evidence for one "
@@ -917,11 +926,11 @@ LESSONS = [
                     "intellectualist's accounts, which it rejects."},
             {"q": "Playing cards in a train, in the passage the chapter quotes from Koffka, "
                   "which train do I see move off?",
-             "a": ["The neighbouring train, even if it is really mine that is starting",
-                   "Always my own train",
+             "a": ["Always my own train",
+                   "The neighbouring train, even if it is really mine that is starting",
                    "Whichever train is actually moving",
                    "Neither train"],
-             "c": 0,
+             "c": 1,
              "why": "Absorbed in the compartment, I take it as at rest, so the other train seems "
                     "to leave. When I look at the other train to pick out someone, my own is set "
                     "in motion; which one moves depends on where I am anchored, not on which is "
@@ -1049,7 +1058,7 @@ LESSONS = [
                   "and the walls of a room seem 150 yards apart. One of the schizophrenic "
                   "patients the psychiatrist Fischer reported hears a bird and its twittering and cannot put them "
                   "together. These disturbances, the chapter notes, leave perception as "
-                  "knowledge intact: the patient still takes food with his hand. The cases are "
+                  "knowledge intact: the subject under mescalin still takes food with his hand. The cases are "
                   "the book's sources' reports; the lab below codes the reports, not the "
                   "patients."),
             ("p", "Then night, and the passage. Eugène Minkowski, a French psychiatrist whose "
@@ -1098,7 +1107,8 @@ LESSONS = [
                   "will conjure it away. The phantoms are fragments of the clear world and "
                   "borrow their standing from it. So, the objector concludes, the lived spaces "
                   "are confused appearances of the one true, objective space."),
-            ("p", "The chapter's reply begins with a patient of Binswanger's. He feels that a "
+            ("p", "The chapter's reply runs from page 337 to page 339, and its sharpest case, "
+                  "near its end, is a patient of Binswanger's. He feels that a "
                   "brush placed near his window is coming nearer and entering his head, and "
                   "never ceases to be aware that the brush is over there; when he looks at the "
                   "window, he still sees it. No appeal to explicit perception can rouse him, "
@@ -1216,9 +1226,9 @@ LESSONS = [
         "quiz": [
             {"q": "Four cases are coded, empiricism then intellectualism: A n, n; B y, n; C n, "
                   "y; D y, y. What do the survivors and split tiles print?",
-             "a": ["survivors none; split B, C", "survivors none; split A, D",
-                   "survivors empiricism; split B", "survivors none; split none"],
-             "c": 0,
+             "a": ["survivors none; split A, D", "survivors empiricism; split B",
+                   "survivors none; split none", "survivors none; split B, C"],
+             "c": 3,
              "why": "Both accounts fail A, so neither survives. The split lists the cases with y "
                     "against n, which are B and C; A is n against n and D is y against y, so "
                     "neither is in it. Empiricism fails A and C."},
@@ -1235,24 +1245,24 @@ LESSONS = [
                     "so neither geometry nor others' testimony would move him."},
             {"q": "Why, on the chapter's reading, do the dream's rising and falling escape the "
                   "explanation by breathing and desire?",
-             "a": ["Dreamed rising and falling are not in visible space, as the waking "
+             "a": ["Dreams have nothing to do with breathing or desire",
+                   "Dreamed rising and falling are not in visible space, as the waking "
                    "perceptions associated with breathing and desire are",
-                   "Dreams have nothing to do with breathing or desire",
                    "The explanation is physiologically false",
                    "Dreamers never remember falling"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter grants that the themes can be related to breathing and sexual "
                     "drives and calls that a first step; what the explanation misses is that the "
                     "dreamed fall is not in physical space. It does not call the physiology "
                     "false, and memory is not the issue."},
             {"q": "How does the chapter answer the charge that it shuts each kind of experience "
                   "in a private space?",
-             "a": ["Mythical, dreaming and mad consciousness are not sealed off; each opens on "
-                   "a horizon of possible objectification",
-                   "It accepts that each experience is a closed world",
+             "a": ["It accepts that each experience is a closed world",
                    "It says only geometrical space is real",
+                   "Mythical, dreaming and mad consciousness are not sealed off; each opens on "
+                   "a horizon of possible objectification",
                    "It says the philosopher must believe the myths"],
-             "c": 0,
+             "c": 2,
              "why": "The text says these are not small islands of experience with no escape: the "
                     "myth forms a world, the dream uses waking space, madness gravitates round "
                     "the world. It refuses to make geometrical space immanent in mythical space, "

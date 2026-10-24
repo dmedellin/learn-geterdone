@@ -1,7 +1,7 @@
 """Course 5 -- Sensing and Space: Part Two, introduction and Chapters 1-2 (Smith pp. 235-347).
 
-Eight lessons in two parts: part_a reads Part Two's introduction and Chapter 1,
-Sense Experience, in three lessons; part_b reads Chapter 2, Space, one lesson
+Eight lessons in two parts: part_a reads Part Two's introduction (one lesson) and
+Chapter 1, Sense Experience (three); part_b reads Chapter 2, Space, one lesson
 per section (up and down, depth, movement, lived space).
 """
 

@@ -684,7 +684,8 @@ acquisition of habit closes Chapter 3.
      other (the lamp; confirmed, p. 79); the object as a horizon of views.
      *(Resolved against Smith, Course 3 authoring: the text first states the
      house seen from nowhere in Leibniz's words, p. 77, corrects it to the house
-     seen from everywhere, p. 79, and at once adds, p. 80, that a human gaze
+     seen from everywhere, p. 79, and, after a paragraph extending the point to
+     time, adds, p. 80 (corrected in the second review), that a human gaze
      posits one facet at a time, so the synthesis of views is presumptive; the
      lesson reads all three. The book's views are the right bank of the Seine,
      inside, and an aeroplane: `above` is labelled the aeroplane.)*
@@ -2189,12 +2190,15 @@ the passage):
   (especially the late manuscripts), to Heidegger and to Sartre. A lesson
   says where its reading is disputed and goes no further.
 - **The later status of the psychology.** Gelb and Goldstein's case of
-  Schneider was re-examined by neurologists in 1949 (Bay, Lauenstein and
-  Cibis; Jung), who questioned the reliability of the reports and the
-  diagnosis; modern reviews (Goldenberg, 2003, in *Classic Cases in
-  Neuropsychology* II; Marotta and Behrmann, 2004, *Neuropsychologia* 42) read
-  the case as a visual form agnosia and judge that the theoretical conclusions
-  went beyond the data. These citations are checked before they are printed.
+  Schneider was re-examined in 1949 (by Bay, Lauenstein and Cibis, and
+  separately by Richard Jung, who found he could see and recognise most
+  objects), and the reliability of the reports and the diagnosis was
+  questioned; of the modern reviews, Marotta and Behrmann (2004,
+  *Neuropsychologia* 42) propose reclassifying the case as an integrative
+  agnosia, and Goldenberg (2003, in *Classic Cases in Neuropsychology* II)
+  doubts it deserves to be a classic case and judges that Gelb and Goldstein
+  were too eager for an all-embracing theory. (Corrected by the Course 3
+  second review, which checked the papers.)
   The course `not_covered` says so, and the Schneider lessons say in a sentence
   that the book's argument concerns the case as reported. The modern
   experiments the lectures' views rest on are asides (§F.1), never evidence

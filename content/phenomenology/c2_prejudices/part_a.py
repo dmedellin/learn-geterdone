@@ -273,11 +273,11 @@ LESSONS = [
                     "of 1 do not."},
             {"q": "In the white-patch passage, what does each part of the patch do, on the "
                   "chapter's description?",
-             "a": ["It arouses the expectation of more than it contains",
-                   "It delivers one impression, later joined to the others",
+             "a": ["It delivers one impression, later joined to the others",
+                   "It arouses the expectation of more than it contains",
                    "It is perceived first as a point and then as part of a shape",
                    "It shows the patch's colour exactly as the stimulus fixes it"],
-             "c": 0,
+             "c": 1,
              "why": "That is the passage's own phrase, and it is why the elementary perception "
                     "is already charged with a meaning. Separate impressions joined later is the "
                     "view the chapter rejects. Points perceived first get the order backwards: "
@@ -285,11 +285,11 @@ LESSONS = [
                     "the shape is described as more intense than the background's, not as fixed "
                     "by the stimulus."},
             {"q": "What do psychologists call the experience error, in the chapter's account?",
-             "a": ["Taking what we know to be in things as being in our consciousness of them",
-                   "Mistaking an illusion for a genuine perception",
+             "a": ["Mistaking an illusion for a genuine perception",
                    "Trusting the senses over measurement",
+                   "Taking what we know to be in things as being in our consciousness of them",
                    "Failing to attend to the edge of the visual field"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter defines it so: we make perception out of things perceived, "
                     "moving the coloured object into consciousness as a coloured sensation. An "
                     "illusion is a different matter, trusting the senses is no error on the "
@@ -297,12 +297,12 @@ LESSONS = [
                     "the chapter rejects."},
             {"q": "Gestalt theory says a figure on a background is the simplest thing the senses "
                   "give. What does the chapter add?",
-             "a": ["That this is the definition of perception, not a contingent fact leaving "
-                   "room for impressions beneath it",
-                   "That figure and background are each built up from sensations",
+             "a": ["That figure and background are each built up from sensations",
                    "That Gestalt theory is wrong about figure and background",
-                   "That the figure appears only after attention is paid to it"],
-             "c": 0,
+                   "That the figure appears only after attention is paid to it",
+                   "That this is the definition of perception, not a contingent fact leaving "
+                   "room for impressions beneath it"],
+             "c": 3,
              "why": "The chapter accepts the finding and denies that an ideal analysis may still "
                     "posit pure impressions under it. Building figure and ground from sensations "
                     "is the view it rejects. It does not reject the Gestalt finding but extends "
@@ -591,34 +591,34 @@ LESSONS = [
         "quiz": [
             {"q": "Two shafts measure 12 cm each, and the one with outward fins is reported 3 cm "
                   "longer. What do the hypothesis's prediction and the gap come to?",
-             "a": ["Predicted 0 cm, gap 3 cm",
-                   "Predicted 3 cm, gap 0 cm",
+             "a": ["Predicted 3 cm, gap 0 cm",
+                   "Predicted 0 cm, gap 3 cm",
                    "Predicted 0 cm, gap −3 cm",
                    "Predicted 12 cm, gap −9 cm"],
-             "c": 0,
+             "c": 1,
              "why": "The prediction is the measured difference, `12 − 12 = 0`, and the gap is "
                     "reported minus predicted, `3 − 0 = 3`. Predicting 3 cm takes the report for "
                     "the prediction; −3 subtracts the wrong way round; 12 cm confuses a length "
                     "with a difference of lengths."},
             {"q": "A shaft of 9 cm and a shaft of 10 cm are reported as differing by 1 cm, the "
                   "first the longer. What are the prediction and the gap?",
-             "a": ["Predicted −1 cm, gap 2 cm",
-                   "Predicted 1 cm, gap 0 cm",
+             "a": ["Predicted 1 cm, gap 0 cm",
                    "Predicted −1 cm, gap 0 cm",
+                   "Predicted −1 cm, gap 2 cm",
                    "Predicted 0 cm, gap 1 cm"],
-             "c": 0,
+             "c": 2,
              "why": "The prediction is `9 − 10 = −1`: the first shaft should look 1 cm shorter. "
                     "The report says 1 cm longer, so the gap is `1 − (−1) = 2`. A prediction of "
                     "+1 reverses the subtraction, a gap of 0 compares sizes and ignores signs, "
                     "and a prediction of 0 treats the shafts as equal."},
             {"q": "What does the chapter say of the two lines of the Müller-Lyer figure as they "
                   "are perceived?",
-             "a": ["That they are neither equal nor unequal, the question arising only in the "
-                   "objective world",
-                   "That they look unequal, so perception is mistaken about them",
+             "a": ["That they look unequal, so perception is mistaken about them",
                    "That they are equal in sensation, the difference being added by a judgement",
-                   "That they look equal once enough attention is paid"],
-             "c": 0,
+                   "That they look equal once enough attention is paid",
+                   "That they are neither equal nor unequal, the question arising only in the "
+                   "objective world"],
+             "c": 3,
              "why": "That is page 6, and page 13 adds that the line becomes different rather "
                     "than unequal. Calling perception mistaken keeps the measured lines as the "
                     "standard. Equal sensations with an added judgement is the intellectualist "
@@ -930,20 +930,20 @@ LESSONS = [
         "quiz": [
             {"q": "With the lesson's twenty remembered words, the pattern _a_e and the context "
                   "water, what does the lab count?",
-             "a": ["1: lake", "18", "2: lake and cake", "0"],
-             "c": 0,
+             "a": ["18", "2: lake and cake", "1: lake", "0"],
+             "c": 2,
              "why": "Eighteen words fit _a_e, and only lake carries the tag water, so one "
                     "remains. Eighteen ignores the context; cake fits the letters but is not "
                     "tagged; and nothing reduces the count to 0, since lake both fits and is "
                     "tagged."},
             {"q": "In Lewin's experiment, why does the delay over ged count against association "
                   "as a force?",
-             "a": ["The same drill caused a delay under one task and none under another, so the "
-                   "task decided whether it acted",
-                   "The subjects had not learnt the syllables well enough to associate them",
+             "a": ["The subjects had not learnt the syllables well enough to associate them",
                    "Reversed syllables cannot be associated at all",
-                   "The delay was too short to measure reliably"],
-             "c": 0,
+                   "The delay was too short to measure reliably",
+                   "The same drill caused a delay under one task and none under another, so the "
+                   "task decided whether it acted"],
+             "c": 3,
              "why": "A force would act whatever the task; the drilled pairs slowed the rhyming "
                     "task and did not touch the vowel task, so they acted only through a "
                     "reproduction intention the task invited. The chapter does not say the "
@@ -963,11 +963,11 @@ LESSONS = [
                     "proofreader's illusion as real."},
             {"q": "How does the chapter place the theory of the projection of memories in "
                   "relation to empiricism?",
-             "a": ["As a tardy correction of empiricism that shares its postulates",
-                   "As the mental activity that refutes empiricism",
+             "a": ["As the mental activity that refutes empiricism",
+                   "As a tardy correction of empiricism that shares its postulates",
                    "As an intellectualist theory opposed to association",
                    "As the Gestalt psychologists' replacement for sensation"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says the theory seems to bring a mental activity into "
                     "perception against empiricism, and that this is a mistake: it accepts "
                     "empiricism's postulates and shares its difficulties. It is not "
@@ -1278,11 +1278,11 @@ LESSONS = [
                   "c1; part of the forest behind, fitting c1 and c2; masts and funnel of the ship, "
                   "fitting c1, c2 and c3. After cues c1 and c2, what is the count, and what did c2 "
                   "remove?",
-             "a": ["Count 2; c2 removed the flat shadow",
-                   "Count 3; c2 removed nothing",
+             "a": ["Count 3; c2 removed nothing",
                    "Count 1; c2 removed the shadow and the forest",
-                   "Count 2; c2 removed the ship"],
-             "c": 0,
+                   "Count 2; c2 removed the ship",
+                   "Count 2; c2 removed the flat shadow"],
+             "c": 3,
              "why": "Every interpretation fits c1. The shadow does not fit c2, so it goes, and the "
                     "forest and the ship remain. A count of 3 ignores c2; removing the forest "
                     "would need c3; and the ship fits every cue."},
@@ -1300,11 +1300,11 @@ LESSONS = [
                     "effort."},
             {"q": "Descartes, looking from his window, sees hats and coats. What does the "
                   "intellectualist conclude from the case?",
-             "a": ["That he does not see the men but judges them to be there",
-                   "That the men are associated with the hats by past experience",
+             "a": ["That the men are associated with the hats by past experience",
+                   "That he does not see the men but judges them to be there",
                    "That perception gives the men before any judgement",
                    "That the hats and coats may be dummies, so nothing can be known"],
-             "c": 0,
+             "c": 1,
              "why": "The case is the intellectualist's showcase: the image of the men cannot be "
                     "on the retina, so they are judged. Association is the empiricist's account. "
                     "Perception before judgement is the chapter's reply, not Descartes's "
@@ -1312,11 +1312,11 @@ LESSONS = [
                     "deny all knowledge."},
             {"q": "Why, on the chapter's argument, does perception as judgement make it hard to "
                   "tell true perception from false?",
-             "a": ["If we see what we judge, seeing and thinking one sees become the same thing",
-                   "Judgements are always false, so every perception is an illusion",
+             "a": ["Judgements are always false, so every perception is an illusion",
                    "The judge cannot compare a perception with the stimulus",
+                   "If we see what we judge, seeing and thinking one sees become the same thing",
                    "A hallucination is a sensation without any judgement"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter asks where the difference between seeing and thinking one sees "
                     "would lie, and finds it only in the sensible text the judgement shapes, "
                     "which is perception before judgement. It does not call all judgements false. "
@@ -1648,34 +1648,34 @@ LESSONS = [
                     "against n; the third is n against silent, which does not split. Choosing an "
                     "account as survivor overlooks its n."},
             {"q": "What, according to the chapter, made sensation and judgement seem clear?",
-             "a": ["The prejudice in favour of the world, while it was maintained",
-                   "Careful introspection of one's own states",
+             "a": ["Careful introspection of one's own states",
+                   "The prejudice in favour of the world, while it was maintained",
                    "The success of physiology in tracing the nerves",
                    "Their agreement with the Gestalt psychologists"],
-             "c": 0,
+             "c": 1,
              "why": "That is the passage's first sentence. Introspection is what the chapter "
                     "denies the phenomenal field is reached by. Physiology's picture of the "
                     "transmitter was found wanting in Chapter 1, and the Gestalt psychologists "
                     "are among those whose findings undid both notions."},
             {"q": "Which of these does the chapter say the phenomenal field is not?",
-             "a": ["An inner world of states of consciousness known by introspection",
-                   "Prior to the objective world",
+             "a": ["Prior to the objective world",
                    "The layer through which things and other people are first given",
+                   "An inner world of states of consciousness known by introspection",
                    "Something consciousness forgets in favour of the things it presents"],
-             "c": 0,
+             "c": 2,
              "why": "That is the passage's second sentence. The chapter does place the field "
                     "before the objective world, as the layer through which others and things are "
                     "first given, and it says consciousness forgets its phenomena in favour of "
                     "things, though it can always recall them."},
             {"q": "On the intro preset, intellectualism absorbs 2 cases and empiricism 1. What "
                   "follows, on the lesson's reading?",
-             "a": ["Nothing about which account is better: the counts depend on the cases coded, "
-                   "and both fail from one shared prejudice",
-                   "Intellectualism is the better account of perception",
+             "a": ["Intellectualism is the better account of perception",
                    "Merleau-Ponty sides with intellectualism against empiricism",
                    "A third case for empiricism would make the accounts equal and the table "
-                   "complete"],
-             "c": 0,
+                   "complete",
+                   "Nothing about which account is better: the counts depend on the cases coded, "
+                   "and both fail from one shared prejudice"],
+             "c": 3,
              "why": "The Introduction's claim is that both fail symmetrically, from the "
                     "prejudice in favour of the objective world, and the lesson says the record "
                     "is not a ranking. Chapter 3 argues that intellectualism stands on the same "

@@ -167,7 +167,8 @@ LESSONS = [
                   "the patient saw there: the tile <strong>core</strong> lists all six of the "
                   "person's properties, the sense included, since there is only one perceived "
                   "thing to compare, and the tile <strong>break</strong> says the patient's man "
-                  "lacks five of them: <em>seen</em> and the four that place a thing in the "
+                  "lacks five of them: <em>seen</em>, since page 397 says the thing in "
+                  "hallucination is never seen and never visible, and the four that place a thing in the "
                   "world. Nothing varies, so the tile for what varies reads <em>none</em>. The <code>voice</code> preset does the same for a voice from "
                   "the next room and the voices a patient hears."),
             ("p", "The <code>all</code> preset sets three perceived things, a voice from the "
@@ -205,18 +206,22 @@ LESSONS = [
                   "as for anyone, each perception is replaced only by another that corrects it, "
                   "and what is certain is that there is a world. I know myself, the chapter "
                   "ends, only in ambiguity."),
-            ("p", "One modern view sets this chapter in an unexpected light. The neuroscientist "
-                  "Anil Seth, in <em>Being You</em> (2021), describes perception as a "
-                  "controlled hallucination, a phrase he did not coin: the brain's best guess "
-                  "about the causes of its signals, held in check by those signals. That runs "
-                  "the other way from the chapter, which argues that a hallucination lacks what "
+            ("p", "One modern view runs close to this chapter and the other way from it. The "
+                  "neuroscientist Anil Seth, in <em>Being You</em> (2021), describes perception "
+                  "as a controlled hallucination, a phrase he did not coin: the brain's best "
+                  "guess about the causes of its signals, held in check by those signals, so "
+                  "that a hallucination is the same process less held in check. That runs the "
+                  "other way from the chapter, which argues that a hallucination lacks what "
                   "perception has, not that perception is a hallucination kept in check. Both "
-                  "sides can claim something here. The chapter itself makes perception and "
-                  "hallucination modes of one function, and says that with a phantasm the "
-                  "initiative comes from us; Seth would see his view in that. The chapter would "
-                  "answer that what perception has is a place in a world shared with others, "
-                  "not a better-checked guess. Neither the chapter nor the lab settles the "
-                  "dispute."),
+                  "sides can point to the page. The chapter itself makes perception and "
+                  "hallucination modes of one function, says that with a phantasm the "
+                  "initiative comes from us, and in a footnote on page 395 repeats without "
+                  "objection the Hungarian philosopher Melchior Palágyi's description of "
+                  "perception as a &ldquo;direct phantasm&rdquo; and hallucination as an "
+                  "&ldquo;inverse phantasm&rdquo;; a reader of Seth can point to all three. "
+                  "Against him, what the chapter says perception has is a place in a world "
+                  "shared with others and a fullness of detail, not a better-checked guess. "
+                  "Neither the chapter nor the lab settles the dispute."),
             ("p", "The world the patient falls out of is a world shared with others, and the "
                   "next chapter asks how there can be others at all. The next lesson, “The "
                   "Cultural World and Others”, begins it."),
@@ -529,24 +534,26 @@ LESSONS = [
                   "one of them, p and q true with r false, makes both premises true and the "
                   "conclusion false, the tile <strong>counterexample rows</strong>; and the tile "
                   "<strong>verdict</strong> reads <em>Invalid</em>. That is no surprise and no "
-                  "objection: Mill offered the argument as an inference from like effects to "
+                  "objection: Mill, whom the chapter does not name, offered the argument as an inference from like effects to "
                   "like causes, which is inductive and was never meant to force its conclusion."),
             ("p", "The <code>valid</code> preset adds the premise the argument needs to become "
                   "deductive: <em>q → r</em>, whatever behaves as I do expresses a mind. Now no "
                   "row makes all three premises true and r false, the counterexample tile reads "
-                  "0, and the verdict is <em>Valid</em>. The tile <strong>form</strong>, which looks "
+                  "0, and the verdict is <em>Valid</em>; the shape that does the work, from q and "
+                  "<em>q → r</em> to r, is the one logicians call modus ponens. The tile <strong>form</strong>, which looks "
                   "an argument up in a catalogue of named shapes, reads <em>no catalogued "
                   "form</em> for all three presets, because each carries the premise p beside "
                   "the shape that does the work. The repair costs something, since the new premise "
                   "is a strong general claim, but the form is now beyond reproach."),
-            ("p", "The <code>circle</code> preset is the chapter's objection, set out in the "
-                  "lab's terms. To know that premise q is true, that the body over there "
+            ("p", "The <code>circle</code> preset is the lesson's way of setting the chapter's "
+                  "objection out in the lab's terms. To know that premise q is true, that the body over there "
                   "<em>behaves</em> as mine does rather than merely moves, I must already "
                   "perceive it as conduct, the conduct of someone, and that is what r says. So "
                   "the preset gives the premises p and r and the conclusion r, over 4 rows, "
                   "since q has dropped out. The lab calls it valid, and it is; a conclusion that is already among the premises cannot "
-                  "be false when they are true. The argument has become circular. That is what "
-                  "presupposing what it is called on to explain amounts to, and no truth table "
+                  "be false when they are true. The argument has become circular. On this "
+                  "reading, that is what presupposing what it is called on to explain amounts "
+                  "to, and no truth table "
                   "can catch it, since a circular argument is perfectly valid."),
             ("def", ("Presupposing what it explains",
                      "An argument presupposes its conclusion when the evidence for one of its "
@@ -653,14 +660,15 @@ LESSONS = [
             {"q": "What is the chapter's objection to the argument from analogy?",
              "a": ["It presupposes the perception of others that it is meant to explain",
                    "It is invalid because it is inductive",
-                   "It compares bodies that are in fact unlike",
+                   "It fails because no two bodies ever behave exactly alike",
                    "It relies on the baby's knowledge of its own face"],
              "c": 0,
              "why": "Page 410, after Scheler: reasoning by analogy presupposes what it is called "
                     "on to explain, since the perception of others is anterior to the "
                     "observations. Being inductive is the misconception the lesson answers. The "
-                    "baby's teeth are unlike mine, but that is evidence against analogy, and the "
-                    "baby has hardly seen its own face."},
+                    "chapter never asks for exact likeness; the baby's unlike teeth show that "
+                    "the perception does not wait for any likeness, and the baby has hardly "
+                    "seen its own face."},
             {"q": "Why does the circle preset come out valid in the lab?",
              "a": ["Its conclusion is one of its premises, so no row makes the premises true "
                    "and the conclusion false",
@@ -854,7 +862,7 @@ LESSONS = [
                   "in Paul Valéry's phrase, refuses something."),
             ("p", "The objectifying look comes next, and the chapter introduces it as something "
                   "asserted: the other turns me into an object and denies me, I turn him into "
-                  "one and deny him. That is the analysis Jean-Paul Sartre gave in <em>Being and "
+                  "one and deny him. That is widely read as the analysis Jean-Paul Sartre gave in <em>Being and "
                   "Nothingness</em> (1943), where being seen by another reveals me as an object "
                   "in his world and is felt as shame, and the chapter answers it without naming "
                   "him. At its strength it explains why the other's presence can feel like a "

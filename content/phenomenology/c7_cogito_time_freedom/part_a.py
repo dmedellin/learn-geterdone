@@ -97,7 +97,8 @@ LESSONS = [
                   "coolness of the paper under his hand and seeing the trees of the boulevard "
                   "through the window (p. 429). For the next six pages it then states, in the "
                   "voice of an idealist, a reading of the cogito as a thought outside time "
-                  "that constitutes every object it finds. The footnotes name the reader he "
+                  "that constitutes every object it finds, that is, builds each one up out of "
+                  "its own resources. The footnotes name the reader he "
                   "has in mind, Pierre Lachièze-Rey, a French interpreter of Kant. Merleau-Ponty "
                   "follows the reading to its end, where my mind would be God, unique and "
                   "unable to recognise any other self, and concludes that the cogito must be "
@@ -116,8 +117,10 @@ LESSONS = [
                   "as the mere impression of seeing, it is certain only as a possibility, and "
                   "we could not even have it unless we had on other occasions really seen. "
                   "Taken as the consciousness of a power that constitutes the world, it would "
-                  "make the world as certain as the power, and transcendental idealism would "
-                  "turn into absolute realism. Either way, the thought of seeing &ldquo;is "
+                  "make the world as certain as the power, and transcendental idealism, the "
+                  "view that the world is built up by the mind, would turn into absolute "
+                  "realism, the view that the world is exactly as it is thought. Either way, "
+                  "the thought of seeing &ldquo;is "
                   "certain only so long as actual sight is equally so&rdquo; (p. 437). So "
                   "Descartes, holding the thing doubtful and the thought of it certain, "
                   "&ldquo;takes up an untenable position&rdquo; (p. 436). That is the "
@@ -160,8 +163,9 @@ LESSONS = [
                   "s be I see an ash-tray and t be I think I see one. Descartes grants that "
                   "if I see, I think I see. The step from thinking I see to seeing is then "
                   "the form the lab names affirming the consequent, and it has one "
-                  "counterexample row: t true, s false. That row is exactly what Descartes "
-                  "needs to be possible, and propositional logic finds nothing wrong with it. "
+                  "counterexample row: t true, s false. Descartes never takes that step; his "
+                  "doubt is the refusal to take it, and that row is exactly what he needs to be "
+                  "possible. Propositional logic finds nothing wrong with it. "
                   "The chapter's objection is not that the row is inconsistent. It is that "
                   "in that row the thought of seeing is the mere impression of seeing, "
                   "certain only as a possibility, so the certainty Descartes wanted from it "
@@ -274,35 +278,35 @@ LESSONS = [
                     "p must be true and q false. A row with p false makes the premise false "
                     "and refutes nothing, and since the row exists, the form is not valid."},
             {"q": "What did Descartes say in the Second Replies about how the cogito is known?",
-             "a": ["That it is not deduced by a syllogism but recognised by a simple intuition "
-                   "of the mind",
-                   "That it is deduced from the major premise that everything which thinks "
+             "a": ["That it is deduced from the major premise that everything which thinks "
                    "exists",
+                   "That it is not deduced by a syllogism but recognised by a simple intuition "
+                   "of the mind",
                    "That it is learned from reading the works of earlier philosophers",
                    "That it is a probable opinion, to be confirmed by experience"],
-             "c": 0,
+             "c": 1,
              "why": "The Replies deny the syllogistic reading and say the general premise is "
                     "learned from one's own case, which is the opposite of deducing the "
                     "cogito from it. Descartes did not take the cogito from books, and he "
                     "held it certain, not probable."},
             {"q": "On the chapter's account, what becomes of the thought that I see an "
                   "ash-tray if no ash-tray is there?",
-             "a": ["It is the mere impression of seeing, certain only as a possibility",
-                   "It stays certain, whatever becomes of the ash-tray",
+             "a": ["It stays certain, whatever becomes of the ash-tray",
                    "It proves that the ash-tray exists after all",
+                   "It is the mere impression of seeing, certain only as a possibility",
                    "It shows that nothing can ever be seen"],
-             "c": 0,
+             "c": 2,
              "why": "The thought of seeing, the chapter says, is certain only so long as actual "
                     "sight is; without the thing it is the impression of seeing. Staying "
                     "certain regardless is Descartes's position, which the chapter calls "
                     "untenable. Nothing in it proves an ash-tray, and real seeing is not denied."},
             {"q": "What does the chapter mean by an illusory love?",
-             "a": ["A love I truly lived, which disillusionment shows touched only part of me "
-                   "and was aimed at qualities rather than the person",
-                   "A love I pretended to and knew all along was not love",
+             "a": ["A love I pretended to and knew all along was not love",
                    "A true love that is now dying",
-                   "A feeling that was never felt at all"],
-             "c": 0,
+                   "A feeling that was never felt at all",
+                   "A love I truly lived, which disillusionment shows touched only part of me "
+                   "and was aimed at qualities rather than the person"],
+             "c": 3,
              "why": "The chapter separates illusory love from the deceit of calling something "
                     "love that I knew was not, and denies that it is only a true love dying. "
                     "It was felt and lived; what it lacked was the whole of me."},
@@ -430,8 +434,10 @@ LESSONS = [
                   "finish it has a triangle in view. The chapter cites two sources for the "
                   "description: Max Wertheimer, the Gestalt psychologist, who studied how "
                   "people solve problems by seeing a figure anew, and Aron Gurwitsch, a "
-                  "phenomenologist then teaching in Paris. On their account the proof sees one "
-                  "sum of angles in two groupings at once. The objector concludes that truth "
+                  "phenomenologist who had lectured in Paris in the 1930s. On Wertheimer's "
+                  "account the proof brings one sum of angles into two groupings and sees it "
+                  "alternately as each; with Gurwitsch the chapter adds that the first "
+                  "grouping survives while the second forms. The objector concludes that truth "
                   "is impossible without a mind that possesses itself absolutely (p. 447)."),
             ("p", "The reply starts by granting that there is an act here that overcomes the "
                   "scattering of thought in time. Then it asks what kind of act. "
@@ -456,7 +462,7 @@ LESSONS = [
                   "parallel and reaches the result by constructing the figure in pure "
                   "intuition. At its strength Kant's view explains both halves of the "
                   "puzzle: the result is not in the concept, and it is still necessary, "
-                  "because the intuition in which the figure is built is the form of all our "
+                  "because space, in which the figure is built, is the form of all our outer "
                   "sensing. The chapter does not cite this passage, and the comparison is the "
                   "lesson's. Merleau-Ponty agrees with Kant that the concept is not enough. "
                   "Where they part is the place of the construction."),
@@ -572,20 +578,21 @@ LESSONS = [
         "quiz": [
             {"q": "A triangle has angles of 40° and 75°. What is the third angle, and what are "
                   "the alternate angles at the parallel through the third vertex?",
-             "a": ["65°; 40° and 75°", "65°; 40° and 65°", "105°; 40° and 75°",
+             "a": ["65°; 40° and 65°", "65°; 40° and 75°", "105°; 40° and 75°",
                    "75°; 40° and 65°"],
-             "c": 0,
+             "c": 1,
              "why": "`180 − 115 = 65`. Through the third vertex the parallel makes angles equal "
-                    "to the two base angles, 40° and 75°. 105° is the exterior angle, not the "
-                    "third angle, and the other pairs mix the vertex's own angle into the "
+                    "to the two base angles, 40° and 75°. 105° is 180° less 75° alone, the "
+                    "exterior angle at the second vertex and not the third angle, and the "
+                    "other pairs mix the vertex's own angle into the "
                     "alternate angles."},
             {"q": "On the chapter's reading, why does the conclusion follow of necessity?",
-             "a": ["Because in constructing, the geometer has already experienced the "
-                   "possibility of the transition",
-                   "Because the angle sum is contained in the definition of a triangle",
+             "a": ["Because the angle sum is contained in the definition of a triangle",
                    "Because the figure on the paper has been measured accurately",
+                   "Because in constructing, the geometer has already experienced the "
+                   "possibility of the transition",
                    "Because a pure intuition, independent of the body, guarantees it"],
-             "c": 0,
+             "c": 2,
              "why": "That is the passage. The chapter denies that the necessity is analytic, so "
                     "the definition does not contain it; it denies that the construction is a "
                     "manual operation, so measuring is not the proof; and a pure intuition "
@@ -593,11 +600,11 @@ LESSONS = [
                     "replaces."},
             {"q": "The refuse preset asks for angles of 100° and 90°, and the lab prints a dash "
                   "for the third angle. Why?",
-             "a": ["The two angles already exceed two right angles, so no triangle has them",
-                   "The lab cannot draw an obtuse angle",
+             "a": ["The lab cannot draw an obtuse angle",
                    "A right angle has no alternate angle",
-                   "The angles were entered in the wrong order"],
-             "c": 0,
+                   "The angles were entered in the wrong order",
+                   "The two angles already exceed two right angles, so no triangle has them"],
+             "c": 3,
              "why": "`100 + 90 = 190`, more than 180, so there is nothing left for a third "
                     "angle and no triangle. The lab draws obtuse angles in other inputs, the "
                     "right preset has a right angle, and the order of a and b does not matter."},
@@ -754,7 +761,7 @@ LESSONS = [
                   "the second, language "
                   "before thought, thought is nothing but words, and consciousness is led by "
                   "language as the realist believes he is led by the world; the chapter raises "
-                  "that conclusion itself on page 468 and answers: &ldquo;This would be to "
+                  "that conclusion itself on pages 467&ndash;468 and answers: &ldquo;This would be to "
                   "forget half the truth.&rdquo;"),
             ("p", "The cases, as the lesson codes them, thought-first then language-first. "
                   "First, Descartes's book: I should be unable even to read it, the chapter "
@@ -790,12 +797,13 @@ LESSONS = [
             ("p", "If ultimate subjectivity cannot think itself the moment it exists, how can "
                   "it ever do so? The chapter puts the objection to itself (p. 470) and "
                   "answers that it has withheld from the primordial I only objective, "
-                  "positing thought, not all self-presence. What am I, then, beneath my "
+                  "positing thought, the kind that sets an object before itself, and not all "
+                  "self-presence. What am I, then, beneath my "
                   "particular thoughts? &ldquo;I am a field, an experience&rdquo; (p. 473). "
                   "With my birth something began that can no longer cease to see or not to "
                   "see, a new possibility of situations, and the cogito retrieves that event."),
-            ("p", "This is the most disputed idea in the chapter, and the first to dispute it "
-                  "was Merleau-Ponty. In a working note of his last years, published after "
+            ("p", "This is the most disputed idea in the chapter, and among the first to "
+                  "dispute it was Merleau-Ponty himself. In a working note of his last years, published after "
                   "his death in <em>The Visible and the Invisible</em> (1964), he wrote that "
                   "the tacit cogito is impossible: to have even the idea of thinking, of "
                   "returning to oneself, one already needs words. Readers disagree over "
@@ -883,19 +891,19 @@ LESSONS = [
         "quiz": [
             {"q": "Language before thought is coded n, y and silent on the three cases. What "
                   "is its record?",
-             "a": ["absorbs 1 of 3, fails 1, silent 1", "absorbs 1 of 3, fails 2, silent 0",
-                   "absorbs 2 of 3, fails 1, silent 0", "absorbs 1 of 2, fails 1, silent 0"],
-             "c": 0,
+             "a": ["absorbs 1 of 3, fails 2, silent 0", "absorbs 2 of 3, fails 1, silent 0",
+                   "absorbs 1 of 3, fails 1, silent 1", "absorbs 1 of 2, fails 1, silent 0"],
+             "c": 2,
              "why": "One y, one n and one silent cell out of three cases. Counting the silent "
                     "cell as a failure gives fails 2, counting it as absorbed gives 2 of 3, and "
                     "dropping it from the total gives 1 of 2."},
             {"q": "What does the chapter mean by a spoken cogito?",
-             "a": ["The cogito reached through Descartes's words, whose true formula would be "
-                   "one thinks, therefore one is",
-                   "A cogito said aloud rather than thought silently",
+             "a": ["A cogito said aloud rather than thought silently",
                    "Descartes's first, unwritten experience of his own existence",
-                   "The cogito as it is used in everyday conversation"],
-             "c": 0,
+                   "The cogito as it is used in everyday conversation",
+                   "The cogito reached through Descartes's words, whose true formula would be "
+                   "one thinks, therefore one is"],
+             "c": 3,
              "why": "The spoken cogito is the one put into words and understood in words, a me "
                     "in idea. Saying it aloud is not the point, since reading silently gives the "
                     "same thing. Descartes's unwritten glimpse of his existence is what the "
@@ -914,12 +922,12 @@ LESSONS = [
                     "unconscious."},
             {"q": "In the expression preset, language before thought survives. What does that "
                   "show?",
-             "a": ["Only that it fails none of the two cases shown; the full table has no "
+             "a": ["That the chapter holds language before thought",
+                   "Only that it fails none of the two cases shown; the full table has no "
                    "survivor",
-                   "That the chapter holds language before thought",
                    "That thought before language is refuted by the book",
                    "That the illusory love is a case about language"],
-             "c": 0,
+             "c": 1,
              "why": "A survivor is a count over the cases chosen. With the first case restored, "
                     "language before thought fails it. The chapter says that view forgets half "
                     "the truth, the coding is the lesson's, and the love is in the table as a "
@@ -1167,8 +1175,8 @@ LESSONS = [
         "quiz": [
             {"q": "Water at positions 1 to 7, the source at 1, and an observer on the bank at "
                   "2. What does the model count as past?",
-             "a": ["w3, w4, w5, w6, w7", "w1", "w1, w2", "none"],
-             "c": 0,
+             "a": ["w1", "w1, w2", "none", "w3, w4, w5, w6, w7"],
+             "c": 3,
              "why": "From the bank, water downstream has gone by: everything beyond position 2. "
                     "w1, upstream, is still to come; w2 is in front of him; and none is the "
                     "answer only with no observer."},
@@ -1186,22 +1194,22 @@ LESSONS = [
                     "unobserved is the river image it calls confused."},
             {"q": "Why does the observer on the bank put what is to come on the side of the "
                   "source?",
-             "a": ["Because the water still on its way to him comes from there",
-                   "Because the past pushes the present into being",
+             "a": ["Because the past pushes the present into being",
+                   "Because the water still on its way to him comes from there",
                    "Because the source is higher than the bank",
                    "Because the glacier is older than the sea"],
-             "c": 0,
+             "c": 1,
              "why": "From the bank, the water yet to reach him is upstream. The chapter denies "
                     "that the past pushes the present; height and age are facts about the "
                     "landscape, not about what is to come for him."},
             {"q": "What is the chapter's objection to explaining the past by traces, in the "
                   "brain or in the unconscious?",
-             "a": ["A trace is present, and points to the past only for someone who already "
-                   "has a sense of the past",
-                   "Traces fade too quickly to be useful",
+             "a": ["Traces fade too quickly to be useful",
                    "The brain stores no traces at all",
+                   "A trace is present, and points to the past only for someone who already "
+                   "has a sense of the past",
                    "Traces are reliable only for the recent past"],
-             "c": 0,
+             "c": 2,
              "why": "The table's initials are in the present; a revived perception would be a "
                     "fresh perception. The objection is not about how long traces last or how "
                     "reliable they are, and it does not depend on whether the brain stores any."},

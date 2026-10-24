@@ -266,11 +266,11 @@ LESSONS = [
                     "ratio upside down."},
             {"q": "The lab gives about 0.0090 rad for the horizon moon and about 0.0092 rad "
                   "for the moon overhead. What do these figures settle?",
-             "a": ["How large an angle the moon subtends at the eye in each position",
-                   "How large the moon looks in each position",
+             "a": ["How large the moon looks in each position",
+                   "How large an angle the moon subtends at the eye in each position",
                    "Why the horizon moon looks larger",
                    "That the horizon moon is an error of perception"],
-             "c": 0,
+             "c": 1,
              "why": "Size over distance is the angle subtended, and that is all it is. How "
                     "large the moon looks is what the figures leave open, which is why the "
                     "overhead moon can be larger by the angle and look smaller. They give no "
@@ -278,11 +278,11 @@ LESSONS = [
                     "angle is what should be seen."},
             {"q": "In the Preface's comparison, geography stands to the countryside as "
                   "science stands to what?",
-             "a": ["The world as perceived, which comes before any knowledge of it",
-                   "The measurements scientists take",
+             "a": ["The measurements scientists take",
                    "Consciousness, as the condition of there being a world",
+                   "The world as perceived, which comes before any knowledge of it",
                    "A map drawn more carefully"],
-             "c": 0,
+             "c": 2,
              "why": "The countryside is where we learnt beforehand what a forest or a river "
                     "is: the perceived world that knowledge speaks of. Measurements belong "
                     "to the map side. Consciousness as the world's condition is analytical "
@@ -290,11 +290,11 @@ LESSONS = [
                     "and a better map is still a map."},
             {"q": "The demand for pure description, the Preface says, excludes two "
                   "procedures. Which two?",
-             "a": ["Scientific explanation and analytical reflection",
-                   "Scientific explanation and the study of essences",
+             "a": ["Scientific explanation and the study of essences",
                    "Every kind of reflection and every kind of science",
-                   "Measurement and memory"],
-             "c": 0,
+                   "Measurement and memory",
+                   "Scientific explanation and analytical reflection"],
+             "c": 3,
              "why": "The text names scientific explanation on the one hand and the analytical "
                     "reflection of Descartes and Kant on the other. The study of essences is "
                     "part of phenomenology, as the Preface's first page says. Reflection is "
@@ -575,34 +575,34 @@ LESSONS = [
         "quiz_title": "The step back",
         "quiz": [
             {"q": "On the Preface's reading, what does the reduction suspend?",
-             "a": ["Our complicity with the world, so that our ties to it can be seen",
-                   "Our belief that the world exists, until doubt has proved it",
+             "a": ["Our belief that the world exists, until doubt has proved it",
+                   "Our complicity with the world, so that our ties to it can be seen",
                    "Our bodies, so that only the mind remains",
                    "Perception, in favour of pure thought"],
-             "c": 0,
+             "c": 1,
              "why": "The text says the reduction refuses the world our complicity, puts it "
                     "out of play, and does so not because the certainties of common sense "
                     "are rejected but because they go unnoticed. Holding the world in doubt until "
                     "it is proved is Descartes's procedure, not this one. The body is not set "
                     "aside, and the step brings perception into view rather than leaving it."},
             {"q": "Why, according to the Preface, can the reduction never be completed?",
-             "a": ["Because we are in the world, and our reflection takes place in the flow "
-                   "of time it is trying to grasp",
-                   "Because Husserl died before finishing it",
+             "a": ["Because Husserl died before finishing it",
                    "Because the world may not exist",
+                   "Because we are in the world, and our reflection takes place in the flow "
+                   "of time it is trying to grasp",
                    "Because doubt, once begun, has no end"],
-             "c": 0,
+             "c": 2,
              "why": "If we were absolute mind there would be no problem; since we are in the "
                     "world and in time, no thought embraces all our thought. Husserl's death "
                     "is not the reason the text gives. The reduction does not raise the "
                     "question of the world's existence, and it is not a doubt."},
             {"q": "In the cube preset, a wire cube is drawn with its back square offset by "
                   "half an edge. How many solids does the drawing fit, on the lab's model?",
-             "a": ["Two, and both draw the identical 12 edges",
-                   "One, because one square is drawn in front",
+             "a": ["One, because one square is drawn in front",
                    "Two, but they draw different edges",
-                   "None, because a flat drawing fits no solid"],
-             "c": 0,
+                   "None, because a flat drawing fits no solid",
+                   "Two, and both draw the identical 12 edges"],
+             "c": 3,
              "why": "Reading B, the mirror image with front and back exchanged, projects "
                     "onto exactly A's 12 segments, so the drawing fits both. Neither square "
                     "is drawn in front; that is what the viewer supplies. If the edges "
@@ -891,18 +891,18 @@ LESSONS = [
             {"q": "Three cups are all coded as cups: glass with a handle that holds liquid, "
                   "clay with a handle that holds liquid, and clay without a handle that holds "
                   "liquid. What is the core?",
-             "a": ["holds liquid", "clay, holds liquid", "handle, holds liquid", "none"],
-             "c": 0,
+             "a": ["clay, holds liquid", "handle, holds liquid", "holds liquid", "none"],
+             "c": 2,
              "why": "Only holding liquid is in all three. Clay is missing from the glass cup "
                     "and the handle from the third, so each varies. The core is not empty, "
                     "because one property is shared by every cup."},
             {"q": "In the melody preset, the tune is played in C, in D and in B flat. What "
                   "does the lab find stays?",
-             "a": ["The intervals between the notes",
-                   "The note C",
+             "a": ["The note C",
                    "The first note",
-                   "Nothing: every note changes"],
-             "c": 0,
+                   "Nothing: every note changes",
+                   "The intervals between the notes"],
+             "c": 3,
              "why": "Every version rises a major third and then a minor third. C is missing "
                     "from the D and B flat versions, the first note differs in each, and "
                     "although every note changes, the relation between them does not."},
@@ -919,12 +919,12 @@ LESSONS = [
                     "every reduction eidetic."},
             {"q": "Jean Wahl wrote that Husserl separates essences from existence. What does "
                   "the Preface reply?",
-             "a": ["Essences look separate only in language, which still rests on lived "
+             "a": ["Wahl is right, and phenomenology accepts the separation",
+                   "Essences look separate only in language, which still rests on lived "
                    "experience",
-                   "Wahl is right, and phenomenology accepts the separation",
                    "Essences exist in a realm of their own, apart from the world",
                    "There are no essences, so nothing is separated"],
-             "c": 0,
+             "c": 1,
              "why": "The text says the separated essences are those of language, and that "
                     "the separation is merely apparent because language rests on the life of "
                     "consciousness. The Preface says Wahl is wrong. A realm apart is the "
@@ -1217,8 +1217,8 @@ LESSONS = [
         "quiz": [
             {"q": "Two viewers look at a cube, one along 1 2 2 and one straight at the "
                   "front. How many faces do they see between them?",
-             "a": ["3 of 6", "4 of 6", "2 of 6", "6 of 6"],
-             "c": 0,
+             "a": ["4 of 6", "2 of 6", "6 of 6", "3 of 6"],
+             "c": 3,
              "why": "The view along 1 2 2 sees right, above and front; the front view sees "
                     "only the front, which is already counted. That makes 3. Four would need a "
                     "face neither direction points towards, two leaves out the right side or "
@@ -1233,23 +1233,23 @@ LESSONS = [
                     "length."},
             {"q": "Which of these is operative intentionality, in the Preface's sense, rather "
                   "than the intentionality of an act?",
-             "a": ["The unity of the landscape you see, before you judge anything about it",
-                   "A judgement that the wall in front of you is white",
+             "a": ["A judgement that the wall in front of you is white",
+                   "The unity of the landscape you see, before you judge anything about it",
                    "A decision to take a position on a disputed question",
                    "The application of the understanding's categories to a manifold"],
-             "c": 0,
+             "c": 1,
              "why": "The Preface says operative intentionality shows itself in desires, "
                     "evaluations and the landscape we see, before any judgement. A judgement "
                     "and a deliberate position-taking are acts. The categories applied to a "
                     "manifold belong to the Critique of Pure Reason, which the Preface says "
                     "discusses only the intentionality of acts."},
             {"q": "On the Preface's account, what is it for there to be rationality?",
-             "a": ["That perspectives blend, perceptions confirm each other and a meaning "
-                   "emerges",
-                   "That a viewpoint above every viewpoint certifies which views are true",
+             "a": ["That a viewpoint above every viewpoint certifies which views are true",
                    "That absolute Spirit realises itself in the world",
+                   "That perspectives blend, perceptions confirm each other and a meaning "
+                   "emerges",
                    "That a world in itself, behind every view, matches our ideas"],
-             "c": 0,
+             "c": 2,
              "why": "That is the passage's own definition. The other three each place "
                     "rationality in a realm apart, outside the perspectives: the spectator "
                     "above them, absolute Spirit and the realist's world in itself are "

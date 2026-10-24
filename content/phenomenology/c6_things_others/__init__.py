@@ -81,8 +81,8 @@ COURSE = {
         "(Routledge Classics), short extracts quoted for commentary, and page numbers are "
         "that edition's.",
         "Watch whose voice a sentence is in. These chapters state the psychologist's, "
-        "Kant's and the objectifying look's views at length in their own words before "
-        "answering them, and a sentence lifted from those pages can say the opposite of "
+        "Kant's and the objectifying look's views in their own words, some of them at "
+        "length, before answering them, and a sentence lifted from those pages can say the opposite of "
         "what the chapter concludes. Each lesson says whose view it is reporting.",
         "Read every figure as a model's. The size and light labs compute what classical "
         "theories predict; the tables count the lesson's coding of the chapters' cases. "
@@ -96,10 +96,10 @@ COURSE = {
         "Sartre's <em>Being and Nothingness</em> (1943). The view that the other's look "
         "makes me an object is widely read as Sartre's, and the chapter answers it without "
         "naming him; the lesson states it at strength and does not read Sartre's book.",
-        "Scheler, Husserl and Hegel on other minds. Each is named where the chapter draws "
-        "on him, in a sentence; Husserl's Fifth Cartesian Meditation, which the chapter's "
-        "problem recalls, is not read.",
-        "The psychology of constancy since the book. Brunswik's ratio and Wallach's ratio "
+        "Scheler, Husserl and Hegel on other minds. Scheler and Hegel are named where the "
+        "chapter draws on them, in a sentence; Husserl's Fifth Cartesian Meditation, which "
+        "the chapter's problem recalls, is not read.",
+        "The psychology of constancy beyond the chapter. Brunswik's ratio and Wallach's ratio "
         "principle are used as the lessons' additions; the later experimental literature "
         "on size and lightness constancy is not surveyed.",
         "The modern dispute over hallucination and prediction. One aside in the "

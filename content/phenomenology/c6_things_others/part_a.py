@@ -113,23 +113,25 @@ LESSONS = [
                   "question is how any determinate size, true or apparent, comes to be given "
                   "at all, or, as page 349 puts it, &ldquo;how can there be "
                   "objectivity?&rdquo;"),
-            ("p", "The second answer is stronger, and the chapter gives it two pages in its own "
-                  "words before questioning it. The true size is not a quality found in any one "
+            ("p", "The second answer looks at first, the chapter says, like a way round the "
+                  "question, and it gives the answer two pages in its own words before "
+                  "questioning it. The true size is not a quality found in any one "
                   "perception; it is the law that governs how the appearance varies with the "
                   "distance. Hold a fountain-pen up to your eye so that it hides the whole "
                   "scene, and it stays small, because the pen that hides everything is also a "
                   "pen seen close to. Followed out, this leads with Kant to the positing of a "
                   "world as a strictly interrelated system. Immanuel Kant, the Königsberg "
                   "philosopher whose <em>Critique of Pure Reason</em> (1781) made the mind's "
-                  "own forms the conditions of any possible experience, is the view's best "
-                  "advocate, and the passage states its consequence for size: the object is "
-                  "&ldquo;the constant product of the distance multiplied by the apparent "
-                  "size&rdquo;."),
+                  "own forms the conditions of any possible experience, is where the view "
+                  "leads. The passage states what the object then is for size, for science "
+                  "and objective thought: &ldquo;the constant product of the distance "
+                  "multiplied by the apparent size&rdquo;."),
             ("p", "That product is something the lab can compute. Description, Not Explanation "
                   "computed one angular size, a size over a distance; this lab computes two "
                   "predictions from one. The <code>far</code> preset is a person 170 cm tall "
                   "at 8 m, with a standard viewing distance of 2 m; the figures are "
-                  "illustrative. The retinal-image account takes the angle as the datum, and "
+                  "illustrative. The retinal-image account, which is the constancy hypothesis "
+                  "of Classical Prejudices applied to size, takes the angle as the datum, and "
                   "the lab states it as the height a person at the standard 2 m would need to "
                   "subtend the same angle, which the lesson calls the retinal-equivalent size: "
                   "`170 × 2/8 = 85/2` cm, the tile "
@@ -138,8 +140,9 @@ LESSONS = [
                   "the distance: `(85/2) × 8/2 = 170` cm, the tile for the size an "
                   "<strong>inference</strong> would conclude. That is the view usually credited to Hermann von Helmholtz, "
                   "the German physicist and physiologist whose <em>Treatise on Physiological "
-                  "Optics</em> (1856&ndash;67) called it unconscious inference; the chapter "
-                  "states it without his name, as Kant's and objective thought's."),
+                  "Optics</em> (1856&ndash;67) called it unconscious inference. The chapter "
+                  "does not name him; the product it states for science and objective "
+                  "thought is the same computation."),
             ("p", "The inference is only as good as the distance it assumes. In the "
                   "<code>misjudged</code> preset the person is still at 8 m, but the distance "
                   "is taken to be 4 m: the lab gives `(85/2) × 4/2 = 85` cm. Done right, the "
@@ -171,7 +174,8 @@ LESSONS = [
                      "(reported − retinal-equivalent) / (size − retinal-equivalent). It is 0 "
                      "when the report matches the retinal-image prediction and 1 when it "
                      "matches perfect constancy. It is named after the psychologist Egon "
-                     "Brunswik; the book does not use it, and it is the lesson's addition.")),
+                     "Brunswik, who proposed it around 1930; the book does not use it, and it "
+                     "is the lesson's addition.")),
             ("p", "The <code>far</code> preset also carries a reported size, 160 cm, and it is "
                   "illustrative, not a measurement from the book, which gives none. The lab's "
                   "third tile places it: `(160 − 85/2) / (170 − 85/2) = 47/51`, about 92 per "
@@ -197,7 +201,7 @@ LESSONS = [
                   "is far more perfect in the horizontal than in the vertical plane, and the "
                   "chapter calls the huge horizon moon a particular case of the same law; for "
                   "apes, who move up trees as easily as we move along the ground, vertical "
-                  "constancy is faultless. Constancy, the note concludes, is not an "
+                  "constancy is faultless. Constancy, the note begins by saying, is not an "
                   "intellectual function but an existential one, tied to the way a subject "
                   "takes up its place in the world."),
             ("p", "So the chapter keeps Kant's point and moves it. Any perception of a real "
@@ -291,12 +295,12 @@ LESSONS = [
         "quiz": [
             {"q": "A lamp-post 6 m tall stands 30 m away; the standard distance is 2 m. What "
                   "is the retinal-equivalent size?",
-             "a": ["2/5 m", "90 m", "6 m", "1/10 m"],
+             "a": ["2/5 m", "90 m", "6 m", "1/5 m"],
              "c": 0,
              "why": "`6 × 2/30 = 2/5` m, the height a post at 2 m would need to subtend the "
                     "same angle. Multiplying by 30/2 instead gives 90 m, the inversion. 6 m is "
-                    "the inference account's answer, not the retinal-image account's, and 1/10 "
-                    "m forgets the standard distance."},
+                    "the inference account's answer, not the retinal-image account's, and 1/5 "
+                    "m, which is `6/30`, forgets the standard distance."},
             {"q": "In the misjudged preset the inferred size falls to 85 cm. What does that "
                   "show?",
              "a": ["That the inference account's prediction depends on the distance it assumes",
@@ -334,8 +338,8 @@ LESSONS = [
         "mistakes": [
             ("Thinking the real size is inferred from the projected one",
              "This is the view usually credited to Helmholtz, and the chapter states it at "
-             "strength in Kant's terms: the size is the constant product of distance and "
-             "apparent size. The lab shows what it predicts when done right: `(85/2) × 8/2 = "
+             "strength as what the object is for science and objective thought: the "
+             "constant product of distance and apparent size. The lab shows what it predicts when done right: `(85/2) × 8/2 = "
              "170` cm, perfect constancy, with no room for a report in between. The chapter's "
              "objection is not that the arithmetic fails but that it treats sizes as already "
              "determinate: the real size is not behind the appearance but is how the thing "
@@ -467,18 +471,18 @@ LESSONS = [
                   "translates Katz's <em>Flächenfarben</em> as &ldquo;coloured areas&rdquo;, "
                   "the spongy colour of the spectrum, always parallel to the face and vaguely "
                   "placed, and <em>Oberflächenfarbe</em> as &ldquo;surface colour&rdquo;, "
-                  "dense, holding the gaze on a surface at any angle. A screen with a small "
-                  "window turns one into the other: a dimly lit white wall seen through it "
-                  "looks bluish-grey, and in gaslight a blue paper that sends the eye the "
-                  "mixture of rays a brown paper sends in daylight still looks blue. The painter does the same by half-closing his "
-                  "eyes. What the screen removes, the chapter says, is the articulation of the "
+                  "dense, holding the gaze on a surface at any angle. In gaslight a blue paper "
+                  "looks blue, though a photometer shows that it sends the eye the mixture of "
+                  "rays a brown paper sends in daylight. A screen with a small window turns "
+                  "one mode into the other: a dimly lit white wall seen through it looks "
+                  "bluish-grey. The painter does the same by half-closing his eyes. What the screen removes, the chapter says, is the articulation of the "
                   "whole field."),
             ("p", "Two more experiments, both reported by Adhémar Gelb, the Frankfurt "
                   "psychologist who also studied the patient Schneider with Kurt Goldstein, "
                   "show what the field needs. Look into two large boxes, one painted black "
                   "inside and strongly lit, one painted white and faintly lit, so that each "
                   "sends the eye the same light, and they cannot be told apart. Put a white "
-                  "paper in the black box and at once it appears black and strongly lit. For "
+                  "paper in the black box and at once the box appears black and strongly lit. For "
                   "lighting to appear as lighting there must be at least two surfaces of "
                   "different reflecting power. The disc in the passage is the same lesson in "
                   "a single room."),
@@ -491,8 +495,9 @@ LESSONS = [
                   "16: `1/20 × 16 = 4/5`, exactly the white paper's luminance in the room. The "
                   "tile <strong>greatest luminance</strong> names the paper and the disc "
                   "together, a tie. If the light a surface sends were its colour, the disc would now have "
-                  "the paper's colour. As the chapter reports it, what is seen is a faintly "
-                  "lit disc like the rest of the room, and a beam that looks like a solid."),
+                  "the paper's colour. As the chapter reports it, the disc appears faintly lit "
+                  "like the rest of the room, and the beam looks like a solid; nothing yet "
+                  "shows a black disc under a strong light. The test comes with the paper."),
             ("p", "The <code>paper</code> preset puts a scrap of white paper in the beam, in "
                   "front of the disc. The disc's luminance has not changed: it is still `4/5`. "
                   "The paper's is `4/5 × 16 = 64/5`. What changed, the chapter reports from "
@@ -808,7 +813,7 @@ LESSONS = [
                   "the chapter says, as we understand a new kind of behaviour: not by bringing "
                   "it under a concept, but by taking up the manner of existing its signs "
                   "outline."),
-            ("p", "The two accounts the passage is aimed at are the Introduction's two. For "
+            ("p", "The two accounts these pages set aside are the Introduction's two. For "
                   "empiricism, the thing is a sum of sensory qualities, each delivered by its "
                   "own sense and joined to the others by association, because they have so "
                   "often come together. At its strength the view is economical: it needs "
@@ -824,7 +829,8 @@ LESSONS = [
                   "observation, an <strong>n</strong> that it cannot, a <strong>-</strong> "
                   "that it is silent. First, a very hot object must redden: empiricism "
                   "<strong>n</strong>, because association joins heat and red only as often "
-                  "seen together, and the chapter calls the link a priori; intellectualism "
+                  "seen together, and the chapter calls the link a priori, that is, necessary "
+                  "in advance of any experience of hot things; intellectualism "
                   "<strong>y</strong>, because a concept or law can carry a necessary "
                   "connection between properties. Second, the carpet's colour implies its "
                   "wool: <strong>n</strong> for both, for the reason the next paragraphs give. "
@@ -832,7 +838,8 @@ LESSONS = [
                   "because sensations are caused by things that exist without us; "
                   "intellectualism <strong>n</strong>, because a unity posited by thought is a "
                   "unity for thought, and page 380 says that on the synthetic view the thing "
-                  "loses its transcendence and opacity."),
+                  "loses its transcendence and opacity, its standing beyond what thought "
+                  "grasps of it."),
             ("p", "With all three observations, the <code>all</code> preset, the tile "
                   "<strong>record</strong> gives each account one observation absorbed and two "
                   "failed; the tile <strong>survivors</strong>, the accounts that fail nothing, "
@@ -1167,7 +1174,7 @@ LESSONS = [
                   "Chartres&rsquo;&rdquo;, and weld the two appearances together. The chapter's "
                   "point is in the next clause: I can do so only because both are drawn from one "
                   "and the same perception of the world."),
-            ("p", "That judgement is something a lab can model. The lesson's model is the "
+            ("p", "That judgement is something a lab can model. The model the lab computes is the "
                   "sceptic's picture of perception: a stream of cues, each read as a sign, and "
                   "interpretations kept while they fit and dropped when they do not, so that "
                   "any reading might always turn out false. The candidates and cues are the "
@@ -1228,11 +1235,13 @@ LESSONS = [
                   "page 388 says, and it grants that the picture is almost inevitable, since I "
                   "have a visual field with distinct objects. But each thing can show itself "
                   "fully only if others recede into the distance, so a sum of things makes no "
-                  "sense. The thing and the world are mysterious, the section ends, not as a "
+                  "sense. The thing and the world are mysterious, the section says near its "
+                  "end, not as a "
                   "problem awaiting a solution but because they are not of the order of "
                   "objective thought, where there are solutions."),
-            ("p", "This chapter's own example of a corrected perception is the town; the book's "
-                  "best-known one, the broad flat stone on a sunken path that turns out to be a "
+            ("p", "This chapter's own example is the town, two appearances welded by a "
+                  "judgement rather than an illusion corrected. The book's best-known "
+                  "corrected illusion, the broad flat stone on a sunken path that turns out to be a "
                   "patch of sunlight, comes at the end of the chapter on space, on page 346, and "
                   "the lesson Lived Space reads it. The world in which every illusion is "
                   "corrected is also the world that a hallucination falls out of. The next "

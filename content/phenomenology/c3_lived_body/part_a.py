@@ -265,24 +265,24 @@ LESSONS = [
                     "only from below."},
             {"q": "In the everywhere preset the cover is east and west. Why are the street "
                   "and the garden left out?",
-             "a": ["East and west already reach every face the four views reach between them",
-                   "The street and the garden reach fewer faces than the lab allows",
+             "a": ["The street and the garden reach fewer faces than the lab allows",
+                   "East and west already reach every face the four views reach between them",
                    "Their foreshortening is too strong to count",
                    "The lab drops every view that faces a single side"],
-             "c": 0,
+             "c": 1,
              "why": "East reaches front, right and top; west reaches back, left and top; that "
                     "is the union, five faces. The street's front and top and the garden's "
                     "back and top are already there. No view is refused for its size or its "
                     "fractions, and the cover keeps a one-face view whenever it is needed."},
             {"q": "Once it has called the house the house seen from everywhere, and said the "
                   "same of time, what reservation does the introduction add?",
-             "a": ["That a human gaze only ever posits one facet, so the synthesis of views is "
-                   "presumptive and never complete",
-                   "That enough views converging on the house give it in its plenitude",
+             "a": ["That enough views converging on the house give it in its plenitude",
                    "That the house seen from everywhere is an error, to be replaced by the "
                    "image on the retina",
+                   "That a human gaze only ever posits one facet, so the synthesis of views is "
+                   "presumptive and never complete",
                    "That the view from the aeroplane gives the house as it really is"],
-             "c": 0,
+             "c": 2,
              "why": "After a paragraph on time, the text turns with &lsquo;But, once more&rsquo;: "
                     "any number of converging "
                     "gazes give a harmonious and indefinite set of views, not the object in its "
@@ -291,12 +291,12 @@ LESSONS = [
                     "among the others."},
             {"q": "What, according to the introduction, does objective thought do with the "
                   "perceiver's body?",
-             "a": ["Treats it as one more object in objective space, the eyes as bits of "
-                   "matter producing the perspective on the retina",
-                   "Ignores it, since a body plays no part in knowledge",
+             "a": ["Ignores it, since a body plays no part in knowledge",
                    "Treats it as the point of view from which every object is seen",
-                   "Leaves it to psychology and keeps space for physics"],
-             "c": 0,
+                   "Leaves it to psychology and keeps space for physics",
+                   "Treats it as one more object in objective space, the eyes as bits of "
+                   "matter producing the perspective on the retina"],
+             "c": 3,
              "why": "The text says that, forgetful of the perspectivism of my experience, I "
                     "regard my body, my point of view on the world, as one of its objects and "
                     "treat my eyes as bits of matter. Treating the body as a point of view is "
@@ -592,30 +592,30 @@ LESSONS = [
         "quiz_title": "Two explanations and a phantom",
         "quiz": [
             {"q": "On the all preset, which explanation fails nothing?",
-             "a": ["Neither", "The physiological explanation", "The psychological explanation",
+             "a": ["The physiological explanation", "Neither", "The psychological explanation",
                    "Both"],
-             "c": 0,
+             "c": 1,
              "why": "The physiological explanation fails the emotion and the posture; the "
                     "psychological one fails the cut nerves. So the survivors tile prints none. "
                     "Each survives only on a table chosen for it."},
             {"q": "Which reported observation does the chapter say no psychological "
                   "explanation can overlook?",
-             "a": ["Cutting the nerves to the brain abolishes the phantom",
-                   "The phantom keeps the posture of the injury",
+             "a": ["The phantom keeps the posture of the injury",
                    "An emotion can make a phantom appear",
+                   "Cutting the nerves to the brain abolishes the phantom",
                    "The phantom shrinks into the stump"],
-             "c": 0,
+             "c": 2,
              "why": "If the phantom were a memory or a belief, severing nerves should leave it. "
                     "The posture, the emotion and the shrinking are what the psychological "
                     "explanation absorbs, and the first two are what defeat the physiological "
                     "one."},
             {"q": "The nerves preset shows the physiological explanation surviving. What does "
                   "that show?",
-             "a": ["That an explanation survives a table of observations chosen for it",
-                   "That the physiological explanation is the chapter's own",
+             "a": ["That the physiological explanation is the chapter's own",
                    "That the cut nerves outweigh the other reports",
-                   "That the psychological explanation is refuted"],
-             "c": 0,
+                   "That the psychological explanation is refuted",
+                   "That an explanation survives a table of observations chosen for it"],
+             "c": 3,
              "why": "With one observation the physiological explanation fails nothing, and on "
                     "the memory preset the psychological one does the same. The count weighs "
                     "nothing; the full table is what shows that neither absorbs every report, "
@@ -888,22 +888,22 @@ LESSONS = [
         "quiz_title": "Two layers of one body",
         "quiz": [
             {"q": "On the cup preset, what do the three tiles print?",
-             "a": ["Habitual: cup; present: none; appeal: cup",
-                   "Habitual: cup; present: cup; appeal: none",
+             "a": ["Habitual: cup; present: cup; appeal: none",
                    "Habitual: none; present: none; appeal: none",
+                   "Habitual: cup; present: none; appeal: cup",
                    "Habitual: none; present: cup; appeal: cup"],
-             "c": 0,
+             "c": 2,
              "why": "60 cm is within the habitual 70 cm and outside the present 0 cm on the "
                     "right, so the cup is in the first list only, and that is the appeal. Both "
                     "lists hold the cup only when it is on the left, and the habit-body never "
                     "reaches less than the present body here."},
             {"q": "Does the amputee, on the chapter's account, know that the arm is gone?",
-             "a": ["Yes, and still counts on it: he is ignorant of it precisely to the extent "
-                   "that he knows of it",
-                   "No: the phantom is a mistaken belief that the arm is there",
+             "a": ["No: the phantom is a mistaken belief that the arm is there",
                    "Yes, and the phantom is a memory of the arm he deliberately keeps",
-                   "No: he has no knowledge of his body at all"],
-             "c": 0,
+                   "No: he has no knowledge of his body at all",
+                   "Yes, and still counts on it: he is ignorant of it precisely to the extent "
+                   "that he knows of it"],
+             "c": 3,
              "why": "The chapter says the patient realizes his disability precisely in so far "
                     "as he is ignorant of it and the other way round, and that the refusal of "
                     "mutilation is not a deliberate decision. A belief and a memory are the "
@@ -1177,8 +1177,8 @@ LESSONS = [
         "quiz_title": "The body that does not leave",
         "quiz": [
             {"q": "On the own preset, which faces does the lab list as unseen?",
-             "a": ["Back, above and below", "None", "Back only", "Above and below"],
-             "c": 0,
+             "a": ["None", "Back only", "Above and below", "Back, above and below"],
+             "c": 3,
              "why": "The three views reach the front, the right and the left, so the back, the "
                     "top and the underside are left. None is the box walked round; above and "
                     "below is what remains once the mirror adds the back."},
@@ -1195,22 +1195,22 @@ LESSONS = [
                     "object at all. One's body can be touched and seen too."},
             {"q": "The mirror preset counts 4 of 6. Why would the chapter not accept the "
                   "fourth face as observed?",
-             "a": ["The reflection follows the body's movements like a shadow instead of "
+             "a": ["Mirrors distort the size of things",
+                   "The reflection follows the body's movements like a shadow instead of "
                    "showing a new side as you move",
-                   "Mirrors distort the size of things",
                    "The back cannot be seen even in a mirror",
                    "Two mirrors give two different backs"],
-             "c": 0,
+             "c": 1,
              "why": "Observation varies the point of view while the object stays put, and the "
                     "mirror image imitates the body's actions instead of responding to them. "
                     "The chapter makes no claim about distortion, and it grants that you can "
                     "see your eyes in three mirrors."},
             {"q": "What does the chapter say happens when the two hands touch?",
-             "a": ["The roles of touching and touched alternate and never coincide",
-                   "Each hand touches and is touched at the same instant",
+             "a": ["Each hand touches and is touched at the same instant",
                    "Neither hand feels anything, since a body cannot touch itself",
+                   "The roles of touching and touched alternate and never coincide",
                    "The touched hand becomes an object for good"],
-             "c": 0,
+             "c": 2,
              "why": "The text says the two hands are never simultaneously in the relation of "
                     "touched and touching, and that what we can do is recognise the touched "
                     "hand as the one that will in a moment be touching. Both hands do feel, "

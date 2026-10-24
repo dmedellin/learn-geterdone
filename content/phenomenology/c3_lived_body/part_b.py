@@ -235,32 +235,32 @@ LESSONS = [
                     "facing north, and the cup is 2 east, so right 2. Ahead 2, left 1 is the "
                     "same cup facing east; the other two mix up the sides or the axes."},
             {"q": "Which figures stay fixed when the body turns?",
-             "a": ["The cup's room coordinates",
-                   "The cup's position ahead of the body",
+             "a": ["The cup's position ahead of the body",
+                   "The cup's room coordinates",
                    "The cup's position to the body's left",
                    "None of them"],
-             "c": 0,
+             "c": 1,
              "why": "The room frame is fixed to the floor, so turning the body leaves cup (2, 1) "
                     "where it was. Ahead and left are read from the body's facing, and they "
                     "change as it turns."},
             {"q": "What does the chapter mean by the body's spatiality of situation?",
-             "a": ["Its space is organised by the task it is engaged in, as the hands lead "
-                   "when you lean on a desk",
-                   "Its parts are at fixed distances from one another",
+             "a": ["Its parts are at fixed distances from one another",
                    "It is situated at a point of objective space",
+                   "Its space is organised by the task it is engaged in, as the hands lead "
+                   "when you lean on a desk",
                    "It is a picture of the body's parts"],
-             "c": 0,
+             "c": 2,
              "why": "The text sets the spatiality of situation against a spatiality of "
                     "position, and its examples are the hands on the desk and the pipe in the "
                     "hand. Fixed distances and a point in objective space are positions, and a "
                     "picture is the reading of the body image it rejects."},
             {"q": "Why does the lesson say the lab computes what the body schema is not?",
-             "a": ["Both of its frames are maps, and the chapter's body schema is the body's "
-                   "hold on its tasks, not a map consulted",
-                   "Because its arithmetic is wrong",
+             "a": ["Because its arithmetic is wrong",
                    "Because the body cannot be at the room's origin",
-                   "Because the chapter says the room has no coordinates"],
-             "c": 0,
+                   "Because the chapter says the room has no coordinates",
+                   "Both of its frames are maps, and the chapter's body schema is the body's "
+                   "hold on its tasks, not a map consulted"],
+             "c": 3,
              "why": "The coordinates are exact, and the chapter has no quarrel with geometry. "
                     "Its claim is that here is the laying down of the first coordinates, the "
                     "anchoring of the body in its task, which any frame, even one centred on "
@@ -549,34 +549,34 @@ LESSONS = [
         "quiz": [
             {"q": "On the tasks preset, which targets does the frame tile say need a "
                   "conversion?",
-             "a": ["Only the nose on command",
-                   "Only the handkerchief and the bite",
+             "a": ["Only the handkerchief and the bite",
+                   "Only the nose on command",
                    "All three",
                    "None of them"],
-             "c": 0,
+             "c": 1,
              "why": "The handkerchief and the bite are given in the body's situation and print "
                     "no conversion; the nose on command is given as a position and is converted "
                     "to ahead 1/10, left 0. The model converts exactly the objectively given "
                     "targets."},
             {"q": "Which of these does the chapter report that Schneider does at once, with "
                   "his eyes shut?",
-             "a": ["Takes his handkerchief from his pocket and blows his nose",
-                   "Bends a finger when asked to",
+             "a": ["Bends a finger when asked to",
                    "Says where he has been touched",
+                   "Takes his handkerchief from his pocket and blows his nose",
                    "Describes the position of his arm"],
-             "c": 0,
+             "c": 2,
              "why": "The passage lists the handkerchief, the match and the lamp among the "
                     "habitual movements of his life. Moving a finger to order, locating a touch "
                     "and describing a limb's position are the abstract tasks he manages only "
                     "by watching or by preparatory movements."},
             {"q": "Why does the chapter reject the explanation of the case by his eyesight "
                   "alone?",
-             "a": ["Disorders of pointing also occur in cerebellar patients with no primary "
-                   "disorder of sight, and no experiment can separate sight from touch",
-                   "Because Schneider's sight was normal",
+             "a": ["Because Schneider's sight was normal",
                    "Because Gelb and Goldstein never examined his sight",
-                   "Because sight plays no part in movement"],
-             "c": 0,
+                   "Because sight plays no part in movement",
+                   "Disorders of pointing also occur in cerebellar patients with no primary "
+                   "disorder of sight, and no experiment can separate sight from touch"],
+             "c": 3,
              "why": "The chapter grants that his sight was badly damaged and that his abstract "
                     "movements improve when he watches the limb. Its reply is that the same "
                     "disorders occur without any primary visual disorder and that sight, touch and motility "
@@ -880,22 +880,22 @@ LESSONS = [
         "quiz_title": "Two accounts of one patient",
         "quiz": [
             {"q": "On the all preset, which observations are in the split?",
-             "a": ["The concrete movements and the failure to point",
-                   "The preparatory movements alone",
+             "a": ["The preparatory movements alone",
                    "All four observations",
+                   "The concrete movements and the failure to point",
                    "The analogies alone"],
-             "c": 0,
+             "c": 2,
              "why": "The split lists observations where one account absorbs and the other "
                     "fails: y against n. The preparatory movements are n against n, and the "
                     "analogies are silent against n, so neither is in it."},
             {"q": "Why does the chapter say mechanistic physiology cannot explain why "
                   "Schneider can grasp and not point?",
-             "a": ["The mosquito and the doctor's ruler on the same spot are too alike, as "
-                   "stimuli, to produce two different acts",
-                   "Because Schneider has no reflexes left",
+             "a": ["Because Schneider has no reflexes left",
                    "Because the nerves to his arm were cut",
-                   "Because pointing uses different muscles from grasping"],
-             "c": 0,
+                   "Because pointing uses different muscles from grasping",
+                   "The mosquito and the doctor's ruler on the same spot are too alike, as "
+                   "stimuli, to produce two different acts"],
+             "c": 3,
              "why": "The text says the physical difference between the two is not great "
                     "enough to explain why one movement is possible and the other not. His "
                     "nerves and reflexes are not in question, and the point is that the same "
@@ -914,11 +914,11 @@ LESSONS = [
                     "being able to explain is what the chapter says of some normal subjects."},
             {"q": "On the thinking preset mechanistic physiology survives. What does that "
                   "show?",
-             "a": ["Only that it is silent on analogies: surviving by silence is not absorbing",
-                   "That mechanistic physiology explains Schneider's thinking",
+             "a": ["That mechanistic physiology explains Schneider's thinking",
+                   "Only that it is silent on analogies: surviving by silence is not absorbing",
                    "That the analogies are a visual problem",
                    "That the chapter sides with physiology on thought"],
-             "c": 0,
+             "c": 1,
              "why": "The cell is -, so physiology fails nothing on a table with that row "
                     "alone. That is a fact about silence. The chapter's own reading is that the "
                     "trouble with thought and the trouble with movement are one disturbance, "
@@ -1188,8 +1188,8 @@ LESSONS = [
         "quiz": [
             {"q": "With an arm's reach of 70 cm and a 100 cm cane, which of these is within "
                   "reach: a kerb at 150 cm or a wall at 180 cm?",
-             "a": ["The kerb only", "Both", "Neither", "The wall only"],
-             "c": 0,
+             "a": ["Both", "Neither", "The wall only", "The kerb only"],
+             "c": 3,
              "why": "70 + 100 = 170 cm, so the kerb at 150 cm is within reach and the wall at "
                     "180 cm is 10 cm beyond it. Without the cane neither is within 70 cm."},
             {"q": "What does the chapter say against a mechanistic theory of habit?",
@@ -1205,23 +1205,23 @@ LESSONS = [
                     "habit as understanding is the second account it refuses."},
             {"q": "Why does the organist's hour of practice count against the conditioned-"
                   "reflex account?",
-             "a": ["An hour is too short to replace one set of conditioned reflexes with "
+             "a": ["Because the organist plays from memory",
+                   "An hour is too short to replace one set of conditioned reflexes with "
                    "another",
-                   "Because the organist plays from memory",
                    "Because a new organ has the same stops in the same places",
                    "Because the organist draws up a plan of the instrument"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says such a short preparation rules out new conditioned "
                     "reflexes. The stops are arranged differently, which is the point, and the "
                     "chapter says he does not act like a person drawing up a plan."},
             {"q": "The hat preset prints clears by 5 cm. What, on the chapter's account, does "
                   "the woman with the feather do?",
-             "a": ["Keeps her distance without any calculation, feeling where the feather is as "
-                   "she feels her hand",
-                   "Compares 195 cm with 200 cm before she walks through",
+             "a": ["Compares 195 cm with 200 cm before she walks through",
                    "Remembers the height of every door",
+                   "Keeps her distance without any calculation, feeling where the feather is as "
+                   "she feels her hand",
                    "Ducks at every door to be safe"],
-             "c": 0,
+             "c": 2,
              "why": "The passage says she does it without any calculation; the comparison of "
                     "195 with 200 is the lab's, and it is the one the chapter says she does not "
                     "make. Memory of doors and ducking everywhere are not in the text."},

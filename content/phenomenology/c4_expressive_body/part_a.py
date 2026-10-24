@@ -307,11 +307,11 @@ LESSONS = [
                     "way and the right hand from the other two, so each varies; the core is not "
                     "empty, because the result is shared."},
             {"q": "The chapter compares the body's unity to that of what?",
-             "a": ["A work of art, whose meaning cannot be had apart from its colours or sounds",
-                   "A cube, whose faces are all known in advance from its geometrical law",
+             "a": ["A cube, whose faces are all known in advance from its geometrical law",
+                   "A work of art, whose meaning cannot be had apart from its colours or sounds",
                    "A machine, whose parts lie side by side and act on one another",
                    "A sum of sensations, joined one by one by association"],
-             "c": 0,
+             "c": 1,
              "why": "The passage says the body is to be compared not to a physical object but to "
                     "a work of art. The cube known by its law is the intellectualist account the "
                     "chapter rejects on p. 173, the machine is the partes extra partes it rejects "
@@ -319,12 +319,12 @@ LESSONS = [
                     "cumulatively."},
             {"q": "Once the blind man's stick has become a habit, what is it, on the chapter's "
                   "account?",
-             "a": ["An instrument with which he perceives, no longer an object he perceives",
-                   "An object whose pressures he reads as signs, ever faster and more faintly",
+             "a": ["An object whose pressures he reads as signs, ever faster and more faintly",
                    "An object built up from the pressures on the hand, through which the "
                    "thing is reached as a second-order object",
+                   "An instrument with which he perceives, no longer an object he perceives",
                    "A tool he must still attend to before each step"],
-             "c": 0,
+             "c": 2,
              "why": "The text says the stick is no longer an object perceived by the blind man "
                     "but an instrument with which he perceives. Reading pressures as signs ever "
                     "faster, and building up the stick from the pressures so that it mediates "
@@ -332,12 +332,12 @@ LESSONS = [
                     "tempted by and then rejects: habit relieves him of that reading."},
             {"q": "In the signature preset no muscle is in the core. Why does the chapter "
                   "still not let you call the core the body's unity?",
-             "a": ["Because I am not in front of my body, so its variations and their constant "
-                   "cannot be set before me as a law",
-                   "Because the core would have to contain at least one muscle",
+             "a": ["Because the core would have to contain at least one muscle",
                    "Because the signature is learnt separately for each limb",
-                   "Because the body has no unity, only parts"],
-             "c": 0,
+                   "Because the body has no unity, only parts",
+                   "Because I am not in front of my body, so its variations and their constant "
+                   "cannot be set before me as a law"],
+             "c": 3,
              "why": "The chapter says that neither the body's variations nor their constant can "
                     "be expressly posited, since I am in my body and not in front of it, and it "
                     "calls the body a nexus of meanings, not a law for covariant terms. It denies "
@@ -693,34 +693,34 @@ LESSONS = [
             {"q": "A fourth observation is added to the all preset and coded y for the bodily "
                   "mechanism and y for the representing consciousness. What do the records and "
                   "survivors now show?",
-             "a": ["Each absorbs 2 of 4 and fails 2; still no survivor",
-                   "Both accounts now survive",
+             "a": ["Both accounts now survive",
+                   "Each absorbs 2 of 4 and fails 2; still no survivor",
                    "Each absorbs 2 of 4 and fails 1; still no survivor",
                    "The new observation joins the split"],
-             "c": 0,
+             "c": 1,
              "why": "A y adds to each account's absorbed count and leaves its failures at 2, so "
                     "neither survives. Nothing removes a failure. The split holds only "
                     "observations coded y against n, and this one is y against y."},
             {"q": "Why, according to the chapter, does Schneider's case tell against the view "
                   "that sexuality is an autonomous reflex apparatus?",
-             "a": ["A small occipital wound should then have freed the automatic responses and "
-                   "made his sexual behaviour more marked, not less",
-                   "His reflex apparatus was destroyed by the wound",
+             "a": ["His reflex apparatus was destroyed by the wound",
                    "He has lost every representation, visual and tactile",
+                   "A small occipital wound should then have freed the automatic responses and "
+                   "made his sexual behaviour more marked, not less",
                    "He recovered once the cause was explained to him"],
-             "c": 0,
+             "c": 2,
              "why": "The text says that if sexuality were an autonomous reflex apparatus, the "
                     "cerebral injury would have freed the automatic responses and accentuated his "
                     "sexual behaviour. The apparatus is not said to be destroyed, the chapter "
                     "doubts that he lacks tactile representations, and no recovery of his is "
                     "reported."},
             {"q": "What, in the chapter, shows that the girl's loss of voice is not a paralysis?",
-             "a": ["Treated by psychological means and left free to see the man she loves, she "
-                   "speaks again",
-                   "She cannot speak even when she wants to",
+             "a": ["She cannot speak even when she wants to",
                    "The loss had happened before, after an earthquake",
-                   "Her throat and mouth may have been particularly sensitive"],
-             "c": 0,
+                   "Her throat and mouth may have been particularly sensitive",
+                   "Treated by psychological means and left free to see the man she loves, she "
+                   "speaks again"],
+             "c": 3,
              "why": "The text says loss of voice is not paralysis, and that this is proved by her "
                     "recovering her speech when treated and left free to see him. Being unable to "
                     "speak at will is what shows it is not a deliberate silence, which would fit a "
@@ -1067,20 +1067,20 @@ LESSONS = [
             {"q": "The samples are dark green (green, 2), pale green (green, 9) and dark blue "
                   "(blue, 3), and the chain starts from dark green. Where does the chain first "
                   "leave green?",
-             "a": ["dark blue", "pale green", "none: it never leaves green", "dark green"],
-             "c": 0,
+             "a": ["pale green", "none: it never leaves green", "dark blue", "dark green"],
+             "c": 2,
              "why": "From dark green at 2, dark blue costs 1 for lightness plus 1 for the hue, "
                     "which is 2, and pale green costs 7. So dark blue comes second and is the "
                     "first sample of another hue. Pale green is green, the chain does leave "
                     "green, and dark green is the start."},
             {"q": "How did Gelb and Goldstein first explain why the patients could neither name "
                   "colours nor sort them, as the chapter reports it?",
-             "a": ["They had lost the general ability to subsume a sensory given under a "
-                   "category",
-                   "They had lost the verbal images of the colour words",
+             "a": ["They had lost the verbal images of the colour words",
                    "They could no longer see differences of colour",
-                   "They sorted at random, by no resemblance at all"],
-             "c": 0,
+                   "They sorted at random, by no resemblance at all",
+                   "They had lost the general ability to subsume a sensory given under a "
+                   "category"],
+             "c": 3,
              "why": "The chapter reports the interpretation that the patients had lost not the "
                     "verbal images but the ability to subsume, and had fallen back to the "
                     "concrete attitude. The lost verbal image is the older theory this one "
@@ -1099,12 +1099,12 @@ LESSONS = [
                     "not the reverse, and only the empiricist speaks of verbal images."},
             {"q": "When the chapter returns to the patients on pp. 222 and 223, how does it "
                   "correct its first description of them?",
-             "a": ["They do not switch between principles of classification; they never adopt "
+             "a": ["They sort correctly, only more slowly than normal subjects",
+                   "They do not switch between principles of classification; they never adopt "
                    "one",
-                   "They sort correctly, only more slowly than normal subjects",
                    "They have lost the names and nothing else",
                    "They keep consistently to a principle of lightness instead of hue"],
-             "c": 0,
+             "c": 1,
              "why": "The text says it was wrong to say that the patient cannot abide by a given "
                     "principle and goes from one to another: in reality he never adopts any. "
                     "Slowness is part of the first description, the chapter says the disorder "
@@ -1442,8 +1442,8 @@ LESSONS = [
         "quiz": [
             {"q": "Three expressions of grief are coded as grief: tears and a bowed head, tears "
                   "and silence, tears and wailing. What is the core?",
-             "a": ["tears", "tears, bowed-head", "none", "bowed-head, silence, wailing"],
-             "c": 0,
+             "a": ["tears, bowed-head", "none", "bowed-head, silence, wailing", "tears"],
+             "c": 3,
              "why": "Tears are in all three. The bowed head, the silence and the wailing are each "
                     "in one only, so they vary, and the core is not empty because one sign is "
                     "shared. A shared sign in three coded variants would still not show that it "
@@ -1461,12 +1461,12 @@ LESSONS = [
                     "that presupposes an earlier communication, and that everything in man is "
                     "natural as well as made."},
             {"q": "What distinguishes the speaking word from the spoken word?",
-             "a": ["In the speaking word a meaning is coming into being; the spoken word uses "
+             "a": ["The speaking word is said aloud; the spoken word is written down",
+                   "In the speaking word a meaning is coming into being; the spoken word uses "
                    "meanings already acquired",
-                   "The speaking word is said aloud; the spoken word is written down",
                    "The speaking word is the speaker's; the spoken word is the listener's",
                    "The speaking word is the thought before it is put into words"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter defines the speaking word as the one in which the significant "
                     "intention is coming into being, and the spoken word as enjoying available "
                     "significances like an acquired fortune. Neither is defined by voice or "
@@ -1474,12 +1474,12 @@ LESSONS = [
                     "thought before its expression."},
             {"q": "What, according to the chapter, sets speech apart from the other ways of "
                   "expressing?",
-             "a": ["It alone settles into a sediment and an acquisition, and can be about "
-                   "itself",
-                   "It alone can be written down",
+             "a": ["It alone can be written down",
                    "It alone is conventional, while gestures are natural",
+                   "It alone settles into a sediment and an acquisition, and can be about "
+                   "itself",
                    "It alone has a meaning"],
-             "c": 0,
+             "c": 2,
              "why": "The text says that alone of all expressive processes speech settles into a "
                     "sediment and constitutes an acquisition, and that one can speak about speech "
                     "but not paint about painting. It says music can be written down too, it "

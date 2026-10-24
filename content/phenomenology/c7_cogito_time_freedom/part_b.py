@@ -74,9 +74,9 @@ LESSONS = [
                   "the paragraph that begins on page 483 to the end of the paragraph on "
                   "passive synthesis on page 486, in your own copy before going on."),
             ("p", "The pages turn on a diagram, and the chapter reproduces it. Edmund Husserl, "
-                  "the founder of phenomenology, drew it in his lectures of 1905 on the "
-                  "consciousness of internal time, which Martin Heidegger edited for "
-                  "publication in 1928. A horizontal line is the series of present moments. "
+                  "the founder of phenomenology, drew it in his lectures on the consciousness "
+                  "of internal time, which grew from a course of 1905 and were published in "
+                  "1928, prepared by Edith Stein and edited by Martin Heidegger. A horizontal line is the series of present moments. "
                   "From each moment an oblique line runs down: that moment as it is seen, "
                   "shaded off, from each later present. The caption calls the vertical lines "
                   "the successive shadings of one and the same present moment; the lab reads "
@@ -221,32 +221,32 @@ LESSONS = [
              "why": "From E back to B is three steps: D at depth 1, C at 2, B at 3. Two is C's "
                     "depth, four is A's, and one is D's."},
             {"q": "On the chapter's account, how is A given when C is present?",
-             "a": ["As A itself, seen through its later shadings, as a pebble is seen through "
+             "a": ["As a stored copy of A, recalled from memory",
+                   "As A itself, seen through its later shadings, as a pebble is seen through "
                    "moving water",
-                   "As a stored copy of A, recalled from memory",
                    "As an idea of A, identified across its shadings by an intellectual synthesis",
                    "Not at all, since only the present C is given"],
-             "c": 0,
+             "c": 1,
              "why": "That is the pebble sentence. A stored copy is the memory model the chapter "
                     "rejects, the identifying synthesis is the objection it answers, and the "
                     "field of presence holds more than C."},
             {"q": "Where, according to the chapter, do identifying syntheses really occur?",
-             "a": ["In express memory and the voluntary recall of the remote past",
-                   "In every retention of the moment just past",
+             "a": ["In every retention of the moment just past",
                    "In protention, when the next moment is anticipated",
+                   "In express memory and the voluntary recall of the remote past",
                    "Nowhere; the chapter denies them altogether"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter grants identifying syntheses in deliberate recollection, as "
                     "with the suit made before the armistice, and says they are derived modes "
                     "resting on retention. It denies them in retention itself and does not "
                     "assign them to protention."},
             {"q": "What does the field of presence include?",
-             "a": ["The moment now, with the horizon of the day behind it and the evening "
-                   "ahead",
-                   "Only the instant now, without extent",
+             "a": ["Only the instant now, without extent",
                    "Every memory I can call up",
-                   "The remote past, made present again"],
-             "c": 0,
+                   "The remote past, made present again",
+                   "The moment now, with the horizon of the day behind it and the evening "
+                   "ahead"],
+             "c": 3,
              "why": "The chapter's example is this moment of work with its horizons. An "
                     "instant without extent is the time the chapter rejects, and the remote "
                     "past is reached only by reopening time, not as part of the present field."},
@@ -373,7 +373,7 @@ LESSONS = [
                   "been approaching, announced by fewer and fewer shadings, and its passing is "
                   "the reverse side of its arriving; since in time being and passing are one, "
                   "by becoming past the event does not cease to be. Here the chapter corrects "
-                  "Henri Bergson twice: he was wrong to explain the unity of time by its "
+                  "Henri Bergson and sides with him: he was wrong to explain the unity of time by its "
                   "continuity, as if past, present and future blurred into one another, and "
                   "right to hold on to continuity as essential. The moments are distinct, and "
                   "they run into each other."),
@@ -516,29 +516,29 @@ LESSONS = [
         "quiz": [
             {"q": "Moments A to E, with the presents B, C, D and E in turn. What depths does B "
                   "take across the columns in which it is past?",
-             "a": ["1, 2, 3", "1, 2, 3, 4", "2, 3, 4", "0, 1, 2, 3"],
-             "c": 0,
+             "a": ["1, 2, 3, 4", "1, 2, 3", "2, 3, 4", "0, 1, 2, 3"],
+             "c": 1,
              "why": "B is past under C, D and E, at depths 1, 2 and 3. Four depths would need "
                     "a present F; starting at 2 skips C; and B at depth 0 would be B present, "
                     "which is not a column in which B is past."},
             {"q": "What does the chapter mean by saying that time is someone, not for someone?",
-             "a": ["That the subject is not an onlooker before whom time is arrayed, but the "
-                   "passage itself",
-                   "That time exists only in someone's mind",
+             "a": ["That time exists only in someone's mind",
                    "That each person has a private time of their own",
+                   "That the subject is not an onlooker before whom time is arrayed, but the "
+                   "passage itself",
                    "That time is a container in which persons exist"],
-             "c": 0,
+             "c": 2,
              "why": "For someone would array time before a spectator and immobilise it, which "
                     "the passage rejects. Time only in the mind is the idealist view the "
                     "chapter turned down in its first pages, private times contradict "
                     "its pages on other temporalities, and the container is time as a thing."},
             {"q": "Against Heidegger, which dimension of time does the chapter say keeps a "
                   "privilege?",
-             "a": ["The present, with its horizons, where being and consciousness coincide",
-                   "The future, from which authentic historical time flows",
+             "a": ["The future, from which authentic historical time flows",
                    "The past, which is acquired once and for all",
-                   "None; the chapter makes all three equal in every respect"],
-             "c": 0,
+                   "None; the chapter makes all three equal in every respect",
+                   "The present, with its horizons, where being and consciousness coincide"],
+             "c": 3,
              "why": "It is always in the present that we are centred. The primacy of the future "
                     "is Heidegger's, which the chapter says is impossible on his own terms; the "
                     "past is acquired but not privileged; and though no dimension can be "
@@ -629,7 +629,7 @@ LESSONS = [
             ("Absolute freedom",
              "The theory that consciousness is free in every act and to the same degree, "
              "that no motive acts on it, and that obstacles exist only in the light of its "
-             "projects. The chapter states it in its own voice for several pages."),
+             "projects. The chapter states it, in the theory's own voice, for several pages."),
             ("A project",
              "An aim that organises a situation, such as climbing a rock. On the theory, it "
              "is the project that makes the rock high, difficult or a means."),
@@ -650,22 +650,24 @@ LESSONS = [
                   "they exceed my body's power to take them in its stride, and, even if I "
                   "have just read Micromégas, I cannot so contrive it that they are small for "
                   "me.&rdquo; The sentence is on page 511 of Smith's translation. Read the "
-                  "chapter from its first page, 504, to the end of the paragraph on fatigue "
-                  "on page 513, in your own copy before going on."),
+                  "chapter from its first page, 504, to the sentences on sedimentation in the "
+                  "middle of page 513, in your own copy before going on; the paragraph runs on "
+                  "into the next lesson's first case."),
             ("p", "Picture a walk along a valley path with boulders beside it. If you mean to "
                   "scramble up one, each is suddenly easy or hard, a handhold or a wall. If "
                   "you are only walking past, they are scenery. That is a fair picture of "
                   "the theory the chapter opens with, and its first pages are in that "
-                  "theory's voice, not Merleau-Ponty's. No causal relation is conceivable between the "
-                  "subject and his body, world or society. I cannot be free in some actions "
+                  "theory's voice, not Merleau-Ponty's, though its first sentence is one he "
+                  "shares: no causal relation is conceivable between the subject and his body, "
+                  "world or society. The theory goes on from there. I cannot be free in some actions "
                   "and determined in others, nor a little free. And motives do not act on me "
                   "either: &ldquo;The alleged motive does not burden my decision; on the "
                   "contrary my decision lends the motive its force&rdquo; (p. 505)."),
             ("p", "Whose theory? The footnotes cite Jean-Paul Sartre's <em>Being and "
                   "Nothingness</em> (1943), and Sartre is named once in the body of the text, "
                   "on page 509. Sartre, the novelist and philosopher who had known Merleau-Ponty "
-                  "since the École normale and in 1945 became his co-editor of the review "
-                  "<em>Les Temps modernes</em>, had argued at length that freedom is the very "
+                  "since the École normale and in 1945 founded the review <em>Les Temps "
+                  "modernes</em> with him, had argued at length that freedom is the very "
                   "being of consciousness, total in every act, and that the world's "
                   "resistance appears only in the light of a freely chosen end. At its "
                   "strength the view explains a great deal: why the same fatigue halts one "
@@ -738,7 +740,8 @@ LESSONS = [
                   "<em>Being and Nothingness</em> has its own long account of situation and "
                   "facticity, the given that freedom never chose, and many readers think the "
                   "chapter answers a sharpened version of Sartre rather than Sartre. The two "
-                  "later quarrelled over politics, and in 1955 Simone de Beauvoir accused "
+                  "later quarrelled over politics, and in 1955 Simone de Beauvoir, the "
+                  "philosopher and novelist who was Sartre's lifelong companion, accused "
                   "Merleau-Ponty of attacking a pseudo-Sartreanism, in a reply to his later "
                   "book on Marxism and politics rather than to this chapter. The chapter itself names "
                   "Sartre only in the notes and once in passing."),
@@ -808,20 +811,20 @@ LESSONS = [
         "quiz": [
             {"q": "Rocks of 1, 2, 3 and 4 m; the project is to climb, with a capacity of 3 m; "
                   "the body's general level is 2 m. What do the two tiles print?",
-             "a": ["Project: 4 m. Level: 3 m, 4 m", "Project: 3 m, 4 m. Level: 3 m, 4 m",
-                   "Project: 4 m. Level: 4 m", "Project: none. Level: 3 m, 4 m"],
-             "c": 0,
+             "a": ["Project: 3 m, 4 m. Level: 3 m, 4 m", "Project: 4 m. Level: 4 m",
+                   "Project: 4 m. Level: 3 m, 4 m", "Project: none. Level: 3 m, 4 m"],
+             "c": 2,
              "why": "Strictly taller than 3 m is only the 4 m rock; strictly taller than 2 m "
                     "are 3 m and 4 m. Counting a rock equal to the capacity gives 3 m and 4 m "
                     "on the project, and none would be right only if the project were not a "
                     "climb."},
             {"q": "What does the chapter grant the theory of absolute freedom about the rock?",
-             "a": ["That being unclimbable is conferred on it only by a project of climbing "
-                   "and a human presence",
-                   "That every rock is an obstacle to every project",
+             "a": ["That every rock is an obstacle to every project",
                    "That the body alone decides which rock to climb",
-                   "That obstacles exist in themselves, before any project"],
-             "c": 0,
+                   "That obstacles exist in themselves, before any project",
+                   "That being unclimbable is conferred on it only by a project of climbing "
+                   "and a human presence"],
+             "c": 3,
              "why": "The chapter grants that the attribute unclimbable comes from the project, "
                     "and then adds that one and the same project finds one rock an obstacle and "
                     "another a means. It never says every rock blocks every project, it does "
@@ -840,12 +843,12 @@ LESSONS = [
                     "says, makes no difference."},
             {"q": "In the body preset the project tile prints none and the level tile prints "
                   "3 m. Why the difference?",
-             "a": ["The project reckoning marks rocks only for a climb; the level reckoning "
+             "a": ["The level is lower than the capacity in that preset",
+                   "The project reckoning marks rocks only for a climb; the level reckoning "
                    "compares every rock with the body's level whatever the project",
-                   "The level is lower than the capacity in that preset",
                    "The lab ignores the 3 m rock when there is no project",
                    "The 3 m rock is an obstacle only for walking past"],
-             "c": 0,
+             "c": 1,
              "why": "Both thresholds are 2 m in every preset, so neither is lower. The level "
                     "tile still marks the 3 m rock with no project, and walking past marks no "
                     "rock on the project's reckoning."},
@@ -949,8 +952,9 @@ LESSONS = [
                   "therefore, never determinism and never absolute choice, I am never a thing "
                   "and never bare consciousness.&rdquo; And two pages later: &ldquo;The fact "
                   "remains that I am free, not in spite of, or on the hither side of, these "
-                  "motivations, but by means of them.&rdquo; Read from the paragraph on "
-                  "sedimentation on page 513 to the end of the book on page 530, in your own "
+                  "motivations, but by means of them.&rdquo; Read from the sentences on "
+                  "sedimentation in the middle of page 513, where the previous lesson stopped, "
+                  "to the end of the book on page 530, in your own "
                   "copy before going on."),
             ("p", "The first case is a sentence about a life (pp. 513&ndash;514). Having built "
                   "our life on an inferiority complex for twenty years, it is not probable "
@@ -979,8 +983,12 @@ LESSONS = [
                   "says later, to point out that &ldquo;it is not the greatest poverty which "
                   "produces the most clear-sighted revolutionaries&rdquo;, but one forgets to "
                   "ask why a return of prosperity often radicalises the masses: easier "
-                  "conditions open a new structure of social space (p. 518). On this case "
-                  "determinism fails and absolute freedom absorbs it."),
+                  "conditions open a new structure of social space (p. 518), which shows, the "
+                  "chapter says, not that the worker makes himself a revolutionary from "
+                  "nothing but that he does so on a basis of coexistence. The lesson codes "
+                  "only the fact as the idealist states it: on that, determinism fails and "
+                  "absolute freedom absorbs it. The prosperity point, which tells against "
+                  "both, is left out of the table."),
             ("p", "The third case is the day labourer (pp. 515&ndash;516), with no farm and no "
                   "tools, going from farm to farm at harvest and feeling an anonymous power "
                   "making a nomad of him. That life can go on without any class consciousness, "
@@ -1047,7 +1055,7 @@ LESSONS = [
             ("p", "That is the end of the book, and of this Subject. It began with a Preface "
                   "that asked what phenomenology is and answered with a method that cannot be "
                   "completed; it ends with a freedom that cannot be found outside a world. "
-                  "If you read the Preface first, as the book asks, read it again now: "
+                  "If you read the Preface first, read it again now: "
                   "“Description, Not Explanation”, the first lesson of What Phenomenology Is, "
                   "will read differently after the body, the perceived world and time."),
         ],
@@ -1128,8 +1136,8 @@ LESSONS = [
         "quiz": [
             {"q": "Determinism is coded y, n, n, n and absolute freedom n, y, n, n. On which "
                   "cases do they part?",
-             "a": ["Cases 1 and 2", "Cases 3 and 4", "All four cases", "None of the cases"],
-             "c": 0,
+             "a": ["Cases 3 and 4", "All four cases", "None of the cases", "Cases 1 and 2"],
+             "c": 3,
              "why": "A split is a case marked y against n. Cases 3 and 4 are n against n, "
                     "which both accounts fail rather than a split, so only cases 1 and 2 count."},
             {"q": "On the chapter's account, when the day labourer becomes class-conscious, why "
@@ -1145,22 +1153,22 @@ LESSONS = [
                     "last without any class consciousness, and dismisses the agitator theory as "
                     "the prefect of police's view of history."},
             {"q": "Why is freedom in situation not partly free and partly determined?",
-             "a": ["Because there is never determinism and never absolute choice; I am free by "
+             "a": ["Because the two shares are always exactly equal",
+                   "Because there is never determinism and never absolute choice; I am free by "
                    "means of my motives, not in a share they leave over",
-                   "Because the two shares are always exactly equal",
                    "Because freedom is total and the situation only apparent",
                    "Because the situation is total and freedom only apparent"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says the shares cannot be determined at all, so they cannot "
                     "be equal; and making either side total is the return to absolute freedom "
                     "or to determinism that it rejects."},
             {"q": "What withstands pain, in the chapter's case of the prisoner?",
-             "a": ["The prisoner with his comrades, or a proudly willed solitude that is "
-                   "still a way of being with others",
-                   "A bare consciousness deciding alone",
+             "a": ["A bare consciousness deciding alone",
                    "His body's tolerance of pain",
+                   "The prisoner with his comrades, or a proudly willed solitude that is "
+                   "still a way of being with others",
                    "Nothing; the chapter says he speaks in the end"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter says in so many words that what withstands pain is not a bare "
                     "consciousness. It says nothing of a physical tolerance, and its prisoner "
                     "refuses to give the names."},
