@@ -17,7 +17,7 @@ Contents
 - §0 The one question, answered for this Subject
 - §A PATH fields
 - §B The fourteen courses, in order
-- §C Every lesson: 118 entries
+- §C Every lesson: 119 entries
 - §D The lab kit: `capkit` (17 modes)
 - §E Package layout, the author's checklist, and how a passage is quoted
 - §F Voice: the read-along, after the three lectures
@@ -121,21 +121,21 @@ reviewer has to rediscover them:**
 **tagline** (counts re-verified at wiring by
 `test_the_tagline_and_description_state_the_real_counts`):
 
-> Karl Marx's *Capital*, read chapter by chapter, all three volumes &mdash; with
+> Karl Marx&rsquo;s <em>Capital</em>, read chapter by chapter, all three volumes &mdash; with
 > the arithmetic Marx does on the page done in front of you: value and money,
 > the working day, surplus value, wages, accumulation, turnover, reproduction,
-> profit, prices of production, interest and rent. Fourteen courses and 118
+> profit, prices of production, interest and rent. Fourteen courses and 119
 > lessons are available.
 
 **description**:
 
 > The Capital Subject: a read-along of all three volumes in Marx's own order,
-> fourteen courses that follow his Parts, one lesson for every chapter and more
+> fourteen courses that follow his Parts, a lesson for every chapter and more
 > for the long ones. Each lesson reads a passage first, then explains it, then
 > computes what the chapter computes &mdash; a commodity's value, a rate of
 > surplus value, a reproduction scheme that balances or does not, a price of
 > production, a rent schedule &mdash; in exact arithmetic in your browser. All
-> fourteen courses and 118 lessons are available.
+> fourteen courses and 119 lessons are available.
 
 **key** (each line ≤ 46 characters, no second column):
 
@@ -171,10 +171,11 @@ price of land = rent / rate of interest
    vocabulary: "capital", "profit" and "value" do not mean here what they mean
    in a textbook, and the first lessons say exactly how.
 3. A copy of the book is welcome but not required. Every lesson quotes the
-   passage it reads from the public-domain English translations (Moore and
-   Aveling for Volume I, Untermann for Volumes II and III), which are free
-   online. Chapter numbers follow the English edition of Volume I; where the
-   German numbering differs, the lesson says so.
+   passage it reads from the public-domain Kerr editions: Volume I in the Moore
+   and Aveling translation as revised by Ernest Untermann, Volumes II and III in
+   Untermann's translation. Chapter numbers follow the English edition of
+   Volume I, which differs from the German from Chapter 4 on; the two places
+   where that matters say so.
 4. Patience with abstraction. Volume I assumes that commodities sell at their
    values; Volume III takes that assumption away. A reader who stops after
    Volume I has read the first half of an argument, and several lessons say so
@@ -215,7 +216,8 @@ price of land = rent / rate of interest
 > over total output, a rate of surplus value is a ratio of two sums, a scheme
 > balances or it does not, a price of production is a cost price plus the
 > average profit. Nothing is rounded except where a lesson says so. Quotations
-> are from the public-domain English translations. What the labs cannot do is
+> are from the public-domain Kerr editions, as published in the Online Library
+> of Liberty. What the labs cannot do is
 > tell you whether Marx's definitions are the right ones &mdash; and that is
 > what the book is arguing about.
 
@@ -227,24 +229,24 @@ Volumes and Parts are Marx's. Courses group short Parts and never split one,
 except Volume III's Part Five, which is sixteen chapters long and divides where
 Marx's own manuscript changes subject (from interest to the credit system).
 
-| # | slug | title | Marx | lessons |
-| --- | --- | --- | --- | --- |
-| 1 | `capital-commodities-and-money` | Commodities and Money | Vol I, Part I (ch. 1–3) | 8 |
-| 2 | `capital-money-into-surplus-value` | From Money to Surplus Value | Vol I, Parts II–III (ch. 4–11) | 9 |
-| 3 | `capital-relative-surplus-value` | Relative Surplus Value | Vol I, Parts IV–V (ch. 12–18) | 9 |
-| 4 | `capital-wages-and-accumulation` | Wages and Accumulation | Vol I, Parts VI–VII (ch. 19–25) | 9 |
-| 5 | `capital-primitive-accumulation` | So-Called Primitive Accumulation | Vol I, Part VIII (ch. 26–33) | 8 |
-| 6 | `capital-circuits-of-capital` | The Circuits of Capital | Vol II, Part I (ch. 1–6) | 6 |
-| 7 | `capital-turnover-of-capital` | The Turnover of Capital | Vol II, Part II (ch. 7–17) | 11 |
-| 8 | `capital-social-reproduction` | Reproduction of the Social Capital | Vol II, Part III (ch. 18–21) | 6 |
-| 9 | `capital-cost-price-and-profit` | Cost Price and the Rate of Profit | Vol III, Part I (ch. 1–7) | 7 |
-| 10 | `capital-prices-of-production` | Average Profit and Its Fall | Vol III, Parts II–III (ch. 8–15) | 8 |
-| 11 | `capital-merchants-and-interest` | Merchant's Capital and Interest | Vol III, Parts IV–V (ch. 16–24) | 9 |
-| 12 | `capital-credit-and-fictitious-capital` | Credit and Fictitious Capital | Vol III, Part V (ch. 25–36) | 12 |
-| 13 | `capital-ground-rent` | Ground Rent | Vol III, Part VI (ch. 37–47) | 11 |
-| 14 | `capital-revenues-and-their-sources` | Revenues and Their Sources | Vol III, Part VII (ch. 48–52) | 5 |
+| # | slug | title | Marx | lessons | level |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `capital-commodities-and-money` | Commodities and Money | Vol I, Part I (ch. 1–3) | 8 | Beginner |
+| 2 | `capital-money-into-surplus-value` | From Money to Surplus Value | Vol I, Parts II–III (ch. 4–11) | 10 | Beginner |
+| 3 | `capital-relative-surplus-value` | Relative Surplus Value | Vol I, Parts IV–V (ch. 12–18) | 9 | Intermediate |
+| 4 | `capital-wages-and-accumulation` | Wages and Accumulation | Vol I, Parts VI–VII (ch. 19–25) | 9 | Intermediate |
+| 5 | `capital-primitive-accumulation` | So-Called Primitive Accumulation | Vol I, Part VIII (ch. 26–33) | 8 | Intermediate |
+| 6 | `capital-circuits-of-capital` | The Circuits of Capital | Vol II, Part I (ch. 1–6) | 6 | Intermediate |
+| 7 | `capital-turnover-of-capital` | The Turnover of Capital | Vol II, Part II (ch. 7–17) | 11 | Intermediate |
+| 8 | `capital-social-reproduction` | Reproduction of the Social Capital | Vol II, Part III (ch. 18–21) | 6 | Advanced |
+| 9 | `capital-cost-price-and-profit` | Cost Price and the Rate of Profit | Vol III, Part I (ch. 1–7) | 7 | Intermediate |
+| 10 | `capital-prices-of-production` | Average Profit and Its Fall | Vol III, Parts II–III (ch. 8–15) | 8 | Advanced |
+| 11 | `capital-merchants-and-interest` | Merchant's Capital and Interest | Vol III, Parts IV–V (ch. 16–24) | 9 | Advanced |
+| 12 | `capital-credit-and-fictitious-capital` | Credit and Fictitious Capital | Vol III, Part V (ch. 25–36) | 12 | Advanced |
+| 13 | `capital-ground-rent` | Ground Rent | Vol III, Part VI (ch. 37–47) | 11 | Advanced |
+| 14 | `capital-revenues-and-their-sources` | Revenues and Their Sources | Vol III, Part VII (ch. 48–52) | 5 | Advanced |
 
-Total 118. The `capital-` prefix keeps course slugs from colliding with the
+Total 119. "So-Called" in Course 5's title is Marx's German (*Die sogenannte ursprüngliche Akkumulation*); the 1887 English edition's Part is titled "Primitive Accumulation", and the course summary says so. The `capital-` prefix keeps course slugs from colliding with the
 generic names other Subjects already use and tells a reader landing on a course
 URL which book it belongs to.
 
@@ -253,7 +255,7 @@ A course's `summary` names the Part; its `assumes_long` names earlier courses by
 title. Course `key` lines are drawn from that course's own formulas.
 
 Chapter splits (one hard idea per lesson): Volume I Chapter 1 (four lessons,
-one per section), Chapter 3 (three), Chapter 10 (two), Chapter 15 (three),
+one per section), Chapter 3 (three), Chapter 9 (two: the rate, and Senior's last hour), Chapter 10 (two), Chapter 15 (three),
 Chapter 25 (three); Volume II Chapters 20 and 21 (two each). Every other
 chapter is one lesson. Two adjacent chapters are never merged into one lesson;
 where a chapter is short (Volume II Chapter 18, Volume III Chapter 7) its lesson
@@ -273,7 +275,24 @@ Format of each entry:
 - **Misconception:** the wrong model `mistakes[0]` must name and refute.
 - **Worked:** the single worked example, in one line.
 
-Preset ids are suggestions; the INSTANCES are not optional. Tile ids are fixed by
+Preset ids are suggestions; the INSTANCES are not optional. Where an entry
+gives only an id, the id is a placeholder: the author designs the instance, records it in this
+section in the same commit as the lesson, and a reviewer rejects a lesson whose entry still
+carries a bare id.
+
+**Read** lines locate the passage by section and subject. Their wording is a pointer, never
+a quotation to copy: the words quoted on the page come only from the Kerr text (§E.3).
+Where an entry says "Kerr wording to be checked", the reviewers found the spec's phrasing
+absent from the text they checked.
+
+**Misconceptions** (`mistakes[0]`) are misreadings of the chapter's definitions or arithmetic,
+refuted by a tile. They are never claims about what happened in history, what is just, or
+which school of economics is right. Where the misconception is a position someone holds
+(Hume's quantity theory, Say's law, the Currency School, the compensation theorists), the
+lesson names its holder and states it at full strength before Marx's reply.
+
+**Do** lines are acts the quiz measures: compute, classify, name, compare. "Say why" belongs
+in the prose, not in the objective. Tile ids are fixed by
 §D. Expected strings are read off the built page with `node scripts/labcheck.js
 --observe`, never predicted. "Marx's figures" means the instance is the one in
 the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
@@ -281,45 +300,47 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 ### Course 1 — Commodities and Money (`capital-commodities-and-money`, 8)
 
 1. **the-two-factors-of-a-commodity** — The Two Factors of a Commodity — *Chapter 1 · Commodities*
-   - Read: §1, the opening sentence ("The wealth of those societies…") and the paragraph on "a common something" in exchange.
-   - Do: given several producers' hours and outputs, compute the socially necessary labour-time per unit and the value of a lot, and say why the slow producer's extra hours add nothing.
-   - Lab: `value`. Presets: `linen` (three weavers, 1 h, 2 h, 3 h per yard, outputs 40, 40, 20 yards), `steam` (the power-loom: the same weavers after productivity doubles for the two largest), `lazy` (one weaver at 5 h per yard, output 1 yard). Pin `vaSnlt`, `vaLotValue`.
+   - Read: §1, the opening sentence ("The wealth of those societies…"), and the definition of socially necessary labour-time ("…under the normal conditions of production, and with the average degree of skill and intensity prevalent at the time").
+   - Do: given several producers' hours and outputs, compute the socially necessary labour-time per unit and the value of a lot, and compute what the slowest producer's extra hours add to it (nothing).
+   - Lab: `value`, view `snlt`. Presets: `linen` (three weavers at 1 h, 2 h, 3 h a yard, outputs 40, 40, 20 yards), `slow` (the same three weavers, the slowest now at 5 h a yard), `power-loom` (Marx's example: after the power-loom, a hand-loom weaver's hour counts as half an hour; the two largest producers at half their hours). Pin `vaSnlt`, `vaLotValue`.
    - Misconception: a commodity made more slowly is worth more.
    - Worked: 100 yards made in 180 hours in all is 9/5 hour a yard; the weaver who needed 3 hours a yard sells at 9/5 like everyone else.
+   - Note to author: the lab's weighted average is a model of "normal conditions", not Marx's definition; Volume III, Chapter 10 shows the regulating value need not be the average, and the `note` says so.
 
 2. **the-twofold-character-of-labour** — The Twofold Character of Labour — *Chapter 1 · Commodities*
-   - Read: §2, "the two-fold nature of the labour contained in commodities… is the pivot on which a clear comprehension of Political Economy turns".
-   - Do: separate concrete (useful) labour from abstract labour in a coat and in linen, and reduce skilled labour to simple labour with a stated multiplier.
-   - Lab: `value`, view `skill`. Presets: `coat-linen` (tailor 10 h, weaver 10 h, multiplier 1), `skilled` (tailor's hour counts as 2 simple hours), `doubled` (productivity doubles: twice the coats, same value in total). Pin `vaLotValue`, `vaPerUnit`.
+   - Read: §2, the full sentence ending "…this point is the pivot on which a clear comprehension of political economy turns".
+   - Do: separate the useful-labour side (coats, yards) from the value side (hours) for one industry, and compute what a change in productivity does to each.
+   - Lab: `value`, view `skill` with `skill` fixed at 1. Presets: `coat-linen` (tailor 10 h for 1 coat, weaver 10 h for 20 yards), `doubled` (tailoring productivity doubles: 2 coats in 10 h), `halved` (it halves). Pin `vaLotValue`, `vaPerUnit`.
    - Misconception: more useful things always means more value.
    - Worked: double the productivity of tailoring and two coats now carry the value one did; the use-values doubled, the value did not.
+   - Skilled labour as "multiplied simple labour" is stated in prose and in `note` as an assumption the chapter makes; it is not a preset, because the reduction is not computed from anything.
 
 3. **the-form-of-value** — The Form of Value — *Chapter 1 · Commodities*
    - Read: §3, "20 yards of linen = 1 coat, or: 20 yards of linen are worth 1 coat".
-   - Do: write the elementary, expanded, general and money forms for a set of commodities from their labour-values, and say which side is the relative form and which the equivalent.
-   - Lab: `form`. Presets: `marx` (Marx's figures: 20 yards linen = 1 coat = 10 lb tea = 40 lb coffee = 1 quarter corn = 2 oz gold = ½ ton iron, values stated in hours so the equations hold), `two` (linen and coat only), `gold` (the same with gold as equivalent). Shipped `stage = elementary`. Pin `foEquation`, `foGeneral`.
+   - Do: write the elementary, expanded, general and money forms for a set of commodities from their labour-values, name the relative and the equivalent form, and compute how the linen's relative value moves when only the coat's value changes.
+   - Lab: `form`, view `stage`, shipped `stage = elementary`. Presets: `marx` (Marx's figures: 20 yards linen = 1 coat = 10 lb tea = 40 lb coffee = 1 quarter corn = 2 oz gold = ½ ton iron, values in hours so the equations hold), `coat-cheapens` (the coat's hours halve, the linen's do not), `gold` (gold as the equivalent). Pin `foEquation`, `foRelative`.
    - Misconception: in "20 yards of linen = 1 coat" the coat's value is what is being expressed.
-   - Worked: from 20 yards = 1 coat to "1 coat = 2 oz gold" every equation is one labour-time on both sides; the money-form only picks one commodity to stand on the right.
+   - Worked: halve the hours in a coat and 20 yards of linen now fetch 2 coats: the linen's value is expressed differently though nothing about linen changed.
 
 4. **the-fetishism-of-commodities** — The Fetishism of Commodities — *Chapter 1 · Commodities*
    - Read: §4, "A commodity appears, at first sight, a very trivial thing…" and Robinson Crusoe's ledger.
-   - Do: read Robinson's ledger and the "association of free men" as the same labour-time accounting done openly, and say what the price tag hides that the ledger shows.
+   - Do: compute the hours behind each product in Robinson's ledger and the association's shares, and compare them with the ratios the village's prices give.
    - Lab: `value`, view `ledger`. Presets: `robinson` (Robinson's week: hours on goats, fishing, furniture; products), `village` (four households trade by the same hours, prices shown), `association` (the same output allocated by hours contributed). Pin `vaTotalHours`, `vaPerUnit`.
    - Misconception: value is a physical property of the thing, like weight.
    - Worked: Robinson's table and the market's prices give the same ratios; only one of them tells you whose hours they were.
 
 5. **exchange** — Exchange — *Chapter 2 · Exchange*
    - Read: "It is plain that commodities cannot go to market and make exchanges of their own account."
-   - Do: show why direct barter among many owners needs a common equivalent, by counting the bilateral ratios with and without one.
+   - Do: count the bilateral ratios a market of n owners needs with and without a single equivalent.
    - Lab: `form`, view `count`. Presets: `four` (four commodities), `six` (six), `six-gold` (six, one chosen as equivalent). Pin `foPairs`, `foWithEquivalent`.
-   - Misconception: money was invented by agreement because it was convenient.
-   - Worked: six owners need fifteen ratios to trade by barter and five once one commodity is everyone's equivalent.
+   - Misconception: money is a mere symbol fixed by convention.
+   - Worked: six owners need fifteen ratios to trade by barter and five once one commodity is everyone's equivalent. The count shows why one equivalent is needed; Marx's point is how it arises — "a social act" of the owners, who "acted and transacted before they thought" — and the `note` says the lab cannot show that.
 
 6. **money-as-measure-and-means-of-circulation** — Money as Measure and Means of Circulation — *Chapter 3 · Money, or the Circulation of Commodities*
    - Read: §1 on price as "the money-name of the labour realised in a commodity"; §2(b) on the quantity of money in circulation.
-   - Do: compute prices from values and gold's value, and the money needed to circulate a day's sales at a given velocity; then change the value of gold and see prices move without any commodity changing.
+   - Do: compute prices from values and gold's value, and the money needed to circulate a day's sales at a given velocity; then compute prices again after gold's value changes and no commodity's does.
    - Lab: `money`, view `circulate`. Presets: `marx` (Marx's figures: 1 quarter wheat, 20 yards linen, a bible, 4 gallons brandy at £2 each, velocity 4 when they change hands in sequence), `gold-falls` (gold's value halves), `faster` (velocity 8). Pin `moNeeded`, `moPriceSum`.
-   - Misconception: prices rise because there is more money (the quantity theory Marx is arguing against).
+   - Misconception (as Marx frames it, against Hume and Ricardo): with gold coin, prices are set by the quantity of money in circulation. State Hume's version at full strength; Marx argues the causation runs the other way for metal, and in §2(c) agrees that paper issued beyond the gold it represents raises prices. The measure of value is kept apart from the standard of price, and §2(a)'s point — that sale and purchase can come apart, the first possibility of crisis — is stated in prose and carried into the next lesson.
    - Worked: four commodities at £2 each, sold one after another by the same two sovereigns' worth of coin: price sum £8, velocity 4, money needed £2.
 
 7. **hoards-means-of-payment-and-world-money** — Hoards, Means of Payment and World Money — *Chapter 3 · Money, or the Circulation of Commodities*
@@ -329,42 +350,42 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
    - Misconception: money only matters as a medium of exchange.
    - Worked: £300 of debts in a circle cancel to £0 in cash; break one link and £100 is suddenly needed in hard money.
 
-8. **commodities-and-money-in-review** — Commodities and Money in Review — *Chapter 3 · Money, or the Circulation of Commodities*
+8. **world-money** — World Money — *Chapter 3 · Money, or the Circulation of Commodities*
    - Read: §3(c), "When money leaves the home sphere of circulation, it strips off the local garbs…".
-   - Do: settle a trade balance in gold between two countries and connect it back to value, the forms of value and price.
+   - Do: compute the balance between two countries' payments and the bullion that settles it.
    - Lab: `money`, view `world`. Presets: `balanced`, `deficit` (one side imports more), `drain` (deficit plus a payment due). Pin `moDrain`.
    - Misconception: world money is just a currency exchanged at a rate.
    - Worked: imports of £1,000 against exports of £800 leave £200 to be shipped in bullion, the "universal means of payment".
 
-### Course 2 — From Money to Surplus Value (`capital-money-into-surplus-value`, 9)
+### Course 2 — From Money to Surplus Value (`capital-money-into-surplus-value`, 10)
 
 1. **the-general-formula-for-capital** — The General Formula for Capital — *Chapter 4*
-   - Read: "The simple circulation of commodities – selling in order to buy – is a means of carrying out a purpose unconnected with circulation…".
+   - Read: "The simple circulation of commodities — selling in order to buy — is a means of carrying out a purpose unconnected with circulation…".
    - Do: tell C–M–C from M–C–M′ by what is at either end, and compute the increment ΔM for given purchases and sales.
-   - Lab: `circuit`, view `formula`. Presets: `cmc` (sell linen £3, buy bible £3), `mcm` (£100 cotton sold for £110), `mcm-loss` (sold for £90). Pin `ciDelta`, `ciForm`.
-   - Misconception: M–C–M is pointless unless it ends with more money, so all trade is M–C–M′.
-   - Worked: £100 → cotton → £110: the circuit only makes sense because of the £10.
+   - Lab: `circuit`, view `formula`. Presets: `cmc` (Marx's ch. 4 example: a quarter of corn sold for £3, clothes bought for £3), `mcm` (£100 of cotton sold for £110), `mcm-loss` (sold for £90). Pin `ciDelta`, `ciForm`.
+   - Misconception: selling to buy and buying to sell are one circulation seen from two starting points.
+   - Worked: corn → £3 → clothes ends where it started in value, ΔM = 0; £100 → cotton → £110 makes sense only because of the £10.
 
 2. **contradictions-in-the-general-formula** — Contradictions in the General Formula — *Chapter 5*
-   - Read: "Capital cannot therefore arise from circulation, and it is equally impossible for it to arise apart from circulation."
+   - Read: the sentence ending "…it is equally impossible for it to originate apart from circulation" (verbatim from the Kerr text).
    - Do: show that if every seller marks up by the same percentage the total value in hands does not change, and that one cheat's gain is another's loss.
    - Lab: `circuit`, view `markup`. Presets: `ten` (every seller 10% above value), `one-cheat` (A cheats B by £10), `merchants` (three dealers, each adds 10%). Pin `ciTotalBefore`, `ciTotalAfter`.
    - Misconception: profit comes from selling above value.
-   - Worked: A sells wine worth £40 to B for £50; the total value held by A and B is £90 before and after.
+   - Worked: A sells wine worth £40 to B and gets corn worth £50 in exchange (Marx's barter); the total value held by A and B is £90 before and after.
 
 3. **buying-and-selling-labour-power** — The Buying and Selling of Labour-Power — *Chapter 6*
-   - Read: the "doubly free" labourer, and the departure from "this noisy sphere… a very Eden of the innate rights of man".
+   - Read: the labourer "free in the double sense", and the departure from "this noisy sphere… a very Eden of the innate rights of man".
    - Do: compute the daily value of labour-power from the value of a worker's means of subsistence, including weekly, yearly and generational items.
    - Lab: `circuit`, view `labour-power`. Presets: `daily` (food daily, clothes weekly, furniture yearly), `family` (add children's upkeep), `training` (add a training cost spread over a working life). Pin `ciLpValue`.
    - Misconception: the worker sells labour; the capitalist buys hours of work done.
    - Worked: 6 hours of daily needs + 7 hours a week of clothes + 365 hours a year of rent is 6 + 1 + 1 = 8 hours a day.
 
-4. **the-labour-process-and-valorisation** — The Labour Process and the Valorisation Process — *Chapter 7*
+4. **the-labour-process-and-surplus-value** — The Labour Process and the Production of Surplus Value — *Chapter 7 · The Labour-Process and the Process of Producing Surplus-Value*
    - Read: §2, Marx's spinning mill, "Our capitalist stares in astonishment."
-   - Do: compute the value of the yarn from cotton, spindle wear and labour, first for 6 hours and then for 12, and locate where the surplus value comes from.
-   - Lab: `surplus`, view `mill`. Presets: `six` (Marx's figures: 10 lb cotton 10s, spindle wear 2s, labour-power 3s a day, 6 hours spinning, 6 hours of labour = 3s), `twelve` (the same day lengthened to 12 hours: 20 lb cotton 20s, wear 4s, 12 hours = 6s), `waste` (12 hours with careless use of cotton beyond the socially necessary). Pin `suProduct`, `suS`.
+   - Do: compute the value of the yarn from cotton, spindle wear and labour, first for 6 hours and then for 12, and compute the difference between the value of a day's labour-power and the value a day's labour adds.
+   - Lab: `surplus`, view `mill`. Presets: `six` (Marx's figures: 10 lb cotton 10s, spindle wear 2s, labour-power 3s a day, 6 hours of spinning adding 3s), `twelve` (12 hours: 20 lb cotton 20s, wear 4s, labour-power still 3s, 12 hours adding 6s), `waste` (12 hours with cotton used beyond the socially necessary). Pin `suProduct`, `suS`.
    - Misconception: the surplus is the machine's contribution.
-   - Worked: 27s advanced, yarn worth 30s: 20 + 4 for means of production carried over, 6 of new value against 3 paid.
+   - Worked: 27s advanced, yarn worth 30s: 20 + 4 for means of production carried over, 6 of new value against 3 paid. On the chapter's accounting every input was bought at its value.
 
 5. **constant-capital-and-variable-capital** — Constant Capital and Variable Capital — *Chapter 8*
    - Read: "That part of capital, then, which is represented by the means of production… does not, in the process of production, undergo any quantitative alteration of value."
@@ -373,33 +394,40 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
    - Misconception: constant capital is fixed capital.
    - Worked: a £1,000 machine with a 1,000-day life passes £1 a day into the product, however much the product is.
 
-6. **the-rate-of-surplus-value** — The Rate of Surplus Value — *Chapter 9*
+6. **the-rate-of-surplus-value** — The Rate of Surplus Value — *Chapter 9 · The Rate of Surplus-Value*
    - Read: §1, s/v "is therefore an exact expression for the degree of exploitation of labour-power by capital".
-   - Do: compute s/v and the product's value in parts, and do Senior's "last hour" arithmetic to show where it goes wrong.
-   - Lab: `surplus`, view `rate`. Presets: `marx` (Marx's figures: c = £410, v = £90, s = £90), `parts` (the product in parts: 20 lb yarn shown as cotton, wear, necessary and surplus pounds), `senior` (Senior's 11½-hour day and the "last hour"). Pin `suRate`, `suParts`.
+   - Do: compute s/v from c, v and s, and the product's value in proportional parts of the product.
+   - Lab: `surplus`, view `rate`. Presets: `marx` (Marx's figures: c = £410, v = £90, s = £90), `parts` (§2: 20 lb of yarn worth 30s as cotton, wear, v and s), `whole-capital` (the same figures read as s over all the capital). Pin `suRate`, `suParts`.
    - Misconception: the rate of exploitation is s divided by all the capital.
-   - Worked: s = 90 on v = 90 is 100%, not the 90/500 = 18% that a rate on the whole capital would say.
+   - Worked: s = 90 on v = 90 is 100%, "not 90/500"; the 20 lb of yarn splits as c 16 lb, v 2 lb, s 2 lb.
 
-7. **the-working-day-and-surplus-labour** — The Working Day: Its Limits and the Greed for Surplus Labour — *Chapter 10 · The Working Day*
-   - Read: §1, "Capital is dead labour, that, vampire-like, only lives by sucking living labour"; §3–4 on night work and relays.
+7. **seniors-last-hour** — Senior's "Last Hour" — *Chapter 9 · The Rate of Surplus-Value*
+   - Read: §3, Senior's claim that "the whole net profit is derived from the last hour".
+   - Do: compute the rate of surplus value on an 11½-hour day and after one hour is cut, and compare it with Senior's prediction that the profit vanishes.
+   - Lab: `surplus`, view `senior`. Presets: `senior` (Marx's figures: an 11½-hour day, 5¾ hours necessary), `ten-and-a-half` (one hour cut), `ten` (the 10-hour day). Pin `suRate`, `suLastHour`.
+   - Misconception: the last hour of the day produces the whole profit, so a shorter day abolishes it.
+   - Worked: 5¾ surplus hours on 5¾ necessary is 100%; cut an hour and 4¾ on 5¾ is 19/23 = 82.61%, not zero.
+
+8. **the-working-day-and-surplus-labour** — The Working Day: Its Limits and the Greed for Surplus Labour — *Chapter 10 · The Working-Day*
+   - Read: §1, "Capital is dead labour, that, vampire-like, only lives by sucking living labour".
    - Do: compute s/v for a given day and necessary time, and the lengthening that doubles it.
-   - Lab: `workday`, view `absolute`. Presets: `six-six` (12-hour day, 6 necessary), `fifteen` (15-hour day), `relay` (24-hour plant on two shifts). Pin `wdRate`, `wdSurplus`.
+   - Lab: `workday`, view `absolute`. Presets: `six-six` (12-hour day, 6 necessary), `fifteen` (15-hour day), `eighteen` (18 hours). Pin `wdRate`, `wdSurplus`.
    - Misconception: the length of the day is fixed by nature or contract and is not a quantity capital can move.
    - Worked: 6 necessary hours of 12 is 100%; stretch the day to 15 and the same worker gives 150%.
 
-8. **the-struggle-for-a-normal-working-day** — The Struggle for a Normal Working Day — *Chapter 10 · The Working Day*
-   - Read: §6–7, the Factory Acts and "the creation of a normal working day is… the product of a protracted civil war".
-   - Do: compute what a legal limit (the Ten Hours Act) does to s/v at a fixed value of labour-power and say why the limit is fought over.
-   - Lab: `workday`, view `limit`. Presets: `before` (12 hours), `ten-hours` (the 1847 Act's 10 hours), `relay-dodge` (the "false relay" system: legal 10 hours stretched by shifts). Pin `wdRate`.
-   - Misconception: the Factory Acts were humanitarian gifts from above.
-   - Worked: cut a 12-hour day with 6 necessary to 10 and s/v falls from 100% to 67%; that is the money the struggle is about.
+9. **the-struggle-for-a-normal-working-day** — The Struggle for a Normal Working Day — *Chapter 10 · The Working-Day*
+   - Read: §5, "The establishment of a normal working day is the result of centuries of struggle between capitalist and labourer", and §7, "a protracted civil war, more or less dissembled, between the capitalist class and the working class" (both verbatim in the Kerr text).
+   - Do: compute what a legal limit does to s/v at a fixed value of labour-power, and what the relay system does to the limit.
+   - Lab: `workday`, view `limit`. Presets: `before` (12 hours), `ten-hours` (the 1847 Act's ten hours, in force from May 1848), `relay-dodge` (the "false relay" system stretching the legal day). Pin `wdRate`.
+   - Misconception: a legal limit on hours leaves the rate of surplus value where it was.
+   - Worked: cut a 12-hour day with 6 necessary to 10 and s/v falls from 100% to 2/3 = 66.67%.
 
-9. **rate-and-mass-of-surplus-value** — Rate and Mass of Surplus Value — *Chapter 11*
-   - Read: the first law, "the mass of the surplus value produced is equal to the amount of the variable capital advanced, multiplied by the rate of surplus value".
-   - Do: compute the mass of surplus value from s/v, the value of one labour-power and the number of workers, and show the trade-off between fewer workers and a longer day.
-   - Lab: `surplus`, view `mass`. Presets: `hundred` (100 workers, 3s each, 100%), `fewer` (50 workers, the rate raised to 200%), `limit` (the rate cannot exceed 24 hours less necessary time). Pin `suMass`.
-   - Misconception: more workers always means more surplus value.
-   - Worked: 100 workers at 3s and 100% give 300s; 50 workers must be worked at 200% to give the same.
+10. **rate-and-mass-of-surplus-value** — Rate and Mass of Surplus Value — *Chapter 11*
+    - Read: the first law, "the mass of the surplus-value produced is equal to the amount of the variable capital advanced, multiplied by the rate of surplus-value".
+    - Do: compute the mass of surplus value from s/v, the value of one labour-power and the number of workers, and the day a smaller workforce needs to yield the same mass.
+    - Lab: `surplus`, view `mass`. Presets: `marx` (Marx's compensation case from the chapter: a smaller variable capital at a higher rate giving the same mass; figures from the text), `hundred` (100 workers at 3s, 100%), `limit` (50 workers at 200%: with 6 necessary hours that is an 18-hour day). Pin `suMass`.
+    - Misconception: more workers always means more surplus value.
+    - Worked: 100 workers at 3s and 100% give 300s; 50 workers must be worked at 200% to give the same, which needs an 18-hour day.
 
 ### Course 3 — Relative Surplus Value (`capital-relative-surplus-value`, 9)
 
@@ -411,55 +439,56 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
    - Worked: Marx's 12 shillings of output a day becomes 24 articles for one innovator, who sells above individual value and pockets the difference until competition generalises it.
 
 2. **co-operation** — Co-operation — *Chapter 13*
-   - Read: "the special productive power of the combined working day is, under all circumstances, the social productive power of labour".
-   - Do: compute the combined working day of many workers and the productivity gain co-operation brings, and say who appropriates it.
-   - Lab: `machine`, view `cooperate`. Presets: `twelve` (12 masons separately, 12 together at a stated gain), `hundred` (the law of large numbers: individual deviations average out), `chain` (bricks passed hand to hand). Pin `maOutput`, `maGain`.
+   - Read: "the special productive power of the combined working day is, under all circumstances, the social productive power of labour", and "this power costs capital nothing".
+   - Do: compute the constant capital per unit when means of production are used in common, and the combined working day of many workers delivered at once.
+   - Lab: `machine`, view `cooperate`. Presets: `masons` (Marx's 12 masons, 144 hours in one day), `workshop` (one workshop and tools for 12 against 12 separate sets), `harvest` (the job that must be done within a day). Pin `maCPerUnit`, `maCombinedDay`.
    - Misconception: co-operation's extra product is paid for in wages because each worker is paid fully.
-   - Worked: 12 workers each paid for a day produce together what 14 would apart; the 2 extra days are a free gift to capital.
+   - Worked: a workshop worth 10s used by one worker costs 10s/12 per unit of a day's output of 12; used by 12 it costs 10s/144; no wage is paid for the difference.
 
 3. **division-of-labour-and-manufacture** — Division of Labour and Manufacture — *Chapter 14*
    - Read: §3 on the "collective labourer" and the fixed proportions between detail workers.
    - Do: compute the number of detail workers each step needs for the steps' rates to match, and the smallest workshop that keeps every worker busy.
-   - Lab: `machine`, view `detail`. Presets: `type` (type-founding: casters, breakers, polishers at Marx's rates), `pins` (Smith's pin factory), `bottle` (glass bottle workshop). Pin `maWorkers`, `maMinimum`.
+   - Lab: `machine`, view `detail`. Presets: `type` (Marx's type-founding figures: founders 2,000 an hour, breakers 4,000, rubbers 8,000), `pins` (Smith's pin factory from the *Wealth of Nations* — the label says Smith, not Marx), `bottle` (glass bottle workshop). Pin `maWorkers`, `maMinimum`.
    - Misconception: the division of labour inside the workshop is the same thing as the division of labour in society.
-   - Worked: if a caster makes 2,000 an hour, a breaker 4,000 and a polisher 8,000, the smallest balanced shop is 4 casters, 2 breakers, 1 polisher.
+   - Worked: if a caster makes 2,000 an hour, a breaker 4,000 and a polisher 8,000, the smallest balanced shop is four founders and two breakers to one rubber, as Marx says.
 
 4. **machinery-and-the-value-it-transfers** — Machinery and the Value It Transfers — *Chapter 15 · Machinery and Modern Industry*
    - Read: §2, "machinery, like every other component of constant capital, creates no new value, but yields up its own value to the product".
-   - Do: compute the value a machine adds per unit and the capitalist's limit for adopting it (the wage bill it displaces), against society's limit (the labour it saves).
-   - Lab: `machine`, view `adopt`. Presets: `adopt` (machine cost below the displaced wages), `cheap-labour` (wages so low the machine is not adopted, Marx's English and continental case), `society` (the machine saves labour-time but not wages). Pin `maPerUnit`, `maVerdict`.
+   - Do: compute the value a machine adds per unit, and apply both tests for adopting it: the capitalist's (machine cost against the wages it displaces) and society's (against the labour it saves).
+   - Lab: `machine`, view `adopt`. Presets: `marx` (Marx's figures: a machine costing as much as a year's wages of the 150 men it displaces, £3,000), `cheap-labour` (wages low enough that the machine is not adopted), `society` (the machine saves labour-time but not wages). Shipped `test = capitalist`. Pin `maPerUnit`, `maVerdict`.
    - Misconception: a machine is used whenever it saves labour.
-   - Worked: a machine costing £1,000 that displaces £800 of wages is not used, though it saves more labour than it costs; the capitalist pays for labour-power, not labour.
+   - Worked: a machine that saves more labour than it embodies is still not bought if it costs more than the wages it displaces; the capitalist pays for labour-power, not labour.
 
-5. **machinery-and-the-worker** — Machinery and the Worker — *Chapter 15 · Machinery and Modern Industry*
-   - Read: §3, the appropriation of women's and children's labour, the prolongation and the intensification of the working day.
-   - Do: compute how adding family members to the labour market divides the value of labour-power, and how intensification raises s/v without lengthening the day.
-   - Lab: `workday`, view `intensity`. Presets: `family` (value of the family's labour-power spread over four workers), `intense` (the same day at 4/3 intensity), `shorter-but-denser` (a 10-hour day of 12 hours' labour). Pin `wdRate`, `wdLpValue`.
+5. **machinery-and-the-worker** — Machinery and the Intensity of Labour — *Chapter 15 · Machinery and Modern Industry*
+   - Read: §3(c), the intensification of labour once the working day is shortened by law.
+   - Do: compute how intensification raises s/v and the labour spent without lengthening the day.
+   - Lab: `workday`, view `intensity`. Presets: `same-day` (12 hours, no change), `intense` (the same day at 4/3 intensity), `shorter-but-denser` (a 10-hour day of 12 hours' labour). Pin `wdRate`, `wdLabour`.
    - Misconception: a shorter working day always means less surplus value.
    - Worked: cut the day from 12 to 10 hours but raise intensity by 1/5 and the worker spends as much labour as before.
+   - The family's labour-power spread over several earners (§3a) is stated in prose; it is a wages fact and is not computed here.
 
 6. **machinery-and-the-displaced-worker** — Machinery and the Displaced Worker — *Chapter 15 · Machinery and Modern Industry*
    - Read: §6, "The theory of compensation as regards the workpeople displaced by machinery".
    - Do: compute the capital "set free" by a machine and the workers that capital can re-employ, and show why compensation is not automatic.
    - Lab: `machine`, view `displace`. Presets: `marx` (Marx's figures: a carpet factory with 100 workers at £30 a year, £3,000 variable capital; 50 discharged and £1,500 spent on machinery), `compensation` (the economists' claim that £1,500 is "set free" to employ the 50 elsewhere), `machine-builders` (the jobs the £1,500 of machinery gives in machine-building, at that industry's composition). Pin `maDisplaced`, `maReemployed`.
-   - Misconception: the capital freed by a machine re-employs the workers it displaced.
+   - Misconception: the capital freed by a machine re-employs the workers it displaced. State the compensation theorists (James Mill, McCulloch, Torrens, Senior, J. S. Mill) at strength first: cheaper products release purchasing power that creates employment elsewhere. Marx's carpet factory answers the narrower "capital set free" version, and the lesson says so.
    - Worked: 100 workers at £30 is £3,000 of variable capital; after the change £1,500 pays 50 and £1,500 sits in machinery: nothing was set free, a fund for wages became constant capital.
 
 7. **absolute-and-relative-surplus-value** — Absolute and Relative Surplus Value — *Chapter 16*
-   - Read: "From one standpoint the distinction between absolute and relative surplus value appears illusory."
+   - Read: "From one standpoint, any distinction between absolute and relative surplus-value appears illusory."
    - Do: classify a change in s/v as absolute or relative and say when the distinction matters.
    - Lab: `workday`, view `classify`. Presets: `lengthen`, `cheapen`, `both`. Pin `wdKind`, `wdRate`.
    - Misconception: surplus value needs a natural surplus of the soil.
    - Worked: from 12/6 to 14/5: 2 more hours are absolute, 1 fewer necessary hour is relative; s/v goes from 100% to 180%.
 
-8. **price-of-labour-power-and-surplus-value** — Changes in the Price of Labour-Power and in Surplus Value — *Chapter 17*
+8. **price-of-labour-power-and-surplus-value** — Changes in the Price of Labour-Power and in Surplus Value — *Chapter 17 · Changes of Magnitude in the Price of Labour-Power and in Surplus-Value*
    - Read: the three determinants, "the length of the working day… the normal intensity of labour… the productiveness of labour".
    - Do: run Marx's cases — one factor varying, the others constant — and predict the direction of s/v and of the price of labour-power.
-   - Lab: `workday`, view `three`. Presets: `productivity`, `intensity`, `length`, `combined`. Shipped `hold = others`. Pin `wdRate`, `wdLpValue`.
+   - Lab: `workday`, view `three`. Presets: `productivity`, `intensity`, `length`, `combined`. Shipped `hold = productivity` (the factor that varies; the other two held). Pin `wdRate`, `wdLpValue`.
    - Misconception: higher productivity raises the value of what the worker produces each day.
    - Worked: double productivity with the day fixed at 12 and the value produced is still 12 hours; only its split between v and s can move.
 
-9. **formulae-for-the-rate-of-surplus-value** — Formulae for the Rate of Surplus Value — *Chapter 18*
+9. **formulae-for-the-rate-of-surplus-value** — Formulae for the Rate of Surplus Value — *Chapter 18 · Various Formulae for the Rate of Surplus-Value*
    - Read: the "derivative formulae", surplus labour over the whole working day.
    - Do: compute s/v and s/(v + s) for the same day and show why the second can never reach 100%.
    - Lab: `surplus`, view `formulae`. Presets: `half` (6/6), `two-thirds` (4/8), `extreme` (1/11). Pin `suRate`, `suFalse`.
@@ -483,32 +512,32 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
    - Worked: 3s for a 12-hour normal day is 3d an hour; work 6 hours at 3d and the worker gets 1s 6d, below the value of labour-power.
 
 3. **piece-wages** — Piece-Wages — *Chapter 21*
-   - Read: "Piece-wage is nothing else than a converted form of the time-wage."
+   - Read: "Wages by the piece are nothing else than a converted form of wages by time".
    - Do: compute the piece-rate from the hourly price and the normal output, and the hidden speed-up when the rate is cut after output rises.
-   - Lab: `wages`, view `piece`. Presets: `marx` (Marx's figures: 24 pieces in 12 hours, 3s a day, so 1½d a piece), `faster` (output rises to 36), `cut` (rate cut back to the old day's pay). Pin `waPieceRate`, `waDaily`.
+   - Lab: `wages`, view `piece`. Presets: `marx` (Marx's figures: 24 pieces in 12 hours, 3s a day, so 1½d a piece), `faster` (Marx's figures: 48 pieces instead of 24), `cut` (the piece-rate falls from 1½d to ¾d). Pin `waPieceRate`, `waDaily`.
    - Misconception: piece-wages pay for the worker's actual effort.
-   - Worked: 3s for 24 pieces is 1½d a piece; at 36 pieces the rate is cut to 1d and the day pays 3s again.
+   - Worked: 3s for 24 pieces is 1½d a piece; at 48 pieces the rate is cut to ¾d and the day pays 3s again.
 
 4. **national-differences-of-wages** — National Differences of Wages — *Chapter 22*
-   - Read: "the more intensive national working-day… is represented by more money".
-   - Do: compare two countries' money wages with their intensity and productivity, and compute the relative wage.
-   - Lab: `wages`, view `national`. Presets: `england-continent`, `same-intensity`, `cheaper-goods`. Pin `waRelative`.
+   - Read: the passage on "The more intense national labour, therefore, as compared with the less intense…".
+   - Do: compute two countries' wages per unit of output (the relative wage) and their rates of surplus value from money wages, intensity and productivity.
+   - Lab: `wages`, view `national`. Presets: `england-continent` (wages 1½ times as high for twice the output per hour), `same-intensity`, `cheaper-goods`. Pin `waRelative`, `waRate`.
    - Misconception: a country with higher money wages has a lower rate of surplus value.
-   - Worked: wages twice as high for 1½ times the output per hour mean a lower relative wage and a higher rate of surplus value.
+   - Worked: wages 1½ times as high for twice the output make the relative wage 3/4 of the other country's, and the rate of surplus value higher.
 
 5. **simple-reproduction** — Simple Reproduction — *Chapter 23*
-   - Read: "after a longer or shorter period, the value of the capital advanced becomes equal to the surplus value appropriated…".
+   - Read: the passage beginning "After the lapse of a certain number of years, the capital value he then possesses is equal to the sum total…" (verify against the Kerr text).
    - Do: compute how many years of consumed surplus value equal the capital advanced, and say what that means for "the capitalist's own" capital.
    - Lab: `accumulate`, view `simple`. Presets: `marx` (Marx's figures: £1,000 capital, £200 surplus a year consumed), `faster` (£250 a year), `slower` (£100). Pin `acYears`.
    - Misconception: the capital remains the capitalist's original property however long it runs.
-   - Worked: £1,000 advanced and £200 a year consumed: after 5 years the capitalist has eaten the original sum, and what remains is capitalised surplus value.
+   - Worked: £1,000 advanced and £200 a year consumed: after 5 years the capitalist has consumed the original sum, and on Marx's reckoning what remains is capitalised surplus value. The `note` says this is a way of reckoning and gives the standard objection its sentence: one could as well say the capitalist consumed only the surplus.
 
 6. **surplus-value-into-capital** — Surplus Value into Capital — *Chapter 24*
    - Read: "Accumulate, accumulate! That is Moses and the prophets!"
-   - Do: run accumulation period by period with a share of s added to capital, and separate original capital from capitalised surplus value.
-   - Lab: `accumulate`, view `expand`. Presets: `marx` (Marx's figures: £10,000 at 4:1 c to v, 100%, half of s accumulated), `all` (all of s accumulated), `abstinence` (none: simple reproduction). Shipped `periods = 5`. Pin `acCapital`, `acShareOriginal`.
+   - Do: run accumulation period by period with a share of s added to capital, and compute original capital as a share of the present capital.
+   - Lab: `accumulate`, view `expand`. Presets: `marx` (Marx's figures: £10,000 at 4:1 c to v, 100%, all of s capitalised as £1,600c and £400v), `half` (illustrative: half of s accumulated), `abstinence` (none: simple reproduction). Shipped `periods = 5`. Pin `acCapital`, `acShareOriginal`.
    - Misconception: accumulation is the capitalist's "abstinence" from consumption.
-   - Worked: after five years at the Marx preset, a stated share of the capital is capitalised surplus value; the lab prints it.
+   - Worked: after one year at Marx's figures the capital is £12,000, of which £2,000, a sixth, is capitalised surplus value; the lab carries it on for five years.
 
 7. **accumulation-with-constant-composition** — Accumulation with Constant Composition — *Chapter 25 · The General Law of Capitalist Accumulation*
    - Read: §1, "Accumulation of capital is, therefore, increase of the proletariat."
@@ -519,74 +548,76 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 
 8. **the-reserve-army** — The Reserve Army of Labour — *Chapter 25 · The General Law of Capitalist Accumulation*
    - Read: §3, "the progressive production of a relative surplus population or industrial reserve army".
-   - Do: compute employment when capital grows while c/v rises, and the surplus population that results.
+   - Do: compute employment when capital grows while c/v rises, and the surplus population that results. The prose covers §2, concentration and centralisation as the source of the rising composition.
    - Lab: `accumulate`, view `composition`. Presets: `rising` (c/v from 4 to 6 over five periods), `fast-growth`, `constant` (no rise). Pin `acDemand`, `acReserve`.
    - Misconception: accumulation always increases employment.
    - Worked: capital doubles while c/v goes from 1 to 3; v falls from half to a quarter of capital and employment stays flat.
 
 9. **the-general-law-of-accumulation** — The General Law of Capitalist Accumulation — *Chapter 25 · The General Law of Capitalist Accumulation*
    - Read: §4, "Accumulation of wealth at one pole is, therefore, at the same time accumulation of misery… at the opposite pole".
-   - Do: name the floating, latent and stagnant forms of the reserve army in a given population, and compute the ratio of reserve to active workers the law speaks of.
-   - Lab: `accumulate`, view `law`. Presets: `boom`, `slump`, `long-run`. Pin `acReserve`, `acRatio`.
+   - Do: compute the ratio of reserve to active workers period by period while wages per worker rise.
+   - Lab: `accumulate`, view `law`. Presets: `boom` (capital grows fast, c/v rises slowly, wages rise), `slump` (accumulation halts), `long-run` (ten periods of rising c/v). Pin `acRatio`, `acReserve`. The floating, latent and stagnant forms and pauperism, "the lowest sediment", are named in prose and asked in the quiz.
    - Misconception: the law predicts that real wages must always fall.
-   - Worked: the law is about the relative size of the reserve, which can grow while employed workers' wages rise.
+   - Worked: in `boom` the ratio of reserve to employed rises while wages per worker rise. Marx adds that the labourer's lot "must grow worse" be his payment high or low; whether that means relative or absolute worsening is argued, and the lab computes only the ratio.
 
 ### Course 5 — So-Called Primitive Accumulation (`capital-primitive-accumulation`, 8)
 
 1. **the-secret-of-primitive-accumulation** — The Secret of Primitive Accumulation — *Chapter 26*
-   - Read: "This primitive accumulation plays in Political Economy about the same part as original sin in theology."
-   - Do: use the simple-reproduction result to show that accumulation presupposes a capital it cannot itself explain, and say what Marx offers instead of the "nursery tale".
-   - Lab: `accumulate`, view `simple`. Presets: `regress` (any starting capital consumed in n years), `thrift` (a "diligent elite" saving 10% a year of a wage), `separation` (a capital that starts with workers separated from means of production). Pin `acYears`.
+   - Read: "This primitive accumulation plays in Political Economy about the same part as original sin in theology", and the "diligent, intelligent, and, above all, frugal elite".
+   - Do: compute how long a frugal worker would save to assemble a capital of a stated size, and compare it with the simple-reproduction result that any capital is consumed in a computable number of years.
+   - Lab: `accumulate`, view `thrift`. Presets: `carpet` (a worker on 3s a day saving a tenth, against the £3,000 wage bill of the carpet factory in “Machinery and the Displaced Worker”), `mill` (against a smaller capital), `regress` (simple reproduction of the saved capital). Pin `acDaysToTarget`.
    - Misconception: the first capitalists became so by saving.
-   - Worked: a worker saving 10% of a 3s wage would need 1,000 days to hoard £15; the mill of Chapter 7 needs far more and a workforce besides.
-   - (Volume I's English edition numbers Part Eight as Chapters 26–33; the German edition has them as sections of Chapter 24 and Chapter 25. The lesson says so once.)
+   - Worked: saving 3.6d a day, £3,000 takes 200,000 working days; and a capital assembled that way would still need workers who own nothing.
+   - Numbering: the English edition (followed here, and by Penguin) differs from the German from Chapter 4 on; German Chapter 4 contains English Chapters 4–6, so English Chapter n is German n − 2 for Chapters 7–25, and English Chapters 26–33 are German Chapters 24 and 25, inside German Part Seven. Said once in From Money to Surplus Value's `how_to` and once here.
 
 2. **expropriation-from-the-land** — Expropriation of the Agricultural Population — *Chapter 27*
-   - Read: "the history of this, their expropriation, is written in the annals of mankind in letters of blood and fire" (Chapter 26) and the clearing of the estates.
-   - Do: compute the smallholder's working day before expropriation (all labour for themselves) and the same person's day as a wage-worker, and locate the surplus that separation creates.
-   - Lab: `workday`, view `separate`. Presets: `smallholder` (12 hours, all for the household), `labourer` (12 hours, 6 necessary), `clearing` (many smallholders made labourers). Pin `wdSurplus`.
-   - Misconception: enclosure mattered because it made farming more efficient.
-   - Worked: the same 12-hour day yields 0 hours of surplus to anyone else on one's own land and 6 to an employer after the clearing.
+   - Read: from Chapter 27 itself — the clearing of the estates (the Sutherland clearances).
+   - Do: compute the smallholder's working day before expropriation (all labour for the household) and the same person's day as a wage-worker, and the surplus that separation makes available to an employer, for one person and for a cleared estate.
+   - Lab: `workday`, view `separate`. Presets: `smallholder` (12 hours, all for the household), `labourer` (12 hours, 6 necessary), `clearing` (a stated number of households made labourers). Pin `wdSurplus`.
+   - Misconception: enclosure was only a change in farming technique, with no effect on who had to work for wages.
+   - Worked: the same 12-hour day yields 0 hours of surplus to anyone else on one's own land and 6 to an employer after the clearing. Whether enclosure also raised yields is a separate, debated question that Marx says he sets aside ("We leave on one side here the purely economic causes of the agricultural revolution").
 
 3. **bloody-legislation** — Bloody Legislation and the Forcing Down of Wages — *Chapter 28*
    - Read: the Statute of Labourers of 1349 and "laws for the compulsion of labour".
    - Do: compute the gap between a statutory maximum wage and the value of labour-power, and the rate of surplus value the law enforces.
    - Lab: `wages`, view `statute`. Presets: `statute` (illustrative statutory maximum below value), `market` (wage at value), `combination` (wages after combination laws). Pin `waGap`, `waRate`. The lesson says the figures are illustrative.
-   - Misconception: wage labour was always freely contracted.
+   - Misconception: a wage law protects the worker by setting a floor.
    - Worked: a legal maximum one-third below the value of labour-power turns a 100% rate into one of 200%.
 
 4. **the-capitalist-farmer** — Genesis of the Capitalist Farmer — *Chapter 29*
-   - Read: "The fall in the value of the precious metals, and therefore of money, brought the farmer golden fruit."
-   - Do: compute a money rent fixed by long lease while gold's value falls and prices rise, and the farmer's gain at the landlord's and labourer's expense.
-   - Lab: `money`, view `fixed-rent`. Presets: `price-revolution` (prices double over the lease), `stable`, `wages-lag` (wages rise by half as much). Pin `moRealRent`, `moFarmerGain`.
-   - Misconception: the capitalist farmer grew rich by working harder than the yeoman.
+   - Read: "The progressive fall in the value of the precious metals, and therefore of money, brought the farmers golden fruit." (Check the Kerr wording.)
+   - Do: compute a money rent fixed by long lease while prices rise, its real value, and the farmer's gain when wages lag.
+   - Lab: `money`, view `fixed-rent`. Presets: `price-revolution` (prices double over the lease), `stable`, `wages-lag` (money wages rise by half as much as prices). Pin `moRealRent`, `moFarmerGain`.
+   - Misconception: when all prices double, every party is where it was.
    - Worked: a £20 rent fixed while prices double now costs the farmer half as much in corn.
 
 5. **the-home-market** — The Home Market for Industrial Capital — *Chapter 30*
    - Read: "The expropriation and expulsion of the agricultural population… set free… their former means of nourishment".
    - Do: compute the market created when households that produced their own subsistence must buy it, and the variable capital that now circulates.
-   - Lab: `circuit`, view `market`. Presets: `before` (100 households, self-supplied), `after` (the same households as wage-earners), `half`. Pin `ciMarket`.
+   - Lab: `circuit`, view `market`. Presets: `before` (100 households, self-supplied), `after` (the same households as wage-earners), `half`. Pin `ciMarket`, `ciLpValue` (the market created equals the wage bill that now circulates: one number from two sides).
    - Misconception: the home market grew because people became richer.
    - Worked: 100 households that spun their own yarn now buy it: the same use-values, newly commodities, a market where none was.
 
 6. **the-industrial-capitalist** — Genesis of the Industrial Capitalist — *Chapter 31*
-   - Read: "The public debt becomes one of the most powerful levers of primitive accumulation."
-   - Do: compute the capitalised value of a state debt from its annual interest, and the tax burden that services it.
+   - Read: "Force is the midwife of every old society pregnant with a new one", with Marx's list of levers: the colonies, the national debt, the modern mode of taxation and the protectionist system.
+   - Do: name the four levers and compute one of them: the capitalised value of a state debt from its annual interest and the tax that services it.
    - Lab: `interest`, view `capitalise`. Presets: `consols` (£3 a year at 3%), `cheap-money` (rate falls to 2%), `tax` (interest paid from taxes on necessaries). Pin `inPrice`.
-   - Misconception: public debt is wealth the nation owes itself and so costs nothing.
+   - Misconception (Marx's own target): the national debt is part of the nation's wealth. His sarcasm: the only part of the so-called national wealth that enters the collective possession of modern peoples is their national debt.
    - Worked: £3 a year at 3% is a £100 claim; nothing was built, but £100 is now capital in its owner's books.
+   - The `note` defines "capitalise" locally (a yearly £3 is called a £100 claim because £100 at 3% pays £3; why that rate exists is Volume III's question), since interest is not taught until Merchant's Capital and Interest.
+   - The prose gives the colonial system and the slave trade their place; the chapter is not only about consols.
 
 7. **the-historical-tendency** — Historical Tendency of Capitalist Accumulation — *Chapter 32*
    - Read: "The knell of capitalist private property sounds. The expropriators are expropriated."
-   - Do: compute concentration and centralisation for a set of capitals over several periods and the share held by the largest.
-   - Lab: `accumulate`, view `centralise`. Presets: `ten` (ten capitals, equal), `merge` (the largest absorbs the smallest each period), `grow` (all grow, no merger). Pin `acTopShare`, `acCount`.
-   - Misconception: Marx's tendency is a forecast with a date.
-   - Worked: ten equal capitals where the largest absorbs the smallest each period leave one capital holding half the total after five periods.
+   - Do: compute concentration (every capital growing) and centralisation (capitals merging) for a set of capitals over several periods, and the share held by the largest.
+   - Lab: `accumulate`, view `centralise`. Presets: `ten` (ten equal capitals), `merge` (the largest absorbs the smallest each period), `grow` (all grow at the same rate, no merger). Pin `acTopShare`, `acCount`.
+   - Misconception: concentration and centralisation are the same thing.
+   - Worked: ten equal capitals where the largest absorbs the smallest each period leave one holding 6/10 after five periods; if all simply grow, the largest still holds 1/10.
 
 8. **the-modern-theory-of-colonisation** — The Modern Theory of Colonisation — *Chapter 33*
    - Read: Mr. Peel who took £50,000 and 3,000 workers to the Swan River, and was "left without a servant to make his bed".
    - Do: compute the labour supply left to a colonial capitalist when workers can take free land, and Wakefield's land price that restores it.
-   - Lab: `accumulate`, view `colony`. Presets: `peel` (Marx's figures: 3,000 workers, free land), `wakefield` (a land price that takes years of wages to pay), `closed` (no free land). Pin `acReserve`, `acYearsToLand`.
+   - Lab: `accumulate`, view `colony`. Presets: `peel` (Marx's figures as printed in the Kerr text: £50,000 and 3,000 workers, free land; the 1887 Moore–Aveling printing reads 300, and the `note` says so), `wakefield` (a land price that takes years of wages to pay), `closed` (no free land). Pin `acReserve`, `acYearsToLand`.
    - Misconception: capital is a thing — money and machines — that can be exported.
    - Worked: with free land every worker leaves; at a price of 4 years' savings the labour market is restored for 4 years per worker.
 
@@ -595,7 +626,7 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
 
 1. **the-circuit-of-money-capital** — The Circuit of Money Capital — *Chapter 1*
-   - Read: the formula M–C…P…C′–M′ and "the circuit of money-capital is… the most one-sided… form".
+   - Read: the formula M–C…P…C′–M′ and the passage calling the circuit of money-capital the most one-sided, and so the most striking and typical, form.
    - Do: trace a capital through its three stages, give the value in each form, and compute s from M and M′.
    - Lab: `circuit`, view `stages`. Presets: `marx` (Marx's figures: £422 advanced as £372 means of production and £50 labour-power; product 10,000 lb yarn worth £500), `unsold` (C′ not yet sold), `partly` (half sold). Pin `ciMprime`, `ciS`.
    - Misconception: the money at the end is where the surplus is made.
@@ -603,8 +634,8 @@ Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
 
 2. **the-circuit-of-productive-capital** — The Circuit of Productive Capital — *Chapter 2*
    - Read: "the circuit of productive capital has the general formula P…C′–M′–C…P".
-   - Do: run the productive circuit under simple reproduction and under accumulation and compute the capital that re-enters P.
-   - Lab: `accumulate`, view `simple`, with `circuit = productive`. Presets: `simple` (all of s spent), `accumulate` (half of s re-enters P), `hoard` (s accumulated as a money hoard until it is large enough to invest). Pin `acCapital`.
+   - Do: run the productive circuit under simple reproduction and under accumulation, compute the capital that re-enters P, and the money held back until it is large enough to invest.
+   - Lab: `accumulate`, view `expand`, shipped `periods = 1`. Presets: `simple` (all of s spent), `accumulate` (half of s re-enters P), `hoard` (s held as money until it reaches `invest_threshold`). Pin `acCapital`, `acHoard`.
    - Misconception: the productive circuit is the money circuit started at a different point.
    - Worked: with £78 of s, simple reproduction restarts P at £422; accumulating half restarts it at £461.
 
@@ -623,11 +654,12 @@ Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
    - Worked: with 4 weeks in each stage, a continuous business always has a third of its capital in each form.
 
 5. **the-time-of-circulation** — The Time of Circulation — *Chapter 5*
-   - Read: "The time of circulation and the time of production mutually exclude each other."
-   - Do: compute turnover time as production time plus circulation time, and production time as working time plus the time the product only waits (wine maturing, corn growing).
-   - Lab: `turnover`, view `time`. Presets: `spinning`, `wine` (production time well above working time), `distant-market`. Pin `tuTurnover`, `tuWorkingShare`.
-   - Misconception: every week in which capital is tied up is a week of labour.
-   - Worked: wine worked for 4 weeks and cellared for 48 has a production time of a year and creates value for 4 weeks of it.
+   - Read: "Time of circulation and time of production mutually exclude each other." (Kerr wording to be checked.)
+   - Do: compute turnover time as production time plus circulation time, and the share of the turnover spent in circulation.
+   - Lab: `turnover`, view `time`. Presets: `spinning`, `slow-sale` (circulation as long as production), `distant-market`. Pin `tuTurnover`, `tuCirculationShare`.
+   - Misconception: a capital is producing value for as long as it is tied up.
+   - Worked: 6 weeks of production and 6 of circulation is a 12-week turnover, half of it in circulation.
+   - Working time against production time (wine, timber) is left to “The Time of Production”.
 
 6. **the-costs-of-circulation** — The Costs of Circulation — *Chapter 6*
    - Read: §1, the costs of buying and selling and of book-keeping, "faux frais"; §2, storage; §3, transport.
@@ -639,25 +671,25 @@ Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
 ### Course 7 — The Turnover of Capital (`capital-turnover-of-capital`, 11)
 
 1. **turnover-time-and-number-of-turnovers** — Turnover Time and the Number of Turnovers — *Chapter 7*
-   - Read: "the year is the natural unit of measure for the turnovers of functioning capital".
+   - Read: the passage making the year the natural unit for measuring turnovers (Kerr wording, and its notation for n, to be taken from the text).
    - Do: compute n = U/u for given turnover times.
-   - Lab: `turnover`, view `time`. Presets: `three-months`, `five-weeks`, `two-years`. Pin `tuTurnovers`.
+   - Lab: `turnover`, view `time`. Presets: `three-months`, `five-weeks`, `two-years`. Shipped `year_weeks = 52`. Pin `tuTurnovers`, `tuAggregate` (value turned over against capital advanced).
    - Misconception: a capital that turns over twice a year has twice the capital.
-   - Worked: a turnover of 3 months gives 4 turnovers a year of the same capital.
+   - Worked: £400 with a 3-month turnover turns over 4 times a year: £1,600 of value turned over, still £400 of capital.
 
 2. **fixed-and-circulating-capital** — Fixed Capital and Circulating Capital — *Chapter 8*
    - Read: §1, fixed capital "circulates… piecemeal, in proportion to its wear and tear".
    - Do: compute the annual value transferred by fixed capital from value and life, and the circulating capital's turnover in the same year.
-   - Lab: `turnover`, view `fixed`. Presets: `ten-years` (£10,000 machine, 10 years), `repairs` (with repair costs), `moral` (moral depreciation: a cheaper machine appears in year 4). Pin `tuWear`, `tuRemaining`.
+   - Lab: `turnover`, view `fixed`. Presets: `ten-years` (£10,000 machine, 10 years), `repairs` (with `repairs_per_year`), `moral` (moral depreciation: a machine of the same kind costing half appears in year 4, `replacement_value`, `appears_year`). Pin `tuWear`, `tuRemaining`.
    - Misconception: fixed and circulating are the same distinction as constant and variable.
    - Worked: a £10,000 machine on a 10-year life transfers £1,000 a year and still has £6,000 of value locked in after four.
 
 3. **aggregate-turnover** — The Aggregate Turnover of Advanced Capital — *Chapter 9*
-   - Read: "the value turned over… is the sum of the value of the fixed and circulating capital that has turned over".
-   - Do: compute the aggregate turnover of a capital with fixed and circulating parts and the average turnover time.
-   - Lab: `turnover`, view `aggregate`. Presets: `marx` (Marx's figures for fixed and circulating capital, verified from the text), `heavy-fixed`, `light-fixed`. Pin `tuAggregate`, `tuAverage`.
+   - Read: from §3 of the chapter, Marx's own figures (Kerr wording).
+   - Do: compute the aggregate turnover of a capital with fixed and circulating parts and the time the whole capital takes to turn over once.
+   - Lab: `turnover`, view `aggregate`. Presets: `marx` (Marx's figures: fixed £80,000 on a 10-year life, circulating £20,000 turned 5 times a year), `heavy-fixed`, `light-fixed`. Pin `tuAggregate`, `tuAverage`.
    - Misconception: a capital's turnover time is the turnover time of its circulating part.
-   - Worked: the lab prints the value turned over in a year and the months the whole capital takes to turn over once.
+   - Worked: £8,000 of wear plus £100,000 of circulating capital is £108,000 turned over on £100,000 advanced, 1 + 2/25 turnovers a year.
 
 4. **physiocrats-and-adam-smith** — The Physiocrats and Adam Smith on Fixed Capital — *Chapter 10*
    - Read: Smith's definition of fixed capital as what yields a profit "without circulating".
@@ -668,10 +700,10 @@ Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
 
 5. **ricardo-on-fixed-and-circulating-capital** — Ricardo on Fixed and Circulating Capital — *Chapter 11*
    - Read: Ricardo's use of durability to explain departures from labour values.
-   - Do: compute two capitals with equal totals and different fixed shares and show what the fixed/circulating split explains and what it hides.
-   - Lab: `turnover`, view `classify`. Presets: `durable`, `wages-heavy`, `equal`. Pin `tuFixed`, `tuVariable`.
+   - Do: compute two capitals with the same fixed share and different wage bills, and the surplus value each produces at the same s′.
+   - Lab: `turnover`, view `classify`. Presets: `same-fixed` (two £1,000 capitals, both a quarter fixed, wages 250 and 500), `durable`, `equal`. Pin `tuVariable`, `tuS`.
    - Misconception: the fixed/circulating split explains where profit comes from.
-   - Worked: two £1,000 capitals with the same fixed share but different wage bills produce different s; the fixed share cannot tell them apart.
+   - Worked: same fixed share, different wage bills, different s at 100%: the fixed share cannot tell them apart.
 
 6. **the-working-period** — The Working Period — *Chapter 12*
    - Read: "a locomotive… is the product of… a working period" and the capital tied up until it is finished.
@@ -697,28 +729,28 @@ Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
 9. **turnover-time-and-capital-advanced** — Turnover Time and the Capital Advanced — *Chapter 15*
    - Read: §1–3, the working period of 9 weeks and the circulation period of 3, and the additional capital.
    - Do: compute the additional capital a continuous business needs when its working and circulation periods differ, and the capital "set free".
-   - Lab: `turnover`, view `advance`. Presets: `marx` (Marx's figures: 9-week working period at £100 a week, 3-week circulation), `equal` (working = circulation), `longer-circulation`. Pin `tuAdvance`, `tuFreed`.
+   - Lab: `turnover`, view `advance`. Presets: `marx` (Marx's figures: 9-week working period at £100 a week, 3-week circulation, a 50-week year), `equal` (working = circulation), `longer-circulation`. Pin `tuAdvance`, `tuFreed`.
    - Misconception: a capital needs only enough to cover one working period.
    - Worked: 9 weeks at £100 is capital I of £900; to keep working while it circulates for 3 weeks needs capital II of £300.
 
 10. **the-turnover-of-variable-capital** — The Turnover of Variable Capital — *Chapter 16*
     - Read: §1, "the annual rate of surplus value".
     - Do: compute the annual rate of surplus value s′·n and show why it differs between capitals with the same real s′.
-    - Lab: `turnover`, view `annual`. Presets: `marx-a` (Marx's figures: £500 variable, 10 turnovers, 100%), `marx-b` (£5,000 variable, 1 turnover, 100%), `same-mass` (both). Pin `tuAnnualRate`, `tuMassS`.
+    - Lab: `turnover`, view `annual`. Presets: `marx-a` (Marx's figures: £500 variable, a 5-week turnover in a 50-week year, 100%), `marx-b` (£5,000 advanced for the 50-week year, 100%), `same-mass` (both). Pin `tuAnnualRate`, `tuMassS`.
     - Misconception: a capital that turns over faster exploits its workers harder.
     - Worked: capital A's annual rate is 1,000% and B's 100%; the workers in both are exploited at 100% and produce the same mass of s.
 
 11. **the-circulation-of-surplus-value** — The Circulation of Surplus Value — *Chapter 17*
-    - Read: "where does the money come from" to realise the surplus value.
-    - Do: compute the money the capitalist class must throw into circulation for its consumption and show it returns as realised s.
-    - Lab: `circuit`, view `realise`. Presets: `consumption` (£100 spent on consumption ahead of sales), `gold` (gold producers' s), `credit`. Pin `ciReturned`.
-    - Misconception: there is never enough money to realise surplus value, so capitalism needs constant outside demand.
-    - Worked: capitalists spend £100 on consumption during the year; the same £100 returns as the money form of £100 of s.
+    - Read: the question where the money comes from to realise the surplus value, and Marx's answer that the capitalist class itself throws it into circulation.
+    - Do: compute the money the capitalist class must advance for its own consumption and the surplus value realised when it returns.
+    - Lab: `circuit`, view `realise`. Presets: `consumption` (£100 spent ahead of sales), `gold` (gold producers' s), `credit`. Pin `ciReturned`.
+    - Misconception: surplus value cannot be realised in money unless someone outside the capitalist class supplies the money.
+    - Worked: capitalists spend £100 on consumption during the year; the same £100 returns as the money form of £100 of s. Whether this answer also covers accumulation is the question Luxemburg reopened; the `note` says so.
 
 ### Course 8 — Reproduction of the Social Capital (`capital-social-reproduction`, 6)
 
-1. **the-object-of-the-inquiry** — The Object of the Inquiry — *Chapter 18*
-   - Read: "the movement of the total social capital… comprises the productive consumption… and the individual consumption".
+1. **the-object-of-the-inquiry** — The Object of the Inquiry — *Chapter 18 · Introduction*
+   - Read: the passage beginning "This total process comprises both the productive consumption…" (Kerr wording).
    - Do: sort a society's product into means of production and means of consumption and say why the individual capital's circuit cannot answer the social question.
    - Lab: `schemes`, view `sort`. Presets: `two-dept` (a small product list), `marx-totals`, `misclassified` (coal used at home). Pin `scDeptI`, `scDeptII`.
    - Misconception: the economy is one big firm.
@@ -739,23 +771,23 @@ Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
    - Worked: I(1,000v + 1,000s) = 2,000 = IIc; the scheme closes; raise I's s by 100 and 100 of means of production find no buyer.
 
 4. **simple-reproduction-fixed-capital-and-money** — Simple Reproduction: Fixed Capital and Money — *Chapter 20 · Simple Reproduction*
-   - Read: §11, the replacement of fixed capital, and §12, the reproduction of the money material.
-   - Do: compute the balance between capitals hoarding for wear and capitals renewing their machines in Department II, and the crisis when they diverge.
-   - Lab: `schemes`, view `fixed`. Presets: `balanced` (wear set aside = renewals bought), `bunched` (renewals all fall in one year), `gold`. Pin `scFixedGap`.
+   - Read: §11, the replacement of fixed capital.
+   - Do: compute the signed gap between the wear Department II hoards in money and the renewals it buys in kind, and say which side is short.
+   - Lab: `schemes`, view `fixed`. Presets: `balanced` (200 hoarded, 200 renewed), `short-renewals` (renewals 100 against 200 hoarded), `bunched` (renewals 300). Pin `scFixedGap`.
    - Misconception: depreciation is a cost that balances automatically every year.
-   - Worked: 200 of wear set aside against 200 of renewals: balanced; let renewals bunch to 300 and 100 of Department I's product cannot be sold.
+   - Worked: renewals of 100 against 200 hoarded leave 100 of Department I's product without a buyer, Marx's crisis of over-production "in spite of reproduction on an unchanging scale"; renewals of 300 leave Department I 100 short.
 
 5. **accumulation-and-money** — Accumulation in Department I and the Money It Needs — *Chapter 21 · Accumulation and Reproduction on an Extended Scale*
-   - Read: §1, the hoard as "virtual new money-capital".
-   - Do: compute how one-sided sales (hoarding) and purchases (investing) must balance for accumulation to proceed.
+   - Read: §1, the hoard that "represents new potential money-capital" (Kerr wording to be checked).
+   - Do: compute the surplus product left unsold when the capitalists of Department I who hoard and those who invest do not balance.
    - Lab: `schemes`, view `hoard`. Presets: `balanced` (sellers and buyers of surplus product equal), `all-hoard`, `all-invest`. Pin `scHoardGap`.
-   - Misconception: saving automatically becomes investment.
+   - Misconception (Say's law, stated at strength first): every sale is a purchase, so saving automatically becomes investment.
    - Worked: if every capitalist in Department I hoards at once, 500 of surplus product is unsold.
 
 6. **extended-reproduction** — Reproduction on an Extended Scale — *Chapter 21 · Accumulation and Reproduction on an Extended Scale*
    - Read: §3, the schematic presentation, "I. 4,000c + 1,000v + 1,000s = 6,000; II. 1,500c + 750v + 750s = 3,000".
    - Do: run the expanded scheme for several years, with Department I accumulating half its s and Department II adjusting, and compute the growth path.
-   - Lab: `schemes`, view `expanded`. Presets: `marx` (Marx's figures: the first example), `ii-leads` (Department II tries to set the pace), `half-half`. Shipped `years = 4`. Pin `scYear2`, `scGrowth`.
+   - Lab: `schemes`, view `expanded`. Presets: `marx` (Marx's figures: the first example), `ii-short` (Department II's s is too small to balance: the period is refused and the banner says why), `half-half`. Shipped `years = 4`. Pin `scYear2`, `scGrowth`.
    - Misconception: the two departments can grow at any rates they like.
    - Worked: from I 4,000c + 1,000v + 1,000s and II 1,500c + 750v + 750s, year one ends at I 4,400c + 1,100v and II 1,600c + 800v.
 
@@ -771,23 +803,23 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
    - Worked: 600 of value, 500 of cost price: a sale at 560 is profitable and still 40 below value.
 
 2. **the-rate-of-profit** — The Rate of Profit — *Chapter 2*
-   - Read: "the rate of surplus value measured against the variable capital is called rate of surplus value; measured against the total capital it is called rate of profit".
+   - Read: the two sentences defining the rate of surplus value against v and the rate of profit against the total capital (Kerr wording).
    - Do: compute p′ = s/(c + v) beside s′ = s/v for the same capital.
    - Lab: `profit`, view `rate`. Presets: `marx`, `labour-heavy`, `capital-heavy`. Pin `prRate`, `prSRate`.
    - Misconception: the rate of profit measures exploitation.
    - Worked: 100s on 400c + 100v is 100% s′ and 20% p′.
 
 3. **rate-of-profit-and-rate-of-surplus-value** — The Rate of Profit and the Rate of Surplus Value — *Chapter 3*
-   - Read: "p′ = s′ v/C".
+   - Read: the formula p′ = s′·v/C as the Kerr text prints it.
    - Do: vary s′ and the composition one at a time and predict the effect on p′.
    - Lab: `profit`, view `relation`. Presets: `vary-s`, `vary-composition`, `both-offset` (a rise in s′ exactly offset by a rise in c/v). Pin `prRate`.
    - Misconception: a rising rate of surplus value must raise the rate of profit.
    - Worked: s′ up from 100% to 150% while c/v rises from 4 to 6.5: p′ stays at 20%.
 
 4. **turnover-and-the-rate-of-profit** — The Effect of Turnover on the Rate of Profit — *Chapter 4*
-   - Read: the annual rate of profit and the turnover of the variable capital.
+   - Read: from Engels' text of the chapter; Engels' preface says Marx left only the title, and the lesson says so in its first paragraph.
    - Do: compute the annual rate of profit from s′, n, v and C.
-   - Lab: `profit`, view `turnover`. Presets: `once`, `ten-times`, `faster-sale`. Pin `prAnnual`.
+   - Lab: `profit`, view `turnover`. Presets: `engels` (Engels' Manchester spinning mill, figures from the chapter, labelled "Engels' figures"), `once`, `ten-times`. Pin `prAnnual`.
    - Misconception: turnover affects only the circulating capital's profit.
    - Worked: v = 100 turned 5 times at 100% on C = 1,000 gives an annual p′ of 50%.
 
@@ -803,26 +835,26 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
    - Do: compute p′ when the raw material's price rises, with and without the product's price following.
    - Lab: `profit`, view `price`. Presets: `cotton-famine` (cotton doubles), `passed-on`, `cheaper`. Pin `prRate`.
    - Misconception: a raw material price rise is always passed on in full.
-   - Worked: if raw material in c rises by 100 and the product's price does not, p′ falls from 20% to 1/6.
+   - Worked: c rises from 400 to 500; if the price follows to 700, p′ = 100/600 = 1/6; if it stays at 600, profit is 0. `price_passed_on` moves between the two.
 
 7. **supplementary-remarks-on-profit** — Supplementary Remarks on Profit — *Chapter 7*
    - Read: the capitalist's "practical notion" of profit and why it must differ from s.
    - Do: reconcile the capitalist's book-keeping view (profit on capital, cost price) with Marx's categories for the same numbers.
    - Lab: `profit`, view `books`. Presets: `ledger`, `marx-view`, `both`. Pin `prProfit`, `prRate`.
-   - Misconception: the two accounts disagree about the numbers.
-   - Worked: the books and the analysis agree on every figure; they disagree only about what the 100 is.
+   - Misconception: a capitalist who sells at value makes no profit.
+   - Worked: sold at its value of 600, the commodity yields a profit of 100 over its cost price of 500; the books and the analysis agree on every figure and disagree only about what the 100 is.
 
 ### Course 10 — Average Profit and Its Fall (`capital-prices-of-production`, 8)
 
 1. **different-compositions-different-rates** — Different Compositions, Different Rates of Profit — *Chapter 8*
-   - Read: the five capitals with "the same rate of surplus value" and "very different rates of profit".
-   - Do: compute the rate of profit of each of five spheres from c, v and a common s′, and state the problem it creates for selling at value.
-   - Lab: `prices`, view `rates`. Presets: `marx` (Marx's figures: 80c+20v, 70c+30v, 60c+40v, 85c+15v, 95c+5v at 100%), `two`, `equal-composition`. Pin `ppRates`.
-   - Misconception: competition already makes rates of profit equal at values.
-   - Worked: at 100% s′ the five rates run from 5% to 40%.
+   - Read: the chapter's comparison of capitals of equal size and unequal composition at the same rate of surplus value.
+   - Do: compute the rate of profit of capitals with different compositions and rates of surplus value, and state what selling at value would imply for them.
+   - Lab: `prices`, view `rates`. Presets: `marx` (Marx's ch. 8 figures: 90c + 10v against 10c + 90v at the same s′), `europe-asia` (Marx's European 84c + 16v at 100% against the Asian 16c + 84v at 25%), `equal-composition`. Pin `ppRates`.
+   - Misconception: a higher rate of surplus value always means a higher rate of profit.
+   - Worked: the Asian capital's s′ is a quarter of the European's and its rate of profit is higher: 21% against 16%.
 
 2. **the-general-rate-of-profit** — The General Rate of Profit and Prices of Production — *Chapter 9*
-   - Read: the table of five spheres, with used-up c, and "the sum of the prices of production… is equal to the sum of their values".
+   - Read: the table of five spheres, with used-up c, and the sentence saying the aggregate price of the commodities I to V equals their aggregate value (Kerr wording).
    - Do: compute the average rate of profit and each sphere's price of production, and check that total profit equals total surplus value and total price equals total value.
    - Lab: `prices`, view `production`. Presets: `marx` (Marx's figures with used-up c of 50, 51, 51, 40, 10), `all-used-up`, `three`. Pin `ppAverage`, `ppPrices`, `ppTotals`.
    - Misconception: prices of production abolish the law of value because no commodity sells at its value.
@@ -836,11 +868,11 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
    - Worked: 1,000 units at 3 h, 8,000 at 4 h and 1,000 at 5 h: market value 4 hours; the best group earns 1 hour of surplus profit per unit.
 
 4. **wages-and-prices-of-production** — Wage Changes and Prices of Production — *Chapter 11*
-   - Read: "a general rise in wages… the price of production of commodities from a capital of lower composition rises".
-   - Do: recompute prices of production after a general wage rise and show which prices rise, which fall and which stay.
-   - Lab: `prices`, view `wage-rise`. Presets: `marx` (Marx's figures: social average 80c + 20v, a 25% rise in wages), `three-spheres`, `fall`. Pin `ppPrices`, `ppAverage`.
+   - Read: the passage on a general rise in wages and the prices of products of capitals of lower and higher composition.
+   - Do: recompute prices of production after a general wage rise, with the new rate taken over the enlarged capital, and classify each sphere's price as rising, falling or unchanged.
+   - Lab: `prices`, view `wage-rise`. Presets: `marx` (Marx's figures: 50c + 50v, 80c + 20v, 92c + 8v at a 20% average rate; wages rise 25%), `two-spheres`, `fall`. Pin `ppPrices`, `ppAverage`.
    - Misconception: a general wage rise raises all prices.
-   - Worked: the average-composition sphere's price is unchanged; the labour-heavy sphere's rises and the capital-heavy sphere's falls.
+   - Worked: profit of 15 on the enlarged 105 is 14 2/7%; the average sphere stays at 120, the low-composition sphere rises to 128 8/14, the high-composition one falls to 116 4/7. The `note` says Marx's own text prints two figures for the low-composition profit.
 
 5. **supplementary-remarks-on-prices** — Supplementary Remarks on Prices of Production — *Chapter 12*
    - Read: §3, "the capitalist's grounds for compensation".
@@ -852,30 +884,30 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
 6. **the-law-as-such** — The Falling Rate of Profit: The Law as Such — *Chapter 13*
    - Read: the table "s′ = 100%: c = 50, v = 100 → p′ = 66⅔%; c = 100 → 50%; c = 200 → 33⅓%; c = 300 → 25%; c = 400 → 20%".
    - Do: compute p′ for a rising c/v at constant s′, and the mass of profit when total capital grows.
-   - Lab: `tendency`, view `law`. Presets: `marx` (Marx's figures), `growing-mass` (capital doubling while p′ falls), `steady`. Pin `teRate`, `teMass`.
+   - Lab: `tendency`, view `law`. Presets: `marx` (Marx's table), `mass-rises` (Marx's illustration: 4c + 2v + 2s against 15c + 3v + 3s), `steady`. Pin `teRate`, `teMass`.
    - Misconception: a falling rate of profit means falling profits.
-   - Worked: 66⅔% falls to 20% while the mass of profit can double if capital more than triples.
+   - Worked: from 4c + 2v + 2s to 15c + 3v + 3s the rate falls from 33⅓% to 16⅔% while the mass of profit rises by half.
 
 7. **counteracting-influences** — Counteracting Influences — *Chapter 14*
-   - Read: "Increasing intensity of exploitation… Depression of wages… Cheapening of elements of constant capital… Relative over-population… Foreign trade… The increase of stock capital".
-   - Do: apply each counteracting factor to the law's sequence and compute how much of the fall it offsets.
+   - Read: the list of influences, from "Increasing intensity of exploitation" to "The increase of stock capital".
+   - Do: apply each counteracting influence to the law's sequence and compute how much of the fall it offsets.
    - Lab: `tendency`, view `counter`. Presets: `rising-s`, `cheap-c`, `combined`. Pin `teRate`, `teOffset`.
-   - Misconception: the counteracting factors refute the law.
-   - Worked: raising s′ from 100% to 150% holds p′ at 25% when c/v rises from 3 to 5 — and cannot go on doing so indefinitely.
+   - Misconception: the counteracting influences are either exceptions that leave the law untouched or a refutation of it; Marx's own claim is narrower: they make the fall a tendency.
+   - Worked: raising s′ from 100% to 150% holds p′ at 25% when c/v rises from 3 to 5. Marx argues a rising s′ cannot offset a rising c/v without limit; whether that is so is the most argued question about Part III (Okishio, 1961), and the lab does not settle it.
 
 8. **internal-contradictions-of-the-law** — The Internal Contradictions of the Law — *Chapter 15*
    - Read: "The real barrier of capitalist production is capital itself."
    - Do: compute when additional capital adds no additional profit (absolute over-accumulation) and the devaluation that restores the rate.
-   - Lab: `tendency`, view `overaccumulation`. Presets: `marx` (the case where extra capital C yields no more than before), `devalue` (a third of capital destroyed), `mild`. Pin `teMass`, `teRate`.
+   - Lab: `tendency`, view `overaccumulation`. Presets: `marx` (Marx's figures: a capital of 1,000 yielding 100 grows to 1,500 and still yields 100), `devalue` (a third of capital destroyed), `mild`. Pin `teMass`, `teRate`.
    - Misconception: crises come from a shortage of capital.
-   - Worked: add 100 to a capital of 500 and get the same 100 of profit: p′ falls from 20% to 1/6, and "superfluous" capital follows.
+   - Worked: 1,000 yielding 100 grows to 1,500 still yielding 100: p′ falls from 10% to 6⅔%, and the additional 500 has added nothing to profit.
 
 ### Course 11 — Merchant's Capital and Interest (`capital-merchants-and-interest`, 9)
 
 1. **commercial-capital** — Commercial Capital — *Chapter 16*
-   - Read: "Commercial capital… is nothing but the converted form of a portion of… capital in circulation."
+   - Read: the sentence calling commercial capital a transmuted (or converted) form of part of the capital of circulation (Kerr wording).
    - Do: compute the capital an industrialist saves by selling to a merchant and the merchant capital needed to circulate a product.
-   - Lab: `turnover`, view `merchant`. Presets: `no-merchant`, `merchant`, `faster-merchant`. Pin `tuAdvance`.
+   - Lab: `turnover`, view `merchant`. Presets: `no-merchant`, `merchant`, `faster-merchant`. Pin `tuFreed`.
    - Misconception: merchants produce value by moving goods from hand to hand.
    - Worked: a merchant who turns over £100 five times frees £500 of the industrialists' circulating capital.
 
@@ -889,9 +921,9 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
 3. **the-turnover-of-merchants-capital** — The Turnover of Merchant's Capital — *Chapter 18*
    - Read: the merchant's turnover and "the commercial profit on each turnover".
    - Do: compute the mark-up per turnover from the general rate and the merchant's turnovers a year.
-   - Lab: `prices`, view `merchant-turnover`. Presets: `once`, `ten`, `grocer`. Pin `ppMarkup`.
+   - Lab: `prices`, view `merchant-turnover`. Presets: `marx` (Marx's figures: 15% a year, five turnovers), `once`, `ten`. Pin `ppMarkup`.
    - Misconception: a faster-turning merchant earns a higher rate of profit.
-   - Worked: at 15% a year, a merchant who turns over 10 times adds 1½% to each sale.
+   - Worked: at 15% a year, a merchant who turns over five times sells at 103 each time, 3% a turnover.
 
 4. **money-dealing-capital** — Money-Dealing Capital — *Chapter 19*
    - Read: "the purely technical movements that money undergoes".
@@ -901,11 +933,11 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
    - Worked: money-dealing capital of 50 joins the averaging and draws 9 at 18%.
 
 5. **history-of-merchants-capital** — Historical Facts about Merchant's Capital — *Chapter 20*
-   - Read: "Merchant's capital is originally merely the intervening movement between extremes which it does not control."
-   - Do: compute a pre-capitalist merchant's profit from buying cheap in one community and selling dear in another, beside the capitalist merchant's average profit.
-   - Lab: `circuit`, view `markup`, with `between = communities`. Presets: `venice`, `dutch`, `capitalist`. Pin `ciDelta`.
-   - Misconception: merchant capital always tended to develop into industrial capital.
-   - Worked: buying at 60 and selling at 100 in a market with no equalisation yields 40, which no general rate limits.
+   - Read: "Merchant's capital is originally merely the intervening movement between extremes which it does not control." (Kerr wording to be checked.)
+   - Do: compute a pre-capitalist merchant's gain from buying cheap in one community and selling dear in another, beside the capitalist merchant's share of an average rate.
+   - Lab: `circuit`, view `formula`. Presets: `venice` (buy at 60, sell at 100), `dutch`, `capitalist` (a merchant held to an 18% average). Pin `ciDelta`.
+   - Misconception: a merchant's profit is always a share of an average rate of profit.
+   - Worked: buying at 60 and selling at 100 between communities yields 40 that no general rate limits; the capitalist merchant of “Commercial Profit” gets 18 on 100.
 
 6. **interest-bearing-capital** — Interest-Bearing Capital — *Chapter 21*
    - Read: "a man has £100 at his disposal… the capacity of producing a profit of £20".
@@ -915,48 +947,49 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
    - Worked: £100 makes £20 at the average rate; £5 goes to the lender and £15 stays with the borrower as profit of enterprise.
 
 7. **the-rate-of-interest** — The Rate of Interest — *Chapter 22*
-   - Read: "There is no such thing as a natural rate of interest."
+   - Read: there is no such thing as a "natural" rate of interest (inner quotation marks as printed).
    - Do: compute interest and profit of enterprise across rates and show the bounds 0 < i < p′.
    - Lab: `interest`, view `bounds`. Presets: `crisis` (interest near the profit rate), `plenty` (interest near zero), `normal`. Pin `inEnterprise`, `inBound`.
    - Misconception: there is a natural rate of interest set by productivity.
-   - Worked: at a 20% average rate the rate of interest can be anything below 20%; competition, not nature, decides where.
+   - Worked: at a 20% average rate the average profit is the normal ceiling and the floor is indeterminate; competition, not nature, decides where. In a crisis the ceiling can be breached, and the interest is then not paid out of profit: `inBound` prints "breached" without error.
 
 8. **interest-and-profit-of-enterprise** — Interest and Profit of Enterprise — *Chapter 23*
    - Read: the "wages of superintendence" and the capitalist who borrows.
    - Do: split gross profit into interest and profit of enterprise and separate the wages of a hired manager from both.
    - Lab: `interest`, view `split`. Presets: `owner`, `borrower`, `manager` (a hired manager paid a salary). Pin `inEnterprise`, `inInterest`.
    - Misconception: profit of enterprise is the capitalist's wage for managing.
-   - Worked: with £5 of interest and £15 of profit of enterprise, a £6 manager's salary leaves £9 that no one worked for.
+   - Worked: with £5 of interest and £15 of profit of enterprise, a £6 manager's salary leaves £9 that, on Marx's account, is paid for owning and directing capital, not for any work of superintendence.
 
 9. **interest-bearing-capital-as-a-thing** — Interest-Bearing Capital as a Thing — *Chapter 24*
    - Read: Dr. Price's "one penny, put out at our Saviour's birth at 5 per cent compound interest".
    - Do: compute Price's compound sum and compare it with the accumulation of real capital at a stated rate, and say why the first is impossible.
    - Lab: `interest`, view `compound`. Presets: `price` (a penny at 5% over a stated span), `real` (a capital growing with the product), `ten-years`. Pin `inCompound`, `inReal`.
    - Misconception: money left at interest grows by itself.
+   - The `note` cross-references “Compound Interest and Continuous Growth” on the Algebra path, which computes the same sum; what is new here is the comparison with `inReal`.
    - Worked: the compound sum outgrows any real product in a few centuries; interest can only be a share of a surplus that labour produces.
 
 ### Course 12 — Credit and Fictitious Capital (`capital-credit-and-fictitious-capital`, 12)
 
 1. **credit-and-fictitious-capital** — Credit and Fictitious Capital — *Chapter 25*
    - Read: bills of exchange as "commercial money".
-   - Do: compute the circulation of a chain of bills and the cash needed when they are settled or discounted.
-   - Lab: `money`, view `payments`. Presets: `bills`, `discounted`, `accommodation` (bills drawn without a sale behind them). Pin `moNeeded`, `moNetted`.
+   - Do: compute the cash a chain of bills needs when settled, and the claims left standing against nothing when a bill has no sale behind it.
+   - Lab: `money`, view `payments`. Presets: `bills` (three backed bills of £100 in a circle), `discounted`, `accommodation` (one bill drawn with no sale behind it). Pin `moNeeded`, `moUnbacked`.
    - Misconception: a bill of exchange is a loan of money.
-   - Worked: three bills of £100 in a circle settle with no cash; one accommodation bill with no sale leaves £100 of claims against nothing.
+   - Worked: three bills of £100 in a circle settle with no cash; one accommodation bill leaves £100 of claims against nothing.
 
 2. **accumulation-of-money-capital** — Accumulation of Money Capital and the Rate of Interest — *Chapter 26*
    - Read: Overstone's evidence before the Committee of 1857.
    - Do: compute what a rise in the rate of interest does to profit of enterprise and to the borrowing industrialist.
-   - Lab: `interest`, view `bounds`. Presets: `overstone-low`, `overstone-high`, `crisis`. Pin `inEnterprise`.
+   - Lab: `interest`, view `bounds`. Presets: `low` (interest 3%), `high` (8%), `crisis` (above the profit rate). State Overstone's evidence at strength. Pin `inEnterprise`.
    - Misconception: a high rate of interest shows a scarcity of capital in general.
    - Worked: at a 10% average rate, moving interest from 3% to 8% cuts profit of enterprise from 7 to 2 per 100.
 
 3. **the-role-of-credit** — The Role of Credit in Capitalist Production — *Chapter 27*
-   - Read: "Formation of stock companies", "the abolition of the capitalist mode of production within the capitalist mode of production itself".
-   - Do: compute dividends paid as interest on share capital and the profit of enterprise that remains, and say what that does to the figure of the owner.
-   - Lab: `interest`, view `split`. Presets: `stock-company`, `owner-managed`, `leveraged` (most capital borrowed). Pin `inEnterprise`, `inInterest`.
-   - Misconception: joint-stock companies are owned and run by their shareholders as a capitalist runs a firm.
-   - Worked: when shareholders get 5% on £1,000 of a 20% business, £150 a year stays with the company and its managers.
+   - Read: "Formation of stock companies", and "the abolition of the capitalist mode of production within the capitalist mode of production itself".
+   - Do: compute a stock company's profit paid out as dividend, the manager's salary, and what each looks like: interest on the shares and wages.
+   - Lab: `interest`, view `split`. Presets: `stock-company` (£1,000 of shares, 20% profit, a hired manager), `owner-managed`, `leveraged` (most capital borrowed). Pin `inInterest`, `inEnterprise`.
+   - Misconception: in a stock company the profit of enterprise stays with the people who run it.
+   - Worked: £200 of profit is paid out as dividend and looks like interest on £1,000; the manager is paid a salary; the figure of the owner-entrepreneur has split in two, "a mere manager" and "a mere money-capitalist".
 
 4. **medium-of-circulation-and-capital** — Medium of Circulation and Capital: Tooke and Fullarton — *Chapter 28*
    - Read: the distinction between money as currency and money as capital.
@@ -973,38 +1006,38 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
    - Worked: £100 a year at 5% is £2,000; at 10% the same claim is £1,000 and nothing has been destroyed.
 
 6. **money-capital-and-real-capital-i** — Money Capital and Real Capital I — *Chapter 30*
-   - Read: "the accumulation of loan capital… is not identical with real accumulation".
-   - Do: compute idle money capital in a slump against real capital stock, and show they can move in opposite directions.
-   - Lab: `interest`, view `cycle`. Presets: `slump` (deposits high, investment low), `boom`, `crash`. Pin `inLoanCapital`, `inRate`.
+   - Read: "Not every augmentation of loanable money-capital indicates a real accumulation of capital" (Kerr wording to be checked).
+   - Do: compute the money that piles up in hoards while no real accumulation takes place.
+   - Lab: `schemes`, view `hoard`. Presets: `stagnant` (hoarders exceed investors), `balanced`, `boom`. Pin `scHoardGap`.
    - Misconception: a pile of bank deposits means plenty of real capital.
-   - Worked: in the slump preset loan capital doubles while production falls by a fifth.
+   - Worked: 500 of surplus product unsold is 500 of money hoarded and lent to the bank; loanable capital has grown and real accumulation has not.
 
 7. **money-capital-and-real-capital-ii** — Money Capital and Real Capital II — *Chapter 31*
-   - Read: "the transformation of money into loan capital".
-   - Do: trace how a hoard, a revenue and a release of circulating capital each become loan capital, and compute the total.
-   - Lab: `interest`, view `cycle`. Presets: `hoards`, `revenues`, `released`. Pin `inLoanCapital`.
+   - Read: the passages on the transformation of money into loan capital.
+   - Do: compute the circulating capital set free when a business contracts, which becomes loan capital without anyone saving.
+   - Lab: `turnover`, view `advance`. Presets: `contract` (a £100-a-week business on 9 + 3 weeks halves its scale), `steady`, `expand`. Pin `tuFreed`.
    - Misconception: loan capital is only savings out of income.
-   - Worked: circulating capital set free as a business contracts becomes loan capital without anyone saving a penny.
+   - Worked: halving the business releases £600 of circulating capital to the money market; nobody saved a penny.
 
 8. **money-capital-and-real-capital-iii** — Money Capital and Real Capital III — *Chapter 32*
-   - Read: the demand for means of payment "in times of crisis".
-   - Do: compute the rate of interest the crisis preset reports beside the profit rate and the scramble for cash.
-   - Lab: `interest`, view `cycle`. Presets: `prosperity`, `crisis`, `recovery`. Pin `inRate`, `inEnterprise`.
+   - Read: the demand for means of payment in times of crisis.
+   - Do: compute the cash a chain of payments needs before and after one default, with the sum of prices unchanged.
+   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears), `crisis` (one default breaks it), `recovery`. Pin `moNeeded`.
    - Misconception: in a crisis capital is scarce.
-   - Worked: in the crisis preset commodities are abundant and money as means of payment is not; interest rises above the rate of profit.
+   - Worked: the same commodities and prices need £0 of cash while the chain holds and £100 once it breaks: what is scarce is money as means of payment, not capital.
 
 9. **the-medium-of-circulation-in-the-credit-system** — The Medium of Circulation in the Credit System — *Chapter 33*
-   - Read: "the quantity of notes in circulation… determined by the requirements of business".
+   - Read: "only the requirements of business itself exert an influence on the quantity of circulating money-notes" (Kerr wording to be checked).
    - Do: compute the notes the circulation needs and what happens to an over-issue.
-   - Lab: `money`, view `circulate`. Presets: `needs`, `over-issue` (notes return to the bank), `crisis-demand`. Pin `moNeeded`, `moReturned`.
-   - Misconception: the bank decides how much money circulates.
+   - Lab: `money`, view `circulate`. Presets: `needs`, `over-issue` (`issue` £200 against needs of £150), `crisis-demand`. Pin `moNeeded`, `moReturned`.
+   - Misconception (the Currency School's view, stated at strength: Overstone held that note issue determines the circulation and through it prices): the bank decides how much money circulates.
    - Worked: issue £200 of notes where circulation needs £150 and £50 flows back as deposits or repayments.
 
 10. **the-currency-principle-and-the-bank-act** — The Currency Principle and the Bank Act of 1844 — *Chapter 34*
     - Read: Overstone's currency principle and the suspension of the Act in 1847 and 1857.
     - Do: compute the note issue the 1844 Act allowed against gold, and the gap in a drain when the circulation's needs do not fall.
     - Lab: `money`, view `bank-act`. Presets: `normal`, `drain` (gold leaves), `suspension`. Pin `moCap`, `moGap`.
-    - Misconception: tying notes to gold stabilises the circulation.
+    - Misconception (Overstone and the Currency School at strength: a mixed currency should behave exactly as a metallic one would): tying notes to gold stabilises the circulation. Marx sides with Tooke and Fullarton, and the lesson presents it as his reply.
     - Worked: a fixed fiduciary issue plus gold reserve caps notes; a £5m drain cuts the cap by £5m when the demand for means of payment is rising.
 
 11. **precious-metal-and-the-rate-of-exchange** — Precious Metal and the Rate of Exchange — *Chapter 35*
@@ -1015,127 +1048,127 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
     - Worked: £8m of imports against £6m of exports and £1m of other receipts leaves £1m to be paid in gold.
 
 12. **pre-capitalist-relationships** — Pre-Capitalist Relationships — *Chapter 36*
-    - Read: "Usurer's capital… ruins this small-scale production".
-    - Do: compute a small producer's surplus against the usurer's interest and the point at which the producer's means of production are forfeit.
-    - Lab: `interest`, view `usury`. Presets: `peasant` (illustrative: a holding producing a small surplus, debt at a usurious rate), `artisan`, `lord` (a spendthrift landlord). Pin `inYearsToRuin`.
+    - Read: usurer's capital that "undermines and ruins small-peasant and small-burgher production" (Kerr wording to be checked).
+    - Do: compute a small producer's debt year by year when the usurer's interest exceeds the surplus, and the year the debt exceeds the holding.
+    - Lab: `interest`, view `usury`. Presets: `peasant` (illustrative: surplus 10 a year, debt 50 at 30%, holding worth 100), `artisan`, `lord` (a spendthrift landlord). Pin `inYearsToRuin`.
     - Misconception: usury is high interest on loans for production.
-    - Worked: a surplus of 10 a year against interest of 15 on a debt of 50 adds 5 a year to the debt; the lab prints the year the debt exceeds the holding.
+    - Worked: 15 of interest against a surplus of 10 adds 5 in the first year and more each year after, because the unpaid interest itself bears interest; the lab prints the year the debt passes 100.
 
 ### Course 13 — Ground Rent (`capital-ground-rent`, 11)
 
 1. **introductory-remarks-on-rent** — Introductory Remarks on Ground Rent — *Chapter 37*
-   - Read: "the price of land… is nothing but the capitalised rent".
+   - Read: "it is nothing but the capitalised income from the lease of the land" (Kerr wording to be checked).
    - Do: compute the price of land from rent and the rate of interest, and separate true rent from interest on capital sunk in the land.
-   - Lab: `rtnt`, view `price`. Presets: `marx` (Marx's figures: rent £200 at 5%), `improvements` (part of the payment is interest on drains and buildings), `rate-falls`. Pin `rtPrice`, `rtTrueRent`.
+   - Lab: `rent`, view `price`. Presets: `marx` (Marx's figures: rent £200 at 5%), `improvements` (part of the payment is interest on drains and buildings), `rate-falls`. Pin `rtPrice`, `rtTrueRent`.
    - Misconception: rent is the return on the land's value.
    - Worked: £200 a year at 5% is a price of £4,000; when the rate falls to 4% the same land costs £5,000.
 
 2. **differential-rent-general** — Differential Rent: General Remarks — *Chapter 38*
-   - Read: the waterfall: the factory with water power against those on steam.
-   - Do: compute the surplus profit of the capital with a monopolisable natural advantage and say why it becomes rent.
-   - Lab: `rtnt`, view `waterfall`. Presets: `marx` (Marx's figures: cost price 100 on steam against 90 on water, average profit 15%), `two-falls`, `steam-cheapens`. Pin `rtSurplusProfit`.
+   - Read: the waterfall: the factory driven by water against those on steam.
+   - Do: compute the surplus profit of the capital with a monopolisable natural advantage both ways Marx does, and the rent it becomes.
+   - Lab: `rent`, view `waterfall`. Presets: `marx` (Marx's figures: cost price 100 on steam, 90 on water, price of production 115), `two-falls`, `steam-cheapens`. Pin `rtSurplusProfit`.
    - Misconception: the waterfall creates the surplus profit.
-   - Worked: price of production 115 against a cost of 90: the 15% average profit on 90 and the remainder a surplus profit that the owner of the fall can claim.
+   - Worked: the water-driven factory sells at 115 with a cost of 90: a profit of 25 against the steam user's 15, a surplus profit of 10 (Marx's figure); measured against its own individual price of production of 103½ it is 11½. The tile prints both and says which rule gives which.
 
 3. **differential-rent-i** — Differential Rent I — *Chapter 39*
    - Read: the table of soils A, B, C, D.
    - Do: compute rent on each of four soils from equal capitals and unequal yields at the price regulated by the worst soil, and the total rent.
-   - Lab: `rtnt`, view `dr1`. Presets: `marx` (Marx's figures: 1, 2, 3, 4 quarters; 60s a quarter), `descending` (worse soil added last), `better-added`. Pin `rtRents`, `rtTotal`.
+   - Lab: `rent`, view `dr1`. Presets: `marx` (Marx's figures: 1, 2, 3, 4 quarters; 60s a quarter), `descending` (worse soil added last), `better-added`. Pin `rtRents`, `rtTotal`.
    - Misconception: rent arises because the worst land is too poor to farm without it.
    - Worked: at 60s a quarter, A pays no rent, B 60s, C 120s, D 180s; 360s of rent in all.
 
 4. **differential-rent-ii** — Differential Rent II — *Chapter 40*
    - Read: successive investments of capital "on the same land".
    - Do: compute rent from successive equal investments on one plot with falling or rising yields, against the regulating price.
-   - Lab: `rtnt`, view `dr2`. Presets: `diminishing`, `constant`, `increasing`. Pin `rtRents`, `rtTotal`.
+   - Lab: `rent`, view `dr2`. Presets: `diminishing`, `constant`, `increasing`. Pin `rtRents`, `rtTotal`.
    - Misconception: DR II is a different source of rent from DR I.
    - Worked: two investments on soil D yielding 4 and 3 quarters pay 180s and 120s of surplus profit at 60s.
 
 5. **dr-ii-constant-price** — Differential Rent II at a Constant Price of Production — *Chapter 41*
    - Read: "First case: constant price of production".
    - Do: compute total rent when added capital raises output and the regulating price does not change.
-   - Lab: `rtnt`, view `dr2`, `case = constant`. Presets: `proportional`, `faster`, `slower`. Pin `rtTotal`.
+   - Lab: `rent`, view `dr2`, `price_case = constant`. Presets: `proportional`, `faster`, `slower`. Pin `rtTotal`.
    - Misconception: more output always lowers rent per acre.
    - Worked: doubling the capital on each rent-bearing soil at the same productivity doubles the rent per acre.
 
 6. **dr-ii-falling-price** — Differential Rent II at a Falling Price of Production — *Chapter 42*
    - Read: "Second case: falling price of production".
    - Do: compute rents when the additional investment is more productive and the regulating price falls.
-   - Lab: `rtnt`, view `dr2`, `case = falling`. Presets: `a-drops-out`, `rtnt-rises`, `rtnt-falls`. Pin `rtTotal`, `rtPrice`.
+   - Lab: `rent`, view `dr2`, `price_case = falling`. Presets: `a-drops-out`, `rent-rises`, `rent-falls`. Pin `rtTotal`, `rtPrice`.
    - Misconception: a falling price must lower total rent.
    - Worked: the lab prints a case in which price falls and total rent still rises.
 
 7. **dr-ii-rising-price** — Differential Rent II at a Rising Price of Production — *Chapter 43*
    - Read: "Third case: rising price of production. Results".
    - Do: compute rents when the additional investment is less productive and the regulating price rises.
-   - Lab: `rtnt`, view `dr2`, `case = rising`. Presets: `worse-investment`, `new-soil`, `rtsults`. Pin `rtTotal`, `rtPrice`.
+   - Lab: `rent`, view `dr2`, `price_case = rising`. Presets: `worse-investment`, `new-soil`, `results`. Pin `rtTotal`, `rtPrice`.
    - Misconception: rent is the cause of high food prices.
    - Worked: price rises because the least productive investment regulates it; rent follows the price, not the other way round.
 
 8. **rent-on-the-worst-soil** — Differential Rent Also on the Worst Cultivated Soil — *Chapter 44*
    - Read: the case in which the least productive investment is on a better soil.
    - Do: compute when the worst soil A pays a differential rent because price is regulated by a second, less productive investment elsewhere.
-   - Lab: `rtnt`, view `dr2`, `case = worst-soil`. Presets: `marx`, `none`, `both`. Pin `rtRents`.
+   - Lab: `rent`, view `dr2`, `price_case = worst-soil`. Presets: `marx`, `none`, `both`. Pin `rtRents`.
    - Misconception: the worst soil can never pay differential rent.
    - Worked: if the regulating investment is a second dose on B yielding less than A's first, A pays rent too.
 
 9. **absolute-ground-rent** — Absolute Ground Rent — *Chapter 45*
-   - Read: "landed property… prevents the equalisation of capitals".
-   - Do: compute value and price of production for agriculture with a lower composition and the absolute rent the difference allows.
-   - Lab: `rtnt`, view `absolute`. Presets: `low-composition` (60c + 40v at 100%, average rate 20%), `average-composition` (no absolute rent possible), `market-limited`. Pin `rtAbsolute`.
+   - Read: "Landed property hinders such an equalisation among capitals, invested in land" (Kerr wording to be checked).
+   - Do: compute value and price of production for agriculture with a lower composition, and the absolute rent the difference allows.
+   - Lab: `rent`, view `absolute`. Presets: `marx` (Marx's figures: non-agricultural 85c + 15v against agricultural 75c + 25v at 100%), `average-composition` (agriculture at the social average: no absolute rent), `market-limited`. Pin `rtAbsolute`.
    - Misconception: absolute rent is a monopoly price that can be set at will.
-   - Worked: value 140 against price of production 120: up to 20 of absolute rent without any price above value.
+   - Worked: agricultural value 125 against a price of production of 120 equalised over both: up to 5 of absolute rent without any price above value; at the average composition, as Marx says, it "would disappear".
 
 10. **building-rent-mining-rent-land-price** — Building Rent, Mining Rent, the Price of Land — *Chapter 46*
-    - Read: "the land-owner… pockets the fruits of social development without contributing anything".
+    - Read: the landowner "exploiting the progress of social development, toward which he contributes nothing and for which he risks nothing" (Kerr wording to be checked).
     - Do: compute a building plot's rent and price as the city grows, and a mine's rent from its deposit.
-    - Lab: `rtnt`, view `price`. Presets: `town-grows`, `mine`, `speculation`. Pin `rtPrice`.
+    - Lab: `rent`, view `price`. Presets: `town-grows`, `mine`, `speculation`. Pin `rtPrice`.
     - Misconception: a rising land price reflects improvements made by the owner.
     - Worked: a plot's rent rises from £50 to £150 as the town reaches it; at 5% its price goes from £1,000 to £3,000.
 
 11. **genesis-of-capitalist-ground-rent** — Genesis of Capitalist Ground Rent — *Chapter 47*
-    - Read: §2, labour rent: "the labour of the direct producer for himself and his labour for the landlord are… separated by time and space".
+    - Read: §2, labour rent: the direct producer's labour for himself "is still separated in space and time from his labour for the landlord" (Kerr wording to be checked).
     - Do: compute the rate of exploitation in labour rent (days on the lord's land against days on one's own), and compare rent in kind and money rent.
     - Lab: `workday`, view `corvee`. Presets: `three-three` (3 days for the lord, 3 for oneself), `four-two`, `money-rent`. Pin `wdRate`.
-    - Misconception: feudal exploitation was hidden while capitalist exploitation is visible.
-    - Worked: 3 days for the lord and 3 for oneself is visibly 100%; the wage-worker's 6 hours in 12 is the same rate, invisible.
+    - Misconception: the wage-worker, unlike the serf, gives no unpaid labour.
+    - Worked: 3 days for the lord and 3 for oneself is visibly 100%; on the chapter's accounting the wage-worker's 6 hours in 12 is the same rate, with nothing to show it.
 
 ### Course 14 — Revenues and Their Sources (`capital-revenues-and-their-sources`, 5)
 
 1. **the-trinity-formula** — The Trinity Formula — *Chapter 48*
    - Read: "Capital — profit (profit of enterprise plus interest), land — ground rent, labour — wages, this is the trinity formula".
    - Do: decompose a year's v + s into wages, profit of enterprise, interest and rent, and show that all three "revenues" come from one value product.
-   - Lab: `rvvenue`, view `trinity`. Presets: `english` (illustrative), `no-landlord`, `all-borrowed`. Pin `rvWages`, `rvRent`, `rvInterest`.
+   - Lab: `revenue`, view `trinity`. Presets: `english` (illustrative), `no-landlord`, `all-borrowed`. Pin `rvWages`, `rvRent`, `rvInterest`.
    - Misconception: each factor of production creates its own income.
-   - Worked: a value product of 200 is 100 wages, 30 rent, 20 interest and 50 profit of enterprise; land and capital have added nothing to the 200.
+   - Worked: a value product of 200 is 100 wages, 30 rent, 20 interest and 50 profit of enterprise; by the chapter's accounting land and capital add nothing to the 200. The `note` states the opposing account at strength: Say's three factors and Clark's marginal productivity, on which each factor is paid what it adds at the margin.
 
-2. **analysis-of-the-process-of-production** — Analysis of the Process of Production — *Chapter 49*
-   - Read: the annual product's value and the annual revenue, and "the dogma".
-   - Do: compute the annual product's c + v + s against revenues v + s, and show why the product cannot all be bought out of revenues.
-   - Lab: `rvvenue`, view `dogma`. Presets: `marx-scheme`, `growing`, `one-sector`. Pin `rvTotal`, `rvSmith`.
+2. **analysis-of-the-process-of-production** — Concerning the Analysis of the Process of Production — *Chapter 49*
+   - Read: the annual product's value against the annual revenue.
+   - Do: compute the part of the annual product that is replaced inside Department I and is never anyone's revenue.
+   - Lab: `schemes`, view `simple`. Presets: `marx` (the simple reproduction scheme), `growing` (the expanded scheme's first year), `one-sector`. Pin `scWithinI`, `scBalance`.
    - Misconception: annual income equals the annual product.
-   - Worked: 9,000 of product against 3,000 of revenue; the 6,000 is constant capital that must be replaced from the product itself.
+   - Worked: of 9,000 of annual product, 4,000 (Ic) is means of production exchanged among Department I's own capitalists and never enters anyone's income.
 
 3. **illusions-created-by-competition** — Illusions Created by Competition — *Chapter 50*
    - Read: price "appears" to be formed by adding wages, profit and rent.
    - Do: compute price both ways — value resolved into parts, and parts added up — and show the second is circular.
-   - Lab: `rvvenue`, view `added-up`. Presets: `wage-rise`, `rvnt-rise`, `fixed-value`. Pin `rvWages`, `rvProfitShare`.
+   - Lab: `revenue`, view `added-up`. Presets: `wage-rise`, `rent-rise`, `fixed-value`. Pin `rvWages`, `rvProfitShare`.
    - Misconception: a wage rise raises prices because wages are a component added to them.
    - Worked: with value product fixed at 200, a wage rise from 100 to 120 cuts profit, interest and rent by 20 together.
 
 4. **distribution-and-production-relations** — Distribution Relations and Production Relations — *Chapter 51*
-   - Read: "the so-called distribution relations… are the reverse side of these production relations".
+   - Read: the passage in which distribution relations are the "opposite side" of production relations (Kerr wording to be checked).
    - Do: compute the same product's distribution under two production relations (a wage relation and an association of producers) and say what changes and what does not.
-   - Lab: `rvvenue`, view `trinity`. Presets: `capitalist`, `association`, `cooperative`. Pin `rvWages`, `rvProfitShare`.
+   - Lab: `revenue`, view `trinity`. Presets: `capitalist`, `association`, `cooperative`. Pin `rvWages`, `rvProfitShare`.
    - Misconception: distribution can be changed without changing production relations.
    - Worked: the association preset keeps c for replacement and a fund for expansion; only the split of v + s and who decides it change.
 
 5. **classes** — Classes — *Chapter 52*
-   - Read: the manuscript's last lines, "What makes a class?" — and where it breaks off.
-   - Do: classify incomes in a small society by their source (wages, profit, rent) and say why Marx's answer cannot be "the source of income" alone.
-   - Lab: `rvvenue`, view `classes`. Presets: `three-classes`, `doctor-and-official`, `mixed-incomes`. Pin `rvClassCount`.
-   - Misconception: a class is defined by the size of its income.
-   - Worked: a doctor and a factory owner may have equal incomes from different sources; the chapter stops as Marx says so.
+   - Read: "The first question to be answered is this: What constitutes a class?" — and where the manuscript breaks off.
+   - Do: group a small society's people by source of revenue, and count the groups as the sources are made finer.
+   - Lab: `revenue`, view `classes`. Presets: `three-classes` (wages, profit, rent), `doctor-and-official` (physicians and officials added), `landowners-split` (vineyards, farms, forests, mines, fisheries). Pin `rvClassCount`.
+   - Misconception: a class is defined by its source of income alone.
+   - Worked: group by source of revenue and physicians and officials become classes, and landowners split into several; the manuscript breaks off there, and so does the lesson.
 
 ---
 
@@ -1162,19 +1195,30 @@ Additions for this Subject:
   `cfg["mode"]` to either module and raises on an unknown mode or view.
 - **Views.** Most modes have several `view`s (listed below). A view is chosen by
   the lesson (`cfg["view"]`), not by the reader: it fixes which inputs and tiles
-  the page shows. It is not a `<select>`. An unknown view raises.
-- **Units.** Every mode takes `cfg["unit"]` from `{"hours", "s", "d", "£",
-  "qr"}` and prints it after every money or time figure (`30s`, `£422`,
-  `9/5 h`). Mixed units inside one preset are refused at build time. Shillings
-  and pence are separate units; a preset never mixes them. A tile never
-  converts.
+  the page shows. In this kit `view` is never a control, which is the opposite
+  of its use in `argkit`. An unknown view raises.
+- **Redraw-only selects** in this kit ship from these cfg keys only: `stage`
+  (`form`), `hold` (`workday/three`), `test` (`machine/adopt`: `capitalist` or
+  `society`). Each defaults to its first option.
+- **Units.** Every mode takes `cfg["money_unit"]` from `{"hours", "s", "£"}`
+  and, where it counts things, `cfg["qty_unit"]` (free text: `lb`, `yards`,
+  `qr`, `pieces`). Money prints with its unit (`30s`, `£422`, `9/5 h`). For
+  `money_unit: "s"` the formatter prints shillings and pence the way Marx does:
+  `3s`, `3d`, `1s 6d`, `1½d`, `¾d` (12d to the shilling; halves and quarters as
+  ½ and ¼, any other fraction of a penny as `n/m d`), so a sub-shilling amount
+  is printed in pence rather than refused. Quantities print with `qty_unit`.
+  A tile never converts between money and quantity.
 - **Percentages.** A rate prints as the exact fraction and its percentage to
-  at most two decimals when it is not whole: `1/1 = 100%`, `2/3 = 66.67%`,
-  `11/50 = 22%`. Marx's `66⅔%` is quoted in prose, never produced by a tile.
+  at most two decimals when it is not whole: `1 = 100%`, `2/3 = 66.67%`,
+  `11/50 = 22%` (the fraction is `Rtext`'s output). Marx's `66⅔%` is quoted in prose, never produced by a tile.
 - **Periods.** Modes that iterate (`accumulate`, `schemes`, `tendency`) take a
   shipped `periods` (1–10) and print one row per period in a table
   (`XXTable`), plus the pinned tiles for the last period. More than 10 periods
-  is refused.
+  is refused. `interest/compound`'s `years` is a closed-form parameter, not an
+  iteration, and the limit does not apply to it.
+- **Tile ids** are unique within the kit. Before freezing them, the kit engineer
+  greps `scripts/mathpath/labs/*.py` for each id and records in a comment that
+  none collides with an existing kit's module-level JS names.
 - **Size limits.** At most 8 producers, 6 commodities, 6 spheres, 6 soils, 10
   capitals, 12 ledger items. Exceeding a limit is refused with the limit named.
 
@@ -1187,7 +1231,7 @@ Each entry: cfg instance fields; views; tiles (id: format).
   `basis: "per-unit" | "total"`), `skill` (multiplier for complex labour,
   default 1), `lot` (units valued), for view `ledger` `items: [{name, hours,
   output}]`, for view `market` `groups: [{units, hours}]`.
-- Views: `snlt` (default), `skill`, `ledger`, `market`.
+- Views: `snlt` (default), `skill` (shipped `skill = 1` unless a lesson says otherwise), `ledger`, `market`.
 - Tiles: `vaSnlt` (`9/5 h` per unit), `vaLotValue` (`lot × snlt`), `vaPerUnit`,
   `vaTotalHours`, `vaMarketValue`, `vaSurplus` (per group, comma-separated in
   input order, signed: `+1 h, 0 h, −1 h`).
@@ -1197,7 +1241,8 @@ Each entry: cfg instance fields; views; tiles (id: format).
 - Views: `stage` with shipped `stage` ∈ `elementary | expanded | general |
   money` (a redraw-only select, cfg key `stage`), and `count`.
 - Tiles: `foEquation` (the equations of the selected stage, `;`-separated,
-  quantities exact), `foGeneral` (the general equivalent's name), `foPairs`
+  quantities exact), `foGeneral` (the general equivalent's name), `foRelative`
+  (how much of the second good the first good's lot now fetches), `foPairs`
   (bilateral ratios needed, n·(n − 1)/2), `foWithEquivalent` (n − 1).
 - Build-time check: every equation in `marx` must balance in hours; a preset
   whose quantities do not balance is refused, which is how Marx's figures are
@@ -1205,14 +1250,19 @@ Each entry: cfg instance fields; views; tiles (id: format).
 
 #### money
 - Instance: `goods: [{name, value_hours}]`, `gold_hours_per_unit`, `velocity`,
-  `credit_sales`, `payments_due`, `cancelling`, `imports`, `exports`,
-  `other_receipts`, `rent`, `price_index`, `wage_index`, `reserve`,
-  `fiduciary`, `demand`.
+  `credit_sales`, `payments_due`, `cancelling`, `bills: [{from, to, amount,
+  backed}]`, `default` (a bill that is not paid), `issue`, `imports`,
+  `exports`, `other_receipts`, `rent`, `price_index`, `wage_index`, `product`,
+  `wages`, `reserve`, `fiduciary`, `demand`.
 - Views: `circulate`, `payments`, `world`, `fixed-rent`, `bank-act`.
-- Tiles: `moPriceSum`, `moNeeded` (Marx's ch. 3 §3b formula: (price sum −
-  credit sales + payments due − cancelling payments) / velocity),
+- Tiles: `moPriceSum`, `moNeeded` (the kit's formalisation of ch. 3, §2(b)
+  and §3(b): (price sum − credit sales + payments due − cancelling payments) /
+  velocity; the banner says it is a formalisation of Marx's sentence, which
+  speaks of subtracting the circuits a coin makes), `moUnbacked` (bills with
+  no sale behind them),
   `moNetted`, `moDrain` (imports − exports − other receipts, floored at 0, with
-  the direction stated), `moRealRent` (rent / price index), `moFarmerGain`,
+  the direction stated), `moRealRent` (rent / price index), `moFarmerGain` (product × price index −
+  wages × wage index − rent),
   `moReturned` (issue − needed, floored at 0), `moCap` (fiduciary + reserve),
   `moGap` (demand − cap, floored at 0).
 
@@ -1232,9 +1282,12 @@ Each entry: cfg instance fields; views; tiles (id: format).
   (units of product), `workers`, `c`, `v`, `s`, `machine_value`,
   `machine_days`, `waste` (materials used beyond the socially necessary,
   carried at zero value).
-- Views: `mill`, `transfer`, `rate`, `parts`, `mass`, `formulae`.
+- Views: `mill`, `transfer`, `rate` (shows `suRate` and `suParts`), `parts`,
+  `senior`, `mass`, `formulae`.
 - Tiles: `suProduct` (c + v + s), `suS`, `suRate` (s/v), `suParts` (the product
-  in parts: `c: 20 lb, v: 2 lb, s: 2 lb` style, units from the instance),
+  in parts: `c: 16 lb, v: 2 lb, s: 2 lb` for Marx's 20 lb of yarn),
+  `suLastHour` (the rate after the day is shortened by one hour, with Senior's
+  prediction of zero printed beside it),
   `suTransfer`, `suMass` (s′ × v × workers), `suFalse` (s/(v + s)).
 
 #### workday
@@ -1245,20 +1298,27 @@ Each entry: cfg instance fields; views; tiles (id: format).
 - Views: `absolute`, `limit`, `relative`, `intensity`, `classify`, `three`
   (with redraw-only `hold`), `separate`, `corvee`.
 - Tiles: `wdSurplus`, `wdRate`, `wdExtra` (the pioneer's extra surplus value
-  per day), `wdLpValue`, `wdKind` (`absolute`, `relative`, `both`, `none`).
+  per day), `wdLpValue`, `wdLabour` (hours × intensity), `wdKind`
+  (`absolute`, `relative`, `both`, `none`). `separate` also takes `count`
+  (households) and multiplies `wdSurplus` by it.
 - Draws the day as one bar cut at the necessary time, with the surplus part
   labelled; the bar is SVG in the existing lab chrome, both themes.
 
 #### machine
-- Instance: `workers`, `output_each`, `cooperation_gain`, `steps: [{name,
+- Instance: `workers`, `output_each`, `shared_c` (means of production used in
+  common), `c_each_if_alone`, `hours`, `steps: [{name,
   rate}]`, `machine_value`, `machine_life_units`, `wages_displaced`,
   `labour_saved_value`, `capital`, `variable`, `wage_each`, `discharged`,
   `machine_spend`, `mb_composition` (machine-building's c/v).
 - Views: `cooperate`, `detail`, `adopt`, `displace`.
-- Tiles: `maOutput`, `maGain`, `maWorkers` (per step, comma-separated),
-  `maMinimum`, `maPerUnit`, `maVerdict` (`adopted`, `not adopted`: the
-  capitalist's test is machine cost < wages displaced, and the tile says which
-  test), `maDisplaced`, `maReemployed`.
+- Tiles: `maOutput`, `maCPerUnit` (constant capital per unit of output, alone
+  and together), `maCombinedDay` (workers × hours delivered in one day),
+  `maWorkers` (per step, comma-separated),
+  `maMinimum`, `maPerUnit`, `maVerdict` (`adopted`, `not adopted`, under the
+  shipped `test`: the capitalist's is machine cost < wages displaced, society's
+  is machine labour < labour saved; the tile names the test), `maDisplaced`,
+  `maReemployed`. A typed co-operation gain is never an input: the kit computes
+  only what follows from shared means of production and simultaneity.
 
 #### wages
 - Instance: `lp_value` (daily), `normal_hours`, `hours_worked`,
@@ -1268,21 +1328,24 @@ Each entry: cfg instance fields; views; tiles (id: format).
 - Views: `form`, `time`, `piece`, `national`, `statute`.
 - Tiles: `waHourPrice`, `waValueCreated`, `waDaily`, `waPieceRate`,
   `waRelative` (wage per unit of output, country A over country B), `waGap`,
-  `waRate` (the rate of surplus value the statute enforces).
+  `waRate` (the rate of surplus value: under the statute in `statute`, for each
+  country in `national`).
 
 #### accumulate
 - Instance: `capital`, `c_v` (composition), `s_rate`, `accumulate_share`,
   `consumed_per_year`, `composition_rise` (added to c/v per period),
   `labour_supply`, `supply_growth`, `wage_per_worker`, `capitals: [n]`
   (for `centralise`), `merge_rule` (`largest-absorbs-smallest | none`),
-  `colonists`, `land_price_years`.
-- Views: `simple`, `expand`, `labour`, `composition`, `law`, `centralise`,
-  `colony`.
+  `colonists`, `land_price_years`, `invest_threshold`, `wage`, `saving_share`,
+  `target`.
+- Views: `simple`, `expand`, `labour`, `composition`, `law` (reserve/employed
+  ratio for every period), `centralise`, `colony`, `thrift`.
 - Tiles: `acYears` (capital / consumed per year), `acCapital`,
   `acShareOriginal` (original capital as a share of the present capital),
   `acDemand` (workers employed: v / wage), `acReserve` (supply − demand,
   floored at 0), `acRatio` (reserve / employed), `acTopShare`, `acCount`,
-  `acYearsToLand`.
+  `acYearsToLand`, `acHoard` (money held back below `invest_threshold`),
+  `acDaysToTarget` (target / (wage × saving_share), in working days).
 
 ### D.2 Modes (capkit_b.py)
 
@@ -1291,13 +1354,17 @@ Each entry: cfg instance fields; views; tiles (id: format).
   `weekly_outlay`, `stage_weeks: [money, productive, commodity]`, `fixed:
   [{name, value, life_years}]`, `circulating`, `circ_turnovers`, `variable`,
   `s_rate`, `items: [{name, value, fixed: bool, variable: bool}]`,
-  `merchant_capital`, `merchant_turnovers`.
+  `merchant_capital`, `merchant_turnovers`, `year_weeks` (default 52; Marx's
+  Volume II figures use 50, and every preset with Marx's figures sets it), and
+  per fixed item `repairs_per_year`, `replacement_value`, `appears_year`.
 - Views: `time`, `phases`, `fixed`, `aggregate`, `classify`, `working`,
   `advance`, `annual`, `merchant`.
-- Tiles: `tuTurnover` (weeks), `tuTurnovers` (52 / turnover weeks, exact),
+- Tiles: `tuTurnover` (weeks), `tuTurnovers` (year_weeks / turnover weeks,
+  exact, with the year length printed), `tuCirculationShare`,
   `tuWorkingShare`, `tuMoney`, `tuProductive`, `tuCommodity` (shares), `tuWear`,
   `tuRemaining`, `tuAggregate`, `tuAverage`, `tuFixed`, `tuVariable` (sums by
-  each classification), `tuAdvance`, `tuFreed`, `tuAnnualRate` (s′·n),
+  each classification), `tuS` (s at `s_rate` on the variable items),
+  `tuAdvance`, `tuFreed`, `tuAnnualRate` (s′·n),
   `tuMassS`.
 
 #### schemes
@@ -1310,6 +1377,11 @@ Each entry: cfg instance fields; views; tiles (id: format).
   what balances I(v + Δv + s/k) = II(c + Δc), at its own composition. The
   status banner states the rule. If balance requires Department II to
   accumulate more than its s, the period is refused and the banner says so.
+- `simple` also prints `scWithinI` (Ic: means of production exchanged within
+  Department I, never anyone's revenue).
+- `fixed`: `scFixedGap` is signed and names the short side: renewals below the
+  hoarded wear leave Department I's product unsold; renewals above it leave
+  Department I short.
 - Tiles: `scDeptI`, `scDeptII`, `scBalance` (`I(v + s) = 2,000 = IIc` or the
   signed gap), `scIExchange`, `scFixedGap`, `scHoardGap`, `scYear2` (both
   departments after the first period, in Marx's notation:
@@ -1334,7 +1406,8 @@ Each entry: cfg instance fields; views; tiles (id: format).
   (`industrial 1,062; merchant 1,080`), `ppMarkup`.
 - The wage-rise rule is stated in the banner: the money wage rises by the
   stated share, the extra wages come out of surplus value, and the new average
-  rate is recomputed over the same total capital. The lesson checks the
+  rate is recomputed over the capital advanced after the rise (Marx: 15 on 105
+  is 14 2/7%). The lesson checks the
   resulting directions against Marx's text before pinning.
 
 #### tendency
@@ -1347,25 +1420,31 @@ Each entry: cfg instance fields; views; tiles (id: format).
 #### interest
 - Instance: `capital`, `profit_rate`, `interest_rate`, `manager_salary`,
   `income`, `years`, `principal`, `real_growth`, `surplus`, `debt`,
-  `holding_value`, `deposits_by_phase`, `investment_by_phase`, `phase`.
-- Views: `split`, `bounds`, `capitalise`, `compound`, `cycle`, `usury`.
+  `holding_value`.
+- Views: `split`, `bounds`, `capitalise`, `compound`, `usury`. (A `cycle` view
+  taking deposits and investment by phase was removed at review: it echoed
+  typed narratives, which D.3 forbids. Volume III, Chapters 30–32 use
+  `schemes/hoard`, `turnover/advance` and `money/payments`.)
 - Tiles: `inInterest`, `inEnterprise`, `inBound` (`0 < i < p′` with the
-  values, or the breach), `inPrice` (income / rate), `inCompound`, `inReal`,
-  `inLoanCapital`, `inRate`, `inYearsToRuin` (first year debt > holding, or
-  `never within n years`).
+  values, or `breached` with the values: not an error), `inPrice` (income /
+  rate), `inCompound`, `inReal`, `inYearsToRuin` (first year debt > holding,
+  or `never within n years`). `usury` compounds unpaid interest and states the
+  rule in the banner.
 - `compound` prints its sum with BigInt numerators and, beside the exact value,
   the number of decimal digits — a penny at 5% for 1,780 years is not a number
   to print in full.
 
 #### rent
 - Instance: `soils: [{name, capital, outputs: [qr per investment]}]`,
-  `profit_rate`, `price_case` (`constant | falling | rising | worst-soil`),
+  `profit_rate`, `price_case` (`constant | falling | rising | worst-soil`; the
+  only name for this key),
   `regulating` (which investment regulates, or `auto` = least productive in
   use), `rent`, `interest_rate`, `improvement_interest`, `cost_steam`,
   `cost_water`, `agri: {c, v}`, `s_rate`, `market_limit`.
 - Views: `price`, `waterfall`, `dr1`, `dr2`, `absolute`.
 - Tiles: `rtPrice` (land price or regulating price, by view), `rtTrueRent`,
-  `rtSurplusProfit`, `rtRents` (per soil, in input order), `rtTotal`,
+  `rtSurplusProfit` (in `waterfall`, both of Marx's measures:
+  `10 against the steam user's profit; 11½ against its own price of production`), `rtRents` (per soil, in input order), `rtTotal`,
   `rtAbsolute`.
 
 #### revenue
@@ -1374,7 +1453,9 @@ Each entry: cfg instance fields; views; tiles (id: format).
 - Views: `trinity`, `dogma`, `added-up`, `classes`.
 - Tiles: `rvTotal` (c + v + s), `rvSmith` (v + s, the dogma's total, with the
   missing c), `rvWages`, `rvRent`, `rvInterest`, `rvProfitShare` (profit of
-  enterprise), `rvClassCount` (people grouped by their largest source).
+  enterprise), `rvClassCount` (the number of groups when people are grouped
+  by source of revenue at the preset's fineness: the count grows as sources
+  are split, which is the chapter's objection).
 
 ### D.3 What the kit must never do
 
@@ -1422,23 +1503,37 @@ As in `docs/philosophy/PLAN.md` §E, with two additions:
 
 ### E.3 Quoting the passage
 
-- **Sources.** Volume I: the Moore–Aveling translation (1887). Volumes II and
-  III: the Untermann translation (Kerr, 1907 and 1909). Both are in the public
-  domain and both are on marxists.org (`/archive/marx/works/1867-c1/`,
-  `1885-c2/`, `1894-c3/`), whose chapter files name their translators. Never
-  quote the Fowkes or Fernbach (Penguin) translations: they are in copyright.
-- **Fetch, then quote.** Fetch the chapter page with WebFetch, ask for the
-  passage verbatim, and fetch it a second time with a differently worded
-  request. Quote only text the two fetches agree on character for character.
-  Keep the quotation under 120 words.
+- **Sources: the Kerr editions, and nothing else.** Volume I: the Moore–Aveling
+  translation as revised and amplified by Ernest Untermann from the fourth German
+  edition (Chicago: Charles H. Kerr, 1906/1909). Volume II: Untermann's
+  translation (Kerr, 1907). Volume III: Untermann's translation (Kerr, 1909).
+  All three are in the public domain. Plain-text copies extracted from the Online
+  Library of Liberty ePubs are in the project's shared folder at
+  `/mnt/project-files/capital-texts/volume-{1,2,3}-kerr.txt`, with a README
+  giving the OLL source URLs (titles 965, 966, 967).
+- **Never quote** the marxists.org HTML of Volumes II and III (the Lasker 1956
+  and Progress 1959 translations, in which rights are asserted) or the Fowkes and
+  Fernbach Penguin translations (in copyright). The marxists.org Volume I HTML is
+  the 1887 Moore–Aveling text and is public domain, but it differs from the
+  Kerr revision in places (Peel's "300" against "3000"); quote the Kerr text so
+  the Subject has one source.
+- **Quote by search, not from memory.** `grep -n` the Kerr text for the
+  passage, copy it character for character, keep it under 120 words, and record
+  the line number in a comment beside the lesson dict. The Kerr wording of a
+  chapter or section title is the title the `module` name uses.
 - **Shape.** The first `body` block is a `p`:
   `<strong>Volume I, Chapter 1, §1.</strong> &ldquo;…&rdquo;` — volume,
   chapter and section, then the quotation, nothing else. A second short
   quotation may appear later in the body the same way.
-- **Translator's spellings stand** inside quotation marks ("labour-power",
-  "valorisation" is not in Moore–Aveling: they write "creation of
-  surplus-value"); the lesson's own prose uses the Subject's spellings
-  (British, "labour-power", "surplus value" unhyphenated as a noun).
+- **Attribution.** The path's `prerequisites` name the editions; each course's
+  `how_to` carries OLL's attribution line once: "Quotations are from the
+  Kerr editions in the Online Library of Liberty, hosted by Liberty Fund, Inc."
+- **Translator's spellings stand** inside quotation marks; the lesson's own
+  prose uses the Subject's spellings (British; "labour-power"; "surplus value"
+  unhyphenated as a noun).
+- **Engels.** Volumes II and III are Engels' edition of Marx's manuscripts, and
+  Volume III, Chapter 4 is Engels' own text; the lessons that lean on that say
+  so once.
 
 ---
 
@@ -1460,10 +1555,12 @@ What the lectures do, and what that means here:
    quoting a few words at a time and saying what each does.
 2. **They open with the reader's own world, not with the definition.** The
    chapter on non-duality starts with the minute that is short when you hit
-   snooze and endless when you hold a plank. Here: a lesson may open its
-   explanation with one concrete scene — a payslip, a rent cheque, a till
-   receipt, a mortgage — and must reach the chapter's category within the
-   paragraph.
+   snooze and endless when you hold a plank. Here: open with a scene only where
+   the chapter's object is already in the reader's life — wages, rent, prices,
+   interest, debt, a mortgage — and reach the chapter's category within the
+   paragraph. The Volume II turnover lessons, the reproduction schemes and the
+   Bank Act lessons open with the passage's own figures instead. A scene that
+   has to be invented is a forced one; leave it out.
 3. **They tell the history of an idea as a story with people in it.** Thales
    sees water everywhere; Laplace tells Napoleon he had no need of that
    hypothesis. Here: when Marx argues with Smith, Ricardo, Senior or Say, the
@@ -1483,13 +1580,19 @@ What the lectures do, and what that means here:
    ones.
 6. **They admit the limit of what can be said.** The lectures end by
    confessing that the words are "a finger pointing at the moon". Here: every
-   lesson's `note` says what the chapter assumes and what the lab cannot
-   settle — that commodities sell at value until Volume III, that the
-   illustrative figures are illustrative, that a disputed reading is disputed.
+   lesson's `note` names the one assumption or limit that lesson leans on — the
+   illustrative figures are illustrative, a disputed reading is disputed, the
+   lab sees quantities and not meanings. "Commodities sell at their values" is
+   said only in the lessons that lean on it (“The Labour Process and the
+   Production of Surplus Value”, “The Rate of Surplus Value”, “Cost Price and
+   Profit”, the two lessons opening Average Profit and Its Fall), not sixty
+   times.
 7. **They close by pointing forward.** Each lecture ends with what next week
    is about. Here: the last `p` of the body names the question the next
-   chapter answers, in one sentence and by the next lesson's title. It does not
-   say "next week" and it does not summarise the lesson.
+   chapter answers, in one sentence and by the next lesson's title. The last
+   lesson of a course points to the next course by title. “Classes” ends where
+   the manuscript does. It never says "next week" and never summarises the
+   lesson.
 
 What does not carry over:
 
@@ -1519,7 +1622,7 @@ never tells the reader what to conclude about capitalism. The lectures take
 sides on the *Tao Te Ching*; this Subject does not take sides on *Capital*.
 
 **One exemplary paragraph** (a `p` block for “The Labour Process and the
-Valorisation Process”, after the passage):
+Production of Surplus Value”, after the passage):
 
 > Think about the last thing you bought that was made in a factory. Its price
 > had to cover the materials, the wear on the machines and the wages, and you
@@ -1527,11 +1630,14 @@ Valorisation Process”, after the passage):
 > Marx sets up with his spinner. Ten pounds of cotton at 10s, 2s of wear on the
 > spindle, six hours of spinning: the yarn is worth 15s, and the capitalist who
 > paid 3s for a day's labour-power and 12s for the rest has made nothing. He
-> "stares in astonishment", Marx writes, and starts to complain about his
+> "stares in astonishment", Marx writes, and starts to talk about his
 > abstinence. Then the day is lengthened to twelve hours. The lab does the same
-> sum twice: 27s goes in, yarn worth 30s comes out, and every input was bought
-> at its value. Nobody cheated. The 3s came from the difference between what a
-> day of labour-power costs and what a day of labour makes.
+> sum twice: 27s goes in, yarn worth 30s comes out, and on the chapter's
+> accounting every input was bought at its value. On Marx's definitions the 3s
+> is the difference between what a day of labour-power costs and what a day of
+> labour adds — which is exactly the step an economist who prices labour by its
+> marginal product would refuse, and the next lessons keep that refusal in
+> view.
 
 ---
 
@@ -1553,6 +1659,13 @@ Valorisation Process”, after the passage):
   history of Marxism. Engels' role as editor is named where it matters.
 - **Exact historical figures beyond those Marx quotes.** Presets on historical
   chapters are mechanisms with illustrative quantities, and say so.
+- **History told as story.** Philosophy's §G excludes the history of
+  philosophy; this Subject tells the history of the argument (Smith, Ricardo,
+  Senior, Say, Overstone) because the book is that argument. Both choices are
+  deliberate; neither is a defect for a later reviewer to "fix".
+- **Exchange within Department II between necessities and luxuries** (Volume
+  II, Chapter 20, §4): named in Reproduction of the Social Capital's
+  `not_covered`.
 - **Modern monetary systems.** Volume III's money chapters are read as about
   gold-backed banking in the 1840s–60s; a lesson may say in one sentence what
   is different now, and does not model fiat money.
@@ -1586,3 +1699,55 @@ specification. For this Subject the reviews are run by two different models
 (see the operator's instruction), each independently, before any lesson is
 authored, and again per course after authoring. Each review's findings and the
 resolution of each are appended here.
+
+### Pre-authoring review, 2026-10-24
+
+Two independent reviews of the first draft, each by a different model, neither
+seeing the other's findings:
+
+- **Fable (pedagogical-expert role)**: instructional design and reconciliation
+  with the library. 35 findings; the full text was kept in the session
+  scratchpad. Two were blocking: mode names corrupted by a prefix rename
+  (`rtnt`, `rvvenue`) and a description sentence ("one lesson for every
+  chapter") that the counts test would read as "1 lesson".
+- **Opus (independent scholarly review)**: accuracy against the text of
+  *Capital*, checked chapter by chapter. 42 findings, including that the
+  marxists.org Volume II and III pages are not Untermann's translation.
+
+Resolutions, by theme:
+
+1. **Corrupted names and counting sentence**: fixed.
+2. **Source text**: the Subject quotes only the Kerr editions, now held
+   locally (§E.3). Read lines in §C are pointers, never quotations.
+3. **German numbering**: corrected (it differs from Chapter 4 on, not only in
+   Part Eight).
+4. **Figures**: every figure the Opus review found wrong or not Marx's was
+   corrected or relabelled illustrative: the 50-week year (`year_weeks`), Vol III
+   ch. 6, 13 and 15, Vol I ch. 21, 22, 24 and 32, Vol II ch. 9 and 20 §11, Vol III
+   ch. 8, 11, 18, 36, 38 and 45, the 16 lb of `suParts`. Peel stays at 3,000 because
+   that is the Kerr text; the 1887 reading of 300 is noted.
+5. **Misconceptions**: rewritten wherever they were historical or political
+   judgments, the reverse of Marx's claim, or a live dispute presented as an
+   error (Factory Acts, enclosure, the capitalist farmer, centralisation,
+   merchant's capital, ground rent's genesis, the quantity theory, Luxemburg,
+   Say's law, the Currency School, Okishio). Register rule added to §C.
+6. **Decorative labs**: co-operation recomputed from shared means of
+   production; the `interest/cycle` view removed and Chapters 30–32 moved to
+   mechanisms; the form of value and the home market given a moving quantity.
+7. **Cognitive load**: Senior's last hour split into its own lesson (119
+   lessons); the family wage dropped from the intensity lesson; skilled labour
+   moved to prose.
+8. **Duplicates**: Chapter 49 now computes Ic within Department I instead of
+   repeating Chapter 19's lab; Ricardo's chapter computes s from wage bills;
+   Chapter 5 no longer pre-empts Chapter 13.
+9. **Presented, not endorsed**: the exemplary paragraph and the trinity, profit
+   of enterprise, stock company and general-law entries now attribute
+   conclusions to the chapter's accounting and name the opposing account.
+10. **Voice**: scenes only where the chapter's object is in the reader's life;
+    course-end and “Classes” exceptions to the forward pointer; the
+    sell-at-value note confined to the lessons that need it.
+
+Not adopted: Fable's suggestion to give every bare preset an instance in this
+document now. Instead §C states that a bare id is a placeholder the author must
+instantiate and record here in the same commit, and the per-course review
+rejects any that remain.
