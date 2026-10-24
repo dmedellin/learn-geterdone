@@ -9,11 +9,15 @@ text has a misprint or a rounded figure (Chapter 9's "8 + 18 + 26", Chapter
 11's "16 1/12", "128 7/12" and "100 10/19"), the quotation keeps it and the
 lesson says so, and the lab prints the exact figure.
 
-The two tables of Chapter 9 (the five spheres, with and without used-up
-constant capital) are printed in the book as tables and are absent from the
-plain text. The lesson on Chapter 9 uses the figures of the second table and
-checks them against every total and deviation the text does print (l. 1681,
-1683, 1691, 1693); it quotes only the text around them.
+Chapter 9's three tables are printed in the book as tables and are absent
+from the plain text; the Kerr pages are in the project's shared folder as
+images (capital-texts/tables/volume-3/lf0445-03-0183-t0001.png, the five
+spheres at value, Kerr p. 183; lf0445-03-0185-t0001.png and -t0002.png, the
+same spheres with used-up c, cost prices and values, and their prices of
+production and deviations, Kerr p. 185). Every figure in the Chapter 9 lesson
+was read from those images and agrees with every total and deviation the text
+does print (l. 1681, 1683, 1691, 1693); the lesson quotes only the text around
+them and cites the pages.
 """
 
 LESSONS = [
@@ -65,8 +69,9 @@ LESSONS = [
         ],
         "read_title": "The passage first, then the chapter's comparisons",
         "read_intro": (
-            "Marx states the difficulty in one sentence and then calls it as plain as daylight. "
-            "The sentence comes first."
+            "Marx states the difficulty in one sentence: if two such capitals made the same "
+            "profit, it would be as plain as daylight that value had some other source than "
+            "labour. The sentence comes first."
         ),
         "body": [
             ("p", "<strong>Volume III, Chapter 8.</strong> &ldquo;If a capital, consisting of "
@@ -206,9 +211,9 @@ LESSONS = [
                 "s′: Europe four times Asia",
             ],
             "after": [
-                "The rate of profit is a fifth higher in Asia, on a quarter of the rate of surplus "
-                "value. Composition decides the comparison, because the Asian capital sets more than "
-                "five times as much labour in motion.",
+                "The rate of profit is higher in Asia by more than a quarter, as Marx says (5 on 16), "
+                "on a quarter of the rate of surplus value. Composition decides the comparison, "
+                "because the Asian capital sets more than five times as much labour in motion.",
             ],
         },
         "quiz_title": "Composition and the rate of profit",
@@ -349,19 +354,21 @@ LESSONS = [
                   "dividend is the total surplus value; what changes is who receives it."),
             ("p", "His table has five spheres of £100 each: I is 80c + 20v, II 70c + 30v, III 60c + "
                   "40v, IV 85c + 15v and V 95c + 5v, all at 100%. Together that is 390c + 110v, "
-                  "110 of surplus value on 500, so the general rate is 22%. In a first version every "
-                  "sphere transfers all of its c to the product, and every product sells at 122. The "
-                  "<strong>all-used-up</strong> preset gives that: five prices of £122, and values "
+                  "110 of surplus value on 500, so the general rate is 22%. In a first version, the "
+                  "table on page 183 of the Kerr edition, every sphere transfers all of its c to the "
+                  "product, the values are 120, 130, 140, 115 and 105, and every product sells at 122. "
+                  "The <strong>all-used-up</strong> preset gives that: five prices of £122, and values "
                   "and prices both summing to £610."),
             ("p", "Marx then warns that &ldquo;not all cost-prices are equal to 100&rdquo;: fixed "
                   "capital wears out over years, and only the worn part enters this year's product. "
                   "In the second table the spheres use up 50, 51, 51, 40 and 10 of their c, so cost "
                   "prices are 70, 81, 91, 55 and 15 and values 90, 111, 131, 70 and 20. Each sphere "
                   "then sells at its cost price plus 22. That is the <strong>marx</strong> preset: "
-                  "prices of £92, £103, £113, £77 and £37. The text does not reprint the table, but "
-                  "it does print the deviations it produces, sales &ldquo;2 + 7 + 17 = 26 "
-                  "above&rdquo; value and 8 + 18 = 26 below (the Kerr text misprints the second sum "
-                  "as &ldquo;8 + 18 + 26&rdquo;), and the lab's last column reproduces them."),
+                  "prices of £92, £103, £113, £77 and £37. The Kerr edition prints both tables on "
+                  "page 185, the second with a last column of deviations, and the text sums them: "
+                  "sales &ldquo;2 + 7 + 17 = 26 above&rdquo; value and 8 + 18 = 26 below (the Kerr "
+                  "text misprints the second sum as &ldquo;8 + 18 + 26&rdquo;). The lab's last column "
+                  "reproduces that column of the table."),
             ("p", "<strong>Volume III, Chapter 9.</strong> &ldquo;That price of any commodity which "
                   "is equal to its cost-price plus that share of average profit on the total capital "
                   "invested (not merely consumed) in its production which is allotted to it in "
@@ -554,7 +561,8 @@ LESSONS = [
             "the equalisation and takes every input at its value. That is the step the "
             "transformation problem disputes: with inputs also at prices of production, the two "
             "totals cannot in general both hold, and which (if either) should be kept is argued to "
-            "this day. The lab computes no solution. The figures are Marx's, read from his tables."
+            "this day. The lab computes no solution. The figures are Marx's, read from the tables "
+            "on pages 183 and 185 of the Kerr edition."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -653,7 +661,7 @@ LESSONS = [
                   "result to be explained by something else. He quotes an anonymous English writer "
                   "of 1821 who admits that the same commodity can have two different natural prices "
                   "at two times while supply and demand stand in the same proportion of equality, "
-                  "and draws the conclusion that the price is fixed independently of them."),
+                  "and Marx draws the conclusion that the price is fixed independently of them."),
             ("p", "The opposing view should be heard at full strength. Alfred Marshall, whose "
                   "<em>Principles of Economics</em> appeared in 1890, before Engels published this "
                   "volume, said that asking whether supply or demand governs value is like asking "

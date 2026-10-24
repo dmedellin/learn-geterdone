@@ -75,8 +75,8 @@ COURSE = {
         "Volume I was published, and never finished it. Friedrich Engels edited the manuscript and "
         "published it in 1894, eleven years after Marx's death, and a few passages, marked in the "
         "Kerr text with his initials, are Engels' own. Marx's tables of Chapter 9 are printed in "
-        "the book as tables; the lessons use their figures and check them against the totals the "
-        "text prints.",
+        "the book as tables, on pages 183 and 185 of the Kerr edition; the lessons read their "
+        "figures from those pages and check them against the totals the text prints.",
         "Expect argument. The transformation of values into prices and the falling rate of profit "
         "are the two results of Volume III most disputed since it appeared. Each lesson does "
         "Marx's arithmetic exactly as he gives it, states the standard objection where the step is "

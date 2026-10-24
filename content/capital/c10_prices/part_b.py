@@ -324,7 +324,8 @@ LESSONS = [
                   "p&rsquo; = 100/400, or 25%. c = 400, and v = 100, then p&rsquo; = 100/500, or "
                   "20%.&rdquo;"),
             ("p", "The first line has a misprint: 100/150 is 66 2/3%, which is how the text writes it "
-                  "two pages later. Otherwise the table is exactly what it looks like. A hundred "
+                  "a few pages later (Kerr page 250, against the table's 247). Otherwise the table "
+                  "is exactly what it looks like. A hundred "
                   "pounds of wages employ the same workers at the same rate of exploitation in every "
                   "line, and make 100 of surplus value. Only the means of production behind them "
                   "grow, from 50 to 400, and the rate of profit falls from two-thirds to a fifth. The "
@@ -339,8 +340,9 @@ LESSONS = [
                   "less labour and is cheaper. The capital that sets them to work grows in value, "
                   "though not as fast as in mass. If the worker's paid and unpaid hours keep their "
                   "proportion, the unpaid labour shrinks relative to everything the capital advances. "
-                  "The rate falls; and Marx says so &ldquo;in the long run&rdquo;, with the reasons "
-                  "it does not fall faster left for the next chapter."),
+                  "The rate falls; and Marx adds, in a parenthesis, that the fall &ldquo;does not "
+                  "manifest itself in an absolute form, but rather as a tendency toward a progressive "
+                  "fall&rdquo;, with the reasons it does not fall faster left for the next chapter."),
             ("def", ("The law of the falling tendency of the rate of profit",
                      "At a given rate of surplus value, a rising organic composition of the social "
                      "capital expresses itself in a falling general rate of profit. Marx states it as "
@@ -365,8 +367,10 @@ LESSONS = [
             ("p", "A rising composition is not the same thing as accumulation. In the "
                   "<strong>steady</strong> preset a capital of 800c + 200v doubles four times at the "
                   "same composition: the rate stays at 1/5 and the mass of profit grows from £200 to "
-                  "£3,200. Marx makes the same point at the end of Chapter 15: accumulation lowers "
-                  "the rate only when it changes the proportions of c and v."),
+                  "£3,200. Marx makes the same point in the chapter: &ldquo;The fall of the rate of "
+                  "profit is not due to an absolute, but only to a relative decrease of the variable "
+                  "part of the total capital&rdquo;. Accumulation lowers the rate only when it changes "
+                  "the proportions of c and v."),
             ("p", "Now the step critics refuse, because the lesson takes it. Marx holds s′ at 100% "
                   "while productivity rises. But the rising productivity that raises the composition "
                   "also cheapens the workers' necessities, which on Volume I's own account raises the "
@@ -375,8 +379,10 @@ LESSONS = [
                   "nothing in the table says whether the composition or the rate of surplus value "
                   "wins. What in the chapter bears on it is this: Marx says the mass of profit in a single "
                   "commodity may grow with a rising rate of surplus value &ldquo;only within certain "
-                  "limits&rdquo;, and the next two chapters argue those limits. Whether they hold is "
-                  "argued to this day, and this course does not decide it."),
+                  "limits&rdquo;, and that, with the exception of a few cases, &ldquo;the rate of profit "
+                  "will fall in spite of the increased rate of surplus-value&rdquo;; the next two "
+                  "chapters argue those limits. Whether they hold is argued to this day, and this "
+                  "course does not decide it."),
             ("p", "Marx claims the law as his own discovery, and says that &ldquo;all of political economy has so "
                   "far tried in vain to discover it&rdquo;. Smith and Ricardo had both expected profits "
                   "to fall, Smith because competition among growing capitals would press them down, "
@@ -693,9 +699,9 @@ LESSONS = [
                 "fall offset:  25/3 of 25/3 points",
             ],
             "after": [
-                "The composition has risen from 3 to 5 and the rate has not moved. Whether s′ can "
-                "keep rising enough is the question Marx answers no and Okishio's theorem answers "
-                "differently.",
+                "The composition has risen from 3 to 5 and the rate has not moved. Whether the checks "
+                "can hold the rate without limit is the question Marx answers no, in Chapter 15, and "
+                "Okishio's theorem, on its own assumptions, answers differently.",
             ],
         },
         "quiz_title": "Counteracting influences",
@@ -887,7 +893,7 @@ LESSONS = [
                   "of profit fixed as the capital grows, where Marx's text has wages rising until it "
                   "does. Whether the rate of profit has fallen in fact, and whether its movements "
                   "explain crises, are argued with data this course does not carry."),
-            ("p", "Marx ends the chapter on a different note. No capitalist adopts a new method that "
+            ("p", "Near the chapter's end Marx strikes a different note. No capitalist adopts a new method that "
                   "lowers his rate of profit; he adopts the cheaper one, sells above its price of "
                   "production while it is new, and competition then generalises it. &ldquo;Then "
                   "follows a fall in the rate of profit&rdquo;, &ldquo;wholly independent of the will "
@@ -957,11 +963,11 @@ LESSONS = [
                   "the new rate of profit?",
              "a": ["10%",
                    "8%",
-                   "12.5%",
+                   "40%",
                    "2%"],
              "c": 1,
-             "why": "`200 / 2,500 = 2/25`, 8%. Ten per cent is the old rate; 12.5% divides the old "
-                    "capital by the new; 2% divides by 10,000."},
+             "why": "`200 / 2,500 = 2/25`, 8%. Ten per cent is the old rate; 40% divides the profit "
+                    "by the added 500 alone; 2% divides it by the old capital times five."},
             {"q": "In the same case, what share of the 2,500 must be devalued to restore the old rate?",
              "a": ["1/4",
                    "1/2",
@@ -1012,9 +1018,10 @@ LESSONS = [
             "the devaluation, and state the share that restores the old rate."
         ),
         "note": (
-            "The lab holds the mass of profit fixed as capital is added. In Marx's own thought "
-            "experiment the added capital makes no more profit because wages rise once the working "
-            "population is fully employed, which the lab does not model; and it says nothing about "
+            "The lab holds the mass of profit fixed as capital is added, which is the second of "
+            "Marx's two alternatives, &ldquo;the mass of profits remaining the same&rdquo;; in his "
+            "thought experiment the added capital makes no more profit because wages rise once the "
+            "working population is fully employed, which the lab does not model; and it says nothing about "
             "whether real crises have this cause. The 1,000 and 1,500 are Marx's; the split into c "
             "and v, the third devalued and the mild case are illustrative."
         ),
