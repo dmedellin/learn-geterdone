@@ -113,9 +113,9 @@ LESSONS = [
                   "value&rdquo;. Jean-Baptiste Say, the French economist whose <em>Treatise</em> of "
                   "1803 made Smith's ideas a system, went further: labour, capital and land each "
                   "render a productive service, and each income is the price of a service. The "
-                  "German historical economist Wilhelm Roscher, whom Marx names, held that profit "
-                  "comes from the means of production and &ldquo;rent from the earth, or nature, "
-                  "represented by the landlord&rdquo;."),
+                  "German historical economist Wilhelm Roscher is the one Marx names, in brackets, "
+                  "for the view that profit comes from the means of production and &ldquo;rent "
+                  "from the earth, or nature, represented by the landlord&rdquo;."),
             ("p", "The modern version is the one most economists hold. John "
                   "Bates Clark, in <em>The Distribution of Wealth</em> of 1899, argued that under "
                   "competition each factor is paid its marginal product: what the last worker, the "
@@ -132,7 +132,7 @@ LESSONS = [
             ("p", "Marx died long before Clark wrote, and the chapter does not reply to him. What "
                   "bears on Clark's account is how narrow the chapter's own claim is. Marx does not deny that land and "
                   "machines are needed to make wheat and yarn. He claims that they help to make "
-                  "the use-value and not the value, and that ownership fixes a portion of the "
+                  "the use-value but add no new value, and that ownership fixes a portion of the "
                   "value product as rent or interest &ldquo;without, however, creating the "
                   "substance itself, which is transformed into these different categories&rdquo;."),
             ("p", "The lab takes that account and computes with it. In the english preset, an "
@@ -141,8 +141,12 @@ LESSONS = [
                   "`v + s = £200`. Wages are £100. Of the £100 of surplus value, rent takes 3/10, "
                   "£30; interest takes 1/5, £20, because the capitalist borrowed half his capital; "
                   "profit of enterprise is the remaining £50. In the no-landlord preset the farmer "
-                  "owns his land: rent is £0 and profit of enterprise £80, and the land is exactly "
-                  "as fertile as before. In the all-borrowed preset every pound of the capital is "
+                  "owns his land and pays rent to nobody: the rent tile reads £0, the profit of "
+                  "enterprise tile £80, and the land is exactly as fertile as before. The tiles "
+                  "follow the money, not Marx's categories: he would still count £30 of the £80 as "
+                  "rent, which the farmer as landowner pays to himself, as Chapter 50 says of the "
+                  "small farmer and Chapter 23 says of interest on a capitalist's own capital. In "
+                  "the all-borrowed preset every pound of the capital is "
                   "borrowed on the same terms, interest doubles to £40 and profit of enterprise "
                   "falls to £30, though no machine or worker does anything different. In all three "
                   "the four tiles add up to £200."),
@@ -239,11 +243,12 @@ LESSONS = [
                   "happens to the £30 that was rent?",
              "a": ["It disappears, and the value product falls to £170",
                    "It goes to the workers as higher wages",
-                   "It stays in the value product of £200 and lands in profit of enterprise",
+                   "It stays in the value product of £200 and goes to the farmer, who owns the land",
                    "It is added on top, and the value product rises to £230"],
              "c": 2,
              "why": "The land and the labour are unchanged, so the value product is still £200; "
-                    "profit of enterprise rises from £50 to £80. Wages are fixed at v, £100, by "
+                    "the farmer's part after interest rises from £50 to £80, though Marx would "
+                    "still call £30 of it rent, paid to himself. Wages are fixed at v, £100, by "
                     "the value of labour-power, not by who owns the land."},
             {"q": "In the reduced formula Capital–Interest, Land–Ground-Rent, Labour–Wages, which "
                   "category does Marx say is &ldquo;happily eliminated&rdquo;?",
@@ -270,8 +275,8 @@ LESSONS = [
              "This is Say's three productive services and, in its modern form, Clark's marginal "
              "productivity, and on those accounts it is no mistake. On the chapter's definitions "
              "it is: the four revenues are parts of one value product, v + s, and do not add "
-             "independent amounts to it. The presets show it. With the landlord gone, rent falls "
-             "from £30 to £0 and profit of enterprise rises from £50 to £80; with all the capital "
+             "independent amounts to it. The presets show it. With no landlord to pay, the £30 of "
+             "rent goes to the farmer instead and his part after interest rises from £50 to £80; with all the capital "
              "borrowed, interest rises to £40. The sum stays at £200 in every case."),
             ("Taking interest as capital's fruit and profit of enterprise as the capitalist's wage",
              "The formula's tidiest version makes interest the product of capital and profit of "
@@ -398,10 +403,12 @@ LESSONS = [
                   "I(v + s) is 2,000 and IIc only 1,500, and the lab reports 500 of Department "
                   "I's product unsold to Department II. In Volume II that 500 is Department I's "
                   "accumulation: surplus value, a revenue in form, existing as means of "
-                  "production. Chapter 49 makes the same point: of the newly created value, "
+                  "production. Marx keeps 400 of it in Department I as new constant capital and "
+                  "sells 100 to Department II as new constant capital there, the money paying "
+                  "Department I's extra workers. Chapter 49 makes the same point: of the newly created value, "
                   "&ldquo;some of it must be productively consumed&rdquo;. The one-sector preset "
-                  "removes Department I altogether, which is the world the error assumes, and the "
-                  "balance fails at once: Department II's 2,000 of constant capital has nothing to "
+                  "removes Department I altogether, as if no one had to make means of production, "
+                  "which is where the error's arithmetic leads, and the balance fails at once: Department II's 2,000 of constant capital has nothing to "
                   "be replaced with."),
             ("p", "Marx then separates gross from net. Gross "
                   "output is the whole product. Gross income is wages plus profit plus rent. Net "
@@ -422,8 +429,11 @@ LESSONS = [
                   "thing is revenue for one man and capital for another saves all further "
                   "thought.&rdquo; Added up over the whole society, though, the riddle comes back: "
                   "&ldquo;How can they buy a value of four with a value of three?&rdquo; The scheme "
-                  "answers it. They do not buy it all; 4,000 is bought and sold among the "
-                  "capitalists of Department I and never meets a consumer."),
+                  "answers in two parts. The consumer goods the revenues buy, Department II's "
+                  "3,000, do contain 2,000 of constant capital, and that 2,000 is paid for by "
+                  "Department I's revenue, whose product replaces it. The rest of the year's "
+                  "product, Department I's 4,000c, is bought and sold among the capitalists of "
+                  "Department I and never meets a consumer."),
             ("p", "Modern national accounts draw the same line between product and income. "
                   "They subtract intermediate consumption from gross output to reach "
                   "value added, and subtract the wear of fixed capital to reach net product. "
@@ -519,10 +529,11 @@ LESSONS = [
                    "Department I accumulates it as additional means of production",
                    "It is destroyed, since nobody buys it"],
              "c": 2,
-             "why": "It is surplus value in the form of means of production, and Department I "
-                    "keeps it to expand. It cannot be eaten, being machines and iron; Department "
-                    "II makes consumer goods and needs only 1,500 of means of production; and in "
-                    "the expanded scheme it is used, not lost."},
+             "why": "It is surplus value in the form of means of production, accumulated: Marx "
+                    "keeps 400 in Department I and sells 100 to Department II as additional "
+                    "constant capital, so all of it serves as means of production. It cannot be "
+                    "eaten, being machines and iron; Department II does not buy means of "
+                    "production as consumer goods; and in the expanded scheme it is used, not lost."},
             {"q": "Which of these is Marx's gross income?",
              "a": ["c + v + s, the whole product",
                    "Wages plus profit plus rent",
@@ -548,8 +559,9 @@ LESSONS = [
             ("Thinking the balance requires Marx's numbers",
              "Marx says his figures were chosen at random. What the scheme requires is the "
              "proportion, I(v + s) = IIc, and the growing preset shows what an imbalance means: "
-             "500 of Department I's product that Department II does not buy and Department I "
-             "must accumulate."),
+             "500 of Department I's product that Department II's simple replacement does not "
+             "take, and that Volume II turns into accumulation, 400 in Department I and 100 "
+             "sold to Department II."),
         ],
         "standard": (
             "Finish when you can separate a year's product from a year's income.",
@@ -643,10 +655,11 @@ LESSONS = [
                   "and the rate of profit from 30 to `18 2/11` per cent, so the rate of profit "
                   "falls more than the mass of surplus value and less than its rate. Marx sets "
                   "the two cases side by side in a small table on page 996 of the Kerr edition: "
-                  "product 650 and new value 250 in both. The table's rate columns are misprinted "
-                  "as well, 80 per cent for the first rate of gross profit and sixty-six and one "
-                  "eighth for the second rate of surplus value, where his text has 30 and "
-                  "`66 2/3`; the figures above are the text's. None of this moves the 650."),
+                  "product 650 and new value 250 in both. In the scan its rate columns read 80 per "
+                  "cent for the first rate of gross profit and sixty-six and one eighth for the "
+                  "second rate of surplus value, where his text has 30 and `66 2/3`. The print is "
+                  "worn, and the 8s may be broken 3s, which would still leave the second figure "
+                  "wrong; the figures above are the text's. None of this moves the 650."),
             ("p", "The lab's wage-rise preset is Marx's example. Wages go from £100 to £150 and "
                   "the profit of enterprise tile from £75 to £50. The lab keeps rent at half of s, "
                   "so rent falls to £50 too, where Marx's text splits the 100 as 45 and 55; the "
@@ -981,11 +994,12 @@ LESSONS = [
                   "the keeping of accounts in connection with this, become more essential than "
                   "ever&rdquo;. How that would be done is the question Mises asked, and Volume III "
                   "does not answer it."),
-            ("p", "Earlier, in Chapter 48, Marx had said what the surplus is ultimately for. "
-                  "Beyond the realm of necessity, where producers regulate their exchange with "
-                  "nature in common, lies &ldquo;the true realm of freedom&rdquo;, and &ldquo;The "
-                  "shortening of the working day is its fundamental premise.&rdquo; The chapter "
-                  "ends on the conflict he expects between the two sides: &ldquo;A conflict then "
+            ("p", "Earlier, in Chapter 48, Marx had looked past the realm of necessity, where "
+                  "associated producers regulate their exchange with nature in common, to "
+                  "&ldquo;the true realm of freedom&rdquo; beyond it, and &ldquo;The "
+                  "shortening of the working day is its fundamental premise.&rdquo; Chapter 51 "
+                  "ends on the conflict he expects between the forces of production and the "
+                  "historical form of production and distribution: &ldquo;A conflict then "
                   "arises between the material development of production and its social "
                   "form.&rdquo;"),
             ("p", "Three revenues, three titles, three kinds of owner. The next lesson, "
@@ -1093,7 +1107,9 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking distribution can be changed without changing production relations",
-             "This is Mill's position, and reforms of distribution are real. Marx's claim is that "
+             "This is how Marx reads Mill, and reforms of distribution are real. Mill's own line "
+             "fell elsewhere: he counted property among the institutions of distribution and "
+             "hoped for workers' co-operatives. Marx's claim is that "
              "the forms themselves rest on relations of production, and the cooperative preset "
              "shows the arithmetic: pay the workers £150 out of £200 while rent and interest stay "
              "at £30 and £20, and profit of enterprise is £0. A capitalist firm exists for that "
