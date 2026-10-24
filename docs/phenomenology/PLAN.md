@@ -16,9 +16,9 @@ note; `content/AGENTS.md` (all of it); `scripts/mathpath/AGENTS.md` ("a
 preset's two claims"); `docs/philosophy/PLAN.md` §D.0 and §E; and
 `docs/capital/PLAN.md` §0, §E and §F.
 
-**Status: blocked on §E.2.** The spec names the Landes translation as the
-single source edition, pending the operator's confirmation of the edition he
-owns. No lesson is authored and no quotation written until that is confirmed.
+**Status: authoring.** The source edition is settled (§E.2): Colin Smith's
+translation, Routledge Classics pagination, chosen by the operator on
+2026-10-24.
 
 Contents
 
@@ -228,7 +228,8 @@ a ∠ sum = two right angles, by a parallel
    each figure is a prediction of, and whose.
 3. A copy of the book is strongly recommended. The book is in copyright, so a
    lesson quotes only a short passage and the phrases it reads closely, with
-   page references to Donald A. Landes's translation (Routledge, 2012), the
+   page references to Colin Smith's translation (Routledge Classics, 2002,
+   the 1962 translation repaginated), the
    one translation every lesson cites (§E.2). The rest is paraphrase, and a
    paraphrase is a reading: check it against the page.
 4. Patience with a style. Merleau-Ponty writes long, looping paragraphs that
@@ -271,7 +272,7 @@ a ∠ sum = two right angles, by a parallel
 > computed in your browser from what the lesson states: an angular size is a
 > size over a distance, a luminance is a reflectance times an illumination, an
 > account's record is a count over the cases. Nothing is rounded except where a
-> lesson says so. Quotations are short extracts from the Landes translation,
+> lesson says so. Quotations are short extracts from Colin Smith&rsquo;s translation,
 > quoted for commentary. What the labs cannot do is compute an experience
 > &mdash; and that is what the book is about.
 
@@ -317,7 +318,7 @@ every slug is inside the 48 the lesson table allows.
 **Module names.** A module name is never shortened by cutting. Each is the
 book locator and a fixed short form from the table below, every one at most 60
 characters. The short forms are the spec's; the full titles are copied from the
-Landes table of contents into the course `summary` (§E.2), and where the
+Smith table of contents into the course `summary` (§E.2), and where the
 edition's heading differs from the wording given in the right-hand column
 (Smith's and Landes's headings differ in places: "Up and Down" may read "High
 and Low"), the module keeps the short form and the summary carries the
@@ -334,18 +335,18 @@ do not use letters.
 | Part One, introduction | `Part One · Experience and Objective Thought` |
 | Part One, Chapter 1 | `Part One · 1 · The Body as Object` |
 | Part One, Chapter 2 | `Part One · 2 · The Experience of the Body` |
-| Part One, Chapter 3 | `Part One · 3 · Spatiality and Motricity` |
+| Part One, Chapter 3 | `Part One · 3 · Spatiality and Motility` |
 | Part One, Chapter 4 | `Part One · 4 · The Synthesis of One's Own Body` |
-| Part One, Chapter 5 | `Part One · 5 · The Body as a Sexed Being` |
+| Part One, Chapter 5 | `Part One · 5 · The Body in its Sexual Being` |
 | Part One, Chapter 6 | `Part One · 6 · Expression and Speech` |
 | Part Two, introduction | `Part Two · The Theory of the Body` |
-| Part Two, Chapter 1 | `Part Two · 1 · Sensing` |
+| Part Two, Chapter 1 | `Part Two · 1 · Sense Experience` |
 | Part Two, Chapter 2, its four sections | `Part Two · 2 · Space · Up and Down`, `· Depth`, `· Movement`, `· Lived Space` |
 | Part Two, Chapter 3, constancies | `Part Two · 3 · The Thing · Constancies` |
 | Part Two, Chapter 3, the thing | `Part Two · 3 · The Thing · The Real` |
 | Part Two, Chapter 3, the natural world | `Part Two · 3 · The Thing · The Natural World` |
 | Part Two, Chapter 3, hallucination | `Part Two · 3 · The Thing · Hallucination` |
-| Part Two, Chapter 4 | `Part Two · 4 · Others and the Human World` |
+| Part Two, Chapter 4 | `Part Two · 4 · Other Selves and the Human World` |
 | Part Three, Chapters 1–3 | `Part Three · 1 · The Cogito`, `Part Three · 2 · Temporality`, `Part Three · 3 · Freedom` |
 
 ---
@@ -1744,27 +1745,45 @@ A course with more than six lessons (Courses 3, 5, 6 and 7) splits into
 ### E.2 The source text
 
 The Subject's single source edition is **Maurice Merleau-Ponty,
-*Phenomenology of Perception*, translated by Donald A. Landes (London and New
-York: Routledge, 2012)**, paperback ISBN 978-0-415-83433-9. The operator
-confirmed on 2026-10-24 that this is the edition he owns (a print copy). Its
-text reaches the authors as photographs of the pages each lesson needs,
-uploaded by the operator to `/mnt/project-files/phenomenology-texts/`; an
-author quotes only from a page they can see there. Every quotation, every page reference, every module's full
-title and every course's `how_to` attribution line comes from it. If the
-operator's copy is Colin Smith's translation (Routledge, 1962) instead, this
-section, the PATH `prerequisites` and `footer_lead`, and every Read line marked
-*(wording to be checked against the text)* are revised to name Smith before
-any lesson is authored; the two translations paginate differently and word
-the same sentences differently, so the Subject never mixes them. (Landes
-prints the Gallimard page numbers in his margins, which would let a lesson give
-the French page too: check against the edition.)
+*Phenomenology of Perception*, translated by Colin Smith (London and New York:
+Routledge, Routledge Classics 2002; first published by Routledge & Kegan Paul,
+1962)**, with the Routledge Classics pagination (Preface vii–xxiv,
+Introduction from p. 3, Part One from p. 77, Part Two from p. 235, Part Three
+from p. 429). The operator owns Donald A. Landes's 2012 translation in print,
+but chose on 2026-10-24 to build the Subject on Smith, the text the authors
+have in full, and to correct errors once it is live. Every quotation, every
+page reference, every module's full title and every course's `how_to`
+attribution line comes from Smith. The two translations are never mixed.
 
-How the text reaches the authors — the operator's physical copy, transcribed
-passage by passage, or another route he names — is recorded here when settled.
+The authors work from a private plain-text extraction of the operator's PDF
+(its path is given in `docs/phenomenology/AUTHORING.md`; the text is never
+copied into the repository or the project files). Page numbers are the
+printed Routledge Classics page numbers, found from the running heads.
+
+**Smith's vocabulary.** Where Smith's English is a known problem, the lesson
+quotes Smith and says what the French says, once, in its own words: Smith
+renders *schéma corporel* as "body image" (the lessons call it the *body
+schema*, and say Smith's word in the lesson that introduces it, because
+"image" suggests a picture, the very reading Merleau-Ponty rejects); *corps
+propre* as "one's own body"; *motricité* as "motility"; *le sentir* as "sense
+experience". The spec's other terms (*motor intentionality*, *intentional
+arc*, *phenomenal field*, *being-in-the-world*) are Smith's too. Smith's
+chapter titles, used in every course `summary`: Introduction 1 The
+'Sensation' as a Unit of Experience, 2 'Association' and the 'Projection of
+Memories', 3 'Attention' and 'Judgement', 4 The Phenomenal Field; Part I,
+Experience and Objective Thought. The Problem of the Body; 1 The Body as
+Object and Mechanistic Physiology; 2 The Experience of the Body and Classical
+Psychology; 3 The Spatiality of One's own Body and Motility; 4 The Synthesis
+of One's own Body; 5 The Body in its Sexual Being; 6 The Body as Expression,
+and Speech; Part II, The Theory of the Body is already a Theory of
+Perception; 1 Sense Experience; 2 Space; 3 The Thing and the Natural World;
+4 Other Selves and the Human World; Part III, Being-for-Itself and
+Being-in-the-World; 1 The Cogito; 2 Temporality; 3 Freedom.
+
 A phrase is never quoted from memory, from the other translation or from a
-secondary source. **Until the edition is confirmed and the route recorded, no
-quotation is written and no lesson is authored.** The pre-authoring review
-(§R) was done with this section open.
+secondary source. Every *(check against text)* in §C is resolved by the
+course's author against Smith, and the §C entry corrected where the text
+differs.
 
 Every course's `how_to` carries the same attribution line, as *Capital*'s carry
 the Kerr line.
@@ -1773,7 +1792,7 @@ the Kerr line.
 
 *Phenomenology of Perception* is in copyright in French (Gallimard, 1945) and
 in both English translations (Colin Smith, Routledge, 1962; Donald A. Landes,
-Routledge, 2012). The Subject quotes it for commentary, and keeps quotation
+Routledge, 2012). The Subject quotes Smith for commentary, and keeps quotation
 small:
 
 - The opening passage is at most **70 words**, cited by page in the source
