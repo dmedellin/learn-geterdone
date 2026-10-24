@@ -88,3 +88,17 @@ course).
 
 End with a short report: lessons written, every §C deviation and why, any kit
 gap, the preview command's final output line, and any spoken forms added.
+
+## Lessons from the Course 1 review
+
+- Every phrase inside `&ldquo;…&rdquo;` counts as a quotation and must be in
+  the Kerr text. The pilot had one phrase written from memory and attributed
+  to Marx; it was not in the chapter. Run the quotation checker over every
+  quoted span, not only the opening block.
+- Every preset id must appear in a body paragraph with the figure it shows.
+- A three-letter word at the head of a key line or after `=` (`due`, `out`,
+  `use`, `tax`, `net`) is spelt out letter by letter by the read-out. Reword
+  (`payable`, `bullion out = …` → put the word mid-phrase) or rephrase.
+- Abbreviations such as `cwt.` read badly; write `hundredweight`.
+- Name the standard objection to a step in the lesson that takes the step,
+  and vary the closing sentence that says the Subject does not settle it.
