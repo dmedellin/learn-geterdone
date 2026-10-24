@@ -92,8 +92,8 @@ LESSONS = [
                   "His counter-claim is blunt: &ldquo;In actual history it is notorious that "
                   "conquest, enslavement, robbery, murder, briefly force, play the great "
                   "part.&rdquo;"),
-            ("p", "The legend deserves a fairer hearing than Marx gives it, because it has "
-                  "serious holders. Max Weber argued in 1905 that a disciplined, saving, "
+            ("p", "The legend has holders more serious than Marx's parody allows, and it "
+                  "should be heard at strength. Max Weber argued in 1905 that a disciplined, saving, "
                   "Protestant asceticism shaped the spirit of early capitalism. François "
                   "Crouzet's studies of the first English industrialists found that most "
                   "founders came from the middling ranks, merchants, master craftsmen and "
@@ -263,8 +263,8 @@ LESSONS = [
                     "definition."},
         ],
         "mistakes": [
-            ("Thinking the first capitalists became so by saving",
-             "In its plain form, saving out of wages, the tile refutes it: 3.6d a day "
+            ("Thinking the first capitals were saved out of wages, as the legend's plain form says",
+             "In that plain form the tile refutes it: 3.6d a day "
              "takes 200,000 working days to reach £3,000, and even the whole wage takes "
              "20,000. The stronger form, held by Weber and supported by Crouzet's founders, "
              "is that capital grew by thrift and reinvested profit. Marx's reply is that "
@@ -358,9 +358,9 @@ LESSONS = [
                   "794,000 acres of land that had from time immemorial belonged to the "
                   "clan.&rdquo;"),
             ("p", "The chapter gets there by a long road, and it starts with people who were "
-                  "not poor. In the fifteenth century, Marx writes, serfdom had practically "
-                  "disappeared in England and the immense majority were free peasant "
-                  "proprietors. Even the agricultural wage-labourers had cottages and four or "
+                  "not poor. By the last part of the fourteenth century, Marx writes, serfdom had "
+                  "practically disappeared in England, and in the fifteenth the immense majority "
+                  "were free peasant proprietors. Even the agricultural wage-labourers had cottages and four or "
                   "more acres, and shared the common land, which gave &ldquo;pasture to their "
                   "cattle, furnished them with timber, fire-wood, turf&rdquo;. That world "
                   "allowed a wealth of the people, he says, but &ldquo;it excluded the "
@@ -401,9 +401,10 @@ LESSONS = [
                   "from people driven off the land. Robert Allen argued in 1992 that enclosure "
                   "added little to output and mainly moved income from farmers and cottagers to "
                   "landlords, a finding closer to Marx's. Eric Richards, the historian of the "
-                  "Highland Clearances, does not dispute the evictions but questions some of "
-                  "the figures Marx took from his sources and reads the Sutherland plan as a "
-                  "resettlement scheme that failed. The lab cannot decide between them."),
+                  "Highland Clearances, does not dispute the evictions but treats several figures "
+                  "in the contemporary accounts Marx relied on as exaggerated, and reads the "
+                  "Sutherland plan as a resettlement scheme, meant to move the people to fishing "
+                  "and crofting on the coast, that failed. The lab cannot decide between them."),
             ("p", "What the lab can do is compute the mechanism the chapter is about. Take a "
                   "smallholder's 12-hour day. On her own land every hour is worked for her "
                   "household, so the surplus labour performed for anyone else is 0 hours: the smallholder "
@@ -594,8 +595,8 @@ LESSONS = [
         ),
         "concepts": [
             ("The laws against vagabonds",
-             "From Henry VIII to James I, people without work were whipped, branded, "
-             "enslaved or executed for being without work. Marx reads the laws as treating "
+             "From Henry VII to James I, people without work were whipped, branded, "
+             "enslaved or executed for it. Marx reads the laws as treating "
              "the expropriated as &ldquo;voluntary&rdquo; criminals who could have gone on "
              "working under conditions that no longer existed."),
             ("The statutory maximum",
@@ -629,14 +630,16 @@ LESSONS = [
                   "vagabonds were to be whipped and sent home to &ldquo;put themselves to "
                   "labour&rdquo;. &ldquo;What grim irony!&rdquo;, Marx writes. Under Edward VI in "
                   "1547 a man who refused to work could be condemned as a slave to whoever "
-                  "denounced him. Elizabeth and James I kept the whipping and added "
-                  "branding."),
+                  "denounced him. Elizabeth and James I kept the whipping and the branding, "
+                  "and death for the third offence."),
             ("p", "Historians have tested the list. C. S. L. Davies showed in 1966 that the "
-                  "slavery statute of 1547 was repealed within about two years and seems hardly "
-                  "to have been enforced, and later work on vagrancy, A. L. Beier's among it, "
-                  "treats the statutes as evidence of what lawmakers feared as much as of what "
-                  "magistrates did. Marx's catalogue is of the law's text. Its force as history "
-                  "depends on enforcement, which he does not measure."),
+                  "slavery statute of 1547 was repealed by 1550 and seems hardly to have been "
+                  "enforced. A. L. Beier, working from the records of arrests rather than the "
+                  "statutes, found a real and growing population of masterless men in Tudor "
+                  "England, mostly young, mobile and looking for work, so the fear behind the "
+                  "laws had an object, though not the hardened idlers the laws imagined. Marx's "
+                  "catalogue is of the law's text. Its force as history depends on enforcement, "
+                  "which he does not measure and which the record shows was uneven."),
             ("p", "Then the turn the chapter's argument rests on. Once capitalist production "
                   "is fully developed, the constant relative surplus population keeps wages "
                   "where capital needs them. &ldquo;The dull compulsion of economic relations "
@@ -796,8 +799,8 @@ LESSONS = [
              "That is true of modern minimum-wage laws, and it is the reverse of these. The "
              "Statute of Labourers fixed a ceiling: in the statute preset the first tile reads "
              "1s below the value, and the rate of surplus value rises from 100% "
-             "to 200%. The only floor ever proposed in the period, Whitbread's in 1796, was "
-             "rejected."),
+             "to 200%. The one floor Marx records being proposed in the period, Whitbread's "
+             "in 1796, was rejected."),
             ("Thinking a law that lowers wages lowers the value of labour-power",
              "In the lab the value of labour-power stays 3s whatever the statute says; what "
              "moves is the gap between it and the wage, and with it the rate. A wage held "
@@ -840,7 +843,7 @@ LESSONS = [
         ),
         "key": [
             "real rent = money rent / price index",
-            "keeps = product·p − wages·w − rent",
+            "keeps = product − wages − rent, at new prices",
             "fixed rent, rising prices: landlord loses",
             "wages lagging prices: labourer loses",
             "the farmer gains from both",
@@ -921,11 +924,12 @@ LESSONS = [
                   "revolution, Jean Bodin argued in 1568 that the flood of American treasure "
                   "raised prices because there was more money, the first statement of the "
                   "quantity theory, and Earl Hamilton's figures on Spanish treasure in 1934 "
-                  "seemed to bear it out. Later historians, R. B. Outhwaite and Jack Goldstone "
-                  "among them, pointed out that English prices began to rise before much "
-                  "American silver arrived and argued that a growing population pressing on "
-                  "land and food drove them. Marx's own account is the fall in the metals' "
-                  "value. The lab takes the price index as given and does not choose."),
+                  "seemed to bear it out. Later historians pointed out that English prices began "
+                  "to rise before much American silver arrived: R. B. Outhwaite and others "
+                  "argued that a growing population pressing on land and food drove them, and "
+                  "Jack Goldstone that population growth and the growth of towns sped the "
+                  "circulation of the money there already was. Marx's own account is the fall in "
+                  "the metals' value. The lab takes the price index as given and does not choose."),
             ("p", "On the effect, Eric Kerridge's study of estate rents from 1540 to 1640 "
                   "found that rents, through entry fines and new leases, rose faster than "
                   "prices, so that many landlords were not losers at all. The farmer's golden "

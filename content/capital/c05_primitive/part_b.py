@@ -63,7 +63,7 @@ LESSONS = [
                   "elements of variable capital. The peasant, expropriated and cast adrift, "
                   "must buy their value in the form of wages, from his new master, the "
                   "industrial capitalist.&rdquo;"),
-            ("p", "The phrase &ldquo;set free&rdquo; is ironic, and it is also exact. The cleared land, "
+            ("p", "The phrase &ldquo;set free&rdquo; is ironic, and Marx also means it literally. The cleared land, "
                   "Marx says, brought forth as much produce as before or more, because of "
                   "better methods, larger farms and labourers worked harder. So the food the "
                   "peasants used to grow still exists. What has changed is that it no longer "
@@ -106,14 +106,14 @@ LESSONS = [
                      "longer make.")),
             ("p", "Read the 150s from the other side and it is the same number. If each "
                   "household supplies one wage-earner and the wage covers the value of its "
-                  "subsistence, the wage bill is 100 × 1s 6d = 150s a day, and it is spent on "
+                  "subsistence, the wage bill is a hundred wages of 1s 6d, 150s a day, and it is spent on "
                   "exactly those goods. The market created and the variable capital that now "
                   "circulates are one sum seen from two sides. Leave each household its "
                   "cottage acres, as the old laws tried to, so that it still grows its own "
                   "food, and the market is 50s, the cottage preset: only the cloth and fuel are bought."),
             ("p", "The strongest rival account starts from the same households. Adam Smith "
-                  "argued that the market grows with the division of labour, as specialised "
-                  "producers find it cheaper to buy than to make. Jan de Vries has argued that "
+                  "tied the market to the division of labour, each extending the other, as "
+                  "specialised producers find it cheaper to buy than to make. Jan de Vries has argued that "
                   "in the seventeenth and eighteenth centuries households chose to work more "
                   "for the market and to buy what they had made at home, because they wanted "
                   "new goods: an industrious revolution, in which the home market grew by "
@@ -345,8 +345,8 @@ LESSONS = [
             ("p", "The colonial system comes first, and the chapter gives it the most space: "
                   "the treasure of the Americas and the enslavement and destruction of their "
                   "peoples, the plunder of the East Indies, and the trade in captured Africans. "
-                  "Marx's catalogue is specific. The Dutch in Java ran a system of stealing men "
-                  "for slaves; &ldquo;Sweet commerce!&rdquo;, he writes after the depopulation of "
+                  "Marx's catalogue is specific. The Dutch stole men in Celebes to work as slaves "
+                  "in Java; &ldquo;Sweet commerce!&rdquo;, he writes after the depopulation of "
                   "Banjuwangi. The East India Company and its servants took £6,000,000 from "
                   "Indians as gifts between 1757 and 1766. New England's assemblies paid bounties "
                   "for scalps. Liverpool's slave-ships rose from 15 in 1730 to 132 in 1792. "
@@ -366,7 +366,7 @@ LESSONS = [
             ("p", "<strong>Volume I, Chapter 31.</strong> &ldquo;The only part of the so-called "
                   "national wealth that actually enters into the collective possessions of "
                   "modern peoples is&mdash;their national debt.&rdquo;"),
-            ("p", "His account of how the debt works is precise. It &ldquo;endows barren money "
+            ("p", "His account of how the debt works is specific. It &ldquo;endows barren money "
                   "with the power of breeding&rdquo;: the state's creditors give nothing away, "
                   "since the sum lent becomes negotiable bonds that go on working in their hands "
                   "like cash. Around the debt grew joint-stock companies, dealing in securities, "
@@ -644,9 +644,11 @@ LESSONS = [
                   "growing, not shrinking, and that small and middling firms were persisting, "
                   "so the polarisation was not happening as foretold. Karl Popper later "
                   "classed such laws of historical development as prophecy rather than "
-                  "science. Those who defend the chapter point to the long growth of giant "
-                  "firms and the spread of wage-labour. The lab computes a mechanism and none "
-                  "of the record."),
+                  "science. On the other side, Paul Baran and Paul Sweezy argued in 1966 that "
+                  "the giant corporation had become the typical unit of capital, which is the "
+                  "centralisation Marx foresaw, and defenders of the chapter point to the spread "
+                  "of wage-labour across the world since he wrote. The lab computes a mechanism "
+                  "and none of the record."),
             ("p", "There is one more chapter, and it seems to go backwards. The next lesson, "
                   "“The Modern Theory of Colonisation”, travels to the colonies, where, Marx "
                   "says, the secret of the old world was blurted out."),
@@ -885,7 +887,8 @@ LESSONS = [
                   "needs 4 years of wage-labour to buy land, and for those 4 years the 3,000 "
                   "colonists remain for hire. The lab ships four periods; move the slider to "
                   "five and they are gone, and the price must bring others to take their place. "
-                  "In the closed preset land cannot be had at all, and the workers stay for hire indefinitely, which "
+                  "In the closed preset the worker can save nothing, so land at any price is out of "
+                  "reach and the workers stay for hire indefinitely, which "
                   "is the condition of the old country. Marx calls the sufficient price "
                   "&ldquo;the ransom which the labourer pays to the capitalist for leave to "
                   "retire from the wage-labour market to the land&rdquo;."),
