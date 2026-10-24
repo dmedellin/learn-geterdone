@@ -22,7 +22,7 @@ LESSONS = [
         "slug": "supplementary-remarks-on-prices",
         "title": "Supplementary Remarks on Prices of Production",
         "module": "Chapter 12 · Some After Remarks",
-        "one_line": "A capitalist who claims a higher price for risk or slow turnover is claiming a larger share of a fixed total of surplus value, and every such premium is paid out of everyone else's rate.",
+        "one_line": "A capitalist who claims a higher price for risk or slow turnover is, on Marx's account, claiming his share of a fixed total of surplus value, not creating profit, and whatever such an allowance adds to one price comes out of everyone else's rate.",
         "summary": (
             "Chapter 12 gathers three remarks. A price of production changes only through a change "
             "in value, its own or other commodities'; a sphere of average composition behaves as if "
@@ -78,8 +78,10 @@ LESSONS = [
                   "of production; Chapter 9 already allotted profit &ldquo;in proportion to its "
                   "conditions of turn-over&rdquo;. What he denies is the capitalist's reading of "
                   "them. Each claim, read alone, seems to create profit: a premium added to a price. "
-                  "Read together they are a rule for sharing what exists, the stock company of "
-                  "Chapter 9 with some shares weighted more heavily."),
+                  "On Marx's reading the claims &ldquo;repeat in another way&rdquo; the stock "
+                  "company of Chapter 9: a capital that turns over slowly or runs a special danger "
+                  "charges more so that it draws the same share per hundred as every other, and what "
+                  "it draws comes out of the one total."),
             ("p", "The lab makes that a sum. Take Marx's five spheres from Chapter 9, with 110 of "
                   "surplus value on 500 of capital. With no premiums, the <strong>none</strong> "
                   "preset gives the familiar 22% and prices of £92, £103, £113, £77 and £37. In "
@@ -87,11 +89,14 @@ LESSONS = [
                   "allowed 5% on top of the general rate for danger. Its 5 has to come from "
                   "somewhere: the base rate falls to 21%, every other sphere's price falls by 1, V's "
                   "rises by 4, and the totals tile still reads values £422 = prices £422; s £110 = "
-                  "profit £110."),
+                  "profit £110. The lab does not model what the allowance makes good, the cargoes "
+                  "lost or the year's turnover not completed; it shows only where the allowance's "
+                  "money comes from."),
             ("def", ("Ground for compensation",
-                     "A circumstance, such as slow turnover or danger, for which a sphere's price "
-                     "allows a profit above the general rate. On the chapter's account it is paid out "
-                     "of the same total surplus value, so it lowers the rate left for the others.")),
+                     "A circumstance, such as slow turnover or danger, for which capitalists allow in "
+                     "a sphere's price. On the chapter's account it creates no profit: what it adds "
+                     "to one price is paid out of the same total surplus value, so it lowers the rate "
+                     "left for the others.")),
             ("p", "In <strong>turnover-premium</strong>, sphere I, a capital with a slow turnover, "
                   "is allowed 10% extra. The base rate falls to 20%, I sells at £100 instead of £92, "
                   "the others at £101, £111, £75 and £35, and the totals do not move. However the "
@@ -248,7 +253,7 @@ LESSONS = [
              "falls by £1, the general rate tile drops from 22% to 21%, and the totals tile still "
              "reads s £110 = profit £110. The premium is a larger share of the same pool."),
             ("Thinking the chapter calls the allowances illegitimate",
-             "Marx says turnover and danger are reckoned into prices of production, and Chapter 9 "
+             "Marx says capitalists reckon slow turnover and danger into their prices, and Chapter 9 "
              "already allots profit in proportion to turnover. His objection is to the idea that "
              "the allowance is a source of profit, not to its being made."),
             ("Treating every change in a price of production as a change in its own value",
@@ -485,7 +490,8 @@ LESSONS = [
              "c": 0,
              "why": "Robinson and Sweezy pressed exactly that: the table fixes s′ while productivity "
                     "rises. No one disputes the arithmetic, and the chapter itself shows the mass "
-                    "rising as the rate falls. A rising composition is the premise both sides grant."},
+                    "rising as the rate falls. Critics also ask whether the composition in value rises "
+                    "as fast as in mass, but none says it cannot rise."},
         ],
         "mistakes": [
             ("Thinking a falling rate of profit means falling profits",
@@ -606,8 +612,8 @@ LESSONS = [
                      "The rate of profit with the counteracting influences minus the rate the same "
                      "sequence would reach without them, in percentage points, set beside the fall "
                      "that would otherwise have happened.")),
-            ("p", "In <strong>combined</strong> both act at half strength: s′ rises by a sixteenth a "
-                  "period, to 125%, and c cheapens as in cheap-c. Neither alone holds the rate, and "
+            ("p", "In <strong>combined</strong> s′ rises half as fast as in rising-s, by a sixteenth "
+                  "a period, to 125%, and c cheapens as in cheap-c. Neither alone holds the rate, and "
                   "together they hold it at 25%, the offset tile reading 25/3 of 25/3 points again. "
                   "The other three causes are mechanisms the lab does not separate. Relative "
                   "overpopulation keeps labour cheap enough that old labour-intensive trades survive "
@@ -617,7 +623,8 @@ LESSONS = [
                   "averaging, which keeps the measured rate higher than it would be."),
             ("p", "Several of them, Marx stresses, cut both ways. Foreign trade cheapens "
                   "inputs and also speeds accumulation and the rise in composition. Cheapening c "
-                  "depreciates existing capital. &ldquo;This law is not suspended, but its effect is "
+                  "depreciates existing capital, which checks the fall in the rate but can shrink "
+                  "the capital that yields a profit. &ldquo;This law is not suspended, but its effect is "
                   "weakened.&rdquo; And near the chapter's end comes a sentence that sums up Part III: "
                   "&ldquo;The rate of profit does not fall, because labor becomes less productive, "
                   "but because it becomes more productive.&rdquo;"),
@@ -629,7 +636,7 @@ LESSONS = [
                   "and it rises if the change touches goods that enter, directly or indirectly, into "
                   "every other. On those assumptions the counteracting influences always win: a "
                   "rising composition chosen by cost-cutting capitalists comes with enough "
-                  "cheapening to more than offset it. If the rate falls, Okishio concluded, it is "
+                  "cheapening to offset it at least. If the rate falls, Okishio concluded, it is "
                   "because real wages rose, not because of the technique."),
             ("p", "There are replies, and the chapter bears on one of them. Marx's premise is close to Okishio's: in Chapter "
                   "15 he says no capitalist adopts a method that lowers the rate of profit, and that "
@@ -770,8 +777,8 @@ LESSONS = [
         "note": (
             "The lab offsets a fall over the periods it is given and says nothing about the long "
             "run, which is where Marx and his critics disagree; nor does it model wages below value, "
-            "overpopulation, foreign trade or stock capital. Okishio's theorem works in a "
-            "general-equilibrium model this lab does not have. The figures are illustrative; Marx "
+            "overpopulation, foreign trade or stock capital. Okishio's theorem works in a linear "
+            "model of production prices with a uniform rate of profit, which this lab does not have. The figures are illustrative; Marx "
             "gives the causes without numbers."
         ),
     },
@@ -853,7 +860,11 @@ LESSONS = [
             ("p", "Section 3 makes this precise with a thought experiment. Suppose capital has grown "
                   "so far relative to the working population that neither the working day nor the "
                   "rate of exploitation can be raised further. Then the increased capital, C plus ΔC in Marx's notation (the Kerr text garbles "
-                  "the symbol), would produce no more profit than C did. That is absolute over-accumulation. His figures:"),
+                  "the symbol), would produce no more profit than C did, or less. That is absolute "
+                  "over-accumulation. Marx gives its cause: with labour scarce, wages rise, and "
+                  "surplus labour shrinks against necessary labour. In reality, he adds, part of the "
+                  "capital would lie fallow while the rest worked at a lower rate. Then, supposing "
+                  "the capital at work keeps producing at the old rate, his figures:"),
             ("p", "<strong>Volume III, Chapter 15, §3.</strong> &ldquo;If a total capital of 1,000 "
                   "yielded a profit of 100, and after its increase to 1,500 still yielded 100, then "
                   "1,000 in the second case would yield only 66 2/3.&rdquo;"),
@@ -864,8 +875,9 @@ LESSONS = [
             ("p", "The <strong>marx</strong> preset sets the capital at 900c + 100v at 100%, which "
                   "yields Marx's 100 on 1,000 (the split is the lab's, since Marx gives only the "
                   "total), and adds 500 that sets no more labour to work. The rate tile reads 1/15, "
-                  "6.67%, and the mass tile £100: the rate has fallen from 10% to 6 2/3% with no fall "
-                  "in exploitation at all. A milder case, <strong>mild</strong>, adds 100 and the rate "
+                  "6.67%, and the mass tile £100: the rate has fallen from 10% to 6 2/3% while the "
+                  "capital at work is exploited exactly as before, because the extra 500 lies idle. "
+                  "The rise in wages that Marx gives as the cause is not modelled. A milder case, <strong>mild</strong>, adds 100 and the rate "
                   "falls to 1/11."),
             ("p", "How is it resolved? Not peacefully. While profits grow, competition is &ldquo;a "
                   "practical brotherhood of the capitalist class&rdquo;; when losses have to be "

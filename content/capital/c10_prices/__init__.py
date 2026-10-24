@@ -97,7 +97,7 @@ COURSE = {
         "and whether its movements explain crises, is argued with national accounts this course "
         "does not carry. The lessons say the law is stated as a tendency and leave it there.",
         "Okishio's theorem as a model. “Counteracting Influences” states the theorem and the main "
-        "replies to it; the lab does not build the general-equilibrium model the theorem needs.",
+        "replies to it; the lab does not build the model of production prices the theorem needs.",
         "Merchant's capital and the division of profit. The general rate here is shared among "
         "industrial capitals only; merchants, interest and rent take their shares in Merchant's "
         "Capital and Interest and the courses after it.",

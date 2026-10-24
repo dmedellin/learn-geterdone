@@ -124,7 +124,7 @@ LESSONS = [
                   "profit. The <strong>europe-asia</strong> preset gives 16% and 21%. Marx adds that "
                   "&ldquo;Men like Carey, Bastiat, and others, would come to the opposite "
                   "conclusion.&rdquo; Henry Carey in Philadelphia and Frédéric Bastiat in Paris were "
-                  "the leading economists of harmony in the 1850s; both held that as capital grows, "
+                  "the leading economists of harmony around 1850; both held that as capital grows, "
                   "labour's share of the product rises and capital's falls. Marx does not spell "
                   "out their reasoning, but on such a view a high return to capital is a sign of a "
                   "large share for capital and a small one for labour. On Marx's accounting the "
@@ -236,7 +236,7 @@ LESSONS = [
                    "The second is higher, because dearer materials add more value",
                    "It cannot be said without the length of the working day"],
              "c": 1,
-             "why": "This is Marx's copper and iron case: 200c + 100v and 400c + 100v each make "
+             "why": "This is Marx's case of dearer means of production: 200c + 100v and 400c + 100v each make "
                     "£100 of surplus value, at 33 1/3% and 20%. Dearer materials pass on their value "
                     "but add no surplus value. The working day is given by the chapter's assumptions."},
             {"q": "In the europe-asia preset, which capital has the higher rate of profit, and "
@@ -331,8 +331,8 @@ LESSONS = [
              "above average composition it is higher than the value, below it lower."),
             ("The two totals",
              "Summed over every sphere, prices of production equal values and profits equal surplus "
-             "values. Marx reads this as the law of value holding for the whole while it fails for "
-             "each commodity."),
+             "values. Marx reads this as the law of value holding for the whole, while each "
+             "commodity's price departs from its value."),
         ],
         "read_title": "The passage first, then the table",
         "read_intro": (
@@ -398,21 +398,31 @@ LESSONS = [
                   "concerning the determination of the cost-price of commodities.&rdquo; He grants "
                   "&ldquo;the possibility of an error&rdquo; if cost price is taken as the value of "
                   "the inputs, and says that his &ldquo;present analysis does not necessitate a "
-                  "closer examination of this point&rdquo;. The table, and this lab, value the inputs "
-                  "at value."),
+                  "closer examination of this point&rdquo;. He had met the same objection a few pages "
+                  "earlier and answered it for the totals: the inputs' prices carry other spheres' "
+                  "profits, but summed over the whole country &ldquo;it is evident that the "
+                  "calculation must come out right&rdquo;, and the deviations &ldquo;mutually "
+                  "compensate one another&rdquo;. He asserts this for the whole; he does not redo the "
+                  "table with its inputs at prices of production. The table, and this lab, value the "
+                  "inputs at value."),
             ("p", "That is the transformation problem, and it deserves its full strength. Eugen von "
                   "Böhm-Bawerk, in <em>Karl Marx and the Close of His System</em> (1896), argued that "
                   "Volume III contradicts Volume I: if no commodity exchanges at its value, then value "
                   "explains no actual price, and the equality of the totals is an empty statement "
                   "about a sum nobody trades. Ladislaus von Bortkiewicz (1906–07) took the procedure "
                   "on its own terms and transformed the inputs too; in his solution the rate of "
-                  "profit can be found, but in general only one of Marx's two totals survives. Later "
+                  "profit can be found, though in general it differs from the rate computed in "
+                  "values, and Marx's two totals cannot in general both hold. Later "
                   "work went in opposite directions. Paul Samuelson (1971) and Ian Steedman (1977), "
                   "after Piero Sraffa, argued that prices and the rate of profit can be computed "
                   "from technique and the real wage without values at all, so values are a detour. "
-                  "The New Interpretation of Gérard Duménil and Duncan Foley (around 1980) and the "
-                  "temporal single-system reading of Andrew Kliman, Alan Freeman and others replied "
-                  "that, read with different definitions, both totals hold. This Subject does not "
+                  "Others redefined the terms. The New Interpretation of Gérard Duménil and Duncan "
+                  "Foley (around 1980) takes the value of money and of labour-power from observed "
+                  "prices and wages, so that total profit equals total surplus value and the year's "
+                  "new value equals its price, though not gross price and gross value. The temporal "
+                  "single-system reading of Andrew Kliman, Alan Freeman and others values inputs at "
+                  "the prices actually paid for them, and on that reading both of Marx's totals "
+                  "hold. This Subject does not "
                   "take a side, and the lab does only what Chapter 9 does."),
             ("p", "What the capitalist sees is the price of production and nothing behind it. Profit "
                   "now differs from surplus value in mass, not only in rate, and Marx says this "
@@ -547,8 +557,8 @@ LESSONS = [
              "marx preset that difference is what lifts V to £37."),
             ("Believing the lab has solved the transformation problem",
              "The lab transforms outputs and leaves inputs at value, exactly as Chapter 9 does. "
-             "Transforming the inputs too is what Bortkiewicz did, and in general it breaks one of "
-             "the two equalities in the totals tile. The lab does not attempt it."),
+             "Transforming the inputs too is what Bortkiewicz did, and in general it breaks at least "
+             "one of the two equalities in the totals tile. The lab does not attempt it."),
         ],
         "standard": (
             "Finish when you can compute a general rate of profit and every sphere's price of production.",
@@ -603,8 +613,8 @@ LESSONS = [
             ("Surplus profit",
              "A producer whose individual value is below the market value realises more than his own "
              "surplus value; one above it realises less. The difference is surplus profit, and Marx "
-             "says every market price carries one for those who produce under the most favourable "
-             "conditions."),
+             "says that, crises and general overproduction aside, every market price carries one for "
+             "those who produce under the most favourable conditions."),
             ("Supply, demand and value",
              "Supply and demand move market prices above and below market values. When they balance "
              "they explain nothing, Marx argues, so the level they balance at must be set by "
@@ -636,8 +646,9 @@ LESSONS = [
                   "under the least favorable conditions determines the market-value, or social "
                   "value.&rdquo;"),
             ("p", "That is the second case: the worst-placed group makes a relatively large share of "
-                  "the output. Marx says that &ldquo;strictly speaking&rdquo; the market value is "
-                  "then the total value of the mass divided by its quantity, which lies above the "
+                  "the output, and &ldquo;The lot produced under the worst conditions decides the "
+                  "question.&rdquo; &ldquo;Strictly speaking&rdquo;, Marx goes on, the market value "
+                  "is then the total value of the mass divided by its quantity, which lies above the "
                   "average group's value and below the worst group's, closer to the worst the "
                   "larger its share. The <strong>worst-dominates</strong> preset has 1,000 pieces at "
                   "3 hours, 3,000 at 4 and 6,000 at 5: the market value is 9/2 hours, and even the "
@@ -664,8 +675,9 @@ LESSONS = [
                   "and Marx draws the conclusion that the price is fixed independently of them."),
             ("p", "The opposing view should be heard at full strength. Alfred Marshall, whose "
                   "<em>Principles of Economics</em> appeared in 1890, before Engels published this "
-                  "volume, said that asking whether supply or demand governs value is like asking "
-                  "which blade of a pair of scissors cuts. In his account the supply side carries "
+                  "volume, said that asking whether value is governed by utility or by cost of "
+                  "production is like asking which blade of a pair of scissors cuts; demand and "
+                  "supply are the two blades. In his account the supply side carries "
                   "costs, and in the long run normal price tends to cost of production, much as "
                   "Marx's market value does; but the curves are drawn at every price, not only at "
                   "balance, and demand helps fix the quantity at which cost is measured. Marx's "
@@ -705,8 +717,8 @@ LESSONS = [
             "panel_title": "One market value from many individual values",
             "panel_intro": (
                 "Each group is typed as units sold and its own hours per unit. The lab takes the "
-                "market value as the average over every unit, Marx's &ldquo;strictly speaking&rdquo; "
-                "reading, and gives each group's gain or loss per unit. The total sold is the same "
+                "market value as the average over every unit, the reading Marx calls strict, "
+                "and gives each group's gain or loss per unit. The total sold is the same "
                 "10,000 in every preset: only the mix of conditions changes."
             ),
         }),
