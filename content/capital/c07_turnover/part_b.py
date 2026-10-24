@@ -122,7 +122,8 @@ LESSONS = [
             ("p", "The lab adds a working time inside the production period. Marx's winter grain "
                   "is nine months, 39 weeks, of which say 13 are worked; with 13 weeks to sell "
                   "it, the capital turns over once a year and a third of the production time "
-                  "is work. Timber at a hundred years turns over once a century. Then the "
+                  "is work. Timber at a hundred years, with six months of work in it, turns "
+                  "over once a century, and only `1/200` of its production time is work. Then the "
                   "tannery, with four weeks of work and four of selling: under the old method, "
                   "a year in the pits, it turns over `13/14` times a year; with the air-pump, "
                   "eight weeks, `13/3` times. The working time is four weeks in both."),
@@ -139,7 +140,7 @@ LESSONS = [
                 {"id": "wheat", "label": "Marx's winter grain: 9 months to ripen, 3 of them worked",
                  "production_weeks": 39, "working_weeks": 13, "circulation_weeks": 13,
                  "year_weeks": 52, "expect": {"tuTurnover": "52 weeks", "tuTurnovers": "1 a year (a 52-week year)", "tuWorkingShare": "1/3 = 33.33%", "tuCirculationShare": "1/4 = 25%"}},
-                {"id": "timber", "label": "Marx's timber: 100 years from seed, a few months of work",
+                {"id": "timber", "label": "Marx's timber: 100 years from seed, six months of work",
                  "production_weeks": 5200, "working_weeks": 26, "circulation_weeks": 0,
                  "year_weeks": 52, "expect": {"tuTurnover": "5,200 weeks", "tuTurnovers": "1/100 a year (a 52-week year)", "tuWorkingShare": "1/200 = 0.5%", "tuCirculationShare": "0 = 0%"}},
                 {"id": "tanning-old", "label": "Tanning by the old method: a year in the pits, 4 weeks of work",
@@ -1043,11 +1044,13 @@ LESSONS = [
                   "Tooke nor any one else has answered it so far&rdquo;. Notice what is not in "
                   "question. Surplus value is produced in the workshop; the puzzle is only its "
                   "money."),
-            ("p", "He disposes of three evasions first. That the same coins serve many "
-                  "purchases one after another; that wages flow back and can be used meanwhile; "
-                  "that money spent on fixed capital stays out for years. Each, he says, "
-                  "&ldquo;assumes that money as existing whose existence it is called upon to "
-                  "explain&rdquo;. Then he says the problem, as a special problem, does not "
+            ("p", "He disposes of four evasions first. That the same coins serve many "
+                  "purchases one after another, which &ldquo;assumes that money as existing "
+                  "whose existence it is called upon to explain&rdquo;; that one capitalist's "
+                  "spending turns another's product into money, which only asks where the "
+                  "spender got his; that wages flow back and can be used meanwhile; that money "
+                  "spent on fixed capital stays out for years. None supplies the money it "
+                  "presumes. Then he says the problem, as a special problem, does not "
                   "exist: the money needed to circulate commodities worth so much is the same "
                   "whether or not part of their value is surplus value. And yet in capitalist "
                   "society the capitalist is the starting point of the money in circulation, "
@@ -1078,8 +1081,10 @@ LESSONS = [
                   "been a product first."),
             ("p", "That covers simple reproduction, where the surplus value is all consumed. "
                   "For accumulation the second section says &ldquo;it does not offer any new "
-                  "problem in matters of the circulation of money&rdquo;: faster circulation, "
-                  "dishoarding and more gold supply the extra money. Rosa Luxemburg, in "
+                  "problem in matters of the circulation of money&rdquo;: the money is already "
+                  "in the capitalists' hands as realised surplus value, and is thrown in as "
+                  "capital instead of being spent as revenue; hoards and new gold do the rest. "
+                  "Rosa Luxemburg, in "
                   "<em>The Accumulation of Capital</em> of 1913, thought this was exactly where "
                   "the problem was. If capitalists invest their surplus value instead of "
                   "consuming it, who buys the growing product, and with whose money? Her "

@@ -359,73 +359,73 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 
 ### Course 2 — From Money to Surplus Value (`capital-money-into-surplus-value`, 10)
 
-1. **the-general-formula-for-capital** — The General Formula for Capital — *Chapter 4*
+1. **the-general-formula-for-capital** — The General Formula for Capital — *Chapter 4 · The General Formula for Capital*
    - Read: "The simple circulation of commodities — selling in order to buy — is a means of carrying out a purpose unconnected with circulation…".
    - Do: tell C–M–C from M–C–M′ by what is at either end, and compute the increment ΔM for given purchases and sales.
    - Lab: `circuit`, view `formula`. Presets: `cmc` (Marx's ch. 4 example: a quarter of corn sold for £3, clothes bought for £3), `mcm` (£100 of cotton sold for £110), `mcm-loss` (sold for £90). Pin `ciDelta`, `ciForm`.
    - Misconception: selling to buy and buying to sell are one circulation seen from two starting points.
    - Worked: corn → £3 → clothes ends where it started in value, ΔM = 0; £100 → cotton → £110 makes sense only because of the £10.
 
-2. **contradictions-in-the-general-formula** — Contradictions in the General Formula — *Chapter 5*
+2. **contradictions-in-the-general-formula** — Contradictions in the General Formula — *Chapter 5 · Contradictions in the General Formula of Capital*
    - Read: the sentence ending "…it is equally impossible for it to originate apart from circulation" (verbatim from the Kerr text).
    - Do: show that if every seller marks up by the same percentage the total value in hands does not change, and that one cheat's gain is another's loss.
-   - Lab: `circuit`, view `markup`. Presets: `ten` (every seller 10% above value), `one-cheat` (A cheats B by £10), `merchants` (three dealers, each adds 10%). Pin `ciTotalBefore`, `ciTotalAfter`.
+   - Lab: `circuit`, view `markup`. Presets: `ten` (three traders holding £100 each, every seller 10% above value: £300 before and after), `one-cheat` (Marx's A, wine £40 at a mark-up of 1/4, and B, corn £50 at value: £90 before and after), `merchants` (a producer selling £100 at value to three dealers who each add 10%: £400 before and after, the producer −£10, the first dealer +£10; in a ring of dealers alone the preset would repeat `ten`, so a party who does not mark up is added). Pin `ciTotalBefore`, `ciTotalAfter`.
    - Misconception: profit comes from selling above value.
    - Worked: A sells wine worth £40 to B and gets corn worth £50 in exchange (Marx's barter); the total value held by A and B is £90 before and after.
 
-3. **buying-and-selling-labour-power** — The Buying and Selling of Labour-Power — *Chapter 6*
+3. **buying-and-selling-labour-power** — The Buying and Selling of Labour-Power — *Chapter 6 · The Buying and Selling of Labour-Power*
    - Read: the labourer "free in the double sense", and the departure from "this noisy sphere… a very Eden of the innate rights of man".
    - Do: compute the daily value of labour-power from the value of a worker's means of subsistence, including weekly, yearly and generational items.
-   - Lab: `circuit`, view `labour-power`. Presets: `daily` (food daily, clothes weekly, furniture yearly), `family` (add children's upkeep), `training` (add a training cost spread over a working life). Pin `ciLpValue`.
+   - Lab: `circuit`, view `labour-power`. Money unit hours. Presets: `daily` (food and fuel 4 h every day, clothes 7 h every 7 days, furniture 365 h every 365 days: 6 h, Marx's figure), `family` (add children's upkeep, 2 h a day: 8 h), `training` (add 2,190 h of training over 10,950 days, Marx's 30-year working life: 31/5 h). Pin `ciLpValue`.
    - Misconception: the worker sells labour; the capitalist buys hours of work done.
-   - Worked: 6 hours of daily needs + 7 hours a week of clothes + 365 hours a year of rent is 6 + 1 + 1 = 8 hours a day.
+   - Worked: 4 hours of daily needs + 7 hours a week of clothes + 365 hours a year of furniture is 4 + 1 + 1 = 6 hours a day, Marx's 6 hours, priced at his 3s. (Corrected from 6 + 1 + 1 = 8 so the total is the chapter's own figure.)
 
 4. **the-labour-process-and-surplus-value** — The Labour Process and the Production of Surplus Value — *Chapter 7 · The Labour-Process and the Process of Producing Surplus-Value*
    - Read: §2, Marx's spinning mill, "Our capitalist stares in astonishment."
    - Do: compute the value of the yarn from cotton, spindle wear and labour, first for 6 hours and then for 12, and compute the difference between the value of a day's labour-power and the value a day's labour adds.
-   - Lab: `surplus`, view `mill`. Presets: `six` (Marx's figures: 10 lb cotton 10s, spindle wear 2s, labour-power 3s a day, 6 hours of spinning adding 3s), `twelve` (12 hours: 20 lb cotton 20s, wear 4s, labour-power still 3s, 12 hours adding 6s), `waste` (12 hours with cotton used beyond the socially necessary). Pin `suProduct`, `suS`.
+   - Lab: `surplus`, view `mill`. Presets: `six` (Marx's figures: 10 lb cotton 10s, spindle wear 2s, labour-power 3s a day, 6 hours of spinning adding 3s), `twelve` (12 hours: 20 lb cotton 20s, wear 4s, labour-power still 3s, 12 hours adding 6s), `waste` (12 hours, 22s of cotton of which 2s is beyond the socially necessary: product 30s, surplus 1s). Pin `suProduct`, `suS`.
    - Misconception: the surplus is the machine's contribution.
    - Worked: 27s advanced, yarn worth 30s: 20 + 4 for means of production carried over, 6 of new value against 3 paid. On the chapter's accounting every input was bought at its value.
 
-5. **constant-capital-and-variable-capital** — Constant Capital and Variable Capital — *Chapter 8*
+5. **constant-capital-and-variable-capital** — Constant Capital and Variable Capital — *Chapter 8 · Constant Capital and Variable Capital*
    - Read: "That part of capital, then, which is represented by the means of production… does not, in the process of production, undergo any quantitative alteration of value."
    - Do: classify the parts of a capital as c or v and compute the value a machine transfers per day from its value and life.
-   - Lab: `surplus`, view `transfer`. Presets: `machine` (£1,000 machine, 1,000 days), `raw` (raw material consumed whole), `price-rise` (cotton's price doubles after purchase). Pin `suTransfer`, `suProduct`.
+   - Lab: `surplus`, view `transfer`. Money unit £; every preset is one 12-hour mill day with £6 of wages (6 h necessary) adding £12. Presets: `machine` (Marx's £1,000 machine, 1,000 days, with £10 of cotton: transferred £11, product £23), `sixfold` (replaces `raw`: Marx's sixfold rise in productivity, £60 of cotton spun in the same day: £61, £73, new value unchanged), `price-rise` (cotton bought at £10 worth £20 when spun: £21, £33). `suTransfer` is machine wear plus materials, so the raw material's whole passage shows in every preset. Pin `suTransfer`, `suProduct`.
    - Misconception: constant capital is fixed capital.
    - Worked: a £1,000 machine with a 1,000-day life passes £1 a day into the product, however much the product is.
 
 6. **the-rate-of-surplus-value** — The Rate of Surplus Value — *Chapter 9 · The Rate of Surplus-Value*
    - Read: §1, s/v "is therefore an exact expression for the degree of exploitation of labour-power by capital".
    - Do: compute s/v from c, v and s, and the product's value in proportional parts of the product.
-   - Lab: `surplus`, view `rate`. Presets: `marx` (Marx's figures: c = £410, v = £90, s = £90), `parts` (§2: 20 lb of yarn worth 30s as cotton, wear, v and s), `whole-capital` (the same figures read as s over all the capital). Pin `suRate`, `suParts`.
+   - Lab: `surplus`, view `rate`. Money unit s, qty lb. Presets: `yarn` (Marx's §2: c 24s, v 3s, s 3s, 20 lb: 100%, 16/2/2 lb), `whole-capital` (the misreading: all 27s advanced entered as v: 1/9 = 11.11%), `six` (the six-hour day: c 12s, v 3s, s 0, 10 lb: 0%, 8/2/0 lb). Kit gap: the money unit is lab-wide, so Marx's £410/£90/£90 cannot share a lab with the 30s of yarn; it is computed in the body and the worked lines, and the status line prints s over the whole capital for every preset. Pin `suRate`, `suParts`.
    - Misconception: the rate of exploitation is s divided by all the capital.
    - Worked: s = 90 on v = 90 is 100%, "not 90/500"; the 20 lb of yarn splits as c 16 lb, v 2 lb, s 2 lb.
 
 7. **seniors-last-hour** — Senior's "Last Hour" — *Chapter 9 · The Rate of Surplus-Value*
    - Read: §3, Senior's claim that "the whole net profit is derived from the last hour".
    - Do: compute the rate of surplus value on an 11½-hour day and after one hour is cut, and compare it with Senior's prediction that the profit vanishes.
-   - Lab: `surplus`, view `senior`. Presets: `senior` (Marx's figures: an 11½-hour day, 5¾ hours necessary), `ten-and-a-half` (one hour cut), `ten` (the 10-hour day). Pin `suRate`, `suLastHour`.
+   - Lab: `surplus`, view `senior`. Presets: `senior` (Marx's figures: an 11½-hour day, 5¾ hours necessary: 100%, an hour off 19/23), `thirteen` (replaces `ten-and-a-half`, whose rate `senior`'s `suLastHour` already shows: Senior's 13 hours, Marx's 126 2/23% = 29/23), `ten` (the 10-hour day, 1½ hours cut: 17/23 = 73.91%). The Kerr text prints the one-hour figure as "82 14/32%", a misprint for 82 14/23%, and introduces it as a cut "from 11½ to 10" while computing a one-hour cut; the lesson says both. Pin `suRate`, `suLastHour`.
    - Misconception: the last hour of the day produces the whole profit, so a shorter day abolishes it.
    - Worked: 5¾ surplus hours on 5¾ necessary is 100%; cut an hour and 4¾ on 5¾ is 19/23 = 82.61%, not zero.
 
-8. **the-working-day-and-surplus-labour** — The Working Day: Its Limits and the Greed for Surplus Labour — *Chapter 10 · The Working-Day*
+8. **the-working-day-and-surplus-labour** — The Working Day: Its Limits and the Greed for Surplus Labour — *Chapter 10 · The Working Day* (the Kerr chapter title has no hyphen)
    - Read: §1, "Capital is dead labour, that, vampire-like, only lives by sucking living labour".
    - Do: compute s/v for a given day and necessary time, and the lengthening that doubles it.
-   - Lab: `workday`, view `absolute`. Presets: `six-six` (12-hour day, 6 necessary), `fifteen` (15-hour day), `eighteen` (18 hours). Pin `wdRate`, `wdSurplus`.
+   - Lab: `workday`, view `absolute`. Presets: `seven` (Marx's working day I: 7 hours, 6 necessary, 1/6), `six-six` (12-hour day, 6 necessary), `fifteen` (15-hour day), `eighteen` (18 hours). Pin `wdRate`, `wdSurplus`.
    - Misconception: the length of the day is fixed by nature or contract and is not a quantity capital can move.
    - Worked: 6 necessary hours of 12 is 100%; stretch the day to 15 and the same worker gives 150%.
 
-9. **the-struggle-for-a-normal-working-day** — The Struggle for a Normal Working Day — *Chapter 10 · The Working-Day*
+9. **the-struggle-for-a-normal-working-day** — The Struggle for a Normal Working Day — *Chapter 10 · The Working Day*
    - Read: §5, "The establishment of a normal working day is the result of centuries of struggle between capitalist and labourer", and §7, "a protracted civil war, more or less dissembled, between the capitalist class and the working class" (both verbatim in the Kerr text).
    - Do: compute what a legal limit does to s/v at a fixed value of labour-power, and what the relay system does to the limit.
-   - Lab: `workday`, view `limit`. Presets: `before` (12 hours), `ten-hours` (the 1847 Act's ten hours, in force from May 1848), `relay-dodge` (the "false relay" system stretching the legal day). Pin `wdRate`.
+   - Lab: `workday`, view `limit`. Every preset: the employer's 12-hour day, 6 necessary. Presets: `before` (the 12-hour limit of 1844: 100%), `ten-hours` (the 1847 Act's ten hours, in force from May 1848: 2/3), `relay-dodge` (relays: the only checkable limit is the 15-hour factory day, so the 12 hours return: 100%), `act-1850` (added: the compromise of 5 August 1850, 10½ hours: 3/4). Pin `wdRate`, `wdSurplus`.
    - Misconception: a legal limit on hours leaves the rate of surplus value where it was.
    - Worked: cut a 12-hour day with 6 necessary to 10 and s/v falls from 100% to 2/3 = 66.67%.
 
-10. **rate-and-mass-of-surplus-value** — Rate and Mass of Surplus Value — *Chapter 11*
+10. **rate-and-mass-of-surplus-value** — Rate and Mass of Surplus Value — *Chapter 11 · Rate and Mass of Surplus-Value*
     - Read: the first law, "the mass of the surplus-value produced is equal to the amount of the variable capital advanced, multiplied by the rate of surplus-value".
     - Do: compute the mass of surplus value from s/v, the value of one labour-power and the number of workers, and the day a smaller workforce needs to yield the same mass.
-    - Lab: `surplus`, view `mass`. Presets: `marx` (Marx's compensation case from the chapter: a smaller variable capital at a higher rate giving the same mass; figures from the text), `hundred` (100 workers at 3s, 100%), `limit` (50 workers at 200%: with 6 necessary hours that is an 18-hour day). Pin `suMass`.
+    - Lab: `surplus`, view `mass`. Presets: `marx` split in two, `marx-hundred` (Marx's 100 workers at 3s on a 9-hour day, 50%: 150s) and `marx-fifty` (his 50 workers on a 12-hour day, 100%: 150s), `hundred` (100 workers at 3s, 100%: 300s), `limit` (50 workers at 200%: with 6 necessary hours that is an 18-hour day: 300s). Pin `suMass`, `suRate`.
     - Misconception: more workers always means more surplus value.
     - Worked: 100 workers at 3s and 100% give 300s; 50 workers must be worked at 200% to give the same, which needs an 18-hour day.
 
@@ -434,35 +434,35 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 1. **the-concept-of-relative-surplus-value** — The Concept of Relative Surplus Value — *Chapter 12*
    - Read: "The surplus value produced by prolongation of the working day, I call absolute surplus value. On the other hand, the surplus value arising from the curtailment of the necessary labour-time… I call relative surplus value."
    - Do: compute the new s/v when productivity in the wage-goods industries cuts necessary time, and the extra surplus value of a single innovating capitalist.
-   - Lab: `workday`, view `relative`. Presets: `cheaper` (necessary falls 10 to 9 hours of a 12-hour day), `pioneer` (one capitalist doubles productivity and sells at the social value), `general` (everyone catches up). Pin `wdRate`, `wdExtra`.
+   - Lab: `workday`, view `relative`. Presets: `given` (Marx's 12-hour day, 10 necessary: `1/5 = 20%`, `0 h`), `cheaper` (necessary falls 10 to 9 hours: `1/3 = 33.33%`, `0 h`), `pioneer` (one capitalist doubles productivity and sells at the social value: `20%`, `+12 h`), `general` (the method has spread; labour-power falls from 5s to 3s, necessary 6 hours: `1 = 100%`, `0 h`). Pin `wdRate`, `wdExtra`. *Changed in authoring: `given` added as the base case. The kit's pioneer sells at the full social value; Marx's sale at 10d (below social, above individual value) is worked in prose.*
    - Misconception: a capitalist innovates in order to lower the value of labour-power.
    - Worked: Marx's 12 shillings of output a day becomes 24 articles for one innovator, who sells above individual value and pockets the difference until competition generalises it.
 
 2. **co-operation** — Co-operation — *Chapter 13*
    - Read: "the special productive power of the combined working day is, under all circumstances, the social productive power of labour", and "this power costs capital nothing".
    - Do: compute the constant capital per unit when means of production are used in common, and the combined working day of many workers delivered at once.
-   - Lab: `machine`, view `cooperate`. Presets: `masons` (Marx's 12 masons, 144 hours in one day), `workshop` (one workshop and tools for 12 against 12 separate sets), `harvest` (the job that must be done within a day). Pin `maCPerUnit`, `maCombinedDay`.
+   - Lab: `machine`, view `cooperate`, money `s`, qty `pieces`. Presets: `one` (one worker, 10s of tools and room, 12 pieces: `alone 10d, together 10d`, `12 h`), `masons` (Marx's 12 masons sharing 10s of tackle: `together 5/6 d`, `144 h`), `workshop` (a room for twelve at 60s: `together 5d`, `144 h`), `harvest` (Marx's hundred harvesters, 5s each alone against 100s shared: `alone 6d, together 1 1/5 d`, `1,200 h`). Pin `maCPerUnit`, `maCombinedDay`. *Changed in authoring: `one` added as the base case; the shilling figures are illustrative, the masons, 144 hours and hundred harvesters are Marx's. Kit gap: `cooperate` computes only the economy of shared means of production, not the extra output of combined labour, which is in prose.*
    - Misconception: co-operation's extra product is paid for in wages because each worker is paid fully.
    - Worked: a workshop worth 10s used by one worker costs 10s/12 per unit of a day's output of 12; used by 12 it costs 10s/144; no wage is paid for the difference.
 
 3. **division-of-labour-and-manufacture** — Division of Labour and Manufacture — *Chapter 14*
    - Read: §3 on the "collective labourer" and the fixed proportions between detail workers.
    - Do: compute the number of detail workers each step needs for the steps' rates to match, and the smallest workshop that keeps every worker busy.
-   - Lab: `machine`, view `detail`. Presets: `type` (Marx's type-founding figures: founders 2,000 an hour, breakers 4,000, rubbers 8,000), `pins` (Smith's pin factory from the *Wealth of Nations* — the label says Smith, not Marx), `bottle` (glass bottle workshop). Pin `maWorkers`, `maMinimum`.
+   - Lab: `machine`, view `detail`. Presets: `type` (Marx's type-founding figures: founders 2,000 an hour, breakers 4,000, rubbers 8,000: `founders 4, breakers 2, rubbers 1`, `7`), `pins` (three illustrative steps, drawing 3,000, cutting 2,000, pointing 1,200: `drawers 2, cutters 3, pointers 5`, `10`), `bottle` (the glass-house hole, five steps at one illustrative pace: 1 each, `5`), `better-mould` (founders cast 4,000: `2, 2, 1`, `5`). Pin `maWorkers`, `maMinimum`. *Changed in authoring: Smith gives no per-step rates, so `pins` uses illustrative rates and its label says so; the prose notes Smith's shop also had ten men (Kerr gives Smith's figure as 48,000 needles, l. 3452). `better-mould` added to show the ratio is a fact about technique.*
    - Misconception: the division of labour inside the workshop is the same thing as the division of labour in society.
    - Worked: if a caster makes 2,000 an hour, a breaker 4,000 and a polisher 8,000, the smallest balanced shop is four founders and two breakers to one rubber, as Marx says.
 
 4. **machinery-and-the-value-it-transfers** — Machinery and the Value It Transfers — *Chapter 15 · Machinery and Modern Industry*
    - Read: §2, "machinery, like every other component of constant capital, creates no new value, but yields up its own value to the product".
    - Do: compute the value a machine adds per unit, and apply both tests for adopting it: the capitalist's (machine cost against the wages it displaces) and society's (against the labour it saves).
-   - Lab: `machine`, view `adopt`. Presets: `marx` (Marx's figures: a machine costing as much as a year's wages of the 150 men it displaces, £3,000), `cheap-labour` (wages low enough that the machine is not adopted), `society` (the machine saves labour-time but not wages). Shipped `test = capitalist`. Pin `maPerUnit`, `maVerdict`.
+   - Lab: `machine`, view `adopt`, money £, qty `yards`, shipped `test = capitalist`. Presets: `marx` (Marx's £3,000 machine against £3,000 of wages and £6,000 of labour, illustrative life of 10,000 yards: `£3/10`, not adopted), `society` (a £5,000 machine saving the same £6,000 of labour: `£1/2`, not adopted on the capitalist's test), `cheap-labour` (wages £2,000: not adopted), `dear-labour` (wages £4,500: adopted). Pin `maPerUnit`, `maVerdict`. *Changed in authoring: `society` instantiated as a £5,000 machine; `dear-labour` added. The kit's test is strict, so Marx's machine costing exactly the wages it displaces is "not adopted", which the prose explains (it saves the capitalist nothing).*
    - Misconception: a machine is used whenever it saves labour.
    - Worked: a machine that saves more labour than it embodies is still not bought if it costs more than the wages it displaces; the capitalist pays for labour-power, not labour.
 
 5. **machinery-and-the-worker** — Machinery and the Intensity of Labour — *Chapter 15 · Machinery and Modern Industry*
    - Read: §3(c), the intensification of labour once the working day is shortened by law.
    - Do: compute how intensification raises s/v and the labour spent without lengthening the day.
-   - Lab: `workday`, view `intensity`. Presets: `same-day` (12 hours, no change), `intense` (the same day at 4/3 intensity), `shorter-but-denser` (a 10-hour day of 12 hours' labour). Pin `wdRate`, `wdLabour`.
+   - Lab: `workday`, view `intensity`, necessary 8 hours (Marx's figures, Kerr l. 3104). Presets: `twelve` (12 hours at normal intensity: `12 h`, `4 h`, 50%), `ten-only` (10 hours, no change in intensity: `10 h`, `2 h`, `1/4 = 25%`), `ten-denser` (10 hours at 6/5: `12 h`, `4 h`, 50%), `twelve-denser` (12 hours at 4/3: `16 h`, `8 h`, `1 = 100%`). Pin `wdLabour`, `wdSurplus`, `wdRate`. *Changed in authoring: `same-day`, `intense` and `shorter-but-denser` renamed and set to Marx's own 12-hour, 8-necessary day; `ten-only` added for the manufacturers' case. Kit gap: the kit allows intensity on any day and holds the value of labour-power fixed, which the `note` states.*
    - Misconception: a shorter working day always means less surplus value.
    - Worked: cut the day from 12 to 10 hours but raise intensity by 1/5 and the worker spends as much labour as before.
    - The family's labour-power spread over several earners (§3a) is stated in prose; it is a wages fact and is not computed here.
@@ -470,93 +470,93 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 6. **machinery-and-the-displaced-worker** — Machinery and the Displaced Worker — *Chapter 15 · Machinery and Modern Industry*
    - Read: §6, "The theory of compensation as regards the workpeople displaced by machinery".
    - Do: compute the capital "set free" by a machine and the workers that capital can re-employ, and show why compensation is not automatic.
-   - Lab: `machine`, view `displace`. Presets: `marx` (Marx's figures: a carpet factory with 100 workers at £30 a year, £3,000 variable capital; 50 discharged and £1,500 spent on machinery), `compensation` (the economists' claim that £1,500 is "set free" to employ the 50 elsewhere), `machine-builders` (the jobs the £1,500 of machinery gives in machine-building, at that industry's composition). Pin `maDisplaced`, `maReemployed`.
+   - Lab: `machine`, view `displace`, money £. Presets: `marx` (Marx's carpet factory, 100 workers at £30, £1,500 into machinery, machine-building materials four times wages (illustrative): `50`, `10 = 0 set free + 10 in machine-building`), `cheaper-machine` (Marx's £1,000 variant: `70/3 = 50/3 set free + 20/3 in machine-building`), `compensation` (the most favourable case, all £1,500 paid as machine-builders' wages, composition 0: `50 = 0 set free + 50 in machine-building`). Pin `maDisplaced`, `maReemployed`. *Changed in authoring: `machine-builders` merged into `marx`; `cheaper-machine` added; `compensation` is the most favourable case rather than "£1,500 set free", since the kit computes what is set free. Kit gap: the kit omits the machine-builders' surplus value, so its re-employed figure is an upper bound, as the `note` says.*
    - Misconception: the capital freed by a machine re-employs the workers it displaced. State the compensation theorists (James Mill, McCulloch, Torrens, Senior, J. S. Mill) at strength first: cheaper products release purchasing power that creates employment elsewhere. Marx's carpet factory answers the narrower "capital set free" version, and the lesson says so.
    - Worked: 100 workers at £30 is £3,000 of variable capital; after the change £1,500 pays 50 and £1,500 sits in machinery: nothing was set free, a fund for wages became constant capital.
 
 7. **absolute-and-relative-surplus-value** — Absolute and Relative Surplus Value — *Chapter 16*
    - Read: "From one standpoint, any distinction between absolute and relative surplus-value appears illusory."
    - Do: classify a change in s/v as absolute or relative and say when the distinction matters.
-   - Lab: `workday`, view `classify`. Presets: `lengthen`, `cheapen`, `both`. Pin `wdKind`, `wdRate`.
+   - Lab: `workday`, view `classify`, from a 12-hour day of 6 necessary. Presets: `lengthen` (to 14: absolute, `4/3 = 133.33%`), `cheapen` (necessary to 5: relative, `7/5 = 140%`), `both` (14 and 5: both, `9/5 = 180%`), `sago` (Marx's sago-cutter, 2 necessary hours, the day from 2 to 12: absolute, `5 = 500%`). Pin `wdKind`, `wdRate`. *Changed in authoring: `sago` added for the chapter's natural-conditions passage.*
    - Misconception: surplus value needs a natural surplus of the soil.
    - Worked: from 12/6 to 14/5: 2 more hours are absolute, 1 fewer necessary hour is relative; s/v goes from 100% to 180%.
 
 8. **price-of-labour-power-and-surplus-value** — Changes in the Price of Labour-Power and in Surplus Value — *Chapter 17 · Changes of Magnitude in the Price of Labour-Power and in Surplus-Value*
    - Read: the three determinants, "the length of the working day… the normal intensity of labour… the productiveness of labour".
    - Do: run Marx's cases — one factor varying, the others constant — and predict the direction of s/v and of the price of labour-power.
-   - Lab: `workday`, view `three`. Presets: `productivity`, `intensity`, `length`, `combined`. Shipped `hold = productivity` (the factor that varies; the other two held). Pin `wdRate`, `wdLpValue`.
+   - Lab: `workday`, view `three`, shipped `hold = combined`. Presets (Marx's figures, at 6d an hour): `productivity` (12 hours, 8 necessary, productivity 4/3: `6 h`, 100%), `intensity` (12 hours, 6 necessary, intensity 4/3: `6 h`, `5/3 = 166.67%`), `length` (to 14: `6 h`, `4/3 = 133.33%`), `combined` (productivity 3/4, day 16: `8 h`, 100%), `dearer-food` (productivity 3/4, day 12: `8 h`, `1/2 = 50%`). Pin `wdLpValue`, `wdRate`. *Changed in authoring: `hold` is a redraw-only select a preset cannot set, so it ships as `combined` and each preset shows its own case; `dearer-food` added.*
    - Misconception: higher productivity raises the value of what the worker produces each day.
    - Worked: double productivity with the day fixed at 12 and the value produced is still 12 hours; only its split between v and s can move.
 
 9. **formulae-for-the-rate-of-surplus-value** — Formulae for the Rate of Surplus Value — *Chapter 18 · Various Formulae for the Rate of Surplus-Value*
    - Read: the "derivative formulae", surplus labour over the whole working day.
    - Do: compute s/v and s/(v + s) for the same day and show why the second can never reach 100%.
-   - Lab: `surplus`, view `formulae`. Presets: `half` (6/6), `two-thirds` (4/8), `extreme` (1/11). Pin `suRate`, `suFalse`.
+   - Lab: `surplus`, view `formulae`, 12-hour day. Presets: `half` (6/6: `1 = 100%`, `1/2 = 50%`), `two-thirds` (4/8: 200%, `2/3 = 66.67%`), `lavergne` (Lavergne's quarter, 3/9: 300%, `3/4 = 75%`), `extreme` (1/11: `11 = 1,100%`, `11/12 = 91.67%`). Pin `suRate`, `suFalse`. *Changed in authoring: `lavergne` added. The chapter's formula displays are missing from the plain text; the lesson quotes only the prose around them.*
    - Misconception: s/(v + s) measures exploitation.
    - Worked: 8 surplus hours in 12 is 200% by s/v and 2/3 by the "derivative" formula.
 
 ### Course 4 — Wages and Accumulation (`capital-wages-and-accumulation`, 9)
 
-1. **value-of-labour-power-into-wages** — The Value of Labour-Power Becomes Wages — *Chapter 19*
+1. **value-of-labour-power-into-wages** — The Value of Labour-Power Becomes Wages — *Chapter 19 · The Transformation of the Value (and Respectively the Price) of Labour-Power into Wages*
    - Read: "On the surface of bourgeois society the wage of the labourer appears as the price of labour, a certain quantity of money that is paid for a certain quantity of labour."
    - Do: compute the "value of labour" that the wage form appears to pay and show it is the value of labour-power divided by the hours, not the value the hours create.
-   - Lab: `wages`, view `form`. Presets: `marx` (3s for 12 hours), `value-created` (12 hours create 6s), `irrational` ("the value of labour" as 3s/12 hours). Pin `waHourPrice`, `waValueCreated`.
+   - Lab: `wages`, view `form`, `money_unit` s. Presets: `marx` (3s for 12 hours, an hour creates 6d: `3d`, `6s in 12 h (6d an hour)`), `equivalents` (6s paid for the 12 hours: `6d`, the same value created), `dearer` (labour-power worth 4s: `4d`), `cheaper` (2s: `2d`). Pin `waHourPrice`, `waValueCreated`. *Changed in authoring: `value-created` and `irrational` became `equivalents`, `dearer` and `cheaper`. The value created is a tile in every preset, and "the value of labour" as 3s/12 hours is the `marx` preset itself, so neither was a separate instance. `equivalents` shows what the wage form claims, the hour paid at the value it creates and no surplus value; `dearer` and `cheaper` show the apparent price of an hour moving with the value of labour-power while the 6s created does not.*
    - Misconception: the wage is the price of the work done.
    - Worked: 3s for a 12-hour day looks like 3d an hour paid for 3d of value; each hour creates 6d.
 
-2. **time-wages** — Time-Wages — *Chapter 20*
-   - Read: the "price of labour" falls as the day lengthens while the daily wage stays.
+2. **time-wages** — Time-Wages — *Chapter 20 · Time-Wages*
+   - Read: "If, e.g., the habitual working-day is 10 hours and the daily value of the labour-power 3s., the price of the working hour is 3 3/5d. It falls to 3d. as soon as the working-day rises to 12 hours, to 2 2/5 d. as soon as it rises to 15 hours."
    - Do: compute the hourly price from the daily value of labour-power and the normal day, and the effect of overtime and short time.
-   - Lab: `wages`, view `time`. Presets: `normal`, `overtime` (paid at the same hourly rate), `short-time` (hours cut, hourly rate kept). Pin `waHourPrice`, `waDaily`.
+   - Lab: `wages`, view `time`, `money_unit` s. Presets, all with Marx's figures: `normal` (3s, normal day 12 h, 12 worked: `3d`, `3s`), `ten-hour` (normal day 10 h: `3 3/5 d`, `3s`), `overtime` (normal day 10 h, 12 worked at the same price: `3 3/5 d`, `3s 7 1/5 d`), `short-time` (normal day 12 h, 6 worked: `3d`, `1s 6d`). Pin `waHourPrice`, `waDaily`. *Changed in authoring: `ten-hour` added so that the lab gives Marx's 3 3/5d beside the 3d of `normal`; overtime is worked from the 10-hour normal day so its figure is Marx's. The lab has no separate overtime rate, so overtime at a higher rate is in prose only.*
    - Misconception: a higher hourly rate means a better-paid worker.
-   - Worked: 3s for a 12-hour normal day is 3d an hour; work 6 hours at 3d and the worker gets 1s 6d, below the value of labour-power.
+   - Worked: 3s for a 12-hour normal day is 3d an hour; work 6 hours at 3d and the worker gets 1s 6d, below the value of labour-power. *As shipped, the worked lines run Marx's 10, 12 and 15-hour days (3 3/5d, 3d, 2 2/5d) and the 10-hour price paid for 12 hours (3s 7 1/5d); short time is in the `short-time` preset and the mistakes.*
 
-3. **piece-wages** — Piece-Wages — *Chapter 21*
-   - Read: "Wages by the piece are nothing else than a converted form of wages by time".
+3. **piece-wages** — Piece-Wages — *Chapter 21 · Piece-Wages*
+   - Read: "Wages by the piece are nothing else than a converted form of wages by time, just as wages by time are a converted form of the value or price of labour-power."
    - Do: compute the piece-rate from the hourly price and the normal output, and the hidden speed-up when the rate is cut after output rises.
-   - Lab: `wages`, view `piece`. Presets: `marx` (Marx's figures: 24 pieces in 12 hours, 3s a day, so 1½d a piece), `faster` (Marx's figures: 48 pieces instead of 24), `cut` (the piece-rate falls from 1½d to ¾d). Pin `waPieceRate`, `waDaily`.
+   - Lab: `wages`, view `piece`, `money_unit` s, `qty_unit` pieces. Presets: `marx` (Marx's figures: 24 pieces in 12 hours, 3s a day: `1½d`, `3s`), `faster` (Marx's figures: 48 pieces at the old rate: `1½d`, `6s`), `cut` (48 pieces become the normal output: `¾d`, `3s`), `speed-up` (illustrative: 30 pieces, the rate cut to 1 1/5d: `1 1/5 d`, `3s`). Pin `waPieceRate`, `waDaily`. *Changed in authoring: `cut` sets the normal output to 48 rather than cutting the rate by hand, because that is how Marx says the rate falls (the rate follows the normal output); `speed-up` added to show `rate_cut_to`, the cut that leaves the day's wage where it was while effort rises.*
    - Misconception: piece-wages pay for the worker's actual effort.
    - Worked: 3s for 24 pieces is 1½d a piece; at 48 pieces the rate is cut to ¾d and the day pays 3s again.
 
-4. **national-differences-of-wages** — National Differences of Wages — *Chapter 22*
-   - Read: the passage on "The more intense national labour, therefore, as compared with the less intense…".
+4. **national-differences-of-wages** — National Differences of Wages — *Chapter 22 · National Differences of Wages*
+   - Read: "The average intensity of labour changes from country to country; here it is greater, there less. … The more intense national labour, therefore, as compared with the less intense, produces in the same time more value, which expresses itself in more money."
    - Do: compute two countries' wages per unit of output (the relative wage) and their rates of surplus value from money wages, intensity and productivity.
-   - Lab: `wages`, view `national`. Presets: `england-continent` (wages 1½ times as high for twice the output per hour), `same-intensity`, `cheaper-goods`. Pin `waRelative`, `waRate`.
+   - Lab: `wages`, view `national`, `money_unit` s, `qty_unit` lb. Instance (illustrative): England pays 6d an hour, the Continent 4d; a pound of yarn is worth 8d. Presets: `england-continent` (England makes 2 lb an hour, the Continent 1: `3/4`, `England 5/3 = 166.67%, Continent 1 = 100%`), `same-intensity` (1 lb an hour each: `3/2`, `England 1/3 = 33.33%, Continent 1 = 100%`), `cheaper-goods` (as `england-continent`, the pound's value falls to 6d: `3/4`, `England 1 = 100%, Continent 1/2 = 50%`). Pin `waRelative`, `waRate`. *Changed in authoring: the plan named the presets only; the instance values above are the author's.*
    - Misconception: a country with higher money wages has a lower rate of surplus value.
    - Worked: wages 1½ times as high for twice the output make the relative wage 3/4 of the other country's, and the rate of surplus value higher.
 
-5. **simple-reproduction** — Simple Reproduction — *Chapter 23*
-   - Read: the passage beginning "After the lapse of a certain number of years, the capital value he then possesses is equal to the sum total…" (verify against the Kerr text).
+5. **simple-reproduction** — Simple Reproduction — *Chapter 23 · Simple Reproduction*
+   - Read: "After the lapse of a certain number of years the capital value he then possesses is equal to the sum total of the surplus-value appropriated by him during those years, and the total value he has consumed is equal to that of his original capital." (Verified against the Kerr text, l. 4256, with the sentence before it.)
    - Do: compute how many years of consumed surplus value equal the capital advanced, and say what that means for "the capitalist's own" capital.
-   - Lab: `accumulate`, view `simple`. Presets: `marx` (Marx's figures: £1,000 capital, £200 surplus a year consumed), `faster` (£250 a year), `slower` (£100). Pin `acYears`.
+   - Lab: `accumulate`, view `simple`. Presets: `marx` (Marx's figures: £1,000 capital, £200 surplus a year consumed: `5 years`), `faster` (£250 a year: `4 years`), `slower` (Marx's figures: half consumed, £100: `10 years`). Pin `acYears`.
    - Misconception: the capital remains the capitalist's original property however long it runs.
    - Worked: £1,000 advanced and £200 a year consumed: after 5 years the capitalist has consumed the original sum, and on Marx's reckoning what remains is capitalised surplus value. The `note` says this is a way of reckoning and gives the standard objection its sentence: one could as well say the capitalist consumed only the surplus.
 
-6. **surplus-value-into-capital** — Surplus Value into Capital — *Chapter 24*
+6. **surplus-value-into-capital** — Surplus Value into Capital — *Chapter 24 · Conversion of Surplus-Value into Capital*
    - Read: "Accumulate, accumulate! That is Moses and the prophets!"
    - Do: run accumulation period by period with a share of s added to capital, and compute original capital as a share of the present capital.
-   - Lab: `accumulate`, view `expand`. Presets: `marx` (Marx's figures: £10,000 at 4:1 c to v, 100%, all of s capitalised as £1,600c and £400v), `half` (illustrative: half of s accumulated), `abstinence` (none: simple reproduction). Shipped `periods = 5`. Pin `acCapital`, `acShareOriginal`.
+   - Lab: `accumulate`, view `expand`. Presets: `marx` (Marx's figures: £10,000 at 4:1 c to v, 100%, all of s capitalised as £1,600c and £400v: `£124,416/5`, `3,125/7,776 = 40.19%`), `half` (illustrative: half of s accumulated: `£161,051/10`, `100,000/161,051 = 62.09%`), `consume-all` (none: simple reproduction: `£10,000`, `1 = 100%`). Shipped `periods = 5`. Pin `acCapital`, `acShareOriginal`. *Changed in authoring: `abstinence` renamed `consume-all`. A preset named for the doctrine the lesson disputes would read as the lab endorsing it, and the preset is the opposite case: the capitalist abstains from nothing.*
    - Misconception: accumulation is the capitalist's "abstinence" from consumption.
    - Worked: after one year at Marx's figures the capital is £12,000, of which £2,000, a sixth, is capitalised surplus value; the lab carries it on for five years.
 
 7. **accumulation-with-constant-composition** — Accumulation with Constant Composition — *Chapter 25 · The General Law of Capitalist Accumulation*
-   - Read: §1, "Accumulation of capital is, therefore, increase of the proletariat."
+   - Read: §1, "Accumulation of capital is, therefore, increase of the proletariat." (Shipped with the sentence that opens the paragraph, "As simple reproduction constantly reproduces the capital-relation itself…", and an ellipsis.)
    - Do: compute the demand for labour as accumulation proceeds at constant c/v, and when it outruns the labour supply and wages rise.
-   - Lab: `accumulate`, view `labour`. Presets: `steady` (supply grows faster than demand), `tight` (demand overtakes supply in period 3), `wage-rise` (the rise slows accumulation). Pin `acDemand`, `acReserve`.
+   - Lab: `accumulate`, view `labour`. Instance (illustrative): £5,120 at c/v 1, s/v 100%, half of s capitalised, a wage of £10, 300 workers at first. Presets: `steady` (supply +100 a period: `625`, `75`, `£15,625`), `tight` (supply +40; demand overtakes it in period 3: `460`, `0`, `£26,525/2`), `wage-rise` (supply fixed at 300; the wage rises every period: `300`, `0`, `£81,825/8`). Shipped `periods = 5`. Pin `acDemand`, `acReserve`, `acCapital`. *Changed in authoring: `acCapital` pinned as well, so that the slower growth the misconception turns on is a pinned figure; instance values are the author's, chosen so `steady` grows by exactly a quarter a period.*
    - Misconception: rising wages show that accumulation benefits the worker without limit.
    - Worked: v grows by half of s each year; when it exceeds the workers available the reserve is empty and wages rise until accumulation slows.
 
 8. **the-reserve-army** — The Reserve Army of Labour — *Chapter 25 · The General Law of Capitalist Accumulation*
-   - Read: §3, "the progressive production of a relative surplus population or industrial reserve army".
+   - Read: §3, "a relatively redundant population of labourers, i.e., a population of greater extent than suffices for the average needs of the self-expansion of capital". *Changed in authoring: the plan's phrase "the progressive production of a relative surplus population or industrial reserve army" is the section's title, not a sentence in the Kerr text; the lesson quotes the sentence that opens "But in fact, it is capitalistic accumulation itself that constantly produces…".*
    - Do: compute employment when capital grows while c/v rises, and the surplus population that results. The prose covers §2, concentration and centralisation as the source of the rising composition.
-   - Lab: `accumulate`, view `composition`. Presets: `rising` (c/v from 4 to 6 over five periods), `fast-growth`, `constant` (no rise). Pin `acDemand`, `acReserve`.
+   - Lab: `accumulate`, view `composition`. Instance: £6,000 at c/v 1, all of s capitalised, a wage of £10, 300 workers at first. Presets: `rising` (Marx's ratios: c/v 1:1 rising by 1 a period to 5:1, s/v 100%, supply +30: `300`, `120`), `fast-growth` (the same rise at s/v 200%, supply +100: `700`, `0`), `constant` (no rise, supply +30: `420`, `0`). Shipped `periods = 5`. Pin `acDemand`, `acReserve`. *Changed in authoring: `rising` runs Marx's own ratios 1:1, 2:1, 3:1, 4:1, 5:1 from his £6,000 (§2) instead of 4 to 6. That matches the worked line's starting ratio of 1, and at s/v 100% with everything capitalised it gives the starkest form of the chapter's claim: v stays at £3,000 and employment at 300 while capital triples.*
    - Misconception: accumulation always increases employment.
-   - Worked: capital doubles while c/v goes from 1 to 3; v falls from half to a quarter of capital and employment stays flat.
+   - Worked: capital doubles while c/v goes from 1 to 3; v falls from half to a quarter of capital and employment stays flat. *As shipped, the worked lines carry on to period 5: capital triples, from £6,000 to £18,000, while c/v goes from 1 to 5 and v stays £3,000. The prose sets Marx's own §2 sum (£18,000 at 4:1, v £3,600) beside it.*
 
 9. **the-general-law-of-accumulation** — The General Law of Capitalist Accumulation — *Chapter 25 · The General Law of Capitalist Accumulation*
    - Read: §4, "Accumulation of wealth at one pole is, therefore, at the same time accumulation of misery… at the opposite pole".
    - Do: compute the ratio of reserve to active workers period by period while wages per worker rise.
-   - Lab: `accumulate`, view `law`. Presets: `boom` (capital grows fast, c/v rises slowly, wages rise), `slump` (accumulation halts), `long-run` (ten periods of rising c/v). Pin `acRatio`, `acReserve`. The floating, latent and stagnant forms and pauperism, "the lowest sediment", are named in prose and asked in the quiz.
+   - Lab: `accumulate`, view `law`. Instance: £6,000 at c/v 1, a wage of £10, 300 workers at first. Presets: `boom` (s/v 200%, c/v +1 a period, wage +£½ a period, supply +50: `1/19 = 5.26%`, `25`, `475`), `slump` (nothing capitalised, c/v +½, supply +30: `9/5 = 180%`, `270`, `150`), `long-run` (Marx's ratios, c/v +1, supply +30: `2/5 = 40%`, `120`, `300`). Shipped `periods = 5`. Pin `acRatio`, `acReserve`, `acDemand`. The floating, latent and stagnant forms and pauperism, "the lowest sediment", are named in prose and asked in the quiz. *Changed in authoring: `long-run` runs five periods, not ten. `periods` is a lesson setting the kit does not let a preset override, and the other two presets read best at five; the lesson says that the periods slider set to 10 gives a ratio of 9/10. `acDemand` pinned as well.*
    - Misconception: the law predicts that real wages must always fall.
    - Worked: in `boom` the ratio of reserve to employed rises while wages per worker rise. Marx adds that the labourer's lot "must grow worse" be his payment high or low; whether that means relative or absolute worsening is argued, and the lab computes only the ratio.
 
@@ -565,43 +565,43 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 1. **the-secret-of-primitive-accumulation** — The Secret of Primitive Accumulation — *Chapter 26*
    - Read: "This primitive accumulation plays in Political Economy about the same part as original sin in theology", and the "diligent, intelligent, and, above all, frugal elite".
    - Do: compute how long a frugal worker would save to assemble a capital of a stated size, and compare it with the simple-reproduction result that any capital is consumed in a computable number of years.
-   - Lab: `accumulate`, view `thrift`. Presets: `carpet` (a worker on 3s a day saving a tenth, against the £3,000 wage bill of the carpet factory in “Machinery and the Displaced Worker”), `mill` (against a smaller capital), `regress` (simple reproduction of the saved capital). Pin `acDaysToTarget`.
-   - Misconception: the first capitalists became so by saving.
+   - Lab: `accumulate`, view `thrift`. Presets: `carpet` (a worker on 3s a day saving a tenth, against the £3,000 wage bill of the carpet factory in “Machinery and the Displaced Worker”), `mill` (the same saving against £600: 40,000 days), `whole-wage` (the whole 3s saved, against £3,000: 20,000 days). Pin `acDaysToTarget`. Wage and target in shillings (£3,000 = 60,000s). As authored: `regress` is replaced by `whole-wage` because the `thrift` view cannot show simple reproduction (that is the `simple` view, and a lab has one view); the comparison with Chapter 23's £1,000 consumed at £200 a year in 5 years is made in prose and the quiz.
+   - Misconception: the first capitals were saved out of wages (the legend in its plain form, which the tile refutes). The stronger form, that capital grew by thrift and reinvested profit (Weber, Crouzet), is a historical position: named, stated at strength, and left open, as §C's rule on misconceptions requires.
    - Worked: saving 3.6d a day, £3,000 takes 200,000 working days; and a capital assembled that way would still need workers who own nothing.
    - Numbering: the English edition (followed here, and by Penguin) differs from the German from Chapter 4 on; German Chapter 4 contains English Chapters 4–6, so English Chapter n is German n − 2 for Chapters 7–25, and English Chapters 26–33 are German Chapters 24 and 25, inside German Part Seven. Said once in From Money to Surplus Value's `how_to` and once here.
 
 2. **expropriation-from-the-land** — Expropriation of the Agricultural Population — *Chapter 27*
    - Read: from Chapter 27 itself — the clearing of the estates (the Sutherland clearances).
    - Do: compute the smallholder's working day before expropriation (all labour for the household) and the same person's day as a wage-worker, and the surplus that separation makes available to an employer, for one person and for a cleared estate.
-   - Lab: `workday`, view `separate`. Presets: `smallholder` (12 hours, all for the household), `labourer` (12 hours, 6 necessary), `clearing` (a stated number of households made labourers). Pin `wdSurplus`.
+   - Lab: `workday`, view `separate`. Presets: `smallholder` (12 hours, all for the household), `labourer` (12 hours, 6 necessary), `clearing` (Marx's 3,000 Sutherland families, one wage-worker each, 12 hours with 6 necessary: 18,000 h). Pin `wdSurplus`, `wdRate`.
    - Misconception: enclosure was only a change in farming technique, with no effect on who had to work for wages.
    - Worked: the same 12-hour day yields 0 hours of surplus to anyone else on one's own land and 6 to an employer after the clearing. Whether enclosure also raised yields is a separate, debated question that Marx says he sets aside ("We leave on one side here the purely economic causes of the agricultural revolution").
 
 3. **bloody-legislation** — Bloody Legislation and the Forcing Down of Wages — *Chapter 28*
-   - Read: the Statute of Labourers of 1349 and "laws for the compulsion of labour".
+   - Read: the Statute of Labourers of 1349 (Kerr l. 5386; the phrase "laws for the compulsion of labour" is not in the Kerr text, which has "laws for keeping them down").
    - Do: compute the gap between a statutory maximum wage and the value of labour-power, and the rate of surplus value the law enforces.
-   - Lab: `wages`, view `statute`. Presets: `statute` (illustrative statutory maximum below value), `market` (wage at value), `combination` (wages after combination laws). Pin `waGap`, `waRate`. The lesson says the figures are illustrative.
+   - Lab: `wages`, view `statute`. Presets: `statute` (illustrative statutory maximum below value), `market` (wage at value), `combination` (masons combine for 4s, 1s above a 3s value, which the statutes forbade: 50%). Instances as authored: 12-hour day, 6 necessary, value of labour-power 3s; `statute` 2s (200%), `market` 3s (100%). Pin `waGap`, `waRate`. The lesson says the figures are illustrative.
    - Misconception: a wage law protects the worker by setting a floor.
    - Worked: a legal maximum one-third below the value of labour-power turns a 100% rate into one of 200%.
 
 4. **the-capitalist-farmer** — Genesis of the Capitalist Farmer — *Chapter 29*
-   - Read: "The progressive fall in the value of the precious metals, and therefore of money, brought the farmers golden fruit." (Check the Kerr wording.)
+   - Read: "The progressive fall in the value of the precious metals, and therefore of money, brought the farmers golden fruit." (Kerr wording checked: identical, l. 5408.)
    - Do: compute a money rent fixed by long lease while prices rise, its real value, and the farmer's gain when wages lag.
-   - Lab: `money`, view `fixed-rent`. Presets: `price-revolution` (prices double over the lease), `stable`, `wages-lag` (money wages rise by half as much as prices). Pin `moRealRent`, `moFarmerGain`.
+   - Lab: `money`, view `fixed-rent`. Presets: `price-revolution` (prices double over the lease), `stable`, `wages-lag` (prices double, money wages rise by half). Instances as authored: rent £20, product £100 and wages £40 at old prices; stable keeps £40, price-revolution £100 (£50 real), wages-lag £120 (£60 real: £10 from the landlord, £10 from the labourers). Pin `moRealRent`, `moFarmerGain`.
    - Misconception: when all prices double, every party is where it was.
    - Worked: a £20 rent fixed while prices double now costs the farmer half as much in corn.
 
 5. **the-home-market** — The Home Market for Industrial Capital — *Chapter 30*
    - Read: "The expropriation and expulsion of the agricultural population… set free… their former means of nourishment".
    - Do: compute the market created when households that produced their own subsistence must buy it, and the variable capital that now circulates.
-   - Lab: `circuit`, view `market`. Presets: `before` (100 households, self-supplied), `after` (the same households as wage-earners), `half`. Pin `ciMarket`, `ciLpValue` (the market created equals the wage bill that now circulates: one number from two sides).
+   - Lab: `circuit`, view `market`. Presets: `before` (100 households, self-supplied), `after` (the same households as wage-earners), `cottage` (wage-earners who still grow their food). Instances as authored, in shillings: subsistence 1s 6d a day (food 1s a day, cloth 3s and fuel 3s every 12 days); markets 0s, 150s, 50s. `half` is replaced by `cottage`, which ties to the four-acre cottage laws of Chapter 27. Pin `ciMarket`, `ciLpValue` (the market created equals the wage bill that now circulates: one number from two sides).
    - Misconception: the home market grew because people became richer.
    - Worked: 100 households that spun their own yarn now buy it: the same use-values, newly commodities, a market where none was.
 
 6. **the-industrial-capitalist** — Genesis of the Industrial Capitalist — *Chapter 31*
    - Read: "Force is the midwife of every old society pregnant with a new one", with Marx's list of levers: the colonies, the national debt, the modern mode of taxation and the protectionist system.
    - Do: name the four levers and compute one of them: the capitalised value of a state debt from its annual interest and the tax that services it.
-   - Lab: `interest`, view `capitalise`. Presets: `consols` (£3 a year at 3%), `cheap-money` (rate falls to 2%), `tax` (interest paid from taxes on necessaries). Pin `inPrice`.
+   - Lab: `interest`, view `capitalise`. Presets: `consols` (£3 a year at 3%), `cheap-money` (rate falls to 2%), `bank-1694` (Marx's rate: the Bank of England lends to the state at 8%, £8 a year on £100). Pin `inPrice`. As authored: `tax` is replaced by `bank-1694` because the `capitalise` view has no tax field; taxation is in prose.
    - Misconception (Marx's own target): the national debt is part of the nation's wealth. His sarcasm: the only part of the so-called national wealth that enters the collective possession of modern peoples is their national debt.
    - Worked: £3 a year at 3% is a £100 claim; nothing was built, but £100 is now capital in its owner's books.
    - The `note` defines "capitalise" locally (a yearly £3 is called a £100 claim because £100 at 3% pays £3; why that rate exists is Volume III's question), since interest is not taught until Merchant's Capital and Interest.
@@ -610,142 +610,147 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 7. **the-historical-tendency** — Historical Tendency of Capitalist Accumulation — *Chapter 32*
    - Read: "The knell of capitalist private property sounds. The expropriators are expropriated."
    - Do: compute concentration (every capital growing) and centralisation (capitals merging) for a set of capitals over several periods, and the share held by the largest.
-   - Lab: `accumulate`, view `centralise`. Presets: `ten` (ten equal capitals), `merge` (the largest absorbs the smallest each period), `grow` (all grow at the same rate, no merger). Pin `acTopShare`, `acCount`.
+   - Lab: `accumulate`, view `centralise`. Presets: `ten` (ten equal capitals), `merge` (the largest absorbs the smallest each period), `grow` (all grow at the same rate, no merger). Instances as authored: ten capitals of £100, five periods; `ten` no growth and no merging (1/10, 10), `grow` at 1/10 a period (1/10, 10), `merge` (3/5, 5). Pin `acTopShare`, `acCount`.
    - Misconception: concentration and centralisation are the same thing.
    - Worked: ten equal capitals where the largest absorbs the smallest each period leave one holding 6/10 after five periods; if all simply grow, the largest still holds 1/10.
 
 8. **the-modern-theory-of-colonisation** — The Modern Theory of Colonisation — *Chapter 33*
    - Read: Mr. Peel who took £50,000 and 3,000 workers to the Swan River, and was "left without a servant to make his bed".
    - Do: compute the labour supply left to a colonial capitalist when workers can take free land, and Wakefield's land price that restores it.
-   - Lab: `accumulate`, view `colony`. Presets: `peel` (Marx's figures as printed in the Kerr text: £50,000 and 3,000 workers, free land; the 1887 Moore–Aveling printing reads 300, and the `note` says so), `wakefield` (a land price that takes years of wages to pay), `closed` (no free land). Pin `acReserve`, `acYearsToLand`.
+   - Lab: `accumulate`, view `colony`. Presets: `peel` (Marx's figures as printed in the Kerr text: £50,000 and 3,000 workers, free land; the 1887 Moore–Aveling printing reads 300, and the `note` says so), `wakefield` (land at two years' wages, half the wage saved: 4 years), `closed` (land at two years' wages, nothing saved: never). Shipped `periods` = 4, so `wakefield` shows 3,000 for hire; a preset cannot set `periods`. Pin `acReserve`, `acYearsToLand`.
    - Misconception: capital is a thing — money and machines — that can be exported.
    - Worked: with free land every worker leaves; at a price of 4 years' savings the labour market is restored for 4 years per worker.
 
 ### Course 6 — The Circuits of Capital (`capital-circuits-of-capital`, 6)
 
-Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n".
+Volume II's Part One. Prose cites Volume II chapters as "Volume II, Chapter n". Module names use
+the Kerr chapter titles (Untermann's "circulation" and "rotation" for *Kreislauf*): Chapter 1 · The
+Circulation of Money-Capital, Chapter 2 · The Rotation of Productive Capital, Chapter 3 · The
+Circulation of Commodity-Capital, Chapter 4 · The Three Diagrams of the Process of Circulation,
+Chapter 5 · The Time of Circulation, Chapter 6 · The Expenses of Circulation. Lesson titles keep
+"circuit", and lesson 1 says once why.
 
 1. **the-circuit-of-money-capital** — The Circuit of Money Capital — *Chapter 1*
-   - Read: the formula M–C…P…C′–M′ and the passage calling the circuit of money-capital the most one-sided, and so the most striking and typical, form.
+   - Read: the formula M–C…P…C′–M′ (Kerr l. 353) and the passage calling the circuit of money-capital "the most one-sided, and thus the most convincing and typical form" (Kerr l. 615; Kerr has "convincing", not "striking").
    - Do: trace a capital through its three stages, give the value in each form, and compute s from M and M′.
-   - Lab: `circuit`, view `stages`. Presets: `marx` (Marx's figures: £422 advanced as £372 means of production and £50 labour-power; product 10,000 lb yarn worth £500), `unsold` (C′ not yet sold), `partly` (half sold). Pin `ciMprime`, `ciS`.
+   - Lab: `circuit`, view `stages`. Presets (all Marx's figures, Kerr l. 472, 492): `marx` (£422 = £372 + £50, product £500, all 10,000 lb sold: `ciMprime` £500, `ciS` £78), `partly` (8,440 lb sold, `sold_share` 211/250: £422, £0), `constant` (7,440 lb sold, 93/125: £372, −£50), `unsold` (0: £0, −£422). The text replaced the earlier "half sold" instance: Marx gives the two partial sales himself. Pin `ciMprime`, `ciS`.
    - Misconception: the money at the end is where the surplus is made.
    - Worked: £422 becomes yarn worth £500 inside P; selling it only changes £500's form.
 
 2. **the-circuit-of-productive-capital** — The Circuit of Productive Capital — *Chapter 2*
-   - Read: "the circuit of productive capital has the general formula P…C′–M′–C…P".
+   - Read: "The rotation of productive capital has the general formula P...C'-M'-C...P" (Kerr l. 652); second passage, the minimum sum for m (Kerr l. 809).
    - Do: run the productive circuit under simple reproduction and under accumulation, compute the capital that re-enters P, and the money held back until it is large enough to invest.
-   - Lab: `accumulate`, view `expand`, shipped `periods = 1`. Presets: `simple` (all of s spent), `accumulate` (half of s re-enters P), `hoard` (s held as money until it reaches `invest_threshold`). Pin `acCapital`, `acHoard`.
+   - Lab: `accumulate`, view `expand`, shipped `periods = 1`; capital 422, `c_v` 186/25, `s_rate` 39/25. Presets: `simple` (share 0: `acCapital` £422, `acHoard` £0), `accumulate` (Marx's figure, Kerr l. 693: £58 of the £78, share 29/39: £480, £0), `hoard` (share 1, `invest_threshold` £200, illustrative: £422, £78; at 3 periods £656). The text replaced the earlier "half of s" instance. Pin `acCapital`, `acHoard`.
    - Misconception: the productive circuit is the money circuit started at a different point.
-   - Worked: with £78 of s, simple reproduction restarts P at £422; accumulating half restarts it at £461.
+   - Worked: with £78 of s, simple reproduction restarts P at £422; capitalising £58 of it, Marx's figure, restarts it at £480.
 
 3. **the-circuit-of-commodity-capital** — The Circuit of Commodity Capital — *Chapter 3*
-   - Read: "C′–M′–C…P…C″" and why this circuit is the one that shows the whole social product.
+   - Read: "C'—M'—C...P...C'" and C'' (Kerr l. 847–853); the aggregate capital (Kerr l. 995).
    - Do: split C′ into the parts that return as means of production, as wages and as capitalists' consumption.
-   - Lab: `surplus`, view `parts`, applied to the commodity product. Presets: `marx` (the £500 of yarn), `consumed`, `accumulated`. Pin `suParts`.
-   - Misconception: the commodity product is all revenue to be consumed.
+   - Lab: `surplus`, view `parts`, `money_unit` £, `qty_unit` lb. Presets (all Marx's figures, Kerr l. 883–889): `marx` (c 372, v 50, s 78, 10,000 lb: `c: 7,440 lb, v: 1,000 lb, s: 1,560 lb`), `lot-1` (7,440 lb worth £372: c 34596/125, v 186/5, s 7254/125), `lot-2` (1,000 lb worth £50: c 186/5, v 5, s 39/5), `lot-3` (1,560 lb worth £78: c 7254/125, v 39/5, s 1521/125). These replace `consumed` and `accumulated`, which the `parts` view cannot distinguish; the three lots add back to the whole and correct the slips in the Kerr tables (1,160.740, 343.360, 7,450). Pin `suParts`, `suProduct`.
+   - Misconception: the commodity product is all revenue to be consumed (Adam Smith's resolution of price into revenues, stated at strength).
    - Worked: of £500 of yarn, £372 must buy back means of production; only £128 is anyone's income.
 
 4. **the-three-formulas-of-the-circuit** — The Three Formulas of the Circuit — *Chapter 4*
-   - Read: "The circuit of industrial capital… is not only a unity of circulation and production, but also of all its three circuits."
+   - Read: Kerr l. 1049: "The actual rotation of industrial capital in its continuity is therefore not alone the unity of the processes of production and circulation, but also the unity of its three cycles."
    - Do: compute how a capital divides at any moment among money, productive and commodity forms when each stage takes a stated time.
-   - Lab: `turnover`, view `phases`. Presets: `even` (4 weeks each), `slow-sale` (selling takes 8), `fast` (2, 6, 2). Pin `tuMoney`, `tuProductive`, `tuCommodity`.
+   - Lab: `turnover`, view `phases`. Presets: `even` (4, 4, 4 weeks: each `1/3 = 33.33%`), `slow-sale` (4, 4, 8: `1/4 = 25%`, `1/4 = 25%`, `1/2 = 50%`), `fast` (2, 6, 2: `1/5 = 20%`, `3/5 = 60%`, `1/5 = 20%`). Pin `tuMoney`, `tuProductive`, `tuCommodity`.
    - Misconception: a capital is in one form at a time.
    - Worked: with 4 weeks in each stage, a continuous business always has a third of its capital in each form.
 
 5. **the-time-of-circulation** — The Time of Circulation — *Chapter 5*
-   - Read: "Time of circulation and time of production mutually exclude each other." (Kerr wording to be checked.)
+   - Read: Kerr l. 1233: "The time of circulation and time of production mutually exclude one another." (checked: Kerr has "one another", not "each other").
    - Do: compute turnover time as production time plus circulation time, and the share of the turnover spent in circulation.
-   - Lab: `turnover`, view `time`. Presets: `spinning`, `slow-sale` (circulation as long as production), `distant-market`. Pin `tuTurnover`, `tuCirculationShare`.
+   - Lab: `turnover`, view `time`, no `capital` (so `tuAggregate` prints —). Presets (illustrative; the chapter gives no figures): `spinning` (6 + 2 weeks: `8 weeks`, `1/4 = 25%`), `slow-sale` (6 + 6: `12 weeks`, `1/2 = 50%`), `distant-market` (6 + 20: `26 weeks`, `10/13 = 76.92%`). Pin `tuTurnover`, `tuCirculationShare`.
    - Misconception: a capital is producing value for as long as it is tied up.
    - Worked: 6 weeks of production and 6 of circulation is a 12-week turnover, half of it in circulation.
    - Working time against production time (wine, timber) is left to “The Time of Production”.
 
 6. **the-costs-of-circulation** — The Costs of Circulation — *Chapter 6*
-   - Read: §1, the costs of buying and selling and of book-keeping, "faux frais"; §2, storage; §3, transport.
+   - Read: the general law (Kerr l. 1398, §3) and transport adding value (Kerr l. 1406); §1 and §2 in the body. Kerr's term for the pure costs is "dead expenses"; "faux frais" does not occur in the Kerr text.
    - Do: classify circulation costs as pure costs (deductions from surplus value) or as costs that add value (transport, necessary storage), and compute the deduction.
-   - Lab: `circuit`, view `costs`. Presets: `clerks` (£10 of pure costs on £100 of s), `transport` (£10 of carriage), `stockpile` (storage beyond the necessary). Pin `ciSNet`.
+   - Lab: `circuit`, view `costs`, M 400, product 500 (illustrative). Presets: `clerks` (pure £10: `ciSNet` £90), `transport` (value-adding £10: £100), `stockpile` (£5 necessary storage, £5 for goods that would not sell: £95). Pin `ciS`, `ciSNet`.
    - Misconception: everything a business must pay for adds to the value of its product.
    - Worked: a bookkeeper paid £10 leaves £90 of s; a carter paid £10 adds £10 to the value delivered.
 
 ### Course 7 — The Turnover of Capital (`capital-turnover-of-capital`, 11)
 
 1. **turnover-time-and-number-of-turnovers** — Turnover Time and the Number of Turnovers — *Chapter 7*
-   - Read: the passage making the year the natural unit for measuring turnovers (Kerr wording, and its notation for n, to be taken from the text).
-   - Do: compute n = U/u for given turnover times.
-   - Lab: `turnover`, view `time`. Presets: `three-months`, `five-weeks`, `two-years`. Shipped `year_weeks = 52`. Pin `tuTurnovers`, `tuAggregate` (value turned over against capital advanced).
+   - Read: the passage making the year the natural unit for measuring turnovers (l. 1453), and the turnover time as the time the capitalist must advance his capital (l. 1459). *Corrected in authoring: Kerr's notation is T for the year, t for the turnover time and n = T/t, not U/u.*
+   - Do: compute n = T/t for given turnover times, and the value turned over on a capital advanced.
+   - Lab: `turnover`, view `time`. Presets: `three-months` (13 weeks, 9 of production and 4 of circulation, £400), `five-weeks` (4 + 1, £500), `eighteen-months` (78 weeks, £600). Shipped `year_weeks = 52`. Pin `tuTurnover`, `tuTurnovers`, `tuAggregate`. *Changed in authoring: `two-years` became `eighteen-months`, Marx's own example (l. 1457: "completes only two-thirds of its turn-over in one year").*
    - Misconception: a capital that turns over twice a year has twice the capital.
    - Worked: £400 with a 3-month turnover turns over 4 times a year: £1,600 of value turned over, still £400 of capital.
 
 2. **fixed-and-circulating-capital** — Fixed Capital and Circulating Capital — *Chapter 8*
-   - Read: §1, fixed capital "circulates… piecemeal, in proportion to its wear and tear".
-   - Do: compute the annual value transferred by fixed capital from value and life, and the circulating capital's turnover in the same year.
-   - Lab: `turnover`, view `fixed`. Presets: `ten-years` (£10,000 machine, 10 years), `repairs` (with `repairs_per_year`), `moral` (moral depreciation: a machine of the same kind costing half appears in year 4, `replacement_value`, `appears_year`). Pin `tuWear`, `tuRemaining`.
+   - Read: §1, fixed capital's exchange-value "circulates… gradually and piecemeal" (l. 1479); §2, Marx's £10,000 over ten years and repairs (l. 1598).
+   - Do: compute the annual value transferred by fixed capital from value and life, and the value still locked in after so many years, with repairs and moral depreciation.
+   - Lab: `turnover`, view `fixed`. Presets: `ten-years` (£10,000 machine, 10 years, at year 4), `repairs` (Marx's 15-year machine booked at 10, `repairs_per_year` 1,000/3, at year 3), `moral` (a machine of the same kind costing £5,000 appears in year 4, `replacement_value`, `appears_year`). Pin `tuWear`, `tuRemaining`.
    - Misconception: fixed and circulating are the same distinction as constant and variable.
    - Worked: a £10,000 machine on a 10-year life transfers £1,000 a year and still has £6,000 of value locked in after four.
 
 3. **aggregate-turnover** — The Aggregate Turnover of Advanced Capital — *Chapter 9*
-   - Read: from §3 of the chapter, Marx's own figures (Kerr wording).
+   - Read: Marx's own figures (l. 1710) and the cycle of turnovers as a material basis for crises (l. 1718). The Kerr text prints the result as "1+2.25", a typesetting slip for 1 2/25; the lesson says so and does not quote it as a figure.
    - Do: compute the aggregate turnover of a capital with fixed and circulating parts and the time the whole capital takes to turn over once.
-   - Lab: `turnover`, view `aggregate`. Presets: `marx` (Marx's figures: fixed £80,000 on a 10-year life, circulating £20,000 turned 5 times a year), `heavy-fixed`, `light-fixed`. Pin `tuAggregate`, `tuAverage`.
+   - Lab: `turnover`, view `aggregate`. Presets: `marx` (fixed £80,000 on a 10-year life, circulating £20,000 turned 5 times a year), `heavy-fixed` (£95,000 and £5,000), `light-fixed` (£20,000 and £80,000). Pin `tuAggregate`, `tuAverage`, `tuWear`.
    - Misconception: a capital's turnover time is the turnover time of its circulating part.
-   - Worked: £8,000 of wear plus £100,000 of circulating capital is £108,000 turned over on £100,000 advanced, 1 + 2/25 turnovers a year.
+   - Worked: £8,000 of wear plus £100,000 of circulating capital is £108,000 turned over on £100,000 advanced, 27/25 turnovers a year.
 
 4. **physiocrats-and-adam-smith** — The Physiocrats and Adam Smith on Fixed Capital — *Chapter 10*
-   - Read: Smith's definition of fixed capital as what yields a profit "without circulating".
+   - Read: Smith's definition of fixed capital as what yields a profit "without changing masters" (l. 1800). *Corrected in authoring: Kerr's Smith says "without changing masters", not "without circulating".*
    - Do: classify the same capital by Smith's fixed/circulating and by constant/variable, and show which split determines surplus value.
-   - Lab: `turnover`, view `classify`. Presets: `farm` (the Physiocrats' avances), `mill`, `smith` (wages counted with raw materials as circulating). Pin `tuFixed`, `tuVariable`.
+   - Lab: `turnover`, view `classify`. Presets: `mill` (£500 machine, £100 cotton, £100 wages), `farm` (Smith's farmer: implements £400 and labouring cattle £200 fixed; fodder £100, seed £100 and wages £200 circulating), `mine` (Marx's copper mine: no raw material, l. 1814; machinery £600, coal £150, wages £250). All at 100%. Pin `tuFixed`, `tuVariable`, `tuS`. *Changed in authoring: `smith` became `mine`, Marx's own counter-example to Smith; the wages-with-materials point is made by every preset.*
    - Misconception: wages and raw materials are the same kind of capital because both circulate.
    - Worked: £100 of cotton and £100 of wages are both circulating, but only the second creates new value.
 
 5. **ricardo-on-fixed-and-circulating-capital** — Ricardo on Fixed and Circulating Capital — *Chapter 11*
-   - Read: Ricardo's use of durability to explain departures from labour values.
+   - Read: Ricardo's use of the distinction to explain exceptions to the law of value (l. 1962), and his definition by durability (l. 2025).
    - Do: compute two capitals with the same fixed share and different wage bills, and the surplus value each produces at the same s′.
-   - Lab: `turnover`, view `classify`. Presets: `same-fixed` (two £1,000 capitals, both a quarter fixed, wages 250 and 500), `durable`, `equal`. Pin `tuVariable`, `tuS`.
+   - Lab: `turnover`, view `classify`. Presets: `same-fixed` (two £1,000 capitals, both a quarter fixed, wages 250 and 500), `different-fixed` (£600/£150/£250 against £100/£650/£250), `farmer-and-baker` (Ricardo's seed wheat and bread wheat, l. 2054: each £500 fixed, £400 of wheat, £100 of wages). All at 100%. Pin `tuFixed`, `tuVariable`, `tuS`. *Changed in authoring: `durable` and `equal` became `different-fixed` (the converse test: different fixed shares, same s) and Ricardo's own farmer and baker.*
    - Misconception: the fixed/circulating split explains where profit comes from.
    - Worked: same fixed share, different wage bills, different s at 100%: the fixed share cannot tell them apart.
 
 6. **the-working-period** — The Working Period — *Chapter 12*
-   - Read: "a locomotive… is the product of… a working period" and the capital tied up until it is finished.
+   - Read: the locomotive's 100 working days as one connected act (l. 2090), and "twelve times more circulating capital" (l. 2082).
    - Do: compute capital tied up over a long working period paid weekly, and the advance needed before any return.
-   - Lab: `turnover`, view `working`. Presets: `cotton` (a day), `locomotive` (3 months), `railway` (a year). Pin `tuAdvance`.
+   - Lab: `turnover`, view `working`. Presets: `cotton` (a week), `locomotive` (12 weeks), `ironclad` (52 weeks). All at £100 a week. Pin `tuAdvance`. *Changed in authoring: the cotton period is Marx's week, not a day; `railway` became Marx's `ironclad`, "a year or more".*
    - Misconception: a long working period is only a question of patience.
    - Worked: £100 a week for a 12-week working period ties up £1,200 before anything can be sold.
 
 7. **the-time-of-production** — The Time of Production — *Chapter 13*
-   - Read: the interruptions of the labour process — seasons, growth, drying — that are still production time.
+   - Read: working time is always production time, not vice versa (l. 2154); tanning by the air-pump (l. 2164).
    - Do: compute the working-time share of a production period and its effect on turnovers a year.
-   - Lab: `turnover`, view `time`. Presets: `wheat` (9 months, 3 worked), `timber` (years), `brewing`. Pin `tuWorkingShare`, `tuTurnovers`.
+   - Lab: `turnover`, view `time`. Presets: `wheat` (39 weeks, 13 worked, 13 of circulation), `timber` (100 years = 5,200 weeks, 26 worked, no circulation), `tanning-old` (52 weeks in the pits, 4 worked, 4 of circulation), `tanning-air-pump` (8 weeks, the same 4 worked and 4 of circulation). Pin `tuTurnover`, `tuTurnovers`, `tuWorkingShare`. *Changed in authoring: `brewing` became the two tanning presets, Marx's own example of production time cut with no labour saved.*
    - Misconception: shortening production time is always shortening labour time.
-   - Worked: a crop needing 3 months of work over 9 months turns over once a year at most.
+   - Worked: a crop needing 3 months of work over 9 months, with 3 months to sell, turns over once a year.
 
 8. **the-time-of-circulation-in-turnover** — The Time of Circulation in the Turnover — *Chapter 14*
-   - Read: distance from market and "the period of selling".
-   - Do: compute how distance and selling time lengthen turnover, and the effect of a railway.
-   - Lab: `turnover`, view `time`. Presets: `near`, `india` (Marx's cotton goods to India), `railway`. Pin `tuTurnover`, `tuTurnovers`.
+   - Read: the time of selling, "relatively the most decisive" section of circulation time, and distance from market (l. 2228, l. 2244).
+   - Do: compute how distance and selling time lengthen turnover, and the effect of a faster passage.
+   - Lab: `turnover`, view `time`. Presets: `near` (four months' production, two months out and back), `india` (four months out, four back), `faster-passage` (two each way). Production is entered as 52/3 weeks. Pin `tuTurnover`, `tuTurnovers`, `tuCirculationShare`. *Changed in authoring: `railway` became `faster-passage`; the worked example is Marx's India (8 months of circulation on 4 of production, one turnover a year) instead of a 6-week sale.*
    - Misconception: circulation time is wasted only for the merchant.
-   - Worked: a 6-week sale on a 6-week production halves the turnovers of the same capital.
+   - Worked: four months' production and eight months out to India and back is one turnover a year, two-thirds of it in circulation.
 
 9. **turnover-time-and-capital-advanced** — Turnover Time and the Capital Advanced — *Chapter 15*
-   - Read: §1–3, the working period of 9 weeks and the circulation period of 3, and the additional capital.
+   - Read: §1, the working period of 9 weeks and the circulation period of 3, and the additional capital (l. 2284); Engels' note on the arithmetic (l. 2889).
    - Do: compute the additional capital a continuous business needs when its working and circulation periods differ, and the capital "set free".
-   - Lab: `turnover`, view `advance`. Presets: `marx` (Marx's figures: 9-week working period at £100 a week, 3-week circulation, a 50-week year), `equal` (working = circulation), `longer-circulation`. Pin `tuAdvance`, `tuFreed`.
+   - Lab: `turnover`, view `advance`. Presets: `marx` (9-week working period at £100 a week, 3-week circulation, a 50-week year), `equal` (5 and 5), `longer-circulation` (4 and 5), `faster-sale` (6 weeks, circulation 3 → 2), `prices-halve` (6 and 3, then £50 a week). Pin `tuAdvance`, `tuFreed`, `tuTurnovers`. *Added in authoring: `faster-sale` and `prices-halve`, Marx's own figures (l. 2881, l. 2912).*
    - Misconception: a capital needs only enough to cover one working period.
    - Worked: 9 weeks at £100 is capital I of £900; to keep working while it circulates for 3 weeks needs capital II of £300.
 
 10. **the-turnover-of-variable-capital** — The Turnover of Variable Capital — *Chapter 16*
-    - Read: §1, "the annual rate of surplus value".
+    - Read: §1, capitals A and B and "the annual rate of surplus-value" (l. 3032).
     - Do: compute the annual rate of surplus value s′·n and show why it differs between capitals with the same real s′.
-    - Lab: `turnover`, view `annual`. Presets: `marx-a` (Marx's figures: £500 variable, a 5-week turnover in a 50-week year, 100%), `marx-b` (£5,000 advanced for the 50-week year, 100%), `same-mass` (both). Pin `tuAnnualRate`, `tuMassS`.
+    - Lab: `turnover`, view `annual`. Presets: `marx-a` (£500 variable, 4 + 1 week turnover in a 50-week year, 100%), `marx-b` (£5,000 for the 50-week year), `marx-c` (£5,500 over 55 weeks), `b-at-a-pace` (B's £5,000 spent every 5 weeks). Pin `tuTurnover`, `tuTurnovers`, `tuAnnualRate`, `tuMassS`. *Changed in authoring: `same-mass` became Marx's capital C (an annual rate of 10/11, his "90 10-11%") and B on A's footing (£50,000 of s), which show the same point without a two-capital view; A's 4 + 1 split is the text's (l. 3016).*
     - Misconception: a capital that turns over faster exploits its workers harder.
     - Worked: capital A's annual rate is 1,000% and B's 100%; the workers in both are exploited at 100% and produce the same mass of s.
 
 11. **the-circulation-of-surplus-value** — The Circulation of Surplus Value — *Chapter 17*
-    - Read: the question where the money comes from to realise the surplus value, and Marx's answer that the capitalist class itself throws it into circulation.
-    - Do: compute the money the capitalist class must advance for its own consumption and the surplus value realised when it returns.
-    - Lab: `circuit`, view `realise`. Presets: `consumption` (£100 spent ahead of sales), `gold` (gold producers' s), `credit`. Pin `ciReturned`.
+    - Read: the question where the money comes from to realise the surplus value, and Marx's answer that the capitalist class itself throws it into circulation (§1, l. 3385 and l. 3395).
+    - Do: compute the money the capitalist class must spend on its own consumption and the surplus value realised when it returns.
+    - Lab: `circuit`, view `realise`. Presets: `class` (£500 as capital, £100 spent), `farmer` (Marx's farmer: £5,000 advanced, £1,000 spent on living), `half-spent` (£50 spent: only £50 of s returns as money). Pin `ciReturned`, `ciS`. *Changed in authoring: `gold` and `credit` cannot be expressed in the `realise` view (it has no gold producer and no credit); the gold producers are treated in prose, credit is left to Volume III, and the presets are Marx's class and farmer and a short-spending case.*
     - Misconception: surplus value cannot be realised in money unless someone outside the capitalist class supplies the money.
-    - Worked: capitalists spend £100 on consumption during the year; the same £100 returns as the money form of £100 of s. Whether this answer also covers accumulation is the question Luxemburg reopened; the `note` says so.
+    - Worked: Marx's farmer spends £1,000 on living during the year; the same £1,000 returns as the money form of £1,000 of s. Whether this answer also covers accumulation is the question Luxemburg reopened; the `note` says so.
 
 ### Course 8 — Reproduction of the Social Capital (`capital-social-reproduction`, 6)
 

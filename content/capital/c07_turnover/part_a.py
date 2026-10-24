@@ -273,7 +273,7 @@ LESSONS = [
             "fixed: value circulates piecemeal",
             "circulating: value returns whole each time",
             "wear a year = value / life",
-            "left after a years = value · (life − a)/life",
+            "left = value · (life − years used)/life",
             "not the same cut as constant and variable",
         ],
         "key_label": "Two ways of returning value",
@@ -379,9 +379,9 @@ LESSONS = [
                   "His fifteen-year machine booked at ten transfers the same £1,000 a year, "
                   "repairs included, and after three years £8,000 is still in it. Then a "
                   "machine of the same kind appears at half the price in the fourth year: the "
-                  "old one is now worth what the new one would be, worn to the same age, so "
-                  "£3,000 is left in it, and another £3,000 has gone without any wear at "
-                  "all."),
+                  "old one is now worth what the new one would be, worn to the same age: it "
+                  "passes on £500 a year instead of £1,000, £3,000 is left in it, and another "
+                  "£3,000 has gone without any wear at all."),
             ("p", "Fixed capital comes back slowly and circulating capital quickly. The next "
                   "lesson, “The Aggregate Turnover of Advanced Capital”, asks how the two can "
                   "be added into one turnover for the whole capital."),
@@ -593,7 +593,8 @@ LESSONS = [
             ("p", "Notice what happened to the speed. The circulating part goes round five "
                   "times, and the whole capital not much more than once, because four-fifths "
                   "of it is in a machine that returns a tenth of its value a year. Point 4 "
-                  "then repeats the rule of the last lesson with new numbers: £4,000 turned "
+                  "then repeats the rule of “Turnover Time and the Number of Turnovers” with "
+                  "new numbers: £4,000 turned "
                   "over five times is £20,000 of value, but what returns and is advanced anew "
                   "is the original £4,000, and &ldquo;Its magnitude is not changed by the "
                   "number of its periods of turn-over&rdquo;."),
