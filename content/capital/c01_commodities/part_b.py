@@ -72,8 +72,9 @@ LESSONS = [
                   "personifications of the economical relations that exist between "
                   "them&rdquo;. When the capitalist appears later, he will be read the same "
                   "way."),
-            ("p", "What separates a commodity from its owner? The commodity is &ldquo;a born "
-                  "leveller and a cynic&rdquo;, ready to exchange with any other at all. The "
+            ("p", "What separates a commodity from its owner? &ldquo;A born leveller and a "
+                  "cynic&rdquo;, Marx calls the commodity: it is ready to exchange with any "
+                  "other at all. The "
                   "owner is particular: his own commodity is no use to him, which is why he "
                   "brings it, and he wants something definite in return. &ldquo;All "
                   "commodities are non-use-values for their owners, and use-values for their "
@@ -795,8 +796,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking money only matters as a medium of exchange",
-             "In the broken preset no commodity changes hands at all, and yet £100 of hard "
-             "cash is needed. Money there is the means of payment, closing a sale made "
+             "In the broken preset every sale was made on credit, so the sales themselves "
+             "need no coin, and yet £100 of hard cash is needed. Money there is the means of payment, closing a sale made "
              "earlier, and in a crisis it is wanted for that alone: &ldquo;money alone is a "
              "commodity!&rdquo;. A model with money only as a medium of exchange cannot "
              "see that demand."),
@@ -816,10 +817,11 @@ LESSONS = [
             "cash that settles them, and again when one is not paid."
         ),
         "note": (
-            "The money-needed formula is the lab's formalisation of Marx's sentence, which "
-            "speaks of subtracting the circuits a coin makes rather than dividing by a "
-            "velocity; the two agree when each coin does the same number of jobs. In the "
-            "broken preset the unpaid bill is counted as no longer falling due, so that the "
+            "The money-needed formula is the lab's formalisation of Marx's sentence. Marx "
+            "takes the velocity as given and also subtracts the circuits in which one coin "
+            "first buys and then pays, so that it is not counted twice; the lab divides by "
+            "the velocity and has no term for that overlap, which is zero in its presets. In "
+            "the broken preset the unpaid bill is counted as no longer falling due, so that the "
             "formula and the netting of the bills return the same £100. The dealers and "
             "their £100 bills are illustrative."
         ),
@@ -901,8 +903,13 @@ LESSONS = [
                   "taking the difference in gold and silver. In a world where only bullion "
                   "settled accounts, that was not foolish: the balance of trade decided "
                   "whether metal came in or went out. Smith attacked it as confusing money "
-                  "with wealth. Marx's verdict is narrower: the mercantilists took the chief "
-                  "function of world money for the whole of what money is."),
+                  "with wealth. Marx's footnote turns the criticism round: it is the "
+                  "mercantilists' opponents who &ldquo;entirely misconceived the functions of "
+                  "money of the world&rdquo;, Ricardo above all, who held that an unfavourable "
+                  "balance &ldquo;never arises but from a redundant currency&rdquo;. That is "
+                  "the quantity view of the last lesson but one, applied between countries, and "
+                  "Marx's reply is the same: the balance moves the gold, not the other way "
+                  "round."),
             ("p", "The lab does the settling. Imports of £1,000 against exports of £1,000 "
                   "balance, and no bullion moves. Let exports fall to £800 and £200 must be "
                   "shipped abroad in gold. Add a payment of £100 owed abroad, interest on a "

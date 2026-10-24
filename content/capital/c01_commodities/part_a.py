@@ -117,9 +117,9 @@ LESSONS = [
                      "production of its time, with average skill and intensity. A producer "
                      "who takes longer has spent more hours, but the article is worth only "
                      "the socially necessary ones.")),
-            ("p", "Read the answer phrase by phrase. &ldquo;Normal conditions of "
-                  "production&rdquo; means the looms and materials in general use, not the "
-                  "ones in this workshop. &ldquo;The average degree of skill and "
+            ("p", "Read the answer phrase by phrase. The &ldquo;normal conditions of "
+                  "production&rdquo; are the looms and materials in general use, not the "
+                  "ones in this workshop. The &ldquo;average degree of skill and "
                   "intensity&rdquo; rules out the idle labourer of the objection. And "
                   "&ldquo;prevalent at the time&rdquo; means the standard moves. Marx's "
                   "example is the power-loom: once it came into England, a hand-loom weaver "
@@ -139,7 +139,8 @@ LESSONS = [
                   "hours, C works exactly as before, and the yard falls to `6/5` of an hour. "
                   "C's 3 hours a yard now count as `6/5`, so each hour he works represents "
                   "`2/5` of an hour of social labour where it represented `3/5`. In Marx's own "
-                  "case the whole trade halves its time, and the hour falls to exactly half."),
+                  "case the power-loom halves the labour socially required while the "
+                  "hand-loom weavers go on as before, so their hour falls to exactly half."),
             ("p", "The rest of the section follows from the definition. The more productive "
                   "labour is, the less time an article needs and the less it is worth: "
                   "Marx imagines carbon turned cheaply into diamonds, whose value &ldquo;might "
@@ -497,8 +498,8 @@ LESSONS = [
              "why": "A whole coat now needs two days of ten hours, so it is worth 20 hours. "
                     "Ten hours is the old figure, and 5 hours is the doubled case. Fifteen "
                     "hours matches no change in the lesson."},
-            {"q": "Which change alters the value created in a ten-hour day of tailoring, on "
-                  "the chapter's assumptions?",
+            {"q": "A tailor works a ten-hour day. Which change alters the value his day's "
+                  "work creates, on the chapter's assumptions?",
              "a": ["A new method that doubles the coats made",
                    "A method that halves the coats made",
                    "Working twelve hours instead of ten",
@@ -516,16 +517,16 @@ LESSONS = [
                    "Shows that it is always 2"],
              "c": 1,
              "why": "He says the reduction is made by a social process behind the producers' "
-                    "backs, and that &ldquo;for simplicity's sake&rdquo; he will treat all "
-                    "labour as simple. He computes it from nothing, so it is not derived from "
+                    "backs, and that he will &ldquo;henceforth account every kind of labour to "
+                    "be unskilled, simple labour&rdquo;. He computes it from nothing, so it is not derived from "
                     "training costs or wages here, and no value is given for it."},
         ],
         "mistakes": [
             ("Thinking more useful things always means more value",
              "The doubled preset refutes it in one line: the day's output goes from 1 coat "
              "to 2 and stays worth 10 hours. More use-values is more material wealth, which "
-             "Marx grants, and it may come with a fall in value per unit, which is the "
-             "&ldquo;antagonistic movement&rdquo; this section explains."),
+             "Marx grants, and if the larger mass takes fewer hours its whole value falls: "
+             "that is the &ldquo;antagonistic movement&rdquo; this section explains."),
             ("Treating productivity as a property of the hour",
              "Productivity is an attribute of concrete labour: how much of a definite "
              "useful thing an hour makes. Once the concrete form is set aside, as it is in "
@@ -644,9 +645,14 @@ LESSONS = [
                   "<em>Critical Dissertation</em> argued that value is nothing but the ratio "
                   "in which things exchange, with no absolute quantity behind it. That is a "
                   "serious position, and close to how most economists still talk about "
-                  "relative prices. Marx's reply is the case just computed: the same change in "
-                  "the ratio can come from a change in either commodity, so the ratio alone "
-                  "cannot tell you which one changed."),
+                  "relative prices. Marx's diagnosis is that the equivalent form itself misled "
+                  "Bailey: because the coats figure only as a quantity of an article, he saw "
+                  "in the expression of value &ldquo;merely a quantitative relation&rdquo;. "
+                  "The case just computed is Marx's evidence: the same change in the ratio can "
+                  "come from a change in either commodity, and Marx reads that as a change in "
+                  "a quantity behind the ratio. Bailey's side answers that asking which one "
+                  "changed can only mean asking against which third commodity it changed, "
+                  "and the disagreement is over whether there is anything more to mean."),
             ("p", "Aristotle got remarkably far with this. He saw that 5 beds = 1 house is no "
                   "different from 5 beds = so much money, and that exchange needs equality and "
                   "equality needs commensurability. Then he stopped: it is &ldquo;in reality, "
@@ -764,7 +770,7 @@ LESSONS = [
         "quiz_title": "Relative and equivalent",
         "quiz": [
             {"q": "In &ldquo;10 lb of tea = 40 lb of coffee&rdquo;, which commodity's value "
-                  "is being expressed?",
+                  "is being expressed, on Marx's reading?",
              "a": ["The tea's", "The coffee's", "Both equally", "Neither; it is only a ratio"],
              "c": 0,
              "why": "The commodity on the left is in the relative form, and its value is "
@@ -923,8 +929,10 @@ LESSONS = [
                   "exertion, even to Mr. Sedley Taylor.&rdquo;"),
             ("p", "Sedley Taylor was the Cambridge fellow who, months after Marx's death, "
                   "accused him in print of falsifying a quotation from Gladstone; Engels tells "
-                  "the story in his preface. The jibe is the closest the section comes to a "
-                  "smile. "
+                  "the story in his preface. So the name cannot be Marx's own: the English "
+                  "edition of 1887, which Engels edited, put Taylor where the German had named "
+                  "a German economist, Max Wirth. The jibe is the closest the section comes to "
+                  "a smile. "
                   "The point is serious. Robinson tames goats, fishes, makes furniture and "
                   "tools, and knows that all of it is his own labour in different modes. His "
                   "ledger states the hours outright. Those relations, Marx says, &ldquo;contain "
