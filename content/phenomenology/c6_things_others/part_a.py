@@ -303,33 +303,33 @@ LESSONS = [
                     "m, which is `6/30`, forgets the standard distance."},
             {"q": "In the misjudged preset the inferred size falls to 85 cm. What does that "
                   "show?",
-             "a": ["That the inference account's prediction depends on the distance it assumes",
-                   "That the person looks half their height",
+             "a": ["That the person looks half their height",
+                   "That the inference account's prediction depends on the distance it assumes",
                    "That the retinal image has changed",
                    "That the chapter's account predicts 85 cm"],
-             "c": 0,
+             "c": 1,
              "why": "Only the assumed distance changed, from 8 m to 4 m, and the inferred size "
                     "halved with it. The retinal-equivalent size is still 85/2 cm. The figure "
                     "is a model's output, not a report of how anyone looks, and the chapter's "
                     "own account is stated in prose and computes nothing."},
             {"q": "Which view does the chapter state at length before questioning it, and "
                   "credit to Kant?",
-             "a": ["That the true size is the law by which the appearance varies with distance",
-                   "That the true size is the one we see most often",
+             "a": ["That the true size is the one we see most often",
                    "That the true size is fixed by convention, within reach",
+                   "That the true size is the law by which the appearance varies with distance",
                    "That the true size is the size at the thing's optimum distance"],
-             "c": 0,
+             "c": 2,
              "why": "Pages 349 to 351 state the law view and, following it out, arrive with "
                     "Kant at a world posited as a system. The convention within reach is the "
                     "psychologist's view, rejected first. The optimum distance is the "
                     "chapter's own answer on page 352, not the view it questions."},
             {"q": "On page 352, what does the chapter say the distance between me and a thing "
                   "is?",
-             "a": ["A tension that fluctuates round a norm",
-                   "A size that increases or decreases",
+             "a": ["A size that increases or decreases",
                    "An angle measured from the plane of my face",
-                   "A quantity the mind infers from cues"],
-             "c": 0,
+                   "A quantity the mind infers from cues",
+                   "A tension that fluctuates round a norm"],
+             "c": 3,
              "why": "The chapter contrasts the two directly: not a size which increases or "
                     "decreases, but a tension round a norm. The angle from the plane of the face "
                     "is how it says an oblique position is not given, and inference from cues "
@@ -635,28 +635,28 @@ LESSONS = [
         "quiz": [
             {"q": "A grey card of reflectance 3/10 lies under a lamp giving illumination 4. What "
                   "is its luminance, and its ratio to a surround of luminance 2?",
-             "a": ["6/5 and 3/5", "3/40 and 3/80", "6/5 and 5/3", "12/10 and 12/5"],
-             "c": 0,
+             "a": ["3/40 and 3/80", "6/5 and 3/5", "6/5 and 5/3", "12/10 and 12/5"],
+             "c": 1,
              "why": "`3/10 × 4 = 6/5`, and `(6/5) / 2 = 3/5`. Dividing the reflectance by the "
                     "illumination gives 3/40. Turning the ratio over gives 5/3, the surround's "
                     "ratio to the card, and 12/10 is 6/5 unreduced but 12/5 multiplies by the "
                     "surround instead of dividing."},
             {"q": "When the white paper is placed in the beam, what happens to the disc's "
                   "luminance in the lab?",
-             "a": ["Nothing: it stays 4/5, and only its surround changes",
-                   "It falls to 1/16",
+             "a": ["It falls to 1/16",
                    "It falls to 1/20, the disc's luminance in the room",
+                   "Nothing: it stays 4/5, and only its surround changes",
                    "It rises to 64/5"],
-             "c": 0,
+             "c": 2,
              "why": "The disc is still reflecting 1/20 of a beam of 16, so its luminance is "
                     "still 4/5. 1/16 is its ratio to the new surround, not its luminance. 1/20 "
                     "is the disc without the beam, and 64/5 is the paper's luminance."},
             {"q": "What does the chapter say lighting is, on pages 360 to 362?",
-             "a": ["What we see by and take as the norm, not one more thing seen",
-                   "A colour added to the colours of things",
+             "a": ["A colour added to the colours of things",
                    "A judgement that subtracts the light from each colour",
-                   "A remembered colour that replaces the actual one"],
-             "c": 0,
+                   "A remembered colour that replaces the actual one",
+                   "What we see by and take as the norm, not one more thing seen"],
+             "c": 3,
              "why": "Lighting is not seen itself but causes us to see the rest, and is what we "
                     "assume, what we take as the norm. The subtracting judgement is the "
                     "intellectualist's account the chapter rejects on page 355, and the "
@@ -989,22 +989,22 @@ LESSONS = [
         "quiz": [
             {"q": "On the lesson's coding, why does empiricism fail the observation that a very "
                   "hot object must redden?",
-             "a": ["Association can only join heat and red as often found together, and the "
-                   "chapter calls the link a priori",
-                   "Empiricism denies that hot objects redden",
+             "a": ["Empiricism denies that hot objects redden",
                    "Empiricism has no account of colour",
+                   "Association can only join heat and red as often found together, and the "
+                   "chapter calls the link a priori",
                    "The chapter says empiricism is silent about heat"],
-             "c": 0,
+             "c": 2,
              "why": "Associated qualities are linked by repetition, so the link is contingent, "
                     "while page 372 calls it a priori necessary. Empiricism does not deny the "
                     "fact and does have an account of colour; the cell is n, not silent."},
             {"q": "In the alien preset only the aloof thing is shown, and empiricism survives. "
                   "What does that show?",
-             "a": ["That an account's record depends on which observations are on the table",
-                   "That the chapter sides with empiricism",
+             "a": ["That the chapter sides with empiricism",
                    "That intellectualism is refuted",
-                   "That the thing is a sum of qualities"],
-             "c": 0,
+                   "That the thing is a sum of qualities",
+                   "That an account's record depends on which observations are on the table"],
+             "c": 3,
              "why": "With all three observations empiricism fails two. Survival is relative to "
                     "the observations counted, and the coding is the lesson's. One n does not "
                     "refute intellectualism outright, and the chapter rejects the sum of "
@@ -1020,11 +1020,11 @@ LESSONS = [
                     "concept is the intellectualist's answer, which the chapter rejects on page "
                     "370, and no single quality is privileged."},
             {"q": "Why does the chapter call the thing an in-itself-for-us?",
-             "a": ["It exists only as perceived and yet presents itself as resting in itself",
-                   "It exists in itself and is never perceived",
+             "a": ["It exists in itself and is never perceived",
+                   "It exists only as perceived and yet presents itself as resting in itself",
                    "It is a mental image that we take to be outside us",
                    "It is whatever several perceivers agree on"],
-             "c": 0,
+             "c": 1,
              "why": "Page 375: we cannot conceive a thing without someone to perceive it, and "
                     "yet it presents itself as a thing in itself. A thing never perceived drops "
                     "the second half, a mental image drops the first, and agreement among "
@@ -1320,9 +1320,9 @@ LESSONS = [
         "quiz": [
             {"q": "Candidates: a hedge (fits c1), a wall (c1, c2), a barn (c1, c2, c3). After "
                   "cues c1 and c2, which remain?",
-             "a": ["the wall and the barn", "the barn only", "the hedge, the wall and the barn",
-                   "the hedge only"],
-             "c": 0,
+             "a": ["the barn only", "the hedge, the wall and the barn", "the hedge only",
+                   "the wall and the barn"],
+             "c": 3,
              "why": "Keep the candidates that fit every cue so far. The hedge fails c2; the wall "
                     "and the barn fit both. The barn alone is what remains after c3, and the "
                     "hedge alone is the one removed."},
@@ -1337,22 +1337,22 @@ LESSONS = [
                     "things, page 388 says, makes no sense, and the Chartres judgement welds two "
                     "views only because both are already drawn from one world."},
             {"q": "Which reply to the sceptic does the chapter give?",
-             "a": ["A perception is cancelled only by another perception that corrects it",
-                   "Perceptions are never mistaken",
+             "a": ["Perceptions are never mistaken",
+                   "A perception is cancelled only by another perception that corrects it",
                    "God guarantees that clear perceptions are true",
                    "Since each thing may be an illusion, so may the world"],
-             "c": 0,
+             "c": 1,
              "why": "Page 401: each perception disappears only to give place to another which "
                     "rectifies it. The chapter admits mistakes (page 382), the guarantee by God "
                     "is Descartes's later answer, not this chapter's, and the last option is the "
                     "sceptic's step the chapter refuses."},
             {"q": "In the Chartres passage, what makes the final judgement possible, on the "
                   "chapter's reading?",
-             "a": ["Both appearances are drawn from one and the same perception of the world",
-                   "The judgement creates the link between two unrelated appearances",
+             "a": ["The judgement creates the link between two unrelated appearances",
                    "The driver remembers a map of the region",
+                   "Both appearances are drawn from one and the same perception of the world",
                    "The two appearances are identical"],
-             "c": 0,
+             "c": 2,
              "why": "Page 384: I weld the two appearances together, but I can do so because "
                     "both come from one perception of the world. The judgement does not create "
                     "the link from nothing; no map is mentioned; and the appearances have, the "

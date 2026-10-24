@@ -257,4 +257,11 @@ first lesson, "The Cogito and the Certainty of Seeing", which exists.
 
 ## Where I disagree with the pedagogy assessment
 
-(Written after reading it; see the section appended below.)
+`docs/pedagogy/phenomenology-perception-things-world-and-others.md` did not
+exist when these findings were finished, so there is nothing to compare yet.
+Its author was evidently working in the same files at the same time: four of
+the fixes above (lamp-post `why`, Koffka note, the two boxes, Sartre hedged in
+lesson 7) and the softening of "Seth would see his view in that" are theirs in
+the file, and agree with my findings. Whoever reconciles the two reviews
+should check that their later edits did not reintroduce any wording changed
+here (final checker and preview runs after my last edit: both `OK`).

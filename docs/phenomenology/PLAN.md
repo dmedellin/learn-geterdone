@@ -138,9 +138,9 @@ Descartes, Kant, Husserl, Heidegger, Scheler, Cassirer, Bergson and Sartre.
 Where a preset uses figures the book or its source reports, its label says so
 ("Stratton's 1897 spectacles: 180°"); where it uses illustrative figures, the
 label says "illustrative" and the lesson says so in prose. Where a lab computes
-a measure or a rule that came later than the book (Brunswik's ratio, Wallach's
-ratio principle, the textbook thresholds for Wertheimer's bands), the label
-names it as the lesson's addition. The `cases` and `variation` cells are the
+a measure or a rule the book does not use (Brunswik's ratio, about 1930;
+Wallach's ratio principle, 1948, later than the book; the textbook thresholds
+for Wertheimer's bands), the label names it as the lesson's addition. The `cases` and `variation` cells are the
 lesson's reading of the chapter, and the lesson says that too.
 
 **Deliberate deviations from the library's conventions, recorded so no reviewer
@@ -1320,14 +1320,14 @@ shortened form these entries first carried.
      him as the inference account's usual holder. Brunswik's ratio is the
      lesson's addition; it dates from about 1930, so it is not "later than
      the book", and the lesson's prose says only that the book does not use
-     it (the kit's tile label still says "later than the book": a kit
-     correction, not the author's).
+     it (the kit's tile label, which said "later than the book", is
+     corrected to "Brunswik ratio").
    - **Do:** compute what the retinal-image account and the unconscious-
      inference account each predict for the size of a distant person, and a
      Brunswik ratio from a reported size.
    - **Lab:** `size/constancy` (family 1: the retinal-image account and
      Helmholtz's unconscious inference, named; Brunswik's ratio named as the
-     lesson's addition, later than the book). The prose says Description, Not
+     lesson's addition, which the book does not use). The prose says Description, Not
      Explanation computed an angular size and this lesson computes the two
      predictions from one. Presets: `far` (a person 170 cm at 8 m,
      standard distance 2 m, the distance assumed correctly; reported 160 cm,
@@ -2207,8 +2207,8 @@ the passage):
   Introduction does not discuss it, and a threshold does not refute a
   point-for-point theory, so setting the two side by side would present a
   strawman as the hypothesis. Fechner's law and signal detection are not used
-  either. Brunswik's ratio and Wallach's ratio principle are used, named as
-  the lessons' additions and later than the book.
+  either. Brunswik's ratio (about 1930) and Wallach's ratio principle (1948, later
+  than the book) are used, named as the lessons' additions.
 - **Trigonometry in the figures.** The kit's Pythagorean angles and
   whole-number view directions are a deliberate limit, so that every figure
   stays exact. It means no trigonometry in any figure, not no picture: a

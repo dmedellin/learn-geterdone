@@ -323,33 +323,33 @@ LESSONS = [
                     "only q, lacks it. q is missing from C, so it varies. The union p q r s is "
                     "not the core, and q is not in every variant."},
             {"q": "Why does the chapter reject the empiricist account of hallucination?",
-             "a": ["The patients mostly tell their hallucinations from their perceptions",
-                   "Nerve centres cannot be irritated",
+             "a": ["Nerve centres cannot be irritated",
+                   "The patients mostly tell their hallucinations from their perceptions",
                    "Hallucinations are always visual",
                    "The patients believe whatever they see"],
-             "c": 0,
+             "c": 1,
              "why": "If a hallucination were a sensation from an inner cause, it should be "
                     "indistinguishable from a perception, and the patients distinguish them. "
                     "The chapter does not dispute the physiology as such; the schizophrenic's "
                     "hallucinations, it says, are mostly auditory and tactile; and the patients "
                     "do not believe they see."},
             {"q": "Why, on the chapter's reading, is a hallucination not a judgement either?",
-             "a": ["A judgement would posit it as true, which the patients do not do",
-                   "Judgements are always correct",
+             "a": ["Judgements are always correct",
                    "The patients cannot speak about what they experience",
+                   "A judgement would posit it as true, which the patients do not do",
                    "A hallucination is a sensory content"],
-             "c": 0,
+             "c": 2,
              "why": "Page 390: the judgement or belief could only consist in positing the "
                     "hallucination as true, and that is just what the patients do not do; they "
                     "argue against it. Judgements can be false, the patients' reports are the "
                     "chapter's evidence, and the chapter denies that it is a sensory content."},
             {"q": "How does the lesson's aside set Anil Seth's view beside the chapter?",
-             "a": ["Seth calls perception a controlled hallucination; the chapter says a "
-                   "hallucination lacks what perception has",
-                   "Seth and the chapter agree that hallucination is a false belief",
+             "a": ["Seth and the chapter agree that hallucination is a false belief",
                    "Seth's experiments show the chapter is wrong",
-                   "Seth's view is the chapter's, in modern words"],
-             "c": 0,
+                   "Seth's view is the chapter's, in modern words",
+                   "Seth calls perception a controlled hallucination; the chapter says a "
+                   "hallucination lacks what perception has"],
+             "c": 3,
              "why": "The two run in opposite directions, and the lesson states both sides: the "
                     "chapter's one function and its initiative from us are close to Seth, its "
                     "shared world is not. Neither holds hallucination a false belief, and the "
@@ -652,17 +652,17 @@ LESSONS = [
         "quiz": [
             {"q": "An argument has premises p and p → q and conclusion q. How many of its four "
                   "rows are counterexamples?",
-             "a": ["0", "1", "2", "4"],
-             "c": 0,
+             "a": ["1", "0", "2", "4"],
+             "c": 1,
              "why": "A counterexample needs p true, p → q true and q false; but with p true and "
                     "q false, p → q is false. So no row qualifies, and the argument, modus "
                     "ponens, is valid. One counterexample is what p, q, so r has."},
             {"q": "What is the chapter's objection to the argument from analogy?",
-             "a": ["It presupposes the perception of others that it is meant to explain",
-                   "It is invalid because it is inductive",
+             "a": ["It is invalid because it is inductive",
                    "It fails because no two bodies ever behave exactly alike",
+                   "It presupposes the perception of others that it is meant to explain",
                    "It relies on the baby's knowledge of its own face"],
-             "c": 0,
+             "c": 2,
              "why": "Page 410, after Scheler: reasoning by analogy presupposes what it is called "
                     "on to explain, since the perception of others is anterior to the "
                     "observations. Being inductive is the misconception the lesson answers. The "
@@ -670,12 +670,12 @@ LESSONS = [
                     "the perception does not wait for any likeness, and the baby has hardly "
                     "seen its own face."},
             {"q": "Why does the circle preset come out valid in the lab?",
-             "a": ["Its conclusion is one of its premises, so no row makes the premises true "
-                   "and the conclusion false",
-                   "Because r is a tautology",
+             "a": ["Because r is a tautology",
                    "Because its premises cannot all be true together",
-                   "Because the lab cannot detect bad arguments"],
-             "c": 0,
+                   "Because the lab cannot detect bad arguments",
+                   "Its conclusion is one of its premises, so no row makes the premises true "
+                   "and the conclusion false"],
+             "c": 3,
              "why": "With r among the premises, any row that makes the premises true makes r "
                     "true. r is not true in every row, and p and r can both be true. The lab "
                     "detects invalidity correctly; circularity is not invalidity, which is the "
@@ -1012,18 +1012,18 @@ LESSONS = [
         "quiz": [
             {"q": "Two accounts, A and B. Cases: one is y for A and n for B; one is - for A and "
                   "y for B; one is n for both. Which cases are in the split?",
-             "a": ["Only the first", "The first and the second", "All three",
+             "a": ["The first and the second", "All three", "Only the first",
                    "None, since both accounts fail something"],
-             "c": 0,
+             "c": 2,
              "why": "The split is the cases where one account absorbs and the other fails. The "
                     "second is a silence for A, not a failure, and the third is a failure for "
                     "both. That both fail something decides the survivors, not the split."},
             {"q": "What does the chapter call insurmountable?",
-             "a": ["A solipsism rooted in living experience",
-                   "The theory that only I exist",
+             "a": ["The theory that only I exist",
                    "The conflict between two looks that objectify each other",
-                   "The gap between my body and the other's body"],
-             "c": 0,
+                   "The gap between my body and the other's body",
+                   "A solipsism rooted in living experience"],
+             "c": 3,
              "why": "Page 417: a solipsism rooted in living experience and quite insurmountable, "
                     "the fact that every experience is lived by me. The theory that only I "
                     "exist is not what is meant. The objectifying conflict, page 420 says, "
@@ -1042,12 +1042,12 @@ LESSONS = [
                     "And the chapter grants that it does happen, under a stranger's gaze, so "
                     "'never' is wrong."},
             {"q": "Does the chapter refute solipsism?",
-             "a": ["No: it grants a truth in solipsism and holds that coexistence is lived "
+             "a": ["Yes: the dialogue proves that other minds exist",
+                   "No: it grants a truth in solipsism and holds that coexistence is lived "
                    "beneath it",
-                   "Yes: the dialogue proves that other minds exist",
                    "Yes: the argument from analogy, once repaired, proves it",
                    "No: it concludes that only I exist"],
-             "c": 0,
+             "c": 1,
              "why": "Page 419: the truth of solipsism is there; page 418: solitude and "
                     "communication are two moments of one phenomenon. The dialogue is a "
                     "description, not a proof; the repaired analogy is circular; and the chapter "
