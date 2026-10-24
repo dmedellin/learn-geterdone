@@ -699,7 +699,7 @@ Chapter 5 · The Time of Circulation, Chapter 6 · The Expenses of Circulation. 
 4. **physiocrats-and-adam-smith** — The Physiocrats and Adam Smith on Fixed Capital — *Chapter 10*
    - Read: Smith's definition of fixed capital as what yields a profit "without changing masters" (l. 1800). *Corrected in authoring: Kerr's Smith says "without changing masters", not "without circulating".*
    - Do: classify the same capital by Smith's fixed/circulating and by constant/variable, and show which split determines surplus value.
-   - Lab: `turnover`, view `classify`. Presets: `mill` (£500 machine, £100 cotton, £100 wages), `farm` (Smith's farmer: implements £400 and labouring cattle £200 fixed; fodder £100, seed £100 and wages £200 circulating), `mine` (Marx's copper mine: no raw material, l. 1814; machinery £600, coal £150, wages £250). All at 100%. Pin `tuFixed`, `tuVariable`, `tuS`. *Changed in authoring: `smith` became `mine`, Marx's own counter-example to Smith; the wages-with-materials point is made by every preset.*
+   - Lab: `turnover`, view `classify`. Presets: `mill` (£500 machine, £100 cotton, £100 wages), `farm` (Smith's farmer, sorted by Marx's turnover test: implements £400 and labouring cattle £200 fixed; fodder £100, seed £100 and wages £200 circulating; Smith himself called the seed fixed, l. 1851, and the lesson says so), `mine` (Marx's copper mine: no raw material, l. 1814; machinery £600, coal £150, wages £250). All at 100%. Pin `tuFixed`, `tuVariable`, `tuS`. *Changed in authoring: `smith` became `mine`, Marx's own counter-example to Smith; the wages-with-materials point is made by every preset.*
    - Misconception: wages and raw materials are the same kind of capital because both circulate.
    - Worked: £100 of cotton and £100 of wages are both circulating, but only the second creates new value.
 
@@ -1178,7 +1178,7 @@ Production; The Classes. Lesson titles are as below.
    - Lab: `revenue`, view `added-up`. Presets: `wage-rise` (Marx's figures, 400c + 100v + 150s with wages up 50, l. 7198–7204; rent 1/2 of s and interest 0, so the lab splits the reduced s 50/50 where Marx says "say" 45 profit and 55 rent), `rent-rise` (illustrative: c 100, v 100, s 100, rent 1/2, interest 1/5, no wage change), `fixed-value` (illustrative: c 100, v 100, s 100, rent 3/10, interest 1/5, wages up 20). Pin `rvWages`, `rvRent`, `rvProfitShare` (and `rvInterest` on the two illustrative presets).
    - Misconception: a wage rise raises prices because wages are a component added to them.
    - Worked: with value product fixed at 200, a wage rise from 100 to 120 cuts profit, interest and rent by 20 together.
-   - Text note: the Kerr text prints wages after the rise as 27 8/11% of the capital advanced; 150/550 is 27 3/11%. The lesson says so.
+   - Text note: the Kerr text prints wages after the rise as 27 8/11% of the capital advanced; 150/550 is 27 3/11%. The lesson says so. Marx's summary table of the two cases is on Kerr p. 996 (image `tables/volume-3/lf0445-03-0996-t0001.png`); the lesson cites it for the 650 and 250, which agree with the text. Its rate columns read 66 1/8% and 80% in the image, where the text (l. 7214) has 66 2/3% and 30%; the lesson uses the text's figures.
 
 4. **distribution-and-production-relations** — Distribution Relations and Production Relations — *Chapter 51*
    - Read: the passage in which the conditions of distribution are the "reverse side" of the conditions of production (Kerr's wording, l. 7354), with l. 7358.
