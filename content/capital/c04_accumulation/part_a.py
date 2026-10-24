@@ -65,9 +65,11 @@ LESSONS = [
             ("p", "If you have ever been paid by the hour, you know this sentence from the "
                   "inside. The payslip says so many hours at so much an hour, and it is hard "
                   "to read it as anything but a price for the work you did. Marx does not "
-                  "say the payslip lies. He says it shows a surface, and that the phrase "
-                  "&ldquo;value of labour&rdquo; on that surface is one the economists "
-                  "borrowed from everyday life without asking what it could mean."),
+                  "call the payslip a fraud. He says it shows a surface, a form that arises "
+                  "from the relations of production themselves and yet shows the opposite "
+                  "of what lies under it. The economists, he adds, took the category "
+                  "&ldquo;price of labour&rdquo; from everyday life without criticism and "
+                  "asked only how the price is determined."),
             ("p", "His first objection is that it means nothing. The value of a commodity is "
                   "measured by the labour it contains. So the value of a twelve-hour day "
                   "would be the twelve hours a twelve-hour day contains, which he calls "
@@ -376,7 +378,8 @@ LESSONS = [
                   "that particular mischief."),
             ("p", "Overtime is the reverse case. In trades with no legal limit a custom grew "
                   "up of a normal day of, say, ten hours, with the hours beyond it paid "
-                  "better. Marx takes the employer at his word and computes. If an hour of "
+                  "better, though often, Marx says, by a ridiculously small amount. He "
+                  "computes what the extra pay leaves unpaid. If an hour of "
                   "the normal day is paid 3d and creates 6d, the employer keeps half of it. "
                   "If an overtime hour is paid 4d, the extra pay still leaves him a third "
                   "of the 6d. Better-paid overtime is still partly unpaid labour, and where "
@@ -389,10 +392,14 @@ LESSONS = [
                   "at the full price, complaining to a parliamentary inquiry about the "
                   "undersellers, who in their words were &ldquo;getting 18 hours' work out "
                   "of their men for 12 hours' wages.&rdquo;"),
-            ("p", "Marx calls their complaint a jeremiad and enjoys it. The full-priced "
+            ("p", "Marx calls their complaint a jeremiad, interesting for what it shows of "
+                  "how the relation looks from the capitalist's side. The full-priced "
                   "bakers think the normal day is fully paid and only the extra hours are "
                   "stolen. Surplus labour inside the normal day does not exist for them, "
-                  "because they believe the day's wage paid for it."),
+                  "because they believe the day's wage paid for it. Facing the underseller, "
+                  "the full-priced baker even insists on extra pay for overtime, without "
+                  "seeing that it too contains unpaid labour: the 4d overtime hour above is "
+                  "Marx's answer to him."),
             ("p", "The objection worth stating comes from later labour economics, which "
                   "treats the hourly wage as a price and the hours as the worker's own "
                   "choice between income and leisure. Lionel Robbins showed in 1930 that a "
@@ -642,7 +649,7 @@ LESSONS = [
             ("p", "Some workers did take the appearance seriously. Marx quotes operatives who "
                   "&ldquo;carefully watch the price of the raw material and the price of "
                   "manufactured goods&rdquo; and so could estimate their master's profits. "
-                  "He adds, dryly, that the capitalist rightly knocks such pretensions on "
+                  "He adds, drily, that the capitalist rightly knocks such pretensions on "
                   "the head as gross errors about the nature of wage-labour, and declares "
                   "that the productivity of labour is none of the labourer's concern."),
             ("p", "Modern labour economics reads piece-rates more kindly. Edward Lazear's "
@@ -1153,17 +1160,19 @@ LESSONS = [
                   "weight. Money has no label on it. An accountant would say just as "
                   "truthfully that the capitalist spent his profits each year and kept his "
                   "capital intact, and nothing in the ledger can choose between the two "
-                  "descriptions. Marx's reply is that he is not tracing coins but asking "
-                  "what the present value of the capital is equivalent to, and that the "
-                  "repeated process makes the question unavoidable whatever the capital's "
-                  "first origin. Even a capital first earned by its owner's own labour, he "
+                  "descriptions. Marx does not take up this objection in so many words. "
+                  "What the chapter sets against it is that the question concerns "
+                  "&ldquo;not the material elements, but the value&rdquo; of the capital, "
+                  "what its present value is the equivalent of, and that the repeated "
+                  "process raises that question whatever the capital's first origin. Even "
+                  "a capital first earned by its owner's own labour, he "
                   "says, becomes unpaid labour of others after enough repetitions. Readers "
                   "who find the accountant's description equally good are not making an "
                   "arithmetic mistake."),
             ("p", "The third change is in the worker. He consumes twice: productively, using "
                   "up means of production at work, and individually, turning his wages into "
                   "food and shelter. Seen as a class, even his individual consumption is "
-                  "the reproduction of labour-power for capital, like oiling a machine, "
+                  "the reproduction of labour-power for capital, like the cleaning of machinery,"
                   "which is why economists counted as productive only the part of it the "
                   "class needs to survive. &ldquo;The Roman slave was held by fetters: the "
                   "wage-labourer is bound to his owner by invisible threads.&rdquo;"),
@@ -1174,8 +1183,10 @@ LESSONS = [
                   "<em>Times</em> in March 1863 against it: the workers were the trade's "
                   "trained power, and could not be replaced for a generation. Marx reads the "
                   "letter as a manufacturer counting his workers among his machinery. The "
-                  "emigration was not paid for, and the workers stayed in what the "
-                  "<em>Times</em> had called a &ldquo;moral workhouse&rdquo;."),
+                  "<em>Times</em> mocked Potter for wanting half a million workers kept in "
+                  "a great &ldquo;moral workhouse&rdquo;, but public opinion, Marx says, "
+                  "was Potter's: the emigration was prevented, and the workers stayed in "
+                  "the cotton districts."),
             ("p", "So the repetition reproduces more than products and surplus value. It "
                   "keeps the worker without means of production and returns him to the "
                   "market to sell his labour-power again. Capitalist production, Marx "
@@ -1245,12 +1256,12 @@ LESSONS = [
             {"q": "A capital of £1,500 yields £300 of surplus value a year, all of it "
                   "consumed. After how many years has the capitalist consumed a sum equal to "
                   "his capital?",
-             "a": ["3", "5", "10", "6"],
+             "a": ["1/5", "5", "10", "6"],
              "c": 1,
              "why": "Capital over surplus value consumed is `1500/300 = 5`. Ten is the answer "
                     "if only half the surplus value, £150, were consumed a year; 6 divides "
-                    "£1,800, the capital with one year's surplus added, by £300; 3 comes from "
-                    "no division of these two figures."},
+                    "£1,800, the capital with one year's surplus added, by £300; and 1/5 is "
+                    "the division upside down, the surplus value over the capital."},
             {"q": "In Marx's example of the peasant whose land is taken, who produces the "
                   "fund from which the peasant is paid after the change?",
              "a": ["The lord, out of his own wealth",

@@ -556,7 +556,7 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 9. **the-general-law-of-accumulation** — The General Law of Capitalist Accumulation — *Chapter 25 · The General Law of Capitalist Accumulation*
    - Read: §4, "Accumulation of wealth at one pole is, therefore, at the same time accumulation of misery… at the opposite pole".
    - Do: compute the ratio of reserve to active workers period by period while wages per worker rise.
-   - Lab: `accumulate`, view `law`. Instance: £6,000 at c/v 1, a wage of £10, 300 workers at first. Presets: `boom` (s/v 200%, c/v +1 a period, wage +£½ a period, supply +50: `1/19 = 5.26%`, `25`, `475`), `slump` (nothing capitalised, c/v +½, supply +30: `9/5 = 180%`, `270`, `150`), `long-run` (Marx's ratios, c/v +1, supply +30: `2/5 = 40%`, `120`, `300`). Shipped `periods = 5`. Pin `acRatio`, `acReserve`, `acDemand`. The floating, latent and stagnant forms and pauperism, "the lowest sediment", are named in prose and asked in the quiz. *Changed in authoring: `long-run` runs five periods, not ten. `periods` is a lesson setting the kit does not let a preset override, and the other two presets read best at five; the lesson says that the periods slider set to 10 gives a ratio of 9/10. `acDemand` pinned as well.*
+   - Lab: `accumulate`, view `law`. Instance: £6,000 at c/v 1, a wage of £10, 300 workers at first. Presets: `boom` (s/v 200%, c/v +1 a period, wage +£½ a period, supply +50: `1/19 = 5.26%`, `25`, `475`), `slump` (£4,200, nothing capitalised, c/v +½, supply +30: `3 = 300%`, `315`, `105`), `long-run` (Marx's ratios, c/v +1, supply +30: `2/5 = 40%`, `120`, `300`). Shipped `periods = 5`. Pin `acRatio`, `acReserve`, `acDemand`. The floating, latent and stagnant forms and pauperism, "the lowest sediment", are named in prose and asked in the quiz. *Changed in authoring: `long-run` runs five periods, not ten. `periods` is a lesson setting the kit does not let a preset override, and the other two presets read best at five; the lesson says that the periods slider set to 10 gives a ratio of 9/10. `acDemand` pinned as well.* *Changed in second review: `slump` starts from £4,200 instead of £6,000. At £6,000 with c/v rising by ½ its period-4 variable capital was £6,000/3.5 and employment a fractional 171 3/7; at £4,200 every period employs a whole number (210, 168, 140, 120, 105). `boom` is unchanged: it shows the reserve only in period 5, but a bounded search (capitals £3,000 to £30,000, s/v 100% to 300%, c/v rising by ½ or 1, wage steps of 1s to £10, a range of supplies) of instances with a rising composition and a wage rising by a fixed step found none that keeps every period's employment a whole number and the ratio rising over several periods, so the lesson says plainly that the reserve forms only in the last period.*
    - Misconception: the law predicts that real wages must always fall.
    - Worked: in `boom` the ratio of reserve to employed rises while wages per worker rise. Marx adds that the labourer's lot "must grow worse" be his payment high or low; whether that means relative or absolute worsening is argued, and the lab computes only the ratio.
 
@@ -797,7 +797,7 @@ bare numbers, as Marx does; only lesson 2 prices in pounds. All six lessons are 
 6. **extended-reproduction** — Reproduction on an Enlarged Scale — *Chapter 21 · Accumulation and Reproduction on an Enlarged Scale*
    - Read: §3, the rule "If things are to proceed normally, accumulation in II must take place more rapidly than in I…" (Kerr l. 5286); the initial diagram I 4,000c + 1,000v + 1,000s, II 1,500c + 750v + 750s as math blocks in the body. Title follows Kerr; slug unchanged.
    - Do: run the expanded scheme for several periods, with Department I accumulating half its s and Department II adjusting, and compute the growth path.
-   - Lab: `schemes`, view `expanded`, shipped `periods = 4` (the kit's name for the plan's `years`). Presets: `marx` (`scYear2` `I 4,400c + 1,100v; II 1,600c + 800v`, `scGrowth` `9,000 to 65,219/5: 20,219/45,000 = 44.93%`; Marx prints 13,033, rounding in the fourth year, and Kerr's II total 4,249 is ten short of its parts), `marx-second` (Marx's second illustration, I 5,000c + 1,000v + 1,000s, II 1,430c + 285v + 285s, composition 5 in both: `I 16,250/3c + 3,250/3v; II 4,750/3c + 947/3v`, which Marx rounds to 5,417, 1,083, 1,583, 316), `ii-short` (II s 100: `refused in period 1`). `marx-second` replaces the planned `half-half`: Marx gives a second example himself. Pin `scBalance`, `scYear2`, `scGrowth`.
+   - Lab: `schemes`, view `expanded`, shipped `periods = 4` (the kit's name for the plan's `years`). Presets: `marx` (`scYear2` `I 4,400c + 1,100v; II 1,600c + 800v`, `scGrowth` `9,000 to 65,219/5: 20,219/45,000 = 44.93%`; Marx prints 13,033, rounding in the fourth year, and Kerr's II total 4,249 is ten short of its parts), `marx-second` (Marx's second illustration, I 5,000c + 1,000v + 1,000s, II 1,430c + 285v + 285s, composition 5 in both: `I 16,250/3c + 3,250/3v; II 4,750/3c + 947/3v`, which Marx rounds to 5,417, 1,083, 1,583, 316; Marx runs it three years and the lab agrees to rounding, except that Kerr prints I's third-year c as 6,385 for 5,869 + 489 = 6,358, which Marx's total 7,629 confirms), `ii-short` (II s 100: `refused in period 1`). `marx-second` replaces the planned `half-half`: Marx gives a second example himself. Pin `scBalance`, `scYear2`, `scGrowth`.
    - Misconception: the two departments can grow at any rates they like. Tugan-Baranovsky and Luxemburg are stated at strength, as later readers; the lesson says what in the chapter bears on their dispute, not Marx's answer.
    - Worked: from I 4,000c + 1,000v + 1,000s and II 1,500c + 750v + 750s, year one ends at I 4,400c + 1,100v and II 1,600c + 800v.
 
@@ -856,9 +856,12 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
 
 ### Course 10 — Average Profit and Its Fall (`capital-prices-of-production`, 8)
 
-Kerr's plain text omits Chapter 9's two tables (printed as tables in the book); the
-figures used are the second table's and agree with every total and deviation the
-text prints (l. 1681–1693). Kerr misprints, kept in quotations and named in the
+Kerr's plain text omits Chapter 9's three tables (printed as tables in the book):
+the five spheres at value on Kerr p. 183 (`tables/volume-3/lf0445-03-0183-t0001.png`)
+and, on p. 185, the same spheres with used-up c, cost prices and values, and their
+prices of production and deviations (`lf0445-03-0185-t0001.png`, `-t0002.png`). The
+figures used are read from those images and agree with every total and deviation the
+text prints (l. 1681–1693); the lessons cite the pages. Kerr misprints, kept in quotations and named in the
 lessons: Chapter 9 "8 + 18 + 26" (for 8 + 18 = 26), Chapter 11 "16 1/12" and
 "128 7/12" (exact 16 1/14 and 128 4/7) and "100 10/19" (87½ + 23 1/38 = 110 10/19),
 Chapter 13 "66 1/3%" (for 66 2/3%).
@@ -992,84 +995,84 @@ Instances as authored (2026-10-24). Corrections the Kerr text forced are marked 
 1. **credit-and-fictitious-capital** — Credit and Fictitious Capital — *Chapter 25*
    - Read: bills of exchange as "commercial money".
    - Do: compute the cash a chain of bills needs when settled, and the claims left standing against nothing when a bill has no sale behind it.
-   - Lab: `money`, view `payments`. Presets: `bills` (three backed bills of £100 in a circle), `discounted`, `accommodation` (one bill drawn with no sale behind it). Pin `moNeeded`, `moUnbacked`.
+   - Lab: `money`, view `payments`. Presets: `bills` (three backed bills of £100 in a circle: £0), `discounted` (B sells his bill on A to a bank: £100 of cash, the bank's own), `accommodation` (the circle plus a £100 bill A accepts for B with no sale behind it: £100 needed, £100 unbacked). Pin `moNeeded`, `moNetted`, `moUnbacked`.
    - Misconception: a bill of exchange is a loan of money.
    - Worked: three bills of £100 in a circle settle with no cash; one accommodation bill leaves £100 of claims against nothing.
 
 2. **accumulation-of-money-capital** — Accumulation of Money Capital and the Rate of Interest — *Chapter 26*
    - Read: Overstone's evidence before the Committee of 1857.
    - Do: compute what a rise in the rate of interest does to profit of enterprise and to the borrowing industrialist.
-   - Lab: `interest`, view `bounds`. Presets: `low` (interest 3%), `high` (8%), `crisis` (above the profit rate). State Overstone's evidence at strength. Pin `inEnterprise`.
+   - Lab: `interest`, view `bounds`. Presets: `low` (interest 3%), `high` (8%), `crisis` (interest at 10%, equal to the profit rate: the bound is reached, profit of enterprise £0; the view cannot go above the profit rate). State Overstone's evidence at strength. Pin `inEnterprise`.
    - Misconception: a high rate of interest shows a scarcity of capital in general.
    - Worked: at a 10% average rate, moving interest from 3% to 8% cuts profit of enterprise from 7 to 2 per 100.
 
 3. **the-role-of-credit** — The Role of Credit in Capitalist Production — *Chapter 27*
-   - Read: "Formation of stock companies", and "the abolition of the capitalist mode of production within the capitalist mode of production itself".
+   - Read: Kerr l. 3899-3901, the transformation of the capitalist into "a mere manager" and of the owner into "mere money-capitalists"; then l. 3913, "This is the abolition of the capitalist mode of production within capitalist production itself" (Kerr wording).
    - Do: compute a stock company's profit paid out as dividend, the manager's salary, and what each looks like: interest on the shares and wages.
-   - Lab: `interest`, view `split`. Presets: `stock-company` (£1,000 of shares, 20% profit, a hired manager), `owner-managed`, `leveraged` (most capital borrowed). Pin `inInterest`, `inEnterprise`.
+   - Lab: `interest`, view `split`. Presets: `stock-company` (£1,000 of shares, 22% profit, dividend at 20%, a £20 salary: enterprise £0), `owner-managed` (20% profit, 5% interest: £50 and £150), `leveraged` (£800 of the £1,000 borrowed at 5%: £40 and £160). Pin `inInterest`, `inEnterprise`.
    - Misconception: in a stock company the profit of enterprise stays with the people who run it.
    - Worked: £200 of profit is paid out as dividend and looks like interest on £1,000; the manager is paid a salary; the figure of the owner-entrepreneur has split in two, "a mere manager" and "a mere money-capitalist".
 
 4. **medium-of-circulation-and-capital** — Medium of Circulation and Capital: Tooke and Fullarton — *Chapter 28*
    - Read: the distinction between money as currency and money as capital.
    - Do: classify payments as circulation of revenue or transfer of capital and compute the notes each needs.
-   - Lab: `money`, view `circulate`. Presets: `revenue` (wages spent in shops), `capital` (payments between capitalists), `mixed`. Pin `moNeeded`.
+   - Lab: `money`, view `circulate`. Presets: `revenue` (wages spent in shops, £1,000 at velocity 10: £100), `capital` (payments between capitalists, £1,000: £100), `mixed` (£2,000: £200), `credit` (the capital payments at velocity 25: £40). Pin `moNeeded`. Kerr l. 3953 prints "price" for "piece"; the lesson quotes it as printed and says so.
    - Misconception: the quantity of notes measures the quantity of capital.
    - Worked: £1,000 of wage spending at velocity 10 needs £100 of notes; £1,000 lent to a manufacturer needs none extra once it is spent.
 
 5. **component-parts-of-bank-capital** — The Component Parts of Bank Capital — *Chapter 29*
    - Read: "The formation of a fictitious capital is called capitalisation."
    - Do: compute the price of a claim to a yearly income at a rate of interest, and what a change in the rate does to it with nothing real changing.
-   - Lab: `interest`, view `capitalise`. Presets: `marx` (Marx's figures: £100 a year at 5%), `rate-up`, `rate-down`. Pin `inPrice`.
+   - Lab: `interest`, view `capitalise`. Presets: `marx` (Marx's figures: £100 a year at 5%: £2,000), `rate-up` (10%: £1,000), `rate-down` (2½%: £4,000), `share` (Marx's share, £10 a year at 5%: £200). Pin `inPrice`.
    - Misconception: the price of a security measures real capital invested.
    - Worked: £100 a year at 5% is £2,000; at 10% the same claim is £1,000 and nothing has been destroyed.
 
 6. **money-capital-and-real-capital-i** — Money Capital and Real Capital I — *Chapter 30*
-   - Read: "Not every augmentation of loanable money-capital indicates a real accumulation of capital" (Kerr wording to be checked).
+   - Read: Kerr l. 4238, "Not every augmentation of loanable capital indicates a real accumulation of capital or expansion of the process of reproduction."
    - Do: compute the money that piles up in hoards while no real accumulation takes place.
-   - Lab: `schemes`, view `hoard`. Presets: `stagnant` (hoarders exceed investors), `balanced`, `boom`. Pin `scHoardGap`.
+   - Lab: `schemes`, view `hoard`. Presets: `balanced` (Volume II's Department I, 4,000c + 1,000v + 1,000s, half of s accumulated, half the accumulators hoard: 0), `stagnant` (all hoard: +500), `boom` (a quarter hoard: −250). Pin `scHoardGap`.
    - Misconception: a pile of bank deposits means plenty of real capital.
    - Worked: 500 of surplus product unsold is 500 of money hoarded and lent to the bank; loanable capital has grown and real accumulation has not.
 
 7. **money-capital-and-real-capital-ii** — Money Capital and Real Capital II — *Chapter 31*
-   - Read: the passages on the transformation of money into loan capital.
+   - Read: Kerr l. 4316, loan capital accumulated "by mere technical means"; the contraction case is l. 4312 ("the money-capital, which was formerly employed in production and commerce, appears as unemployed loan capital"), and Chapter 32 (l. 4406) adds capital released by a fall in prices, which Course 7's `prices-halve` preset shows.
    - Do: compute the circulating capital set free when a business contracts, which becomes loan capital without anyone saving.
-   - Lab: `turnover`, view `advance`. Presets: `contract` (a £100-a-week business on 9 + 3 weeks halves its scale), `steady`, `expand`. Pin `tuFreed`.
+   - Lab: `turnover`, view `advance`. Presets: `contract` (Marx's 9 + 3 weeks at £100, then £50 a week: £600 released), `steady` (£100: £0 released), `expand` (£150: £600 more tied up). Pin `tuAdvance`, `tuFreed`.
    - Misconception: loan capital is only savings out of income.
    - Worked: halving the business releases £600 of circulating capital to the money market; nobody saved a penny.
 
 8. **money-capital-and-real-capital-iii** — Money Capital and Real Capital III — *Chapter 32*
    - Read: the demand for means of payment in times of crisis.
    - Do: compute the cash a chain of payments needs before and after one default, with the sum of prices unchanged.
-   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears), `crisis` (one default breaks it), `recovery`. Pin `moNeeded`.
+   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears: £0), `crisis` (bill 1 defaulted, Course 1's `broken` chain: £100), `cash-only` (credit stopped, every sale in cash at velocity 1: £300; replaces `recovery`, since Chapter 32's recovery is borrowing to buy, which this view cannot show). Pin `moNeeded`, `moNetted`. Read: Kerr l. 4486; its second clause, "by no means a demand for money as a means of payment", reads as a slip for means of purchase, and the lesson says the reading is its own.
    - Misconception: in a crisis capital is scarce.
    - Worked: the same commodities and prices need £0 of cash while the chain holds and £100 once it breaks: what is scarce is money as means of payment, not capital.
 
 9. **the-medium-of-circulation-in-the-credit-system** — The Medium of Circulation in the Credit System — *Chapter 33*
-   - Read: "only the requirements of business itself exert an influence on the quantity of circulating money-notes" (Kerr wording to be checked).
+   - Read: Kerr l. 4579, "Hence only the requirements of business itself exert an influence on the quantity of circulating money—notes and gold."
    - Do: compute the notes the circulation needs and what happens to an over-issue.
-   - Lab: `money`, view `circulate`. Presets: `needs`, `over-issue` (`issue` £200 against needs of £150), `crisis-demand`. Pin `moNeeded`, `moReturned`.
+   - Lab: `money`, view `bank-act` (not `circulate`: only `bank-act` has `issue` and `moReturned`; its cap is set high enough never to bind). Presets: `needs` (£600 of goods at velocity 4: £150 needed, £150 issued), `over-issue` (`issue` £200: £50 flows back), `crisis-demand` (velocity 2, Wright's "twice as much currency": £300). Pin `moNeeded`, `moReturned`.
    - Misconception (the Currency School's view, stated at strength: Overstone held that note issue determines the circulation and through it prices): the bank decides how much money circulates.
    - Worked: issue £200 of notes where circulation needs £150 and £50 flows back as deposits or repayments.
 
 10. **the-currency-principle-and-the-bank-act** — The Currency Principle and the Bank Act of 1844 — *Chapter 34*
-    - Read: Overstone's currency principle and the suspension of the Act in 1847 and 1857.
+    - Read: Kerr l. 4839, Engels' sentence on the mechanism ("For every five pounds in gold..."); most of Chapter 34 is Engels' brackets round a quotation from the Contribution of 1859, and the lesson says so.
     - Do: compute the note issue the 1844 Act allowed against gold, and the gap in a drain when the circulation's needs do not fall.
-    - Lab: `money`, view `bank-act`. Presets: `normal`, `drain` (gold leaves), `suspension`. Pin `moCap`, `moGap`.
+    - Lab: `money`, view `bank-act`. Presets in pounds, Marx's figures from Chapter 29 (l. 4159): `normal` (14m fixed + 14m gold: cap £28m, 20m out), `drain` (6m of gold exported: cap £22m), `panic` (demand 24m, Gurney's 4m hoarded: £2m unmet), `suspension` (fixed issue raised by 2m, illustrative: gap £0). Pin `moCap`, `moGap`. Hubbard's first table (Kerr p. 646) supplies two rows.
     - Misconception (Overstone and the Currency School at strength: a mixed currency should behave exactly as a metallic one would): tying notes to gold stabilises the circulation. Marx sides with Tooke and Fullarton, and the lesson presents it as his reply.
-    - Worked: a fixed fiduciary issue plus gold reserve caps notes; a £5m drain cuts the cap by £5m when the demand for means of payment is rising.
+    - Worked: 14 + 14 = 28; a 6m drain cuts the cap to 22 and the banking reserve from 8 to 2; a panic demand of 24 leaves 2 unmet.
 
 11. **precious-metal-and-the-rate-of-exchange** — Precious Metal and the Rate of Exchange — *Chapter 35*
-    - Read: §2, "the rate of exchange… the barometer for the international movement of the money metals".
+    - Read: Kerr l. 5018, "The barometer for the international movement of the money metals is the rate of exchange." This is Engels' bracket, not Marx; the lesson says so.
     - Do: compute the net balance and the bullion shipped when exchanges move past the gold points.
-    - Lab: `money`, view `world`. Presets: `balanced`, `india-drain`, `harvest-failure`. Pin `moDrain`.
+    - Lab: `money`, view `world`. Presets: `balanced` (imports 8m, exports 6m, other receipts 2m: £0), `harvest-failure` (imports 9m: £1m out), `india` (Newmarch's 1855 figures, l. 5042-5044: imports from India 12,670,000, exports 10,350,000, India House drafts 3,700,000: £1,380,000 in). Pin `moDrain`.
     - Misconception: a gold outflow means the country is getting poorer.
-    - Worked: £8m of imports against £6m of exports and £1m of other receipts leaves £1m to be paid in gold.
+    - Worked: £9m of imports against £6m of exports and £2m of other receipts leaves £1m to be paid in gold (the harvest-failure preset).
 
 12. **pre-capitalist-relationships** — Pre-Capitalist Relationships — *Chapter 36*
-    - Read: usurer's capital that "undermines and ruins small-peasant and small-burgher production" (Kerr wording to be checked).
+    - Read: Kerr l. 5206, "it undermines and ruins small peasants' and small burghers' production".
     - Do: compute a small producer's debt year by year when the usurer's interest exceeds the surplus, and the year the debt exceeds the holding.
-    - Lab: `interest`, view `usury`. Presets: `peasant` (illustrative: surplus 10 a year, debt 50 at 30%, holding worth 100), `artisan`, `lord` (a spendthrift landlord). Pin `inYearsToRuin`.
+    - Lab: `interest`, view `usury`. Presets (in £): `peasant` (surplus 10 a year, debt 50 at 30%, holding 100: year 6), `artisan` (20 at 20%, surplus 10: repaid in year 3), `leipzig` (the peasant at Luther's 40%: year 4), `lord` (1,000 at 10%, 50 to spare, estate 2,000: year 12). Pin `inInterest`, `inYearsToRuin`.
     - Misconception: usury is high interest on loans for production.
     - Worked: 15 of interest against a surplus of 10 adds 5 in the first year and more each year after, because the unpaid interest itself bears interest; the lab prints the year the debt passes 100.
 

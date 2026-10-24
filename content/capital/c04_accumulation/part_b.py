@@ -53,8 +53,8 @@ LESSONS = [
         "read_title": "Marx at his most sardonic",
         "read_intro": (
             "The passage comes from the third section, after the story of the Manchester "
-            "manufacturers. It is the chapter's summary in one line, and a joke at the "
-            "expense of the economists who preached it."
+            "manufacturers. It is the chapter's summary in one line, a parody of the "
+            "economists who preached it and, in the same breath, a tribute to their candour."
         ),
         "body": [
             ("p", "<strong>Volume I, Chapter 24, §3.</strong> &ldquo;Accumulate, "
@@ -66,8 +66,11 @@ LESSONS = [
                   "expressed the historical mission of the bourgeoisie, and did not for a "
                   "single instant deceive itself over the birth-throes of wealth.&rdquo;"),
             ("p", "&ldquo;Moses and the prophets&rdquo; is scripture: the whole of the law. "
-                  "Marx is mocking the economists who made accumulation a commandment, and "
-                  "the line he quotes inside his own comes from Adam Smith. To see what the "
+                  "Marx is parodying the economists who made accumulation a commandment, and "
+                  "the line he quotes inside his own comes from Adam Smith. But the parody "
+                  "is also a tribute: the formula, he says, expressed the historical mission "
+                  "of the bourgeoisie, and classical economy took that mission &ldquo;in "
+                  "bitter earnest&rdquo;, without deceiving itself about what it cost. To see what the "
                   "commandment asks, go back to the start of the chapter, where Marx sets up "
                   "a spinner. He advances £10,000, four fifths of it, £8,000, in cotton and "
                   "machinery and one fifth, £2,000, in wages. At a rate of surplus value of "
@@ -93,11 +96,11 @@ LESSONS = [
                   "adds the share of it you choose. In the marx preset, with all of it added, "
                   "the capital is £12,000 after the first year, and the original £10,000 is "
                   "`5/6` of it; the other sixth is capitalised surplus value. After five "
-                  "years the capital is £24,883 4s and the original advance is about 40% of "
-                  "it. Marx says that as production goes on the capital first advanced "
+                  "years the capital is £24,883 4s, which the tile prints as £124,416/5, "
+                  "and the original advance is about 40% of it. Marx says that as production goes on the capital first advanced "
                   "becomes a vanishing quantity, <em>magnitudo evanescens</em>, beside the "
                   "capital accumulated. The half preset capitalises half and ends at £16,105 "
-                  "2s, of which the original is 62.09%; the consume-all preset is simple "
+                  "2s, £161,051/10 on the tile, of which the original is 62.09%; the consume-all preset is simple "
                   "reproduction again, and the capital stays at £10,000."),
             ("p", "Where did the first £10,000 come from? &ldquo;By his own labour and that "
                   "of his forefathers,&rdquo; the economists answer, and Marx lets it stand "
@@ -120,8 +123,8 @@ LESSONS = [
                   "consumption is a robbery from accumulation. As a man, he wants to enjoy "
                   "himself, and Marx gives him Faust's two souls. His witness is Dr Aikin's "
                   "history of Manchester from 1795: manufacturers who once lived like misers, "
-                  "then got rich, then began to build brick houses, and by 1758 one of them "
-                  "was seen with a carriage of his own."),
+                  "then got rich, then began to build brick houses; and not until 1758, an "
+                  "epoch, Marx notes, was a man in business seen with a carriage of his own."),
             ("p", "Then comes Nassau Senior, the Oxford professor of the last hour, who a "
                   "year before that discovery had announced another. &ldquo;I "
                   "substitute,&rdquo; Marx quotes him, &ldquo;for the word capital, "
@@ -130,16 +133,18 @@ LESSONS = [
                   "sown, that is the capitalist's abstinence; if the wine is left to mature, "
                   "that too is the capitalist's abstinence."),
             ("p", "The idea outlived the ridicule, and it deserves its strongest form. Alfred "
-                  "Marshall kept it under a better name, &lsquo;waiting&rsquo;, in his "
+                  "Marshall kept it under a name he thought less misleading, "
+                  "&lsquo;waiting&rsquo;, in his "
                   "<em>Principles</em> of 1890, and Eugen von Böhm-Bawerk in 1889 and Irving "
                   "Fisher in 1907 built theories of interest on the "
                   "observation that people value present goods above future ones. On that "
                   "view, a capitalist who invests instead of spending gives up something "
                   "real, present consumption, and interest is the price of getting him to "
-                  "do it. Marx's reply works at the level of the class: the means of "
+                  "do it. Marx died before any of them wrote. What his chapter says against "
+                  "Senior bears on their version at the level of the class: the means of "
                   "production must be used, not eaten, if production is to go on at all, "
-                  "and the capitalist's consumption grows with his accumulation rather than "
-                  "being sacrificed to it. The two accounts do not disagree about the "
+                  "and the capitalist's expenditure &ldquo;grows with his accumulation, "
+                  "without the one necessarily restricting the other&rdquo;. The two accounts do not disagree about the "
                   "arithmetic below; they disagree about what it rewards."),
             ("p", "The fourth section lists what determines the amount accumulated besides "
                   "the split. If 80 per cent is capitalised, the accumulation is £2,400 or "
@@ -255,13 +260,17 @@ LESSONS = [
         ],
         "mistakes": [
             ("Calling accumulation the capitalist's abstinence from consumption",
-             "The half preset consumes £1,000 of the first year's surplus value and still "
-             "adds £1,000 to capital; in the consume-all preset the capitalist eats £2,000 a "
-             "year and keeps a £10,000 capital. What is added is in either case surplus "
-             "value, and after five periods of the marx preset nearly three fifths of the "
-             "capital was never anybody's to abstain from: it is capitalised unpaid labour, on "
-             "Marx's definitions. Waiting may be a real cost to a person, as Marshall said; "
-             "it is not what the capital consists of."),
+             "Senior's claim is that what is added to capital is what the capitalist "
+             "refrains from eating, and the half preset agrees so far: £1,000 of the first "
+             "year's surplus value is consumed and £1,000 added. What the tiles add is "
+             "Marx's point about the source. Every pound added in any preset is surplus "
+             "value, so after five periods of the marx preset about three fifths of the "
+             "capital is capitalised surplus value, on Marx's definitions. And the chapter's "
+             "answer to Senior is not that nothing is given up but that, as capital grows, the "
+             "capitalist's expenditure &ldquo;grows with his accumulation, without the one "
+             "necessarily restricting the other&rdquo;. Whether forgone consumption earns a "
+             "reward is what Senior's successors and Marx dispute; the arithmetic is common "
+             "to both."),
             ("Treating all capitalised surplus value as wages",
              "Smith and Ricardo held that what is added to capital is consumed by "
              "productive labourers. Marx's spinner lays out £1,600 of the £2,000 in means "
@@ -505,7 +514,7 @@ LESSONS = [
              "why": "Demand is 256, 320 and 400 in the first three periods; supply is 300, "
                     "340 and 380. In period 2, 320 is still below 340; in period 3, 400 is "
                     "above 380."},
-            {"q": "Marx says that &ldquo;to put it mathematically&rdquo; one of the two "
+            {"q": "Putting the relation &ldquo;mathematically&rdquo;, Marx says one of two "
                   "rates is the independent variable. Which?",
              "a": ["The rate of wages",
                    "The rate of accumulation",
@@ -536,8 +545,9 @@ LESSONS = [
             ("Making the working population the independent variable",
              "The economists Marx answers explain wages by population: high wages make the "
              "poor multiply until wages fall. Marx reverses the arrow. In the lab the "
-             "supply is the same in all three presets until it is changed by hand, and the "
-             "wage rises only when accumulation outruns it."),
+             "supply is an input: it grows by a fixed number each period whatever the wage "
+             "does, and the wage rises only when accumulation outruns it, as in the tight "
+             "and wage-rise presets."),
             ("Confusing the value composition with the technical composition",
              "The technical composition is a ratio of masses, means of production to "
              "labour; the value composition is a ratio of values, c to v. They move "
@@ -782,7 +792,7 @@ LESSONS = [
              "a": ["1,200", "400", "300", "600"],
              "c": 2,
              "why": "The variable capital is £12,000 / 4 = £3,000, which employs 300. Divide "
-                    "by 3 instead of 4 and you get 400; 600 is the variable capital at 1:1, "
+                    "by 3 instead of 4 and you get 400; 600 is the employment at 1:1, "
                     "and 1,200 divides the whole capital by the wage."},
             {"q": "In Marx's §2 example, £6,000 at half and half grows to £18,000 at four "
                   "fifths and one fifth. What is the variable capital now?",
@@ -891,8 +901,8 @@ LESSONS = [
         "read_title": "The law in its strongest words",
         "read_intro": (
             "The passage comes near the end of §4, after the forms of the surplus "
-            "population have been described and the law stated. It is the sentence most "
-            "quoted from the whole of Volume I, and most argued over."
+            "population have been described and the law stated. It is among the most "
+            "quoted sentences of Volume I, and among the most argued over."
         ),
         "body": [
             ("p", "<strong>Volume I, Chapter 25, §4.</strong> &ldquo;It follows therefore "
@@ -923,9 +933,9 @@ LESSONS = [
                   "and it is characterised &ldquo;by maximum of working time, and minimum "
                   "of wages.&rdquo; It is the domestic industry of Chapter 15, recruited from "
                   "trades where handicraft is giving way to manufacture and manufacture to "
-                  "machinery. Below all three lies pauperism, &ldquo;the lowest sediment of "
-                  "the relative surplus-population&rdquo;: those able to work, whose numbers "
-                  "rise with every crisis; orphans and pauper children, enrolled in the "
+                  "machinery. Below all three: &ldquo;The lowest sediment of the relative "
+                  "surplus-population finally dwells in the sphere of pauperism.&rdquo; Its "
+                  "layers are those able to work, whose numbers rise with every crisis; orphans and pauper children, enrolled in the "
                   "active army in good years like 1860; and the demoralised, the old, the "
                   "maimed and the widowed. &ldquo;Pauperism is the hospital of the active "
                   "labour-army and the dead weight of the industrial reserve-army.&rdquo;"),
@@ -940,23 +950,27 @@ LESSONS = [
                   "larger that layer and the reserve, the greater official pauperism. The lab "
                   "can compute the middle term, the reserve as a ratio of those employed, and "
                   "that is all it computes."),
-            ("p", "Its presets run the law view for five periods from £6,000 at a "
-                  "composition of 1:1 and a wage of £10. In the boom the rate of surplus "
+            ("p", "Its presets run the law view for five periods at a starting composition "
+                  "of 1:1, a wage of £10 and 300 workers available. The boom and the long "
+                  "run start from £6,000. In the boom the rate of surplus "
                   "value is 200%, all of it is capitalised, the composition rises by 1 a "
                   "period, and the wage is set to rise by 10s a period, from £10 to £12. For "
                   "four periods capital wants every worker there is: in periods 2 and 3 it "
                   "wants more than the supply, and the lab's rule pushes the wage paid above "
-                  "the set path, to about £11 9s and £11 11s, before it returns to the path "
-                  "at £11 10s in period 4. Only in period 5 does the supply, growing by 50 a "
+                  "the set path, to £80/7 and £185/16 in the table, about £11 9s and £11 "
+                  "11s, before it returns to the path at £23/2, £11 10s, in period 4. Only in "
+                  "period 5 does the supply, growing by 50 a "
                   "period, outrun the 475 employed, and the ratio of reserve to employed goes "
                   "from 0 to `1/19`. Between the first period and the last, the wage and the "
-                  "reserve both rose. In the slump nothing is capitalised and "
-                  "the composition creeps up by a half each period, so the same capital "
-                  "employs 150 by the fifth period, and the ratio is `9/5`. In the long run "
+                  "reserve both rose. The slump starts from a smaller capital, £4,200, which "
+                  "employs 210 of the 300 at once. Nothing is capitalised and the "
+                  "composition creeps up by a half each period, so the same capital employs "
+                  "168, 140, 120 and then 105 workers while the supply grows by 30, and the "
+                  "ratio climbs from `3/7` to 3. In the long run "
                   "Marx's ratios carry employment flat at 300 while the reserve reaches 120, "
                   "a ratio of `2/5`; slide the periods to 10 and it reaches `9/10`."),
-            ("p", "Now the passage. &ldquo;Be his payment high or low&rdquo; is the phrase to "
-                  "hold on to: Marx is not saying the worker's pay must fall. He is saying "
+            ("p", "Now the passage. The phrase to hold on to is &ldquo;be his payment high "
+                  "or low&rdquo;: Marx is not saying the worker's pay must fall. He is saying "
                   "the worker's position worsens in proportion as capital accumulates, "
                   "whatever happens to pay, because the methods of raising productivity "
                   "turn into means of domination: they mutilate the labourer into a fragment "
@@ -1009,10 +1023,10 @@ LESSONS = [
                  "capital": 6000, "c_v": 1, "s_rate": 2, "accumulate_share": 1,
                  "composition_rise": 1, "labour_supply": 300, "supply_growth": 50,
                  "wage_per_worker": 10, "wage_growth": "1/2", "expect": {"acRatio": "1/19 = 5.26%", "acReserve": "25", "acDemand": "475"}},
-                {"id": "slump", "label": "Slump: nothing capitalised, c/v creeps up by 1/2",
-                 "capital": 6000, "c_v": 1, "s_rate": 1, "accumulate_share": 0,
+                {"id": "slump", "label": "Slump: a capital of £4,200, nothing capitalised, c/v creeps up by 1/2",
+                 "capital": 4200, "c_v": 1, "s_rate": 1, "accumulate_share": 0,
                  "composition_rise": "1/2", "labour_supply": 300, "supply_growth": 30,
-                 "wage_per_worker": 10, "wage_growth": 0, "expect": {"acRatio": "9/5 = 180%", "acReserve": "270", "acDemand": "150"}},
+                 "wage_per_worker": 10, "wage_growth": 0, "expect": {"acRatio": "3 = 300%", "acReserve": "315", "acDemand": "105"}},
                 {"id": "long-run", "label": "Long run: Marx's ratios, 1:1 rising by 1 a period",
                  "capital": 6000, "c_v": 1, "s_rate": 1, "accumulate_share": 1,
                  "composition_rise": 1, "labour_supply": 300, "supply_growth": 30,
@@ -1083,9 +1097,10 @@ LESSONS = [
                    "Wages rise and the reserve disappears",
                    "Employment falls and wages stay at £10"],
              "c": 1,
-             "why": "The wage goes from £10 to £12 and the ratio from 0 to 1/19. Falling "
-                    "wages are the slump's reading of the law, not the boom's; employment "
-                    "rises from 300 to 475."},
+             "why": "The wage goes from £10 to £12 and the ratio from 0 to 1/19. No preset "
+                    "lowers the wage, since the lab never lets it fall; the reserve appears "
+                    "in period 5 rather than disappearing; and employment rises from 300 to "
+                    "475."},
             {"q": "Marx says the lot of the labourer must grow worse &ldquo;be his payment "
                   "high or low&rdquo;. Which of these does the lab compute?",
              "a": ["The worker's real wage over time",
