@@ -5,10 +5,12 @@ Quoting conventions as in part_a: every quotation is copied from
 the translator's inner double quotes printed as single curly quotes, nothing
 else changed. Misprints in the Kerr text are quoted as printed and pointed out.
 
-Chapters 33 to 35 lean heavily on the parliamentary evidence, and Chapter 34
-is mostly Engels: a long bracket of his own, wrapped round a quotation from
-Marx's Contribution to the Critique of Political Economy (1859). The opening
-passages of lessons 10 and 11 are Engels' text, and the lessons say so.
+Chapters 33 to 35 lean heavily on the parliamentary evidence; Engels made
+them up from Marx's extracts, marking his own interpolations. Chapter 34 opens
+with an Engels bracket that mostly quotes Marx's Contribution to the Critique
+of Political Economy (1859), and he adds three more brackets later, but the
+larger part of the chapter is Marx's text. The opening passages of lessons 10
+and 11 are Engels' text, and the lessons say so.
 """
 
 LESSONS = [
@@ -40,8 +42,9 @@ LESSONS = [
         ],
         "key_label": "Where loan capital comes from",
         "concepts_intro": (
-            "Marx starts by separating two things that both put money in a banker's hands, "
-            "and says only the second can go with real accumulation."
+            "Engels says this chapter was &ldquo;worked out more connectedly&rdquo; than the one "
+            "before it. Marx starts by separating two things that both put money in a banker's "
+            "hands, and says only the second can go with real accumulation."
         ),
         "concepts": [
             ("Conversion of money into loan capital",
@@ -53,12 +56,12 @@ LESSONS = [
              "invested or spent. This is the route that can go with actual accumulation."),
             ("Floating capital",
              "The money market's name for the short-term loan capital that moves back and "
-             "forth between banks and borrowers. Marx makes fun of the jargon: in it money, "
-             "bullion and debts all become capital."),
+             "forth between banks and borrowers. Marx makes fun of the jargon: in it money and "
+             "bullion are capital, and debts are commodities."),
         ],
         "read_title": "The technical routes first, then the routes through income",
         "read_intro": (
-            "The passage closes the chapter's first section, on the plain conversion of "
+            "The passage comes early in the chapter's first section, on the plain conversion of "
             "money into loan capital."
         ),
         "body": [
@@ -139,7 +142,7 @@ LESSONS = [
             ("p", "The view the chapter has in its sights is the classical one, which John "
                   "Stuart Mill put in his Principles of 1848: capital is the result of "
                   "saving. On that account a loan is always some saver's abstinence lent out, and "
-                  "the rate of interest is the price of waiting. Marx does not deny that saved "
+                  "interest is the reward of abstinence, Nassau Senior's term, which Mill adopted. Marx does not deny that saved "
                   "profit becomes loan capital; that is his second route. What the chapter adds "
                   "is the first route, in which the mass on offer grows or shrinks with no saving "
                   "at all. Later theories of the supply of loans, such as Dennis Robertson's "
@@ -305,8 +308,9 @@ LESSONS = [
         ],
         "key_label": "Borrowing to pay and borrowing to buy",
         "concepts_intro": (
-            "The chapter has two halves: the last word on where loan capital comes from, and "
-            "then what the demand for it is in each phase of the cycle."
+            "Engels found the material for this chapter &ldquo;in tolerable order&rdquo; in "
+            "the manuscript. It has two halves: the last word on where loan capital comes from, "
+            "and then what the demand for it is in each phase of the cycle."
         ),
         "concepts": [
             ("Means of payment",
@@ -341,8 +345,9 @@ LESSONS = [
                   "obligations&rdquo;, while in the recovery loan capital &ldquo;is demanded for "
                   "the purpose of buying&rdquo;. Read the second clause as <em>not a demand for "
                   "money as a means of purchase</em> and the passage says what that contrast "
-                  "says. This lesson reads it so. Marx's German has <em>Kaufmittel</em>, a means "
-                  "of purchase, so the slip is the translation's, not the manuscript's."),
+                  "says. This lesson reads it so, on the strength of that contrast. Whether the slip "
+                  "is the translator's, the printer's or the manuscript's, the English alone "
+                  "cannot say."),
             ("p", "The lab settles one chain of bills three ways. In the prosperity preset A owes "
                   "B £100, B owes C £100 and C owes A £100, every bill for goods delivered. Set "
                   "off, they cancel: cash needed £0. In the crisis preset A cannot pay B. Nothing "
@@ -583,7 +588,9 @@ LESSONS = [
         "key_label": "Notes and the needs of trade",
         "concepts_intro": (
             "The chapter applies Volume I's law of circulation to bank notes, and the evidence "
-            "is the reports of 1847 to 1858."
+            "is the reports of 1847 to 1858. Engels made up this chapter and the next two from "
+            "Marx's extracts from those reports, a section of the manuscript headed <em>The "
+            "Confusion</em> and what followed it; his own additions are in brackets."
         ),
         "concepts": [
             ("The law of circulation",
@@ -670,7 +677,8 @@ LESSONS = [
                   "behind them are, for the Bank, &ldquo;additional, even if fictitious, "
                   "capital&rdquo; that earns interest, and in a squeeze, a London banker said, "
                   "&ldquo;the Bank of England commands the rate of interest&rdquo;. It cannot "
-                  "choose how many notes circulate; it can choose what they cost."),
+                  "choose how many notes circulate; in a squeeze, at least, it can choose what "
+                  "they cost."),
             ("p", "The opposing view is the Currency School's, which the next lesson takes in "
                   "full. Overstone and his allies held that the quantity of notes is the lever "
                   "on prices: issue more and prices rise, gold leaves, and the country is drawn "
@@ -851,9 +859,9 @@ LESSONS = [
         ],
         "key_label": "The Act of 1844 in five lines",
         "concepts_intro": (
-            "Most of Chapter 34 is in Engels' hand. He supplies the theory from Marx's earlier "
-            "book and a description of the Act; Marx's own text is the evidence of the bankers "
-            "who worked under it."
+            "Chapter 34 is shared. Engels supplies the theory, mostly by quoting Marx's earlier "
+            "book, and a description of the Act, in brackets of his own; Marx's text, the larger "
+            "part, is the evidence of the bankers who worked under it, with his comments."
         ),
         "concepts": [
             ("The currency principle",
@@ -886,8 +894,10 @@ LESSONS = [
             ("p", "A word on whose chapter this is. It opens with a bracket by Engels, most of "
                   "which quotes Marx's <em>A Contribution to the Critique of Political "
                   "Economy</em> of 1859; Engels then describes the Act and its crises in a second "
-                  "bracket. Between them is Marx's manuscript: extracts from the committees of "
-                  "1848 and 1857, with his comments."),
+                  "bracket. Marx's manuscript fills the space between them and most of what "
+                  "follows: extracts from the committees of 1848 and 1857, with his comments. "
+                  "Engels adds a short bracket after the second and closes the chapter with a "
+                  "fourth."),
             ("p", "The theory, at its strongest. Ricardo had argued that a currency of gold alone "
                   "corrects itself: too much gold raises prices, gold flows abroad, and prices "
                   "fall again. The Currency School, Overstone, Torrens, Norman and others, "
@@ -954,7 +964,7 @@ LESSONS = [
                   "of gold and the relation of money to capital. The Act was suspended a third "
                   "time in 1866, after the failure of Overend, Gurney and Co., the bill brokers "
                   "whose partners Gurney and Chapman testify in these chapters. Bagehot's "
-                  "<em>Lombard Street</em>, which the last lesson met, was written in the years after it."),
+                  "<em>Lombard Street</em>, which the lesson on Chapter 32 met, was written in the years after it."),
             ("p", "The Act tied the notes to the Bank's gold, and the gold moved with the "
                   "foreign exchanges. “Precious Metal and the Rate of Exchange” follows it "
                   "abroad."),
@@ -1078,7 +1088,7 @@ LESSONS = [
              "November 1857."),
             ("Thinking the suspension worked by flooding the country with notes",
              "In 1847 no extra notes were issued at all; the promise brought hoards back. In "
-             "1857 the excess stayed under a million and lasted days. What the suspension "
+             "1857 the excess stayed under a million and was out for a very short time. What the suspension "
              "removed was the fear that notes could not be had."),
         ],
         "standard": (
@@ -1124,7 +1134,8 @@ LESSONS = [
         "concepts_intro": (
             "The chapter has four sections. Marx's notes on the gold reserve come first; the "
             "second opens with a paragraph of Engels' on the exchanges, then returns to the "
-            "evidence."
+            "evidence. Like Chapter 33, it is Engels' assembly of Marx's extracts and comments, "
+            "with Engels' additions bracketed."
         ),
         "concepts": [
             ("Rate of exchange",
@@ -1163,8 +1174,9 @@ LESSONS = [
                   "abroad. In the balanced preset a country imports £8 million, exports £6 "
                   "million and receives £2 million in interest and dividends: nothing to ship. In "
                   "the harvest-failure preset it must buy £1 million more of corn, and £1 million "
-                  "goes out in bullion. Of drains caused by crop failures Marx says only that "
-                  "they need &ldquo;no further explanation&rdquo;."),
+                  "goes out in bullion. A drain caused by a crop failure, Marx says, needs "
+                  "&ldquo;no further explanation&rdquo;; he adds only that its effects are "
+                  "greater the more production is working under high pressure when it comes."),
             ("p", "Where does the gold come from? From the Bank of England's reserve, which, "
                   "Marx says, does three jobs: a fund of world money for payments abroad, a fund "
                   "for the gold circulating at home, and a fund for paying deposits and changing "
@@ -1372,8 +1384,9 @@ LESSONS = [
         ],
         "key_label": "Usurer's capital in five lines",
         "concepts_intro": (
-            "Marx calls usurer's capital and merchant's capital twins, both far older than "
-            "capitalist production. The chapter asks what the older one did to the societies "
+            "Engels says this chapter, unlike the ones before it, was &ldquo;fully "
+            "elaborated&rdquo; in the manuscript. Marx calls usurer's capital and merchant's "
+            "capital twins, both far older than capitalist production. The chapter asks what the older one did to the societies "
             "it lived in."
         ),
         "concepts": [
@@ -1460,7 +1473,7 @@ LESSONS = [
                   "trade could flourish. What changed was the borrower: credit is now given to a "
                   "man &ldquo;in his capacity as a potential capitalist&rdquo;, expected to make "
                   "a profit out of others' labour."),
-            ("p", "The chapter, and Part V, ends on the banking system's double character. By "
+            ("p", "Near its end the chapter turns to the banking system's double character. By "
                   "putting all society's idle capital at the disposal of industry, it &ldquo;does "
                   "away with the private character of capital and implies in itself, to that "
                   "extent, the abolition of capital&rdquo;; and it is &ldquo;one of the most potent "
@@ -1480,7 +1493,8 @@ LESSONS = [
                   "lab's line between interest that the surplus covers and interest that it does "
                   "not. Which side of that line a given borrower stands on is not a question the "
                   "chapter can answer."),
-            ("p", "That ends Part V and this course. Marx's last remark in the chapter is that "
+            ("p", "That ends Part V and this course. Close to the end of his argument, before "
+                  "the notes on usury in earlier times that close the chapter, Marx remarks that "
                   "&ldquo;land, like capital, is loaned only to capitalists&rdquo;, and land is "
                   "where Volume III goes next. Ground Rent asks how a share of surplus value "
                   "reaches the owners of the soil."),

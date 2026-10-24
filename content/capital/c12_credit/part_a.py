@@ -142,9 +142,10 @@ LESSONS = [
                   "circle needed none: A owes B twice, once for cotton and once for nothing."),
             ("p", "Engels, in a long bracketed passage, tells what this came to in 1845 to 1847. "
                   "Goods were shipped to India and China not to be sold but so that bills could be "
-                  "drawn against them and discounted, and the bills were renewed when they fell "
-                  "due; railway shares were bought on credit by firms that then borrowed to carry "
-                  "on their own trade. A Liverpool banker told the Lords' committee that he could "
+                  "drawn against them and discounted; firms put their capital into railway shares "
+                  "and then borrowed to carry on their own trade. The extracts Marx gathered after "
+                  "the bracket fill in the detail: a Manchester newspaper of 1848 reports that the "
+                  "drafts were commonly renewed when they fell due, and a Liverpool banker told the Lords' committee that he could "
                   "not tell by looking at a bill &ldquo;whether it represents products or "
                   "wind&rdquo;. Marx's dry contribution is a line from the banker James Gilbart, "
                   "who had written in 1834 that &ldquo;The cheapness of capital promotes "
@@ -260,13 +261,13 @@ LESSONS = [
              "why": "Each firm receives £50 and pays £50, so every net balance is zero. Two hundred "
                     "pounds is the gross sum of the bills, which would be needed only if each were "
                     "paid separately in cash with nothing passed on."},
-            {"q": "In the same circle, C sells its bill on D to a bank before it falls due, so D "
+            {"q": "In the same circle, A sells its bill on D to a bank before it falls due, so D "
                   "pays the bank. How much cash does the settlement need?",
              "a": ["£0", "£50", "£100", "£200"],
              "c": 1,
-             "why": "C now pays D £50 with nothing coming in, and the bank receives £50 from D: "
+             "why": "A now pays B £50 with nothing coming in, and the bank receives £50 from D: "
                     "the positive balances come to £50. The circle no longer closes among the "
-                    "firms, so it cannot be £0; £100 counts both the bank's receipt and C's "
+                    "firms, so it cannot be £0; £100 counts both the bank's receipt and A's "
                     "payment as cash needed."},
             {"q": "On the account Engels gives in Part V, what happens when a bank discounts a "
                   "bill for a merchant?",
@@ -405,7 +406,7 @@ LESSONS = [
                   "top of the examiner's question, &ldquo;from 2% to 7 or 8%&rdquo;: £8 to the lender, "
                   "£2 left. In the crisis preset it is 10%, where the Bank's rate peaked in November "
                   "1847, and profit of enterprise is £0. The rate of profit never moved."),
-            ("p", "This is not hypothetical. Tooke told the Lords' committee that in the "
+            ("p", "This is not hypothetical. Tooke told a committee of Parliament that in the "
                   "Warwickshire and Staffordshire metal trades &ldquo;very many orders were rejected "
                   "in 1847, because the rate of interest, which the manufacturer had to pay for "
                   "discounting his bills of exchange, would have more than swallowed his entire "
@@ -425,13 +426,14 @@ LESSONS = [
                   "forms fell.&rdquo; Money capital grew dear because commodity capital could not "
                   "be turned into money."),
             ("p", "The other banker, George Warde Norman, a director of the Bank of England, "
-                  "offers the chapter's most quoted exchange. Interest, he argued, is the price "
-                  "of commodities used in production, so that &ldquo;There would be interest even "
+                  "offers the chapter's most quoted exchange. The rate of interest, he argued, is "
+                  "set by the supply of and demand for capital, and capital is &ldquo;All "
+                  "commodities used in production.&rdquo; So &ldquo;There would be interest even "
                   "if no money existed.&rdquo; Marx answers him flatly: &ldquo;If there were no "
                   "money at all, there would certainly be no general rate of interest.&rdquo; A "
                   "single rate of interest for borrowers in every trade, whatever the state of "
-                  "the cotton or the iron market, is a price of money capital, set in the money "
-                  "market, and the chapter's point is that it moves on its own."),
+                  "the cotton or the iron market, is a price of money capital, set by the supply of and "
+                  "demand for money capital, which need not follow the market for cotton or iron."),
             ("p", "Marx is at his most sarcastic in this chapter, and he lets the committee's examiners make "
                   "his jokes. Disraeli asks a director of the Bank what its dividend was in 1844: "
                   "7%. And in 1847, the year of the crisis? &ldquo;Nine per cent.&rdquo; Overstone, "
@@ -578,8 +580,9 @@ LESSONS = [
         ),
         "note": (
             "The lab holds the rate of profit fixed so that only the division moves. In 1847 the "
-            "rate of profit fell as well, which Marx says made the rise in interest harder to "
-            "bear; the lab does not model a falling profit. The 10% rate of profit is "
+            "rate of profit fell as well: the interest rose, Marx writes, &ldquo;because the "
+            "profits decreased and the money-values of commodities fell enormously&rdquo;. The "
+            "lab does not model a falling profit. The 10% rate of profit is "
             "illustrative; the 3% and 10% are the two ends of the Bank of England's rate as the "
             "chapter lists it month by month for 1847, 3 to 3½% in January and 7 to 10% in "
             "November."
@@ -685,10 +688,10 @@ LESSONS = [
                   "since: cartels fixing output, and then trusts. His example is the United Alkali "
                   "Trust, which brought more than thirty works under one management, with shares of "
                   "about £5 million given to the former owners and £1 million of working capital "
-                  "raised from the public. Marx also notes, in passing, a point the course on the "
-                  "falling rate of profit could use: a company that pays only interest can go on "
-                  "operating, so such firms &ldquo;do not necessarily come under the regulation of "
-                  "the average rate of profit&rdquo;."),
+                  "raised from the public. Marx also notes, in passing, that a company that pays only "
+                  "interest can go on operating, so such firms &ldquo;do not necessarily come under the regulation of "
+                  "the average rate of profit&rdquo;, and he says outright that this &ldquo;is one of "
+                  "the causes, which stem the fall of the rate of profit&rdquo;."),
             ("p", "The standard objection came in 1932, when Adolf Berle and Gardiner Means "
                   "showed how widely ownership and control had separated in American corporations "
                   "and argued the opposite moral: that managers, unchecked by scattered owners, "
@@ -847,7 +850,7 @@ LESSONS = [
         "module": "Chapter 28 · The Medium of Circulation (Currency) and Capital. Tooke's and Fullarton's Conception",
         "one_line": "Money spent from wages and money paid between capitalists are the same notes and obey the same law; how many are needed depends on prices and velocity, not on whether they are capital.",
         "summary": (
-            "Thomas Tooke and John Fullarton, the best critics of the Bank Act, drew a line "
+            "Thomas Tooke and John Fullarton, the leading critics of the Bank Act, drew a line "
             "between currency, the notes in the public's pockets, and capital, the funds bankers "
             "lend. Marx says the line is drawn in the wrong place. Sort payments into the "
             "circulation of revenue and the transfer of capital, compute the notes each needs at "
@@ -862,7 +865,9 @@ LESSONS = [
         ],
         "key_label": "Currency and capital",
         "concepts_intro": (
-            "Engels says this chapter had to be rearranged in places but is Marx's throughout. It "
+            "Engels says this chapter had to be rearranged in places; apart from a bracketed "
+            "passage of his on the forms a bank loan can take and a one-line gloss on a drain "
+            "of gold, the text is Marx's. It "
             "is an argument with allies: Tooke and Fullarton were right against the Currency "
             "School, and Marx thinks they were right for a confused reason."
         ),
@@ -896,8 +901,10 @@ LESSONS = [
                   "return of his capital, for the manufacturer capital advanced. Marx's example is the "
                   "same note: &ldquo;the same price of money, for instance a five pound note, "
                   "passes from one sphere to the other and performs alternately both "
-                  "functions&rdquo;. (The word &ldquo;price&rdquo; there is a misprint in the Kerr text "
-                  "for &ldquo;piece&rdquo;: Marx's German is <em>Geldstück</em>, a piece of money.)"),
+                  "functions&rdquo;. (The word &ldquo;price&rdquo; makes no sense there: what passes "
+                  "from one sphere to the other is a single note, and earlier in the same "
+                  "chapter Marx speaks of &ldquo;pieces of individual coin&rdquo;. It reads as a slip, "
+                  "most likely for &ldquo;piece&rdquo;.)"),
             ("p", "Who were Tooke and Fullarton? Thomas Tooke, a Russia merchant turned historian "
                   "of prices, and John Fullarton, a banker who had worked in India, led the "
                   "<em>Banking School</em> against Overstone's Currency School in the 1840s. "
@@ -1067,7 +1074,8 @@ LESSONS = [
              "a": ["£150", "£50", "£200", "£1,500"],
              "c": 0,
              "why": "From `2000/10 = 200` to `2000/40 = 50`, a fall of 150. Fifty is the new need, "
-                    "200 the old one, and 1,500 subtracts the velocities from the payments."},
+                    "200 the old one, and 1,500 applies the fall to the £2,000 of payments "
+                    "instead of to the notes."},
         ],
         "mistakes": [
             ("Thinking the quantity of notes measures the quantity of capital",
@@ -1093,7 +1101,7 @@ LESSONS = [
         ),
         "note": (
             "The lab divides a period's payments by one velocity. Marx's law also subtracts "
-            "payments that cancel, which the lesson on the next chapter's bills returns to; and in "
+            "payments that cancel, which the lessons on Chapters 25 and 32 return to; and in "
             "fact the two circulations have different velocities, which the lab shows only by "
             "running them as separate presets. The wages and payments are illustrative."
         ),
@@ -1134,7 +1142,9 @@ LESSONS = [
              "dividing the income by the going rate of interest."),
             ("Fictitious capital",
              "The capital-value so computed, where no capital of that amount exists: a state debt "
-             "whose principal was spent long ago, or the price of a share above what was invested."),
+             "whose principal was spent long ago, or a share, whose paper price is a second "
+             "capital-value beside the real capital the company works. Even where the paper stands "
+             "for real capital, Marx says its capital-value is &ldquo;wholly illusory&rdquo;."),
             ("A bank's capital",
              "Cash, bills of exchange and interest-bearing papers, most of it other people's "
              "deposits. Marx calls the greater part of it &ldquo;purely fictitious&rdquo;."),
@@ -1282,7 +1292,7 @@ LESSONS = [
              "a": ["£180", "£500", "£300", "£1,800"],
              "c": 1,
              "why": "`30 / (6/100) = 500`. One hundred and eighty multiplies instead of dividing; "
-                    "£300 and £1,800 misplace the rate by a factor of ten."},
+                    "£300 is ten years' income and £1,800 sixty years'."},
             {"q": "The rate of interest falls from 5% to 4% and the bond's income does not change. "
                   "What happens to the price of a bond paying £20 a year?",
              "a": ["It falls from £400 to £320",
@@ -1358,8 +1368,8 @@ LESSONS = [
             "Chapter 30 asks whether a growing mass of loanable money capital shows that real "
             "capital is being accumulated, and answers that it often shows the reverse. Using "
             "Volume II's scheme of expanded reproduction, compute the surplus product left unsold "
-            "when more of the capitalists who accumulate hoard money than spend it, and the money "
-            "that piles up in the banks while production stands still."
+            "when more of the capitalists who accumulate hoard money than spend it, and see why "
+            "the money that would have bought it lies in the banks while production stands still."
         ),
         "key": [
             "real capital: means of production, goods",
@@ -1422,16 +1432,18 @@ LESSONS = [
             ("p", "In the balanced preset half the accumulating capitalists hoard and half invest: "
                   "250 of surplus product sold, 250 bought, gap 0. In the stagnant preset all of "
                   "them hoard and none invests, the state just after a crisis: they sell 500 and buy "
-                  "nothing, and the lab prints +500, 500 of surplus product unsold. That 500 has not "
-                  "vanished. It is money in the sellers' hands, and in a developed credit system it "
-                  "sits in a bank as a deposit, loanable capital that grew by 500 while not one "
-                  "spindle was added. In the boom preset only a quarter hoard, and investors want "
+                  "nothing, and the lab prints +500, 500 of surplus product unsold. That 500 is "
+                  "commodity capital that cannot complete its round: the sellers do not have the "
+                  "money for it, because nobody bought it. The money that would have bought it, "
+                  "the hoards the investors built up in earlier years, is not spent either. In a "
+                  "developed credit system it sits in the banks as deposits, loanable capital "
+                  "lying fallow while not one spindle is added. In the boom preset only a quarter hoard, and investors want "
                   "250 more than is offered: the lab prints −250, demand without a product."),
             ("p", "So a pile of deposits can mean two opposite things. Marx's reading of the cycle "
                   "is that the movements of loan capital &ldquo;tend in a direction opposite to that "
                   "of industrial capital&rdquo;. A low rate of interest coincides with contraction "
                   "at the start of the cycle and a high rate with a glut of industrial capital at "
-                  "the end. Only in the recovery and the middle of prosperity are cheap loan capital "
+                  "the end. Only in the recovery and the middle of prosperity are abundant loan capital "
                   "and expanding production found together."),
             ("p", "The second question gets an answer in the same chapter, though the next lessons "
                   "work it out. In the crash, when credit stops, commodities are unsold and "
@@ -1482,8 +1494,8 @@ LESSONS = [
                 "Department I's c, v and s, the share of s it accumulates and the share of the "
                 "accumulators who hoard this year go in. Hoarders sell their surplus product and buy "
                 "nothing; investors buy with money hoarded before. The tile is hoarders' sales less "
-                "investors' purchases; a positive gap is surplus product unsold and the same sum "
-                "held as money."
+                "investors' purchases; a positive gap is surplus product unsold, and a negative one "
+                "is investors' money with no product to buy."
             ),
         }),
         "steps_title": "Finding the unsold surplus product",
@@ -1497,9 +1509,10 @@ LESSONS = [
             ("Subtract",
              "The gap is the hoarders' sales less the investors' purchases. Positive, product is "
              "unsold; negative, investors want more than is offered."),
-            ("Read the gap as money",
-             "An unsold product is the same sum held as money by the sellers. Deposited, it is "
-             "loanable capital that grew with no real accumulation."),
+            ("Read the gap both ways",
+             "A positive gap is commodity capital that cannot be turned into money. The hoards "
+             "that would have bought it stay in the banks as loanable capital, while real "
+             "accumulation stands still."),
         ],
         "worked": {
             "title": "Department I, before and after a crisis",
@@ -1511,12 +1524,13 @@ LESSONS = [
                 "to accumulate:  1000 · 1/2 = 500",
                 "half hoard:  sales 250,  purchases 250,  gap 0",
                 "all hoard:  sales 500,  purchases 0",
-                "gap:  +500 unsold;  500 held as money",
+                "gap:  +500 unsold;  the investors' hoards unspent",
             ],
             "after": [
-                "In the second year 500 of money has gone into the banks and nothing has gone into "
-                "production. Measured by deposits, capital has grown by 500; measured by means of "
-                "production, it has not grown at all.",
+                "In the second year 500 of product lies unsold, and the money that would have "
+                "bought it stays in the banks. Measured by the money offered for loan, capital "
+                "looks plentiful; measured by means of production put to work, nothing has been "
+                "added.",
             ],
         },
         "quiz_title": "Loanable capital and actual accumulation",
@@ -1548,8 +1562,9 @@ LESSONS = [
              "c": 1,
              "why": "&ldquo;Not every augmentation of loanable capital indicates a real "
                     "accumulation&rdquo;. With nothing built the rise cannot be real capital; more "
-                    "money offered for loan tends to lower the rate, not raise it; and deposits of "
-                    "money are not the same as the fictitious capital of securities."},
+                    "money offered for loan tends to lower the rate, not raise it; and although "
+                    "Chapter 29 calls most deposits fictitious, nothing in the chapter says these "
+                    "will vanish."},
             {"q": "Why, after the crisis of 1847, was the rate of interest low, according to the "
                   "banker Marx quotes?",
              "a": ["Because the Bank of England printed more notes",
@@ -1564,13 +1579,13 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking a pile of bank deposits means plenty of real capital",
-             "In the stagnant preset Department I sells 500 of surplus product and buys none: +500 "
-             "of product is unsold, and the same 500 sits in the banks as money. Loanable capital "
-             "grew by 500 while real accumulation was nothing. Marx's evidence is 1847: production "
+             "In the stagnant preset Department I offers 500 of surplus product and buys none: +500 "
+             "of product is unsold, and the hoards that would have bought it sit in the banks. "
+             "Loanable capital lies fallow while real accumulation is nothing. Marx's evidence is 1847: production "
              "down a third and &ldquo;a great super-abundance of money&rdquo;."),
             ("Reading a low rate of interest as a sign of good times",
              "A low rate comes both in the slump after a crisis and in the early recovery. Marx "
-             "says only the recovery and mid-prosperity combine cheap loans with expanding "
+             "says only the recovery and mid-prosperity combine abundant loan capital with expanding "
              "production; just after a crisis the low rate shows industrial capital &ldquo;laid "
              "lame&rdquo;."),
             ("Taking the sentence on the masses' consumption as the chapter's settled theory of crisis",
@@ -1587,8 +1602,8 @@ LESSONS = [
         "note": (
             "The lab reuses Volume II's scheme, whose 4,000c + 1,000v + 1,000s are Marx's figures "
             "there; Chapter 30 gives no scheme, and the shares of hoarders are illustrative. It "
-            "treats every unsold product as money deposited, which ignores the money that stays in "
-            "pockets as a hoard, and it follows one department for one year."
+            "computes the unsold product only; it does not track the deposits, or the money "
+            "that stays in pockets as a hoard, and it follows one department for one year."
         ),
     },
 ]

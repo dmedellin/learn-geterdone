@@ -318,7 +318,7 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 3. **the-form-of-value** — The Form of Value — *Chapter 1 · Commodities*
    - Read: §3, "20 yards of linen = 1 coat, or: 20 yards of linen are worth 1 coat".
    - Do: write the elementary, expanded, general and money forms for a set of commodities from their labour-values, name the relative and the equivalent form, and compute how the linen's relative value moves when only the coat's value changes.
-   - Lab: `form`, view `stage`, shipped `stage = elementary`. Presets: `marx` (Marx's figures: 20 yards linen = 1 coat = 10 lb tea = 40 lb coffee = 1 quarter corn = 2 oz gold = ½ ton iron, each lot 20 h so the equations hold; equivalent linen: `20 yards linen = 1 coat`, `1 coat`), `coat-cheapens` (the coat's hours halve to 10, the linen's do not: `20 yards linen = 2 coat`), `gold` (gold as the equivalent and listed second, so the elementary form is Marx's price form: `20 yards linen = 2 ounces gold`). Pin `foEquation`, `foRelative`.
+   - Lab: `form`, view `stage`, shipped `stage = elementary`. Presets: `marx` (Marx's figures: 20 yards linen = 1 coat = 10 lb tea = 40 lb coffee = 1 quarter corn = 2 oz gold = ½ ton iron, each lot 20 h so the equations hold; equivalent linen: `20 yards linen = 1 coat`, `1 coat`), `coat-cheapens` (the coat's hours halve to 10, the linen's do not: `20 yards linen = 2 coats`), `gold` (gold as the equivalent and listed second, so the elementary form is Marx's price form: `20 yards linen = 2 ounces gold`). Pin `foEquation`, `foRelative`.
    - Misconception: in "20 yards of linen = 1 coat" the coat's value is what is being expressed.
    - Worked: halve the hours in a coat and 20 yards of linen now fetch 2 coats: the linen's value is expressed differently though nothing about linen changed.
 
@@ -1016,7 +1016,7 @@ Instances as authored (2026-10-24). Corrections the Kerr text forced are marked 
 4. **medium-of-circulation-and-capital** — Medium of Circulation and Capital: Tooke and Fullarton — *Chapter 28*
    - Read: the distinction between money as currency and money as capital.
    - Do: classify payments as circulation of revenue or transfer of capital and compute the notes each needs.
-   - Lab: `money`, view `circulate`. Presets: `revenue` (wages spent in shops, £1,000 at velocity 10: £100), `capital` (payments between capitalists, £1,000: £100), `mixed` (£2,000: £200), `credit` (the capital payments at velocity 25: £40). Pin `moNeeded`. Kerr l. 3953 prints "price" for "piece"; the lesson quotes it as printed and says so.
+   - Lab: `money`, view `circulate`. Presets: `revenue` (wages spent in shops, £1,000 at velocity 10: £100), `capital` (payments between capitalists, £1,000: £100), `mixed` (£2,000: £200), `credit` (the capital payments at velocity 25: £40). Pin `moNeeded`. Kerr l. 3953 prints "price" where the context (a single five pound note passing between spheres; "pieces of individual coin", l. 3941) needs something like "piece"; the lesson quotes it as printed and says it reads as a slip, most likely for "piece", without appeal to the German.
    - Misconception: the quantity of notes measures the quantity of capital.
    - Worked: £1,000 of wage spending at velocity 10 needs £100 of notes; £1,000 lent to a manufacturer needs none extra once it is spent.
 
@@ -1044,7 +1044,7 @@ Instances as authored (2026-10-24). Corrections the Kerr text forced are marked 
 8. **money-capital-and-real-capital-iii** — Money Capital and Real Capital III — *Chapter 32*
    - Read: the demand for means of payment in times of crisis.
    - Do: compute the cash a chain of payments needs before and after one default, with the sum of prices unchanged.
-   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears: £0), `crisis` (bill 1 defaulted, Course 1's `broken` chain: £100), `cash-only` (credit stopped, every sale in cash at velocity 1: £300; replaces `recovery`, since Chapter 32's recovery is borrowing to buy, which this view cannot show). Pin `moNeeded`, `moNetted`. Read: Kerr l. 4486; its second clause, "by no means a demand for money as a means of payment", reads as a slip for means of purchase (Marx's German has *Kaufmittel*), and the lesson says the slip is the translation's.
+   - Lab: `money`, view `payments`. Presets: `prosperity` (the chain clears: £0), `crisis` (bill 1 defaulted, Course 1's `broken` chain: £100), `cash-only` (credit stopped, every sale in cash at velocity 1: £300; replaces `recovery`, since Chapter 32's recovery is borrowing to buy, which this view cannot show). Pin `moNeeded`, `moNetted`. Read: Kerr l. 4486; its second clause, "by no means a demand for money as a means of payment", reads as a slip for means of purchase, forced by the chapter's own contrast (l. 4462: in a crisis firms borrow "only for the purpose of paying", in recovery "for the purpose of buying"); the lesson reads it so and says the English cannot show whose slip it is.
    - Misconception: in a crisis capital is scarce.
    - Worked: the same commodities and prices need £0 of cash while the chain holds and £100 once it breaks: what is scarce is money as means of payment, not capital.
 
@@ -1056,7 +1056,7 @@ Instances as authored (2026-10-24). Corrections the Kerr text forced are marked 
    - Worked: issue £200 of notes where circulation needs £150 and £50 flows back as deposits or repayments.
 
 10. **the-currency-principle-and-the-bank-act** — The Currency Principle and the Bank Act of 1844 — *Chapter 34*
-    - Read: Kerr l. 4839, Engels' sentence on the mechanism ("For every five pounds in gold..."); most of Chapter 34 is Engels' brackets round a quotation from the Contribution of 1859, and the lesson says so.
+    - Read: Kerr l. 4839, Engels' sentence on the mechanism ("For every five pounds in gold..."); Chapter 34 opens with an Engels bracket that mostly quotes the Contribution of 1859, and has three more of his brackets (l. 4833-4847, 4853-4855, 4920-4930), but the larger part is Marx's extracts and comments; the lesson says which is which.
     - Do: compute the note issue the 1844 Act allowed against gold, and the gap in a drain when the circulation's needs do not fall.
     - Lab: `money`, view `bank-act`. Presets in pounds, Marx's figures from Chapter 29 (l. 4159): `normal` (14m fixed + 14m gold: cap £28m, 20m out), `drain` (6m of gold exported: cap £22m), `panic` (demand 24m, Gurney's 4m hoarded: £2m unmet), `suspension` (fixed issue raised by 2m, illustrative: gap £0). Pin `moCap`, `moGap`. Hubbard's first table (Kerr p. 646) supplies two rows.
     - Misconception (Overstone and the Currency School at strength: a mixed currency should behave exactly as a metallic one would): tying notes to gold stabilises the circulation. Marx sides with Tooke and Fullarton, and the lesson presents it as his reply.
