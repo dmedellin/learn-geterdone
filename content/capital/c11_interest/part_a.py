@@ -564,10 +564,10 @@ LESSONS = [
         ),
         "key": [
             "the merchant's rate is the general rate",
-            "mark-up = annual rate / turnovers",
+            "addition per sale = annual rate / turnovers",
             "15% a year, 5 turnovers: 3% a sale",
             "100 sells at 103, five times: 515",
-            "faster turnover, smaller mark-up",
+            "faster turnover, a smaller addition per sale",
         ],
         "key_label": "Chapter 18 in five lines",
         "concepts_intro": (
@@ -619,10 +619,10 @@ LESSONS = [
                   "at £115. In the ten preset it is `3/200`, 1½ per cent, and 100 sells at "
                   "`£203/2`, which is £101½. The rate on the merchant's capital is 15 per cent a year in all "
                   "three."),
-            ("p", "Marx's sugar example makes the same point from the price side. At 1 pound "
-                  "a pound of sugar, 100 pounds buys 100 lb, and a merchant who turns over "
-                  "once adds 3 shillings to each pound to make his 15. If productivity cuts "
-                  "the price of production to 1 shilling, the same 100 pounds buys 2,000 lb "
+            ("p", "Marx's sugar example makes the same point from the price side. At £1 for "
+                  "a pound of sugar, £100 buys 100 lb, and a merchant who turns over "
+                  "once adds 3 shillings to each pound to make his £15. If productivity cuts "
+                  "the price of production to 1 shilling, the same £100 buys 2,000 lb "
                   "and the addition to each is 1⅘d. The profit a year is unchanged. What "
                   "fixes the mark-up is the price of production, which the merchant does not "
                   "control, and the general rate, which he does not control either. So, Marx "
@@ -630,7 +630,10 @@ LESSONS = [
                   "it depends on the merchant whether he wants to sell many commodities at a "
                   "small profit or few commodities at a large profit on the individual "
                   "commodities.&rdquo; He excepts the monopolist, the Dutch East India Company "
-                  "his example."),
+                  "his example, and he names one economist who had not seen it: Wilhelm "
+                  "Roscher of Leipzig, who could still imagine selling prices changed by a "
+                  "merchant's &ldquo;prudence and humanity&rdquo; rather than by a change in "
+                  "production."),
             ("p", "He enjoys the shopkeeper's motto: &ldquo;Small profits and quick returns "
                   "appears particularly to the shopkeeper as a principle, which he follows on "
                   "principle.&rdquo; The motto describes the result of a fast turnover, and the "
@@ -872,7 +875,7 @@ LESSONS = [
                   "root is the hoard every business keeps as a reserve. Managed for the class "
                   "as a whole, Marx notes, the reserves &ldquo;need not be so large as they "
                   "would have to be, did each capitalist manage his own.&rdquo;"),
-            ("p", "Then the profit. A capital lent to this business must earn the general "
+            ("p", "Then the profit. A capital put into this business must earn the general "
                   "rate, or no one would put it there. Marx is brief: &ldquo;It is equally "
                   "evident, that the profit of the money dealers is nothing but a deduction "
                   "from the surplus-value, since they are operating merely with already "

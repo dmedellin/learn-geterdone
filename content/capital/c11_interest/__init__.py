@@ -29,7 +29,7 @@ COURSE = {
     ),
     "key": [
         "rate = s / (industrial + merchant capital)",
-        "mark-up = annual rate / turnovers",
+        "addition per sale = annual rate / turnovers",
         "interest = sum lent × rate of interest",
         "enterprise = profit − interest − salary",
         "normal bounds: 0 < i < p′",

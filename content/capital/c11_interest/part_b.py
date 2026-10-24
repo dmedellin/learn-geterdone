@@ -205,7 +205,7 @@ LESSONS = [
                     "interest instead of subtracting it."},
             {"q": "On Marx's account, what does the lender give the borrower?",
              "a": ["The use of money as capital: its power to produce the average profit",
-                   "Money in exchange for the borrower's promissory goods",
+                   "Money in exchange for goods of equal value",
                    "A share of his labour-power",
                    "Ownership of the sum lent"],
              "c": 0,
@@ -320,7 +320,7 @@ LESSONS = [
                   "it follows that there is no such thing as a &lsquo;natural&rsquo; rate of "
                   "interest.&rdquo;"),
             ("p", "Interest rates are news. A central bank raises or cuts its rate, mortgage "
-                  "payments follow, and economists argue over where the rate &ldquo;should&rdquo; "
+                  "payments follow, and economists argue over where the rate ought to "
                   "be. Behind the argument is an idea Marx rejects: that there is a right level "
                   "the market rate tends toward, as the price of bread tends toward its cost of "
                   "production. The inner quotation marks around &lsquo;natural&rsquo; are the "
@@ -704,8 +704,8 @@ LESSONS = [
             ],
             "after": [
                 "If profit of enterprise were the wage of managing, the £6 would use it up. "
-                "It leaves £9, which on Marx's account rewards owning or commanding capital, "
-                "not any work of superintendence.",
+                "It leaves £9, which on Marx's account is surplus value, unpaid labour, and "
+                "not the price of any work of superintendence.",
             ],
         },
         "quiz_title": "Ownership, function and wages",
@@ -856,9 +856,10 @@ LESSONS = [
             ("p", "Then Price, who took the pear tree literally. Marx says he &ldquo;was "
                   "simply dazzled by the enormousness of the figures arising from geometrical "
                   "progression&rdquo;, and that he treated capital as a number increasing "
-                  "itself, by the formula `s = c·(1 + i)ⁿ`. Pitt believed him and in 1786 "
-                  "set aside a sum each year to accumulate at compound interest until it "
-                  "should pay off the national debt. Price went further in a later book: a "
+                  "itself, by the formula `s = c·(1 + i)ⁿ`. Pitt believed him, and his "
+                  "sinking-fund Act set aside £250,000 a year to accumulate at compound "
+                  "interest until the fund should reach £4,000,000 a year and pay off the "
+                  "national debt. Price went further in a later book: a "
                   "shilling at 6 per cent from the same date would fill a globe the size of "
                   "Saturn's orbit, and a state with the smallest savings could pay the largest "
                   "debt. Marx's comment is one line: &ldquo;What a pretty theoretical "
