@@ -34,7 +34,7 @@ COURSE = {
         "workers employed = v / wage",
         "reserve = supply − workers employed",
     ],
-    "assumes_short": "Courses 1–3",
+    "assumes_short": "Commodities and Money, From Money to Surplus Value and Relative Surplus Value",
     "assumes_long": (
         "the value of labour-power and the rate of surplus value from From Money to Surplus "
         "Value, and the working day, intensity and machinery from Relative Surplus Value"

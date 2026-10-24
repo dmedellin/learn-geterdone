@@ -272,4 +272,8 @@ SPOKEN = {
     'claim:  £100 · (11/10)^70 ≈ £78,975': 'claim, pounds 100 times the quantity 11 over 10, to the power 70 is approximately pounds 78975',
     "Child's figure:  £100 · 2^10 = £102,400": "Child's figure, pounds 100 times 2 to the power 10 equals pounds 102400",
     'ratio:  78,975 / 400 ≈ 197': 'ratio, 78975 over 400 is approximately 197',
+    # Relative Surplus Value
+    # The Kerr text's ligature in "Formulæ" is read letter by letter.
+    'Formulæ': 'Formulae',
+    'formulæ': 'formulae',
 }

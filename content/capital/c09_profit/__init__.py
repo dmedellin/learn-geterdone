@@ -65,7 +65,7 @@ COURSE = {
          "why two businesses exploiting labour equally earn different rates of profit."),
     ],
     "syllabus_intro": (
-        "Seven lessons read the seven chapters of Part I in order: cost price and profit, the "
+        "Seven lessons read the seven chapters of Part I in Marx's order: cost price and profit, the "
         "rate of profit and its two factors, the effect of turnover, economy in constant "
         "capital, the price of raw materials, and the chapter of further remarks that closes "
         "the Part."

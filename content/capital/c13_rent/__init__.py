@@ -72,7 +72,7 @@ COURSE = {
          "days on one's own, and say what changes in rent in kind and money rent."),
     ],
     "syllabus_intro": (
-        "Eleven lessons read the eleven chapters of Part VI in order: the preliminaries and "
+        "Eleven lessons read the eleven chapters of Part VI in Marx's order: the preliminaries and "
         "the waterfall, the two forms of differential rent and the three cases of the second, "
         "rent on the worst soil, absolute rent, building and mining rent, and the history of "
         "rent."

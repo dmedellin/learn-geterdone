@@ -1605,6 +1605,188 @@ DE_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Capital, same shape. One course title carries an apostrophe (Merchant's
+# Capital and Interest), which the renderer writes as &#x27;, so the markers
+# carry the title as the page escapes it rather than as it is spelt here.
+CAP_PATH_PAGE_PATH = "/paths/capital/"
+CAP_MATERIAL_MARKER = "only as good as the definitions"
+CAP_COURSES = (
+    ("capital-commodities-and-money", "Commodities and Money", (
+        "the-two-factors-of-a-commodity",
+        "the-twofold-character-of-labour",
+        "the-form-of-value",
+        "the-fetishism-of-commodities",
+        "exchange",
+        "money-as-measure-and-means-of-circulation",
+        "hoards-and-means-of-payment",
+        "world-money",
+    )),
+    ("capital-money-into-surplus-value", "From Money to Surplus Value", (
+        "the-general-formula-for-capital",
+        "contradictions-in-the-general-formula",
+        "buying-and-selling-labour-power",
+        "the-labour-process-and-surplus-value",
+        "constant-capital-and-variable-capital",
+        "the-rate-of-surplus-value",
+        "seniors-last-hour",
+        "the-working-day-and-surplus-labour",
+        "the-struggle-for-a-normal-working-day",
+        "rate-and-mass-of-surplus-value",
+    )),
+    ("capital-relative-surplus-value", "Relative Surplus Value", (
+        "the-concept-of-relative-surplus-value",
+        "co-operation",
+        "division-of-labour-and-manufacture",
+        "machinery-and-the-value-it-transfers",
+        "machinery-and-the-worker",
+        "machinery-and-the-displaced-worker",
+        "absolute-and-relative-surplus-value",
+        "price-of-labour-power-and-surplus-value",
+        "formulae-for-the-rate-of-surplus-value",
+    )),
+    ("capital-wages-and-accumulation", "Wages and Accumulation", (
+        "value-of-labour-power-into-wages",
+        "time-wages",
+        "piece-wages",
+        "national-differences-of-wages",
+        "simple-reproduction",
+        "surplus-value-into-capital",
+        "accumulation-with-constant-composition",
+        "the-reserve-army",
+        "the-general-law-of-accumulation",
+    )),
+    ("capital-primitive-accumulation", "So-Called Primitive Accumulation", (
+        "the-secret-of-primitive-accumulation",
+        "expropriation-from-the-land",
+        "bloody-legislation",
+        "the-capitalist-farmer",
+        "the-home-market",
+        "the-industrial-capitalist",
+        "the-historical-tendency",
+        "the-modern-theory-of-colonisation",
+    )),
+    ("capital-circuits-of-capital", "The Circuits of Capital", (
+        "the-circuit-of-money-capital",
+        "the-circuit-of-productive-capital",
+        "the-circuit-of-commodity-capital",
+        "the-three-formulas-of-the-circuit",
+        "the-time-of-circulation",
+        "the-costs-of-circulation",
+    )),
+    ("capital-turnover-of-capital", "The Turnover of Capital", (
+        "turnover-time-and-number-of-turnovers",
+        "fixed-and-circulating-capital",
+        "aggregate-turnover",
+        "physiocrats-and-adam-smith",
+        "ricardo-on-fixed-and-circulating-capital",
+        "the-working-period",
+        "the-time-of-production",
+        "the-time-of-circulation-in-turnover",
+        "turnover-time-and-capital-advanced",
+        "the-turnover-of-variable-capital",
+        "the-circulation-of-surplus-value",
+    )),
+    ("capital-social-reproduction", "Reproduction of the Social Capital", (
+        "the-object-of-the-inquiry",
+        "former-presentations",
+        "simple-reproduction-the-three-exchanges",
+        "simple-reproduction-fixed-capital-and-money",
+        "accumulation-and-money",
+        "extended-reproduction",
+    )),
+    ("capital-cost-price-and-profit", "Cost Price and the Rate of Profit", (
+        "cost-price-and-profit",
+        "the-rate-of-profit",
+        "rate-of-profit-and-rate-of-surplus-value",
+        "turnover-and-the-rate-of-profit",
+        "economy-in-constant-capital",
+        "price-fluctuations-of-raw-materials",
+        "supplementary-remarks-on-profit",
+    )),
+    ("capital-prices-of-production", "Average Profit and Its Fall", (
+        "different-compositions-different-rates",
+        "the-general-rate-of-profit",
+        "market-value-and-surplus-profit",
+        "wages-and-prices-of-production",
+        "supplementary-remarks-on-prices",
+        "the-law-as-such",
+        "counteracting-influences",
+        "internal-contradictions-of-the-law",
+    )),
+    ("capital-merchants-and-interest", "Merchant's Capital and Interest", (
+        "commercial-capital",
+        "commercial-profit",
+        "the-turnover-of-merchants-capital",
+        "money-dealing-capital",
+        "history-of-merchants-capital",
+        "interest-bearing-capital",
+        "the-rate-of-interest",
+        "interest-and-profit-of-enterprise",
+        "interest-bearing-capital-as-a-thing",
+    )),
+    ("capital-credit-and-fictitious-capital", "Credit and Fictitious Capital", (
+        "credit-and-fictitious-capital",
+        "accumulation-of-money-capital",
+        "the-role-of-credit",
+        "medium-of-circulation-and-capital",
+        "component-parts-of-bank-capital",
+        "money-capital-and-real-capital-i",
+        "money-capital-and-real-capital-ii",
+        "money-capital-and-real-capital-iii",
+        "the-medium-of-circulation-in-the-credit-system",
+        "the-currency-principle-and-the-bank-act",
+        "precious-metal-and-the-rate-of-exchange",
+        "pre-capitalist-relationships",
+    )),
+    ("capital-ground-rent", "Ground Rent", (
+        "introductory-remarks-on-rent",
+        "differential-rent-general",
+        "differential-rent-i",
+        "differential-rent-ii",
+        "dr-ii-constant-price",
+        "dr-ii-falling-price",
+        "dr-ii-rising-price",
+        "rent-on-the-worst-soil",
+        "absolute-ground-rent",
+        "building-rent-mining-rent-land-price",
+        "genesis-of-capitalist-ground-rent",
+    )),
+    ("capital-revenues-and-their-sources", "Revenues and Their Sources", (
+        "the-trinity-formula",
+        "analysis-of-the-process-of-production",
+        "illusions-created-by-competition",
+        "distribution-and-production-relations",
+        "classes",
+    )),
+)
+
+CAP_PATH_PAGE_MARKERS = (
+    canonical_marker(CAP_PATH_PAGE_PATH),
+    html.escape(CAP_COURSES[0][1]),
+    html.escape(CAP_COURSES[-1][1]),
+    'href="../../%s/"' % CAP_COURSES[-1][0],
+)
+
+CAP_COURSE_HOMES = tuple(
+    (
+        "cap-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, CAP_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(CAP_COURSES, start=1)
+)
+
+CAP_COURSE_LESSONS = tuple(
+    (
+        "cap-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), CAP_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(CAP_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1701,6 +1883,7 @@ def path_page_targets(args):
         ("phil-path", PHIL_PATH_PAGE_PATH, PHIL_PATH_PAGE_MARKERS),
         ("eng-path", ENG_PATH_PAGE_PATH, ENG_PATH_PAGE_MARKERS),
         ("de-path", DE_PATH_PAGE_PATH, DE_PATH_PAGE_MARKERS),
+        ("cap-path", CAP_PATH_PAGE_PATH, CAP_PATH_PAGE_MARKERS),
     ]
 
 
@@ -1724,7 +1907,8 @@ def course_home_targets(args):
                                     + ALGO_COURSE_HOMES + OR_COURSE_HOMES
                                     + PHIL_COURSE_HOMES
                                     + ENG_COURSE_HOMES
-                                    + DE_COURSE_HOMES):
+                                    + DE_COURSE_HOMES
+                                    + CAP_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -1763,6 +1947,7 @@ def lesson_targets(args):
         + PHIL_COURSE_LESSONS
         + ENG_COURSE_LESSONS
         + DE_COURSE_LESSONS
+        + CAP_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

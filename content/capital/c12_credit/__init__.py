@@ -73,7 +73,7 @@ COURSE = {
          "holding."),
     ],
     "syllabus_intro": (
-        "Twelve lessons read the twelve chapters from 25 to 36 in order: credit and the banks, "
+        "Twelve lessons read the twelve chapters from 25 to 36 in Marx's order: credit and the banks, "
         "the rate of interest, stock companies, currency and capital, the bank's capital, three "
         "chapters on money capital and real capital, the currency, the Bank Act, gold and the "
         "exchanges, and usury before capitalism."

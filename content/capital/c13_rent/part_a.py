@@ -1568,7 +1568,7 @@ LESSONS = [
              "180s, holding at 360s and doubling to 720s, according to how much capital the "
              "better soils take. A falling price lowers what each surplus quarter is worth; the "
              "number of surplus quarters decides the rest."),
-            ("Reading the Kerr text's &ldquo;D&rdquo; as the new regulator",
+            ("Reading the Kerr text's “D” as the new regulator",
              "The text says D's price of production of 30s would regulate. D's is 15s; it is "
              "B, the worst soil left, whose 2 quarters for 60s give 30s. Everything that "
              "follows in the chapter uses B."),

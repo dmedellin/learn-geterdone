@@ -61,7 +61,7 @@ COURSE = {
          "and state the objection with which Chapter 52 ends."),
     ],
     "syllabus_intro": (
-        "Five lessons read the five chapters of Part VII in order: the trinity formula, the "
+        "Five lessons read the five chapters of Part VII in Marx's order: the trinity formula, the "
         "product and the income, the appearance of price as a sum, distribution and production, "
         "and the chapter on classes that the manuscript leaves unfinished."
     ),

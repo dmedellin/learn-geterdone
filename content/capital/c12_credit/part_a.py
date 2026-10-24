@@ -816,7 +816,7 @@ LESSONS = [
              "interest&rdquo;, and the function of the old capitalist is paid as &ldquo;a mere wage "
              "of a certain kind of skilled labor&rdquo;. Whether managers in fact take more, as "
              "Berle and Means argued, is a question about real firms the lab does not settle."),
-            ("Reading the &ldquo;abolition&rdquo; as the end of capitalism",
+            ("Reading the “abolition” as the end of capitalism",
              "Marx calls it a &ldquo;transition&rdquo; that stays &ldquo;ensnared in the boundaries "
              "of capitalism&rdquo;. Profit is still paid out, now to shareholders, and the same "
              "page describes a &ldquo;new aristocracy of finance&rdquo;."),

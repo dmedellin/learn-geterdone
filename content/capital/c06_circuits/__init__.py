@@ -66,7 +66,7 @@ COURSE = {
          "the surplus value left after the pure costs."),
     ],
     "syllabus_intro": (
-        "Six lessons read the six chapters of Part I in order: the three circuits one at a time, "
+        "Six lessons read the six chapters of Part I in Marx's order: the three circuits one at a time, "
         "the three together, and then the time and the costs of the circulation that joins them."
     ),
     "how_to": [
@@ -101,7 +101,7 @@ COURSE = {
         "The equalisation of profits. Chapter 5 mentions that capitals with longer circulation "
         "times receive higher prices once profits are equalised. That needs prices of production, "
         "which come in Average Profit and Its Fall.",
-        "The modern debate over productive and unproductive labour. Lesson 6 names where the "
+        "The modern debate over productive and unproductive labour. The Costs of Circulation names where the "
         "dispute lies and who has argued it; it does not attempt to measure an economy on Marx's "
         "categories.",
     ],

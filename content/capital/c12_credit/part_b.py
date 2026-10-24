@@ -100,7 +100,7 @@ LESSONS = [
                   "&ldquo;formerly employed in production&rdquo;, now lying in a bank as a "
                   "deposit. The steady preset keeps £100 a week and releases nothing; the expand "
                   "preset raises the outlay to £150 and ties up £600 more."),
-            ("p", "Course 7's version of this preset halved prices, not scale, and Chapter 32 "
+            ("p", "The Turnover of Capital's version of this preset halved prices, not scale, and Chapter 32 "
                   "makes the difference count. A fall in the prices of materials sets capital "
                   "free and leaves the business able to do as much as before: it is &ldquo;an "
                   "actual release of a portion of formerly tied up capital&rdquo;. A contraction "
@@ -353,7 +353,7 @@ LESSONS = [
                   "off, they cancel: cash needed £0. In the crisis preset A cannot pay B. Nothing "
                   "about the cloth, yarn or cotton has changed, and their prices sum to £300 as "
                   "before, but B still owes C £100 with nothing coming in: cash needed £100. It "
-                  "is Course 1's broken chain from “Hoards and Means of Payment”, now as a "
+                  "is the broken chain of Commodities and Money's “Hoards and Means of Payment”, now as a "
                   "picture of 1847. In the cash-only preset credit has stopped. As Chapter 33 "
                   "puts it, &ldquo;no man can make use of a promise to pay, since every one "
                   "wants to accept only cash payment&rdquo;; every sale is paid in money, and with "

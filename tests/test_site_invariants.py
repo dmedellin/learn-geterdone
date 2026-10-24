@@ -1283,9 +1283,195 @@ DE_COURSES = (
 DE_PATH_COURSE_COUNT = 10
 DE_UPCOMING_COURSES = ()
 
+# The Capital path: fourteen courses, all published. Generated from
+# content/capital/ so these cannot disagree with what is built.
+CAP_PATH_PAGE = "/paths/capital/"
+
+CAP_COURSE_1_HOME = "/capital-commodities-and-money/"
+CAP_COURSE_1_LESSONS = (
+    "the-two-factors-of-a-commodity",
+    "the-twofold-character-of-labour",
+    "the-form-of-value",
+    "the-fetishism-of-commodities",
+    "exchange",
+    "money-as-measure-and-means-of-circulation",
+    "hoards-and-means-of-payment",
+    "world-money",
+)
+CAP_COURSE_2_HOME = "/capital-money-into-surplus-value/"
+CAP_COURSE_2_LESSONS = (
+    "the-general-formula-for-capital",
+    "contradictions-in-the-general-formula",
+    "buying-and-selling-labour-power",
+    "the-labour-process-and-surplus-value",
+    "constant-capital-and-variable-capital",
+    "the-rate-of-surplus-value",
+    "seniors-last-hour",
+    "the-working-day-and-surplus-labour",
+    "the-struggle-for-a-normal-working-day",
+    "rate-and-mass-of-surplus-value",
+)
+CAP_COURSE_3_HOME = "/capital-relative-surplus-value/"
+CAP_COURSE_3_LESSONS = (
+    "the-concept-of-relative-surplus-value",
+    "co-operation",
+    "division-of-labour-and-manufacture",
+    "machinery-and-the-value-it-transfers",
+    "machinery-and-the-worker",
+    "machinery-and-the-displaced-worker",
+    "absolute-and-relative-surplus-value",
+    "price-of-labour-power-and-surplus-value",
+    "formulae-for-the-rate-of-surplus-value",
+)
+CAP_COURSE_4_HOME = "/capital-wages-and-accumulation/"
+CAP_COURSE_4_LESSONS = (
+    "value-of-labour-power-into-wages",
+    "time-wages",
+    "piece-wages",
+    "national-differences-of-wages",
+    "simple-reproduction",
+    "surplus-value-into-capital",
+    "accumulation-with-constant-composition",
+    "the-reserve-army",
+    "the-general-law-of-accumulation",
+)
+CAP_COURSE_5_HOME = "/capital-primitive-accumulation/"
+CAP_COURSE_5_LESSONS = (
+    "the-secret-of-primitive-accumulation",
+    "expropriation-from-the-land",
+    "bloody-legislation",
+    "the-capitalist-farmer",
+    "the-home-market",
+    "the-industrial-capitalist",
+    "the-historical-tendency",
+    "the-modern-theory-of-colonisation",
+)
+CAP_COURSE_6_HOME = "/capital-circuits-of-capital/"
+CAP_COURSE_6_LESSONS = (
+    "the-circuit-of-money-capital",
+    "the-circuit-of-productive-capital",
+    "the-circuit-of-commodity-capital",
+    "the-three-formulas-of-the-circuit",
+    "the-time-of-circulation",
+    "the-costs-of-circulation",
+)
+CAP_COURSE_7_HOME = "/capital-turnover-of-capital/"
+CAP_COURSE_7_LESSONS = (
+    "turnover-time-and-number-of-turnovers",
+    "fixed-and-circulating-capital",
+    "aggregate-turnover",
+    "physiocrats-and-adam-smith",
+    "ricardo-on-fixed-and-circulating-capital",
+    "the-working-period",
+    "the-time-of-production",
+    "the-time-of-circulation-in-turnover",
+    "turnover-time-and-capital-advanced",
+    "the-turnover-of-variable-capital",
+    "the-circulation-of-surplus-value",
+)
+CAP_COURSE_8_HOME = "/capital-social-reproduction/"
+CAP_COURSE_8_LESSONS = (
+    "the-object-of-the-inquiry",
+    "former-presentations",
+    "simple-reproduction-the-three-exchanges",
+    "simple-reproduction-fixed-capital-and-money",
+    "accumulation-and-money",
+    "extended-reproduction",
+)
+CAP_COURSE_9_HOME = "/capital-cost-price-and-profit/"
+CAP_COURSE_9_LESSONS = (
+    "cost-price-and-profit",
+    "the-rate-of-profit",
+    "rate-of-profit-and-rate-of-surplus-value",
+    "turnover-and-the-rate-of-profit",
+    "economy-in-constant-capital",
+    "price-fluctuations-of-raw-materials",
+    "supplementary-remarks-on-profit",
+)
+CAP_COURSE_10_HOME = "/capital-prices-of-production/"
+CAP_COURSE_10_LESSONS = (
+    "different-compositions-different-rates",
+    "the-general-rate-of-profit",
+    "market-value-and-surplus-profit",
+    "wages-and-prices-of-production",
+    "supplementary-remarks-on-prices",
+    "the-law-as-such",
+    "counteracting-influences",
+    "internal-contradictions-of-the-law",
+)
+CAP_COURSE_11_HOME = "/capital-merchants-and-interest/"
+CAP_COURSE_11_LESSONS = (
+    "commercial-capital",
+    "commercial-profit",
+    "the-turnover-of-merchants-capital",
+    "money-dealing-capital",
+    "history-of-merchants-capital",
+    "interest-bearing-capital",
+    "the-rate-of-interest",
+    "interest-and-profit-of-enterprise",
+    "interest-bearing-capital-as-a-thing",
+)
+CAP_COURSE_12_HOME = "/capital-credit-and-fictitious-capital/"
+CAP_COURSE_12_LESSONS = (
+    "credit-and-fictitious-capital",
+    "accumulation-of-money-capital",
+    "the-role-of-credit",
+    "medium-of-circulation-and-capital",
+    "component-parts-of-bank-capital",
+    "money-capital-and-real-capital-i",
+    "money-capital-and-real-capital-ii",
+    "money-capital-and-real-capital-iii",
+    "the-medium-of-circulation-in-the-credit-system",
+    "the-currency-principle-and-the-bank-act",
+    "precious-metal-and-the-rate-of-exchange",
+    "pre-capitalist-relationships",
+)
+CAP_COURSE_13_HOME = "/capital-ground-rent/"
+CAP_COURSE_13_LESSONS = (
+    "introductory-remarks-on-rent",
+    "differential-rent-general",
+    "differential-rent-i",
+    "differential-rent-ii",
+    "dr-ii-constant-price",
+    "dr-ii-falling-price",
+    "dr-ii-rising-price",
+    "rent-on-the-worst-soil",
+    "absolute-ground-rent",
+    "building-rent-mining-rent-land-price",
+    "genesis-of-capitalist-ground-rent",
+)
+CAP_COURSE_14_HOME = "/capital-revenues-and-their-sources/"
+CAP_COURSE_14_LESSONS = (
+    "the-trinity-formula",
+    "analysis-of-the-process-of-production",
+    "illusions-created-by-competition",
+    "distribution-and-production-relations",
+    "classes",
+)
+
+CAP_COURSES = (
+    ("Commodities and Money", CAP_COURSE_1_HOME, CAP_COURSE_1_LESSONS),
+    ("From Money to Surplus Value", CAP_COURSE_2_HOME, CAP_COURSE_2_LESSONS),
+    ("Relative Surplus Value", CAP_COURSE_3_HOME, CAP_COURSE_3_LESSONS),
+    ("Wages and Accumulation", CAP_COURSE_4_HOME, CAP_COURSE_4_LESSONS),
+    ("So-Called Primitive Accumulation", CAP_COURSE_5_HOME, CAP_COURSE_5_LESSONS),
+    ("The Circuits of Capital", CAP_COURSE_6_HOME, CAP_COURSE_6_LESSONS),
+    ("The Turnover of Capital", CAP_COURSE_7_HOME, CAP_COURSE_7_LESSONS),
+    ("Reproduction of the Social Capital", CAP_COURSE_8_HOME, CAP_COURSE_8_LESSONS),
+    ("Cost Price and the Rate of Profit", CAP_COURSE_9_HOME, CAP_COURSE_9_LESSONS),
+    ("Average Profit and Its Fall", CAP_COURSE_10_HOME, CAP_COURSE_10_LESSONS),
+    ("Merchant's Capital and Interest", CAP_COURSE_11_HOME, CAP_COURSE_11_LESSONS),
+    ("Credit and Fictitious Capital", CAP_COURSE_12_HOME, CAP_COURSE_12_LESSONS),
+    ("Ground Rent", CAP_COURSE_13_HOME, CAP_COURSE_13_LESSONS),
+    ("Revenues and Their Sources", CAP_COURSE_14_HOME, CAP_COURSE_14_LESSONS),
+)
+
+CAP_PATH_COURSE_COUNT = 14
+CAP_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
-               + DE_COURSES)
+               + DE_COURSES + CAP_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1405,7 +1591,8 @@ def source_of(url):
 # them -- but the per-course invariants do not, because neither is a course.
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
-                       PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE)
+                       PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
+                       CAP_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1428,6 +1615,8 @@ PATHS = (
      ENG_UPCOMING_COURSES),
     ("Differential Equations", DE_PATH_PAGE, DE_COURSES, DE_PATH_COURSE_COUNT,
      DE_UPCOMING_COURSES),
+    ("Capital", CAP_PATH_PAGE, CAP_COURSES, CAP_PATH_COURSE_COUNT,
+     CAP_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -1622,6 +1811,12 @@ ENG_DISCLAIMER_RE = re.compile(
 # short of the em dash and free of apostrophes, for the reason OR's gives.
 DE_DISCLAIMER_RE = re.compile(
     r"(?i)exact arithmetic applied to an approximate method")
+# Capital promises that every figure is computed from the lesson's quantities
+# and the chapter's definitions, and warns that a figure is only as good as
+# those definitions -- whether they describe an actual economy is what the book
+# argues and no lab settles. Stopping short of the em dash, for OR's reason.
+CAP_DISCLAIMER_RE = re.compile(
+    r"(?i)only as good as the definitions")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -1640,6 +1835,8 @@ PATH_MATERIAL_DISCLAIMER = {
     ENG_PATH_PAGE: ("the check-it-by-hand disclaimer", ENG_DISCLAIMER_RE),
     DE_PATH_PAGE: ("the exact-arithmetic-on-an-approximate-method disclaimer",
                    DE_DISCLAIMER_RE),
+    CAP_PATH_PAGE: ("the only-as-good-as-the-definitions disclaimer",
+                    CAP_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -1964,9 +2161,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(DE_COURSES)
             + sum(len(slugs) for _t, _h, slugs in DE_COURSES)
         )
+        cap_tree = (
+            1  # the Capital path page
+            + len(CAP_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in CAP_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
-                       + phil_tree + eng_tree + de_tree)  # 1 for the index
+                       + phil_tree + eng_tree + de_tree
+                       + cap_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2022,9 +2225,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "+ 10 + 9 + 10 + 8 = 103 pages, got %d" % de_tree,
         )
         self.assertEqual(
-            989,
+            134,
+            cap_tree,
+            "the Capital path is 1 + 14 + 8 + 10 + 9 + 9 + 8 + 6 + 11 + 6 + 7 + 8 + 9 + 12 + 11 + 5 "
+            "= 134 pages, got %d" % cap_tree,
+        )
+        self.assertEqual(
+            1123,
             course_tree,
-            "the site index plus all nine path trees is 989 pages, got %d" % course_tree,
+            "the site index plus all ten path trees is 1123 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2035,9 +2244,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            993,
+            1127,
             expected,
-            "989 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 993, "
+            "1123 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1127, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2252,6 +2461,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "philosophy": getattr(smoke, "PHIL_COURSES", ()),
             "english": getattr(smoke, "ENG_COURSES", ()),
             "differential_equations": getattr(smoke, "DE_COURSES", ()),
+            "capital": getattr(smoke, "CAP_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -2664,9 +2874,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            979,
+            1112,
             len(course_pages),
-            "eighty-four course homes and 895 lessons carry a material "
+            "ninety-eight course homes and 1014 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -3657,7 +3867,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(84, checked, "every published course must be checked")
+        self.assertEqual(98, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -3955,6 +4165,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from philosophy import PATH as PHILOSOPHY
             from english import PATH as ENGLISH
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
+            from capital import PATH as CAPITAL
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -3965,6 +4176,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("english", ENG_COURSES, ENG_PATH_PAGE, ENGLISH),
             ("differential equations", DE_COURSES, DE_PATH_PAGE,
              DIFFERENTIAL_EQUATIONS),
+            ("capital", CAP_COURSES, CAP_PATH_PAGE, CAPITAL),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4097,10 +4309,12 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from philosophy import PATH as PHILOSOPHY
             from english import PATH as ENGLISH
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
+            from capital import PATH as CAPITAL
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
-        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
+                     CAPITAL):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4250,11 +4464,13 @@ class TestEveryLabBuilds(unittest.TestCase):
             from philosophy import PATH as PHILOSOPHY
             from english import PATH as ENGLISH
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
+            from capital import PATH as CAPITAL
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
-        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS):
+        for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
+                     CAPITAL):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]
