@@ -102,3 +102,19 @@ gap, the preview command's final output line, and any spoken forms added.
 - Abbreviations such as `cwt.` read badly; write `hundredweight`.
 - Name the standard objection to a step in the lesson that takes the step,
   and vary the closing sentence that says the Subject does not settle it.
+
+## Lessons from the Course 1 second review
+
+The numbers were all right; the errors were in what the lessons said Marx
+argues. Before you finish, re-read every sentence that begins "Marx says",
+"Marx's verdict", "Marx replies" or paraphrases him, and find the line in
+the text that supports it. In particular:
+
+- Do not give Marx a verdict the text does not contain. A footnote aimed at
+  one school is not a verdict on another.
+- When the lesson answers a critic, the answer must be Marx's actual reply,
+  not a computation the critic would accept.
+- An example's point is often in what does NOT change (the hand-loom weaver
+  keeps his old time). Paraphrase it with the text open.
+- First-word case inside a quotation must match the text; reword around the
+  quotation instead of changing its case.
