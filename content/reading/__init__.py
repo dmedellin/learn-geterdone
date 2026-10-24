@@ -40,7 +40,7 @@ PATH = {
     "level": "Beginner → Intermediate",
     "level_note": "any fluent adult reader; the arithmetic is a division",
     "tagline": (
-        "Read faster in the ways that work, and find out for yourself which ones do &mdash; timed drills with comprehension checks in every lesson, a log of your own numbers, and the research on eye movements, the inner voice, skimming and memory. Eight courses and 42 lessons are available."
+        "Read faster in the ways that can be measured, and find out for yourself which ones work for you &mdash; timed drills with comprehension checks in every lesson, a log of your own numbers, and the research on eye movements, the inner voice, skimming and memory. Eight courses and 42 lessons are available."
     ),
     "description": (
         "The Reading Faster Subject: eight courses of practice. Each lesson gives you a drill &mdash; a timed reading, a pacer, a flashed word stream, a skim, a scan, a recall test &mdash; scores it in your browser, and logs the result, so that what you learn about reading speed is measured on your own reading. The lessons explain what the eye can and cannot do, what the speed-reading courses promise and what the studies found, and how to choose a speed for a purpose. All eight courses and 42 lessons are available."
@@ -54,17 +54,17 @@ PATH = {
         "one reading is one measurement",
     ],
     "sequence_intro": (
-        "Each course assumes the ones before it and nothing else. Measure Your Reading gives every later drill its scoring; How the Eyes Read gives the limits every technique is tested against; Guided Practice and The Inner Voice and Flashing Words try the classic techniques against a control; Skimming, Scanning and Previewing and Words, Knowledge and Difficulty are where most of the time is saved; Remembering What You Read measures what is kept; Your Training Plan uses all of it on your own log."
+        "Each course assumes the ones before it and nothing else. Measure Your Reading gives every later drill its scoring; Guided Practice starts the Daily Drill the rest of the Subject keeps going; How the Eyes Read gives the limits every technique is tested against; The Inner Voice and Flashing Words tries the tradition's other techniques against a control; Skimming, Scanning and Previewing and Words, Knowledge and Difficulty are where most of the time is saved; Remembering What You Read measures what is kept; Your Training Plan uses all of it on your own log."
     ),
     "why_order": [
         "Measurement comes first because every later claim &mdash; that a pacer helps, that a flashed stream is faster, that skimming loses detail &mdash; is a comparison of two measurements, and a comparison means nothing until you know how much one measurement varies on its own.",
-        "The eye comes second because it sets the limits. Once you have computed what a fixation costs and how far a glance reaches, you can test any speed claim in a line of arithmetic, and the rest of the Subject does.",
-        "Guided practice and the inner voice come next: the techniques the speed-reading tradition teaches, each tried as a drill with a control condition, so you see what it does to your rate and to your comprehension.",
+        "Practice comes second, because the routine should start early and a log needs weeks to say anything: the pacer, the hold target and the Daily Drill, which you then keep up through the rest of the Subject.",
+        "The eye comes third, as the limits the practice is read against. Once you have computed what a fixation costs and how far a glance reaches, you can test any speed claim in a line of arithmetic, and the inner voice and the flashed word stream are tested next the same way.",
         "Skimming, difficulty and memory come after because they are where the real time is saved or lost: by not reading what you do not need, by knowing more words and more about the subject, and by remembering what you read the first time. The training plan comes last and uses all of it.",
     ],
     "prerequisites": [
         "Fluent reading in English. This is a Subject for an adult who already reads well and wants to read more in less time; it does not teach reading. If English is not your first language, your rates will be lower than the reference figures, and the comparisons that matter are with yourself.",
-        "A quiet ten to twenty minutes per lesson, and a keyboard or a touchscreen. Every drill is timed; a drill run while you are interrupted measures the interruption.",
+        "A quiet ten to twenty minutes per lesson, then ten to fifteen a day for the Daily Drill, and a keyboard or a touchscreen. Every drill is visual and timed; a drill run while you are interrupted measures the interruption, and a reader using a screen reader can read the lessons but not do the drills.",
         "The arithmetic is a division and a product. The labs do it; what is asked of you is to read each number for what it is a measurement of.",
         "A willingness to be measured honestly. The comprehension questions are there so that a fast time with nothing understood shows up as what it is.",
     ],
