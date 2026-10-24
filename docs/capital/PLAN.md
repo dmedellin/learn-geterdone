@@ -754,46 +754,51 @@ Chapter 5 · The Time of Circulation, Chapter 6 · The Expenses of Circulation. 
 
 ### Course 8 — Reproduction of the Social Capital (`capital-social-reproduction`, 6)
 
+Volume II's Part III. Module names use the Kerr chapter titles: Chapter 18 · Introduction, Chapter
+19 · Former Discussions of the Subject, Chapter 20 · Simple Reproduction, Chapter 21 · Accumulation
+and Reproduction on an Enlarged Scale (Kerr has "Enlarged", not "Extended"). The lab tiles print
+bare numbers, as Marx does; only lesson 2 prices in pounds. All six lessons are in `part_a.py`.
+
 1. **the-object-of-the-inquiry** — The Object of the Inquiry — *Chapter 18 · Introduction*
-   - Read: the passage beginning "This total process comprises both the productive consumption…" (Kerr wording).
+   - Read: "This total process comprises both the productive consumption…" (Kerr l. 3609).
    - Do: sort a society's product into means of production and means of consumption and say why the individual capital's circuit cannot answer the social question.
-   - Lab: `schemes`, view `sort`. Presets: `two-dept` (a small product list), `marx-totals`, `misclassified` (coal used at home). Pin `scDeptI`, `scDeptII`.
-   - Misconception: the economy is one big firm.
+   - Lab: `schemes`, view `sort`. Presets: `two-dept` (machines 300, mill coal 100, bread 150, kitchen coal 50, illustrative: `scDeptI` `400: machines, coal for a mill`, `scDeptII` `200: bread, coal for kitchens`), `misclassified` (kitchen coal filed as means of production: 450, 150), `marx-totals` (Marx's 6,000 and 3,000). Pin `scDeptI`, `scDeptII`.
+   - Misconception: the economy is one big firm (Proudhon, Kerr l. 4419).
    - Worked: the same coal is Department I sold to a mill and Department II sold to a kitchen.
 
-2. **former-presentations** — Former Presentations: Quesnay and Smith — *Chapter 19*
-   - Read: §2, Adam Smith's resolution of price into v + s, "the dogma".
+2. **former-presentations** — Former Discussions: Quesnay and Smith — *Chapter 19 · Former Discussions of the Subject*
+   - Read: §2, Adam Smith's dogma, the passage beginning "The dogma of Adam Smith" (Kerr l. 3787); "The first mistake of Adam Smith…" (Kerr l. 3838) in the body. Title follows Kerr's chapter title; slug unchanged.
    - Do: compute the annual product's value with and without c, and show where Smith's account loses the constant capital.
-   - Lab: `revenue`, view `dogma`. Presets: `marx-scheme` (the simple reproduction totals), `one-firm`, `tableau` (Quesnay's classes in outline). Pin `rvTotal`, `rvSmith`.
-   - Misconception: the whole price of the annual product is resolved into incomes.
+   - Lab: `revenue`, view `dogma`, `money_unit` £. Presets: `marx-scheme` (6,000 / 1,500 / 1,500: `rvTotal` £9,000, `rvSmith` `v + s = £3,000; c = £6,000 missing`), `one-firm` (Marx's spinner, 372 / 50 / 78: £500, £372 missing), `tableau` (illustrative, 200 / 100 / 200: £500, £200 missing; Marx gives no Tableau figures in this chapter). Pin `rvTotal`, `rvSmith`.
+   - Misconception: the whole price of the annual product is resolved into incomes. Sraffa's reduction to dated labour is stated at strength; the lesson says Marx wrote against Smith, not Sraffa, and what in the chapter bears on it (the one-year period).
    - Worked: 9,000 of annual product against 3,000 of incomes; Smith's account has lost 6,000 of means of production.
 
 3. **simple-reproduction-the-three-exchanges** — Simple Reproduction: The Three Great Exchanges — *Chapter 20 · Simple Reproduction*
-   - Read: §2–5, the scheme "I. 4,000c + 1,000v + 1,000s = 6,000; II. 2,000c + 500v + 500s = 3,000".
+   - Read: the recapitulation, "I. 4000 c+1000 v+1000 s = 6000…" (Kerr l. 4031–4037); the condition I(v + s) = IIc (Kerr l. 4076) in the body.
    - Do: check whether a two-department scheme reproduces itself (I(v + s) = IIc) and compute each of the three exchanges.
-   - Lab: `schemes`, view `simple`. Presets: `marx` (Marx's figures), `too-much-I` (I's v + s exceeds IIc), `too-little-I`. Pin `scBalance`, `scIExchange`.
+   - Lab: `schemes`, view `simple`. Presets: `marx` (`scBalance` `I(v + s) = 2,000 = IIc`, `scIExchange` `2,000 each way`), `too-much-in-i` (I s 1,100: gap +100, 100 of Department I's product unsold), `too-little-in-i` (I s 900: gap −100, 1,900 each way, 100 of Department II's product unsold), `diagram-b` (Marx's diagram b from Chapter 21, I 4,000c + 875v + 875s, II 1,750c + 376v + 376s: 1,750 = IIc). Ids are lowercase because the kit requires it; `diagram-b` added because Marx gives a second balanced scheme. Pin `scBalance`, `scIExchange`.
    - Misconception: each department's product only needs a buyer, not a buyer in the other department.
    - Worked: I(1,000v + 1,000s) = 2,000 = IIc; the scheme closes; raise I's s by 100 and 100 of means of production find no buyer.
 
 4. **simple-reproduction-fixed-capital-and-money** — Simple Reproduction: Fixed Capital and Money — *Chapter 20 · Simple Reproduction*
-   - Read: §11, the replacement of fixed capital.
+   - Read: §11, Kerr l. 4567 (the money received for wear, a fund for renewing fixed capital in kind; "productive capital suspended in the form of money", Kerr l. 4565, in the body); the crisis passage, Kerr l. 4780: "in spite of the fact that reproduction had taken place on the same scale" (Kerr wording, replacing the planned paraphrase).
    - Do: compute the signed gap between the wear Department II hoards in money and the renewals it buys in kind, and say which side is short.
-   - Lab: `schemes`, view `fixed`. Presets: `balanced` (200 hoarded, 200 renewed), `short-renewals` (renewals 100 against 200 hoarded), `bunched` (renewals 300). Pin `scFixedGap`.
+   - Lab: `schemes`, view `fixed`, Marx's departments, wear 200. Presets: `balanced` (`0: renewals = wear hoarded`), `short-renewals` (100: `−100: 100 of Department I's product unsold`), `bunched` (300: `+100: Department I 100 short`), `marx-180` (Marx's case, Kerr l. 4753: `−20: 20 of Department I's product unsold`; Marx counts 20 on each side, 40 in all, and the body says so). Pin `scFixedGap`.
    - Misconception: depreciation is a cost that balances automatically every year.
-   - Worked: renewals of 100 against 200 hoarded leave 100 of Department I's product without a buyer, Marx's crisis of over-production "in spite of reproduction on an unchanging scale"; renewals of 300 leave Department I 100 short.
+   - Worked: renewals of 100 against 200 hoarded leave 100 of Department I's product without a buyer, while the balance tile still reads I(v + s) = 2,000 = IIc; renewals of 300 leave Department I 100 short.
 
-5. **accumulation-and-money** — Accumulation in Department I and the Money It Needs — *Chapter 21 · Accumulation and Reproduction on an Extended Scale*
-   - Read: §1, the hoard that "represents new potential money-capital" (Kerr wording to be checked).
+5. **accumulation-and-money** — Accumulation in Department I and the Money It Needs — *Chapter 21 · Accumulation and Reproduction on an Enlarged Scale*
+   - Read: §1, Kerr l. 4998 (A's hoard as "a new potential money-capital"; Kerr l. 5002 has "an addition to the potential money-capital"); Engels' note on "latent" and "potential" (Kerr l. 5496).
    - Do: compute the surplus product left unsold when the capitalists of Department I who hoard and those who invest do not balance.
-   - Lab: `schemes`, view `hoard`. Presets: `balanced` (sellers and buyers of surplus product equal), `all-hoard`, `all-invest`. Pin `scHoardGap`.
-   - Misconception (Say's law, stated at strength first): every sale is a purchase, so saving automatically becomes investment.
+   - Lab: `schemes`, view `hoard`, I 4,000c + 1,000v + 1,000s accumulating 1/2. Presets: `balanced` (hoarders 1/2: `0: hoarders' sales = investors' purchases`), `all-hoard` (1: `+500: 500 of surplus product unsold`), `all-invest` (0: `−500: 500 of demand without a product`). Pin `scHoardGap`.
+   - Misconception (Say's law, stated at strength first): every sale is a purchase, so saving automatically becomes investment. The section does not name Say; the lesson says what in it bears on the law. The loanable-funds view and Keynes are stated in their own terms, and the lesson says the text does not answer them.
    - Worked: if every capitalist in Department I hoards at once, 500 of surplus product is unsold.
 
-6. **extended-reproduction** — Reproduction on an Extended Scale — *Chapter 21 · Accumulation and Reproduction on an Extended Scale*
-   - Read: §3, the schematic presentation, "I. 4,000c + 1,000v + 1,000s = 6,000; II. 1,500c + 750v + 750s = 3,000".
-   - Do: run the expanded scheme for several years, with Department I accumulating half its s and Department II adjusting, and compute the growth path.
-   - Lab: `schemes`, view `expanded`. Presets: `marx` (Marx's figures: the first example), `ii-short` (Department II's s is too small to balance: the period is refused and the banner says why), `half-half`. Shipped `years = 4`. Pin `scYear2`, `scGrowth`.
-   - Misconception: the two departments can grow at any rates they like.
+6. **extended-reproduction** — Reproduction on an Enlarged Scale — *Chapter 21 · Accumulation and Reproduction on an Enlarged Scale*
+   - Read: §3, the rule "If things are to proceed normally, accumulation in II must take place more rapidly than in I…" (Kerr l. 5286); the initial diagram I 4,000c + 1,000v + 1,000s, II 1,500c + 750v + 750s as math blocks in the body. Title follows Kerr; slug unchanged.
+   - Do: run the expanded scheme for several periods, with Department I accumulating half its s and Department II adjusting, and compute the growth path.
+   - Lab: `schemes`, view `expanded`, shipped `periods = 4` (the kit's name for the plan's `years`). Presets: `marx` (`scYear2` `I 4,400c + 1,100v; II 1,600c + 800v`, `scGrowth` `9,000 to 65,219/5: 20,219/45,000 = 44.93%`; Marx prints 13,033, rounding in the fourth year, and Kerr's II total 4,249 is ten short of its parts), `marx-second` (Marx's second illustration, I 5,000c + 1,000v + 1,000s, II 1,430c + 285v + 285s, composition 5 in both: `I 16,250/3c + 3,250/3v; II 4,750/3c + 947/3v`, which Marx rounds to 5,417, 1,083, 1,583, 316), `ii-short` (II s 100: `refused in period 1`). `marx-second` replaces the planned `half-half`: Marx gives a second example himself. Pin `scBalance`, `scYear2`, `scGrowth`.
+   - Misconception: the two departments can grow at any rates they like. Tugan-Baranovsky and Luxemburg are stated at strength, as later readers; the lesson says what in the chapter bears on their dispute, not Marx's answer.
    - Worked: from I 4,000c + 1,000v + 1,000s and II 1,500c + 750v + 750s, year one ends at I 4,400c + 1,100v and II 1,600c + 800v.
 
 ### Course 9 — Cost Price and the Rate of Profit (`capital-cost-price-and-profit`, 7)
@@ -851,59 +856,66 @@ Volume III's Part One. Prose cites "Volume III, Chapter n".
 
 ### Course 10 — Average Profit and Its Fall (`capital-prices-of-production`, 8)
 
+Kerr's plain text omits Chapter 9's two tables (printed as tables in the book); the
+figures used are the second table's and agree with every total and deviation the
+text prints (l. 1681–1693). Kerr misprints, kept in quotations and named in the
+lessons: Chapter 9 "8 + 18 + 26" (for 8 + 18 = 26), Chapter 11 "16 1/12" and
+"128 7/12" (exact 16 1/14 and 128 4/7) and "100 10/19" (87½ + 23 1/38 = 110 10/19),
+Chapter 13 "66 1/3%" (for 66 2/3%).
+
 1. **different-compositions-different-rates** — Different Compositions, Different Rates of Profit — *Chapter 8*
-   - Read: the chapter's comparison of capitals of equal size and unequal composition at the same rate of surplus value.
+   - Read: "If a capital, consisting of percentages of 90 c + 10 v…" (Kerr l. 1633).
    - Do: compute the rate of profit of capitals with different compositions and rates of surplus value, and state what selling at value would imply for them.
-   - Lab: `prices`, view `rates`. Presets: `marx` (Marx's ch. 8 figures: 90c + 10v against 10c + 90v at the same s′), `europe-asia` (Marx's European 84c + 16v at 100% against the Asian 16c + 84v at 25%), `equal-composition`. Pin `ppRates`.
+   - Lab: `prices`, view `rates`. Presets: `marx` (90c + 10v against 10c + 90v at 100%: 10%, 90%), `copper` (Marx's 200c + 100v against 400c + 100v at 100%: 33.33%, 20%), `europe-asia` (Marx's European 84c + 16v at 100% against the Asian 16c + 84v at 25%: 16%, 21%), `equal-composition` (£100 and £1,000 at 80c + 20v: 20%, 20%). Pin `ppRates`.
    - Misconception: a higher rate of surplus value always means a higher rate of profit.
-   - Worked: the Asian capital's s′ is a quarter of the European's and its rate of profit is higher: 21% against 16%.
+   - Worked: the Asian capital's s′ is a quarter of the European's and its rate of profit is higher: 21% against 16%. (Kerr's l. 1643 calls the Asian 25% a "rate of profit"; its own clause makes it s′, and the lesson says so.)
 
 2. **the-general-rate-of-profit** — The General Rate of Profit and Prices of Production — *Chapter 9*
-   - Read: the table of five spheres, with used-up c, and the sentence saying the aggregate price of the commodities I to V equals their aggregate value (Kerr wording).
+   - Read: "The aggregate price of the commodities of I to V would be equal to their aggregate value…" (Kerr l. 1707).
    - Do: compute the average rate of profit and each sphere's price of production, and check that total profit equals total surplus value and total price equals total value.
-   - Lab: `prices`, view `production`. Presets: `marx` (Marx's figures with used-up c of 50, 51, 51, 40, 10), `all-used-up`, `three`. Pin `ppAverage`, `ppPrices`, `ppTotals`.
+   - Lab: `prices`, view `production`. Presets: `marx` (I–V: 80c + 20v, 70c + 30v, 60c + 40v, 85c + 15v, 95c + 5v at 100%, used-up c 50, 51, 51, 40, 10), `all-used-up` (the same spheres, all c used up: five prices of 122, totals 610), `three` (Marx's l. 1751–1755: 80c + 20v, 90c + 10v, 70c + 30v; three prices of 120, totals 360). Pin `ppAverage`, `ppPrices`, `ppTotals`.
    - Misconception: prices of production abolish the law of value because no commodity sells at its value.
    - Worked: values 90, 111, 131, 70, 20; average rate 22%; prices of production 92, 103, 113, 77, 37; both sum to 422.
 
 3. **market-value-and-surplus-profit** — Market Value and Surplus Profit — *Chapter 10*
-   - Read: the three groups of producers, and the market value "regulated" by the mass produced under average conditions.
+   - Read: the market value as the average value of a sphere's commodities and the individual value of its bulk (Kerr l. 1861); the second case, l. 1898.
    - Do: compute a market value as the weighted average of individual values and each group's surplus profit or loss.
-   - Lab: `value`, view `market`. Presets: `average-dominates`, `worst-dominates` (demand forces the worst to regulate), `best-dominates`. Pin `vaMarketValue`, `vaSurplus`.
+   - Lab: `value`, view `market`. Presets (illustrative, 10,000 pieces each): `average-dominates` (1,000 at 3 h, 8,000 at 4 h, 1,000 at 5 h: 4 h), `worst-dominates` (1,000, 3,000, 6,000: 9/2 h — Marx's "strictly speaking" reading of his second case, the average over the mass; the kit does not model demand letting the worst regulate outright), `best-dominates` (6,000, 3,000, 1,000: 7/2 h). Pin `vaMarketValue`, `vaSurplus`.
    - Misconception: supply and demand determine value.
    - Worked: 1,000 units at 3 h, 8,000 at 4 h and 1,000 at 5 h: market value 4 hours; the best group earns 1 hour of surplus profit per unit.
 
 4. **wages-and-prices-of-production** — Wage Changes and Prices of Production — *Chapter 11*
-   - Read: the passage on a general rise in wages and the prices of products of capitals of lower and higher composition.
+   - Read: "Let wages rise by 25%…" to "the new average rate of profit" (Kerr l. 2010).
    - Do: recompute prices of production after a general wage rise, with the new rate taken over the enlarged capital, and classify each sphere's price as rising, falling or unchanged.
-   - Lab: `prices`, view `wage-rise`. Presets: `marx` (Marx's figures: 50c + 50v, 80c + 20v, 92c + 8v at a 20% average rate; wages rise 25%), `two-spheres`, `fall`. Pin `ppPrices`, `ppAverage`.
+   - Lab: `prices`, view `wage-rise`. Presets: `marx` (80c + 20v named as the average, 50c + 50v, 92c + 8v at 20%; wages rise 25%: 1/7; £120, £900/7, £816/7), `two-spheres` (70c + 30v and 90c + 10v, the whole as the average: 1/7; £860/7, £820/7, summing to 240), `fall` (Marx's l. 2038–2044, wages fall by a quarter: 5/19; £120, £2,100/19, £2,352/19). Pin `ppPrices`, `ppAverage`.
    - Misconception: a general wage rise raises all prices.
-   - Worked: profit of 15 on the enlarged 105 is 14 2/7%; the average sphere stays at 120, the low-composition sphere rises to 128 8/14, the high-composition one falls to 116 4/7. The `note` says Marx's own text prints two figures for the low-composition profit.
+   - Worked: profit of 15 on the enlarged 105 is 14 2/7%; the average sphere stays at 120, the low-composition sphere rises to 128 4/7, the high-composition one falls to 116 4/7. The body and `mistakes` say that Marx's text prints 16 1/12 and 128 7/12 (§C formerly asked for this in the `note`).
 
 5. **supplementary-remarks-on-prices** — Supplementary Remarks on Prices of Production — *Chapter 12*
-   - Read: §3, "the capitalist's grounds for compensation".
-   - Do: list the compensations (risk, turnover, skill) a capitalist claims and show each as a redistribution within a fixed total profit.
-   - Lab: `prices`, view `production`. Presets: `risk-premium`, `turnover-premium`, `none`. Pin `ppTotals`.
+   - Read: §3, "The capitalist simply forgets…" to "the total surplus-value" (Kerr l. 2110).
+   - Do: list the compensations (risk, turnover) a capitalist claims and show each as a redistribution within a fixed total profit.
+   - Lab: `prices`, view `production`. Presets: Marx's five spheres of Chapter 9 with `none` (22%), `risk-premium` (5% extra for sphere V: base 21%, prices 91, 102, 112, 76, 41), `turnover-premium` (10% extra for sphere I: base 20%, prices 100, 101, 111, 75, 35). Pin `ppTotals` (with `ppAverage`, `ppPrices`).
    - Misconception: each compensation adds new profit.
-   - Worked: give one sphere a 2% risk premium and the others' share of total s falls by the same amount.
+   - Worked: give sphere V a 5% premium and the base rate falls from 22% to 21%: V gains 4, the other four lose 1 each, total profit stays 110. (Changed from a 2% premium so that every price is whole.)
 
 6. **the-law-as-such** — The Falling Rate of Profit: The Law as Such — *Chapter 13*
-   - Read: the table "s′ = 100%: c = 50, v = 100 → p′ = 66⅔%; c = 100 → 50%; c = 200 → 33⅓%; c = 300 → 25%; c = 400 → 20%".
+   - Read: the table "c = 50, and v = 100 … c = 400, and v = 100, then p' = 100/500, or 20%" (Kerr l. 2122–2128; Kerr prints 66 1/3% for 66 2/3%).
    - Do: compute p′ for a rising c/v at constant s′, and the mass of profit when total capital grows.
-   - Lab: `tendency`, view `law`. Presets: `marx` (Marx's table), `mass-rises` (Marx's illustration: 4c + 2v + 2s against 15c + 3v + 3s), `steady`. Pin `teRate`, `teMass`.
+   - Lab: `tendency`, view `law`, 4 periods. Presets: `marx` (c 50 rising by 50, 100, 100, 100 on v 100: 1/5, £100), `mass-rises` (Marx's 4c + 2v + 2s to 15c + 3v + 3s, in pounds as millions, the change made in the first of four periods: 1/6, £3,000,000), `steady` (800c + 200v doubling each period: 1/5, £3,200). Pin `teRate`, `teMass`.
    - Misconception: a falling rate of profit means falling profits.
    - Worked: from 4c + 2v + 2s to 15c + 3v + 3s the rate falls from 33⅓% to 16⅔% while the mass of profit rises by half.
 
 7. **counteracting-influences** — Counteracting Influences — *Chapter 14*
-   - Read: the list of influences, from "Increasing intensity of exploitation" to "The increase of stock capital".
+   - Read: the opening, "How is it that this fall is not greater and more rapid?" (Kerr l. 2284); the Kerr headings run from "Raising the Intensity of Exploitation" to "The Increase of Stock Capital".
    - Do: apply each counteracting influence to the law's sequence and compute how much of the fall it offsets.
-   - Lab: `tendency`, view `counter`. Presets: `rising-s`, `cheap-c`, `combined`. Pin `teRate`, `teOffset`.
+   - Lab: `tendency`, view `counter`, 4 periods, all from 300c + 100v at 100% with c rising 50 a period. Presets: `rising-s` (s′ up 1/8 a period: 25%, offset 25/3 of 25/3 points), `cheap-c` (c cheapens 1/14, 1/15, 1/16, 1/17, halving each rise in its value: 20%, 10/3 of 25/3), `combined` (s′ up 1/16 a period and the same cheapening: 25%, 25/3 of 25/3). Pin `teRate`, `teOffset` (with `teMass`).
    - Misconception: the counteracting influences are either exceptions that leave the law untouched or a refutation of it; Marx's own claim is narrower: they make the fall a tendency.
    - Worked: raising s′ from 100% to 150% holds p′ at 25% when c/v rises from 3 to 5. Marx argues a rising s′ cannot offset a rising c/v without limit; whether that is so is the most argued question about Part III (Okishio, 1961), and the lab does not settle it.
 
 8. **internal-contradictions-of-the-law** — The Internal Contradictions of the Law — *Chapter 15*
-   - Read: "The real barrier of capitalist production is capital itself."
+   - Read: §2, "The real barrier of capitalist production is capital itself." (Kerr l. 2437); §3, the 1,000 and 1,500 (l. 2453).
    - Do: compute when additional capital adds no additional profit (absolute over-accumulation) and the devaluation that restores the rate.
-   - Lab: `tendency`, view `overaccumulation`. Presets: `marx` (Marx's figures: a capital of 1,000 yielding 100 grows to 1,500 and still yields 100), `devalue` (a third of capital destroyed), `mild`. Pin `teMass`, `teRate`.
+   - Lab: `tendency`, view `overaccumulation`. Presets: `marx` (Marx's 1,000 yielding 100, split 900c + 100v by the lab, grows to 1,500: 1/15, £100), `devalue` (a third of the 1,500 destroyed: 1/10), `mild` (1,000 grows to 1,100: 1/11). Pin `teMass`, `teRate`.
    - Misconception: crises come from a shortage of capital.
    - Worked: 1,000 yielding 100 grows to 1,500 still yielding 100: p′ falls from 10% to 6⅔%, and the additional 500 has added nothing to profit.
 
