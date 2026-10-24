@@ -357,13 +357,16 @@ LESSONS = [
                   "and D, valued at 70s, pay 265s and 405s. The tile prints rents of 10s, 125s, "
                   "265s and 405s, 805s in all, which is the £40¼ of Marx's second table."),
             ("p", "The both preset makes the choice explicit. It offers the lab A's second dose "
-                  "at 75s and B's third at 70s, with a market just large enough for the first doses and one extra dose. The "
+                  "at 75s and B's third at 70s, with a market just large enough for the doses already in use and one extra dose. The "
                   "lab takes the cheapest doses first, B's third dose fills the market, A's "
                   "second is not used, and the rents are the marx preset's again. That is Marx's "
                   "reasoning: if the quarter cost more on B than on A, &ldquo;then it would "
                   "naturally be produced upon A, not upon B&rdquo;."),
-            ("p", "The on-a preset is the second route, A's own second dose at 75s. Then A "
-                  "regulates through its second capital, and its first capital, at 60s, earns "
+            ("p", "The on-a preset is the second route, A's own second dose at 75s. Marx takes "
+                  "the averaging rule first here: A's two quarters cost 135s together, an average "
+                  "of 67s 6d, his 3⅜ pounds, and if that average regulates, A pays no rent. Only "
+                  "if the second quarter is sold at its own 75s does A regulate through its second "
+                  "capital, and then its first capital, at 60s, earns "
                   "15s: &ldquo;the soil A would yield a rent of ¾ pound sterling&rdquo;, as Marx "
                   "says, and B's rent rises to 142s 6d, C's to 292s 6d and D's to 442s 6d. Marx adds that this can last only as "
                   "long as no unfarmed land of A's quality is on offer, because new A at 60s "
@@ -754,8 +757,9 @@ LESSONS = [
              "bread. On Marx's account the rent is limited from above by the value of the "
              "product: in the marx preset it is at most 5, and in the market-limited preset 2. "
              "Set agriculture at the average composition and there is nothing to take; the "
-             "tile reads up to £0. A price set at will is what Marx calls an actual monopoly "
-             "price, a different case."),
+             "tile reads up to £0. A price fixed only by buyers' eagerness and means, apart from "
+             "value and price of production, is what Marx calls an actual monopoly price, a "
+             "different case."),
             ("Thinking absolute rent contradicts differential rent",
              "Marx shows the differences are unchanged: if every price rises by the worst "
              "soil's rent r, each better soil's rent still exceeds A's by the same d, 2d, 3d. "
@@ -846,8 +850,8 @@ LESSONS = [
                   "landowner's."),
             ("p", "Marx's witness is a London builder, Edward Capps, examined by the Select "
                   "Committee on Bank Acts. A builder, Capps said, makes little out of the houses; "
-                  "he takes land at £300 a year, builds the right class of houses, and makes the "
-                  "ground worth &ldquo;400 or 500 pounds sterling&rdquo;, so that his profit lies "
+                  "he takes land at £300 a year, builds the right class of houses, and may make "
+                  "&ldquo;400 or 500 pounds sterling&rdquo; a year out of it, so that his profit lies "
                   "in &ldquo;the increased ground-rent&rdquo;. The capps preset takes the lower "
                   "figure, £400: at 5% the ground goes from £6,000 to £8,000. And at the end of "
                   "the usual lease, &ldquo;at the end of 99 years&rdquo;, the land, the "
@@ -866,8 +870,8 @@ LESSONS = [
                   "the rich wine drinkers&rdquo;, and the surplus becomes the vineyard owner's "
                   "rent: &ldquo;Here, then, the monopoly price creates the rent.&rdquo; Corn "
                   "would be the opposite case, where rent created a monopoly price, if landed "
-                  "property held its price above its value. Building rent can be both, Marx "
-                  "says, and adds that poverty is a more lucrative source for house rent "
+                  "property held its price above its value. Building rent, Marx says, often rests "
+                  "on monopoly price, and he adds that poverty is a more lucrative source for house rent "
                   "&ldquo;than the mines of Potosi ever were for Spain&rdquo;."),
             ("def", ("Building rent",
                      "The rent of land as a site for houses, works or docks, ruled above all by "

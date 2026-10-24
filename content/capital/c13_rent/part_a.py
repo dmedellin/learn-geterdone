@@ -124,8 +124,9 @@ LESSONS = [
                   "other, he paid for it, and the rent is the return on what he paid. Henry "
                   "Carey, the American economist who saw harmony where Marx saw antagonism, "
                   "argued that rent is interest on all the labour ever spent improving the soil. "
-                  "In the seventeenth century the argument ran the other way: Dudley North and "
-                  "Locke defended interest by likening it to rent, and Turgot justified interest "
+                  "Earlier, Marx notes, the argument ran the other way: in the seventeenth century "
+                  "Dudley North and Locke defended interest by likening it to rent, and in the "
+                  "eighteenth Turgot justified interest "
                   "&ldquo;from the existence of ground-rent&rdquo;. Marx's reply is that rent can "
                   "exist without any capital sunk in the land, and that a purchase only transfers "
                   "a title. If paying for land justified rent, he says, paying for a slave would "
@@ -355,9 +356,11 @@ LESSONS = [
                   "&ldquo;the water wheel need not be heated&rdquo;. It still sells at 115. Its profit is 25 against the steam user's 15: a surplus "
                   "profit of 10. The marx preset prints £115 for the price and both of Marx's "
                   "measures in the surplus tile."),
-            ("p", "Why two measures? Marx gives both. His first is the one above, 10, the water "
-                  "user's profit less the steam user's. His second is the difference between the "
-                  "general price and the water user's own individual price of production: if 100 "
+            ("p", "Why two measures? Marx's text holds both, though it writes out only the first. "
+                  "His figure is the one above, 10, the water "
+                  "user's profit less the steam user's. But he also defines the surplus profit as the "
+                  "difference between the general price and the water user's own individual price "
+                  "of production, and computes that price: if 100 "
                   "becomes 115, then 90 becomes 103½, and 115 less 103½ is 11½. The first "
                   "measure treats the water user as entitled to 15, the steam user's profit in "
                   "money; the second gives him 15% on his own smaller cost. The lab prints both, "
@@ -487,7 +490,7 @@ LESSONS = [
              "a": ["The value the waterfall adds to the product",
                    "The landowner's title to the waterfall",
                    "The sale of its goods at the general price of production, above its own lower one",
-                   "The sale of its goods above their price of production"],
+                   "The sale of its goods above the general price of production"],
              "c": 2,
              "why": "The waterfall is the &ldquo;natural basis&rdquo; and adds no value; the "
                     "title transfers the surplus but does not create it; and the goods sell at "
@@ -517,7 +520,7 @@ LESSONS = [
              "property did not prevail&rdquo;. Ownership decides who gets it, not whether it "
              "exists."),
             ("Mixing up the two measures",
-             "Ten and 11½ are both Marx's. Ten measures against the steam user's profit, 11½ "
+             "Ten is Marx's figure, and 11½ follows from his definition and his 103½. Ten measures against the steam user's profit, 11½ "
              "against the water user's own price of production. Say which one a figure is; "
              "the later lessons use the first."),
         ],
@@ -556,7 +559,7 @@ LESSONS = [
             "says rent does not need a descent to ever worse land, as Ricardo thought."
         ),
         "key": [
-            "price = worst soil's capital + profit / output",
+            "price = (capital + profit) / worst output",
             "A–D: 1, 2, 3, 4 quarters on 50s, 20%",
             "price 60s; rents 0, 60, 120, 180s",
             "total rent 360s = £18",
@@ -621,8 +624,9 @@ LESSONS = [
                   "middle step, with D, C and B in use: the price is 30s, and the rents are 0s, "
                   "30s and 60s, with D's 60s just as Marx says. Or suppose A was farmed first "
                   "and the better soils were found later, as settlers might find them: then the "
-                  "price never rose above 60s, and the same table forms with the price "
-                  "constant."),
+                  "price rose above 60s only until B's supply came in, fell back to 60s, and "
+                  "stayed there, and the same table forms with the price ending where it "
+                  "began."),
             ("p", "That is the first half of Marx's quarrel with Ricardo, and he states it as a "
                   "conclusion of the tables:"),
             ("p", "<strong>Volume III, Chapter 39.</strong> &ldquo;This does away with the "
@@ -928,7 +932,8 @@ LESSONS = [
                   "300s against four doses' 240s of cost and profit: a rent of 60s, or £3, and "
                   "the dose that yields 1 quarter does not even cover its costs. The point Marx "
                   "wanted, that the regulating price can fall while rent on the better land "
-                  "rises, is sound, and the next two lessons compute it properly."),
+                  "rises, does not depend on the slip, and the next two lessons compute it dose "
+                  "by dose."),
             ("p", "The chapter's quarrel is again with Ricardo, who made differential rent II "
                   "one case only: additional capital on land already farmed, with diminishing "
                   "returns, so that the price of corn rises, wages rise with it, profits fall "
@@ -1172,7 +1177,8 @@ LESSONS = [
                   "rent per acre rises faster than the capital. Here it is 180s, 300s and 420s, "
                   "900s in all. He adds a distinction that matters later. Producing twice the "
                   "product with the same capital is not the same as producing it with twice the "
-                  "capital: the first releases capital, the second has to find it."),
+                  "capital: the first saves the capital a doubled output would otherwise need, "
+                  "the second has to find it."),
             ("def", ("Rent per acre and rate of rent",
                      "Rent per acre is rent divided by the land; the rate of rent is rent "
                      "divided by the capital invested in it. Under differential rent II at a "
@@ -1315,7 +1321,7 @@ LESSONS = [
             ("Taking Chapter 40's 6 quarters for D at face value",
              "Chapter 40 gives D a total of 6 quarters but a second-dose rent of 2 quarters and "
              "a total rent of 5, which need 7 quarters; with 6, D's rent would be 240s, not the "
-             "£15 the text states twice. Chapter 41's Table III gives 7½. Say which table a "
+             "£15 the text states and its table on page 800 implies. Chapter 41's Table III gives 7½. Say which table a "
              "figure for D comes from."),
         ],
         "standard": (
@@ -1412,9 +1418,10 @@ LESSONS = [
                   "54 quarters in all, a money rent of 720s, at 30s a quarter. The rent-rises "
                   "preset runs it; the lab takes six doses a soil at most, so D's eleven doses of 50s "
                   "go in as one capital of 550s yielding 44 quarters, the same 15s a quarter. "
-                  "Marx's table on page 817 prints the money rents the lab does, £3 on C and "
-                  "£33 on D; it gives C a grain rent of 3 quarters and a grain total of 25, where "
-                  "£3 at 30s is 2 quarters and the total 24. "
+                  "The table on page 817 of the Kerr edition prints the money rents the lab does, "
+                  "£3 on C and £33 on D; it gives C a grain rent of 3 quarters and a grain total "
+                  "of 25, where £3 at 30s is 2 quarters and the total 24, the doubling of Table "
+                  "II's 12 quarters that Marx's sentence after it describes. "
                   "Compared with Table I, the price has halved and the money rent "
                   "has doubled; compared with Table II, the price has halved and the money rent "
                   "is the same."),
@@ -1441,8 +1448,8 @@ LESSONS = [
                   "B's average, £6 for 3½ quarters or 1 5/7 pounds, and reaches a rent of 9 3/7 "
                   "pounds. The lab values each dose by itself, so it would let B's weaker second "
                   "dose, at £2 a quarter, set the price instead; it does not reproduce Table V."),
-            ("p", "Engels, editing the volume in the 1890s, added a note to the next chapter "
-                  "that reads like this one come true. American prairie, Argentine pampas and "
+            ("p", "Engels, editing the volume after Marx's death, closed the section he wrote for "
+                  "the next chapter with a passage that reads like this one come true. American prairie, Argentine pampas and "
                   "the grain of Russian and Indian peasants forced to sell for their taxes "
                   "reached Europe by steamship and railway; a portion of Europe's soil "
                   "&ldquo;fell definitely out of the competition for the raising of "
