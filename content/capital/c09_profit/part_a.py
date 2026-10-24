@@ -129,7 +129,7 @@ LESSONS = [
             ("p", "Because cost price is what the capitalist himself paid, it is easy to take it "
                   "for the commodity's real value, and then the profit seems to come from selling "
                   "above value. Robert Torrens, a Royal Marines officer turned economist who wrote "
-                  "in Ricardo's circle, made the argument carefully. A farmer advances 100 "
+                  "in Ricardo's circle, put the argument this way. A farmer advances 100 "
                   "quarters of corn and gets 120 back, and &ldquo;it would be absurd to call this "
                   "surplus, or profit, a part of his expenditure&rdquo;. So profit cannot be part "
                   "of the cost of production, and must come from the buyers, who &ldquo;by a "
@@ -607,9 +607,9 @@ LESSONS = [
                   "wages, the intensity of labour or the length of the day, and that the first, "
                   "with the other two held constant, is the only case in which David Ricardo was "
                   "right that &ldquo;profits would be high or low, exactly in proportion as wages "
-                  "would be low or high&rdquo;. Ricardo, the stockbroker whose <em>Principles</em> of 1817 "
-                  "dominated English economics for a generation, reasoned as if the composition "
-                  "of capital stood still. The vary-s preset is Marx's 200% capital."),
+                  "would be low or high&rdquo;. Ricardo was the stockbroker whose <em>Principles</em> of 1817 "
+                  "dominated English economics for a generation; on this chapter's reckoning his "
+                  "rule is one case among many. The vary-s preset is Marx's 200% capital."),
             ("p", "Third, both at once. Marx starts from `80c + 20v + 20s` and lets wages fall "
                   "so that the same workers cost 16 instead of 20: the capital becomes "
                   "`80c + 16v + 24s`, with s′ = 150% and p′ = 25%. For p′ to stay at 20%, the "
@@ -627,7 +627,7 @@ LESSONS = [
                   "rising rate of surplus-value&rdquo;, and so on through every combination."),
             ("p", "This is where the chapter matters for what comes later. In Part III Marx "
                   "argues that the rate of profit tends to fall as c grows faster than v, even "
-                  "while exploitation rises. Mikhail Tugan-Baranovsky argued in 1901 that a "
+                  "while exploitation rises. Mikhail Tugan-Baranovsky argued in 1905 that a "
                   "rising composition need not lower the rate at all, since the productivity that "
                   "raises c also cheapens it and the workers' necessities. Nobuo Okishio proved in "
                   "1961 that a new technique a capitalist adopts because it cuts his costs at the "
@@ -737,7 +737,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking a rising rate of surplus value must raise the rate of profit",
-             "It holds only if the composition stays put, and Ricardo reasoned as though it did. "
+             "It holds only if the composition stays put, the one case in which, Marx says, Ricardo's "
+             "rule that profits rise as wages fall is correct. "
              "The s-up-p-down preset refutes it on Marx's figures: s′ rises from 100% to 150% "
              "while p′ falls from 20% to 15%, because v's share of the capital halved. The "
              "both-offset preset shows the middle case, s′ up by half and p′ unchanged at 20%."),
@@ -949,7 +950,7 @@ LESSONS = [
             {"q": "Engels' capital A, 80c + 20v, turns over twice a year at s′ = 100%. Why is "
                   "its annual rate 40% and not 20%?",
              "a": ["Because the 40 of surplus is divided by the 100 advanced, not by the 200 turned over",
-                   "Because its rate of surplus value is 200%",
+                   "Because its rate of surplus value per turnover is 200%",
                    "Because its fixed capital is smaller",
                    "Because it sells above value"],
              "c": 0,

@@ -117,11 +117,12 @@ LESSONS = [
             ("p", "Marx's summary is that capitalist production, however sparing it is with "
                   "materials, &ldquo;is utterly prodigal with human life&rdquo;. A standing "
                   "objection to it is older than the chapter. Adam Smith argued that wages vary with "
-                  "the hardship and danger of a trade, so that dangerous work is paid "
-                  "a premium and the risk is priced, not simply imposed; later economists built "
-                  "the theory of compensating wage differentials on that idea. The chapter does "
-                  "not take up Smith. The evidence it sets against the idea is the 1829 report "
-                  "it quotes, in which miners, &ldquo;whose numbers generally exceed the "
+                  "the ease or hardship, the cleanliness or dirtiness of a trade, and later "
+                  "economists built the theory of compensating wage differentials on that idea: "
+                  "dangerous work is paid a premium, so the risk is priced, not simply imposed. "
+                  "The chapter does not take up Smith. What in it bears on the idea is the mines "
+                  "report it quotes, dated 1829 in the text (the Children's Employment "
+                  "Commission reported on the mines in 1842), in which miners, &ldquo;whose numbers generally exceed the "
                   "demand&rdquo;, accept danger &ldquo;for a wage which is little above that of "
                   "the day laborers&rdquo; nearby. Whether risk is priced in a given labour "
                   "market is an empirical question the lab cannot answer."),
@@ -204,7 +205,7 @@ LESSONS = [
             {"q": "Cheaper cotton raises a spinner's rate of profit. Where, on Marx's account, "
                   "did the gain originate?",
              "a": ["In the spinner's own management",
-                   "In higher productivity of labour in cotton growing and transport",
+                   "In higher productivity of labour in cotton growing, outside the spinnery",
                    "In a higher rate of surplus value in the spinnery",
                    "In selling the yarn above its value"],
              "c": 1,
@@ -228,8 +229,8 @@ LESSONS = [
              "Much of it is a real saving, and Marx describes engines, buildings and reused waste "
              "at length. But the unsafe preset cuts c by £20 by not buying guards and ventilation, "
              "and the rate rises from 20% to `5/24`, exactly as a £20 saving from a better boiler "
-             "would. The rate of profit rewards both alike, which is why Marx files the crowded "
-             "room under &ldquo;a saving in buildings&rdquo;."),
+             "would. The rate of profit rewards both alike, which is why, in Marx's phrase, the "
+             "capitalist calls the crowded room &ldquo;a saving in buildings&rdquo;."),
             ("Thinking a saving in c produces more surplus value",
              "In the shared-building preset the profit is £100 before and after. The rate rises "
              "because the same surplus is measured against a smaller capital, not because more "
@@ -364,12 +365,15 @@ LESSONS = [
                   "had cost 5d or 6d a pound and went to 2s. Mills ran short time or closed; in "
                   "Lancashire and Cheshire in late 1862 about half the cotton workers had no work "
                   "at all. Marx reads the cycle as built in: machinery can be multiplied in a "
-                  "year, cotton only at the pace of a harvest. Economists who trust prices to "
-                  "balance the two hold that the high price itself calls out new supply, and the "
-                  "inspectors' figures show Indian and Egyptian cotton arriving. What the chapter "
-                  "sets against that is its observation that the supply of raw materials is "
-                  "extended &ldquo;only convulsively&rdquo;, suddenly enlarged and then violently "
-                  "contracted when the price falls back."),
+                  "very short time, cotton only at the pace of a harvest. Economists who trust "
+                  "prices to balance the two hold that the high price itself calls out new "
+                  "supply, and Marx grants the first step: a dear raw material is shipped from "
+                  "further away and planted more widely, though the new crop is not felt until "
+                  "the following year, and the inspectors' figures show Indian and Egyptian "
+                  "cotton arriving. What the chapter adds is that the supply comes late and all "
+                  "at once, so that the production of raw materials is extended &ldquo;only "
+                  "convulsively&rdquo;, suddenly enlarged and then violently contracted when the "
+                  "price falls back."),
             ("p", "The two chapters on c are done. The last lesson of the course, “Supplementary "
                   "Remarks on Profit”, asks why the capitalist, looking at all this, still does "
                   "not see his profit as surplus value."),
@@ -438,7 +442,7 @@ LESSONS = [
              "a": ["20%", "25%", "0%", "33.33%"],
              "c": 0,
              "why": "c becomes 400, so `100/500 = 1/5`. 25% is the old rate on 400, 0% would "
-                    "need none of the rise passed on, and 33.33% divides by c alone."},
+                    "need none of the rise passed on, and 33.33% divides by the old c alone."},
             {"q": "In the same case the product's price does not move at all. What is the "
                   "profit?",
              "a": ["£100", "£0", "−£100", "£50"],
@@ -530,7 +534,7 @@ LESSONS = [
             ("Business ability",
              "With the same surplus value, a capitalist who manages with less constant capital "
              "earns a higher rate. That difference is real, and it persuades him that his "
-             "profit comes from his own activity."),
+             "profit comes, at least in part, from his own activity."),
             ("Size and rate",
              "Changing the size of a capital leaves the rate of profit alone only in two cases: "
              "a change in the money measuring it, or a change that keeps its composition. "
