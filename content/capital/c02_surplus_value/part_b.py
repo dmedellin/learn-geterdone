@@ -95,7 +95,8 @@ LESSONS = [
             ("p", "The method, then, in Marx's summary: take the value of the product, set the "
                   "constant part to zero, and what is left is the value created; split it into "
                   "v and s; divide. He works two examples. A mill of 10,000 spindles in 1871 "
-                  "spends £378 a week on cotton, wear, rent and coal and £52 on wages, and sells "
+                  "spends £378 a week on cotton, wear, rent, coal, gas and oil and £52 on wages, "
+                  "and sells "
                   "its yarn for £510: s is £80, and s/v is 80/52, or 153 11/13%. And an English "
                   "acre of wheat in 1815, from the economist William Jacob's figures, yields £3 "
                   "11s of surplus against £3 10s of wages, a little over 100%."),
@@ -111,8 +112,8 @@ LESSONS = [
                   "and 2 2/3 lb for the wear; 2 lb carry the wages; 2 lb carry the surplus. Of "
                   "course every pound was spun, and every pound contains cotton. The division "
                   "is of value, not of fibre. Marx's image is that the spinner might as well "
-                  "have spun the last 4 lb &ldquo;out of air&rdquo;: all the cotton's value is "
-                  "concentrated in the first 16."),
+                  "have spun the last 4 lb &ldquo;out of air&rdquo;: all the value of the cotton "
+                  "and the wear is concentrated in the other 16."),
             ("p", "The manufacturer reads the same division in time: in the first 8 hours the "
                   "spinner produces yarn equal in value to the day's cotton, in the next hour "
                   "and 36 minutes the wear, in the next hour and 12 minutes his wages, and in "
@@ -266,7 +267,7 @@ LESSONS = [
         "slug": "seniors-last-hour",
         "title": "Senior's “Last Hour”",
         "module": "Chapter 9 · The Rate of Surplus-Value",
-        "one_line": "Senior claimed the whole net profit came from the last hour of an 11½-hour day; on his own figures an hour less still leaves a rate of surplus value of about 83%.",
+        "one_line": "Senior claimed the whole net profit came from the last hour of an 11½-hour day; on Marx's reckoning an hour less still leaves a rate of surplus value of about 83%.",
         "summary": (
             "In 1836 the Oxford economist Nassau Senior argued against shorter hours that "
             "a mill's net profit is made in the last hour of the day. Compute the rate of "
@@ -294,9 +295,10 @@ LESSONS = [
              "Senior put machinery, raw material and wages in one sum, so it looked as if "
              "the worker spent most of the day replacing the cotton and the mill."),
             ("Marx's correction",
-             "Separate c from v. On Senior's own figures wages and net profit are equal, so "
-             "the day is half necessary and half surplus labour, and an hour off the day "
-             "takes an hour off the surplus, not all of it."),
+             "Separate c from v. Suppose, as Marx does, that the separated account keeps the "
+             "manufacturers' story and shows wages and net profit equal: then the day is half "
+             "necessary and half surplus labour, and an hour off the day takes an hour off the "
+             "surplus, not all of it."),
         ],
         "read_title": "The scene, then Senior's analysis and Marx's reply",
         "read_intro": (
@@ -337,9 +339,11 @@ LESSONS = [
                   "as you lose.&rdquo; Then he takes the analysis seriously, and asks Senior to "
                   "do what he did not: put the constant capital on one side of the account and "
                   "the wages on the other."),
-            ("p", "On Senior's own figures, the worker reproduces his wages in one hour's worth "
-                  "of product, the last hour but one, and the net profit in another. Wages and "
-                  "net profit are therefore equal in value. But the worker adds value only by "
+            ("p", "Senior's figures put wages in one sum with the raw material, so they cannot "
+                  "show this by themselves. Marx supposes that the separated account keeps the "
+                  "manufacturers' story: the worker reproduces his wages in the product of the "
+                  "last hour but one and the net profit in the product of the last. Wages and net "
+                  "profit are then equal in value. But the worker adds value only by "
                   "working, and only in proportion to the hours, so of his 11½ hours, 5¾ "
                   "reproduce his wages and 5¾ produce the net profit. The rate of surplus value "
                   "is 100%."),
@@ -423,8 +427,8 @@ LESSONS = [
         "worked": {
             "title": "An hour off Senior's day",
             "intro": [
-                "Senior's mill works 11½ hours. On his own figures wages and net profit are "
-                "equal. You want the rate of surplus value now, after an hour is cut, and on "
+                "Senior's mill works 11½ hours. Take Marx's supposition that, once the constant "
+                "capital is set aside, wages and net profit are equal. You want the rate of surplus value now, after an hour is cut, and on "
                 "the 13-hour day he wanted.",
             ],
             "lines": [
@@ -448,8 +452,8 @@ LESSONS = [
              "why": "The surplus falls from 5¾ to 4¾ hours and the necessary time is unchanged, "
                     "so the rate is `19/23`. Zero is Senior's prediction; 100% is the rate "
                     "before the cut; `23/19` divides the wrong way."},
-            {"q": "On Marx's reading of Senior's own figures, how many of the 11½ hours "
-                  "reproduce the value of the wages?",
+            {"q": "On Marx's reading, with wages and net profit equal in value, how many of the "
+                  "11½ hours reproduce the value of the wages?",
              "a": ["One hour, the last hour but one", "Half an hour",
                    "5¾ hours", "10½ hours"],
              "c": 2,
@@ -498,8 +502,10 @@ LESSONS = [
             "The lab assumes, with Marx, that the wear on the means of production is in "
             "proportion to the hours they run. Costs that accrue with calendar time, interest "
             "and obsolescence, are left out, and they are the strongest part of the "
-            "manufacturers' case. Senior's 11½ hours and the equality of wages and net profit "
-            "are his figures as Marx reads them; the Kerr text's &ldquo;82 14/32%&rdquo; is a "
+            "manufacturers' case. Senior's 11½ hours and his predictions are his own; the "
+            "equality of wages and net profit is Marx's supposition about what the "
+            "manufacturers' figures would show with wages separated, and the 100% rests on "
+            "it. The Kerr text's &ldquo;82 14/32%&rdquo; is a "
             "misprint for 82 14/23%."
         ),
     },
@@ -590,7 +596,8 @@ LESSONS = [
                   "for its owners, Athenian, Roman, Norman baron or Wallachian boyar. The "
                   "difference is visibility. A Wallachian peasant under the corvée worked his "
                   "own field on some days and his lord's on others, so the division was there "
-                  "to be seen; Marx shows how the Russian-drafted code of 1831 turned a nominal "
+                  "to be seen; Marx shows how the code that the Russian general Kisseleff "
+                  "proclaimed in 1831, dictated, he says, by the boyars themselves, turned a nominal "
                   "14 days of corvée into 56, a rate of 56/84, 66 2/3%. In a factory, necessary "
                   "and surplus labour &ldquo;glide one into the other&rdquo;, minute by "
                   "minute."),
@@ -604,8 +611,8 @@ LESSONS = [
                   "put a thousand a year in his pocket. &ldquo;Moments are the elements of "
                   "profit.&rdquo;"),
             ("p", "Section 3 turns to trades with no legal limit, and the evidence is hard to "
-                  "read. Children in Nottingham's lace trade at work from two or three in the "
-                  "morning until ten or eleven at night; William Wood, who began running moulds "
+                  "read. Children of nine or ten in Nottingham's lace trade at work from two, "
+                  "three or four in the morning until ten, eleven or twelve at night; William Wood, who began running moulds "
                   "in the Staffordshire potteries at 7 years and 10 months, working from 6 a.m. "
                   "to 9 p.m.; London bakers who rarely reached 42; Mary Anne Walkley, a "
                   "milliner of 20, dead after 26½ hours of unbroken work on gowns for a ball. "
@@ -838,8 +845,9 @@ LESSONS = [
                   "compromise Act of 5 August 1850: young persons and women would work 10½ hours "
                   "on weekdays and 7½ on Saturday, all between 6 a.m. and 6 p.m., with common "
                   "meal times. That ended the relay system &ldquo;once for all&rdquo;, at the "
-                  "price of half an hour a day. Through the 1850s and 1860s the Act reached "
-                  "dye-works, bleach-works, lace, potteries, match-making and bakeries."),
+                  "price of half an hour a day. From 1860 the Factory Acts reached dye-works, "
+                  "bleach-works, lace, potteries and match-making, and an Act of 1863 reached "
+                  "the bakeries."),
             ("p", "<strong>Volume I, Chapter 10, §7.</strong> &ldquo;The creation of a normal "
                   "working day is, therefore, the product of a protracted civil war, more or "
                   "less dissembled, between the capitalist class and the working class.&rdquo;"),
@@ -1093,7 +1101,8 @@ LESSONS = [
                   "experience based on appearance&rdquo;: in fact capitals of the same size earn "
                   "about the same profit wherever they are invested. He compares the missing "
                   "steps to the algebra needed to see that 0/0 can stand for a real quantity, "
-                  "and defers the solution to Volume III."),
+                  "and says only that many intermediate terms are still wanting. They are "
+                  "supplied in Volume III."),
             ("p", "That deferral is where the sharpest criticism of Capital lands. Eugen von "
                   "Böhm-Bawerk argued in 1896 that Volume III's solution, prices of production "
                   "that depart systematically from values, contradicts Volume I's theory "
@@ -1243,8 +1252,9 @@ LESSONS = [
         ),
         "note": (
             "The lab assumes every worker is an average worker and the value of labour-power "
-            "stays put as the day lengthens; Marx makes both assumptions and says that where "
-            "they fail, the mass no longer grows with the number of workers. The third law's "
+            "stays put as the day lengthens. Marx makes both assumptions, and notes exceptional "
+            "cases where the mass does not grow in proportion to the number of workers, which "
+            "are cases where the value of labour-power has changed. The third law's "
             "conflict with observed profits is left for Volume III. The 100 and 50 workers at "
             "3s are Marx's; the 18-hour case is his 200% applied to the same 50 workers."
         ),

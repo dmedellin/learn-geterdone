@@ -261,8 +261,8 @@ LESSONS = [
         "note": (
             "The lab subtracts one sum of money from another. It cannot say where the £10 "
             "came from, and Chapter 4 does not either: on the ordinary account it pays for "
-            "carriage, storage, risk and waiting, and Marx's reply comes only once labour-power "
-            "is on the market. The corn and the cotton are Marx's figures; the £90 is his "
+            "carriage, storage, risk and waiting. Marx's general answer begins once labour-power "
+            "is on the market; his account of the merchant's own share waits for Volume III. The corn and the cotton are Marx's figures; the £90 is his "
             "&ldquo;or lets it go for £100, or even £50&rdquo; made specific."
         ),
     },
@@ -278,8 +278,8 @@ LESSONS = [
         "summary": (
             "Marx tests every way buying and selling might create surplus value and finds "
             "that none does. Compute the values held before and after when every seller "
-            "marks up 10%, when one trader cheats another, and when three dealers mark up a "
-            "producer's goods: the total never changes, only who holds it."
+            "marks up 10%, when one trader cheats another, and when three dealers who mark "
+            "up trade with a producer who does not: the total never changes, only who holds it."
         ),
         "key": [
             "equivalents exchanged: no gain in value",
@@ -309,7 +309,7 @@ LESSONS = [
         ],
         "read_title": "The conclusion first, then the cases that lead to it",
         "read_intro": (
-            "The passage is the chapter's verdict, two sentences from its end. The lesson "
+            "The passage is the chapter's verdict, from its closing paragraphs. The lesson "
             "then works back through the cases Marx eliminates on the way."
         ),
         "body": [
@@ -330,7 +330,8 @@ LESSONS = [
                   "philosopher, built a theory of trade on this: value lies in a thing's "
                   "relation to our wants, so each side gives less for more, and both gain. "
                   "Marx's reply is that Condillac has run use-value and exchange value together, "
-                  "and that &ldquo;commodities are not paid for twice over, once on account of "
+                  "and, to the later economists who used the argument to show that commerce adds "
+                  "value, that &ldquo;commodities are not paid for twice over, once on account of "
                   "their use-value, and again on account of their value.&rdquo;"),
             ("p", "So suppose instead that sellers can sell above value. Every seller marks "
                   "up 10%, so what is worth 100 sells for 110. But every seller is also a "
@@ -387,9 +388,9 @@ LESSONS = [
             ("p", "The lab arranges traders in a ring, each selling to the next at a mark-up, "
                   "so everyone is a buyer and a seller. Ten per cent all round leaves each "
                   "trader where he began. Marx's wine-and-corn cheat moves £10 from B to A and "
-                  "leaves the £90 alone. Three dealers who each add 10% to a producer's goods "
-                  "move £10 from the one party who does not mark up; the total is still what "
-                  "it was."),
+                  "leaves the £90 alone. Put a producer who sells at value into a ring with three "
+                  "dealers who each add 10%, and £10 moves from him to the dealer he sells to; "
+                  "the total is still what it was."),
             ("p", "So the surplus must come from a purchase made at its value. The next lesson, "
                   "“The Buying and Selling of Labour-Power”, finds the one commodity whose use "
                   "can supply it."),
@@ -597,7 +598,7 @@ LESSONS = [
                   "tools he would sell "
                   "boots instead, and &ldquo;No boots can be made without leather.&rdquo; Free "
                   "of masters, then, and free of property."),
-            ("p", "Marx then says something that the economists he is reading did not. Nature "
+            ("p", "Marx then adds a point that does not interest Moneybags at all. Nature "
                   "does not produce owners of money on one side and people with nothing but "
                   "their capacity to work on the other. That relation is the result of a long "
                   "history, &ldquo;the extinction of a whole series of older forms of social "
@@ -631,11 +632,11 @@ LESSONS = [
                   "is a floor. A price at that floor is below the value."),
             ("p", "Pellegrino Rossi, the Italian economist who taught at the Collège de France, "
                   "objected that to speak of labour-power apart from the worker's subsistence "
-                  "is to speak of a phantom. Marx agrees that the two cannot be separated, and "
-                  "turns the point round: the subsistence is exactly what the capacity costs. "
-                  "And then the joke: &ldquo;When we speak of capacity for labour, we do not "
-                  "speak of labour, any more than when we speak of capacity for digestion, we "
-                  "speak of digestion.&rdquo;"),
+                  "is to speak of a phantom. Marx answers first with a joke: &ldquo;When we speak "
+                  "of capacity for labour, we do not speak of labour, any more than when we speak "
+                  "of capacity for digestion, we speak of digestion.&rdquo; Then he turns the point "
+                  "round: nobody is abstracting from the subsistence, because its value is exactly "
+                  "what the capacity is worth."),
             ("p", "One detail matters later. Labour-power is usually paid for after it has been "
                   "used, at the end of the week, so the worker &ldquo;gives credit to the "
                   "capitalist&rdquo;. Marx sets this aside and assumes payment on the spot, "
@@ -923,17 +924,22 @@ LESSONS = [
                   "the work so closely. A spinner given a distaff where the self-acting mule is "
                   "normal, or cotton so poor that it wastes, spends time that creates no value. "
                   "If the capitalist uses a gold spindle where a steel one would do, only the "
-                  "steel one's labour counts. Waste, Marx says, is forbidden by the factory's "
+                  "steel one's labour counts. Waste, Marx says, is forbidden by the capitalist's "
                   "&ldquo;penal code of his own&rdquo;, because wasted material carries no "
                   "value into the product."),
             ("p", "On Marx's definitions the 3s is the difference between what a day of "
                   "labour-power costs and what a day of labour adds. That is exactly the step "
                   "an economist who prices labour by its marginal product would refuse: on that "
-                  "account the capital goods are productive too, and the return on them pays "
-                  "for waiting, which Eugen von Böhm-Bawerk made the centre of his theory of "
-                  "interest in the 1880s. The capitalist's appeal to abstinence is a cruder "
-                  "version of that argument, and Marx mocks it rather than refuting it here. "
-                  "The next lessons keep the refusal in view."),
+                  "account the capital goods are productive too, and part of the product is "
+                  "theirs. Eugen von Böhm-Bawerk, in the 1880s, put the return on capital down "
+                  "to time instead: present goods are worth more than future ones, and the "
+                  "capitalist who advances them is paid for the wait. The capitalist's appeal to "
+                  "abstinence is a cruder version of that argument. Marx's answers in this "
+                  "chapter are that in the six-hour case there is nothing to reward abstinence "
+                  "with, since the product is worth exactly what went in, and that the "
+                  "&ldquo;service&rdquo; of the cotton and the spindle is a matter of use-value, "
+                  "while the question is one of value. Whether the 3s of the twelve-hour day "
+                  "rewards waiting is the question the next lessons keep in view."),
             ("p", "The lab does the mill's sum. The first preset is Marx's six hours, product "
                   "15s and nothing left over. The second is his twelve hours: 27s goes in, yarn "
                   "worth 30s comes out. The third keeps the twelve hours but uses 2s more cotton "
@@ -1187,8 +1193,9 @@ LESSONS = [
                   "changes enormously while their functions stay what they were. That proportion "
                   "returns, as the composition of capital, in Wages and Accumulation."),
             ("p", "The objection at its strongest is that machines are productive, and that "
-                  "their owners are paid for that productivity. Marx agrees with half of it: "
-                  "in the sixfold case the machine multiplies the yarn. What he denies is that "
+                  "their owners are paid for that productivity. Marx grants half of it: an "
+                  "instrument helps make use-values, and an invention like the one in the "
+                  "sixfold case multiplies the yarn. What he denies is that "
                   "it adds value, which on his definition only living labour does. The dispute "
                   "is over what value is, and the arithmetic below follows the chapter's "
                   "answer."),
@@ -1309,8 +1316,8 @@ LESSONS = [
              "its whole life the £1,000 machine passes £1,000 into the products and not a "
              "penny more, because it can only give up the value it loses."),
             ("Calling v constant because the wage is a fixed sum",
-             "The £6 paid in wages is a fixed sum when it is paid, which is Marx's own "
-             "objection to his term. What varies is what replaces it in production: £12 of new "
+             "The £6 paid in wages is a fixed sum when it is paid, a difficulty Marx raises "
+             "against his own term in the next chapter. What varies is what replaces it in production: £12 of new "
              "value in a twelve-hour day."),
         ],
         "standard": (

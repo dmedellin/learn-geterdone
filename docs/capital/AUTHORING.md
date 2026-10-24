@@ -126,3 +126,11 @@ the text that supports it. In particular:
   (Böhm-Bawerk's time preference is not Senior's abstinence).
 - Do not praise one side in the lesson's own voice ("they were right about
   what it shows", "a fair reading"). Quote Marx's verdict if there is one.
+
+## Marx's tables
+
+The plain-text files lose every table, because the ePubs print tables as
+images. The images are extracted as PNG in
+`/mnt/project-files/capital-texts/tables/volume-N/`, indexed in
+`tables/README.md` by Kerr page and by the line of that page's marker in the
+.txt file. Read the image before using a table's figures, and cite the page.

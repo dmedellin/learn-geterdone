@@ -101,8 +101,9 @@ COURSE = {
         "the argument, and no lab models the history beyond the length of the day.",
         "Theories of profit as a reward for waiting or risk. The abstinence argument, "
         "Böhm-Bawerk's theory of interest and the marginal productivity theory of wages "
-        "are stated at their strongest where Marx argues with them. They are not developed "
-        "or computed.",
+        "are stated at their strongest where the lessons meet them; Böhm-Bawerk wrote after "
+        "Marx, so his are objections to the book rather than positions it answers. None is "
+        "developed or computed.",
     ],
     "footer_lead": (
         "Every figure in this course is computed in your browser from the sums, hours and "
