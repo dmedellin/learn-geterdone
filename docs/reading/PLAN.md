@@ -1278,9 +1278,11 @@ content/reading/
 content/spoken/reading.py           SPOKEN = {}
 ```
 
-A lesson's lab cfg names passages by id (`"passage": "P01"`, `"passages":
-["P07", "P08"]`); the kit resolves them from `content.reading.passages` at
-build time and embeds only those. Course fields and lesson fields are exactly
+A lesson module imports the bank (`from reading.passages import PASSAGES`)
+and puts the passage dicts themselves into its lab cfg (`"passage":
+PASSAGES["P01"]`, `"passages": [PASSAGES["P07"], PASSAGES["P08"]]`), each
+dict carrying its own `id`. The kit never imports `content/`; it validates
+the dict's shape at build time and embeds only what it is given. Course fields and lesson fields are exactly
 those of `docs/philosophy/PLAN.md` §E (the field table and its ranges), with
 `body` 7–16 blocks.
 
