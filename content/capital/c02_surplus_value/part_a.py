@@ -329,9 +329,9 @@ LESSONS = [
                   "more wine. Étienne Bonnot de Condillac, the eighteenth-century French "
                   "philosopher, built a theory of trade on this: value lies in a thing's "
                   "relation to our wants, so each side gives less for more, and both gain. "
-                  "Marx's reply is that Condillac has run use-value and exchange value together. "
-                  "&ldquo;Commodities are not paid for twice over, once on account of their "
-                  "use-value, and again on account of their value.&rdquo;"),
+                  "Marx's reply is that Condillac has run use-value and exchange value together, "
+                  "and that &ldquo;commodities are not paid for twice over, once on account of "
+                  "their use-value, and again on account of their value.&rdquo;"),
             ("p", "So suppose instead that sellers can sell above value. Every seller marks "
                   "up 10%, so what is worth 100 sells for 110. But every seller is also a "
                   "buyer, and pays 10% too much in turn: &ldquo;Our friend gained 10 as a "
@@ -589,11 +589,12 @@ LESSONS = [
                      "capabilities existing in a human being, which he exercises whenever he "
                      "produces a use-value of any description&rdquo;. It is sold for a period, "
                      "and its use is labour.")),
-            ("p", "Now read the passage clause by clause. &ldquo;As a free man he can dispose "
-                  "of his labour-power&rdquo;: the seller must own himself, and he must sell for "
-                  "a definite time only. Sell it &ldquo;rump and stump, once for all&rdquo;, "
-                  "and he would be selling himself, a slave rather than a seller. &ldquo;He has "
-                  "no other commodity for sale&rdquo;: if he had leather and tools he would sell "
+            ("p", "Now read the passage clause by clause. First, &ldquo;as a free man he can "
+                  "dispose of his labour-power&rdquo;: the seller must own himself, and he must "
+                  "sell for a definite time only. Sell it &ldquo;rump and stump, once for "
+                  "all&rdquo;, and he would be selling himself, a slave rather than a seller. "
+                  "Then, &ldquo;he has no other commodity for sale&rdquo;: if he had leather and "
+                  "tools he would sell "
                   "boots instead, and &ldquo;No boots can be made without leather.&rdquo; Free "
                   "of masters, then, and free of property."),
             ("p", "Marx then says something that the economists he is reading did not. Nature "
@@ -738,11 +739,11 @@ LESSONS = [
             {"q": "A worker's food and fuel take 4 hours a day to produce, clothes worth 14 "
                   "hours last 14 days, and furniture worth 730 hours lasts 730 days. What is "
                   "the daily value of labour-power?",
-             "a": ["748 hours", "18 hours", "6 hours", "4 hours"],
+             "a": ["748 hours", "19 hours", "6 hours", "4 hours"],
              "c": 2,
              "why": "Spread each item over its life: `4 + 14/14 + 730/730 = 6` hours. 748 adds "
-                    "the totals without spreading them, 18 spreads only the furniture, and 4 "
-                    "leaves out everything not bought daily."},
+                    "the totals without spreading them, 19 spreads only the furniture and "
+                    "counts the clothes whole, and 4 leaves out everything not bought daily."},
             {"q": "On the chapter's account, what does the worker sell to the capitalist?",
              "a": ["Labour, so many hours of work already done",
                    "Labour-power, for a definite period",
@@ -873,7 +874,7 @@ LESSONS = [
                   "structure in imagination before he erects it in reality.&rdquo; Its elements "
                   "are the work itself, the object worked on and the instruments. Fish in the "
                   "sea is an object of labour supplied by nature; cotton already grown is raw "
-                  "material; the spindle is an instrument. At the end, &ldquo;the process "
+                  "material; the spindle is an instrument. At the end, &ldquo;The process "
                   "disappears in the product&rdquo;."),
             ("p", "When the capitalist runs the process, two things change and nothing else "
                   "yet does. The worker works under the capitalist's control, and the product "
