@@ -39,7 +39,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Subsistence as variable capital",
-             "The land fed as many or more after the clearing. The food the evicted "
+             "The land yielded as much or more after the clearing. The food the evicted "
              "peasants used to grow for themselves is now sold, and they must buy back its "
              "value with wages: it has become an element of variable capital."),
             ("Materials as constant capital",
@@ -112,8 +112,9 @@ LESSONS = [
                   "cottage acres, as the old laws tried to, so that it still grows its own "
                   "food, and the market is 50s, the cottage preset: only the cloth and fuel are bought."),
             ("p", "The strongest rival account starts from the same households. Adam Smith "
-                  "tied the market to the division of labour, each extending the other, as "
-                  "specialised producers find it cheaper to buy than to make. Jan de Vries has argued that "
+                  "made the division of labour depend on the extent of the market, with "
+                  "households buying what specialised producers make more cheaply than they "
+                  "could. Jan de Vries has argued that "
                   "in the seventeenth and eighteenth centuries households chose to work more "
                   "for the market and to buy what they had made at home, because they wanted "
                   "new goods: an industrious revolution, in which the home market grew by "
@@ -121,9 +122,11 @@ LESSONS = [
                   "consumption flat. The lab holds consumption flat by construction, so it "
                   "shows Marx's mechanism; it cannot show that the change was forced."),
             ("p", "Marx himself says the process was slow and incomplete. Manufacture destroyed "
-                  "rural domestic industry in some branches and called it up again in others, "
-                  "which is why the student of English history keeps finding the peasantry "
-                  "complained of as vanishing and then turning up again. Only modern industry, "
+                  "rural domestic industry in some branches and called it up again in others. "
+                  "That is one reason, though not, he says, the chief one, why the student of "
+                  "English history keeps finding the peasantry complained of as vanishing and "
+                  "then turning up again; the chief is that England swung between corn and "
+                  "cattle, and peasant cultivation with it. Only modern industry, "
                   "with machinery, completes the separation of agriculture from domestic "
                   "spinning and weaving and conquers the whole home market for capital."),
             ("p", "That accounts for the farmer and for the market. The next lesson, “Genesis "
@@ -356,7 +359,7 @@ LESSONS = [
                   "of the long arguments of economic history. Eric Williams argued in 1944, in "
                   "<em>Capitalism and Slavery</em>, that the profits of the slave trade and the "
                   "plantations helped finance the Industrial Revolution. Stanley Engerman and "
-                  "Patrick O'Brien answered with estimates in which those profits were a small "
+                  "Patrick O'Brien answered, in separate studies of 1972 and 1982, with estimates in which those profits were a small "
                   "share of British investment, too small to be decisive. Joseph Inikori "
                   "replied in 2002 that the Atlantic trade's demand for British manufactures, "
                   "not its profits alone, was central. None of these sides denies the "
@@ -402,7 +405,7 @@ LESSONS = [
                   "already called the change a financial revolution. Marx and they describe "
                   "the same institutions; they disagree on what they were for and whom they "
                   "served."),
-            ("p", "Marx closes the chapter with an image you will not forget: if money comes "
+            ("p", "Marx closes the chapter by finishing a sentence of Augier's: if money comes "
                   "into the world with a blood-stain on one cheek, &ldquo;capital comes "
                   "dripping from head to foot, from every pore, with blood and dirt&rdquo;. The "
                   "next lesson, “Historical Tendency of Capitalist Accumulation”, asks what the "
@@ -512,7 +515,7 @@ LESSONS = [
              "make it the fundamental cause of the people's misery. The fundamental process, "
              "on his account, remains the separation of the producers from the means of "
              "production."),
-            ("Reading the colonial chapter as only about consols",
+            ("Reading the chapter as only about consols",
              "Most of the chapter is the colonial system: plunder, enslavement and the slave "
              "trade. The lab computes the debt because it is the lever with a formula; the "
              "others are matters of evidence, argued between Williams, Engerman, O'Brien and "
@@ -577,8 +580,8 @@ LESSONS = [
         ],
         "read_title": "The knell",
         "read_intro": (
-            "The most famous passage in Volume I comes at the end of a long sentence about "
-            "centralisation. Its argument is about the merging of capitals."
+            "One of the best-known passages in Volume I comes at the end of a long sentence "
+            "about centralisation. Its argument is about the merging of capitals."
         ),
         "body": [
             ("p", "<strong>Volume I, Chapter 32.</strong> &ldquo;Centralisation of the means of "
@@ -636,7 +639,7 @@ LESSONS = [
                   "and difficult&rdquo; than the second will be, because &ldquo;we had the "
                   "expropriation of the mass of the people by a few usurpers; in the latter, we "
                   "have the expropriation of a few usurpers by the mass of the people&rdquo;."),
-            ("p", "This chapter has drawn more argument than any other in the volume. Eugen "
+            ("p", "Few chapters of the volume have drawn more argument. Eugen "
                   "Dühring attacked the negation of the negation as Hegelian word-play doing "
                   "the work of proof, and Engels replied in <em>Anti-Dühring</em> in 1878 that "
                   "Marx first shows the process historically and only afterwards names its "
@@ -785,7 +788,7 @@ LESSONS = [
             "The merging rule is mechanical, the largest absorbing the smallest, and the "
             "figures are illustrative; real centralisation goes by competition and credit "
             "in no fixed order. The lab shows what centralisation does to shares. Whether "
-            "it leads where Marx says is the most argued question in the book, and the "
+            "it leads where Marx says is one of the most argued questions in the book, and the "
             "record that would settle it is not computed here."
         ),
     },
@@ -800,8 +803,8 @@ LESSONS = [
         "module": "Chapter 33 · The Modern Theory of Colonisation",
         "one_line": "In the colonies, where land was free, a capitalist found that his money and machines employed no one, and Wakefield's remedy was to put a price on the land.",
         "summary": (
-            "Volume I ends with Edward Gibbon Wakefield, who discovered in the colonies "
-            "that capital is not a thing but a relation between persons. Compute the "
+            "Volume I ends with Edward Gibbon Wakefield, who, on Marx's reading, discovered "
+            "in the colonies that capital is not a thing but a relation between persons. Compute the "
             "workers left for hire to a colonist who brought £50,000 and 3,000 labourers "
             "when land is free, and the years of wage-labour Wakefield's land price "
             "imposes before a worker can leave."
@@ -1024,8 +1027,10 @@ LESSONS = [
              "Peel exported £50,000 of means of subsistence and production, and with free "
              "land the tile counts 0 workers for hire: the things arrived and the capital did "
              "not. Only the Wakefield and closed presets, which keep the workers from the "
-             "land, give the £50,000 anyone to employ. This is Wakefield's own discovery, "
-             "which Marx credits him with."),
+             "land, give the £50,000 anyone to employ. This is the discovery Marx credits "
+             "to Wakefield, while adding that Wakefield himself went on calling the settlers' "
+             "own tools capital, and their spread among many owners an equal division of "
+             "capital."),
             ("Reading the land price as a market price",
              "Wakefield's price was to be set by the state, &ldquo;independent of the law of "
              "supply and demand&rdquo;, at whatever level kept workers on the labour market. "

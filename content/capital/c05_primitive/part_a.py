@@ -99,9 +99,9 @@ LESSONS = [
                   "founders came from the middling ranks, merchants, master craftsmen and "
                   "farmers, started small, and grew by ploughing their profits back. Neither "
                   "claims that capital was saved out of wages. Both claim that thrift and "
-                  "reinvestment, not plunder, built most firms. Marx's reply, which the next "
-                  "paragraphs compute, is that profits to plough back already presuppose "
-                  "people who work for wages."),
+                  "reinvestment, not plunder, built most firms. Marx wrote before either, but "
+                  "the chapter's opening circle is his answer to both: profits to plough back "
+                  "already presuppose people who work for wages."),
             ("p", "First the legend in its plainest form, which the lab computes. A labourer "
                   "earns 3s a day and saves a tenth of it, 3.6 pence. The target is £3,000, the "
                   "yearly wage bill of the carpet factory in “Machinery and the Displaced "
@@ -365,9 +365,10 @@ LESSONS = [
                   "cattle, furnished them with timber, fire-wood, turf&rdquo;. That world "
                   "allowed a wealth of the people, he says, but &ldquo;it excluded the "
                   "possibility of capitalistic wealth&rdquo;."),
-            ("p", "Then the stages. At the end of the fifteenth century the great lords "
-                  "disbanded their retainers and drove peasants from the land to turn arable "
-                  "into sheep-walks, because Flemish wool had raised the price of English wool. "
+            ("p", "Then the stages. At the end of the fifteenth century the bands of feudal "
+                  "retainers were broken up, and the great lords drove peasants from the land to "
+                  "turn arable into sheep-walks, because the rise of the Flemish wool "
+                  "manufactures had raised the price of English wool. "
                   "Parliament legislated against it for a hundred and fifty years, in vain. "
                   "Francis Bacon praised Henry VII's law for keeping farms large enough "
                   "&ldquo;to keep the plough in the hands of the owners and not mere "
@@ -537,8 +538,8 @@ LESSONS = [
              "the work moves; yet the surplus labour for someone else goes from 0 hours on "
              "her own land to 6 hours as a wage-labourer, and to 18,000 hours a day for the "
              "3,000 Sutherland families. Whether enclosure also raised yields is a separate "
-             "question, which Marx sets aside and historians such as Chambers and Allen "
-             "still argue."),
+             "question, which Marx sets aside and on which historians such as Chambers and "
+             "Allen have disagreed."),
             ("Reading 0 hours as a claim that smallholders had no surplus at all",
              "The lab's zero is surplus labour for anyone else. A smallholder might work "
              "beyond her household's needs and keep or sell the product, and real "
@@ -648,7 +649,9 @@ LESSONS = [
                   "bourgeoisie used the state to &ldquo;regulate&rdquo; wages, to lengthen the "
                   "day and to keep the labourer dependent, and Marx calls this an essential "
                   "element of primitive accumulation."),
-            ("p", "The Statute of Labourers of 1349 is where the wage laws start. Marx's "
+            ("p", "The Statute of Labourers is where the wage laws start. Marx dates it 1349, "
+                  "the year of the royal Ordinance of Labourers; Parliament enacted it as a "
+                  "statute in 1351. Marx's "
                   "context is that wage-labourers were then few and well placed, with demand "
                   "for labour outrunning supply. Historians add the event behind the date: the "
                   "Black Death of 1348 and 1349 killed perhaps a third or more of England's "
@@ -680,8 +683,8 @@ LESSONS = [
                   "justices fix wages by the season and the price of goods. In 1796 Samuel "
                   "Whitbread proposed a legal minimum wage for farm labourers, the first such "
                   "proposal in the House; &ldquo;Pitt opposed this&rdquo;, though he confessed "
-                  "that the condition of the poor was cruel. The wage laws went in 1813, the laws "
-                  "against combinations in 1825. Marx's verdict on five centuries is that "
+                  "that the condition of the poor was cruel. The wage laws went in 1813, and the laws "
+                  "against combinations, Marx says, fell in 1825, and only in part. Marx's verdict on five centuries is that "
                   "Parliament had held &ldquo;the position of a permanent Trades' Union of the "
                   "capitalists against the labourers&rdquo;."),
             ("p", "Wage laws you may know are the reverse: a minimum wage is a floor. The "
@@ -748,7 +751,8 @@ LESSONS = [
             ],
             "after": [
                 "A third off the wage doubles the rate, because the shilling taken from the "
-                "wage is added to a surplus value that was only 3s. The figures are "
+                "wage moves to the other side of the ratio: the surplus value rises from 3s "
+                "to 4s while the wage it is measured against falls from 3s to 2s. The figures are "
                 "illustrative; the direction of the effect is the statute's.",
             ],
         },
@@ -922,8 +926,8 @@ LESSONS = [
                   "&ldquo;their labourers and their landlords&rdquo;."),
             ("p", "Both halves of the story are disputed. On the cause of the price "
                   "revolution, Jean Bodin argued in 1568 that the flood of American treasure "
-                  "raised prices because there was more money, the first statement of the "
-                  "quantity theory, and Earl Hamilton's figures on Spanish treasure in 1934 "
+                  "raised prices because there was more money, the most famous early "
+                  "statement of the quantity theory, and Earl Hamilton's figures on Spanish treasure in 1934 "
                   "seemed to bear it out. Later historians pointed out that English prices began "
                   "to rise before much American silver arrived: R. B. Outhwaite and others "
                   "argued that a growing population pressing on land and food drove them, and "
@@ -1039,7 +1043,7 @@ LESSONS = [
              "c": 1,
              "why": "Marx names the &ldquo;progressive fall in the value of the precious "
                     "metals, and therefore of money&rdquo;. Population pressure is the "
-                    "explanation later historians such as Goldstone give, not Marx's; rents "
+                    "explanation later historians such as Outhwaite give, not Marx's; rents "
                     "were fixed, not raised; and there was no state paper money in Tudor "
                     "England."},
         ],
@@ -1056,7 +1060,8 @@ LESSONS = [
              "changes between presets; only prices, wages and a fixed rent do."),
             ("Taking the price revolution's cause as settled",
              "Marx says the metals' value fell, Bodin and the quantity theorists that their "
-             "quantity rose, and historians such as Goldstone that population drove prices. "
+             "quantity rose, and historians such as Outhwaite and Goldstone that a growing "
+             "population drove prices. "
              "The lab takes the price index as an input and is silent between them."),
         ],
         "standard": (
