@@ -338,7 +338,7 @@ LESSONS = [
             ("Productive labour",
              "For capital, the productive labourer is the one who produces surplus value. A "
              "schoolmaster employed by a school proprietor is productive in this sense; the "
-             "same teaching done for oneself is not."),
+             "same teaching done on one's own account is not."),
             ("Formal and real subjection",
              "Absolute surplus value needs only that workers work for a capitalist. Relative "
              "surplus value needs the methods of production themselves to be remade."),
@@ -398,8 +398,8 @@ LESSONS = [
                   "is fertile and wants are few, the necessary time is short. But "
                   "&ldquo;Favourable natural conditions alone, gave us only the possibility, "
                   "never the reality, of surplus-labour&rdquo;. His example is a sago-cutter in "
-                  "the eastern islands of the Asiatic Archipelago, who fells a tree and has his bread for "
-                  "the week from it:"),
+                  "the eastern islands of the Asiatic Archipelago, where sago grows wild and "
+                  "people cut their bread in the forest as others cut firewood:"),
             ("p", "<strong>Volume I, Chapter 16.</strong> &ldquo;The bounty of Nature does "
                   "not explain why he would then have to work 6 days a week, or why he must "
                   "furnish 5 days of surplus-labour. It explains only why his necessary "
@@ -410,8 +410,10 @@ LESSONS = [
                   "time is "
                   "still 2 hours, but the day is 12: a rate of 500%, Marx's five days of surplus "
                   "labour to one of necessary. The change is absolute. Nature set the 2 hours. "
-                  "The other 10 needed, in Marx's words, &ldquo;a whole series of historical "
-                  "events&rdquo; and compulsion."),
+                  "Nature's gift, Marx says, is leisure: before the sago-cutter can use it "
+                  "productively even for himself &ldquo;a whole series of historical events is "
+                  "required&rdquo;, and before he spends it in surplus labour for others, "
+                  "&ldquo;compulsion is necessary&rdquo;."),
             ("p", "The chapter ends with John Stuart Mill, who said that capital yields a profit "
                   "because food, clothing and tools &ldquo;last longer than the time which was "
                   "required to produce them&rdquo;. Marx's reply is the lesson's one joke, and "
@@ -421,12 +423,15 @@ LESSONS = [
                   "Mill's arithmetic. If workers produce 20% more than their wages, profit is "
                   "not 20%, because profit is reckoned on the whole capital: with £400 of means "
                   "of production and £100 of wages, it is 20 on 500, which is 4%."),
-            ("p", "Those who explain profit by the productivity of capital, or by the reward for "
-                  "waiting, would reply that Mill's durability point is a crude form of a sound "
-                  "idea: that goods available sooner are worth more than goods available later, "
-                  "and interest pays for the difference. Marx's answer is that this explains "
-                  "nothing about where the surplus comes from, and Volume III returns to the "
-                  "question when it divides surplus value into profit and interest."),
+            ("p", "Economists who came after Marx built a more careful theory near Mill's "
+                  "point. Eugen von Böhm-Bawerk, in the 1880s, argued that roundabout methods of "
+                  "production take time and yield more, and that because people value present "
+                  "goods above future ones, whoever advances the present goods earns interest on "
+                  "the wait. That is a theory of time preference, not of durability, and Marx, "
+                  "who died in 1883, never met it. What the chapter offers is narrower: its "
+                  "objection to Mill is that he &ldquo;confounds the duration of labour-time "
+                  "with the duration of its products&rdquo;. Volume III returns to profit and "
+                  "interest when it divides surplus value between them."),
             ("p", "If the rate can move in these two ways, how do its parts move together? The "
                   "next lesson, “Changes in the Price of Labour-Power and in Surplus Value”, "
                   "varies length, intensity and productivity one at a time."),
@@ -505,7 +510,8 @@ LESSONS = [
              "c": 0,
              "why": "Marx says the bounty of nature &ldquo;explains only why his necessary "
                     "labour-time would be limited to one day a week&rdquo;. The five days of "
-                    "surplus labour, and so the 500%, need historical events and compulsion. "
+                    "surplus labour, and so the 500%, need compulsion, which nature does not "
+                    "supply. "
                     "Nature is not irrelevant either: it fixes the necessary time."},
             {"q": "Mill says that if workers produce 20% more than their wages, profits will be "
                   "20%. With £400 of means of production and £100 of wages, what does Marx say "
@@ -638,9 +644,12 @@ LESSONS = [
                   "hours, surplus value 2s, 4 hours. Productivity rises and labour-power falls "
                   "to 3s, 6 hours; surplus value rises to 3s, 6 hours. The same shilling moved "
                   "each way, but labour-power fell by a quarter and surplus value rose by half. "
-                  "Ricardo, who first stated these laws, missed that the proportions differ, and "
-                  "made a larger mistake: he knew no change in length or intensity, so he took "
-                  "this one case for the whole."),
+                  "Ricardo, who first stated these laws, missed that the proportions differ. "
+                  "Marx charges him with two larger errors: he knew no change in length or "
+                  "intensity, so he took this one case for the whole; and, the error Marx says "
+                  "&ldquo;vitiates his analysis much more&rdquo;, he never studied surplus value "
+                  "as such, and so confused the laws of the rate of surplus value with those of "
+                  "the rate of profit."),
             ("p", "Second, intensity, with length and productivity fixed. A more intense day "
                   "&ldquo;will be incorporated in an increased value&rdquo;: the 12 hours that "
                   "created 6s may create 8s. Now both parts can grow at once, from 3s each to "
@@ -678,7 +687,7 @@ LESSONS = [
             ("p", "The chapter ends with the case that runs the other way: higher productivity "
                   "and intensity with a shorter day. The necessary time sets the lower limit of "
                   "the day, and only the end of capitalist production, Marx says, would let the "
-                  "day shrink towards it. His last sentence is the chapter's sharpest: "
+                  "day shrink towards it. The chapter's last sentence puts it in terms of class: "
                   "&ldquo;In capitalist society spare time is acquired for one class by "
                   "converting the whole life-time of the masses into labour-time.&rdquo;"),
             ("p", "All of this has used one measure of exploitation, the rate of surplus value. "
@@ -800,8 +809,8 @@ LESSONS = [
             ("Expecting wages and surplus value always to move in opposite directions",
              "That holds when only productivity varies, because the value to be divided is "
              "fixed. When the day is longer or more intense, there is more value and both "
-             "parts can rise; Marx's example takes each from 3s to 4s. Ricardo's error, as "
-             "Marx tells it, was to treat the first case as the only one."),
+             "parts can rise; Marx's example takes each from 3s to 4s. The first of the "
+             "errors Marx finds in Ricardo is treating that case as the only one."),
             ("Reading a rise in wages as a rise above the value of labour-power",
              "In a more intense or longer day the worker's labour-power wears out faster, so "
              "its value can rise. A wage that rises less than that wear is a wage below value, "
@@ -914,8 +923,8 @@ LESSONS = [
                   "3 hours in 12: 300% and three-quarters. And in the extreme preset, with a "
                   "single necessary hour, the rate of surplus value is 1,100% while the share "
                   "is eleven-twelfths, still "
-                  "short of 100%. Every step that doubles or triples the first barely moves the "
-                  "second."),
+                  "short of 100%. As the first climbs without limit, the second creeps towards "
+                  "100% and never reaches it."),
             ("p", "Why should the choice matter? Because, Marx says, representing surplus value "
                   "and wages as fractions of the value created hides the transaction that "
                   "creates them:"),

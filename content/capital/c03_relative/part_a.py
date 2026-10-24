@@ -214,11 +214,15 @@ LESSONS = [
             "after": [
                 "His worker's necessary labour has fallen from 10 hours to `7 1/2` without any "
                 "change in what the worker is paid or can buy. The book prints `7 1/5` hours "
-                "here, and a surplus labour increased by `2 4/5`; that is a slip in the text, "
-                "not in the method. Five-eighths of 12 is `7 1/2`, and Marx's own ratio of "
-                "necessary to surplus labour, 5 to 3, is `7 1/2` hours to `4 1/2`, not `7 1/5` "
-                "to `4 4/5`. Selling at the full 1s would have given 6s of extra surplus value; "
-                "the lab's pioneer preset counts at that full social value.",
+                "here, and a surplus labour increased by `2 4/5`, and every other figure in the "
+                "same paragraph says `7 1/2`. Marx has the day's labour carried by `9 3/5` "
+                "articles, 6 of them for the wage, and 6 of `9 3/5` is five-eighths, the same "
+                "as 5s of the 8s; he gives the new ratio of necessary to surplus labour as 5 to "
+                "3; and he has surplus value grow from 1s to 3s. Each of these makes the "
+                "necessary time `7 1/2` hours and the surplus `4 1/2`, not `7 1/5` and `4 4/5`, "
+                "so the slip is in the text, not in the method. Selling at the full 1s would "
+                "have given 6s of extra surplus value; the lab's pioneer preset counts at that "
+                "full social value.",
             ],
         },
         "quiz_title": "Absolute, relative and extra",
@@ -427,10 +431,13 @@ LESSONS = [
                   "productive in its own right, and pay as its price. On that account the "
                   "co-operative gain is partly the return to coordination, and the firm exists "
                   "because coordination inside it is cheaper than through the market, which is "
-                  "Ronald Coase's later answer to why firms exist at all. Marx's reply is that "
-                  "the managers who coordinate are themselves wage labourers, and he will take "
-                  "the question up again in Volume III, where profit of enterprise is set beside "
-                  "the wages of superintendence."),
+                  "Ronald Coase's answer, in 1937, to why firms exist at all. The chapter was "
+                  "written long before that, and what it says bears on the first half of the "
+                  "view: once co-operation is large enough the capitalist hands supervision "
+                  "&ldquo;to a special kind of wage labourer&rdquo;, managers and overlookers, "
+                  "so the work of directing is paid as a wage while the capital's return "
+                  "remains. Volume III takes the question up again, where profit of enterprise "
+                  "is set beside the wages of superintendence."),
             ("p", "Co-operation in its simple form leaves each worker doing what he did before, "
                   "only beside others. The next lesson, “Division of Labour and Manufacture”, "
                   "takes the next step: splitting the work itself into pieces."),
@@ -601,7 +608,7 @@ LESSONS = [
         ],
         "key_label": "The collective labourer",
         "concepts_intro": (
-            "Chapter 14 runs from the late sixteenth century to the eve of the factory. "
+            "Chapter 14 runs from the middle of the sixteenth century to the eve of the factory. "
             "Three ideas carry its argument."
         ),
         "concepts": [
@@ -692,8 +699,8 @@ LESSONS = [
                   "&ldquo;the detail labourer produces no commodities&rdquo;. What binds him to "
                   "the breaker is that both sold their labour-power to the same capitalist, who "
                   "fixes their proportions in advance. Society's proportions are found only "
-                  "afterwards, in the swings of market prices. Marx's sharpest line is about the "
-                  "people who praise the first and denounce any attempt at the second: their "
+                  "afterwards, in the swings of market prices. Marx then turns to the people who "
+                  "praise the first and denounce any attempt at the second: their "
                   "worst charge against planning society is that it would &ldquo;turn all society "
                   "into one immense factory&rdquo;."),
             ("def", ("Manufacture",
@@ -984,8 +991,11 @@ LESSONS = [
                   "£6,000 of labour and still loses on the capitalist's test. The cheap-labour "
                   "preset lowers the wages to £2,000, and even the £3,000 machine is not "
                   "adopted; the dear-labour preset raises them to £4,500, and it is."),
-            ("p", "This is why, Marx says, machines were invented in England to be used only "
-                  "in North America, where wages were higher. It is why a Yankee stone-breaking "
+            ("p", "This, Marx says, is why machines were invented in England to be used only "
+                  "in North America: the gap between a machine's value and the labour-power it "
+                  "replaces differs from country to country, and the same machine can pass the "
+                  "capitalist's test where labour-power is dear and fail it where it is cheap. "
+                  "It is why a Yankee stone-breaking "
                   "machine went unused in England, where the &ldquo;wretch&rdquo; who broke "
                   "stones was paid for so little of his labour, and why women still sometimes "
                   "hauled canal boats instead of horses. The capitalist's profit comes, in "
@@ -1221,7 +1231,7 @@ LESSONS = [
                   "labourers.&rdquo; Lengthening the day is how capital tries to make up the "
                   "lost numbers."),
             ("p", "The long day provoked the reaction that “The Struggle for a Normal Working "
-                  "Day” of the previous course described: a legal limit, twelve hours from 1832 "
+                  "Day” of the previous course described: a legal limit, twelve hours from 1833 "
                   "and ten from 1847. From then on, Marx says, &ldquo;a point must inevitably be "
                   "reached, where extension of the working day and intensity of the labour "
                   "mutually exclude one another&rdquo;. With the length fixed, capital turned to "
