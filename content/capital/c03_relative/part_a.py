@@ -74,7 +74,7 @@ LESSONS = [
                   "surplus-value.&rdquo;"),
             ("p", "Marx draws the day as a line from a through b to c: from a to b the worker "
                   "replaces the value of his labour-power, from b to c he works for the capitalist. In "
-                  "“The Working Day” of the previous course the point c moved, as the day was "
+                  "the previous course's two lessons on Chapter 10 the point c moved, as the day was "
                   "pushed out to fourteen or fifteen hours. Here c is fixed by law or custom at "
                   "twelve, and the question is whether b can be pushed back towards a. Marx's "
                   "figures are a 12-hour day with 10 hours necessary and 2 surplus. Move b "
@@ -110,7 +110,7 @@ LESSONS = [
                   "individual value, 6s in a day, which is 12 hours of social labour. To sell "
                   "twice as many he will shade the price, and Marx's example has him sell at "
                   "10d. Even then, his day's surplus value goes from 1s to 3s, and the worker "
-                  "replaces his 5s wage in `7 1/5` hours instead of 10."),
+                  "replaces his 5s wage in `7 1/2` hours instead of 10."),
             ("p", "That gain is the motive. It does not depend on whether his article is a "
                   "necessary at all; a maker of mirrors would chase it too. And it is "
                   "temporary. The same law of value that let him sell above his individual "
@@ -209,13 +209,16 @@ LESSONS = [
                 "means of production:  24 · 6d = 144d = 12s",
                 "new value realised:  20s − 12s = 8s",
                 "surplus value:  8s − 5s = 3s (was 1s)",
-                "wage replaced in:  12 h · 5/8 = 7 1/5 h",
+                "wage replaced in:  12 h · 5/8 = 7 1/2 h",
             ],
             "after": [
-                "His worker's necessary labour has fallen from 10 hours to `7 1/5` without any "
-                "change in what the worker is paid or can buy. Selling at the full 1s would "
-                "have given 6s of extra surplus value; the lab's pioneer preset counts at that "
-                "full social value.",
+                "His worker's necessary labour has fallen from 10 hours to `7 1/2` without any "
+                "change in what the worker is paid or can buy. The book prints `7 1/5` hours "
+                "here, and a surplus labour increased by `2 4/5`; that is a slip in the text, "
+                "not in the method. Five-eighths of 12 is `7 1/2`, and Marx's own ratio of "
+                "necessary to surplus labour, 5 to 3, is `7 1/2` hours to `4 1/2`, not `7 1/5` "
+                "to `4 4/5`. Selling at the full 1s would have given 6s of extra surplus value; "
+                "the lab's pioneer preset counts at that full social value.",
             ],
         },
         "quiz_title": "Absolute, relative and extra",
@@ -572,7 +575,10 @@ LESSONS = [
     # human beings); l. 2788 (a given result in a given time); l. 2798 (the
     # "hole"); l. 2843 (one immense factory); l. 2837 (Ferguson's Helots);
     # l. 2867 (a crippled monstrosity); l. 2875-2877 (Smith on the detail
-    # labourer); l. 2889 (a refined and civilised method of exploitation).
+    # labourer); l. 2889 (a refined and civilised method of exploitation);
+    # l. 2814-2816 (a hierarchy of labour-powers; in both cases the value of
+    # labour-power falls); l. 7524 (footnote 50, Babbage on purchasing the
+    # precise quantity of skill).
     {
         "slug": "division-of-labour-and-manufacture",
         "title": "Division of Labour and Manufacture",
@@ -639,6 +645,23 @@ LESSONS = [
                   "reshaped for his one task: Birmingham, Marx notes, made 500 kinds of hammer. "
                   "All of this is still handicraft. Each operation is done by hand and depends "
                   "on the strength and skill of the person doing it."),
+            ("p", "There is a second gain, and the economists of the day saw it before Marx did. "
+                  "Charles Babbage, the Cambridge mathematician who designed a calculating "
+                  "engine and in 1832 wrote <em>On the Economy of Machinery and "
+                  "Manufactures</em>, put it exactly: a master who divides the work into "
+                  "processes needing different degrees of skill or force &ldquo;can purchase "
+                  "exactly that precise quantity of both which is necessary for each "
+                  "process&rdquo;, where a single craftsman must be paid at the rate of the "
+                  "hardest operation for all of them. Marx quotes the passage and takes the "
+                  "point whole. Manufacture &ldquo;developes a hierarchy of labour-powers, to "
+                  "which there corresponds a scale of wages&rdquo;; it creates a class of "
+                  "unskilled workers the crafts never had, for whom the cost of apprenticeship "
+                  "vanishes, and for the skilled it shrinks. &ldquo;In both cases the value of "
+                  "labour-power falls.&rdquo; That is the sense in which manufacture, like "
+                  "co-operation, is a method of relative surplus value: not only more pieces "
+                  "an hour, but cheaper labour-power for each piece. The lab does not compute "
+                  "this; its workers all stand at one rate and one wage, and the hierarchy is "
+                  "stated here only."),
             ("p", "Now read the passage again. Casting is slow, breaking twice as fast, "
                   "polishing four times as fast. If one founder fed one breaker, the breaker "
                   "would stand idle half the time. The workshop balances only when every step "
@@ -1121,7 +1144,9 @@ LESSONS = [
     # of its intensity); l. 3102 (extension and intensity exclude one another);
     # l. 3037 (spread over the whole family); l. 3068 (perpetuum mobile);
     # l. 3088 (2 against 24 labourers); l. 3110 (Gardner's experiment);
-    # l. 3145 (twelve hours compressed into ten); l. 3173 (a living appendage).
+    # l. 3145 (twelve hours compressed into ten); l. 3173 (a living appendage;
+    # the lightening of the labour a torture); l. 3157 (Ure, the Pindar of the
+    # automatic factory); l. 3315 (Ure on the self-acting mule).
     {
         "slug": "machinery-and-the-worker",
         "title": "Machinery and the Intensity of Labour",
@@ -1232,14 +1257,26 @@ LESSONS = [
                   "12 normal hours, and the rate is back at 50%. The twelve-denser preset keeps "
                   "twelve hours and raises intensity by a third: 16 normal hours "
                   "and a rate of 100%, which is exactly the combination Marx says cannot last."),
-            ("p", "The rest of the chapter goes on to the factory itself. In section 4 the "
-                  "worker becomes &ldquo;its mere living appendage&rdquo;, and the overlooker's "
-                  "book of fines replaces the slave-driver's lash. In section 5 the worker turns "
-                  "on the machine: the ribbon-loom riots of the seventeenth century, the "
-                  "Luddites, until, Marx says, workers learned to distinguish machinery from its "
-                  "employment by capital. The inspectors who praised the shorter day also "
-                  "reported that the new pace was itself injuring health, and Marx predicted it "
-                  "would force a further cut in hours."),
+            ("p", "The rest of the chapter goes on to the factory itself, and there Marx argues "
+                  "with its great admirer. Andrew Ure, a Glasgow chemist, published <em>The "
+                  "Philosophy of Manufactures</em> in 1835, and his case deserves its full "
+                  "weight: the automatic factory relieves the worker of the heaviest toil, "
+                  "its discipline, which he credits to Arkwright, is the real invention, and "
+                  "every improvement that makes a skilled hand unnecessary ends a strike before "
+                  "it starts. Of the self-acting mule he wrote that it was &ldquo;A creation "
+                  "destined to restore order among the industrious classes&rdquo;, and that "
+                  "&ldquo;when capital enlists science into her service, the refractory hand of "
+                  "labour will always be taught docility.&rdquo; Marx calls him &ldquo;the "
+                  "Pindar of the automatic factory&rdquo; and answers that the lightness is the "
+                  "point against him: in section 4 the worker becomes &ldquo;its mere living "
+                  "appendage&rdquo;, &ldquo;The lightening of the labour, even, becomes a sort "
+                  "of torture&rdquo;, and the overlooker's book of fines replaces the "
+                  "slave-driver's lash. In section 5 the worker turns on the machine: the "
+                  "ribbon-loom riots of the seventeenth century, the Luddites, until, Marx "
+                  "says, workers learned to distinguish machinery from its employment by "
+                  "capital. The inspectors who praised the shorter day also reported that the "
+                  "new pace was itself injuring health, and Marx predicted it would force a "
+                  "further cut in hours."),
             ("p", "Machines make the hour denser and need fewer hands for it. The next lesson, "
                   "“Machinery and the Displaced Worker”, asks what becomes of the hands no "
                   "longer needed, and of the economists' promise that capital would re-employ "

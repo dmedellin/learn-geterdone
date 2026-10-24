@@ -754,9 +754,9 @@ LESSONS = [
         },
         "quiz_title": "One factor at a time",
         "quiz": [
-            {"q": "A 12-hour day creates a value of 6s. Productivity doubles in every industry, "
-                  "with the length and intensity of the day unchanged. What value does the day "
-                  "create now?",
+            {"q": "A 12-hour day creates a value of 6s. Productivity doubles in the industries "
+                  "that make the worker's necessaries, with the length and intensity of the day "
+                  "and the value of money unchanged. What value does the day create now?",
              "a": ["6s", "12s", "3s", "It depends on the new price of labour-power"],
              "c": 0,
              "why": "Marx's first law: a day of given length always creates the same value, "
