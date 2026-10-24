@@ -118,3 +118,11 @@ the text that supports it. In particular:
   keeps his old time). Paraphrase it with the text open.
 - First-word case inside a quotation must match the text; reword around the
   quotation instead of changing its case.
+- Marx died in 1883 and cannot answer anyone who wrote later (Böhm-Bawerk,
+  Bortkiewicz, Keynes, Solow, Okishio). Present a later critic's position at
+  strength, then say what in the chapter bears on it, in those words; never
+  "Marx's answer to Böhm-Bawerk".
+- Describe each critic's theory in their own terms, not in another critic's
+  (Böhm-Bawerk's time preference is not Senior's abstinence).
+- Do not praise one side in the lesson's own voice ("they were right about
+  what it shows", "a fair reading"). Quote Marx's verdict if there is one.

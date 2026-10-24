@@ -77,7 +77,7 @@ COURSE = {
         "Know what kind of book Volume II is. Marx did not finish it. He died in 1883, and "
         "Friedrich Engels assembled the volume from his manuscripts and published it in 1885; "
         "Marx had left the material, Engels wrote, for him &ldquo;to make something&rdquo; of. "
-        "Part I draws on the last drafts Marx wrote, in 1877 and 1878, and on an earlier, more "
+        "Part I draws on the last drafts Marx wrote of it, in 1877 and 1878, and on an earlier, more "
         "finished manuscript, and in places it reads like notes, repeated and unpolished. The "
         "lessons follow Engels' text and do not try to separate the two hands.",
         "Keep the spinner in view. Chapter 1 sets up £422 of capital, £372 of means of "

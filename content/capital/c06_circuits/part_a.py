@@ -20,7 +20,8 @@ LESSONS = [
     # Kerr vol. 2, l. 353 (the formula); l. 615 (the most one-sided form).
     # Inline: l. 414 (the class relation in M-L), l. 482 (change of form,
     # not of magnitude), l. 492 (7,440 and 8,440 lb), l. 597 (the feverish
-    # attempt), l. 483-484 and l. 533 (M' as a sum of money).
+    # attempt), l. 483-484 and l. 533 (M' as a sum of money), l. 626 (deceptive;
+    # the monetary system).
     {
         "slug": "the-circuit-of-money-capital",
         "title": "The Circuit of Money Capital",
@@ -139,20 +140,23 @@ LESSONS = [
                   "slogan.&rdquo;"),
             ("p", "One-sided, because it starts and ends in money and so shows only the end in "
                   "view, more money, with production as the passage in between. Typical, for the "
-                  "same reason: it is how the capitalist sees his own business. Marx's dry aside "
+                  "same reason: it shows most plainly the motive of the whole business, the making "
+                  "of money. Marx's dry aside "
                   "is that this is how whole economies sometimes see it too: &ldquo;All nations "
                   "with a capitalist mode of production are seized periodically by a feverish "
                   "attempt to make money without the mediation of the process of "
                   "production.&rdquo;"),
             ("p", "The formula invites a reading Marx wants to block. The earliest mercantilist "
-                  "writers, of the seventeenth century, measured a nation's gain by the gold its "
-                  "trade brought in, and Marx says their &ldquo;so-called monetary system&rdquo; "
-                  "read `M–C–M′` as &ldquo;a movement which takes place exclusively in the "
-                  "circulation&rdquo;, so that it &ldquo;cannot explain the two phases M-C and C-M' "
-                  "in any other way than by declaring that C is sold above its value&rdquo;. It is "
-                  "a fair reading of `M…M′` alone that the gain is made in selling, by selling "
-                  "dear; the later mercantilists, he adds, at least put production inside the "
-                  "formula. The chapter's answer is the yarn: it "
+                  "writers, of the sixteenth and early seventeenth centuries, measured a nation's "
+                  "gain by the gold its trade brought in, and Marx says their &ldquo;so-called "
+                  "monetary system&rdquo; read `M–C–M′` as &ldquo;a movement which takes place "
+                  "exclusively in the circulation&rdquo;, so that it &ldquo;cannot explain the two "
+                  "phases M-C and C-M' in any other way than by declaring that C is sold above its "
+                  "value&rdquo;. That the gain is made in selling, by selling dear, is the reading "
+                  "`M…M′` invites when it is taken alone, and that is why Marx calls the "
+                  "formula &ldquo;in a certain sense, deceptive&rdquo;; the later mercantilists, he "
+                  "adds, at least put production inside the formula. The chapter's answer is the "
+                  "yarn: it "
                   "was worth £500 before it left the mill, and a sale at value turns £500 of yarn "
                   "into £500 of money. Whether value comes from labour at all is a separate "
                   "dispute, set out in Commodities and Money; here the claim is narrower, that on "
@@ -240,8 +244,8 @@ LESSONS = [
              "c": 1,
              "why": "The chapter assumes everything is bought and sold at its value, so neither "
                     "purchase nor sale changes the magnitude. The yarn is worth £500 when it "
-                    "leaves the mill. The last option is the view Marx is arguing against, and "
-                    "the chapter gives the capitalist no wage."},
+                    "leaves the mill. The last option is a view Marx rejects elsewhere, and this "
+                    "chapter's accounts give the capitalist no wage."},
             {"q": "Marx notes that £10 of a sum of £110 is 1/11 of the sum and also 1/10 of the "
                   "£100 advanced. What is the point about M′?",
              "a": ["That the rate of surplus value is 1/11",
@@ -300,7 +304,8 @@ LESSONS = [
     # ---------------------------------------------------------------- 02
     # Kerr vol. 2, l. 652 (the formula); l. 809 (the minimum for m).
     # Inline: l. 676 (spent, not advanced), l. 693 (480 or 500), l. 753
-    # (no overproduction), l. 763 (a crisis comes), l. 839 (classical economy).
+    # (no overproduction, and the reply before it), l. 763 (a crisis comes),
+    # l. 839 (classical economy), l. 956 (Chapter 3: shallow rationalism).
     {
         "slug": "the-circuit-of-productive-capital",
         "title": "The Circuit of Productive Capital",
@@ -330,7 +335,8 @@ LESSONS = [
             ("Circulation between two productions",
              "In `P…P` the whole of circulation, the sale and the purchase back, sits between "
              "one production and the next. Money appears only in the middle and is dropped as "
-             "soon as it appears. The movement has the shape `C–M–C`, buying in order to use."),
+             "soon as it appears. The circulation has the shape `C–M–C`, the form of simple "
+             "commodity circulation, selling in order to buy."),
             ("Simple and enlarged reproduction",
              "If the surplus value is all spent as revenue, production restarts at the same "
              "size: simple reproduction. If some of it is laid out as capital, production "
@@ -374,15 +380,18 @@ LESSONS = [
                   "there can never be more goods in general than buyers for them. Marx does not "
                   "name them in this chapter; his comment is one sentence, &ldquo;some economists "
                   "use this sort of exchange as a proof that there can be no "
-                  "overproduction&rdquo;, and his answer is the money stage they treat as a "
-                  "veil."),
-            ("p", "The answer runs like this. Once the yarn is sold to a merchant, the "
+                  "overproduction&rdquo;, and the sentence before it is his reply: replacing one "
+                  "commodity by another in order to produce surplus value is &ldquo;a different "
+                  "matter than the exchange of products which is perfected merely by means of "
+                  "money&rdquo;."),
+            ("p", "A few pages on he shows how the circuit itself can hide a glut. Once the yarn "
+                  "is sold to a merchant, the "
                   "spinner's circuit goes on, whether or not anyone has yet used the yarn. "
                   "Production can grow, wages and the capitalists' spending can grow with it, and "
                   "much of the product can still be lying unsold in dealers' warehouses. Then the "
                   "next wave of goods arrives, the old bills fall due, and dealers sell at any "
-                  "price to pay them. &ldquo;Then a crisis comes.&rdquo; It shows first, Marx "
-                  "says, not in what households buy but in the exchange of capital for capital."),
+                  "price to pay them. &ldquo;Then a crisis comes.&rdquo; It shows, Marx says, "
+                  "not in what households buy but in the exchange of capital for capital."),
             ("p", "Now let part of the surplus value stay in the circuit. Marx's own figure: the "
                   "capital may continue &ldquo;for instance as 480 pounds sterling or 500 pounds "
                   "sterling&rdquo;, that is, with £58 or all £78 of the surplus value added. The "
@@ -413,9 +422,10 @@ LESSONS = [
                   "productive capital is that form, under which classical political economy "
                   "discusses the rotation process of industrial capital.&rdquo; Adam Smith and "
                   "David Ricardo thought about capital as stock that is used up and replaced year "
-                  "by year, which is `P…P`, and they were right about what it shows. Marx's claim "
-                  "is that it hides what `M…M′` shows, that the point of the whole movement is "
-                  "more value."),
+                  "by year, which is `P…P`. Marx's claim, made in the next chapter, is that this "
+                  "form hides what `M…M′` shows, that the point of the whole movement is more "
+                  "value, and so lets production look like its own purpose: a picture "
+                  "&ldquo;natural in the sense of a shallow rationalism&rdquo;."),
             ("p", "Two circuits, then, and a third is already implied in them, since the yarn "
                   "that ends one is where another begins. The next lesson, “The Circuit of "
                   "Commodity Capital”, starts there."),
@@ -550,7 +560,7 @@ LESSONS = [
     # Kerr vol. 2, l. 847-853 (the formula and C''); l. 995 (the aggregate
     # capital). Inline: l. 861, l. 883-889 and l. 903-946 (the three lots and
     # the printed totals), l. 948 (the buyer), l. 1005 (avances and reprises),
-    # l. 1013 (Quesnay).
+    # l. 1013 (Quesnay), l. 3820 (Chapter 19: Smith's regress).
     {
         "slug": "the-circuit-of-commodity-capital",
         "title": "The Circuit of Commodity Capital",
@@ -647,12 +657,18 @@ LESSONS = [
                   "throughout this volume, held that the price of every commodity resolves, "
                   "finally, into wages, profit and rent. His reasoning is strong: the cotton was "
                   "grown with paid labour, the spindle was made with paid labour, and if you "
-                  "trace each input back far enough you find only incomes. Marx's reply fills "
-                  "Volume II, Chapter 19, read in Reproduction of the Social Capital as “Former "
-                  "Presentations: Quesnay and Smith”; this chapter's arithmetic already shows "
-                  "the difficulty. In this year's £500 of yarn, £372 must buy back this year's "
-                  "means of production, and only `£50 + £78 = £128` is income for anyone."),
-            ("p", "Marx credits one economist with seeing this first. François Quesnay, court "
+                  "trace each input back far enough you find only incomes. He would grant the "
+                  "spinner's split, and say that the £372 is the planter's and the machine-maker's "
+                  "wages, profit and rent. Marx's reply fills Volume II, Chapter 19, read in "
+                  "Reproduction of the Social Capital as “Former Presentations: Quesnay and "
+                  "Smith”. The cotton's price, he answers, contains the means of production used "
+                  "up in growing it, and Smith only sends you &ldquo;from one line of production "
+                  "to another&rdquo; without ever reaching a product that has no such part; and the "
+                  "year's labour adds only the new value, while the rest is value made earlier "
+                  "that reappears. This chapter's split is the first step of that reply: in this "
+                  "year's £500 of yarn, £372 must buy back means of production, and only "
+                  "`£50 + £78 = £128` is new value, the part that is anyone's income."),
+            ("p", "Marx credits one economist with choosing this circuit. François Quesnay, court "
                   "physician at Versailles, drew his <em>Tableau Économique</em> in 1758 to show "
                   "a year's harvest passing between farmers, landlords and artisans. "
                   "&ldquo;C'...C' is the basis of Quesnay's Tableau Economique, and it shows "
@@ -661,7 +677,7 @@ LESSONS = [
                   "mercantilists).&rdquo; In the language of Quesnay's school, the second circuit "
                   "starts from the advances, the sowing, and the third from the returns, the "
                   "harvest."),
-            ("p", "One consequence closes the chapter. If production is to grow next year, the "
+            ("p", "One consequence comes at the chapter's end. If production is to grow next year, the "
                   "part of this year's surplus product to be capitalised must already exist as "
                   "cotton, spindles and food, not just as value. The next lesson, “The Three "
                   "Formulas of the Circuit”, sets the three circuits side by side and asks how "
@@ -747,8 +763,9 @@ LESSONS = [
              "a": ["£500", "£128", "£78", "£372"],
              "c": 1,
              "why": "Wages and surplus value, `£50 + £78 = £128`. £78 is the capitalist's part "
-                    "alone. £372 must buy back means of production, and £500 is Adam Smith's "
-                    "answer, which leaves nothing to replace the cotton and the spindles."},
+                    "alone. £372 must buy back means of production, and £500 counts that £372 as "
+                    "income as well, the step Marx says Adam Smith's resolution of price into "
+                    "revenues takes."},
             {"q": "Why must the circuit of commodity capital be written with C′ at its start even "
                   "when it repeats on the same scale?",
              "a": ["Because the yarn is sold above its value",
@@ -763,9 +780,13 @@ LESSONS = [
         "mistakes": [
             ("Treating the whole product as revenue to be consumed",
              "Adam Smith's version is the strongest: trace every input back and you find only "
-             "wages, profit and rent. The marx preset answers for one year's product: of 10,000 "
-             "lb, 7,440 lb carry £372 that must buy back cotton, coal and wear, or next year's "
-             "spinning cannot happen. Only 2,560 lb, `£128`, are anyone's income."),
+             "wages, profit and rent. He would accept the marx preset's split, 7,440 lb of the "
+             "10,000 carrying £372 that must buy back cotton, coal and wear, and call that £372 "
+             "the planter's and the machine-maker's income. Marx's reply is that their products "
+             "divide the same way, each with a part that replaces means of production, so the "
+             "regress never ends in pure income. Only the new value, here 2,560 lb or `£128`, is "
+             "anyone's income; the rest must go back into production or next year's spinning "
+             "cannot happen."),
             ("Thinking only a divisible product can be split into its parts",
              "Yarn can be cut into lots; a machine cannot. The division still holds in value: "
              "Marx notes that London builders, working on credit, drew advances against stages "
@@ -969,8 +990,8 @@ LESSONS = [
              "a": ["1/3", "1/2", "2/3", "1/4"],
              "c": 1,
              "why": "`8/(4 + 4 + 8) = 1/2`. A third was the share before the slowdown, a quarter "
-                    "is now the share in each of the other two forms, and two thirds counts the "
-                    "selling weeks against the other eight."},
+                    "is now the share in each of the other two forms, and two thirds divides the "
+                    "eight selling weeks by the old 12-week circuit."},
             {"q": "Samuel Bailey held that value is a relation between commodities exchanged at "
                   "the same time. What does Marx say this misses?",
              "a": ["That market prices fluctuate from day to day",
@@ -1119,12 +1140,14 @@ LESSONS = [
                   "circulation."),
             ("p", "The strongest objection comes from economists who make time itself "
                   "productive. Eugen von Böhm-Bawerk argued in the 1880s that roundabout methods "
-                  "of production yield more, that waiting for their yield is a real sacrifice, "
-                  "and that interest is its price; later theories of the time value of money "
-                  "build on the same thought. On that view, capital tied up for longer has earned "
-                  "more. Marx's answer, on his definitions, is that waiting adds no labour and so "
-                  "no value, and that any extra a longer-waiting capital receives is a share of "
-                  "value produced elsewhere."),
+                  "of production yield more, that present goods are worth more than future ones, "
+                  "and that interest is the premium on that difference; later theories of the "
+                  "time value of money build on the same thought. On that view, capital tied up "
+                  "for longer has earned more. Böhm-Bawerk wrote after Marx's death, so the "
+                  "chapter answers the view, not the man: during circulation time capital "
+                  "&ldquo;produces neither commodities nor surplus-value&rdquo;, and the higher "
+                  "prices longer-circulating capitals do receive come, on Marx's account, from "
+                  "the equalisation of profits, a share of value produced elsewhere."),
             ("p", "Buying and selling also need people to do them, and they must be paid. The "
                   "next lesson, “The Costs of Circulation”, asks whether what they are paid "
                   "adds anything to the value of the product."),
