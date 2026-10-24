@@ -405,9 +405,9 @@ depend on its labs.
    - **Read:** the opening question, what phenomenology is, and the demand to
      describe rather than explain or analyse; the comparison of scientific
      knowledge with geography and of the perceived world with the countryside
-     *(wording to be checked against the text)*; the Preface's charge that a
+    ; the Preface's charge that a
      science which forgets the perceived world it presupposes is both naïve and
-     dishonest *(wording to be checked against the text)*.
+     dishonest.
    - **Do:** compute the moon's angular size at the horizon and overhead and
      state which question the figures answer and which they do not.
    - **Lab:** `size/angle` (family 1: geometric optics). The moon is the

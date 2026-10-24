@@ -134,3 +134,45 @@ course's end, to the next course).
 End with a short report: lessons written, every §C deviation and why, any kit
 gap, the preview command's final output line, the quotation checker's final
 line, and any spoken forms added.
+
+## Lessons from the Course 1 second review
+
+The numbers were all right; the errors were in whose voice a sentence is in
+and in what a figure is a figure of.
+
+- Merleau-Ponty often grants a point to the view he is about to reject
+  ("methodical doubt does not deprive us of anything" is a concession to the
+  idealists, followed at once by the objection). Before you present a
+  sentence as his view, read the next sentence in Smith.
+- An example he gives in an opponent's voice (the cardboard tube and the
+  horizon moon, p. 32, is the intellectualist's) is not "the book's test".
+  Say whose it is and give his reply (p. 36).
+- A lab figure is what the model computes, never what anyone sees. Write "the
+  projection draws the face at 2/3 of its area", not "you see the front at
+  2/3 of its size": the book argues against exactly that reading, and the
+  lesson must not make the claim it is about to refute. Check every step,
+  worked line, quiz answer and mistake for this, not only the body.
+- A quotation cut before its justification can say less, or something else;
+  paraphrase the justification in beside it.
+- A wrong quiz answer that the text partly supports (the reduction does
+  suspend common-sense certainties, p. xv) is defensible. Sharpen it into the
+  reading the lesson argues against.
+
+## Lessons from the Course 1 pedagogy assessment
+
+- Name the voice of every paraphrase, not only of quotations: "the book
+  reports" was the pilot's one fidelity error.
+- The reading instruction in the opening `p` gives the exact page range the
+  lesson then reads, no shorter.
+- Every "the chapter says / denies / concludes" points at a sentence on a page.
+- Do not impose a structure the text lacks ("three consequences").
+- Gloss every term of art in plain English on first use (*natural attitude*,
+  *posit*, *motility*).
+- Every tile a view prints, not just every preset, is explained in prose.
+- `panel_intro` names the family and the model; where the "model" is
+  undisputed geometry, say that nothing in it is disputed.
+- One sentence of who they were for each opponent or source on first mention.
+- Spend the quotation budget on the chapter's own summary lines.
+- Several authors share this checkout. If the package fails to import because
+  another course is mid-edit, wait a minute and retry; re-read a file before
+  each edit.

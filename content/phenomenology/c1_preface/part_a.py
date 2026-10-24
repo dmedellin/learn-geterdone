@@ -72,9 +72,9 @@ LESSONS = [
                   "geography in relation to the country-side in which we have learnt "
                   "beforehand what a forest, a prairie or a river is.&rdquo; The two "
                   "sentences are from pages ix and x of Colin Smith's translation. Read the "
-                  "Preface from its first page, vii, to the end of that paragraph in your "
-                  "own copy before going on; the lesson goes back through it a phrase at a "
-                  "time."),
+                  "Preface from its first page, vii, to the end of the first paragraph on "
+                  "page xii, just before the reduction is introduced, in your own copy "
+                  "before going on; the lesson goes back through it a phrase at a time."),
             ("p", "Think of the last time you saw the full moon come up behind the roofs: "
                   "enormous, low, almost close enough to touch, and an hour later, high in "
                   "the sky, an ordinary coin of light. Ask why and you will be offered an "
@@ -90,13 +90,14 @@ LESSONS = [
                   "century after Husserl's first works, Merleau-Ponty says, it still has not "
                   "been answered, and he shows why by setting out what looks like a list of "
                   "contradictions. Phenomenology studies essences, and puts essences back "
-                  "into existence. It suspends the assertions of the natural attitude, and "
+                  "into existence. It suspends the assertions of the natural attitude, the "
+                  "everyday stance in which the world is simply taken for granted, and "
                   "holds that the world is always already there before reflection begins. "
                   "It wants to be a rigorous science, and gives an account of space, time "
                   "and the world as we live them. It describes experience without its "
                   "causes, and yet Husserl's last works speak of a genetic phenomenology. A "
-                  "reader pressed for time, he says, might decide that a philosophy which "
-                  "cannot define its scope is a myth or a fashion."),
+                  "reader pressed for time, he says, will wonder whether a philosophy which "
+                  "cannot define its scope is not a myth or a fashion."),
             ("p", "His answer is not a definition. Phenomenology, he says, can be practised "
                   "and recognised as a manner or style of thinking; it existed as a movement "
                   "before it was fully aware of itself as a philosophy, and it is accessible "
@@ -128,8 +129,9 @@ LESSONS = [
                   "science is the &ldquo;second-order expression&rdquo;. Scientific points "
                   "of view on which my existence is one moment of the world's are, he says, "
                   "&ldquo;naïve and at the same time dishonest&rdquo;, because they take "
-                  "for granted, without saying so, the point of view through which a world "
-                  "first forms round me and begins to exist for me."),
+                  "for granted, without saying so, the other point of view, that of "
+                  "consciousness, through which a world first forms round me and begins to "
+                  "exist for me."),
             ("p", "Now go back to the passage's second sentence. The world &ldquo;which "
                   "precedes knowledge&rdquo; is the one you were in before you learned "
                   "anything about it. Knowledge &ldquo;always speaks&rdquo; of it: there is "
@@ -154,8 +156,8 @@ LESSONS = [
                   "sentence: &ldquo;The real has to be described, not constructed or "
                   "formed.&rdquo;"),
             ("p", "That is why perception cannot be put in the same class as judgements. "
-                  "Your field of vision is full of flickers, noises and touches you could "
-                  "not place precisely, and you place them in the world at once, without "
+                  "Your field of perception is full of flickers of colour, noises and "
+                  "passing touches you could not place precisely, and you place them in the world at once, without "
                   "ever confusing them with daydreams. If the reality of what you perceive "
                   "rested on the coherence of your representations, you would be forever "
                   "taking apart bad syntheses and making new ones, and you are not. "
@@ -168,9 +170,11 @@ LESSONS = [
                   "is the one that looks small. The <code>disc</code> preset is a 7 mm disc "
                   "held at 77 cm: `1/110`, about `0.0091` radians, enough to cover the "
                   "horizon moon at the lab's mean distance and not quite enough for the moon "
-                  "overhead. The book's own version of the test is a cardboard tube or a "
-                  "telescope, through which, it reports, the horizon moon looks no bigger "
-                  "than at the zenith."),
+                  "overhead. In Introduction III the book reports the old test of a cardboard tube or a "
+                  "telescope, through which the horizon moon looks no bigger than at the "
+                  "zenith. The intellectualist takes that to show the size never changed; "
+                  "Merleau-Ponty replies that the tube makes a different, analytic kind of "
+                  "looking, and settles nothing about the moon seen freely."),
             ("p", "So which question do the figures answer? How large an angle the moon "
                   "subtends at your eye, from a size and a distance that astronomers measured "
                   "and you have taken on trust. Which do they leave open? How large the moon "
@@ -385,8 +389,8 @@ LESSONS = [
         "read_title": "The passage first, then the reduction line by line",
         "read_intro": (
             "The passage is the Preface's own description of the reduction, given right "
-            "after it names Fink. The lesson reads it phrase by phrase, then the paragraph "
-            "that follows it, which says why the reduction cannot be finished."
+            "after it names Fink. The lesson reads it phrase by phrase, then the rest of its "
+            "paragraph, which says why the reduction cannot be finished."
         ),
         "body": [
             ("p", "<strong>Preface, p. xv.</strong> &ldquo;Reflection does not withdraw "
@@ -429,7 +433,7 @@ LESSONS = [
                   "for: reflection &ldquo;slackens the intentional threads which attach us to "
                   "the world&rdquo;. A thread pulled tight is invisible from inside the pull. "
                   "Let it go slack and you see it."),
-            ("p", "The paragraph before the passage says why the step is needed at all. We "
+            ("p", "The sentences before the passage say why the step is needed at all. We "
                   "are through and through made of relationships with the world, so the only "
                   "way to become aware of them is to suspend them, &ldquo;to refuse it our "
                   "complicity&rdquo;, to look on, in Husserl's phrase, &ldquo;ohne "
@@ -449,12 +453,16 @@ LESSONS = [
                   "own body and of the world included, until he reaches something that "
                   "cannot: that he thinks, and so is. Husserl himself introduced his "
                   "suspension by way of Descartes's attempt at universal doubt, while "
-                  "insisting that the two differ. The Preface's own remark on Descartes is "
-                  "that &ldquo;methodical doubt does not deprive us of anything&rdquo;, since "
-                  "the whole world comes back in the cogito, as certain as before and "
-                  "labelled thought of the world. On that account Descartes's doubt "
-                  "withdraws assent to find a firmer ground. The reduction withdraws nothing. "
-                  "It suspends our complicity to see the ground we were already standing on."),
+                  "insisting that the two differ. The Preface's own remark on Descartes, back on "
+                  "page x, is a concession to idealism made just before an objection: in "
+                  "Descartes &ldquo;methodical doubt does not deprive us of anything&rdquo;, "
+                  "since the whole world comes back in the cogito, as certain as before, but "
+                  "labelled thought of the world. The objection follows at once: if subject "
+                  "and world were really on a par, the world's certainty would be given with "
+                  "the cogito's, and what comes back is only the world as thought. Doubt "
+                  "withdraws assent and wins the world back as thought. The reduction, on the "
+                  "Preface's reading, withdraws nothing: it suspends our complicity to see "
+                  "the ground we were already standing on."),
             ("p", "Then the turn the section is building to. Every misunderstanding between "
                   "Husserl and his interpreters, the Preface says, and between Husserl and "
                   "himself, comes from the same two facts: to see the world as strange we "
@@ -466,13 +474,13 @@ LESSONS = [
                   "problem.&rdquo; We are not. We are in the world, our reflections happen in "
                   "the flow of time they are trying to grasp, and so &ldquo;there is no "
                   "thought which embraces all our thought&rdquo;."),
-            ("p", "The section draws three consequences, and the first is Husserl's own, from "
-                  "the unpublished work: the philosopher is &ldquo;a perpetual "
-                  "beginner&rdquo;, who takes nothing for granted that people, learned or "
-                  "not, believe they know. Philosophy may not take itself for granted either, "
-                  "even when it has said something true. And reflection at its most radical "
-                  "is an awareness of its own dependence on an unreflective life it can "
-                  "never get behind. So, the Preface concludes, the reduction is not a "
+            ("p", "The section then unfolds one phrase from Husserl's unpublished work: the "
+                  "philosopher is &ldquo;a perpetual beginner&rdquo;. It means, the Preface "
+                  "says, that he takes nothing for granted that people, learned or not, "
+                  "believe they know; that philosophy may not take itself for granted either, "
+                  "even when it has said something true; and that reflection at its most "
+                  "radical is an awareness of its own dependence on an unreflective life it "
+                  "can never get behind. So, the Preface concludes, the reduction is not a "
                   "procedure of idealist philosophy at all. It belongs to existential "
                   "philosophy, and Heidegger's being-in-the-world appears only against its "
                   "background."),
@@ -568,15 +576,15 @@ LESSONS = [
         "quiz": [
             {"q": "On the Preface's reading, what does the reduction suspend?",
              "a": ["Our complicity with the world, so that our ties to it can be seen",
-                   "Our belief that the world exists",
+                   "Our belief that the world exists, until doubt has proved it",
                    "Our bodies, so that only the mind remains",
                    "Perception, in favour of pure thought"],
              "c": 0,
              "why": "The text says the reduction refuses the world our complicity, puts it "
                     "out of play, and does so not because the certainties of common sense "
-                    "are rejected but because they go unnoticed. No belief is withdrawn, the body "
-                    "is not set aside, and the step brings perception into view rather than "
-                    "leaving it."},
+                    "are rejected but because they go unnoticed. Holding the world in doubt until "
+                    "it is proved is Descartes's procedure, not this one. The body is not set "
+                    "aside, and the step brings perception into view rather than leaving it."},
             {"q": "Why, according to the Preface, can the reduction never be completed?",
              "a": ["Because we are in the world, and our reflection takes place in the flow "
                    "of time it is trying to grasp",
@@ -763,7 +771,7 @@ LESSONS = [
                      "The passage from a fact to its essence, taken as a means: the essence "
                      "is sought in order to bring to light the world as it is before we "
                      "fall back on ourselves, and is not itself the object of philosophy.")),
-            ("p", "The section ends by saying what the essence of the world is not. "
+            ("p", "Near its end the section says what the essence of the world is not. "
                   "Sensationalism reduces the world to states of ourselves; transcendental "
                   "idealism reduces it to the correlate of our knowledge. The eidetic "
                   "reduction, on the contrary, is the resolve to bring the world to light as "
@@ -976,7 +984,7 @@ LESSONS = [
             "The Preface ends with intentionality, which it widens from the acts of "
             "judgement to an operative intentionality already at work in desire and in the "
             "landscape, and with a rationality that is the agreement of perspectives, "
-            "guaranteed from nowhere above them. Compute which faces of a cube several "
+            "guaranteed by no standpoint above them. Compute which faces of a cube several "
             "viewpoints see, which no view sees, and whether each viewer's report fits "
             "the direction they look from."
         ),
@@ -1043,7 +1051,8 @@ LESSONS = [
                   "impossible without outer perception, so that the world is already "
                   "anticipated in the consciousness of my own unity."),
             ("p", "What is new, the Preface says, is that the world's unity is lived as "
-                  "ready-made, already there, before knowledge posits it in a specific act. "
+                  "ready-made, already there, before knowledge posits it, sets it down as an "
+                  "object, in a specific act. "
                   "It finds the first sign of this in Kant himself, in the <em>Critique of "
                   "Judgement</em>: in finding something beautiful I feel a harmony between "
                   "sensation and concept, and between myself and others, that is itself "
@@ -1065,9 +1074,10 @@ LESSONS = [
                   "Marx says, that history does not walk on its head, and also true that "
                   "&ldquo;it does not think with its feet&rdquo;; it is neither its head nor "
                   "its feet we should worry about, the Preface says, but its body. Economic "
-                  "and psychological explanations of a doctrine are all true, provided none "
-                  "is isolated, because every perspective on an event or a thinker meets in "
-                  "one core of existential meaning. That is the passage's idea before it is "
+                  "and psychological explanations of a doctrine are all true, since a "
+                  "thinker thinks only from what he is, and every view of an event or a "
+                  "doctrine is true provided it is not isolated: followed deep enough, each "
+                  "reaches one core of existential meaning. That is the passage's idea before it is "
                   "stated: many views, one sense, found where they cross."),
             ("p", "Now the passage. Rationality is &ldquo;precisely proportioned&rdquo;, the "
                   "sentence before it says, to the experiences in which it is disclosed: "
@@ -1090,15 +1100,20 @@ LESSONS = [
                   "along. The Preface's answer is that the philosopher, the meditating ego, "
                   "the &ldquo;impartial spectator&rdquo;, does not rediscover a rationality "
                   "already given. It establishes it, &ldquo;by an act of initiative which "
-                  "has no guarantee in being&rdquo;."),
+                  "has no guarantee in being&rdquo;, and whose only justification, the "
+                  "Preface adds, is the power it gives us to take our own history upon "
+                  "ourselves."),
             ("p", "The lab puts the passage's views on a cube. The <code>three</code> preset "
                   "has three viewers. One looks from front, right and above, along the "
-                  "direction <code>1 2 2</code>, whose length is 3; it sees the front at "
-                  "`2/3` of its true size, the right side at `1/3` and the top at `2/3`. One "
-                  "looks from back, left and above, along <code>-2 1 -2</code>, and sees the "
-                  "back at `2/3`, the left at `2/3` and the top at `1/3`. One looks straight "
-                  "at the front and sees it whole. Between them they see 5 of the 6 faces. "
-                  "The top is seen by two viewers, foreshortened differently, and is one top. "
+                  "direction <code>1 2 2</code>, whose length is 3; the lab's projection "
+                  "draws the front at `2/3` of its true area, the right side at `1/3` and the "
+                  "top at `2/3`. One looks from back, left and above, along <code>-2 1 "
+                  "-2</code>, and the projection draws the back at `2/3`, the left at `2/3` "
+                  "and the top at `1/3`. One looks straight at the front and it is drawn "
+                  "whole. Between them they see 5 of the 6 faces, and the cover tile adds "
+                  "that the two oblique viewers already see all five between them: the third, "
+                  "looking straight at the front, adds no face, only a second sight of one. "
+                  "The top is seen by two viewers, projected differently, and is one top. "
                   "Nobody sees the bottom, and nobody needs to, to see a cube."),
             ("p", "The <code>two</code> preset has one viewer in front and one behind: 1 face "
                   "each, 2 of 6 between them, and nothing seen in common. The "
@@ -1107,7 +1122,9 @@ LESSONS = [
                   "<code>no: front-right-above (below)</code>: a viewer looking down on the "
                   "cube cannot see its underside. Notice how the lab knows. It checks each "
                   "report against a cube it holds complete, from outside every view, which "
-                  "is exactly the standpoint the Preface says nobody occupies. In perception "
+                  "is exactly the standpoint the Preface denies us when it says, in the "
+                  "section on the reduction, that there is no thought which embraces all "
+                  "our thought. In perception "
                   "the report would be caught the other way, by failing to mesh with the "
                   "other views."),
             ("p", "The Preface ends by refusing to call any of this unfinished in the bad "
@@ -1165,8 +1182,9 @@ LESSONS = [
              "A view sees the right face if its first component is positive and the left if "
              "negative, the top or bottom by the second, and the front or back by the third."),
             ("Foreshorten",
-             "A face seen at an angle appears at the component over the length of its true "
-             "size: from 1 2 2 the right face appears at 1/3."),
+             "In the projection a face seen at an angle is drawn at its component over the "
+             "direction's length, as a fraction of its true area: from 1 2 2 the right face "
+             "is drawn at 1/3."),
             ("Take the union",
              "Collect every face some view sees, and name the faces no view sees."),
             ("Check each report",
@@ -1177,8 +1195,8 @@ LESSONS = [
             "title": "Three viewers and one cube",
             "intro": [
                 "Take the three preset: views along 1 2 2, along −2 1 −2, and straight at "
-                "the front. You want what each sees, at what fraction of its true size, and "
-                "what they see together.",
+                "the front. You want what each sees, at what fraction of its true area the "
+                "projection draws it, and what they see together.",
             ],
             "lines": [
                 "first view:  1 + 4 + 4 = 9, so its length is 3",
@@ -1189,8 +1207,8 @@ LESSONS = [
                 "together:  5 of 6 faces; no view sees below",
             ],
             "after": [
-                "The top is seen twice, at `2/3` and at `1/3`, and is one top; the front is "
-                "seen twice, at `2/3` and whole. Nobody sees the bottom, and the cube is no "
+                "The top is seen twice, projected at `2/3` and at `1/3`, and is one top; the "
+                "front is seen twice, projected at `2/3` and whole. Nobody sees the bottom, and the cube is no "
                 "less a cube for that. No view here is the true one. Each is partial, and "
                 "they fit.",
             ],
@@ -1205,11 +1223,12 @@ LESSONS = [
                     "only the front, which is already counted. That makes 3. Four would need a "
                     "face neither direction points towards, two leaves out the right side or "
                     "the top, and no pair of these views sees the back or the bottom."},
-            {"q": "Along 1 2 2, at what fraction of its true size does the top appear?",
+            {"q": "In the lab's projection along 1 2 2, at what fraction of its true area is "
+                  "the top drawn?",
              "a": ["2/3", "1/3", "1", "2/9"],
              "c": 0,
              "why": "The length of 1 2 2 is 3, and the top's component is 2, so the top "
-                    "appears at `2/3`. `1/3` is the right side's figure, 1 would mean looking "
+                    "is drawn at `2/3`. `1/3` is the right side's figure, 1 would mean looking "
                     "straight down, and `2/9` divides by the squared length instead of the "
                     "length."},
             {"q": "Which of these is operative intentionality, in the Preface's sense, rather "
@@ -1243,8 +1262,8 @@ LESSONS = [
              "agreeing. The Preface denies there is such a standpoint to occupy; the "
              "meditating ego and the impartial spectator establish rationality rather than "
              "find it. The lab shows the difference against itself. In the three preset the "
-             "views confirm one another, the top seen at `2/3` and at `1/3` and still one "
-             "top. The conflict preset's verdict, <code>no: front-right-above "
+             "views confirm one another, the top projected at `2/3` and at `1/3` and still "
+             "one top. The conflict preset's verdict, <code>no: front-right-above "
              "(below)</code>, is reached by checking against a complete cube the lab holds "
              "from nowhere, which is the one thing a perceiver never has."),
             ("Taking operative intentionality for a quiet kind of judgement",
@@ -1255,8 +1274,9 @@ LESSONS = [
             ("Reading the unfinished as a failure",
              "The Preface expects phenomenology to stay unfinished, because it is itself in "
              "history and must question itself as it questions everything else. It says "
-             "that this is not a sign of failure but was inevitable, given a task like the "
-             "novelist's or the painter's: to seize the world's meaning as it comes into "
+             "that this is not a sign of failure but was inevitable, because its task was "
+             "to reveal the mystery of the world and of reason, and it compares the work to "
+             "the novelist's or the painter's: to seize the world's meaning as it comes into "
              "being."),
         ],
         "standard": (
