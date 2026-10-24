@@ -26,6 +26,7 @@ sys.dont_write_bytecode = True
 
 from algebra import PATH as ALGEBRA_PATH  # noqa: E402
 from algorithms import PATH as ALGORITHMS_PATH  # noqa: E402
+from capital import PATH as CAPITAL_PATH  # noqa: E402
 from differential_equations import PATH as DE_PATH  # noqa: E402
 from discrete_math import PATH as DISCRETE_MATH_PATH  # noqa: E402
 from english import PATH as ENGLISH_PATH  # noqa: E402
@@ -36,7 +37,7 @@ from mathpath import render  # noqa: E402
 
 GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
                    ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, PHILOSOPHY_PATH,
-                   ENGLISH_PATH, DE_PATH)
+                   ENGLISH_PATH, DE_PATH, CAPITAL_PATH)
 
 SITE = REPO_ROOT / "site"
 # The list of pages this build produces, consumed by scripts/labcheck.js.
@@ -62,7 +63,8 @@ KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "copi
                           "dpkit", "dpseq", "strings", "geometry",
                           "markov", "schedule", "network", "graphkit", "flowkit",
                           "argkit", "choicekit", "english",
-                          "calckit", "dekit",)
+                          "calckit", "dekit",
+                          "capkit",)
 
 
 def path_pages(path):

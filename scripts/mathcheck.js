@@ -19744,6 +19744,501 @@ console.log('differential equations: polynomials, rational functions, exponentia
   eq(de("DE_digits([R(12345n, 7n), R(1n, 100n)])"), '5', 'DE_digits: the widest numerator or denominator');
 }
 
+// ---- capkit (Volume I modes) ----
+// ==========================================================================
+// Capital: capkit.py's nine Volume I modes and capkit_core.py's printing
+// ==========================================================================
+//
+// The shipped blocks run in a vm context of their own -- RATIONAL_JS,
+// capkit_core's CAP_CORE_JS and every <MODE>_JS of capkit.py -- exactly as a
+// capkit page assembles them, so no definition above can shadow them. Each
+// mode's pure function <xx>Compute(view, inst, U, opts) is called with an
+// instance and compared on the exact tile strings a reader sees. The figures
+// are Marx's wherever docs/capital/PLAN.md section C gives them. Every case
+// below was seen to FAIL when its function was broken on purpose.
+console.log('capital: capkit Volume I modes, shillings and pence, rates');
+{
+  const vm = require('vm');
+  const CK_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'capkit.py');
+  const CC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'capkit_core.py');
+  const ckSrc = fs.readFileSync(CK_SOURCE, 'utf8'), ccSrc = fs.readFileSync(CC_SOURCE, 'utf8');
+  const ctx = { console: console };
+  vm.createContext(ctx);
+  vm.runInContext(block('RATIONAL_JS') + blockFrom(ccSrc, 'CAP_CORE_JS', CC_SOURCE)
+    + ['VALUE_JS', 'FORM_JS', 'MONEY_JS', 'CIRCUIT_JS', 'SURPLUS_JS', 'WORKDAY_JS', 'MACHINE_JS', 'WAGES_JS',
+       'ACCUMULATE_JS'].map((n) => blockFrom(ckSrc, n, CK_SOURCE)).join('')
+    + "function Q(t) { return Rparse(String(t)); }", ctx, { filename: 'capkit.py' });
+  const ck = (expr) => {
+    try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; }
+  };
+  const tile = (fn, view, inst, U, opts, id) =>
+    ck(fn + "('" + view + "', " + inst + ", " + JSON.stringify(U) + ", " + JSON.stringify(opts || {}) + ").tiles." + id);
+
+  /* --- capkit_core: money, rates, the reader's input ---------------------- */
+  eq(ck("capMoney(Q('30'), 's')"), '30s', 'capMoney: 30 shillings');
+  eq(ck("capMoney(Q('1/4'), 's')"), '3d', 'capMoney: a quarter shilling is 3d');
+  eq(ck("capMoney(Q('3/2'), 's')"), '1s 6d', 'capMoney: 1s 6d');
+  eq(ck("capMoney(Q('1/8'), 's')"), '1½d', 'capMoney: 3s / 24 pieces = 1½d (Marx, ch. 21)');
+  eq(ck("capMoney(Rdiv(Q(3), Q(48)), 's')"), '¾d', 'capMoney: 3s / 48 pieces = ¾d');
+  eq(ck("capMoney(Q('1/48'), 's')"), '¼d', 'capMoney: ¼d');
+  eq(ck("capMoney(Q('3/10'), 's')"), '3 3/5 d', 'capMoney: a tenth of 3s is 3 3/5 d');
+  eq(ck("capMoney(Q('1/36'), 's')"), '1/3 d', 'capMoney: a third of a penny');
+  eq(ck("capMoney(Q('0'), 's')"), '0s', 'capMoney: nothing is 0s');
+  eq(ck("capMoney(Q('-3/2'), 's')"), '−1s 6d', 'capMoney: a loss, with the minus sign');
+  eq(ck("capMoney(Q('12000'), '£')"), '£12,000', 'capMoney: pounds, digits grouped');
+  eq(ck("capMoney(Q('-10'), '£')"), '−£10', 'capMoney: minus before the pound sign');
+  eq(ck("capMoney(Q('9/5'), 'hours')"), '9/5 h', 'capMoney: hours');
+  eq(ck("capPct(Q(1))"), '1 = 100%', 'capPct: whole');
+  eq(ck("capPct(Q('2/3'))"), '2/3 = 66.67%', 'capPct: two decimals');
+  eq(ck("capPct(Q('11/50'))"), '11/50 = 22%', 'capPct: no trailing zeros');
+  eq(ck("capPct(Q('10'))"), '10 = 1,000%', 'capPct: grouped');
+  eq(ck("capSigned(Q(1), capHours) + ', ' + capSigned(Q(0), capHours) + ', ' + capSigned(Q(-1), capHours)"),
+     '+1 h, 0 h, −1 h', 'capSigned');
+  eq(ck("capRead([{key: 'x', kind: 'pos', what: 'The wage'}], {x: '-1'}).x"), 'THREW The wage must be more than 0, and it is −1',
+     'capRead refuses a negative where a positive is needed');
+  eq(ck("capRead([{key: 'x', kind: 'pos', what: 'The velocity'}], {x: '0'}).x"), 'THREW The velocity must be more than 0, and it is 0',
+     'capRead refuses 0 where a positive is needed');
+  eq(ck("capRead([{key: 'x', kind: 'nn', what: 'The wage'}], {x: '1/0'}).x"),
+     'THREW The wage should be a number such as 3, 1/2 or 0.25, and "1/0" is not one', 'capRead refuses 1/0');
+  eq(ck("capRead([{key: 'p', kind: 'rec', what: 'Producers', lo: 1, hi: 8, unique: true, sub: [['name', 'name'], ['hours', 'pos']]}],"
+        + " {p: 'A, 1; B, 2'}).p.map(function (r) { return r.name + Rtext(r.hours); }).join(' ')"), 'A1 B2',
+     'capRead reads records');
+
+  /* --- value ---------------------------------------------------------------- */
+  const weavers = "{producers: [{name: 'A', hours: Q(1), output: Q(40)}, {name: 'B', hours: Q(2), output: Q(40)},"
+    + " {name: 'C', hours: Q(3), output: Q(20)}], basis: 'per-unit', lot: Q(20)}";
+  eq(tile('vaCompute', 'snlt', weavers, { money: 'hours', qty: 'yards' }, {}, 'vaSnlt'), '9/5 h',
+     'vaCompute: 100 yards in 180 hours is 9/5 h a yard');
+  eq(tile('vaCompute', 'snlt', weavers, { money: 'hours', qty: 'yards' }, {}, 'vaLotValue'), '36 h', 'vaCompute: 20 yards');
+  eq(tile('vaCompute', 'skill', "{producers: [{name: 't', hours: Q(10), output: Q(2)}], basis: 'total', skill: Q(1), lot: Q(1)}",
+          { money: 'hours', qty: '' }, {}, 'vaPerUnit'), '5 h', 'vaCompute: two coats in 10 hours');
+  eq(tile('vaCompute', 'ledger', "{items: [{name: 'goats', hours: Q(10), output: Q(2)}, {name: 'fish', hours: Q(4), output: Q(8)}]}",
+          { money: 'hours', qty: '' }, {}, 'vaPerUnit'), 'goats 5 h, fish 1/2 h', 'vaCompute: the ledger');
+  eq(tile('vaCompute', 'market', "{groups: [{units: Q(10), hours: Q(1)}, {units: Q(20), hours: Q(2)}, {units: Q(10), hours: Q(3)}]}",
+          { money: 'hours', qty: '' }, {}, 'vaSurplus'), '+1 h, 0 h, −1 h', 'vaCompute: gains against the market value');
+
+  /* --- form ----------------------------------------------------------------- */
+  const goods = "{goods: [{name: 'linen', qty: Q(20), unit: 'yards', hours: Q(20)}, {name: 'coat', qty: Q(1), unit: '', hours: Q(10)},"
+    + " {name: 'tea', qty: Q(10), unit: 'lb', hours: Q(20)}], equivalent: 'linen'}";
+  eq(tile('foCompute', 'stage', goods, {}, { stage: 'elementary' }, 'foRelative'), '2 coats',
+     'foCompute: halve the coat\'s hours and the linen fetches 2 coats');
+  /* the plural: the unit when there is one, else the name; never below 2 */
+  const lotOf = (name, qty, unit) => ck("foLotOf({name: '" + name + "', unit: '" + unit + "'}, Q('" + qty + "'))");
+  eq(lotOf('coat', '1', ''), '1 coat', 'foLotOf: one coat');
+  eq(lotOf('coat', '3/2', ''), '3/2 coats', 'foLotOf: more than one is plural');
+  eq(lotOf('iron', '1/2', 'ton'), '1/2 ton iron', 'foLotOf: a fraction up to one is singular');
+  eq(lotOf('corn', '2', 'quarter'), '2 quarters corn', 'foLotOf: the unit takes the plural, not the mass noun');
+  eq(lotOf('linen', '20', 'yards'), '20 yards linen', 'foLotOf: a unit already plural is left');
+  eq(lotOf('tea', '10', 'lb'), '10 lb tea', 'foLotOf: an abbreviation is left');
+  eq(lotOf('cattle', '2', 'head of'), '2 head of cattle', 'foLotOf: head of cattle');
+  eq(lotOf('pair of boots', '2', ''), '2 pairs of boots', 'foLotOf: the word before "of"');
+  eq(lotOf('watch', '2', '') + ', ' + lotOf('Bible', '3', '') + ', ' + lotOf('pony', '2', ''), '2 watches, 3 Bibles, 2 ponies',
+     'foLotOf: -es, -s and -ies');
+  eq(tile('foCompute', 'stage', goods, {}, { stage: 'general' }, 'foEquation'), '1 coat = 10 yards linen; 10 lb tea = 20 yards linen',
+     'foCompute: the general form');
+  eq(tile('foCompute', 'count', goods, {}, {}, 'foPairs'), '3', 'foCompute: three owners need 3 ratios');
+  eq(ck("foCompute('count', {goods: [1,2,3,4,5,6].map(function (i) { return {name: 'g' + i, qty: Q(1), unit: '', hours: Q(1)}; }),"
+        + " equivalent: 'g1'}, {}, {}).tiles.foPairs"), '15', 'foCompute: six owners need fifteen');
+
+  /* --- money ---------------------------------------------------------------- */
+  const four = "{goods: [1,2,3,4].map(function (i) { return {name: 'g' + i, value_hours: Q(2)}; }), gold_hours_per_unit: Q(1),"
+    + " velocity: Q(4)";
+  eq(tile('moCompute', 'circulate', four + '}', { money: '£' }, {}, 'moNeeded'), '£2',
+     'moCompute: £8 of prices at velocity 4 needs £2');
+  eq(tile('moCompute', 'circulate', four.replace('gold_hours_per_unit: Q(1)', "gold_hours_per_unit: Q('1/2')") + '}', { money: '£' }, {},
+          'moPriceSum'), '£16', 'moCompute: gold\'s value halves and every price doubles');
+  eq(ck("moNeededOf(Q(8), Q(2), Q(6), Q(2), Q(4)).n"), '5', 'moNeededOf: (8 - 2 + 6 - 2) / 4 = 5/2');
+  const bills = "bills: [{from: 'A', to: 'B', amount: Q(100), backed: true}, {from: 'B', to: 'C', amount: Q(100), backed: true},"
+    + " {from: 'C', to: 'A', amount: Q(100), backed: false}]";
+  eq(tile('moCompute', 'payments', four + ", credit_sales: Q(0), payments_due: Q(0), cancelling: Q(0), " + bills + ", default: null}",
+          { money: '£' }, {}, 'moNetted'), '£0', 'moCompute: a circle of debts cancels to £0');
+  eq(tile('moCompute', 'payments', four + ", credit_sales: Q(0), payments_due: Q(0), cancelling: Q(0), " + bills + ", default: Q(3)}",
+          { money: '£' }, {}, 'moNetted'), '£100', 'moCompute: break one link and £100 is needed');
+  eq(tile('moCompute', 'payments', four + ", credit_sales: Q(0), payments_due: Q(0), cancelling: Q(0), " + bills + ", default: null}",
+          { money: '£' }, {}, 'moUnbacked'), '£100', 'moCompute: the bill with no sale behind it');
+  eq(tile('moCompute', 'world', "{imports: Q(1000), exports: Q(800), other_receipts: Q(0)}", { money: '£' }, {}, 'moDrain'),
+     '£200 out', 'moCompute: £1,000 of imports against £800 of exports');
+  eq(tile('moCompute', 'fixed-rent', "{rent: Q(20), price_index: Q(2), wage_index: Q('3/2'), product: Q(100), wages: Q(40)}",
+          { money: '£' }, {}, 'moRealRent'), '£10', 'moCompute: a £20 rent while prices double');
+  eq(tile('moCompute', 'fixed-rent', "{rent: Q(20), price_index: Q(2), wage_index: Q('3/2'), product: Q(100), wages: Q(40)}",
+          { money: '£' }, {}, 'moFarmerGain'), '£120', 'moCompute: 200 - 60 - 20');
+  eq(tile('moCompute', 'bank-act', four + ", issue: Q(5), reserve: Q(10), fiduciary: Q(14), demand: Q(30)}", { money: '£' }, {},
+          'moGap'), '£6', 'moCompute: demand beyond the fiduciary issue plus the reserve');
+
+  /* --- circuit -------------------------------------------------------------- */
+  eq(tile('ciCompute', 'formula', "{start: 'money', M: Q(100), product: Q(110)}", { money: '£' }, {}, 'ciDelta'), '+£10',
+     'ciCompute: £100 of cotton sold for £110');
+  eq(tile('ciCompute', 'markup', "{sellers: [{name: 'A', value: Q(40), markup: Q('1/4')}, {name: 'B', value: Q(50), markup: Q(0)}]}",
+          { money: '£' }, {}, 'ciTotalAfter'), '£90', 'ciCompute: wine £40 for corn £50, £90 before and after');
+  eq(ck("ciRingOf([{name: 'A', value: Q(40), markup: Q('1/4')}, {name: 'B', value: Q(50), markup: Q(0)}])"
+        + ".map(function (r) { return Rtext(r.after); }).join(',')"), '50,40', 'ciRingOf: A gains what B loses');
+  eq(tile('ciCompute', 'labour-power', "{subsistence: [{item: 'food', hours: Q(6), every_days: Q(1)},"
+          + " {item: 'clothes', hours: Q(7), every_days: Q(7)}, {item: 'rent', hours: Q(365), every_days: Q(365)}]}",
+          { money: 'hours' }, {}, 'ciLpValue'), '8 h', 'ciCompute: 6 + 7/7 + 365/365 = 8 h a day');
+  eq(tile('ciCompute', 'realise', "{M: Q(100), product: Q(120), consumption_advance: Q(20)}", { money: '£' }, {}, 'ciS'), '£20',
+     'ciCompute: the capitalists\' own spending realises s');
+  eq(tile('ciCompute', 'realise', "{M: Q(100), product: Q(120), consumption_advance: Q(0)}", { money: '£' }, {}, 'ciReturned'), '£100',
+     'ciCompute: with nothing advanced for consumption, only M returns');
+  eq(tile('ciCompute', 'costs', "{M: Q(100), product: Q(120), pure_costs: Q(5), value_adding_costs: Q(10)}", { money: '£' }, {},
+          'ciSNet'), '£15', 'ciCompute: pure costs come out of s');
+
+  /* --- surplus -------------------------------------------------------------- */
+  const mill = (m, w, h) => "{materials: Q(" + m + "), wear: Q(" + w + "), wage: Q(3), hours: Q(" + h + "), necessary_hours: Q(6), waste: Q(0)}";
+  eq(tile('suCompute', 'mill', mill(20, 4, 12), { money: 's' }, {}, 'suProduct'), '30s', 'suCompute: 27s advanced, yarn worth 30s');
+  eq(tile('suCompute', 'mill', mill(20, 4, 12), { money: 's' }, {}, 'suS'), '3s', 'suCompute: 3s more than was advanced');
+  eq(tile('suCompute', 'mill', mill(10, 2, 6), { money: 's' }, {}, 'suS'), '0s', 'suCompute: six hours yield nothing');
+  eq(tile('suCompute', 'mill', "{materials: Q(25), wear: Q(4), wage: Q(3), hours: Q(12), necessary_hours: Q(6), waste: Q(5)}",
+          { money: 's' }, {}, 'suS'), '−2s', 'suCompute: waste beyond the socially necessary passes over no value');
+  eq(tile('suCompute', 'rate', "{c: Q(410), v: Q(90), s: Q(90), output: Q(1)}", { money: '£' }, {}, 'suRate'), '1 = 100%',
+     'suCompute: c = 410, v = 90, s = 90 is 100%, not 90/500');
+  eq(tile('suCompute', 'rate', "{c: Q(24), v: Q(3), s: Q(3), output: Q(20)}", { money: 's', qty: 'lb' }, {}, 'suParts'),
+     'c: 16 lb, v: 2 lb, s: 2 lb', 'suCompute: 20 lb of yarn in parts');
+  eq(tile('suCompute', 'senior', "{hours: Q('23/2'), necessary_hours: Q('23/4')}", {}, {}, 'suLastHour'),
+     '19/23 = 82.61% (Senior: 0)', 'suCompute: Senior\'s last hour, 4¾ on 5¾');
+  eq(tile('suCompute', 'mass', "{wage: Q(3), workers: Q(50), hours: Q(18), necessary_hours: Q(6)}", { money: 's' }, {}, 'suMass'),
+     '300s', 'suCompute: 50 workers at 200% give what 100 give at 100%');
+  eq(tile('suCompute', 'formulae', "{hours: Q(12), necessary_hours: Q(4)}", {}, {}, 'suFalse'), '2/3 = 66.67%',
+     'suCompute: 8 surplus hours in 12 by the derivative formula');
+  eq(tile('suCompute', 'transfer', "{machine_value: Q(1000), machine_days: Q(1000), materials: Q(0), wage: Q(3), hours: Q(0),"
+          + " necessary_hours: Q(6)}", { money: '£' }, {}, 'suTransfer'), '£1', 'suCompute: a £1,000 machine over 1,000 days');
+
+  /* --- workday -------------------------------------------------------------- */
+  eq(tile('wdCompute', 'limit', "{day: Q(12), necessary: Q(6), limit: Q(10)}", {}, {}, 'wdRate'), '2/3 = 66.67%',
+     'wdCompute: the ten-hour limit');
+  eq(tile('wdCompute', 'classify', "{day: Q(12), necessary: Q(6), new_day: Q(14), new_necessary: Q(5)}", {}, {}, 'wdKind'), 'both',
+     'wdCompute: 12/6 to 14/5 is both');
+  eq(tile('wdCompute', 'classify', "{day: Q(12), necessary: Q(6), new_day: Q(14), new_necessary: Q(5)}", {}, {}, 'wdRate'),
+     '9/5 = 180%', 'wdCompute: and 180%');
+  eq(tile('wdCompute', 'classify', "{day: Q(12), necessary: Q(6), new_day: Q(14), new_necessary: Q(6)}", {}, {}, 'wdKind'), 'absolute',
+     'wdCompute: a longer day alone is absolute');
+  eq(tile('wdCompute', 'relative', "{day: Q(12), necessary: Q(10), productivity: Q(1), pioneer_productivity: Q(2)}", {}, {}, 'wdExtra'),
+     '+12 h', 'wdCompute: the pioneer\'s extra surplus value');
+  eq(tile('wdCompute', 'intensity', "{day: Q(10), necessary: Q(6), intensity: Q('6/5')}", {}, {}, 'wdLabour'), '12 h',
+     'wdCompute: 10 hours at 6/5 intensity');
+  eq(tile('wdCompute', 'three', "{day: Q(12), necessary: Q(6), productivity: Q(2), intensity: Q(1), new_day: Q(12)}", {},
+          { hold: 'productivity' }, 'wdLpValue'), '3 h', 'wdCompute: doubled productivity halves the value of labour-power');
+  eq(tile('wdCompute', 'separate', "{day: Q(12), necessary: Q(6), own_land: false, count: Q(100)}", {}, {}, 'wdSurplus'), '600 h',
+     'wdCompute: a cleared estate of 100 households');
+  eq(ck("wdBar(Q(12), Q(6), capHours).indexOf('width=\"310\"') > 0"), true, 'wdBar: cut at half of 620 px');
+
+  /* --- machine -------------------------------------------------------------- */
+  eq(ck("maBalance([Q(2000), Q(4000), Q(8000)]).join(':')"), '4:2:1', 'maBalance: type-founding, 4 : 2 : 1');
+  eq(ck("maBalance([Q(3), Q(2)]).join(':')"), '2:3', 'maBalance: rates 3 and 2 need 2 and 3');
+  eq(ck("maBalance([Q('3/2'), Q('5/2')]).join(':')"), '5:3', 'maBalance: fractional rates, 10:6 reduced to 5:3');
+  eq(tile('maCompute', 'cooperate', "{workers: Q(12), output_each: Q(12), shared_c: Q(10), c_each_if_alone: Q(10), hours: Q(12)}",
+          { money: 's', qty: '' }, {}, 'maCPerUnit'), 'alone 10d, together 5/6 d', 'maCompute: 10s/12 against 10s/144');
+  eq(tile('maCompute', 'adopt', "{machine_value: Q(3000), machine_life_units: Q(10000), wages_displaced: Q(3000), labour_saved_value: Q(6000)}",
+          { money: '£' }, { test: 'capitalist' }, 'maVerdict'), 'not adopted (the capitalist’s test)',
+     'maCompute: a machine costing what the wages cost is not bought');
+  eq(tile('maCompute', 'adopt', "{machine_value: Q(3000), machine_life_units: Q(10000), wages_displaced: Q(3000), labour_saved_value: Q(6000)}",
+          { money: '£' }, { test: 'society' }, 'maVerdict'), 'adopted (society’s test)', 'maCompute: society\'s test');
+  eq(tile('maCompute', 'displace', "{variable: Q(3000), wage_each: Q(30), discharged: Q(50), machine_spend: Q(1500), mb_composition: Q(4)}",
+          { money: '£' }, {}, 'maReemployed'), '10 = 0 set free + 10 in machine-building',
+     'maCompute: the carpet factory sets nothing free');
+
+  /* --- wages ---------------------------------------------------------------- */
+  eq(tile('waCompute', 'piece', "{lp_value: Q(3), normal_hours: Q(12), pieces_normal: Q(24), pieces_actual: Q(24), rate_cut_to: null}",
+          { money: 's' }, {}, 'waPieceRate'), '1½d', 'waCompute: 3s for 24 pieces');
+  eq(tile('waCompute', 'piece', "{lp_value: Q(3), normal_hours: Q(12), pieces_normal: Q(24), pieces_actual: Q(48), rate_cut_to: Q('1/16')}",
+          { money: 's' }, {}, 'waDaily'), '3s', 'waCompute: 48 pieces at ¾d');
+  eq(tile('waCompute', 'time', "{lp_value: Q(3), normal_hours: Q(12), hours_worked: Q(6)}", { money: 's' }, {}, 'waDaily'), '1s 6d',
+     'waCompute: six hours at 3d');
+  eq(tile('waCompute', 'form', "{lp_value: Q(3), normal_hours: Q(12), value_per_hour: Q('1/2')}", { money: 's' }, {}, 'waValueCreated'),
+     '6s in 12 h (6d an hour)', 'waCompute: 12 hours create 6s');
+  eq(tile('waCompute', 'national', "{countries: [{name: 'E', wage: Q('3/2'), output_per_hour: Q(2)}, {name: 'C', wage: Q(1),"
+          + " output_per_hour: Q(1)}], unit_value: Q(2)}", { money: 's' }, {}, 'waRelative'), '3/4',
+     'waCompute: wages 1½ times as high for twice the output');
+  eq(tile('waCompute', 'statute', "{statutory_wage: Q(2), lp_value: Q(3), day: Q(12), necessary: Q(6)}", { money: 's' }, {}, 'waRate'),
+     '2 = 200%', 'waCompute: a maximum a third below value turns 100% into 200%');
+
+  /* --- accumulate ----------------------------------------------------------- */
+  const grow = "{capital: Q(10000), c_v: Q(4), s_rate: Q(1), accumulate_share: Q(1), invest_threshold: Q(0)}";
+  eq(tile('acCompute', 'simple', "{capital: Q(1000), consumed_per_year: Q(200)}", { money: '£' }, {}, 'acYears'), '5 years',
+     'acCompute: £1,000 at £200 a year');
+  eq(tile('acCompute', 'expand', grow, { money: '£' }, { periods: 1 }, 'acCapital'), '£12,000',
+     'acCompute: £10,000 at 4:1 and 100%, all capitalised, is £12,000 after a year');
+  eq(tile('acCompute', 'expand', grow, { money: '£' }, { periods: 1 }, 'acShareOriginal'), '5/6 = 83.33%',
+     'acCompute: the original capital is five sixths of it');
+  eq(tile('acCompute', 'expand', grow, { money: '£' }, { periods: 5 }, 'acCapital'), '£124,416/5', 'acCompute: (6/5)^5 after five years');
+  eq(tile('acCompute', 'expand', "{capital: Q(10000), c_v: Q(4), s_rate: Q(1), accumulate_share: Q(1), invest_threshold: Q(5000)}",
+          { money: '£' }, { periods: 1 }, 'acHoard'), '£2,000', 'acCompute: s below the threshold is hoarded');
+  eq(tile('acCompute', 'labour', "{capital: Q(10000), c_v: Q(4), s_rate: Q(1), accumulate_share: Q('1/2'), labour_supply: Q(500),"
+          + " supply_growth: Q(100), wage_per_worker: Q(5)}", { money: '£' }, { periods: 3 }, 'acReserve'), '216',
+     'acCompute: 700 available, 484 employed');
+  eq(tile('acCompute', 'labour', "{capital: Q(10000), c_v: Q(4), s_rate: Q(1), accumulate_share: Q(1), labour_supply: Q(300),"
+          + " supply_growth: Q(0), wage_per_worker: Q(5)}", { money: '£' }, { periods: 2 }, 'acCapital'), '£11,800',
+     'acCompute: short of labour, the wage rises to v over the supply and s falls');
+  eq(tile('acCompute', 'composition', "{capital: Q(10000), c_v: Q(4), s_rate: Q(1), accumulate_share: Q('1/2'), composition_rise: Q('1/2'),"
+          + " labour_supply: Q(2000), supply_growth: Q(0), wage_per_worker: Q(5)}", { money: '£' }, { periods: 5 }, 'acDemand'), '400',
+     'acCompute: capital grows by half while c/v rises from 4 to 6, and employment stays flat');
+  eq(tile('acCompute', 'law', "{capital: Q(10000), c_v: Q(4), s_rate: Q(1), accumulate_share: Q(1), composition_rise: Q(0),"
+          + " labour_supply: Q(500), supply_growth: Q(0), wage_per_worker: Q(5), wage_growth: Q(1)}", { money: '£' }, { periods: 3 },
+          'acRatio'), '39/136 = 28.68%', 'acCompute: reserve over employed while wages rise');
+  eq(tile('acCompute', 'centralise', "{capitals: [1,1,1,1,1,1,1,1,1,1].map(Q), merge_rule: 'largest-absorbs-smallest', growth: Q(0)}",
+          { money: '£' }, { periods: 5 }, 'acTopShare'), '3/5 = 60%', 'acCompute: the largest absorbs the smallest five times: 6/10');
+  eq(tile('acCompute', 'centralise', "{capitals: [1,1,1,1,1,1,1,1,1,1].map(Q), merge_rule: 'none', growth: Q('1/10')}",
+          { money: '£' }, { periods: 5 }, 'acTopShare'), '1/10 = 10%', 'acCompute: if all simply grow, still 1/10');
+  eq(ck("Rtext(acCentralise([1,1,1,1,1,1,1,1,1,1].map(Q), Q('1/10'), false, 2)[1].total)"), '121/10',
+     'acCentralise: ten capitals of 1 grown 10% twice');
+  eq(tile('acCompute', 'colony', "{capital: Q(50000), colonists: Q(3000), land_price_years: Q('2/5'), saving_share: Q('1/10')}",
+          { money: '£' }, { periods: 3 }, 'acYearsToLand'), '4 years', 'acCompute: Wakefield\'s price');
+  eq(tile('acCompute', 'colony', "{capital: Q(50000), colonists: Q(3000), land_price_years: Q(0), saving_share: Q('1/10')}",
+          { money: '£' }, { periods: 1 }, 'acReserve'), '0', 'acCompute: Mr Peel, free land, no servant');
+  eq(tile('acCompute', 'thrift', "{wage: Q(3), saving_share: Q('1/10'), target: Q(60000)}", { money: 's' }, {}, 'acDaysToTarget'),
+     '200,000 working days', 'acCompute: £3,000 saved at 3.6d a day');
+
+  /* --- a preset's own periods: capkit_core's CAP_WIRE_JS, run as a page runs it.
+     The lesson ships 1 period; the long-run preset carries 10. Choosing it must
+     move the range to 10 and print ten periods' growth; choosing a preset that
+     carries none must put the range back to the lesson's 1, whatever came
+     before it. */
+  {
+    function Fake(id) { this.id = id; this.value = ''; this.textContent = ''; this.innerHTML = ''; this.listeners = {}; }
+    Fake.prototype.addEventListener = function (t, fn) { (this.listeners[t] = this.listeners[t] || []).push(fn); };
+    Fake.prototype.fire = function (t) { (this.listeners[t] || []).forEach((fn) => fn.call(this, { target: this })); };
+    const els = {};
+    const byId = (id) => els[id] || (els[id] = new Fake(id));
+    const wctx = { console: console, document: { getElementById: byId }, window: {} };
+    vm.createContext(wctx);
+    const inst = { capital: '10000', c_v: '4', s_rate: '1', accumulate_share: '1', invest_threshold: '0' };
+    const lit = (name, value) => 'var ' + name + ' = ' + JSON.stringify(value) + ';\n';
+    const spec = [['capital', 'pos'], ['c_v', 'nn'], ['s_rate', 'nn'], ['accumulate_share', 'share'], ['invest_threshold', 'nn']]
+      .map(([key, kind]) => ({ key: key, what: key, kind: kind, id: 'acIn' + key }));
+    spec.forEach((f) => { byId(f.id).value = inst[f.key]; });
+    byId('acPreset').value = 'short';
+    byId('acPeriods').value = '1';
+    vm.runInContext(block('RATIONAL_JS') + blockFrom(ccSrc, 'CAP_CORE_JS', CC_SOURCE) + blockFrom(ckSrc, 'ACCUMULATE_JS', CK_SOURCE)
+      + lit('PRESETS', { short: inst, long: inst, again: inst }) + lit('SPEC', spec)
+      + lit('TILES', ['acCapital', 'acShareOriginal', 'acHoard']) + lit('REDRAW', {}) + lit('PERIODS', 'acPeriods')
+      + lit('PRESET_PERIODS', { long: 10 }) + lit('PERIODS_DEFAULT', 1) + lit('VIEW', 'expand')
+      + lit('U', { money: '£', qty: '' })
+      + blockFrom(ccSrc, 'CAP_WIRE_JS', CC_SOURCE).replace(/%\(p\)s/g, 'ac').replace(/%\(fn\)s/g, 'acCompute'),
+    wctx, { filename: 'capkit_core.py' });
+    const ten = tile('acCompute', 'expand', grow, { money: '£' }, { periods: 10 }, 'acCapital');
+    eq(byId('acCapital').textContent, '£12,000', 'CAP_WIRE_JS: the lesson\'s 1 period on first paint');
+    const pick = (pid) => { byId('acPreset').value = pid; byId('acPreset').fire('change'); };
+    pick('long');
+    eq(byId('acPeriods').value + ' ' + byId('acCapital').textContent, '10 ' + ten,
+       'CAP_WIRE_JS: the long-run preset runs its own 10 periods');
+    eq(ten, '£967,458,816/15,625', 'acCompute: £10,000 at (6/5)^10');
+    pick('again');
+    eq(byId('acPeriods').value + ' ' + byId('acCapital').textContent, '1 £12,000',
+       'CAP_WIRE_JS: a preset without periods goes back to the lesson\'s figure');
+    eq(wctx.capPresetPeriods('x', { x: 7 }, 3) + ' ' + wctx.capPresetPeriods('y', { x: 7 }, 3), '7 3', 'capPresetPeriods');
+  }
+}
+// ---- end capkit (Volume I modes) ----
+
+// ---- capkit_b (Volumes II and III modes) ----
+// ==========================================================================
+// Capital: capkit_b.py's Volume II and III modes (turnover, schemes, profit,
+// prices, tendency, interest, rent, revenue)
+// ==========================================================================
+//
+// RATIONAL_JS, CAP_CORE_JS, KB_COMMON_JS and the eight <MODE>_JS blocks of
+// capkit_b.py run in a vm context of their own, as a capkit page assembles
+// them. Every pure helper is called on Marx's figures (Volume II chapters 7,
+// 8, 9, 15, 16, 20, 21; Volume III chapters 1, 6, 9, 11, 13, 15, 17, 18, 21,
+// 24, 29, 36, 37, 38, 39, 44, 45, 48, 50, 52), and each mode's entry function
+// once on the exact tile string a reader sees. Every case below was seen to
+// FAIL when its function was broken on purpose.
+console.log('capital: capkit_b Volume II and III modes');
+{
+  const vm = require('vm');
+  const KB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'capkit_b.py');
+  const KC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'capkit_core.py');
+  const kbSrc = fs.readFileSync(KB_SOURCE, 'utf8'), kcSrc = fs.readFileSync(KC_SOURCE, 'utf8');
+  const ctx = { console: console };
+  vm.createContext(ctx);
+  vm.runInContext(block('RATIONAL_JS') + blockFrom(kcSrc, 'CAP_CORE_JS', KC_SOURCE)
+    + ['KB_COMMON_JS', 'TURNOVER_JS', 'SCHEMES_JS', 'PROFIT_JS', 'PRICES_JS', 'TENDENCY_JS', 'INTEREST_JS', 'RENT_JS',
+       'REVENUE_JS'].map((n) => blockFrom(kbSrc, n, KB_SOURCE)).join('')
+    + "function Q(t) { return Rparse(String(t)); }"
+    + "function T(r) { return Rtext(r); }"
+    + "function Ts(rs) { return rs.map(Rtext).join(', '); }", ctx, { filename: 'capkit_b.py' });
+  const kb = (expr) => {
+    try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; }
+  };
+  const tile = (fn, view, inst, U, opts, id) =>
+    kb(fn + "('" + view + "', " + inst + ", " + JSON.stringify(U) + ", " + JSON.stringify(opts || {}) + ").tiles." + id);
+
+  /* --- KB_COMMON_JS ------------------------------------------------------- */
+  eq(kb("String(kbFloor(Q('-7/2'))) + ' ' + String(kbFloor(Q('7/2'))) + ' ' + String(kbFloor(Q(-4)))"), '-4 3 -4',
+     'kbFloor: toward minus infinity');
+  eq(kb("kbVulgar(Q('23/2')) + ', ' + kbVulgar(Q('7/3')) + ', ' + kbVulgar(Q('1/4')) + ', ' + kbVulgar(Q('-23/2'))"),
+     '11½, 2 1/3, ¼, −11½', 'kbVulgar: Marx\'s 11½ (Vol. III ch. 38)');
+  eq(kb("kbMoneyV(Q('23/2'), '£') + ', ' + kbMoneyV(Q('-10'), '£')"), '£11½, −£10', 'kbMoneyV: pounds with a vulgar fraction');
+  eq(kb("kbPctNum(Q('2/3')) + ', ' + kbPctShort(Q('1/20')) + ', ' + kbPctShort(Q('1/7'))"), '66.67%, 5%, 100/7%',
+     'kbPctNum and kbPctShort');
+  eq(kb("kbApprox(Q('2/3'), '£') + ', ' + kbApprox(Q('-1234567/2'), 's')"), '≈ £0.67, ≈ −617,283.5s', 'kbApprox');
+  eq(kb("kbFig(Q(108000)) + ', ' + kbSigned(Q(500)) + ', ' + kbSigned(Q(-100)) + ', ' + kbSigned(Q(0))"), '108,000, +500, −100, 0',
+     'kbFig and kbSigned');
+  eq(kb("kbWeeks(Q(1)) + ', ' + kbWeeks(Q(13)) + ', ' + kbYears(Q(4)) + ', ' + kbTimes(Q(5)) + ', ' + kbPlural(1, 'digit', 'digits')"
+        + " + ', ' + kbPlural(37, 'digit', 'digits')"), '1 week, 13 weeks, 4 years, 5 times, 1 digit, 37 digits',
+     'kbWeeks, kbYears, kbTimes, kbPlural');
+  eq(kb("kbPpCvR({c: Q(75), v: Q(25)})"), '75c + 25v', 'kbPpCvR: Chapter 45\'s agriculture');
+  eq(kb("kbGuard(function () { throw new Error('no'); }, 'v', {}, {}).refuse + kbGuard(function () { return 7; }, 'v', {}, {}).o"),
+     'no7', 'kbGuard: a thrown sentence becomes the refusal');
+
+  /* --- turnover (Vol. II Part Two) ---------------------------------------- */
+  eq(kb("var t = kbTuTime(Q(9), Q(4), Q(52)); T(t.u) + ' ' + T(t.n)"), '13 4', 'kbTuTime: 9 + 4 weeks, 4 a year');
+  eq(kb("var t = kbTuTime(Q(6), Q(6), Q(52)); T(t.n)"), '13/3', 'kbTuTime: India, 12 weeks');
+  eq(kb("var f = kbTuFixed([{value: Q(10000), life: Q(10), repairs: Q(0), replacement: null, appears: null}], Q(4));"
+        + " T(f.wear) + ' ' + T(f.left) + ' ' + T(f.lost)"), '1000 6000 0', 'kbTuFixed: £10,000 over ten years, at four');
+  eq(kb("var f = kbTuFixed([{value: Q(10000), life: Q(10), repairs: Q(0), replacement: Q(5000), appears: Q(2)}], Q(4));"
+        + " T(f.wear) + ' ' + T(f.left) + ' ' + T(f.lost)"), '500 3000 3000', 'kbTuFixed: moral depreciation (ch. 8)');
+  eq(kb("var a = kbTuAggregate([{value: Q(80000), life: Q(10)}], Q(20000), Q(5)); T(a.turned) + ' ' + T(a.advanced) + ' ' + T(a.average)"),
+     '108000 100000 27/25', 'kbTuAggregate: Marx\'s ch. 9 figures');
+  eq(kb("var g = kbTuClassify([{capital: 'A', value: Q(250), fixed: true, variable: false},"
+        + " {capital: 'A', value: Q(500), fixed: false, variable: false}, {capital: 'A', value: Q(250), fixed: false, variable: true}],"
+        + " Q(1))[0]; Ts([g.fixed, g.circulating, g.constant, g.variable, g.s])"), '250, 750, 750, 250, 250',
+     'kbTuClassify: fixed/circulating against constant/variable');
+  eq(kb("var a = kbTuAdvance(Q(9), Q(3), Q(100)); Ts([a.capI, a.capII, a.total, a.freed])"), '900, 300, 1200, 300',
+     'kbTuAdvance: ch. 15, working period longer: capital II set free');
+  eq(kb("Ts([kbTuAdvance(Q(6), Q(6), Q(100)).freed, kbTuAdvance(Q(3), Q(6), Q(100)).freed, kbTuAdvance(Q(4), Q(6), Q(100)).freed])"),
+     '0, 0, 200', 'kbTuAdvance: equal, a whole multiple, and the excess');
+  eq(kb("T(kbTuRescale(Q(9), Q(3), Q(100), Q(50)))"), '600', 'kbTuRescale: halving the outlay releases £600');
+  eq(kb("var a = kbTuAnnual(Q(500), Q(1), Q(5), Q(50)); Ts([a.n, a.rate, a.mass])"), '10, 10, 5000',
+     'kbTuAnnual: ch. 16 capital A, 1,000%');
+  eq(kb("var a = kbTuAnnual(Q(5000), Q(1), Q(50), Q(50)); Ts([a.n, a.rate, a.mass])"), '1, 1, 5000',
+     'kbTuAnnual: ch. 16 capital B, 100%, the same mass');
+  eq(tile('kbTurnover', 'aggregate', "{fixed: [{name: 'machines', value: Q(80000), life_years: Q(10), repairs_per_year: null,"
+          + " replacement_value: null, appears_year: null}], circulating: Q(20000), circ_turnovers: Q(5)}", { money: '£' }, {},
+          'tuAggregate'), '£108,000 a year on £100,000 advanced', 'kbTurnover: the aggregate tile');
+
+  /* --- schemes (Vol. II Part Three) --------------------------------------- */
+  const I0 = "{c: Q(4000), v: Q(1000), s: Q(1000)}";
+  eq(kb("T(kbScTotal(" + I0 + ")) + ' ' + kbScText(" + I0 + ")"), '6000 4,000c + 1,000v + 1,000s', 'kbScTotal and kbScText');
+  eq(kb("var m = kbScSimple(" + I0 + ", {c: Q(2000), v: Q(500), s: Q(500)}); Ts([m.ivs, m.gap, m.exchanged, m.withinI, m.withinII])"
+        + " + '; ' + kbScBalanceText(m)"), '2000, 0, 2000, 4000, 1000; I(v + s) = 2,000 = IIc', 'kbScSimple: ch. 20');
+  eq(kb("kbScBalanceText(kbScSimple(" + I0 + ", {c: Q(1500), v: Q(750), s: Q(750)}))"),
+     'I(v + s) = 2,000, IIc = 1,500: gap +500', 'kbScBalanceText: an imbalance');
+  eq(kb("Ts([kbScFixedGap(Q(200), Q(100)), kbScFixedGap(Q(100), Q(200))])"), '-100, 100', 'kbScFixedGap: renewals less wear');
+  eq(kb("Ts([kbScHoardGap(Q(1000), Q('1/2'), Q(1)), kbScHoardGap(Q(1000), Q('1/2'), Q('1/2')), kbScHoardGap(Q(1000), Q('1/2'), Q(0))])"),
+     '500, 0, -500', 'kbScHoardGap: ch. 21 §1');
+  const II0 = "{c: Q(1500), v: Q(750), s: Q(750)}";
+  eq(kb("var st = kbScStep(" + I0 + ", " + II0 + ", Q('1/2'), Q(4), Q(2)); kbScText(st.I) + '; ' + kbScText(st.II)"),
+     '4,400c + 1,100v + 1,100s; 1,600c + 800v + 800s', 'kbScStep: Marx\'s first example of expanded reproduction');
+  eq(kb("kbScStep(" + I0 + ", {c: Q(1500), v: Q(750), s: Q(50)}, Q('1/2'), Q(4), Q(2)).refused"), 'short',
+     'kbScStep: II cannot match I');
+  eq(kb("var r = kbScRun(" + I0 + ", " + II0 + ", Q('1/2'), Q(4), Q(2), 2); r.rows.length + ' '"
+        + " + T(Radd(kbScTotal(r.rows[1].I), kbScTotal(r.rows[1].II)))"), '3 9800', 'kbScRun: 9,000 to 9,800 in a year');
+  eq(kb("kbScText(kbScDept([Q(1), Q(2), Q(3)]))"), '1c + 2v + 3s', 'kbScDept');
+  eq(tile('kbSchemes', 'expanded', "{I: [Q(4000), Q(1000), Q(1000)], II: [Q(1500), Q(750), Q(750)], I_accumulate_share: Q('1/2'),"
+          + " composition_I: null, composition_II: null}", { money: '£' }, { periods: 1 }, 'scGrowth'),
+     '9,000 to 9,800: 4/45 = 8.89%', 'kbSchemes: the growth tile');
+
+  /* --- profit (Vol. III Part One) ----------------------------------------- */
+  eq(kb("Ts([kbPrCost(Q(400), Q(100)), kbPrRate(Q(100), Q(400), Q(100))])"), '500, 1/5', 'kbPrCost and kbPrRate: ch. 1');
+  eq(kb("T(kbPrAnnual(Q(100), Q(5), Q(800), Q(200)))"), '1/2', 'kbPrAnnual: s per turnover times n');
+  eq(kb("var p = kbPrPriceChange(Q(400), Q(100), Q(100), Q(100), Q(1)); Ts([p.cost, p.price, p.profit, p.rate])"),
+     '600, 700, 100, 1/6', 'kbPrPriceChange: a dearer c passed on in full');
+  eq(kb("var p = kbPrPriceChange(Q(400), Q(100), Q(100), Q(100), Q(0)); Ts([p.price, p.profit])"), '600, 0',
+     'kbPrPriceChange: nothing passed on');
+  eq(tile('kbProfit', 'rate', "{c: Q(400), v: Q(100), s: Q(100)}", { money: '£' }, {}, 'prRate'), '1/5 = 20%',
+     'kbProfit: the rate tile');
+
+  /* --- prices (Vol. III Part Two) ----------------------------------------- */
+  const SPH = "[[80, 20, 50], [70, 30, 51], [60, 40, 51], [85, 15, 40], [95, 5, 10]].map(function (a) {"
+    + " return {c: Q(a[0]), v: Q(a[1]), used: Q(a[2]), s: Q(a[1])}; })";
+  eq(kb("kbPpCv({c: Q(80), v: Q(20)})"), '80c + 20v', 'kbPpCv');
+  eq(kb("Ts(kbPpRates(" + SPH + "))"), '1/5, 3/10, 2/5, 3/20, 1/20', 'kbPpRates: ch. 9 spheres at value');
+  eq(kb("var p = kbPpProduction(" + SPH + ", [0, 0, 0, 0, 0].map(Q)); T(p.rate) + '; ' + Ts(p.prices) + '; '"
+        + " + Ts([p.totalPrice, p.totalValue, p.totalProfit])"), '11/50; 92, 103, 113, 77, 37; 422, 422, 110',
+     'kbPpProduction: Marx\'s ch. 9 table');
+  eq(kb("var p = kbPpProduction(" + SPH + ", [1, 0, 0, 0, 0].map(Q)); T(p.rate) + ' ' + T(p.totalProfit)"), '1/50 110',
+     'kbPpProduction: a premium comes out of the same total');
+  eq(kb("T(kbPpNewRate({c: Q(80), v: Q(20)}, Q('1/5'), Q('1/4')))"), '1/7', 'kbPpNewRate: ch. 11, 15 on 105');
+  eq(kb("var w = kbPpWageRise([[50, 50], [80, 20], [92, 8]].map(function (a) { return {c: Q(a[0]), v: Q(a[1]), used: Q(a[0])}; }),"
+        + " {c: Q(80), v: Q(20)}, Q('1/5'), Q('1/4')); Ts(w.before) + '; ' + Ts(w.after)"),
+     '120, 120, 120; 900/7, 120, 816/7', 'kbPpWageRise: ch. 11, exact (Marx prints 128 7/12 for 128 4/7)');
+  eq(kb("var m = kbPpMerchant([{c: Q(720), v: Q(180), used: Q(720), s: Q(180)}], Q(100), Q(0));"
+        + " Ts([m.rate, m.industrial, m.merchant, m.mprofit])"), '9/50, 1062, 1080, 18', 'kbPpMerchant: ch. 17');
+  eq(kb("T(kbPpMarkup(Q('3/20'), Q(5)))"), '3/100', 'kbPpMarkup: ch. 18');
+  eq(tile('kbPrices', 'production', "{spheres: [[80, 20, 50], [70, 30, 51], [60, 40, 51], [85, 15, 40], [95, 5, 10]].map("
+          + "function (a, i) { return {name: 'I' + i, c: Q(a[0]), v: Q(a[1]), c_used: Q(a[2]), s_rate: null}; }),"
+          + " s_rate: Q(1), premiums: []}", { money: '£' }, {}, 'ppPrices'), '£92, £103, £113, £77, £37',
+     'kbPrices: the prices tile');
+
+  /* --- tendency (Vol. III Part Three) ------------------------------------- */
+  eq(kb("Ts([kbTeAt([], 2), kbTeAt([Q(5)], 2), kbTeAt([Q(1), Q(2), Q(3)], 2)])"), '0, 5, 3', 'kbTeAt');
+  eq(kb("Ts(kbTePath(Q(50), Q(100), Q(1), [50, 100, 100, 100].map(Q), [], [], [], 4).map(function (r) { return r.rate; }))"),
+     '2/3, 1/2, 1/3, 1/4, 1/5', 'kbTePath: ch. 13, c from 50 to 400 on v 100');
+  eq(kb("Ts(kbTePath(Q(4), Q(2), Q(1), [Q(9)], [Q('1/2')], [], [], 1).map(function (r) { return r.s; }))"
+        + " + '; ' + Ts(kbTePath(Q(4), Q(2), Q(1), [Q(9)], [Q('1/2')], [], [], 1).map(function (r) { return r.rate; }))"),
+     '2, 3; 1/3, 1/6', 'kbTePath: growth first, then the step: the mass rises 2 to 3');
+  eq(kb("Ts(kbTePath(Q(100), Q(100), Q(1), [], [], [Q(1)], [Q('1/2')], 1).map(function (r) { return r.rate; }))"),
+     '1/2, 4/3', 'kbTePath: s\' up and c cheapened');
+  eq(kb("var o = kbTeOver(Q(800), Q(200), Q('1/2'), Q(500), Q('1/3')); Ts([o.s, o.before, o.after, o.restored])"),
+     '100, 1/10, 1/15, 1/10', 'kbTeOver: ch. 15, the same mass on more capital');
+  eq(tile('kbTendency', 'law', "{c: Q(50), v: Q(100), s_rate: Q(1), c_step: [50, 100, 100, 100].map(Q), capital_growth: []}",
+          { money: '£' }, { periods: 4 }, 'teRate'), '1/5 = 20%', 'kbTendency: the rate tile');
+
+  /* --- interest (Vol. III Part Five) -------------------------------------- */
+  eq(kb("var s = kbInSplit(Q(100), Q('1/5'), Q('1/20'), Q(100), Q(0)); Ts([s.profit, s.interest, s.enterprise])"),
+     '20, 5, 15', 'kbInSplit: ch. 21, £5 and £15');
+  eq(kb("[kbInBound(Q('1/20'), Q('1/5')), kbInBound(Q('1/4'), Q('1/5')), kbInBound(Q(0), Q('1/5'))].join()"),
+     'true,false,false', 'kbInBound: 0 < i < p\'');
+  eq(kb("Ts([kbInPrice(Q(100), Q('1/20')), kbInPrice(Q(100), Q('1/10'))])"), '2000, 1000', 'kbInPrice: ch. 29');
+  eq(kb("T(kbInCompound(Q(2000), Q('1/20'), 10))"), '16679880978201/5120000000', 'kbInCompound: exact over BigInt');
+  eq(kb("kbInDigits(kbInCompound(Q('1/12'), Q('1/20'), 1780)) + ' ' + kbInDigits(Q('-123/2'))"), '37 2',
+     'kbInDigits: Price\'s penny at 5% for 1,780 years, in shillings');
+  eq(kb("var u = kbInUsury(Q(50), Q('3/10'), Q(10), Q(100), 20); u.ruin + ' ' + u.repaid + ' ' + T(u.rows[0].interest)"),
+     '6 null 15', 'kbInUsury: ch. 36, ruin in year 6');
+  eq(kb("var u = kbInUsury(Q(10), Q('1/10'), Q(20), Q(100), 20); u.ruin + ' ' + u.repaid + ' ' + u.rows.length"),
+     'null 1 1', 'kbInUsury: repaid in year 1');
+  eq(kb("kbInSum(Q(2000), Q('1/20'), 10, kbInCompound(Q(2000), Q('1/20'), 10), 's')"),
+     '2,000s × (21/20)^10 = 3,257s 9 602934603/1280000000 d', 'kbInSum: short enough to print exactly');
+  eq(kb("kbInSum(Q('1/12'), Q('1/20'), 1780, kbInCompound(Q('1/12'), Q('1/20'), 1780), 's')"),
+     '1d × (21/20)^1780: 37 digits before the point, in shillings', 'kbInSum: too long, its digits');
+  eq(kb("kbInSum(Q(2000), Q('1/20'), 16, kbInCompound(Q(2000), Q('1/20'), 16), '£')"),
+     '£2,000 × (21/20)^16: 4 digits before the point, in pounds', 'kbInSum: 41 characters is past the 40-character limit');
+  eq(tile('kbInterest', 'usury', "{debt: Q(50), interest_rate: Q('3/10'), surplus: Q(10), holding_value: Q(100), years: Q(20)}",
+          { money: '£' }, {}, 'inYearsToRuin'), 'year 6', 'kbInterest: the ruin tile');
+
+  /* --- rent (Vol. III Part Six) ------------------------------------------- */
+  eq(kb("T(kbRtPrice(Q(200), Q('1/20')))"), '4000', 'kbRtPrice: ch. 37, £200 at 5%');
+  eq(kb("var w = kbRtWaterfall(Q(100), Q(90), Q('3/20')); Ts([w.price, w.own, w.marx, w.againstOwn])"),
+     '115, 207/2, 10, 23/2', 'kbRtWaterfall: ch. 38, 10 and 11½');
+  const SOILS = "[1, 2, 3, 4].map(function (n, i) { return {soil: 'ABCD'[i], capital: Q(50), output: Q(n)}; })";
+  eq(kb("var g = kbRtInvestments(" + SOILS + ", Q('1/5')); g.soils.length + ' ' + Ts(g.invs.map(function (x) { return x.ppu; }))"),
+     '4 60, 30, 20, 15', 'kbRtInvestments: ch. 39, price of production per quarter');
+  eq(kb("var g = kbRtInvestments(" + SOILS + ", Q('1/5')), r = kbRtRegulate(g.invs, g.soils, '', null);"
+        + " r.reg + ' ' + T(r.price) + '; ' + Ts(kbRtRents(g.soils, g.invs, r.use, r.price, Q('1/5')).rents)"),
+     '0 60; 0, 60, 120, 180', 'kbRtRegulate and kbRtRents: ch. 39, the worst soil regulates');
+  eq(kb("var g = kbRtInvestments(" + SOILS + ", Q('1/5')), r = kbRtRegulate(g.invs, g.soils, '', Q(7));"
+        + " r.reg + ' ' + T(r.price) + ' ' + r.use.join()"), '2 20 false,false,true,true',
+     'kbRtRegulate: a market of 7 is met exactly by D and C');
+  eq(kb("var g = kbRtInvestments(" + SOILS + ", Q('1/5')); kbRtRegulate(g.invs, g.soils, 'E', null).error"),
+     'The regulating investment "E" is not one of the investments listed', 'kbRtRegulate: an unknown regulator');
+  eq(kb("var g = kbRtInvestments([{soil: 'A', capital: Q(50), output: Q(1)}, {soil: 'B', capital: Q(50), output: Q(2)},"
+        + " {soil: 'B', capital: Q(50), output: Q('1/2')}], Q('1/5')), r = kbRtRegulate(g.invs, g.soils, '', null),"
+        + " k = kbRtCase(g.invs, r.reg, r.use, r.price, null);"
+        + " k.move + ' ' + k.worstSoil + '; ' + Ts(kbRtRents(g.soils, g.invs, r.use, r.price, Q('1/5')).rents)"),
+     'rising true; 60, 180', 'kbRtCase: ch. 44, the worst soil yields rent');
+  eq(kb("var g = kbRtInvestments(" + SOILS + ", Q('1/5')), r = kbRtRegulate(g.invs, g.soils, '', Q(6));"
+        + " kbRtCase(g.invs, r.reg, r.use, r.price, null).move + ' ' + kbRtCase(g.invs, r.reg, r.use, r.price, Q(20)).move"),
+     'falling constant', 'kbRtCase: the price against the former price');
+  eq(kb("var a = kbRtAbsolute({c: Q(75), v: Q(25)}, {c: Q(85), v: Q(15)}, Q(1), null); Ts([a.rate, a.value, a.price, a.absolute])"),
+     '1/5, 125, 120, 5', 'kbRtAbsolute: ch. 45, up to 5');
+  eq(kb("Ts([kbRtAbsolute({c: Q(75), v: Q(25)}, {c: Q(85), v: Q(15)}, Q(1), Q(122)).absolute,"
+        + " kbRtAbsolute({c: Q(85), v: Q(15)}, {c: Q(75), v: Q(25)}, Q(1), null).absolute])"), '2, 0',
+     'kbRtAbsolute: a market limit; a higher composition yields none');
+  eq(tile('kbRent', 'dr1', "{soils: " + SOILS + ", profit_rate: Q('1/5'), regulating: '', market_limit: null}",
+          { money: 's', qty: 'qr' }, {}, 'rtRents'), '0s, 60s, 120s, 180s', 'kbRent: the rents tile');
+
+  /* --- revenue (Vol. III Part Seven) -------------------------------------- */
+  eq(kb("var t = kbRvTrinity(Q(100), Q(100), Q(100), Q('1/5'), Q('3/10')); Ts([t.total, t.wages, t.rent, t.interest, t.enterprise])"),
+     '300, 100, 30, 20, 50', 'kbRvTrinity: ch. 48');
+  eq(kb("var t = kbRvAddedUp(Q(100), Q(100), Q(100), Q('1/5'), Q('3/10'), Q(20)); Ts([t.total, t.wages, t.rent, t.interest, t.enterprise])"),
+     '300, 120, 24, 16, 40', 'kbRvAddedUp: ch. 50, the wage rise comes out of s');
+  eq(kb("kbRvClasses([{source: 'wages'}, {source: 'profit'}, {source: 'wages'}, {source: 'rent'}]).join()"),
+     'wages,profit,rent', 'kbRvClasses: ch. 52');
+  eq(tile('kbRevenue', 'dogma', "{c: Q(6000), v: Q(1500), s: Q(1500)}", { money: '£' }, {}, 'rvSmith'),
+     'v + s = £3,000; c = £6,000 missing', 'kbRevenue: Smith\'s dogma');
+}
+// ---- end capkit_b ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the

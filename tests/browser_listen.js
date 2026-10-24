@@ -15,6 +15,7 @@ const PAGES = [
   ['generated', '/arguments-and-validity/validity-by-truth-table/'],
   ['generated', '/listening/why-it-sounds-too-fast/'],
   ['generated', '/differential-equations-and-eulers-method/eulers-method/'],
+  ['generated', '/capital-money-into-surplus-value/the-rate-of-surplus-value/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];
