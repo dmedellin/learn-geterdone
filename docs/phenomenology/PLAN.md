@@ -412,12 +412,15 @@ depend on its labs.
      state which question the figures answer and which they do not.
    - **Lab:** `size/angle` (family 1: geometric optics). The moon is the
      lesson's illustration, not the Preface's: the prose says so and says the
-     book treats the horizon moon later (Introduction III or Part Two Chapter 2,
-     Depth, or both — check against text). Presets: `horizon` (moon 3,474 km at
-     384,400 km — modern astronomy's figures, labelled so), `zenith` (the same
-     moon about one Earth radius nearer, 378,029 km: slightly *larger* in angle
-     overhead), `disc` (a 7 mm disc held at 77 cm, which covers it,
-     illustrative). Pins the ratio tile.
+     book treats the horizon moon later, in both places (checked against Smith:
+     Introduction III, pp. 32 and 36, where it is first the intellectualist's
+     example and then turned against both opponents; Part Two Chapter 2, Depth,
+     p. 302). Presets: `horizon` (moon 3,474 km at 384,400 km — modern
+     astronomy's figures, labelled so), `zenith` (the same moon about one Earth
+     radius nearer, 378,029 km: slightly *larger* in angle overhead), `disc` (a
+     7 mm disc held at 77 cm, illustrative: `1/110` rad covers the horizon
+     moon's `0.0090` and falls just short of the overhead moon's `0.0092`).
+     Pins the ratio and degree tiles.
    - **Misconception:** "Phenomenology rejects science." Refuted by the
      Preface's geography comparison: the scientific figure is a second-order
      expression of a world already perceived — naïve and dishonest when it
@@ -439,8 +442,9 @@ depend on its labs.
    - **Lab:** `perspective/necker` (family 1: parallel projection). The
      reversible cube is the lesson's illustration of what habit had supplied;
      the Preface has no drawing. The prose cites the book's own reversible
-     figure by page once the author finds it (probably Part Two Chapter 2,
-     Depth, or the Introduction — check against text). Presets: `cube` (a wire
+     figure: Part Two Chapter 2, Depth, p. 306, Fig. 1 (checked against Smith:
+     a cube seen from below, from above, or as a flat mosaic of ten triangles
+     and a square). Presets: `cube` (a wire
      cube, offset 1/2: both readings draw the identical 12 edges), `box` (a wire
      2 × 1 × 1 box: the same), `solid` (a solid cube: 9 edges drawn, and the
      other reading draws a different 9: one reading only). Pins the
@@ -456,7 +460,7 @@ depend on its labs.
 
 3. **essences-and-existence** — Essences and Existence — *Preface*
    - **Read:** essences as a means, not the end; the remark about the Vienna
-     Circle and the word *consciousness* (check against text); the world as
+     Circle and the word *consciousness* (checked: p. xvi); the world as
      what I live through rather than what I think *(wording to be checked
      against the text)*.
    - **Do:** compute the invariant core of a set of free variations and say
@@ -467,7 +471,14 @@ depend on its labs.
      `table` (a table varied in material, height and legs; a table with no top),
      `melody` (a melody transposed: every note changes, the intervals do not —
      Christian von Ehrenfels's example (1890), taken up by the Gestalt
-     psychologists). Pins the invariant-core tile.
+     psychologists). Pins the invariant-core tile. As authored: `sound` is five
+     tones (pitch 220 or 880, soft or loud, flute or violin, each with
+     `some-duration`) and a sixth, `no duration`, marked no; `table` is oak,
+     steel and tripod tables and `no top`, marked no; `melody` is the first
+     three notes in C (C E G), D (D F-sharp A) and B flat (B-flat D F), each
+     `major-third-up minor-third-up`, chosen so that no note is shared with
+     the C version, plus `C notes backwards` (G E C), marked no: every note
+     kept and the core lost. Pins vrCore and vrBreak.
    - **Misconception:** "Phenomenology is the study of essences, so it ends
      where the invariant is found." The Preface says essences are the means by
      which existence is brought into view; the core the lab prints is a tool,
@@ -476,10 +487,12 @@ depend on its labs.
      all vary; having some duration stays.
 
 4. **intentionality-and-rationality** — Intentionality and Rationality — *Preface*
-   - **Read:** act intentionality and *operative* intentionality (wording to be
-     checked against the text); rationality as perspectives that confirm one
-     another; the closing comparison with the labour of Balzac, Proust, Valéry
-     and Cézanne (check against text).
+   - **Read:** act intentionality and *operative* intentionality (checked:
+     Smith's terms are *intentionality of act* and *operative
+     intentionality*, p. xx);
+     rationality as perspectives that confirm one another (p. xxii); the
+     closing comparison with Balzac, Proust, Valéry and Cézanne (checked:
+     p. xxiv).
    - **Do:** compute which faces of a cube several viewpoints see, and whether
      what each viewer reports seeing is consistent with one cube.
    - **Lab:** `perspective/faces` (family 1). Presets: `three` (views
@@ -493,8 +506,10 @@ depend on its labs.
      viewpoints, from which each view can be checked." This is the absolute
      spectator of idealist reflection, which the Preface attacks: a mind that
      places itself at the origin of the world and surveys it from nowhere
-     (the author checks whether the book uses the term *pensée de survol*;
-     if not, the lesson describes the view without it). On the Preface's
+     (checked: Smith's Preface does not use *pensée de survol* or a
+     rendering of it; it names the *impartial spectator*, p. xxii, and the
+     idealism of p. xiii, and the lesson describes the view in those terms.
+     The *house seen from nowhere* is Part One's introduction, p. 77). On the Preface's
      account there is no view from nowhere to check the views against;
      rationality is the fact that they confirm one another, which is all the
      lab can compute.
