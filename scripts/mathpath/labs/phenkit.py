@@ -297,7 +297,7 @@ SIZE_VIEWS = {
     "constancy": dict(fields=["size", "distance", "standard_distance", "assumed", "reported", "unit"],
                       tiles=[("Retinal-image prediction (same angle at the standard distance)", "szRetinal"),
                              ("The size an inference from the assumed distance would conclude", "szInferred"),
-                             ("Brunswik ratio (later than the book)", "szBrunswik")]),
+                             ("Brunswik ratio", "szBrunswik")]),
 }
 
 # ---------------------------------------------------------------------------

@@ -527,8 +527,10 @@ coded so as not to say otherwise.
 
 1. **the-idea-of-pure-sensation** — The Idea of Pure Sensation — *Introduction · I · Sensation*
    - **Read:** the white patch on a homogeneous background; the perceptual
-     something that is always in the middle of something else (check against
-     text).
+     something that is always in the middle of something else (checked:
+     both Smith p. 4; the lesson reads pp. 3–7). Wertheimer's laws are named
+     only in Chapter II (p. 19, n. 4), where the chapter warns against reading
+     them as objective conditions; the lesson's `note` says so.
    - **Do:** compute the grouping proximity predicts for a row of dots and say
      what a pure-sensation account must add to get it.
    - **Lab:** `grouping` (family 1: the Gestalt proximity rule, Wertheimer
@@ -546,19 +548,24 @@ coded so as not to say otherwise.
 
 2. **the-constancy-hypothesis** — The Constancy Hypothesis — *Introduction · I · Sensation*
    - **Read:** the constancy hypothesis — that a stimulus and the elementary
-     perception correspond point for point — under Köhler's name for it
-     (*Konstanzannahme*, 1913), which Merleau-Ponty adopts; the Müller-Lyer
-     figure, whose lines the chapter describes as neither equal nor unequal
-     *(wording to be checked against the text)*.
+     perception correspond point for point (Smith p. 8). Corrected against the
+     text: Smith prints no German term; a footnote (n. 7) credits the term to
+     Köhler's 1913 paper on unnoticed sensations and errors of judgement, and
+     n. 8 names Stumpf. The Müller-Lyer figure is described as neither equal
+     nor unequal on p. 6 and as becoming different rather than unequal on
+     p. 13 (checked). The lesson reads pp. 6–14.
    - **Do:** compute the constancy hypothesis's prediction for two stimuli and
      the gap to a reported percept.
    - **Lab:** `stimulus/illusion` (family 1: "the constancy hypothesis
      (Köhler's term)"). Presets: `muller` (shafts 10 cm and 10 cm with fins,
      reported difference 2 cm, illustrative — the lesson says the magnitude
      varies with the fins), `equal` (no fins: predicted and reported agree),
-     `context` (one shaft 10 cm shown first with outward fins, then with
-     inward: the same local stimulus, two reports — exactly what the hypothesis
-     forbids). Pins the predicted, reported and gap tiles.
+     `context` (as authored, after p. 13: one 10 cm shaft with inward fins
+     against the same shaft drawn alone, a = b = 10, reported −1 cm,
+     illustrative: the same local stimulus, two reports — exactly what the
+     hypothesis forbids; one stimulus/illusion instance holds one pair, so the
+     outward-then-inward version could not be one preset). Pins the
+     predicted, reported and gap tiles.
    - **Misconception:** "The Müller-Lyer lines really look unequal, so
      perception is simply mistaken." Merleau-Ponty's point is not that
      perception errs but that the question of equal or unequal belongs to the
@@ -574,7 +581,10 @@ coded so as not to say otherwise.
 3. **association-and-the-projection-of-memories** — Association and the Projection of Memories — *Introduction · II · Association and Memory*
    - **Read:** association by contiguity and resemblance; reading a word with
      a misprint or a missing letter, where memory is said to fill in what was
-     not seen (check against text).
+     not seen (checked: the proofreader's illusion, Smith p. 23, whose example
+     is one word read for another, not a missing letter, so the lesson's
+     `hoxse` is illustrative and says so; Bergson's gaps in reading, p. 22;
+     opening passage p. 23; the lesson reads pp. 15–29).
    - **Do:** count the remembered words that fit a partly seen word, then
      after the context arrives, and say which did the selecting.
    - **Lab:** `cues/pattern` (family 1: the associationist account). One
@@ -598,19 +608,27 @@ coded so as not to say otherwise.
      it lights, and as the intellectualist's discovery of what was already
      constituted — sterile in both; judgement as what the intellectualist adds
      to sensation; Descartes seeing hats and coats from the window and judging
-     there are men, beside the wax (check against text); the walk along a shore
-     towards a stranded ship whose masts and funnel merge with the forest
-     behind it until, suddenly, they become part of the ship (check against
-     text for the details).
+     there are men, beside the wax (checked: pp. 30–33, 37–38); the walk along
+     a shore towards a stranded ship whose masts and funnel merge with the
+     forest behind it until, suddenly, they become part of the ship.
+     Corrected against the text: the ship is in Chapter II, p. 20, aimed at
+     association, and the same page credits Kant's synopsis; the lesson
+     borrows it to test the psychologists' judgement-from-signs model
+     (Lagneau, Alain) and says it is the lesson's use. The lesson reads
+     pp. 30–59; the moon through a cardboard tube (pp. 32, 36) is in III.
    - **Do:** count the interpretations a judgement-from-signs account keeps as
      the cues arrive, and name the step at which the book's reorganisation
      happens with no cue to decide it.
    - **Lab:** `cues/sequence` (family 1: "perception as a judgement from
-     signs"). Candidates: *trees at the forest's edge* (consistent with c1, c2),
-     *masts and funnel of a ship* (c1, c2, c3). Cues: c1 tall vertical forms
-     against the forest; c2 the same forms, nearer, no new detail; c3 a hull
-     beneath them. Presets: `ship` (cues c1, c2: the model keeps 2 candidates
-     at every step), `hull` (c1, c2, c3: 1 candidate at step 3). The step range
+     signs"). As authored (the book's ship is visible throughout, so a hull
+     cannot be the deciding cue): candidates *part of the forest behind*
+     (consistent with c1, c2), *masts and funnel of the ship* (c1, c2, c3).
+     Cues: c1 upright forms where the ship meets the forest; c2 the same
+     forms, nearer, with no new detail; c3 the forms at close quarters, the
+     same colour as the ship and fitting its superstructure — the
+     justifications p. 20 says were found only afterwards. Presets: `ship`
+     (cues c1, c2: the model keeps 2 candidates at every step), `close` (c1,
+     c2, c3: 1 candidate at step 3). The step range
      runs 1..3 for every preset; in `ship` a step past 2 is clamped and the
      banner says so. Pins the count tile at steps 2 and 3.
    - **Misconception:** "Intellectualism and empiricism are opposites, so
@@ -620,7 +638,7 @@ coded so as not to say otherwise.
      ship can only be concluded from a sign that excludes the trees; on the
      chapter's description the unity arrives before any such sign.
    - **Worked:** `ship`: 2 candidates after c1 and after c2 — the model never
-     chooses, where the walker on the beach already sees a ship; `hull`: 1
+     chooses, where the walker on the beach already sees a ship; `close`: 1
      after c3.
 
 5. **the-phenomenal-field** — The Phenomenal Field — *Introduction · IV · The Phenomenal Field*
@@ -630,25 +648,31 @@ coded so as not to say otherwise.
      cases, name the observations on which they part, and state the
      observation on which both fail.
    - **Lab:** `cases` (family 2). Accounts (cfg): empiricism, intellectualism.
-     Observations (each to be checked against the text; proposed coding
-     empiricism / intellectualism): (1) the Müller-Lyer lines (I): n / n — the
-     constancy hypothesis predicts equality, and a judgement of inequality
-     would be a judgement that deceives about what it sees; (2) the misprinted
-     word read as the right word (II): n / y — association needs the shape it
-     claims to supply, a judgement can interpret; (3) attention (III): n / n —
-     sterile in both, it finds what was already there; (4) the ship on the
-     beach (III): y / n — association can follow the details as they are
-     added, a judgement has nothing new to conclude from. Presets (observation
-     subsets): `intro` (all four), `sensation` (1 and 2), `judgement` (3 and
-     4). The moon is not among these cases unless the author finds it in the
-     Introduction. Pins the survivors and the splitting-case tiles.
+     Observations, as authored after checking each against the text (coding
+     empiricism / intellectualism): (1) the Müller-Lyer lines (I, pp. 6–9,
+     13; intellectualism by the Zöllner argument, p. 41): n / n; (2) the
+     misprinted word (II, p. 23): n / y — read as an interpretation of signs,
+     a misreading is a false judgement intellectualism can describe; (3) the
+     ship on the shore (II, p. 20): n / - — corrected: the passage is aimed
+     at association (the proposed y for empiricism contradicted p. 20), and
+     credits Kant on the point, so intellectualism is coded silent; (4)
+     knowing what is sought (III, p. 33): n / y; (5) not knowing what is
+     sought (p. 33): y / n; (6) attention making a new object (pp. 33–35):
+     n / n — the proposed single attention row, split so that p. 33's
+     symmetry is visible; (7) the moon through a tube (pp. 32, 36; it is in
+     the Introduction): n / n; (8) the drawn cube (p. 40): n / n. Presets:
+     `intro` (all eight: records 1 of 8 and 2 of 8, survivors none, split
+     rows 2, 4, 5), `sensation` (1–3: split row 2), `attention` (4–6: split
+     rows 4, 5), `shared` (7, 8: split none). Pins the record, survivors and
+     splitting-case tiles.
    - **Misconception:** "The phenomenal field is a private inner world of
      appearances." The chapter places it before the split into inner and
      outer: it is the world as it is lived, not a mental picture of it.
-   - **Worked:** four cases; survivors none; caSplit the misprint and the ship;
-     both fail the Müller-Lyer and attention, where — the prose adds — both
-     assume the objective world. The record is not a ranking, and the lesson
-     says the split is its coding, not the book's.
+   - **Worked:** eight cases; survivors none; caSplit the misprint and the
+     two attention rows; both fail the Müller-Lyer lines, attention making a
+     new object, the moon and the cube, where — the prose adds — both assume
+     the objective world. The record is not a ranking, and the lesson says
+     the split is its coding, not the book's.
 
 ### Course 3 — The Lived Body (`perception-the-lived-body`, 8)
 
@@ -657,7 +681,13 @@ acquisition of habit closes Chapter 3.
 
 1. **experience-and-objective-thought** — Experience and Objective Thought — *Part One · Experience and Objective Thought*
    - **Read:** the house seen from nowhere, and the objects that see each
-     other (the lamp; check against text); the object as a horizon of views.
+     other (the lamp; confirmed, p. 79); the object as a horizon of views.
+     *(Resolved against Smith, Course 3 authoring: the text first states the
+     house seen from nowhere in Leibniz's words, p. 77, corrects it to the house
+     seen from everywhere, p. 79, and at once adds, p. 80, that a human gaze
+     posits one facet at a time, so the synthesis of views is presumptive; the
+     lesson reads all three. The book's views are the right bank of the Seine,
+     inside, and an aeroplane: `above` is labelled the aeroplane.)*
    - **Do:** compute which faces of a house four views see, find the smallest
      set of views that sees every face any of them sees, and state that the
      house is the system of views, none of them privileged.
@@ -698,6 +728,11 @@ acquisition of habit closes Chapter 3.
      there is no common ground on which they meet.
    - **Worked:** physiological fails cases 2 and 3, psychological fails case 1;
      survivors none; split 1, 2, 3.
+   - *(Checked against Smith, pp. 87–89: all four observations and the coding
+     stand; observation 1 is worded the nerves to the brain, as the text has
+     it. Cocaine anaesthesia and phantoms from brain injury, p. 88, tell
+     against the peripheral theory only, so they are in the prose, not the
+     table.)*
    - This course's one modern aside (§F.1), if used, is here: Ramachandran's
      mirror box, with both caveats — the evidence for mirror therapy is mixed
      and mostly of low quality, and Ramachandran's explanation (visual feedback
@@ -706,8 +741,9 @@ acquisition of habit closes Chapter 3.
 
 3. **the-habitual-body** — The Habitual Body — *Part One · 1 · The Body as Object*
    - **Read:** the layer of the habitual body and the layer of the present
-     body; manipulable objects that appeal to a hand that is gone (*appeal*,
-     wording to be checked against the text); anosognosia.
+     body; manipulable objects that appeal to a hand that is gone (*appeal*
+     is Smith's word, p. 95; his layers are the habit-body and the body at this
+     moment); anosognosia.
    - **Do:** compute which objects are within reach for the habitual body and
      for the present body and name those that appeal only to the first.
    - **Lab:** `schema/habitual` (family 3: the lesson's model). Presets: `cup`
@@ -731,20 +767,26 @@ acquisition of habit closes Chapter 3.
    - **Lab:** `perspective/own` (family 3: the lesson's model of the body as a
      rigid box seen from its own eyes). Presets: `object` (a box walked
      round: the six axis views; unseen none), `own` (the body as a box, seen
-     only from where its eyes are: `0 3 4` down the front, `3 4 0` down the
-     right side, `-3 4 0` down the left side; unseen back and below). Pins the
-     unseen-faces tile. The `note` says what the rigid box leaves out (a foot
-     can be lifted into view; the face cannot).
+     only from where its eyes are: `front` down the front, `right` down the
+     right side, `left` down the left side; unseen back, above and below),
+     `mirror` (the same plus `back`, seen in two mirrors: 4 of 6, unseen above
+     and below; the prose says the chapter, p. 105, does not count a mirror
+     image as observation). Pins the union and unseen-faces tiles. The `note`
+     says what the rigid box leaves out (a foot can be lifted into view; the
+     face cannot). *(Changed in authoring: the diagonal views `0 3 4`, `3 4 0`,
+     `-3 4 0` reach the top face, which would have the model claim a person
+     sees the top of their own head; Smith p. 105 says the head is seen only to
+     the nose end and the eye-sockets.)*
    - **Misconception:** "Touching one hand with the other is touching and
      being touched at once." The chapter says the two never coincide: the
      roles alternate, and the touched hand never becomes the touching one in
      the same moment. The `note` says the late work (*The Visible and the
      Invisible*, on reversibility) develops this differently, so that a reader
      who knows it does not read it back into this book.
-   - **Worked:** the box: 6 of 6 seen across the views; one's own body: 4 of 6,
-     back and below never.
+   - **Worked:** the box: 6 of 6 seen across the views; one's own body: 3 of 6,
+     back, above and below never; with two mirrors, 4 of 6.
 
-5. **the-body-schema** — The Body Schema — *Part One · 3 · Spatiality and Motricity*
+5. **the-body-schema** — The Body Schema — *Part One · 3 · Spatiality and Motility*
    - **Read:** the body schema as more than an image or an association of
      parts; the spatiality of situation against the spatiality of position;
      *here*.
@@ -763,7 +805,7 @@ acquisition of habit closes Chapter 3.
    - **Worked:** cup at room (2, 1); facing east it is ahead 2, left 1; facing
      north, ahead 1, right 2; after walking 1 m east, ahead 1, left 1.
 
-6. **schneider-concrete-and-abstract-movement** — Schneider: Concrete and Abstract Movement — *Part One · 3 · Spatiality and Motricity*
+6. **schneider-concrete-and-abstract-movement** — Schneider: Concrete and Abstract Movement — *Part One · 3 · Spatiality and Motility*
    - **Read:** Gelb and Goldstein's patient: he performs concrete movements
      (taking a handkerchief from his pocket, reaching the place where a
      mosquito bites) but cannot point to a part of his body on command or
@@ -781,6 +823,13 @@ acquisition of habit closes Chapter 3.
      objective`), `turned` (the same, with the body turned a right angle: the
      objective target's body coordinates must be recomputed, the body-given
      ones need none), `eyes` (the command target alone). Pins `scFrame`.
+     *(As authored: objects `handkerchief`, `mosquito bite`, `nose on
+     command`; in `turned` every target is moved with the body, so the nose's
+     room position becomes (0, 1/10) and its conversion is recomputed to the
+     same ahead 1/10, left 0; `eyes` is renamed `command`. Smith p. 118 gives
+     the nose example with a note, p. 119 n. 12, assigning it to a cerebellar
+     case of Goldstein's; the dissociation itself is reported in Schneider and
+     in cerebellar cases, and the lesson says so.)*
    - **Misconception:** "Schneider's trouble is a visual deficit, so it is a
      problem of seeing and not of moving." The chapter takes up this reading
      (his injury was occipital) and argues it does not cover the case: the
@@ -788,10 +837,10 @@ acquisition of habit closes Chapter 3.
      body as a place among places on command.
    - **Worked:** the handkerchief and the bite: given in the body's situation,
      no conversion; the nose on command: given as an objective position,
-     conversion needed — the one task, on Gelb and Goldstein's report, he
-     cannot do.
+     conversion needed — pointing to a part of the body on command is, on the
+     reports, what he cannot do without preparatory movements.
 
-7. **the-intentional-arc** — The Intentional Arc — *Part One · 3 · Spatiality and Motricity*
+7. **the-intentional-arc** — The Intentional Arc — *Part One · 3 · Spatiality and Motility*
    - **Read:** the *intentional arc* that projects around us our past, our
      future and our human setting; motricity as original intentionality; the
      *I can*; Schneider's thinking — he cannot grasp an analogy or the point of
@@ -819,8 +868,15 @@ acquisition of habit closes Chapter 3.
      movements as the task changes.
    - **Worked:** physiology fails 2 and 3, intellectualism fails 1 and 3;
      survivors none; split 1 and 2; both fail the preparatory movements.
+     *(Corrected in authoring, from Smith p. 147: the text says Schneider's
+     trouble with analogies is not that he cannot subsume but that he relates
+     terms only by quite explicit subsumption, which tells against the
+     intellectualist reading. Observation 4 is coded - / n, so intellectualism
+     fails 1, 3 and 4; the `all` split is unchanged (1 and 2), and `thinking`
+     now prints mechanistic physiology as survivor, by silence, which the
+     lesson explains. The analogies are confirmed, p. 147; the story, p. 153.)*
 
-8. **habit-and-the-blind-mans-cane** — Habit and the Blind Man's Cane — *Part One · 3 · Spatiality and Motricity*
+8. **habit-and-the-blind-mans-cane** — Habit and the Blind Man's Cane — *Part One · 3 · Spatiality and Motility*
    - **Read:** the closing pages of Chapter 3 on acquiring a habit as a
      reworking of the body schema: the woman with a feather in her hat, the
      car through a gateway, the typist, the organist who adapts to an
@@ -831,7 +887,9 @@ acquisition of habit closes Chapter 3.
    - **Lab:** `schema/tool` (family 3: the lesson's model). Presets: `hand`
      (reach 70 cm), `cane` (cane 100 cm: reach 170 cm), `hat` (a 165 cm head
      with a 30 cm feather, 195 cm, under a 200 cm door: clears by 5 cm), `car`
-     (a car 180 cm wide through a 200 cm gateway: clears by 20 cm). The prose
+     (a car 180 cm wide through a 200 cm gateway: clears by 20 cm; as authored
+     it adds a 170 cm gate: does not clear by 10 cm). *(Organist checked,
+     Smith pp. 167–8: an hour's practice; the source is Chevalier.)* The prose
      says the lab does the comparison the chapter says she does not make: she
      clears the door without calculating.
    - **Misconception:** "Habit is a reflex learned by repetition, an
@@ -849,8 +907,8 @@ Part One, Chapters 4–6.
 1. **the-body-as-a-work-of-art** — The Body as a Work of Art — *Part One · 4 · The Synthesis of One's Own Body*
    - **Read:** the body's unity, which is neither that of a physical object
      whose parts lie side by side nor that of a law; the comparison of the
-     body with a work of art, a knot of living meanings *(wording to be checked
-     against the text)*; the intersensory unity of the body; perceptual habit,
+     body with a work of art, a nexus of living meanings (Smith's wording,
+     p. 175); the intersensory unity of the body; perceptual habit,
      and the stick again, now as an instrument of perception.
    - **Do:** compute what stays the same when one learned movement is made by
      different limbs, and name what does not.
@@ -863,7 +921,15 @@ Part One, Chapters 4–6.
      the signature by someone else, marked not of the kind: it lacks the
      rhythm). The author checks whether the book's own example of a movement
      transferred across limbs is in this chapter; if not, the preset is the
-     lesson's illustration and says so.
+     lesson's illustration and says so. *Resolved against Smith:* the
+     signature is not in the chapter (nor elsewhere in Smith), so
+     `signature`, `muscles` and `tracing` are labelled the lesson's
+     illustration. The chapter's own example is the telephone (p. 172), added
+     as the first preset, `telephone`: lean back and stretch further
+     (arm-at-full-stretch trunk-back hand-at-the-telephone), lean forward
+     (arm-half-bent trunk-forward hand-at-the-telephone), half stand up
+     (arm-half-bent trunk-raised legs-tautened hand-at-the-telephone), all of
+     the kind: core `hand-at-the-telephone`.
    - **Misconception:** "The body is one thing because its parts are joined
      like a machine's, or because the mind synthesises them under a law, as it
      unifies any object." The chapter rejects both: the unity is like a
@@ -872,12 +938,13 @@ Part One, Chapters 4–6.
    - **Worked:** four variants; the muscles vary in every one; the shapes, the
      order and the rhythm stay.
 
-2. **the-body-as-a-sexed-being** — The Body as a Sexed Being — *Part One · 5 · The Body as a Sexed Being*
+2. **the-body-as-a-sexed-being** — The Body as a Sexed Being — *Part One · 5 · The Body in its Sexual Being* (module corrected to §B's name, which is Smith's title)
    - **Read:** Schneider's sexual life; sexuality as a way of being in the
      world; Binswanger's patient, the young woman who lost her voice after her
-     mother forbade her to see the man she loved, and recovered it when the
-     prohibition was lifted (check against text); the chapter's discussion of
-     Freud.
+     mother forbade her to see the man she loved, and recovered it when,
+     treated by psychological means, she was left free by her family to see
+     him (Smith p. 187; the text names the treatment as well as the lifted
+     prohibition); the chapter's discussion of Freud.
    - **Do:** compute the two classical accounts' records over the chapter's
      cases and name the case both fail.
    - **Lab:** `cases` (family 2). Accounts (cfg): sexuality as an automatism
@@ -893,10 +960,23 @@ Part One, Chapters 4–6.
      `aphonia` (2 and 3), `all`. The existential account — sexuality as an
      atmosphere coextensive with life, neither explaining existence nor
      explained by it — is in the prose, as is Freud, whom the chapter reads as
-     already moving towards it.
+     already moving towards it. *Resolved against Smith:* the accounts are
+     named `a bodily mechanism` and `a representing consciousness`, because
+     the chapter sets the girl's symptom against paralysis and simulation
+     (p. 187), not against two accounts of sexuality; the pair is the same
+     dilemma as p. 180's vital zone between automatic response and
+     representation.
+     Observation (1) drops "he can represent sex abstractly", which is not in
+     the text, and reads "for Schneider after a small occipital wound sight
+     and touch have lost much of their sexual significance": n (p. 180, the
+     wound should have freed automatisms) / n (p. 180, touch has lost its
+     significance too; weak representations are effect, not cause). (2) is
+     "she speaks again when left free to see him" n / y (p. 187, not
+     paralysis); (3) "she cannot speak even when she wants to" y / n (p. 187,
+     not a deliberate silence). Coding otherwise as proposed.
    - **Misconception:** "Merleau-Ponty reduces sexuality to existence, or
      existence to sexuality." He says neither; the chapter's word is that they
-     are interfused (*interfusion*, wording to be checked against the text),
+     are interfused (*interfusion*: Smith's word, p. 196),
      and he discusses Freud and historical materialism to make the point that
      one does not explain the other.
    - **Worked:** survivors none; split the two aphonia observations; both fail
@@ -905,7 +985,10 @@ Part One, Chapters 4–6.
 3. **speech-as-gesture** — Speech as Gesture — *Part One · 6 · Expression and Speech*
    - **Read:** the word has a meaning; speech does not translate a ready-made
      thought but accomplishes it; Gelb and Goldstein's amnesic aphasia and the
-     colour-sorting test.
+     colour-sorting test. Pages 202–214 and the chapter's return to the case
+     on pp. 221–225, where it corrects its first description (the patient
+     does not switch principles of classification; he never adopts one,
+     pp. 222–223).
    - **Do:** compute a categorical sort of colour samples and a chain of
      concrete resemblances, and name the sample where they part.
    - **Lab:** `sorting` (family 3: the lesson's model of a sort by concrete
@@ -914,7 +997,12 @@ Part One, Chapters 4–6.
      brown 2, dark brown brown 1; start pale red), `lightness` (pale, mid and
      dark red only: the two sorts agree), `close` (dark red red 2, pale red red
      9, light red red 8, brown brown 2; start dark red: the chain goes to brown
-     first).
+     first). Added as the first preset, `ribbons`, the chapter's own report
+     (p. 204: a pale blue ribbon followed by a pale green or pale pink), with
+     the lesson's lightness figures: dark blue blue 2, mid blue blue 5, pale
+     blue blue 8, pale green green 8, pale pink pink 9; start dark blue: chain
+     dark blue → mid blue → pale blue → pale green → pale pink, leaving blue at
+     pale green.
    - **Misconception:** Gelb and Goldstein's reading, stated at strength:
      "The patient has lost the categorial attitude; his words are intact, but
      he can no longer subsume a sample under a category, so he sorts by
@@ -930,9 +1018,11 @@ Part One, Chapters 4–6.
 4. **the-spoken-word-and-thought** — The Spoken Word and Thought — *Part One · 6 · Expression and Speech*
    - **Read:** the gestural meaning of words; emotions and their expression
      differ by culture — the angry Japanese who smiles, the Westerner who goes
-     red and stamps or goes pale and hisses (check against text); the
-     *speaking* and the *spoken* word (wording to be checked against the
-     text).
+     red and stamps or goes pale and hisses (confirmed, Smith p. 219); the
+     *speaking* and the *spoken* word (confirmed, Smith p. 229, the speaking
+     word and the spoken word). Reading pp. 214–232. The `anger` signs are only
+     those p. 219 names: smiles; goes-red stamps; goes-pale hisses. The
+     smile in pleasure is the lesson's addition and is labelled so.
    - **Do:** compute what bodily sign, if any, is common to the expressions of
      one emotion, and say what the common sign would have to be for the
      natural-sign view to hold.
@@ -958,13 +1048,20 @@ Part Two, its introduction and Chapters 1 and 2.
 
 1. **the-body-and-perception** — The Theory of the Body Is Already a Theory of Perception — *Part Two · The Theory of the Body*
    - **Read:** the cube with six equal faces, which no perspective presents;
-     the *already* of the title, which points back to Part One.
+     the *already* of the title, which points back to Part One. *(Resolved
+     against Smith, pp. 235–239: the six-equal-sided cube as the cube in
+     reality is an objector's view, p. 236; the reply, that it is invisible
+     and inconceivable and a limiting idea, is p. 237; Smith writes body
+     image on p. 238 and body schema on p. 239.)*
    - **Do:** compute the faces and foreshortenings a cube presents from three
      directions and say what "six equal faces" is a claim about.
    - **Lab:** `perspective/faces` (family 1). Presets: `square` (`front`: one
      face, foreshortening 1), `turned` (`3 0 4`, the view turned about the
      vertical by 3-4-5: front 4/5, right 3/5), `corner` (`1 2 2`: three faces,
-     front 2/3, above 2/3, right 1/3).
+     front 2/3, above 2/3, right 1/3), `tour` (added by the author: `front`,
+     `3 0 4`, `4 0 3`, `right`, the objector's walk round the cube: the front
+     drawn at 1, 4/5, 3/5, then not at all; 2 of 6 faces; cover one view, the
+     `3 0 4` one).
    - **Misconception:** "The equal faces are what the cube looks like, once
      the distortions are corrected." The six equal faces are never seen; they
      are the thought of a cube seen from nowhere, and the chapter's claim is
@@ -972,21 +1069,32 @@ Part Two, its introduction and Chapters 1 and 2.
    - **Worked:** turned by 3-4-5, the two visible faces are foreshortened to
      4/5 and 3/5; from the corner, three faces, none at its true size.
 
-2. **the-motor-physiognomy-of-colours** — The Motor Physiognomy of Colours — *Part Two · 1 · Sensing*
+2. **the-motor-physiognomy-of-colours** — The Motor Physiognomy of Colours — *Part Two · 1 · Sense Experience*
    - **Read:** Goldstein and Rosenthal's patients: with the arm held out and
      the eyes closed, red and yellow make it deviate outward, blue and green
      inward (check against text); sensation as communion (*communion*, wording
-     to be checked against the text).
+     to be checked against the text). *(Resolved against Smith, pp. 240–246:
+     the module is §B's `Part Two · 1 · Sense Experience`, Smith's chapter
+     title, here and in lessons 3 and 4. The text has no arm held out with
+     the eyes closed: it reports the gesture of raising the arm, modified in
+     sweep and direction by the colour of the field, red applied to the right
+     eye favouring a stretching outward and green a bending back towards the
+     body, p. 242; the general rule, red and yellow abduction, blue and green
+     adduction, is p. 243, where Smith misprints the second as abduction.
+     Communion is Smith's word, p. 246. The faint-colour evidence is in the
+     chapter, Werner's weak and brief stimuli, pp. 244–245, reported as bodily
+     attitudes, not deviations.)*
    - **Do:** compute what a pure-quality account predicts for the arm under
      two colours, and the gap to the deviation reported.
    - **Lab:** `stimulus/illusion` (family 1: "sensation as a pure quality,
-     with no motor effect of its own"). Presets: `red-blue` (the arm's starting
-     position the same, 0 cm, under both colours: predicted difference 0;
-     reported difference, outward under red against inward under blue, 6 cm,
-     illustrative), `same` (blue against blue: 0 and 0), `faint` (the colour
-     too faint to be named, deviation still reported, illustrative; the
-     author checks whether the chapter reports this). Pins the predicted and
-     gap tiles.
+     with no motor effect of its own"). Presets: `red-green` (renamed from
+     `red-blue`, since the chapter's paired example is red and green: the
+     arm's starting position the same, 0 cm, under both colours: predicted
+     difference 0; reported difference, outward under red against inward
+     under green, 6 cm, illustrative), `same` (green against green: 0 and 0),
+     `faint` (red against green too faint to be named, reported 4 cm,
+     illustrative; the chapter reports bodily attitudes there). Pins the
+     predicted, reported and gap tiles.
    - **Misconception:** "The colour is seen first and then it affects the body."
      The chapter's claim is that the motor significance is part of the
      colour's appearance, not a consequence of it.
@@ -994,7 +1102,7 @@ Part Two, its introduction and Chapters 1 and 2.
      reported deviation differs by 6 cm (illustrative); the gap is the motor
      physiognomy.
 
-3. **the-anonymous-subject-of-sensing** — The Anonymous Subject of Sensing — *Part Two · 1 · Sensing*
+3. **the-anonymous-subject-of-sensing** — The Anonymous Subject of Sensing — *Part Two · 1 · Sense Experience*
    - **Read:** sensation as pre-personal and anonymous: one perceives in me,
      rather than I perceive *(wording to be checked against the text)*; I am
      no more the author of my sensations than of my birth or my death (check
@@ -1014,21 +1122,31 @@ Part Two, its introduction and Chapters 1 and 2.
      mind's act gives the quality its sense; (3) sensing is a coexistence in
      which the sensible and the sentient each give the other what it has, and
      neither is first: n / n. Presets: `all`, `passivity` (1), `activity` (2
-     and 3).
+     and 3). *(Resolved against Smith, pp. 246–252: the first two Read
+     phrases are Smith's, p. 250, the sky p. 249, the critique of reflective
+     analysis pp. 246–247. Observation 1 becomes "I do not decide to see blue",
+     as one decides to be a mathematician, p. 250; the text says nothing of
+     dating the act. Observation 2 becomes "the sensible beckons until taken
+     up", p. 248, coded n / y as proposed, the note saying the activity is
+     the body's in the text. On `passivity` the survivors tile prints
+     empiricism, and the lesson says why one observation is not the case.)*
    - **Misconception:** "If one perceives in me, there is no subject of
      perception at all." The chapter's subject is not abolished but placed
      below the personal one: a bodily, general subject that has already taken
      sides with the world before I do.
    - **Worked:** survivors none; split 1 and 2; both fail the coexistence.
 
-4. **the-unity-of-the-senses** — The Unity of the Senses — *Part Two · 1 · Sensing*
+4. **the-unity-of-the-senses** — The Unity of the Senses — *Part Two · 1 · Sense Experience*
    - **Read:** the senses communicate; synaesthesia as the rule; the glass
      whose hardness and brittleness are seen and whose breaking sound is
      carried by the visible glass, beside the steel and the plane blade (check
      against text; the author also finds where the sentence about the glass's
      single manner of being falls and, if it is in Part Two Chapter 3 too,
      cites both pages); von Senden's congenitally blind patients after the
-     operation.
+     operation. *(Resolved against Smith: the glass seen and heard, with
+     steel and the plane blade, is pp. 266–267; the single manner of being
+     is in Part Two Chapter 3, p. 372, and both are cited; synaesthesia as
+     the rule p. 266; von Senden pp. 258–261. The lesson reads pp. 252–282.)*
    - **Do:** compute what is common to the glass as it is given to four
      senses, on two codings, and say which coding the chapter describes.
    - **Lab:** `variation` (family 2). Presets: `sense-bound` (the glass seen,
@@ -1036,6 +1154,9 @@ Part Two, its introduction and Chapters 1 and 2.
      sense — transparent; smooth, cold; rings; shatters with a sound: core
      none), `chapter` (the same four coded as the chapter describes them, the
      hardness and brittleness seen, heard and felt: core brittle, hard).
+     *(As built: dropped is coded `tinkles`, the chapter's sound of breaking;
+     the kit prints the core `hard, brittle`; the felt hardness is carried
+     over from the chapter's steel bar and lime branch, and the note says so.)*
    - **Misconception:** "Each sense has its own world, and the mind joins
      them." The `sense-bound` coding is that view, and its empty core is what
      it predicts; the chapter's description is the other coding. The operated
@@ -1048,7 +1169,15 @@ Part Two, its introduction and Chapters 1 and 2.
      form, and its distinction between spatialised and spatialising space
      (check against text); Stratton's inverting spectacles; Wertheimer's
      mirror, which shows a room tilted by 45° that after a few minutes
-     suddenly rights itself; the spatial level.
+     suddenly rights itself; the spatial level. *(Resolved against Smith:
+     Smith prints no section headings in Space. The chapter opens p. 283;
+     up and down begins p. 284 and the section ends p. 296 with giddiness
+     and nausea. Space as the means whereby the position of things becomes
+     possible, and the passage from spatialized to spatializing space, are
+     Kant's view as the chapter states it, pp. 283–284, not the chapter's
+     own; the chapter seeks a third spatiality, p. 289. The associationist
+     reading of Stratton is, a footnote says, at least implicitly Stratton's
+     own, p. 285; Wertheimer's mirror is p. 289.)*
    - **Do:** compute the perceived tilt as image tilt minus spatial level,
      period by period, under a sudden and under a gradual re-anchoring.
    - **Lab:** `level` (family 3: the lesson's model). Presets: `wertheimer`
@@ -1061,6 +1190,12 @@ Part Two, its introduction and Chapters 1 and 2.
      no clean re-inversion and that Merleau-Ponty reads him selectively:
      perceived 180, 90, 45, 45/2, 45/4), `none` (image 0, level 0: perceived 0
      at every period). Pins the perceived-tilt tile at periods 1 and 3.
+     *(As built: Smith describes the second experiment as lasting a week,
+     p. 285, and the lesson says so rather than eight days or one eye. The
+     prose says the chapter takes Stratton's descriptions and sets aside his
+     interpretation, and that how far the reports support its reading is
+     argued over by later readers. Per kit deviation 10, the series tile is
+     pinned, with the perceived and level tiles at the shipped period 1.)*
    - **Misconception:** "Up is where the retinal image's top is." Stratton
      shows the image can be inverted and up re-established; Wertheimer that
      the level is not given by the image at all, and is re-anchored as a whole,
@@ -1070,7 +1205,13 @@ Part Two, its introduction and Chapters 1 and 2.
 
 6. **depth** — Depth — *Part Two · 2 · Space · Depth*
    - **Read:** depth is not breadth seen from the side; convergence and
-     apparent size as signs of depth in the classical theory.
+     apparent size as signs of depth in the classical theory. *(Resolved
+     against Smith: the section begins p. 297 and ends p. 311. The triangle
+     whose base and base angles are given is stated in the traditional
+     view's voice, p. 299, with a footnote to Malebranche; the Cartesians'
+     natural geometry is p. 300. The chapter does not name Descartes's
+     Dioptrics: the lesson gives the blind man's two sticks as going back to
+     Descartes's Optics as history, and Berkeley's signs from his own book.)*
    - **Do:** compute convergence and disparity for two distances and state
      what the classical theory says the mind does with them.
    - **Lab:** `depth` (family 1: the classical theory of depth from signs).
@@ -1092,7 +1233,13 @@ Part Two, its introduction and Chapters 1 and 2.
      is a movement without a moving thing (*pure phi*); the chapter's answer —
      there is always something that moves, but it is not an object posited
      apart from the movement, and has no identity outside it (check against
-     text); Zeno.
+     text); Zeno. *(Resolved against Smith: the section begins p. 311 and
+     ends p. 327. Smith prints Wertheimer's phenomenon as phenomenon ø,
+     p. 316; pure phi is not his wording, and the lesson names the phi
+     phenomenon in its own voice. The logician is Linke. The answer is
+     confirmed: the mobile entity is identical in the phases of the
+     movement, not beneath them, p. 318, and has only a style, p. 319;
+     Zeno p. 313.)*
    - **Do:** compute the implied speed and whether an interval falls in the
      band in which motion is reported.
    - **Lab:** `motion/phi` (family 1: Wertheimer's bands). Presets:
@@ -1126,19 +1273,54 @@ Part Two, its introduction and Chapters 1 and 2.
      the one space cannot make space itself close; (3) in the dream, rising and
      falling carry the dreamer's mood and desire: n / y — the dream is an
      imagined representation, but no sensation in it is associated. Presets:
-     `all`, `night` (1), `patients` (2 and 3).
+     `all`, `night` (1), `patients` (2 and 3). *(Resolved against Smith,
+     pp. 327–347; the section begins p. 327. Minkowski is the source for the
+     night, p. 330; dark space is not in this section but in Sense
+     Experience, p. 258, of hallucination. Observation 2 is replaced: the
+     patient before the mountain landscape, p. 334, is Fischer's, and the
+     text has the landscape itself moving at times, so nothing in it has
+     moved is wrong. In its place Binswanger's patient, p. 339, who feels a
+     brush by the window entering his head while seeing it at the window and
+     has no quarrel with explicit perception: y / n, the intellectualist
+     correction never coming. Observation 3 is confirmed against p. 331
+     and the objector's reply, p. 336. Preset `patients` is renamed
+     `brush-and-dream`.)*
    - **Misconception:** "Lived space is a subjective distortion of real
      space." The chapter: geometric space is a later and thinner structure,
-     drawn from the space of an existence.
+     drawn from the space of an existence. *(As written, closer to the text:
+     human spaces are built on a natural space that is not geometrical
+     space, pp. 342–343, and objective thought draws on the unreflective
+     experience it calls a distortion, p. 337.)*
    - **Worked:** survivors none; split 2 and 3; both fail the night.
 
 ### Course 6 — Things, the World and Others (`perception-things-world-and-others`, 7)
 
 Part Two, Chapters 3 and 4.
 
+Checked against Smith (author, 2026-10-24). Chapter 3 runs pp. 348–402 and
+Smith marks its four parts only by a blank line: the constancies from the
+chapter's first line, p. 348 (size and shape to p. 354, colour, lighting,
+weight and touch to p. 370); the thing as an inter-sensory entity from p. 370
+to p. 381; the natural world from p. 381 to p. 389; hallucination from p. 389
+to the chapter's end, p. 402. Chapter 4 runs pp. 403–425 with no breaks; the
+lessons divide it at p. 414, where it asks whether shared behaviour has
+reached other people at all. The module for lessons 6 and 7 is §B's
+`Part Two · 4 · Other Selves and the Human World` (Smith's title), not the
+shortened form these entries first carried.
+
 1. **size-and-shape-constancy** — Size and Shape Constancy — *Part Two · 3 · The Thing · Constancies*
-   - **Read:** perceptual constancies; a coin seen obliquely; the size of a
-     person across a room.
+   - **Read:** perceptual constancies, pp. 348–354. The chapter has no coin
+     and no person across a room; it has the psychologist's conventional
+     standard size (pp. 348–9), the law view stated with Kant (the pen held
+     to the eye, the oblique square, pp. 349–51), the object at a hundred and
+     at ten yards (p. 351, the opening passage), and the optimum distance
+     (p. 352). The person across the room and the coin are the lesson's
+     illustrations. Helmholtz is not named in the chapter; the lab names
+     him as the inference account's usual holder. Brunswik's ratio is the
+     lesson's addition; it dates from about 1930, so it is not "later than
+     the book", and the lesson's prose says only that the book does not use
+     it (the kit's tile label still says "later than the book": a kit
+     correction, not the author's).
    - **Do:** compute what the retinal-image account and the unconscious-
      inference account each predict for the size of a distant person, and a
      Brunswik ratio from a reported size.
@@ -1164,7 +1346,14 @@ Part Two, Chapters 3 and 4.
 
 2. **colour-and-lighting** — Colour and Lighting — *Part Two · 3 · The Thing · Constancies*
    - **Read:** Gelb's experiment (1929); the lighting as what we see by, not
-     what we see; Katz's film and surface colours.
+     what we see; Katz's film and surface colours. Checked: pp. 354–370;
+     Gelb's disc and the white paper p. 358 (again p. 363), the two boxes
+     p. 358, lighting not seen but showing the rest p. 360, lighting as the
+     norm p. 362; Smith's terms for Katz's modes are *coloured areas* and
+     *surface colour* (p. 356). As Smith reports Gelb, the disc in the beam
+     appears faintly lit like the rest of the room and the beam looks like a
+     solid; the text does not say the disc looks white, so the misconception
+     is reworded below.
    - **Do:** compute luminances and ratios to the surround and name the change
      that makes Gelb's disc look black again.
    - **Lab:** `light` (family 1: luminance as the empiricist's sensation;
@@ -1175,8 +1364,9 @@ Part Two, Chapters 3 and 4.
      in the room, 4/5; the wall surround 1/2: disc and paper tie for
      brightest), `paper` (a scrap of white paper placed in the beam, 4/5 × 16
      = 64/5, as the surround: the disc's ratio falls to 1/16).
-   - **Misconception:** "The disc looks white because it sends the eye white
-     paper's light." Then it should stay white when the paper is added.
+   - **Misconception:** "The disc's colour is the light it sends the eye."
+     Then adding the paper, which leaves the disc's luminance at 4/5, should
+     change nothing; Gelb reports the disc at once black and strongly lit.
    - **Worked:** reflectance 1/20 × illumination 16 = 4/5, white paper's
      luminance in the room; its ratio to the wall 8/5, the paper's own; with
      the paper in the beam, (4/5) / (64/5) = 1/16.
@@ -1188,6 +1378,17 @@ Part Two, Chapters 3 and 4.
      the thing *in-itself-for-us* (wording to be checked against the text),
      which ignores us and rests in itself; Cézanne. The glass belongs to
      Sensing (The Unity of the Senses), and this lesson does not reuse it.
+     Checked: pp. 370–381. Honey appears only in passing among tactile
+     phenomena (p. 368), and Sartre's analysis of the viscous is not in the
+     chapter, so observation (1) is replaced by the chapter's heat and colour:
+     a very hot object must redden, which the chapter calls a priori (p. 372).
+     The carpet is a woolly *blue*, not red (p. 365, in the constancies), and
+     in this part its colour cannot be fully described without its wool
+     (p. 376). *In-itself-for-us* is Smith's wording (p. 375); the thing as a
+     silent Other and Cézanne are p. 376. The lab's observation names are
+     "a very hot object must redden", "the carpet's colour implies its wool",
+     "the thing rests aloof in itself"; coding n / y, n / n, y / n as
+     proposed.
    - **Do:** compute the two classical accounts' records over the chapter's
      observations about the thing and name the observation each fails.
    - **Lab:** `cases` (family 2). Accounts (cfg): empiricism (the thing as a
@@ -1205,7 +1406,8 @@ Part Two, Chapters 3 and 4.
      held together by the mind." The table is the lab's half of the answer;
      the chapter's half, in prose, is that the unity is a style the qualities
      share, which is not one more quality and not a concept.
-   - **Worked:** survivors none; split 1 and 3; both fail the woolly red.
+   - **Worked:** survivors none; split 1 and 3; both fail the woolly carpet.
+     (`alien` alone: empiricism survives, which the prose says.)
 
 4. **the-natural-world** — The Natural World — *Part Two · 3 · The Thing · The Natural World*
    - **Read:** the world as the horizon of all horizons; a perception corrected
@@ -1213,7 +1415,18 @@ Part Two, Chapters 3 and 4.
      broad flat stone on a sunken road that turns out to be a patch of
      sunlight (check against text: it may be in Part Three Chapter 1; if it is
      not in this chapter, the author uses this chapter's own example and does
-     not import the stone without saying so).
+     not import the stone without saying so). Checked: the stone is on
+     p. 346, at the end of Chapter 2 (Lived Space), not here. The section is
+     pp. 381–389; its own example is driving towards a town glimpsed only now
+     and then and judging that it is Chartres (p. 384), which the lesson uses,
+     saying in its last paragraph where the stone is. The reply that a
+     perception gives way only to another that corrects it is on p. 401, in
+     the hallucination pages; this section has the world as the permanent
+     being within which all corrections are made (p. 382). Candidates and
+     cues are therefore replaced, all illustrative: *a stand of poplars*
+     (c1), *a village church* (c1, c2), *Chartres* (c1, c2, c3); c1 tall
+     shapes rise from the plain far ahead; c2 a spire stands above a cluster
+     of roofs; c3 two spires, one plain and one ornate, over a town on a rise.
    - **Do:** count the interpretations consistent with the cues as they
      arrive, and say what was never among the candidates.
    - **Lab:** `cues/sequence` (family 1: the sceptic's picture of perception
@@ -1235,7 +1448,20 @@ Part Two, Chapters 3 and 4.
 5. **hallucination** — Hallucination — *Part Two · 3 · The Thing · Hallucination*
    - **Read:** the patients who say their voices or visions are not like what
      they perceive; hallucination as lacking the perceived world's texture
-     and depth, a pseudo-world (check against text).
+     and depth, a pseudo-world (check against text). Checked: pp. 389–402;
+     the patients' discrimination p. 389, the man in the garden and the
+     powder pp. 389–90, what the hallucination lacks pp. 394–6, its value of
+     reality p. 399. The chapter's word is *quasi-reality* (p. 389) and
+     *pseudo-presence* (p. 396). Properties as coded: *in-the-shared-world*,
+     *explorable*, *packed-with-detail*, *thick-with-duration*, *real-for-me*
+     (the chapter has no "confirmed by the other senses" for this case, and
+     says the hallucination is no part of the intersubjective world and has
+     no thickness of duration, pp. 395–6), plus the sense each perceived
+     thing is given to, which varies. Presets use the chapter's own cases:
+     `voice` (a voice from the next room; the voices a patient hears),
+     `vision` (the person placed in the garden; the man the patient saw),
+     `all` (the voice, the person in the garden, the damp powder in the bed;
+     the dry powder of the complaint).
    - **Do:** compute what every perceived thing has in common and what the
      hallucination lacks of it.
    - **Lab:** `variation` (family 2: the lesson's coding of the chapter's
@@ -1254,16 +1480,27 @@ Part Two, Chapters 3 and 4.
      is not.
    - **Worked:** `all`: the core of the perceived things is all five
      properties; the hallucination lacks the first four and keeps only
-     *present to me*.
+     *real-for-me*; *heard*, *seen*, *touched* vary.
    - This course's one modern aside (§F.1), if used, is here, with both sides:
      Anil Seth's description of perception as a controlled hallucination (a
      phrase he credits to earlier users; check the attribution before
      printing) runs the other way from this chapter, which argues that a
      hallucination lacks what perception has, not that perception is a
-     hallucination kept in check.
+     hallucination kept in check. Used, in the second-last `p`, naming
+     *Being You* (2021) and saying only that the phrase is not Seth's
+     coinage; the earlier users are not named, since the author could not
+     confirm the attribution.
 
-6. **the-cultural-world-and-others** — The Cultural World and Others — *Part Two · 4 · Others and the Human World*
+6. **the-cultural-world-and-others** — The Cultural World and Others — *Part Two · 4 · Other Selves and the Human World*
    - **Read:** cultural objects; the argument from analogy and its circle.
+     Checked: pp. 403–414; cultural objects p. 405; the analogical reply in
+     the theory's voice p. 406; the other's body as the first cultural
+     object p. 406; Scheler's objection and the baby p. 410. Mill is not
+     named in the chapter; the lesson names him as the argument's classical
+     holder. Sentence letters: p my behaviour expresses a mind, q that body
+     behaves as mine does, r that body's behaviour expresses a mind;
+     `analogy` p, q ⊢ r (8 rows, 1 counterexample); `valid` adds q → r;
+     `circle` p, r ⊢ r (4 rows, valid).
    - **Do:** set out the argument from analogy and decide whether its premises
      force its conclusion.
    - **Lab:** `argkit/validity` (family 1). Presets: `analogy` (my body
@@ -1276,13 +1513,20 @@ Part Two, Chapters 3 and 4.
      should explain: I would need to perceive the other as a behaviour first.
    - **Worked:** the `analogy` table's one countercase.
 
-7. **the-truth-of-solipsism** — The Truth of Solipsism — *Part Two · 4 · Others and the Human World*
+7. **the-truth-of-solipsism** — The Truth of Solipsism — *Part Two · 4 · Other Selves and the Human World*
    - **Read:** the other's grief, which I see and do not live; a solipsism
      rooted in lived experience that cannot be surpassed (*lived solipsism*,
      wording to be checked against the text); the look that objectifies,
      Sartre's, and the chapter's answer that it does so only if both of us
      withdraw into our thinking natures (check against text); the social as a
-     permanent field.
+     permanent field. Checked: pp. 414–425. Smith's wording is a solipsism
+     *rooted in living experience* and insurmountable (p. 417); the truth of
+     solipsism p. 419; the look's answer confirmed, p. 420. Sartre is not
+     named: the chapter introduces the objectifying view as something
+     asserted, so the account is named "the objectifying look" in the lab,
+     and the prose says the view is widely read as Sartre's (*Being and
+     Nothingness*, 1943). The baby (p. 410) and the dialogue (p. 413) fall
+     in lesson 6's pages and are read back from there.
    - **Do:** compute two opponent accounts' records over the chapter's cases,
      name the case both absorb and the case both fail.
    - **Lab:** `cases` (family 2). Accounts (cfg): the argument from analogy
@@ -1295,7 +1539,11 @@ Part Two, Chapters 3 and 4.
      and do not live: y / y; (3) a conversation in which my thought and the
      other's are woven into one fabric: n / n; (4) the stranger's look that
      makes me feel an object, and stops doing so when we speak: - / y.
-     Presets: `all`, `infant` (1), `dialogue` (2 and 3).
+     Presets: `all`, `infant` (1), `dialogue` (2 and 3). As built, the
+     accounts are "the argument from analogy" and "the objectifying look",
+     and (4) is "the stranger's silent gaze" (its ending when he speaks is in
+     the prose, since the look's account does not absorb that part). `infant`
+     alone: the look survives, which the prose says.
    - **Misconception:** "Merleau-Ponty refutes solipsism." He says there is a
      truth in it that cannot be overcome, and that coexistence is lived before
      and beneath it; both claims are in the chapter, and coexistence is in the
@@ -1312,7 +1560,9 @@ Part Three, Chapters 1–3.
      which is certain even if the seeing is not; the chapter's reply that the
      two certainties cannot be separated; true and false feelings — a love
      that turns out not to have been love — showing that the certainty of an
-     inner state is not given in advance either (check against text).
+     inner state is not given in advance either (checked: Smith pp.
+     435–446; the objector's claim that a felt feeling is always true is
+     p. 439, the reply from p. 440).
    - **Do:** set out the cogito read as an inference and decide what it needs
      to be valid.
    - **Lab:** `argkit/validity` (family 1). Presets: `bare` ("I think, so I
@@ -1320,8 +1570,12 @@ Part Three, Chapters 1–3.
      me, of Descartes' general premise that whatever thinks exists: "if I
      think, I exist; I think; so I exist" — valid; the lab is propositional,
      so it states the instance, and the prose gives the general premise),
-     `seeing` ("I think I see a lamp, so I see a lamp": invalid — the gap
-     Descartes relies on).
+     `seeing` (the chapter's ash-tray, p. 435, with the conditional Descartes
+     grants: "if I see an ash-tray I think I see one; I think I see one; so I
+     see one", s → t, t, so s — affirming the consequent, invalid, one
+     countercase t true, s false, the gap Descartes relies on. Changed by the
+     author from "I think I see a lamp, so I see a lamp", which had the same
+     form as `bare`).
    - **Misconception:** "The cogito is an inference from thinking to being."
      Descartes himself denied it in the Second Replies, calling it a simple
      intuition of the mind and saying the general premise is learned from the
@@ -1357,33 +1611,38 @@ Part Three, Chapters 1–3.
 3. **the-tacit-cogito** — The Tacit Cogito — *Part Three · 1 · The Cogito*
    - **Read:** the spoken cogito, learned from books, and the tacit cogito
      beneath it, which words presuppose; expression and the eternal truths
-     (Hegel, Valéry; check against text).
+     (checked: pp. 451–475; Claudel is quoted on expression, pp. 452–453, and
+     Valéry, p. 465; Hegel does not appear in this chapter, and the earlier
+     wording naming him is corrected).
    - **Do:** compute two opponent accounts' records over the chapter's cases
-     about language and thought, and name the case both fail.
+     about language and thought, and name the cases on which they part (no
+     case is failed by both on this coding; corrected from "the case both
+     fail").
    - **Lab:** `cases` (family 2). Accounts (cfg): thought before language
      (thought complete in itself, words its clothing); language before thought
-     (thought nothing but words, inner speech). Observations (each to be
-     checked against the text; proposed coding thought-first /
-     language-first): (1) I understand Descartes' written cogito only because
-     I already am a thinking being for whom it can mean something: y / n;
-     (2) a speaker or a writer does not know what he thinks until he has said
-     it: n / y; (3) I can be mistaken about my own feelings, as in a false
-     love: n / - — an inner state is not transparent in advance. Presets:
+     (thought nothing but words, inner speech). Observations (checked; coding
+     thought-first / language-first, as authored): (1) the written cogito
+     needs a reader already in contact with his own life and thought, p. 468:
+     y / n; (2) the speaker finds in his words more than the thought he put
+     into them, p. 452: n / y; (3) an illusory love lived and not known, pp.
+     440–443: n / - — an inner state is not transparent in advance. Presets:
      `all`, `books` (1), `expression` (2 and 3). The tacit cogito is in the
      prose.
    - **Misconception:** "The tacit cogito is a silent inner voice that thinks
      in words before speaking." The chapter says it is not yet a thought in
      words at all. The `note` says the reading is disputed by Merleau-Ponty
      himself: a working note of *The Visible and the Invisible* calls the tacit
-     cogito impossible (check the wording before quoting).
+     cogito impossible (paraphrased, never quoted: the source edition is
+     Smith's *Phenomenology*, and the note is not in it).
    - **Worked:** survivors none; split 1 and 2; thought-first fails the false
      love, language-first is silent on it.
 
 4. **time-is-not-in-things** — Time Is Not in Things — *Part Three · 2 · Temporality*
    - **Read:** the image of time as a river, and why it smuggles in an
      observer: what is past or future for me is present in the world, the
-     water that will pass tomorrow already at its source (check against
-     text).
+     water that will pass tomorrow already at its source (checked: pp.
+     477–478; in the boat case the chapter puts the future in the landscapes
+     ahead, not the water, and the lesson says the lab counts the water).
    - **Do:** classify the river's water as past and future from two
      standpoints, then remove the standpoint and see what is left.
    - **Lab:** `time/river` (family 3: the lesson's model of the chapter's
@@ -1403,8 +1662,9 @@ Part Three, Chapters 1–3.
 
 5. **the-field-of-presence** — The Field of Presence — *Part Three · 2 · Temporality*
    - **Read:** Husserl's diagram of retention and protention, which the
-     chapter reproduces; the *field of presence* (wording to be checked against
-     the text).
+     chapter reproduces; the *field of presence* (checked: p. 483; Smith
+     prints protections for protentions on pp. 483–484, and the lesson says
+     so).
    - **Do:** compute, for a present, the depth at which each earlier moment is
      retained, and the span of protention.
    - **Lab:** `time/diagram` (family 3: Husserl's diagram as the lesson's
@@ -1419,9 +1679,11 @@ Part Three, Chapters 1–3.
 
 6. **time-as-subject** — Time as Subject — *Part Three · 2 · Temporality*
    - **Read:** the chapter's thesis that time must be understood as the
-     subject and the subject as time *(wording to be checked against the
-     text)*; passive synthesis; self-affection, with Kant and Heidegger;
-     the priority of the present and the future (check against text).
+     subject and the subject as time *(checked: p. 490)*; passive synthesis;
+     self-affection, with Kant and Heidegger; the privilege of the present
+     (p. 492) against Heidegger's primacy of the future (pp. 496–497).
+     Corrected from "the priority of the present and the future": the
+     chapter gives the privilege to the present alone.
    - **Do:** compute the diagram's column at each present in turn and show
      that one moment is held at a different depth in each while the order of
      moments never changes.
@@ -1438,10 +1700,13 @@ Part Three, Chapters 1–3.
 7. **the-rock-and-the-project** — The Rock and the Project — *Part Three · 3 · Freedom*
    - **Read:** a theory of absolute freedom, recognisably Sartre's in *Being
      and Nothingness* — the chapter states it largely without naming him in
-     its body text (check against text and notes) — and the rock, Sartre's
+     its body text (checked: *L'Être et le Néant* is cited in the notes on
+     pp. 505, 508, 509 and 513, and Sartre is named once in the body, p.
+     509) — and the rock, Sartre's
      own example, that is unclimbable only for someone who means to climb it;
      the chapter's reply that some mountains look high even to someone with no
-     plan to climb them (check against text).
+     plan to climb them (checked: the rock in the theory's voice, p. 507; the
+     concession, p. 510; the mountains, p. 511).
    - **Do:** classify rocks as obstacles relative to a project and then
      relative to the body's own general level, and name the rock that is an
      obstacle on the second reckoning and not the first.
@@ -1449,7 +1714,8 @@ Part Three, Chapters 1–3.
      2 m and 3 m in every preset. Presets: `climb` (project climb, capacity
      2 m: the 3 m rock is an obstacle), `pass` (project walk past: none is),
      `body` (no explicit project, the body's general level 2 m: the 3 m rock
-     still stands out).
+     still stands out). As authored, every preset has capacity 2 m and
+     general level 2 m, so the level tile prints 3 m in all three.
    - **Misconception:** "Merleau-Ponty agrees with the theory of absolute
      freedom that obstacles exist only for a project." He agrees with the
      first half and denies the conclusion: the body gives a general valuation
@@ -1468,10 +1734,13 @@ Part Three, Chapters 1–3.
      consciousness outside every situation). Observations (each to be checked
      against the text; proposed coding determinism / absolute freedom):
      (1) a man who has built his life for twenty years on an inferiority
-     complex is unlikely to undo it by a decision in a moment: y / n; (2) the
-     same hardship does not produce a revolutionary consciousness in everyone
-     or at every time, and becomes unbearable only when a change is in view:
-     n / y; (3) the day labourer finds himself a revolutionary before he has
+     complex is unlikely to undo it by a decision in a moment, pp. 513–514:
+     y / n; (2) there was exploitation long before there were
+     revolutionaries, a fact stated in the idealist's voice on p. 514 and
+     kept by the chapter on p. 518 (the earlier wording, that hardship
+     becomes unbearable only when a change is in view, is not in the text
+     and is corrected): n / y; (3) the day labourer, pp. 515–516, finds
+     himself a revolutionary before he has
      decided anything, in his coexistence with other labourers: n / n;
      (4) the prisoner who does not speak under torture holds out with his
      comrades, not alone: n / n. Presets: `all`, `past` (1), `class` (2 and
@@ -1480,7 +1749,7 @@ Part Three, Chapters 1–3.
      partly determined." The chapter rejects the arithmetic of a share
      without returning to totality: there is never determinism and never
      absolute choice, and I am free not in spite of my motives but by means
-     of them *(wording to be checked against the text)*.
+     of them *(checked: p. 529)*.
    - **Worked:** survivors none; split 1 and 2; both fail the labourer and the
      prisoner. The course ends where the book does.
 
