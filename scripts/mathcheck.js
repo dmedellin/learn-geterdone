@@ -19820,8 +19820,20 @@ console.log('capital: capkit Volume I modes, shillings and pence, rates');
   /* --- form ----------------------------------------------------------------- */
   const goods = "{goods: [{name: 'linen', qty: Q(20), unit: 'yards', hours: Q(20)}, {name: 'coat', qty: Q(1), unit: '', hours: Q(10)},"
     + " {name: 'tea', qty: Q(10), unit: 'lb', hours: Q(20)}], equivalent: 'linen'}";
-  eq(tile('foCompute', 'stage', goods, {}, { stage: 'elementary' }, 'foRelative'), '2 coat',
+  eq(tile('foCompute', 'stage', goods, {}, { stage: 'elementary' }, 'foRelative'), '2 coats',
      'foCompute: halve the coat\'s hours and the linen fetches 2 coats');
+  /* the plural: the unit when there is one, else the name; never below 2 */
+  const lotOf = (name, qty, unit) => ck("foLotOf({name: '" + name + "', unit: '" + unit + "'}, Q('" + qty + "'))");
+  eq(lotOf('coat', '1', ''), '1 coat', 'foLotOf: one coat');
+  eq(lotOf('coat', '3/2', ''), '3/2 coats', 'foLotOf: more than one is plural');
+  eq(lotOf('iron', '1/2', 'ton'), '1/2 ton iron', 'foLotOf: a fraction up to one is singular');
+  eq(lotOf('corn', '2', 'quarter'), '2 quarters corn', 'foLotOf: the unit takes the plural, not the mass noun');
+  eq(lotOf('linen', '20', 'yards'), '20 yards linen', 'foLotOf: a unit already plural is left');
+  eq(lotOf('tea', '10', 'lb'), '10 lb tea', 'foLotOf: an abbreviation is left');
+  eq(lotOf('cattle', '2', 'head of'), '2 head of cattle', 'foLotOf: head of cattle');
+  eq(lotOf('pair of boots', '2', ''), '2 pairs of boots', 'foLotOf: the word before "of"');
+  eq(lotOf('watch', '2', '') + ', ' + lotOf('Bible', '3', '') + ', ' + lotOf('pony', '2', ''), '2 watches, 3 Bibles, 2 ponies',
+     'foLotOf: -es, -s and -ies');
   eq(tile('foCompute', 'stage', goods, {}, { stage: 'general' }, 'foEquation'), '1 coat = 10 yards linen; 10 lb tea = 20 yards linen',
      'foCompute: the general form');
   eq(tile('foCompute', 'count', goods, {}, {}, 'foPairs'), '3', 'foCompute: three owners need 3 ratios');
@@ -19974,6 +19986,46 @@ console.log('capital: capkit Volume I modes, shillings and pence, rates');
           { money: '£' }, { periods: 1 }, 'acReserve'), '0', 'acCompute: Mr Peel, free land, no servant');
   eq(tile('acCompute', 'thrift', "{wage: Q(3), saving_share: Q('1/10'), target: Q(60000)}", { money: 's' }, {}, 'acDaysToTarget'),
      '200,000 working days', 'acCompute: £3,000 saved at 3.6d a day');
+
+  /* --- a preset's own periods: capkit_core's CAP_WIRE_JS, run as a page runs it.
+     The lesson ships 1 period; the long-run preset carries 10. Choosing it must
+     move the range to 10 and print ten periods' growth; choosing a preset that
+     carries none must put the range back to the lesson's 1, whatever came
+     before it. */
+  {
+    function Fake(id) { this.id = id; this.value = ''; this.textContent = ''; this.innerHTML = ''; this.listeners = {}; }
+    Fake.prototype.addEventListener = function (t, fn) { (this.listeners[t] = this.listeners[t] || []).push(fn); };
+    Fake.prototype.fire = function (t) { (this.listeners[t] || []).forEach((fn) => fn.call(this, { target: this })); };
+    const els = {};
+    const byId = (id) => els[id] || (els[id] = new Fake(id));
+    const wctx = { console: console, document: { getElementById: byId }, window: {} };
+    vm.createContext(wctx);
+    const inst = { capital: '10000', c_v: '4', s_rate: '1', accumulate_share: '1', invest_threshold: '0' };
+    const lit = (name, value) => 'var ' + name + ' = ' + JSON.stringify(value) + ';\n';
+    const spec = [['capital', 'pos'], ['c_v', 'nn'], ['s_rate', 'nn'], ['accumulate_share', 'share'], ['invest_threshold', 'nn']]
+      .map(([key, kind]) => ({ key: key, what: key, kind: kind, id: 'acIn' + key }));
+    spec.forEach((f) => { byId(f.id).value = inst[f.key]; });
+    byId('acPreset').value = 'short';
+    byId('acPeriods').value = '1';
+    vm.runInContext(block('RATIONAL_JS') + blockFrom(ccSrc, 'CAP_CORE_JS', CC_SOURCE) + blockFrom(ckSrc, 'ACCUMULATE_JS', CK_SOURCE)
+      + lit('PRESETS', { short: inst, long: inst, again: inst }) + lit('SPEC', spec)
+      + lit('TILES', ['acCapital', 'acShareOriginal', 'acHoard']) + lit('REDRAW', {}) + lit('PERIODS', 'acPeriods')
+      + lit('PRESET_PERIODS', { long: 10 }) + lit('PERIODS_DEFAULT', 1) + lit('VIEW', 'expand')
+      + lit('U', { money: '£', qty: '' })
+      + blockFrom(ccSrc, 'CAP_WIRE_JS', CC_SOURCE).replace(/%\(p\)s/g, 'ac').replace(/%\(fn\)s/g, 'acCompute'),
+    wctx, { filename: 'capkit_core.py' });
+    const ten = tile('acCompute', 'expand', grow, { money: '£' }, { periods: 10 }, 'acCapital');
+    eq(byId('acCapital').textContent, '£12,000', 'CAP_WIRE_JS: the lesson\'s 1 period on first paint');
+    const pick = (pid) => { byId('acPreset').value = pid; byId('acPreset').fire('change'); };
+    pick('long');
+    eq(byId('acPeriods').value + ' ' + byId('acCapital').textContent, '10 ' + ten,
+       'CAP_WIRE_JS: the long-run preset runs its own 10 periods');
+    eq(ten, '£967,458,816/15,625', 'acCompute: £10,000 at (6/5)^10');
+    pick('again');
+    eq(byId('acPeriods').value + ' ' + byId('acCapital').textContent, '1 £12,000',
+       'CAP_WIRE_JS: a preset without periods goes back to the lesson\'s figure');
+    eq(wctx.capPresetPeriods('x', { x: 7 }, 3) + ' ' + wctx.capPresetPeriods('y', { x: 7 }, 3), '7 3', 'capPresetPeriods');
+  }
 }
 // ---- end capkit (Volume I modes) ----
 

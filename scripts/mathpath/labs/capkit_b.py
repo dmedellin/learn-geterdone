@@ -44,7 +44,9 @@ of one. Every other field is the box's text as capkit_core writes it.
 VIEW IS NOT A CONTROL. cfg["view"] fixes which inputs and tiles the page
 shows. There are no redraw-only selects in these eight modes.
 schemes/expanded and tendency/law and counter carry the periods range (1 to
-10), shipped from cfg["periods"]; rent/dr2 takes cfg["price_case"] (constant,
+10), shipped from cfg["periods"] or from a preset's own "periods" (capkit_core
+mode_lab), and a tendency step list must match the periods of its own preset;
+rent/dr2 takes cfg["price_case"] (constant,
 falling, rising, worst-soil), which is not a control: every preset is checked
 against it at build time, and the banner says when a reader's edit leaves the
 case.
@@ -1670,9 +1672,10 @@ def _checker(mode, view, cfg, n_periods):
                 raise ValueError("%s: average names %r, which is not a sphere" % (where, p["average"]))
         if mode == "tendency" and view in ("law", "counter"):
             for k in ("c_step", "capital_growth", "s_rate_step", "c_cheapening"):
-                n = len(p.get(k) or [])
-                if n > 1 and n != n_periods:
-                    raise ValueError("%s: %s lists %d figures and the lesson ships %d periods" % (where, k, n, n_periods))
+                n, runs = len(p.get(k) or []), p.get("periods", n_periods)
+                if n > 1 and n != runs:
+                    raise ValueError("%s: %s lists %d figures and the %s ships %d periods"
+                                     % (where, k, n, "preset" if "periods" in p else "lesson", runs))
         if mode == "rent" and view in ("dr1", "dr2"):
             rows = [{"soil": r["soil"], "capital": _f(where, r["capital"], "capital"),
                      "output": _f(where, r["output"], "output")} for r in p["soils"]]

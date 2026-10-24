@@ -190,6 +190,130 @@ class TestReadings(unittest.TestCase):
         self.assertEqual(say("w(e) &le; w(g)"), "w of e is at most w of g")
 
 
+class TestCapitalForms(unittest.TestCase):
+    """Rules added for the Capital read-along; each also pins what it must NOT
+    touch, because every rule here is global to all Subjects."""
+
+    def test_grouped_thousands_are_one_number(self):
+        cases = {
+            "10,000": "10000",
+            "1,000·3 + 3,000·4": "1000 times 3 plus 3000 times 4",
+            "dominance: 1,001,000 > 1,000,000": "dominance, 1001000 is greater than 1000000",
+            "990 / 50,940 = 11/566": "990 over 50940 equals 11 over 566",
+            # a list is not a number: no group may continue or run into one
+            "60,72,90,120,180,360": "60, 72, 90, 120, 180, 360",
+            "(1, 2)": "1, 2",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+    def test_pounds_follow_the_amount(self):
+        cases = {
+            "£1,062": "1062 pounds",
+            "E[winnings] = 3.5 − 2 = £1.50": "E of winnings equals 3.5 minus 2 equals 1.50 pounds",
+            "−£10": "negative 10 pounds",
+            "hours in £1": "hours in 1 pound",
+            "£": "pounds",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+    def test_shillings_and_pence(self):
+        cases = {
+            "3s 6d": "3 shillings 6 pence",
+            "100 × 1s 6d =": "100 times 1 shilling 6 pence equals",
+            "24 · 1½d = 48 · ¾d = 3s":
+                "24 times 1 and a half pence equals 48 times three farthings equals 3 shillings",
+            "a halfpenny: ½d": "a halfpenny, a halfpenny",
+            "10 hours:  36d / 10 = 3 3/5 d an hour":
+                "10 hours, 36 pence over 10 equals 3 and 3 over 5 pence an hour",
+            "12 · 6d = 72d = 6s": "12 times 6 pence equals 72 pence equals 6 shillings",
+            "10s / 144 = 120d / 144 = 5/6 d a piece":
+                "10 shillings over 144 equals 120 pence over 144 equals 5 over 6 of a penny a piece",
+            "£24,883 4s": "24883 pounds 4 shillings",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+    def test_s_and_d_alone_are_not_money(self):
+        """Surplus value, seconds, days and distances keep their readings."""
+        cases = {
+            "400c + 100v + 100s": "400 c plus 100 v plus 100 s",
+            "40 · 3s = 120s": "40 times 3 s equals 120 s",
+            "36d / 12": "36 d over 12",
+            "two nines, and 1 d 11 h 51 min 9.58 s":
+                "two nines, and 1 d 11 h 51 minutes 9.58 seconds",
+            "RTT_min = 2d / (⅔c)": "RTT sub min equals 2 d over two thirds c",
+            "25q + 10d": "25 q plus 10 d",
+            "s / v": "s over v",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+    def test_departments(self):
+        cases = {
+            "I(v + s) = IIc": "Department one's v plus s, equals Department two's c",
+            "IIc": "Department two's c",
+            "Ic is replaced within Department I":
+                "Department one's c is replaced within Department one",
+            "within II: IIv + IIs = 1000":
+                "within Department two, Department two's v plus Department two's s equals 1000",
+            "revenue:  I(1000 + 1000) + II(500 + 500) = 3000":
+                "revenue, Department one's 1000 plus 1000, plus Department two's 500 plus 500, equals 3000",
+            "I:  4000c + 1000v + 1000s = 6000":
+                "Department one, 4000 c plus 1000 v plus 1000 s equals 6000",
+            "unsold:  100 of Department I's product": "unsold, 100 of Department one's product",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+    def test_roman_letters_elsewhere_are_letters(self):
+        cases = {
+            "DR II: successive capitals": "DR II, successive capitals",
+            "II / (I + II)": "II over the quantity I plus II",
+            "Is −2 ∈ A?": "I s negative 2 in A ?",
+            "(I - gP)v = r": "the quantity I minus g P, times v equals r",
+            "I(X; Y)": "I of X, Y",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+    def test_short_words_are_words(self):
+        cases = {
+            "due = 500": "due equals 500",
+            "out − in": "out minus in",
+            "use = 3": "use equals 3",
+            "gap = bound − incumbent": "gap equals bound minus incumbent",
+            "straggler tax = 4.33×": "straggler tax equals 4.33 times",
+            "x = net + tax": "x equals net plus tax",
+            "cap = fixed issue + gold": "cap equals fixed issue plus gold",
+            # still products when a number or a power touches them
+            "4tax": "4 t A x",
+            "ax + by": "A x plus b y",
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say(text), spoken)
+
+
+class TestMathBlockPayload(unittest.TestCase):
+    def test_a_string_payload_is_refused(self):
+        """("math", "x = 1") would iterate the string and render one character
+        per line; three Capital lessons shipped like that."""
+        from mathpath import render
+        with self.assertRaises(TypeError):
+            render._block("math", "x = 1")
+        with self.assertRaises(TypeError):
+            render._mathblock("x = 1")
+        self.assertIn('data-say="x equals 1"', render._block("math", ["x = 1"]))
+
+
 class TestProseIslands(unittest.TestCase):
     """Math written into prose without backticks still reaches the voice as words."""
 

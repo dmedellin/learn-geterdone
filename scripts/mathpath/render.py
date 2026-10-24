@@ -93,6 +93,11 @@ def esc_inline(text):
 
 
 def _mathblock(lines):
+    # ("math", "one line") iterates its characters: the block renders and
+    # reads one character per line, and every check passes. Three Capital
+    # lessons shipped that way before this guard.
+    if isinstance(lines, str) or not all(isinstance(line, str) for line in lines):
+        raise TypeError("a math block takes a list of lines, not %r" % (lines,))
     spoken = ". ".join(speech.say_block(lines, _SPOKEN))
     return '<div class="mathblock" data-say="%s">%s</div>' % (
         esc(spoken), "\n".join(esc(line) for line in lines))

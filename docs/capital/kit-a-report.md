@@ -16,7 +16,7 @@ As far as I compared, both halves now print money and rates identically.
 ## Conventions as implemented
 
 - **Input syntax.** Inputs are text boxes with id `<prefix>In<CamelField>`, for example `suInS` or `ciInEveryDays`. Records are written `a, 1, 2; b, 3, 4`, and yes/no fields take `yes` or `no`.
-- **Shipped controls.** The preset menu is `<prefix>Preset`; the status banner is `<prefix>Status` and the table `<prefix>Table`. The workday bar is `wdBar`. Iterating views get a `<prefix>Periods` range (1 to 10) shipped from `cfg["periods"]`, default 5. The redraw-only selects are `foStage` (cfg `stage`), `wdHold` (cfg `hold`) and `maTest` (cfg `test`).
+- **Shipped controls.** The preset menu is `<prefix>Preset`; the status banner is `<prefix>Status` and the table `<prefix>Table`. The workday bar is `wdBar`. Iterating views get a `<prefix>Periods` range (1 to 10) shipped from `cfg["periods"]`, default 5. A preset of an iterating view may carry its own `periods` (1 to 10): choosing it sets the range, choosing a preset without one sets the range back to the lesson's `cfg["periods"]`, and the range starts at the chosen preset's figure. The redraw-only selects are `foStage` (cfg `stage`), `wdHold` (cfg `hold`) and `maTest` (cfg `test`).
 - **cfg keys.** Every mode takes `view`, `presets` and `preset`, plus `money_unit`, `qty_unit`, `title`, `panel_title` and `panel_intro`. The default money unit is £ for money, circuit, machine and accumulate, `s` for surplus and wages, and `hours` (the only one allowed) for value, form and workday.
 - **Build-time refusals.** Each of these raises an error naming the preset:
   - a preset key that is not an input of its view, which catches typos;
@@ -42,7 +42,7 @@ Prefixes: va fo mo ci su wd ma wa ac. Money formats: `9/5 h`, `£12,000`, `−£
 - `stage`: goods `[{name,qty,unit,hours}]` (2 to 7; unit may be ""), `equivalent`, and an optional preset-only `marx: ["20 linen = 1 coat", …]` that is checked at build time to balance in hours. The redraw-only `stage` takes elementary|expanded|general|money. Tiles:
   - foEquation, `20 yards linen = 1 coat`, with equations joined by `; `;
   - foGeneral, `none` in the elementary and expanded stages, `linen` in general, `gold (as money)` in money;
-  - foRelative, `2 coat`.
+  - foRelative, `2 coats` (more than one is plural: the unit when there is one, `2 quarters corn`, else the name).
 - `count`: goods, equivalent. Tiles: foPairs `15`, foWithEquivalent `5`.
 
 **money**

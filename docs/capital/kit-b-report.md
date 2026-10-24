@@ -55,7 +55,7 @@ Top-level keys:
 - `money_unit`: "£", "s" or "hours"; the default is "£".
 - `qty_unit`
 - `presets`: a list of {id, label?, ...fields, expect?}.
-- `periods`: only on iterating views; the default is 4. On any other view it raises.
+- `periods`: only on iterating views; the default is 4. On any other view it raises. A preset of an iterating view may carry its own `periods`, which overrides the lesson's for that preset (see kit-a-report); a tendency step list must then match the preset's own periods.
 - `price_case`: rent/dr2 only. It is one of constant, falling, rising or worst-soil. Each preset is checked against it at build time.
 - `stage`, `hold` and `test`: rejected.
 

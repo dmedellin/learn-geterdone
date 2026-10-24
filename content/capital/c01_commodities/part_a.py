@@ -708,7 +708,7 @@ LESSONS = [
                            {"name": "corn", "qty": 1, "unit": "quarter", "hours": 20},
                            {"name": "gold", "qty": 2, "unit": "ounces", "hours": 20},
                            {"name": "iron", "qty": "1/2", "unit": "ton", "hours": 20}],
-                 "equivalent": "linen", "expect": {"foEquation": "20 yards linen = 2 coat", "foRelative": "2 coat"}},
+                 "equivalent": "linen", "expect": {"foEquation": "20 yards linen = 2 coats", "foRelative": "2 coats"}},
                 {"id": "gold", "label": "Gold as the equivalent: the price form",
                  "goods": [{"name": "linen", "qty": 20, "unit": "yards", "hours": 20},
                            {"name": "gold", "qty": 2, "unit": "ounces", "hours": 20},

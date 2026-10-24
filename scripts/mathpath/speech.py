@@ -133,7 +133,10 @@ _SILENT = re.compile(r"[─-▟]")
 _TOKEN = re.compile(
     r"(?P<gap> {2,}|\t+)"
     r"|(?P<ws> )"
-    r"|(?P<num>\d{1,3}(?: \d{3})+(?:\.\d+)?(?!\d)|\d+(?:\.\d+)?)"
+    # 100 000 and 10,000 are one number. A comma group must not continue a
+    # list (60,72,90,120,180: the lookbehind) or run on into one (the lookahead).
+    r"|(?P<num>\d{1,3}(?: \d{3})+(?:\.\d+)?(?!\d)"
+    r"|(?<![\d,])[1-9]\d{0,2}(?:,\d{3})+(?:\.\d+)?(?!,?\d)|\d+(?:\.\d+)?)"
     r"|(?P<word>[A-Za-z]+(?:'[a-z]+)?)"
     r"|(?P<sup>[%s]+)"
     r"|(?P<sub>[%s]+)"
@@ -154,6 +157,13 @@ in is it its key log low max min new no nor not now of off old on one or our
 out own per put row run set so ten the top two up use was way who why yes yet
 all any few her him his lot may met one sum six who add big bit cut due far
 fit hit let lo mid odd pay raw red sat tie try via win won
+""".split())
+
+# Words that are never a product of variables, even at the head of a line or
+# after `=` (`gap = 100 − 200`, `tax = 10`, `in = out`). A number or a power
+# touching one still makes it a product (`4tax`, `tax²`).
+ALWAYS_WORDS = set("""
+due out use gap tax net cap
 """.split())
 
 # What survives in a spoken string. Anything else is unspoken residue.
@@ -414,6 +424,8 @@ def _product(tokens, i, tok):
     beside = before in _ARITH or after in _ARITH
     if tok in ("th", "st", "nd", "rd") and i and tokens[i - 1][1] in ("-", "−"):
         return False  # the j-th character
+    if tok.lower() in ALWAYS_WORDS:
+        return False  # gap = bound − incumbent: the word, not g times a times p
     if tok.lower() not in COMMON_WORDS:
         return beside or (before == "(" and after == ")")  # Θ(nk), not P(job ...)
     return beside and before in _ARITH | {None} and after in _ARITH | {None}
@@ -443,7 +455,7 @@ def _say(text):
         elif kind == "ws":
             continue
         elif kind == "num":
-            say(tok.replace(" ", ""))
+            say(tok.replace(" ", "").replace(",", ""))
         elif kind == "word":
             call = touching_next and tokens[i + 1][1] == "("
             if re.fullmatch(r"d[a-z]", tok) and tok not in COMMON_WORDS \
@@ -671,6 +683,12 @@ def _say(text):
             else:
                 say("the integral over %s of" % lower)
                 skip_to = i + 2
+        elif tok in ("£", "€") and touching_next and tokens[i + 1][0] == "num":
+            # £1,062 is "1062 pounds", as $400 is said "400 dollars"
+            amount = tokens[i + 1][1].replace(" ", "").replace(",", "")
+            say(amount)
+            say({"£": "pound", "€": "euro"}[tok] + ("" if amount == "1" else "s"))
+            skip_to = i + 2
         elif tok in SYMBOLS:
             phrase = SYMBOLS[tok]
             if tok in "⌊⌈√∛" and i and tokens[i - 1][0] == "num":
@@ -736,6 +754,90 @@ def _arity(tokens, comma_at):
 _CHOOSE = re.compile(r"\b(?:C|binom)\(\s*([\w+−\- ]+?)\s*,\s*([\w+−\- ]+?)\s*\)")
 
 
+# --- shillings and pence ---------------------------------------------------------
+#
+# `3s 6d` is three shillings and sixpence, but a bare `s` after a number is
+# also seconds (`9.58 s`) and, in Capital, surplus value (`400c + 100v + 100s`),
+# and a bare `d` is a distance or a day (`2d/c`, `10 d 20 h`). So a run is read
+# as old money only when it carries a form nothing else writes:
+#
+#   * a shillings-and-pence pair, `1s 6d`, `3s 7 1/5 d`, `£24,883 4s`;
+#   * pence in a fraction glyph, `1½d`, `¾d`;
+#   * a mixed number of pence, `3 3/5 d`;
+#   * whole pence and whole shillings side by side, `12 · 6d = 72d = 6s`.
+#
+# In such a run every `Ns` is shillings and every `Nd` pence. A run with pence
+# alone (`36d / 12 = 3d`) or shillings alone (`40 · 3s = 120s`) is left as it
+# is written: no rule can tell `3s` from `3 s` of surplus value, and those need
+# a spoken form.
+
+_N = r"(?<![\w.,/])(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)"
+_GLYPH = {"½": "a half", "¼": "a quarter", "¾": "three quarters"}
+_GLYPH_ALONE = {"½": "a halfpenny", "¼": "a farthing", "¾": "three farthings"}
+_PENCE = re.compile(_N + r"d\b")
+_SHILLINGS = re.compile(_N + r"s\b")
+_GLYPH_PENCE = re.compile(r"(?<![\w.,/])(\d*)([½¼¾])d\b")
+_MIXED_PENCE = re.compile(r"(?<![\w.,/])(\d+) (\d+/\d+) d\b")
+_FRACTION_PENCE = re.compile(r"(?<![\w.,/])(\d+/\d+) d\b")
+_OLD_MONEY = re.compile(
+    r"(?<![\w.,/])\d+s (?:\d+ \d+/\d+ d|\d*[½¼¾]d|\d+(?:\.\d+)?d)\b"  # 1s 6d
+    r"|£[\d,]+(?:\.\d+)? \d+s\b"                                         # £24,883 4s
+    r"|(?<![\w.,/])\d*[½¼¾]d\b"                                          # 1½d
+    r"|(?<![\w.,/])\d+ \d+/\d+ d\b")                                     # 3 3/5 d
+
+
+def _old_money(text):
+    """Shillings and pence, said as such, in a run that is unmistakably £sd."""
+    if not (_OLD_MONEY.search(text) or (_PENCE.search(text) and _SHILLINGS.search(text))):
+        return text
+
+    def unit(n, one, many):
+        return "%s %s" % (n, one if n == "1" else many)
+
+    text = _GLYPH_PENCE.sub(lambda m: "%s and %s pence" % (m.group(1), _GLYPH[m.group(2)])
+                            if m.group(1) else _GLYPH_ALONE[m.group(2)], text)
+    text = _MIXED_PENCE.sub(lambda m: "%s and %s pence" % (m.group(1), m.group(2)), text)
+    text = _FRACTION_PENCE.sub(lambda m: "%s of a penny" % m.group(1), text)
+    text = _PENCE.sub(lambda m: unit(m.group(1), "penny", "pence"), text)
+    return _SHILLINGS.sub(lambda m: unit(m.group(1), "shilling", "shillings"), text)
+
+
+# --- Marx's departments ----------------------------------------------------------
+#
+# Department I makes means of production, Department II means of consumption,
+# and the reproduction schemes write them as Roman numerals: `I(v + s) = IIc`.
+# A Roman numeral is read as a department only in a form that says so:
+#
+#   * after the word: `Department I`, `Department II's product`;
+#   * glued to c or v, or to s beside another department mark: `IIc`, `Iv`, `IIs`;
+#   * called on a sum of c, v, s and numbers: `I(v + s)`, `II(500 + 500)`;
+#   * standing alone, in a run that is a reproduction scheme (`4000c + 1000v`)
+#     or already names a department: `I:  4000c + 1000v + 1000s`, `within I:  Ic`.
+#
+# Anything else (`DR II`, `II / (I + II)` for two periods of turnover, `I` as
+# an identity matrix or a pronoun) stays as written.
+
+_ROMAN = {"I": "one", "II": "two", "III": "three"}
+_DEPT_WORD = re.compile(r"\bDepartment (III|II|I)\b")
+_DEPT_PART = re.compile(r"(?<![\w'])(II|I)([cv]|s(?=\s*[=+−\-:,)]|$))(?![\w'])")
+_DEPT_SUM = re.compile(r"(?<![\w'])(II|I)\(\s*((?:[cvs]|\d+)(?:\s*[+−-]\s*(?:[cvs]|\d+))+)\s*\)")
+_DEPT_ALONE = re.compile(r"(?<![\w'(])(II|I)(?='s\b|(?![\w'(]))")
+_SCHEME = re.compile(r"\d[cvs]\b.*[+−-].*\d[cvs]\b")
+
+
+def _departments(text):
+    """Roman numerals that name Marx's departments, said as departments."""
+    marked = bool(_DEPT_WORD.search(text) or _DEPT_SUM.search(text)
+                  or re.search(r"(?<![\w'])II?[cv](?![\w'])", text))
+    text = _DEPT_WORD.sub(lambda m: "Department " + _ROMAN[m.group(1)], text)
+    text = _DEPT_SUM.sub(lambda m: "Department %s's %s ," % (_ROMAN[m.group(1)], m.group(2)), text)
+    if marked or re.search(r"(?<![\w'])IIs(?![\w'])", text):
+        text = _DEPT_PART.sub(lambda m: "Department %s's %s" % (_ROMAN[m.group(1)], m.group(2)), text)
+    if marked or _SCHEME.search(text):
+        text = _DEPT_ALONE.sub(lambda m: "Department " + _ROMAN[m.group(1)], text)
+    return text
+
+
 def say(text, *, override=None):
     """One authored math run (inline span or one display line) -> words."""
     if override is not None:
@@ -749,6 +851,7 @@ def say(text, *, override=None):
         # "turn each `≤` into a `≥`": a lone symbol is named, not read as a relation
         return RELATION_NAMES[text.strip()]
     text = _CHOOSE.sub(lambda m: "%s choose %s" % (m.group(1), m.group(2)), text)
+    text = _old_money(_departments(text))
     return _say(text)
 
 

@@ -39,10 +39,13 @@ Python:
   units(cfg, kit, allowed, default) (money_unit, qty_unit), validated
   pick_view(cfg, kit, views)       cfg["view"] or the first; raises on unknown
   choice(cfg, kit, key, options)   a redraw-only select's shipped value
-  periods(cfg, kit, default)       cfg["periods"], 1..10, refused above 10
+  periods(cfg, kit, default)       cfg["periods"], 1..10, refused above 10; a
+                                   preset of an iterating view may carry its
+                                   own "periods", and the lab-level value is
+                                   the default for every preset that does not
   field_text(where, key, kind, v)  a preset value -> the text the box holds
-  presets(cfg, kit, fields, redraw_keys=(), check=None)
-                                   (table, menu, expect, chosen)
+  presets(cfg, kit, fields, redraw_keys=(), check=None, n_periods=None)
+                                   (table, menu, expect, chosen, periods by preset)
   mode_lab(cfg, ...)               the whole Lab for one mode and view: preset
                                    menu, text inputs, redraw-only selects, the
                                    periods range, tiles, table, banner, the
@@ -226,6 +229,12 @@ CAP_CORE_JS = r"""
     return out;
   }
 
+  /* The periods a preset runs: its own cfg periods, else the lesson's. A
+     preset without one goes back to the lesson's figure, so what a preset
+     prints never depends on which preset was chosen before it. */
+  function capPresetPeriods(pid, own, fallback) {
+    return Object.prototype.hasOwnProperty.call(own, pid) ? own[pid] : fallback;
+  }
   function capSet(id, text) { document.getElementById(id).textContent = text; }
   function capBlank(ids) { ids.forEach(function (id) { capSet(id, CAP_DASH); }); }
   function capRefuse(statusEl, ids, why) {
@@ -283,6 +292,7 @@ CAP_WIRE_JS = r"""
     var inst = PRESETS[presetS.value];
     if (!inst) return;
     SPEC.forEach(function (f) { if (inst[f.key] !== undefined) field(f.id).value = inst[f.key]; });
+    if (PERIODS) field(PERIODS).value = String(capPresetPeriods(presetS.value, PRESET_PERIODS, PERIODS_DEFAULT));
     redraw();
   });
   SPEC.forEach(function (f) { field(f.id).addEventListener('input', redraw); });
@@ -408,8 +418,8 @@ def _js_kind(key, label, kind):
     return spec
 
 
-def presets(cfg, kit, fields, redraw_keys=(), check=None):
-    """(instance table, menu pairs, expect by preset id, the chosen id).
+def presets(cfg, kit, fields, redraw_keys=(), check=None, n_periods=None):
+    """(instance table, menu pairs, expect by preset id, the chosen id, periods by preset id).
 
     fields: [(key, label, kind, default)] -- the instance inputs this view
     shows. A preset lacking a field takes its default; a default of None
@@ -422,7 +432,11 @@ def presets(cfg, kit, fields, redraw_keys=(), check=None):
     if not isinstance(plist, list) or not plist:
         raise ValueError("%s: cfg['presets'] must be a non-empty list of instances" % kit)
     known = {f[0] for f in fields} | {"id", "label", "note", "expect"}
-    table, menu, expect = {}, [], {}
+    if n_periods is not None:
+        # an iterating view: a preset may run its own number of periods
+        known.add("periods")
+        redraw_keys = tuple(k for k in redraw_keys if k != "periods")
+    table, menu, expect, own_periods = {}, [], {}, {}
     for p in plist:
         pid = p.get("id") if isinstance(p, dict) else None
         if not isinstance(pid, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", pid):
@@ -449,6 +463,8 @@ def presets(cfg, kit, fields, redraw_keys=(), check=None):
             if value is None and kind not in ("opt", "optcount"):
                 raise ValueError("%s: needs %s" % (where, key))
             inst[key] = field_text(where, key, kind, value)
+        if "periods" in p:
+            own_periods[pid] = periods(p, where)
         if check is not None:
             check(where, p)
         table[pid] = inst
@@ -457,7 +473,7 @@ def presets(cfg, kit, fields, redraw_keys=(), check=None):
     chosen = cfg.get("preset", plist[0]["id"])
     if chosen not in table:
         raise ValueError("%s: cfg['preset'] %r is not one of the presets (%s)" % (kit, chosen, ", ".join(table)))
-    return table, menu, expect, chosen
+    return table, menu, expect, chosen, own_periods
 
 
 def units(cfg, kit, allowed=MONEY_UNITS, default="hours", qty_default=""):
@@ -555,12 +571,16 @@ def mode_lab(cfg, *, kit, prefix, view, fields, tiles, mode_js, fn, money, qty,
     tiles:  [(label, id)].
     redraw: [(cfg key, element id, label, [(value, text)])] -- redraw-only
             selects, shipped from cfg[key], defaulting to the first option.
-    n_periods: None, or the shipped number of periods (a 1..10 range, id
-            prefix + 'Periods').
+    n_periods: None, or the lesson's number of periods (a 1..10 range, id
+            prefix + 'Periods'). A preset may carry its own "periods"
+            (1..10); choosing it sets the range, and choosing one without
+            sets the range back to n_periods. The range starts at the chosen
+            preset's figure.
     fn:     the name of the mode's pure JS function.
     Returns Lab(expect={prefix + 'Preset': {preset id: {tile: text}}}).
     """
-    table, menu, expect, chosen = presets(cfg, kit, fields, tuple(k for k, *_ in redraw) + ("periods",), check)
+    table, menu, expect, chosen, own_periods = presets(
+        cfg, kit, fields, tuple(k for k, *_ in redraw) + ("periods",), check, n_periods)
     here = table[chosen]
     spec = []
     controls = select_html(prefix + "Preset", "Worked example", menu, chosen)
@@ -577,7 +597,7 @@ def mode_lab(cfg, *, kit, prefix, view, fields, tiles, mode_js, fn, money, qty,
     periods_id = ""
     if n_periods is not None:
         periods_id = prefix + "Periods"
-        controls += range_html(periods_id, "Periods", 1, 10, n_periods)
+        controls += range_html(periods_id, "Periods", 1, 10, own_periods.get(chosen, n_periods))
     controls += kpis_html(tiles)
     ids = [s["id"] for s in spec] + list(redraw_ids.values()) + [cid for _l, cid in tiles]
     if len(set(ids)) != len(ids):
@@ -586,6 +606,7 @@ def mode_lab(cfg, *, kit, prefix, view, fields, tiles, mode_js, fn, money, qty,
               + cfg_literal("PRESETS", table) + cfg_literal("SPEC", spec)
               + cfg_literal("TILES", [cid for _label, cid in tiles])
               + cfg_literal("REDRAW", redraw_ids) + cfg_literal("PERIODS", periods_id)
+              + cfg_literal("PRESET_PERIODS", own_periods) + cfg_literal("PERIODS_DEFAULT", n_periods or 0)
               + cfg_literal("VIEW", view) + cfg_literal("U", {"money": money, "qty": qty})
               + CAP_WIRE_JS % {"p": prefix, "fn": fn})
     return Lab(title=cfg.get("title", title), subtitle=subtitle,

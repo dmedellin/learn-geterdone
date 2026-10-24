@@ -164,7 +164,31 @@ FORM_JS = r"""
   /* form: each good's lot carries its hours; a lot of a exchanges for
      b.qty * a.hours / b.hours of b, so every equation printed balances. */
   function foFetch(a, b) { return Rdiv(Rmul(b.qty, a.hours), b.hours); }
-  function foLotOf(g, q) { return capNumText(q) + ' ' + (g.unit ? g.unit + ' ' : '') + g.name; }
+  /* More than one of a thing is plural: 2 coats, 2 quarters corn. The unit
+     takes the plural when there is one (the name is then a mass noun: 20
+     yards linen), else the name does. A word already ending in s, an
+     abbreviation (lb, cwt) and a unit ending in "of" (head of cattle) stay as
+     they are; "pair of boots" becomes "pairs of boots". A fraction up to 1 is
+     singular: 1/2 ton iron. */
+  var FO_ABBREV = ['lb', 'lbs', 'oz', 'cwt', 'qr', 'qrs', 'yd', 'yds', 'ft', 'kg', 'cm', 'mm', 'km', 'g', 'm'];
+  function foPluralWord(w) {
+    if (!w || /s$/i.test(w) || FO_ABBREV.indexOf(w.toLowerCase()) >= 0 || !/^[A-Za-z]+$/.test(w)) return w;
+    if (/(ch|sh|x|z)$/i.test(w)) return w + 'es';
+    if (/[^aeiou]y$/i.test(w)) return w.slice(0, -1) + 'ies';
+    return w + 's';
+  }
+  function foPlural(phrase) {
+    var words = phrase.split(' '), at = words.indexOf('of');
+    if (at === words.length - 1) return phrase;
+    var k = at > 0 ? at - 1 : words.length - 1;
+    words[k] = foPluralWord(words[k]);
+    return words.join(' ');
+  }
+  function foLotOf(g, q) {
+    var many = Rcmp(q, R(1n)) > 0;
+    return capNumText(q) + ' ' + (g.unit ? (many ? foPlural(g.unit) : g.unit) + ' ' + g.name
+                                         : (many ? foPlural(g.name) : g.name));
+  }
   function foFind(goods, name) {
     for (var i = 0; i < goods.length; i += 1) if (goods[i].name === name) return goods[i];
     return null;
