@@ -1076,7 +1076,8 @@ LESSONS = [
                   "with all surplus value. It was explaining &ldquo;the excess of agricultural "
                   "profit over the average profit&rdquo;. Earlier writers did not have that "
                   "problem. For Petty and Cantillon rent was the normal form of surplus and "
-                  "profit hardly existed; for the physiocrats, the French economists around "
+                  "profit not yet a category of its own, still mixed up with wages; for the "
+                  "physiocrats, the French economists around "
                   "Quesnay, agriculture was the only productive labour and rent the only "
                   "surplus. To see why, Marx goes back to rent before capital."),
             ("p", "In labour rent the producer has his own holding, plough and cattle, and works "
@@ -1091,8 +1092,9 @@ LESSONS = [
             ("p", "Marx draws a consequence from the two days being fixed. The days a peasant "
                   "works for himself are his to make more productive; better methods, new "
                   "wants and a market for his surplus all spur him on, and the custom that "
-                  "fixes the lord's share protects his. So labour rent leaves room for a serf to "
-                  "become comparatively well off, the thing some historians found surprising."),
+                  "fixes the lord's share protects his. So labour rent leaves open what Marx "
+                  "calls &ldquo;a certain economic development&rdquo; on the serf's side, "
+                  "depending on circumstances."),
             ("p", "Rent in kind changes the form and not the substance. The producer now works "
                   "his whole time on his own holding and hands over a share of the product. "
                   "&ldquo;The labor of the producer for himself and his labor for the landlord "

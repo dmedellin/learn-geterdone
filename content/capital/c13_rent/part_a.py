@@ -89,7 +89,7 @@ LESSONS = [
                   "&ldquo;land-capital&rdquo;, and the interest on it may be part of what the "
                   "landowner collects; but it is interest on capital, not rent for the soil as "
                   "such. When the lease ends the improvements stay with the land, and the next "
-                  "lease charges for them. Marx's dry Latin for the landowners is "
+                  "lease charges for them. Marx borrows Horace's Latin for the landowners, "
                   "&ldquo;fruges consumere nati&rdquo;, born to consume the fruits of the earth, "
                   "and he notes that the obstacle this puts in the way of improvement was "
                   "denounced by James Anderson, a Scottish farmer who worked "
@@ -236,8 +236,8 @@ LESSONS = [
                    "It rises from £4,000 to £4,200"],
              "c": 1,
              "why": "At 4% the same £200 is the income of £5,000, so the price moves against the "
-                    "rate. £3,200 multiplies instead of dividing; £4,000 ignores the rate; £4,200 "
-                    "adds a year's rent."},
+                    "rate. £3,200 cuts the price by a fifth, moving it with the rate instead of "
+                    "against it; £4,000 ignores the rate; £4,200 adds a year's rent."},
             {"q": "A tenant pays £200 a year, of which £50 is interest on drains the landowner "
                   "inherited with the land. On Marx's definitions, what is the ground rent "
                   "proper?",
@@ -477,12 +477,12 @@ LESSONS = [
             {"q": "Steam-driven mills have a cost price of 200 and the average rate of profit is "
                   "10%. A mill on a waterfall has a cost price of 180. What is its surplus profit "
                   "by Marx's first measure?",
-             "a": ["20", "22", "18", "38"],
+             "a": ["20", "22", "18", "40"],
              "c": 0,
              "why": "The price is `200 + 20 = 220`; the water user's profit is `220 − 180 = 40` "
                     "against the steam user's 20, so 20. Twenty-two is the second measure, "
-                    "`220 − 198`; 18 is 10% of 180; 38 subtracts only the water user's own "
-                    "profit."},
+                    "`220 − 198`; 18 is 10% of 180; 40 is the water user's whole profit, not "
+                    "its surplus over the steam user's."},
             {"q": "On Marx's account, what is the source of the water user's surplus profit?",
              "a": ["The value the waterfall adds to the product",
                    "The landowner's title to the waterfall",
@@ -754,9 +754,10 @@ LESSONS = [
              "a": ["180s", "240s", "120s", "300s"],
              "c": 0,
              "why": "The worst soil sets the price: `120 / 2 = 60`s a quarter. The best soil's "
-                    "5 quarters fetch 300s against its 120s, a rent of 180s. 240s forgets the "
-                    "profit; 120s is the middle soil's figure at 60s plus nothing for it; 300s "
-                    "is its whole product."},
+                    "5 quarters fetch 300s against its 120s, a rent of 180s. 240s subtracts "
+                    "Marx's 60s of cost and profit instead of this question's 120s; 120s is the "
+                    "cost and profit itself, not the surplus over it; 300s is the whole "
+                    "product."},
             {"q": "In the improved preset the price falls from 60s to 30s. What happens to the "
                   "total rent?",
              "a": ["It halves, to 180s",
@@ -842,11 +843,11 @@ LESSONS = [
             "is not the rule but how the surplus becomes rent."
         ),
         "key": [
-            "DR II: successive capitals on one field",
+            "second form: successive capitals on one field",
             "price set by the least productive dose",
             "D: 4, 3, 2, 1 quarters on 50s: rent 360s",
             "same 360s as A–D side by side",
-            "harder to fix in a lease than DR I",
+            "harder to fix in a lease than the first form",
         ],
         "key_label": "The second form in five lines",
         "concepts_intro": (
@@ -1003,7 +1004,7 @@ LESSONS = [
             ],
             "lines": [
                 "cost and profit:  60 shillings a dose",
-                "price:  60 / 1 = 60 shillings (the 4th dose)",
+                "price:  60 / 1 = 60 shillings (dose 4)",
                 "doses 1 to 3:  (4 + 3 + 2) · 60 − 3 · 60 = 360",
                 "dose 4:  1 · 60 − 60 = 0",
                 "rent of the acre:  360 shillings",
@@ -1022,8 +1023,8 @@ LESSONS = [
              "c": 0,
              "why": "The price is `60 / 1 = 60`s. The doses fetch `6 · 60 = 360`s against "
                     "`3 · 60 = 180`s of cost and profit, leaving 180s. 360s is the whole "
-                    "product; 120s counts only the first dose's surplus; 240s forgets the "
-                    "profit on the capital."},
+                    "product; 120s counts only the first dose's surplus; 240s deducts the cost "
+                    "and profit of two doses instead of three."},
             {"q": "In the second-on-d preset, D's second dose yields 3 quarters and A still "
                   "regulates the price. What happens to the price and the total rent?",
              "a": ["The price falls and the rent falls",
@@ -1048,7 +1049,7 @@ LESSONS = [
                     "rent too."},
         ],
         "mistakes": [
-            ("Thinking DR II is a different source of rent from DR I",
+            ("Thinking differential rent II is a different source of rent from differential rent I",
              "Laying capital on the same field sounds like a different thing from farming more "
              "fields. Marx's test is the same-acre preset: Table I's four capitals laid on one "
              "acre of D with yields of 4, 3, 2 and 1 make exactly the surpluses of A, B, C and "
@@ -1395,7 +1396,7 @@ LESSONS = [
                   "a-drops-out preset, Marx's Table IV, gives the lab exactly that: all four soils "
                   "and a market of 18 quarters. It prints 30s a quarter, rents of 0s, 0s, 60s and "
                   "120s, and a total of 180s, Marx's fall &ldquo;from 36 pounds sterling to 9 "
-                  "pounds sterling&rdquo;. A misprint on the way: the Kerr text says that "
+                  "pounds sterling&rdquo;. A slip on the way: the Kerr text says that "
                   "&ldquo;D and its price of production of 30 shillings&rdquo; would regulate. "
                   "It is B: D's price of production is 15s, and B's is the 30s the rest of the "
                   "chapter uses."),

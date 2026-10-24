@@ -90,7 +90,8 @@ COURSE = {
         "Expect the tables to be rebuilt. The Kerr edition prints Marx's tables as images, "
         "which the lessons cite by page; each &ldquo;Marx's figures&rdquo; preset is built "
         "from a printed table or from the sentences around it, and checked against both. The labs reckon in shillings throughout; Marx changes from shillings to pounds "
-        "after Chapter 39, and 60s is his £3.",
+        "after Chapter 39, and 60s is his £3. Differential Rent I is the lesson to read "
+        "slowly: the five lessons after it reuse its four soils and its price rule.",
         "Keep the definitions apart from the verdict. Every figure is computed on Marx's "
         "definitions, above all his claim that land adds no value and rent is a share of "
         "surplus value. Ricardo built the theory Marx is correcting, and the economists who "
