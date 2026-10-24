@@ -72,7 +72,7 @@ LESSONS = [
             ("p", "You know the working day from Volume I: labour-power is bought by the day, "
                   "and the day is cut into necessary and surplus labour. Marx now wants the "
                   "matching unit for capital, and he chooses the year. His reason is "
-                  "agricultural, and a little quaint: the main crops of the temperate zone, "
+                  "agricultural: the main crops of the temperate zone, "
                   "where capitalist production grew up, come once a year. Nothing in the "
                   "arithmetic depends on the reason. The year is a yardstick, and the rest of "
                   "Part II measures everything against it."),
@@ -244,9 +244,9 @@ LESSONS = [
         "note": (
             "The lab counts turnovers as if every one were identical and the year began with "
             "the first; Marx's own tables in Chapter 15 show the last turnover of a year "
-            "running on into the next. The split of Marx's three months into 9 weeks of "
-            "production and 4 of circulation is illustrative; the chapter gives only the "
-            "total."
+            "running on into the next. The splits of Marx's three months into 9 weeks of "
+            "production and 4 of circulation, and of his eighteen months into 65 and 13, "
+            "are illustrative; the chapter gives only the totals."
         ),
     },
     # ---------------------------------------------------------------- 02
@@ -294,7 +294,8 @@ LESSONS = [
             ("Wear and repair",
              "Wear is the value fixed capital transfers on average as its use-value is used "
              "up, reckoned over its average life. Repairs are a separate, additional outlay "
-             "that keeps it alive for that life, and they count as circulating capital."),
+             "that keeps it alive for that life; Marx says they fit neither category "
+             "cleanly, but belong with more justification to circulating capital."),
         ],
         "read_title": "Value that circulates piecemeal, then the chapter line by line",
         "read_intro": (
@@ -355,8 +356,8 @@ LESSONS = [
                   "there is a second kind of wear that has nothing to do with use. Dionysius "
                   "Lardner, the Irish writer on science and railway economy, reported that "
                   "cars and locomotives that cost £40,000 could be bought ten years later for "
-                  "£30,000. Marx calls this virtual wear, later readers call it moral "
-                  "depreciation, and he adds that &ldquo;competition enforces the introduction "
+                  "£30,000. Marx calls this virtual wear here; in Volume I, Chapter 15 he "
+                  "called it moral depreciation. He adds that &ldquo;competition enforces the introduction "
                   "of new machinery before the old is worn out&rdquo;."),
             ("p", "Repairs are a separate account:"),
             ("p", "<strong>Volume II, Chapter 8, §2.</strong> &ldquo;For instance, if the value "
@@ -369,9 +370,8 @@ LESSONS = [
                   "on the average of the branch. Many businesses, Marx notes, fold them into "
                   "the wear: a fixed capital of £10,000 that lasts 15 years wears `2,000/3` a "
                   "year, but is booked as if it lasted 10, at £1,000 a year, and the extra "
-                  "`1,000/3` pays for the repairs that let it last the fifteen. He records, "
-                  "with evident pleasure, how elastic the boundary between repair and "
-                  "renewal could be: moving repairs to the capital account &ldquo;is the "
+                  "`1,000/3` pays for the repairs that let it last the fifteen. He notes how "
+                  "elastic the boundary between repair and renewal could be: moving repairs to the capital account &ldquo;is the "
                   "familiar method by which railway managements artificially inflate their "
                   "dividends&rdquo;."),
             ("p", "The lab computes three cases. Marx's £10,000 machine on a ten-year life "
@@ -513,8 +513,10 @@ LESSONS = [
             "The lab spreads wear evenly over the average life, as Marx does, and revalues "
             "the whole machine the moment a cheaper one appears; in practice neither wear nor "
             "devaluation is that tidy, and Marx says the boundary between repair and renewal "
-            "shifts. The £10,000 and the fifteen years booked as ten are his figures, which "
-            "he says were chosen at random; the halving price is illustrative."
+            "shifts. The £10,000 machine and the fifteen years booked as ten are his figures "
+            "(the 10 and the 15, he says, are chosen at random); the halving price is "
+            "illustrative, and revaluing the old machine at what a new one costs follows "
+            "Volume I's account of moral depreciation."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -610,7 +612,7 @@ LESSONS = [
                   "periods of lassitude, average activity, overspeeding, and crisis.&rdquo;"),
             ("p", "He hedges it in the same paragraph: &ldquo;it is not a question of any one "
                   "definite number here&rdquo;. Moral depreciation shortens the life of fixed "
-                  "capital as fast as engineering lengthens it, and a crisis is the moment a "
+                  "capital even as engineering lengthens it, and a crisis is the moment a "
                   "great deal of new fixed capital is bought at once, so the next cycle starts "
                   "together. Whether replacement investment actually paces the trade cycle is "
                   "a question for the data. Economists after Marx built cycle theories on "
@@ -778,8 +780,8 @@ LESSONS = [
         "one_line": "Quesnay drew the line between annual and lasting advances correctly; Smith generalised it, mixed it up with buying and selling, and put wages beside raw materials, where the difference that creates surplus value cannot be seen.",
         "summary": (
             "Chapter 10 traces fixed and circulating capital back to Quesnay's avances and "
-            "follows what Adam Smith did with them. Sort the same productive capital by "
-            "Smith's two categories and by constant and variable capital, and compute which "
+            "follows what Adam Smith did with them. Sort the same productive capital as "
+            "fixed or circulating and as constant or variable capital, and compute which "
             "sort fixes the surplus value: two capitals split identically into fixed and "
             "circulating can produce different surplus value."
         ),
@@ -877,11 +879,15 @@ LESSONS = [
             ("p", "The lab sorts one capital both ways. In a mill with a £500 machine, £100 of "
                   "cotton and £100 of wages, Smith's split is £500 fixed and £200 circulating; "
                   "Marx's is £600 constant and £100 variable, and at 100% only the £100 of "
-                  "wages yields surplus value. Then compare Smith's farmer with a copper mine. "
-                  "Both split £600 fixed and £400 circulating. The farm's circulating capital "
-                  "is £200 of fodder and seed and £200 of wages; the mine's is £150 of coal and "
-                  "£250 of wages. Same fixed and circulating, different variable capital, "
-                  "different surplus value: £200 against £250."),
+                  "wages yields surplus value. Then compare Smith's farmer with a copper mine, "
+                  "both sorted by how their value returns, which is Marx's test and not "
+                  "Smith's. Smith himself called the seed fixed, because it &ldquo;never "
+                  "changes masters&rdquo;, and on his test the whole mine would be fixed; "
+                  "Marx puts the seed, the coal and the wages on the circulating side. So "
+                  "sorted, both split £600 fixed and £400 circulating. The farm's circulating "
+                  "capital is £200 of fodder and seed and £200 of wages; the mine's is £150 of "
+                  "coal and £250 of wages. Same fixed and circulating, different variable "
+                  "capital, different surplus value: £200 against £250."),
             ("p", "Smith set the terms, and his successors kept them. The next lesson, “Ricardo "
                   "on Fixed and Circulating Capital”, follows them into the most careful "
                   "economist of the next generation."),
@@ -897,7 +903,7 @@ LESSONS = [
                            {"name": "cotton", "value": 100, "fixed": False, "variable": False},
                            {"name": "wages", "value": 100, "fixed": False, "variable": True}],
                  "s_rate": 1, "expect": {"tuFixed": "fixed £500, circulating £200", "tuVariable": "constant £600, variable £100", "tuS": "£100"}},
-                {"id": "farm", "label": "Smith's farmer: implements and cattle fixed, fodder, seed and wages circulating",
+                {"id": "farm", "label": "Smith's farmer, sorted by Marx's test: implements and cattle fixed, fodder, seed and wages circulating",
                  "items": [{"name": "implements", "value": 400, "fixed": True, "variable": False},
                            {"name": "labouring cattle", "value": 200, "fixed": True, "variable": False},
                            {"name": "fodder", "value": 100, "fixed": False, "variable": False},
@@ -1080,7 +1086,7 @@ LESSONS = [
                   "retired to the country, and wrote the most rigorous economics of his day, "
                   "<em>On the Principles of Political Economy and Taxation</em>, in 1817. His "
                   "first chapter argues that commodities exchange in proportion to the labour "
-                  "they contain, and then honestly lists the exceptions. Two goods made with "
+                  "they contain, and then lists the exceptions. Two goods made with "
                   "the same labour can have different prices if one is made with long-lasting "
                   "machines and the other mostly with wages, because when wages rise the second "
                   "costs more to produce and the first hardly changes. Fixed and circulating "
@@ -1109,7 +1115,8 @@ LESSONS = [
                   "clothes and the worker's food lie on one scale of durability, and the "
                   "difference between buying a machine and buying labour-power becomes a "
                   "difference of degree. Marx's test is the manner in which value passes to "
-                  "the product, and on that test the line can be drawn exactly."),
+                  "the product, a test of the part a thing plays in production and not of how "
+                  "long it lasts."),
             ("p", "Ricardo's example makes the point for Marx. &ldquo;The wheat bought by a "
                   "farmer to sow is comparatively a fixed capital to the wheat purchased by a "
                   "baker to make into loaves.&rdquo; The farmer waits a year for his return, "
@@ -1344,7 +1351,7 @@ LESSONS = [
                   "the product they are one long act. Marx notes that the difference has "
                   "nothing to do with fixed and circulating capital: it would be there if both "
                   "factories had exactly the same proportions of each."),
-            ("p", "The variety is enormous, and Marx lists it with relish: a house in less time "
+            ("p", "The variety is enormous, and Marx lists it: a house in less time "
                   "than a factory, a locomotive in three months and an ironclad in a year or "
                   "more, grain in nearly a year, cattle in several, timber in twelve to a "
                   "hundred years, an ordinary carpet in a week and a Gobelins tapestry in "
@@ -1368,8 +1375,8 @@ LESSONS = [
                   "it."),
             ("p", "This is why long working periods came late to capitalist hands. Roads and "
                   "canals were built by states and towns, often with forced labour; houses were "
-                  "paid for in instalments by the people who ordered them. By the 1850s a "
-                  "London contractor told a parliamentary committee that he now bought land, "
+                  "paid for in instalments by the people who ordered them. In 1857 a "
+                  "London contractor told the parliamentary committee on the Bank Acts that he now bought land, "
                   "built 100 to 200 houses on speculation, and so took on &ldquo;an enterprise "
                   "which exceeds from twenty to fifty times his resources&rdquo;, the rest "
                   "borrowed on mortgage. If a crisis stopped the instalments, the whole thing "
@@ -1453,9 +1460,8 @@ LESSONS = [
                   "delivered?",
              "a": ["£250", "£10,000", "£6,250", "£40"],
              "c": 1,
-             "why": "`250 · 40 = 10,000`. £250 is one week's outlay; £6,250 is a quarter of the "
-                    "right answer, as if the period were 25 weeks; and £40 is the weeks with a "
-                    "pound sign."},
+             "why": "`250 · 40 = 10,000`. £250 is one week's outlay; £6,250 multiplies by 25 "
+                    "weeks instead of 40; and £40 is the weeks with a pound sign."},
             {"q": "What happens to the fixed capital during a long working period, on Marx's "
                   "account?",
              "a": ["It must be advanced again every week",

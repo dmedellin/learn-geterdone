@@ -109,16 +109,20 @@ LESSONS = [
                   "over once in as much as 150 years, which in Marx's judgement makes forestry "
                   "&ldquo;little adapted for private, and therefore, capitalist "
                   "enterprise&rdquo;."),
-            ("p", "The chapter also names the people who got this wrong. John Ramsay McCulloch "
-                  "and James Mill, Ricardo's most loyal followers, faced the old puzzle of wine "
-                  "that is worth more after years in a cellar, with no more work done on it. "
-                  "Their case at its strongest: if value is labour and the wine's value rose, "
-                  "something must have laboured, so let the operations of nature count as "
-                  "labour. Marx calls these &ldquo;senseless theories&rdquo;, an attempt at "
-                  "&ldquo;identifying the diverging time of production with the working "
-                  "time&rdquo;, and promises the answer in Volume III, where profit on the "
-                  "waiting capital is explained by the equalisation of profit rates, not by "
-                  "labour done in the cellar."),
+            ("p", "The chapter names, in a single sentence, the people who got this wrong: the "
+                  "&ldquo;senseless theories&rdquo; of MacCulloch, James Mill and others, an "
+                  "attempt at &ldquo;identifying the diverging time of production with the "
+                  "working time&rdquo;. Marx says no more here, and promises to return to them "
+                  "in Volume III; the volume Engels published does not take them up by name. "
+                  "The case they argued over is not in this chapter either. It comes from their "
+                  "own books: wine that is worth more after years in a cellar, with no more "
+                  "work done on it. Their case at its strongest: if value is labour and the "
+                  "wine's value rose, something must have laboured. James Mill reckoned the "
+                  "year in the cellar as so much more labour spent on the wine; John Ramsay "
+                  "McCulloch let the operations of nature count as labour. On Marx's "
+                  "definitions the waiting adds no value, and why capital that waits longer "
+                  "still earns the going rate is left to Volume III's equalisation of profit "
+                  "rates."),
             ("p", "The lab adds a working time inside the production period. Marx's winter grain "
                   "is nine months, 39 weeks, of which say 13 are worked; with 13 weeks to sell "
                   "it, the capital turns over once a year and a third of the production time "
@@ -227,7 +231,8 @@ LESSONS = [
                    "Hodgskin's, who described the farmers' dependence"],
              "c": 1,
              "why": "The chapter names MacCulloch and James Mill for the theories that "
-                    "identify the two times, the wine in the cellar being the standard case. "
+                    "identify the two times; the wine in the cellar, their standard case, "
+                    "comes from their own writings, not from this chapter. "
                     "Quesnay and Smith appear in Chapter 10 for other mistakes, and Marx cites "
                     "Hodgskin with approval."},
         ],
@@ -241,7 +246,8 @@ LESSONS = [
              "grain ties up its outlay for nine months though only three are worked, and the "
              "wheat preset turns over once a year for that reason."),
             ("Counting natural processes as labour",
-             "That was MacCulloch's and James Mill's way out of the wine-cellar puzzle. On "
+             "That was MacCulloch's way out of the wine-cellar puzzle, one of the theories "
+             "Marx calls senseless. On "
              "Marx's definitions value is created only by labour, so the months in which the "
              "grain ripens or the wine matures add time to the turnover and no value to the "
              "product."),
@@ -341,11 +347,11 @@ LESSONS = [
                   "markets, the more production is for the world market, and the more of "
                   "society's capital is at any moment on its way somewhere."),
             ("p", "Marx's India example was not idle. Trade with the East ran on bills of "
-                  "exchange of six or ten months, and the turnover was the reason: "
+                  "exchange of six or ten months, and turnover was part of the reason: "
                   "&ldquo;The differences in the turn-over thus caused are one of the material "
                   "bases of the various terms of credit.&rdquo; The banks tried in 1866 to cut "
-                  "the Indian usance to four months and had to give up; Engels adds in a "
-                  "bracket that the Suez canal has since revolutionised all of it."),
+                  "the Indian usance to four months and had to give up; a bracketed sentence "
+                  "adds that the Suez canal has since revolutionised all of it."),
             ("p", "Buying time is the other half. A wool spinner in London had to buy at the "
                   "great auctions held every three months, and so had to keep money for three "
                   "months' wool; a cotton spinner could buy more evenly. Either way part of the "
@@ -353,7 +359,7 @@ LESSONS = [
                   "build on next: &ldquo;It is especially the portion always available as "
                   "money-capital which is forgotten by economists&rdquo;."),
             ("p", "The lab takes a production period of four months, `52/3` weeks, and varies "
-                  "only the circulation. A market two months away and back gives a turnover "
+                  "only the circulation. A market a month away, two months there and back, gives a turnover "
                   "of 26 weeks, twice a year. Marx's India, eight months there and back, gives "
                   "52 weeks: once a year, with two-thirds of the turnover in circulation. Halve "
                   "each leg of the voyage and the turnover falls to `104/3` weeks, `3/2` a "
@@ -417,7 +423,7 @@ LESSONS = [
                 "circulation share = (104/3) / 52 = 2/3",
             ],
             "after": [
-                "Sold at home, two months out and back, the same factory turns over twice a "
+                "Sold nearer home, a month each way, the same factory turns over twice a "
                 "year. Distance alone halved its turnovers.",
             ],
         },
@@ -457,7 +463,7 @@ LESSONS = [
              "It is the producer's own capital that is fettered. In the India preset nothing "
              "in the factory changes and its capital turns over once a year instead of twice, "
              "with two-thirds of the turnover spent in circulation. If a merchant buys the "
-             "goods, Marx notes, he simply advances that additional capital in the "
+             "goods, Marx notes in Chapter 16, he simply advances that additional capital in the "
              "manufacturer's place."),
             ("Measuring distance in miles",
              "What lengthens a turnover is time. A railway can make a distant town nearer in "
@@ -509,7 +515,7 @@ LESSONS = [
         "key_label": "Two capitals for one business",
         "concepts_intro": (
             "This is the longest and most arithmetical chapter of Part II, and Engels says "
-            "it gave him the most trouble. Three ideas are enough to follow it."
+            "preparing it gave him no small trouble. Three ideas are enough to follow it."
         ),
         "concepts": [
             ("Capital I",
@@ -816,8 +822,9 @@ LESSONS = [
                   "of the 19th century&rdquo;, in its disguised form as the annual rate of "
                   "profit. Ricardo's followers could not explain, from labour alone, why "
                   "capitals that turn over at different speeds earned what looked like the same "
-                  "annual return; their critics, Samuel Bailey and Robert Torrens among them, "
-                  "pressed exactly that point. Marx's answer is to separate the variable capital "
+                  "annual return. Marx names no one here; histories of the school usually "
+                  "count Samuel Bailey and Robert Torrens among the critics who pressed that "
+                  "kind of point. Marx's answer is to separate the variable capital "
                   "advanced from the variable capital employed."),
             ("p", "Put B on A's footing to see it. Let B spend its £5,000 every five weeks, "
                   "£1,000 a week: then it too turns over ten times, its annual rate is 1,000%, "
@@ -833,7 +840,7 @@ LESSONS = [
                   "first; B's are paid out of money that will not be replaced by their product "
                   "until next year. Scale that up to a railway, which takes labour and means of "
                   "production out of the market for years and puts nothing back, and you get "
-                  "pressure on prices and on the money market. A society that planned, Marx "
+                  "pressure on prices and on the money market. A communist society, Marx "
                   "says, would reckon in advance how much it could spare; in capitalist "
                   "society, &ldquo;where social intelligence does not act until after the "
                   "fact, great disturbances will and must occur&rdquo;."),
@@ -1077,8 +1084,9 @@ LESSONS = [
                   "their wages, their costs and their surplus value into circulation directly "
                   "as money, newly made, replacing the coin worn out each year. Surplus value "
                   "elsewhere is &ldquo;thrown into circulation without the money required for "
-                  "its monetization&rdquo;, and on the other side gold arrives without having "
-                  "been a product first."),
+                  "its monetization&rdquo;, and on the other side the gold producers' surplus "
+                  "value arrives already as gold, without first being a product that has to "
+                  "be sold."),
             ("p", "That covers simple reproduction, where the surplus value is all consumed. "
                   "For accumulation the second section says &ldquo;it does not offer any new "
                   "problem in matters of the circulation of money&rdquo;: the money is already "
