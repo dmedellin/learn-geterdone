@@ -893,7 +893,8 @@ LESSONS = [
                   "labourers, found that the higher English wages roughly matched the higher "
                   "intensity of their work, and lost nothing by it: the relative price of "
                   "labour generally moves in the opposite direction to the money wage."),
-            ("p", "The chapter ends with the American economist Henry Carey, who argued that "
+            ("p", "The chapter ends with the American economist Henry Carey, whose 1835 "
+                  "<em>Essay on the Rate of Wages</em> argued that "
                   "the wages of different nations are proportional to the productivity of "
                   "their working days, and concluded that wages everywhere rise and fall "
                   "with productivity. Marx answers that the whole analysis of surplus value "
@@ -1244,10 +1245,12 @@ LESSONS = [
             {"q": "A capital of £1,500 yields £300 of surplus value a year, all of it "
                   "consumed. After how many years has the capitalist consumed a sum equal to "
                   "his capital?",
-             "a": ["3", "5", "4½", "6"],
+             "a": ["3", "5", "10", "6"],
              "c": 1,
-             "why": "Capital over surplus value consumed is `1500/300 = 5`. Three, 4½ and 6 "
-                    "come from no division of these two figures."},
+             "why": "Capital over surplus value consumed is `1500/300 = 5`. Ten is the answer "
+                    "if only half the surplus value, £150, were consumed a year; 6 divides "
+                    "£1,800, the capital with one year's surplus added, by £300; 3 comes from "
+                    "no division of these two figures."},
             {"q": "In Marx's example of the peasant whose land is taken, who produces the "
                   "fund from which the peasant is paid after the change?",
              "a": ["The lord, out of his own wealth",

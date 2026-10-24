@@ -130,8 +130,9 @@ LESSONS = [
                   "sown, that is the capitalist's abstinence; if the wine is left to mature, "
                   "that too is the capitalist's abstinence."),
             ("p", "The idea outlived the ridicule, and it deserves its strongest form. Alfred "
-                  "Marshall kept it under a better name, &lsquo;waiting&rsquo;, and Eugen "
-                  "von Böhm-Bawerk and Irving Fisher built theories of interest on the "
+                  "Marshall kept it under a better name, &lsquo;waiting&rsquo;, in his "
+                  "<em>Principles</em> of 1890, and Eugen von Böhm-Bawerk in 1889 and Irving "
+                  "Fisher in 1907 built theories of interest on the "
                   "observation that people value present goods above future ones. On that "
                   "view, a capitalist who invests instead of spending gives up something "
                   "real, present consumption, and interest is the price of getting him to "
@@ -174,7 +175,9 @@ LESSONS = [
                 "Each period the lab lays out the whole capital at the composition c/v, takes "
                 "s = s/v · v, and adds the chosen share of s to capital. The table shows every "
                 "period; the tiles show the end of the last. Slide the periods back to 1 to "
-                "see Marx's first year, £12,000 of which the original is 5/6."
+                "see Marx's first year, £12,000 of which the original is 5/6. The hoard tile "
+                "stays at £0 in every preset: the investment threshold is 0, so every pound "
+                "capitalised is laid out in the next period."
             ),
         }),
         "steps_title": "Running accumulation period by period",
@@ -255,8 +258,8 @@ LESSONS = [
              "The half preset consumes £1,000 of the first year's surplus value and still "
              "adds £1,000 to capital; in the consume-all preset the capitalist eats £2,000 a "
              "year and keeps a £10,000 capital. What is added is in either case surplus "
-             "value, and after five periods of the marx preset five ninths of the capital "
-             "was never anybody's to abstain from: it is capitalised unpaid labour, on "
+             "value, and after five periods of the marx preset nearly three fifths of the "
+             "capital was never anybody's to abstain from: it is capitalised unpaid labour, on "
              "Marx's definitions. Waiting may be a real cost to a person, as Marshall said; "
              "it is not what the capital consists of."),
             ("Treating all capitalised surplus value as wages",
@@ -368,13 +371,13 @@ LESSONS = [
                   "workers clearly, and Marx lets them say it. John Bellers wrote in 1696 "
                   "of &ldquo;the labour of the poor being the mines of the rich&rdquo;. "
                   "Bernard de Mandeville, early in the next century, thought the poor should "
-                  "be kept from starving but receive nothing worth saving. Sir Frederic Eden, "
+                  "be kept from starving but receive nothing worth saving. Sir Frederick Eden, "
                   "whom Marx calls the only disciple of Adam Smith in the eighteenth century "
                   "to produce a work of importance, "
                   "described the ideal relation as an &ldquo;easy and liberal&rdquo; "
-                  "dependence. What none of them saw, Marx says, is that the mechanism of "
-                  "accumulation itself produces the &lsquo;labouring poor&rsquo; along with "
-                  "the capital."),
+                  "dependence. What Mandeville, &ldquo;an honest, clear-headed man&rdquo;, "
+                  "had not yet seen, Marx says, is that the mechanism of accumulation itself "
+                  "produces the &lsquo;labouring poor&rsquo; along with the capital."),
             ("p", "Under these conditions, the most favourable to the worker, the dependence "
                   "becomes wider rather than tighter. Workers can buy a little more, put "
                   "something by. Marx grants it and gives it an image: a rise in wages "
@@ -399,10 +402,10 @@ LESSONS = [
                   "workers capital wants are more than the 380 available. The lab then "
                   "employs all 380, spreads the variable capital over them as a higher wage, "
                   "and takes the extra wages out of surplus value: s is £3,600 instead of "
-                  "£4,000, and capital grows more slowly. In wage-rise the supply stops "
-                  "growing at 300, the wage climbs every period, and surplus value falls "
-                  "from £2,800 in period 2 to about £1,181 in period 5. The rise in wages "
-                  "eats its own cause."),
+                  "£4,000, and capital grows more slowly. In wage-rise the supply stops at "
+                  "300 and demand passes it in period 2; from then on the wage climbs every "
+                  "period, and surplus value falls from £2,800 in period 2 to about £1,181 "
+                  "in period 5. The rise in wages eats its own cause."),
             ("p", "So the movement of wages reflects the movement of capital, not the other "
                   "way round. Marx's target is the economists who read it backwards, as a "
                   "natural law of population: too few workers, so wages rise, so the poor "
@@ -412,8 +415,10 @@ LESSONS = [
             ("p", "The view he opposed is not foolish, and a modern version of it is "
                   "standard. In the growth model Robert Solow published in 1956, capital "
                   "accumulating faster than the labour force raises capital per worker, and "
-                  "with it the real wage, as far as you like, with no reaction that pushes "
-                  "wages back: rising wages and continuing accumulation go together. Marx's "
+                  "with it the real wage, and nothing in the model pushes wages back down: "
+                  "the rise is braked only by diminishing returns on capital, not by a "
+                  "squeeze on unpaid labour, so rising wages and continuing accumulation go "
+                  "together. Marx's "
                   "second case, the reaction, depends on his claim that the rise comes out "
                   "of unpaid labour. The lab builds that claim in, so it cannot test it."),
             ("p", "This section held the composition fixed, and Marx immediately drops the "
@@ -457,8 +462,8 @@ LESSONS = [
              "Workers wanted = v / wage. At £10 a worker, £2,560 wants 256."),
             ("Compare with the supply",
              "If the workers wanted are no more than those available, the difference is a "
-             "reserve. If they are more, all available are employed, the wage becomes v / "
-             "supply, and surplus value is reduced by the extra wages."),
+             "reserve. If they are more, all available are employed and, by the lab's rule, "
+             "the wage becomes v / supply, so surplus value is reduced by the extra wages."),
             ("Accumulate and repeat",
              "Add the capitalised share of s and start the next period from the larger "
              "capital, at the same composition."),
@@ -523,8 +528,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Taking rising wages as proof that accumulation benefits the worker without limit",
-             "In the wage-rise preset the wage climbs every period, and surplus value falls "
-             "with it, from £2,800 in period 2 to about £1,181 in period 5, while capital "
+             "In the wage-rise preset the wage climbs every period from the second, and "
+             "surplus value falls with it, from £2,800 in period 2 to about £1,181 in period 5, while capital "
              "grows ever more slowly. On Marx's account a rise in wages can only reduce the "
              "unpaid labour, and once that touches the point where accumulation slackens "
              "the rise is checked. The chain is relaxed, not removed."),
@@ -938,10 +943,14 @@ LESSONS = [
             ("p", "Its presets run the law view for five periods from £6,000 at a "
                   "composition of 1:1 and a wage of £10. In the boom the rate of surplus "
                   "value is 200%, all of it is capitalised, the composition rises by 1 a "
-                  "period, and the wage rises by 10s a period, from £10 to £12. Employment "
-                  "grows from 300 to 475, and still the supply, growing by 50 a period, "
-                  "outruns it: the ratio of reserve to employed goes from 0 to `1/19`. Wages "
-                  "and the reserve rise together. In the slump nothing is capitalised and "
+                  "period, and the wage is set to rise by 10s a period, from £10 to £12. For "
+                  "four periods capital wants every worker there is: in periods 2 and 3 it "
+                  "wants more than the supply, and the lab's rule pushes the wage paid above "
+                  "the set path, to about £11 9s and £11 11s, before it returns to the path "
+                  "at £11 10s in period 4. Only in period 5 does the supply, growing by 50 a "
+                  "period, outrun the 475 employed, and the ratio of reserve to employed goes "
+                  "from 0 to `1/19`. Between the first period and the last, the wage and the "
+                  "reserve both rose. In the slump nothing is capitalised and "
                   "the composition creeps up by a half each period, so the same capital "
                   "employs 150 by the fifth period, and the ratio is `9/5`. In the long run "
                   "Marx's ratios carry employment flat at 300 while the reserve reaches 120, "
