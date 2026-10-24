@@ -79,7 +79,7 @@ LESSONS = [
             ("p", "Go through the passage. The man holds &ldquo;a power&rdquo;: in a society where "
                   "labour-power and means of production can be bought, £100 can be turned into "
                   "capital, and capital makes the average profit. That power is what makes the "
-                  "sum worth borrowing. So, in Marx's phrase a page earlier, &ldquo;capital as "
+                  "sum worth borrowing. So, in Marx's phrase a paragraph earlier, &ldquo;capital as "
                   "capital becomes a commodity.&rdquo; The man who lends the £100 for a year "
                   "&ldquo;gives him the power to produce a profit of 20%&rdquo;. And the £5 is "
                   "paid &ldquo;out of the produced profit&rdquo;: interest is not a second "
@@ -117,7 +117,8 @@ LESSONS = [
                   "doubled by the double existence of the same sum of money as a capital for "
                   "two persons. It can serve as a capital for both of them only by dividing the "
                   "profit.&rdquo;"),
-            ("p", "So is interest the price of money? Marx says the phrase is &ldquo;an "
+            ("p", "So is interest the price of money? Marx's word is &ldquo;capital&rdquo;: "
+                  "to call interest the price of capital, he writes, is to use &ldquo;an "
                   "irrational expression&rdquo;. A price is the value of a thing expressed in "
                   "money. The £100 lent comes back as the same £100; it has a value, and the "
                   "interest is a second figure beside it that measures not its value but how "
@@ -241,8 +242,8 @@ LESSONS = [
              "But the £100 lent comes back as the same £100, so its value has not been paid "
              "for; what is paid is a part of what it made. In the high-rate preset interest "
              "doubles to £10 and the £100 is still £100; only the split of the £20 changes, "
-             "from £5 and £15 to £10 and £10. Marx calls the phrase &ldquo;an irrational "
-             "expression&rdquo;."),
+             "from £5 and £15 to £10 and £10. Marx calls interest as the price of capital "
+             "&ldquo;an irrational expression&rdquo;."),
             ("Thinking the lender's money produces the interest",
              "It is the money's use in the borrower's business that produces profit. Kept as "
              "a hoard or spent on consumption, the £100 would make nothing; it is capital for "
@@ -347,9 +348,11 @@ LESSONS = [
                   "floor. In the crisis preset profit has fallen to 5 per cent and interest is "
                   "8 per cent, the level Marx says it passed in 1847: the borrower makes £5 "
                   "and owes £8, the tile shows profit of enterprise at minus £3, and the bounds "
-                  "tile prints that the ceiling is breached. It is not an error. It is the "
-                  "exceptional case, interest that &ldquo;could not be paid out of "
-                  "profit&rdquo;."),
+                  "tile prints that the ceiling is breached. It is not an error. Marx allows "
+                  "for &ldquo;exceptional cases&rdquo; of interest that &ldquo;could not be "
+                  "paid out of profit&rdquo;, and he puts the highest rates in the crisis; "
+                  "pairing the two in one preset is the lesson's illustration, not a figure "
+                  "of his."),
             ("p", "Those dates come from Marx's account of the trade cycle. Low interest "
                   "goes with prosperity, a rise with the turn, and a maximum &ldquo;up to a "
                   "point of extreme usury&rdquo; with the crisis, when money must be borrowed "
@@ -500,9 +503,9 @@ LESSONS = [
              "different divisions, and nothing in the chapter picks between them."),
             ("Treating a breach of the ceiling as impossible",
              "In the crisis preset interest of 8 per cent meets a profit of 5 per cent and the "
-             "borrower ends £3 down. Marx expects exactly this at the height of a crisis, when "
-             "money is borrowed to meet payments at any cost; the interest is then not paid "
-             "out of profit."),
+             "borrower ends £3 down. Marx allows for exceptional cases in which interest "
+             "exceeds profit and is not paid out of it, and he puts the highest rates in the "
+             "crisis, when money is borrowed to meet payments at any cost."),
             ("Thinking the rate of profit is the more visible of the two",
              "The rate of interest is quoted daily and is the same for every borrower of "
              "the same standing; the general rate of profit is an average that no one "
@@ -617,14 +620,14 @@ LESSONS = [
                   "it can be bought, like any skilled labour. In the manager preset the "
                   "borrower hires a manager for £6. Interest is still £5, and profit of "
                   "enterprise falls to £9. The work of management is now paid for, and £9 is "
-                  "left that is paid for no work at all."),
+                  "left that, on Marx's account, is paid for no work at all."),
             ("p", "Marx's evidence is from his own day. After every crisis, he notes, "
                   "&ldquo;one may see plenty of ex-manufacturers in the English factory "
                   "districts, who for low wages superintend their own former factories as "
                   "managers of the new owners, who are frequently their creditors.&rdquo; The "
                   "co-operative factories' accounts showed a profit after the manager's wages "
-                  "were paid, and the joint-stock companies separated management from "
-                  "ownership altogether. He allows himself one sharp remark about the boards of "
+                  "were paid, and the joint-stock companies tended to separate management "
+                  "from ownership. He allows himself one sharp remark about the boards of "
                   "directors who were paid by the meeting: such wages of superintendence, the "
                   "bankruptcy court showed, were inversely proportioned to the actual "
                   "superintendence performed."),
@@ -641,8 +644,9 @@ LESSONS = [
                   "the entrepreneur who innovates, and Frank Knight in 1921 as the return for "
                   "bearing uncertainty that cannot be insured. Both accept that a hired "
                   "manager's salary is not profit. What in the chapter bears on them is "
-                  "limited: it does not discuss risk or innovation as sources of profit, and "
-                  "argues that the residue after interest "
+                  "limited: it sets aside a single capitalist's departures from the average "
+                  "profit, which is where better methods and the luck of the market come in, "
+                  "says nothing of risk, and argues that the residue after interest "
                   "and salary is part of surplus value. The lab computes the residue and cannot "
                   "say what it rewards."),
             ("p", "Interest now looks like the natural fruit of capital and profit of "
@@ -758,7 +762,7 @@ LESSONS = [
              "enterprise as its reward, which Marx says his brain &ldquo;necessarily "
              "conceives&rdquo;. Hire the work and the claim can be checked. In the manager "
              "preset a £6 salary pays for the managing, interest is still £5, and £9 of "
-             "profit of enterprise is left over that pays for no work."),
+             "profit of enterprise is left over that, on Marx's account, pays for no work."),
             ("Thinking interest is earned only when money is actually lent",
              "In the owner preset no interest is paid out and the lab books £0. Marx's "
              "point is that the owner reckons the same £5 to himself as owner of capital; "
@@ -785,7 +789,7 @@ LESSONS = [
     # ---------------------------------------------------------------- 09
     # Kerr vol. 3, l. 3561 (Price's penny, quoted by Marx; source in fn. 81,
     # l. 7579). Inline: l. 3533 (most fetish-like form), l. 3537 (the pear
-    # tree), l. 3565 (the national debt), l. 3567 (dazzled), l. 3573 (Child),
+    # tree), l. 3565 (the national debt), l. 3567 (dazzled), l. 3569 (Pitt), l. 3573 (Child),
     # l. 3590 (a qualitative limit).
     {
         "slug": "interest-bearing-capital-as-a-thing",
@@ -857,9 +861,10 @@ LESSONS = [
                   "simply dazzled by the enormousness of the figures arising from geometrical "
                   "progression&rdquo;, and that he treated capital as a number increasing "
                   "itself, by the formula `s = c·(1 + i)ⁿ`. Pitt believed him, and his "
-                  "sinking-fund Act set aside £250,000 a year to accumulate at compound "
-                  "interest until the fund should reach £4,000,000 a year and pay off the "
-                  "national debt. Price went further in a later book: a "
+                  "sinking-fund Act, as Marx reports it, ordered £250,000 to be accumulated "
+                  "at compound interest until, with the expired annuities, the fund should "
+                  "reach £4,000,000 a year and pay off the national debt. Price went further "
+                  "in another book: a "
                   "shilling at 6 per cent from the same date would fill a globe the size of "
                   "Saturn's orbit, and a state with the smallest savings could pay the largest "
                   "debt. Marx's comment is one line: &ldquo;What a pretty theoretical "

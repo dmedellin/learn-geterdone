@@ -18,7 +18,8 @@ LESSONS = [
     # ---------------------------------------------------------------- 01
     # Kerr vol. 3, l. 2596 (a changed form of the capital of circulation).
     # Inline: l. 2600 (3,000 p.st. of linen), l. 2610 (the clerk), l. 2646
-    # (the persons who hold it), l. 2668 (the quicker the turnover),
+    # (the persons who hold it), l. 2628 (his own or borrowed), l. 2668 (the
+    # quicker the turnover),
     # l. 2681-2683 (no value, at least not directly).
     {
         "slug": "commercial-capital",
@@ -54,7 +55,7 @@ LESSONS = [
              "it."),
             ("The merchant's advance",
              "A travelling agent who sells on commission is not a capitalist. What makes "
-             "the merchant one is that he advances money of his own: his business is "
+             "the merchant one is that he advances money capital, his own or borrowed: his business is "
              "M–C–M′, buying in order to sell, and the same commodity changes hands twice."),
             ("A smaller money reserve",
              "Without the merchant each manufacturer would keep a larger reserve to carry "
@@ -100,7 +101,8 @@ LESSONS = [
                   "connection would not be obscured for a moment.&rdquo;"),
             ("p", "So what makes the merchant a capitalist rather than a clerk? Two things, "
                   "on Marx's count. Selling becomes the exclusive business of a separate "
-                  "agent, and that agent advances money of his own. A commission salesman has "
+                  "agent, and that agent advances money capital, &ldquo;his own or "
+                  "borrowed&rdquo;. A commission salesman has "
                   "the first and not the second. The merchant buys outright, and his business "
                   "is `M–C–M′`. Notice what changes hands twice here. In the manufacturer's "
                   "sale-and-purchase `C–M–C` it is the money: received for linen, spent on "
@@ -110,7 +112,9 @@ LESSONS = [
                   "capital a merchant takes off the manufacturers' hands in a year. In the "
                   "no-merchant preset there is no merchant capital and the tile reads £0: "
                   "every manufacturer carries his own goods until they sell. In the merchant "
-                  "preset Marx's 3,000 pounds buy one lot of linen a year, £3,000. In the "
+                  "preset Marx's 3,000 pounds are taken as turning over once, one lot of linen a "
+                  "year, £3,000; the chapter gives the sum and leaves the number of turnovers "
+                  "open. In the "
                   "faster-merchant preset the same £3,000 is turned over four times, because "
                   "the merchant sells each lot before its maker can finish the next and buys "
                   "from other manufacturers in between: `£3,000 × 4 = £12,000`. Marx draws the "
@@ -155,7 +159,7 @@ LESSONS = [
                 {"id": "no-merchant", "label": "No merchant: each manufacturer holds his own goods",
                  "merchant_capital": 0, "merchant_turnovers": 0,
                  "expect": {"tuFreed": "£0"}},
-                {"id": "merchant", "label": "Marx's figures: £3,000 of linen bought once a year",
+                {"id": "merchant", "label": "Marx's £3,000 of linen, taken as one turnover a year",
                  "merchant_capital": 3000, "merchant_turnovers": 1,
                  "expect": {"tuFreed": "£3,000"}},
                 {"id": "faster-merchant", "label": "The same £3,000 turned over four times a year",
@@ -218,7 +222,7 @@ LESSONS = [
                     "a fourth turnover that does not happen."},
             {"q": "On Marx's account, what makes a merchant a capitalist rather than a "
                   "salesman for the manufacturer?",
-             "a": ["He advances money capital of his own and buys the goods outright",
+             "a": ["He advances money capital and buys the goods outright",
                    "He moves the goods to where they are consumed",
                    "He adds value to the goods by selling them",
                    "He sells to many buyers instead of one"],
@@ -249,9 +253,9 @@ LESSONS = [
              "Every sale passes goods from one owner to another, and it can look as if the "
              "passing were the work that makes them worth more. Marx's linen shows otherwise: "
              "after the merchant buys it, nothing has happened to it but a change in the "
-             "person of its owner. In the no-merchant preset the manufacturers hold £0 less "
-             "of their goods and the linen is worth the same; in the merchant preset £3,000 "
-             "changes owner and is still worth £3,000. What the merchant can do is shorten "
+             "person of its owner. In the no-merchant preset nothing changes owner and the "
+             "tile reads £0; in the merchant preset £3,000 of linen changes owner and is "
+             "still worth £3,000. What the merchant can do is shorten "
              "the time goods wait, which helps the industrial capital produce more."),
             ("Confusing the merchant's selling with transport and storage",
              "A merchant may also carry and store goods, and Volume II counted those as "
@@ -343,7 +347,7 @@ LESSONS = [
                   "question is whether that excess is a price raised above value. His "
                   "illustration of the obvious answer is a yard of linen bought at 2 shillings "
                   "and sold at 2s 2⅖d to make 10 per cent, which, he notes, comes to the same "
-                  "as selling the buyer 10/11 of a yard for the price of one. Then: "
+                  "as selling the buyer 10/11 of a yard for 2 shillings. Then: "
                   "&ldquo;It is only outward semblance that commercial profit is a mere "
                   "addition to, a nominal raise of the prices of commodities above their "
                   "value.&rdquo;"),
@@ -631,8 +635,8 @@ LESSONS = [
                   "small profit or few commodities at a large profit on the individual "
                   "commodities.&rdquo; He excepts the monopolist, the Dutch East India Company "
                   "his example, and he names one economist who had not seen it: Wilhelm "
-                  "Roscher of Leipzig, who could still imagine selling prices changed by a "
-                  "merchant's &ldquo;prudence and humanity&rdquo; rather than by a change in "
+                  "Roscher of Leipzig, who could still imagine selling prices changed by "
+                  "&ldquo;prudence and humanity&rdquo; rather than by a change in "
                   "production."),
             ("p", "He enjoys the shopkeeper's motto: &ldquo;Small profits and quick returns "
                   "appears particularly to the shopkeeper as a principle, which he follows on "
@@ -744,7 +748,8 @@ LESSONS = [
                     "line until it stopped; 3 is one sale's mark-up, not the year's profit."},
             {"q": "On the chapter's account, which of these settles whether a merchant sells "
                   "“many commodities at a small profit” or few at a large one?",
-             "a": ["The price of production of the goods and the turnover of his line",
+             "a": ["The price of production of the goods, the general rate of profit and the "
+                   "turnover of his line",
                    "The merchant's own pricing policy",
                    "The merchant's generosity to his customers",
                    "The rate of surplus value in his shop"],
@@ -1053,7 +1058,8 @@ LESSONS = [
     # Inline: l. 3061 (reduced to the general average), l. 3065 (inverse
     # ratio), l. 3077 (profit upon alienation; buy cheap, sell dear), l. 3089
     # (a system of robbery), l. 3101 (industry revolutionises commerce; the
-    # decline of Holland), l. 3105 (the really revolutionary way).
+    # decline of Holland), l. 3105 (the really revolutionary way), l. 3119
+    # (interest-bearing capital likewise a very old form).
     {
         "slug": "history-of-merchants-capital",
         "title": "Historical Facts about Merchant's Capital",
@@ -1167,8 +1173,9 @@ LESSONS = [
                   "furniture trade, where small masters sell their chairs and tables every "
                   "Saturday to the furniture-store owners with as much haggling as a pawnshop, and "
                   "the merchant is the real capitalist."),
-            ("p", "That closes Part IV. Part V begins with a capital even older than the "
-                  "merchant's and even further from production. The next lesson, "
+            ("p", "That closes Part IV. Part V begins with a capital that is, as Marx says at "
+                  "the chapter's end, &ldquo;likewise a very old form of capital&rdquo;, and one "
+                  "even further from production. The next lesson, "
                   "“Interest-Bearing Capital”, asks what a lender sells when he lends £100."),
         ],
         "lab": ("capkit", {
