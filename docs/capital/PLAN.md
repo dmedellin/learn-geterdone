@@ -921,69 +921,71 @@ Chapter 13 "66 1/3%" (for 66 2/3%).
 
 ### Course 11 — Merchant's Capital and Interest (`capital-merchants-and-interest`, 9)
 
+Instances as authored (2026-10-24). Corrections the Kerr text forced are marked **Text:**; other changes are marked **Changed:**.
+
 1. **commercial-capital** — Commercial Capital — *Chapter 16*
-   - Read: the sentence calling commercial capital a transmuted (or converted) form of part of the capital of circulation (Kerr wording).
-   - Do: compute the capital an industrialist saves by selling to a merchant and the merchant capital needed to circulate a product.
-   - Lab: `turnover`, view `merchant`. Presets: `no-merchant`, `merchant`, `faster-merchant`. Pin `tuFreed`.
+   - Read: the sentence calling commercial capital a changed form of a portion of the capital of circulation (Kerr l. 2596: "a changed form", not "transmuted" or "converted").
+   - Do: compute the commodity capital a merchant takes off the manufacturers' hands from his advance and turnovers, and the merchant's capital a year's trade needs.
+   - Lab: `turnover`, view `merchant`. Presets: `no-merchant` (capital 0: £0), `merchant` (Marx's £3,000 of linen, once a year: £3,000), `faster-merchant` (£3,000 four times: £12,000). Pin `tuFreed`.
    - Misconception: merchants produce value by moving goods from hand to hand.
-   - Worked: a merchant who turns over £100 five times frees £500 of the industrialists' circulating capital.
+   - Worked: **Changed:** Marx's £3,000 turned over four times carries £12,000 of linen a year, which would need £12,000 turned once (the §C figure of £100 five times is the same arithmetic; the lesson uses the chapter's merchant).
 
 2. **commercial-profit** — Commercial Profit — *Chapter 17*
-   - Read: the example "720c + 180v + 180s… merchant's capital of 100".
+   - Read: Kerr l. 2717, "720 c + 180 v + 162 s = 1,062 … 1,062 + 18 = 1,080".
    - Do: compute the general rate of profit including the merchant's capital, the price at which the industrialist sells to the merchant, and the merchant's selling price.
-   - Lab: `prices`, view `merchant`. Presets: `marx` (Marx's figures: industrial 900, merchant 100, s = 180), `no-merchant`, `with-costs` (merchant's own circulation costs). Pin `ppAverage`, `ppMerchantPrice`.
+   - Lab: `prices`, view `merchant`, one sphere 720c + 180v, s/v = 1. Presets: `marx` (merchant 100: 9/50 = 18%, industrial £1,062, merchant £1,080), `no-merchant` (1/5 = 20%, £1,080 and £1,080), `with-costs` (Marx's 50 of costs, l. 2772: 6/35 = 17.14%, industrial £7,380/7 = 1,054 2/7, merchant £1,130). Pin `ppAverage`, `ppMerchantPrice`.
    - Misconception: the merchant's profit is a mark-up added on top of value.
    - Worked: 180 of s on 1,000 of capital is 18%; the industrialist sells at 1,062, the merchant at 1,080, which is the value.
 
 3. **the-turnover-of-merchants-capital** — The Turnover of Merchant's Capital — *Chapter 18*
-   - Read: the merchant's turnover and "the commercial profit on each turnover".
+   - Read: Kerr l. 2930, 15% a year, once (115) and five times (103; "500 sold 515").
    - Do: compute the mark-up per turnover from the general rate and the merchant's turnovers a year.
-   - Lab: `prices`, view `merchant-turnover`. Presets: `marx` (Marx's figures: 15% a year, five turnovers), `once`, `ten`. Pin `ppMarkup`.
+   - Lab: `prices`, view `merchant-turnover`. Presets: `marx` (3/20, five turnovers: 3%, sells at £103), `once` (15%, £115), `ten` (1.5%, £203/2). Pin `ppMarkup`, `ppMerchantPrice`.
    - Misconception: a faster-turning merchant earns a higher rate of profit.
    - Worked: at 15% a year, a merchant who turns over five times sells at 103 each time, 3% a turnover.
 
-4. **money-dealing-capital** — Money-Dealing Capital — *Chapter 19*
-   - Read: "the purely technical movements that money undergoes".
-   - Do: compute the money-dealer's share of profit from the capital tied up in payments, cash-keeping and exchange.
-   - Lab: `prices`, view `merchant`. Presets: `cashier`, `exchange`, `none`. Pin `ppAverage`.
+4. **money-dealing-capital** — Money-Dealing Capital — *Chapter 19* (Kerr title "Financial Capital"; the module keeps it)
+   - Read: **Text:** Kerr l. 2966-2968, the "purely technical labor of paying money and receiving money" organised as a special department. The §C phrase "movements that money undergoes" is not Kerr's; l. 2960 reads "purely technical movements performed by money" and opens on a drop capital, so it is quoted inline.
+   - Do: compute the general rate with a money-dealer's capital in the averaging, the dealer's share and the manufacturers' price.
+   - Lab: `prices`, view `merchant`; Marx's 900 industrial and 100 merchant, with the money-dealer's capital entered in `merchant_capital` beside the merchant's (the view has one field for capital in circulation). Presets: `none` (100: 18%, £1,062), `cashier` (100 + 125: 4/25 = 16%, £1,044; cashier draws 20), `exchange` (100 + 125 + 75: 3/20 = 15%, £1,035; dealers draw 30). Pin `ppAverage`, `ppMerchantPrice`.
    - Misconception: money-dealing creates value because it handles value.
-   - Worked: money-dealing capital of 50 joins the averaging and draws 9 at 18%.
+   - Worked: **Changed:** a cashier's 125 beside Marx's 900 and 100 gives 16%; the cashier draws 20, the manufacturers 144, the merchant 16. (§C's "50 draws 9 at 18%" is not consistent: adding 50 to Marx's 1,000 gives 6/35, not 18%.)
 
 5. **history-of-merchants-capital** — Historical Facts about Merchant's Capital — *Chapter 20*
-   - Read: "Merchant's capital is originally merely the intervening movement between extremes which it does not control." (Kerr wording to be checked.)
+   - Read: **Text:** Kerr l. 3079, "The merchants' capital is at first merely the intervening movement between extremes not controlled by it and between premises not created by it."
    - Do: compute a pre-capitalist merchant's gain from buying cheap in one community and selling dear in another, beside the capitalist merchant's share of an average rate.
-   - Lab: `circuit`, view `formula`. Presets: `venice` (buy at 60, sell at 100), `dutch`, `capitalist` (a merchant held to an 18% average). Pin `ciDelta`.
+   - Lab: `circuit`, view `formula`, start money. Presets: `venice` (60 to 100: +£40), `dutch` (a monopoly company, 25 to 100: +£75), `capitalist` (100 to 118: +£18). Pin `ciDelta` (and `ciForm`).
    - Misconception: a merchant's profit is always a share of an average rate of profit.
    - Worked: buying at 60 and selling at 100 between communities yields 40 that no general rate limits; the capitalist merchant of “Commercial Profit” gets 18 on 100.
 
 6. **interest-bearing-capital** — Interest-Bearing Capital — *Chapter 21*
-   - Read: "a man has £100 at his disposal… the capacity of producing a profit of £20".
+   - Read: Kerr l. 3133, "a man having 100 p.st. at his disposal … is called interest".
    - Do: compute what the lender's £100 lets a borrower make at the average rate and the interest paid out of it.
-   - Lab: `interest`, view `split`. Presets: `marx` (Marx's figures: £100, 20% average profit, £5 interest), `high-rate`, `low-rate`. Pin `inInterest`, `inEnterprise`.
+   - Lab: `interest`, view `split`. Presets: `marx` (£100, 1/5, 1/20: £5, £15), `high-rate` (1/10: £10, £10), `low-rate` (1/50: £2, £18). Pin `inInterest`, `inEnterprise`.
    - Misconception: interest is the price of money.
    - Worked: £100 makes £20 at the average rate; £5 goes to the lender and £15 stays with the borrower as profit of enterprise.
 
 7. **the-rate-of-interest** — The Rate of Interest — *Chapter 22*
-   - Read: there is no such thing as a "natural" rate of interest (inner quotation marks as printed).
+   - Read: Kerr l. 3349, "there is no such thing as a 'natural' rate of interest" (also l. 3291 in Chapter 21).
    - Do: compute interest and profit of enterprise across rates and show the bounds 0 < i < p′.
-   - Lab: `interest`, view `bounds`. Presets: `crisis` (interest near the profit rate), `plenty` (interest near zero), `normal`. Pin `inEnterprise`, `inBound`.
+   - Lab: `interest`, view `bounds`, capital £100. Presets: `normal` (Marx's l. 3311 figures, 4/25 and 1/25: £12, `0 < 4% < 16%`), `plenty` (1/5 and 3/200, the 1½% of September 1843: £37/2, `0 < 3/2% < 20%`), `crisis` (1/20 and 2/25, the 8% of 1847: −£3, `breached: 8% ≥ 5%`). Pin `inEnterprise`, `inBound`.
    - Misconception: there is a natural rate of interest set by productivity.
-   - Worked: at a 20% average rate the average profit is the normal ceiling and the floor is indeterminate; competition, not nature, decides where. In a crisis the ceiling can be breached, and the interest is then not paid out of profit: `inBound` prints "breached" without error.
+   - Worked: **Changed:** Marx's own pair from l. 3311, 20% and 8% against 16% and 4%: both leave £12.
 
 8. **interest-and-profit-of-enterprise** — Interest and Profit of Enterprise — *Chapter 23*
-   - Read: the "wages of superintendence" and the capitalist who borrows.
+   - Read: Kerr l. 3454, "wages of superintendence of labor".
    - Do: split gross profit into interest and profit of enterprise and separate the wages of a hired manager from both.
-   - Lab: `interest`, view `split`. Presets: `owner`, `borrower`, `manager` (a hired manager paid a salary). Pin `inEnterprise`, `inInterest`.
+   - Lab: `interest`, view `split`, £100 at 1/5 and 1/20. Presets: `owner` (principal 0: £0, £20; the owner's reckoning of interest to himself is in the prose), `borrower` (£5, £15), `manager` (salary £6: £5, £9). Pin `inEnterprise`, `inInterest`.
    - Misconception: profit of enterprise is the capitalist's wage for managing.
    - Worked: with £5 of interest and £15 of profit of enterprise, a £6 manager's salary leaves £9 that, on Marx's account, is paid for owning and directing capital, not for any work of superintendence.
 
 9. **interest-bearing-capital-as-a-thing** — Interest-Bearing Capital as a Thing — *Chapter 24*
-   - Read: Dr. Price's "one penny, put out at our Saviour's birth at 5 per cent compound interest".
+   - Read: **Text:** Kerr l. 3561, Price quoted by Marx: "A penny, loaned at the birth of our Savior at compound interest at 5%…". The §C wording ("put out at our Saviour's birth") is not Kerr's. Source in fn. 81 (l. 7579): Price's *Appeal*, 1772.
    - Do: compute Price's compound sum and compare it with the accumulation of real capital at a stated rate, and say why the first is impossible.
-   - Lab: `interest`, view `compound`. Presets: `price` (a penny at 5% over a stated span), `real` (a capital growing with the product), `ten-years`. Pin `inCompound`, `inReal`.
+   - Lab: `interest`, view `compound`, `money_unit` s. Presets: **Changed:** `price` (1d at 5% for 1,772 years, real growth 1%: 37 digits against 7), `child` (Josiah Child's £100 = 2,000s at 10% for 70 years, l. 3573, real growth 2%: 7 digits against 4), `ten-years` (2,000s at 5% for ten years, real growth 5%: equal). The `real` preset's instance, "a capital growing with the product", is the `inReal` tile of every preset, so `child` takes its place. Pin `inCompound`, `inReal`.
    - Misconception: money left at interest grows by itself.
-   - The `note` cross-references “Compound Interest and Continuous Growth” on the Algebra path, which computes the same sum; what is new here is the comparison with `inReal`.
-   - Worked: the compound sum outgrows any real product in a few centuries; interest can only be a share of a surplus that labour produces.
+   - The `note` cross-references “Compound Interest and Continuous Growth” on the Algebra path.
+   - Worked: **Changed:** Child's £100 at 10% for 70 years, about £78,975 yearly (his 102,400 is £100 doubled ten times), against about £400 at 2%.
 
 ### Course 12 — Credit and Fictitious Capital (`capital-credit-and-fictitious-capital`, 12)
 
@@ -1152,40 +1154,45 @@ Chapter 13 "66 1/3%" (for 66 2/3%).
 
 ### Course 14 — Revenues and Their Sources (`capital-revenues-and-their-sources`, 5)
 
+Module names use Untermann's chapter titles (§E.3): The Trinitarian Formula; A Contribution to the
+Analysis of the Process of Production; The Semblance of Competition; Conditions of Distribution and
+Production; The Classes. Lesson titles are as below.
+
 1. **the-trinity-formula** — The Trinity Formula — *Chapter 48*
-   - Read: "Capital — profit (profit of enterprise plus interest), land — ground rent, labour — wages, this is the trinity formula".
+   - Read: the opening statement of the trinitarian formula and its reduction to Capital—Interest, Land—Ground-Rent, Labor—Wages (Kerr vol. 3, l. 6924–6926).
    - Do: decompose a year's v + s into wages, profit of enterprise, interest and rent, and show that all three "revenues" come from one value product.
-   - Lab: `revenue`, view `trinity`. Presets: `english` (illustrative), `no-landlord`, `all-borrowed`. Pin `rvWages`, `rvRent`, `rvInterest`.
+   - Lab: `revenue`, view `trinity`. Presets (all illustrative, c 100, v 100, s 100): `english` (rent 3/10 of s, interest 1/5: half the capital borrowed), `no-landlord` (rent 0, interest 1/5), `all-borrowed` (rent 3/10, interest 2/5). Pin `rvWages`, `rvRent`, `rvInterest`, `rvProfitShare` (and `rvTotal` on `english`).
    - Misconception: each factor of production creates its own income.
    - Worked: a value product of 200 is 100 wages, 30 rent, 20 interest and 50 profit of enterprise; by the chapter's accounting land and capital add nothing to the 200. The `note` states the opposing account at strength: Say's three factors and Clark's marginal productivity, on which each factor is paid what it adds at the margin.
 
 2. **analysis-of-the-process-of-production** — Concerning the Analysis of the Process of Production — *Chapter 49*
-   - Read: the annual product's value against the annual revenue.
+   - Read: the two questions on how a value of wages plus profit plus rent buys a product worth that plus C (l. 7060–7062).
    - Do: compute the part of the annual product that is replaced inside Department I and is never anyone's revenue.
-   - Lab: `schemes`, view `simple`. Presets: `marx` (the simple reproduction scheme), `growing` (the expanded scheme's first year), `one-sector`. Pin `scWithinI`, `scBalance`.
+   - Lab: `schemes`, view `simple`. Presets: `marx` (Marx's figures, I 4,000c + 1,000v + 1,000s, II 2,000c + 500v + 500s, l. 7092–7094), `growing` (Marx's figures: Volume II, Chapter 21's initial diagram for accumulation, II 1,500c + 750v + 750s, vol. 2 l. 5210–5214), `one-sector` (illustrative: Department I set to 0, Department II as in `marx`). Pin `scWithinI`, `scBalance` (and `scIExchange` on `growing`).
    - Misconception: annual income equals the annual product.
    - Worked: of 9,000 of annual product, 4,000 (Ic) is means of production exchanged among Department I's own capitalists and never enters anyone's income.
 
 3. **illusions-created-by-competition** — Illusions Created by Competition — *Chapter 50*
-   - Read: price "appears" to be formed by adding wages, profit and rent.
+   - Read: the passage in which the value of commodities "exists first" and the wrong conception makes wages, profit and rent independent magnitudes (l. 7248).
    - Do: compute price both ways — value resolved into parts, and parts added up — and show the second is circular.
-   - Lab: `revenue`, view `added-up`. Presets: `wage-rise`, `rent-rise`, `fixed-value`. Pin `rvWages`, `rvProfitShare`.
+   - Lab: `revenue`, view `added-up`. Presets: `wage-rise` (Marx's figures, 400c + 100v + 150s with wages up 50, l. 7198–7204; rent 1/2 of s and interest 0, so the lab splits the reduced s 50/50 where Marx says "say" 45 profit and 55 rent), `rent-rise` (illustrative: c 100, v 100, s 100, rent 1/2, interest 1/5, no wage change), `fixed-value` (illustrative: c 100, v 100, s 100, rent 3/10, interest 1/5, wages up 20). Pin `rvWages`, `rvRent`, `rvProfitShare` (and `rvInterest` on the two illustrative presets).
    - Misconception: a wage rise raises prices because wages are a component added to them.
    - Worked: with value product fixed at 200, a wage rise from 100 to 120 cuts profit, interest and rent by 20 together.
+   - Text note: the Kerr text prints wages after the rise as 27 8/11% of the capital advanced; 150/550 is 27 3/11%. The lesson says so.
 
 4. **distribution-and-production-relations** — Distribution Relations and Production Relations — *Chapter 51*
-   - Read: the passage in which distribution relations are the "opposite side" of production relations (Kerr wording to be checked).
+   - Read: the passage in which the conditions of distribution are the "reverse side" of the conditions of production (Kerr's wording, l. 7354), with l. 7358.
    - Do: compute the same product's distribution under two production relations (a wage relation and an association of producers) and say what changes and what does not.
-   - Lab: `revenue`, view `trinity`. Presets: `capitalist`, `association`, `cooperative`. Pin `rvWages`, `rvProfitShare`.
+   - Lab: `revenue`, view `trinity`. Presets (illustrative, c 100 and value product 200 in each): `capitalist` (v 100, s 100, rent 3/10, interest 1/5), `cooperative` (workers own the firm but rent its land and borrow its capital: v 150, s 50, rent 3/5, interest 2/5, so rent 30, interest 20, profit of enterprise 0), `association` (v 150 consumed, s 50 common fund, no rent or interest). Pin `rvWages`, `rvRent`, `rvInterest`, `rvProfitShare`.
    - Misconception: distribution can be changed without changing production relations.
    - Worked: the association preset keeps c for replacement and a fund for expansion; only the split of v + s and who decides it change.
 
 5. **classes** — Classes — *Chapter 52*
    - Read: "The first question to be answered is this: What constitutes a class?" — and where the manuscript breaks off.
    - Do: group a small society's people by source of revenue, and count the groups as the sources are made finer.
-   - Lab: `revenue`, view `classes`. Presets: `three-classes` (wages, profit, rent), `doctor-and-official` (physicians and officials added), `landowners-split` (vineyards, farms, forests, mines, fisheries). Pin `rvClassCount`.
+   - Lab: `revenue`, view `classes`. Presets: `three-classes` (two spinners on wages, a mill owner and a manufacturer on profit, a landlord on rent: 3 groups), `doctor-and-official` (the same five plus a physician on medical fees and an official on a salary: 5 groups), `landowners-split` (a spinner, a mill owner, and owners of vineyards, farms, forests, mines and fisheries each on their own rent: 7 groups). Pin `rvClassCount`.
    - Misconception: a class is defined by its source of income alone.
-   - Worked: group by source of revenue and physicians and officials become classes, and landowners split into several; the manuscript breaks off there, and so does the lesson.
+   - Worked: group by source of revenue and physicians and officials become classes, and landowners split into several; the manuscript breaks off there, and so does the lesson. The Kerr text has no editorial "breaks off" note; the chapter simply ends at "fisheries."
 
 ---
 

@@ -129,4 +129,42 @@ SPOKEN = {
     '8 1/3': '8 and 1 third',
     'p′ : s′ = v : C': 'p prime is to s prime as v is to C',
     '150 : 30 = 100 : 20': '150 is to 30 as 100 is to 20',
+    # Average Profit and Its Fall
+    # Grouped numbers ("1,000") are read split at the comma, mixed numbers
+    # ("14 2/7") as two numbers, and "h" as a letter; these give the same runs
+    # ungrouped and in words.
+    "hours:  1,000·3 + 3,000·4 + 6,000·5 = 45,000": "hours, 1000 times 3 plus 3000 times 4 plus 6000 times 5 equals 45000",
+    "pieces:  1,000 + 3,000 + 6,000 = 10,000": "pieces, 1000 plus 3000 plus 6000 equals 10000",
+    "market value:  45,000 / 10,000 = 9/2 h": "market value, 45000 over 10000 equals 9 over 2 hours",
+    "gains:  +3/2 h, +1/2 h, −1/2 h": "gains, plus 3 over 2 hours, plus 1 over 2 hours, minus 1 over 2 hours",
+    "2,000 · 2 + 2,000 · 4 = 12,000": "2000 times 2 plus 2000 times 4 equals 12000",
+    "Marx: 15 on 105 = 14 2/7%": "Marx, 15 on 105 equals 14 and 2 sevenths percent",
+    "900/7 = 128 4/7, up from 120": "900 over 7 equals 128 and 4 sevenths, up from 120",
+    "816/7 = 116 4/7, down from 120": "816 over 7 equals 116 and 4 sevenths, down from 120",
+    "Marx: 66 2/3% → 20% as c: 50 → 400": "Marx, 66 and 2 thirds percent falling to 20 percent as c goes from 50 to 400",
+    "Marx: 1,000 earns 100; 1,500 earns 100": "Marx, 1000 earns 100, 1500 earns 100",
+    "p′ from 10% to 6 2/3%": "p prime from 10 percent to 6 and 2 thirds percent",
+    "devalue a third: 1,000 again, 10%": "devalue a third, 1000 again, 10 percent",
+    "before:  100 / 1,000 = 10%": "before, 100 over 1000 equals 10 percent",
+    "after the addition:  100 / 1,500 = 1/15": "after the addition, 100 over 1500 equals 1 over 15",
+    "devalued:  1,500 · 2/3 = 1,000": "devalued, 1500 times 2 over 3 equals 1000",
+    "after devaluation:  100 / 1,000 = 10%": "after devaluation, 100 over 1000 equals 10 percent",
+    "200 / 2,500 = 2/25": "200 over 2500 equals 2 over 25",
+    # Revenues and Their Sources
+    # Grouped numbers ("2,000") are read split at the comma, mixed numbers
+    # ("8 2/11") as two numbers, and Marx's department notation (I(v + s),
+    # IIc) as a function and letters; these give the same runs in words.
+    "I(v + s) buys IIc": "Department one's v plus s buys Department two's c",
+    "Ic is replaced within Department I": "Department one's c is replaced within Department one",
+    "I(v + s) = 2,000 = IIc": "Department one's v plus s equals 2000 equals Department two's c",
+    "2,000 + 1,000 = 3,000": "2000 plus 1000 equals 3000",
+    "revenue:  I(1000 + 1000) + II(500 + 500) = 3000": "revenue, Department one's 1000 plus 1000, plus Department two's 500 plus 500, equals 3000",
+    "exchange:  I(v + s) = 2000 = IIc": "exchange, Department one's v plus s equals 2000 equals Department two's c",
+    "within Department I:  Ic = 4000": "within Department one, Department one's c equals 4000",
+    "8 2/11": "8 and 2 elevenths",
+    "18 2/11": "18 and 2 elevenths",
+    "27 3/11": "27 and 3 elevenths",
+    "27 8/11": "27 and 8 elevenths",
+    "66 2/3": "66 and 2 thirds",
+    "137 1/2": "137 and a half",
 }
