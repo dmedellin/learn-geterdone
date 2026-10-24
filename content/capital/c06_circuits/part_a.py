@@ -36,10 +36,10 @@ LESSONS = [
         ),
         "key": [
             "M–C…P…C′–M′: buy, produce, sell",
-            "M = mp + lp: £422 = £372 + £50",
+            "M = Pm + L: £422 = £372 + £50",
             "C′ = C + c: £500 = £422 + £78",
             "s = M′ − M, once all of C′ is sold",
-            "the sale changes form, not magnitude",
+            "a sale changes form, not magnitude",
         ],
         "key_label": "The first circuit in five lines",
         "concepts_intro": (
@@ -80,10 +80,12 @@ LESSONS = [
                   "translation first: Untermann calls this the &ldquo;circulation&rdquo; of money "
                   "capital, and in the next chapter the &ldquo;rotation&rdquo; of productive "
                   "capital. Both render one German word, <em>Kreislauf</em>, which later "
-                  "translations give as &ldquo;circuit&rdquo;, and these lessons use that word."),
+                  "translations give as <em>circuit</em>, and these lessons use that word."),
             ("p", "The first stage is `M–C`, a purchase, and Marx's figures are the ones the "
                   "chapter keeps throughout: £422, of which £372 buys means of production and £50 "
-                  "buys labour-power. The split is not arbitrary. The cotton, coal and wear of the "
+                  "buys labour-power. Marx writes the two purchases `M–Pm` and `M–L`, Pm for the "
+                  "means of production and L for labour-power, and the lessons keep his letters. "
+                  "The split is not arbitrary. The cotton, coal and wear of the "
                   "spindles must be enough to soak up the whole of the labour bought, surplus "
                   "labour included; too little and some of the labour cannot be used, too much "
                   "and some of the cotton sits unspun. And the purchase of labour-power is "
@@ -115,7 +117,10 @@ LESSONS = [
                   "sells 8,440 pounds of yarn, he recovers only the value of his total "
                   "capital.&rdquo; Only the whole 10,000 lb bring the £78 home. The lab runs "
                   "these sales: the money returned is the product's value times the share sold, "
-                  "and `M′ − M` is zero at 8,440 lb and negative below it. A negative figure here "
+                  "and `M′ − M` is zero at 8,440 lb and negative below it. The marx preset sells "
+                  "everything, £500 back and £78 realised; the partly preset sells 8,440 lb, £422 "
+                  "back and £0 realised; the constant preset sells 7,440 lb, £372 back and −£50; "
+                  "and the unsold preset sells nothing, £0 back and −£422. A negative figure here "
                   "is not a loss of value. It is capital-value still sitting in the warehouse as "
                   "yarn."),
             ("p", "Once the sale is made, the result looks different from how it was made. In "
@@ -139,10 +144,15 @@ LESSONS = [
                   "with a capitalist mode of production are seized periodically by a feverish "
                   "attempt to make money without the mediation of the process of "
                   "production.&rdquo;"),
-            ("p", "The formula invites a reading Marx wants to block. The mercantilist writers "
-                  "of the seventeenth and eighteenth centuries measured a nation's gain by the "
-                  "gold its trade brought in, and it is a fair reading of `M…M′` alone that the "
-                  "gain is made in selling, by selling dear. The chapter's answer is the yarn: it "
+            ("p", "The formula invites a reading Marx wants to block. The earliest mercantilist "
+                  "writers, of the seventeenth century, measured a nation's gain by the gold its "
+                  "trade brought in, and Marx says their &ldquo;so-called monetary system&rdquo; "
+                  "read `M–C–M′` as &ldquo;a movement which takes place exclusively in the "
+                  "circulation&rdquo;, so that it &ldquo;cannot explain the two phases M-C and C-M' "
+                  "in any other way than by declaring that C is sold above its value&rdquo;. It is "
+                  "a fair reading of `M…M′` alone that the gain is made in selling, by selling "
+                  "dear; the later mercantilists, he adds, at least put production inside the "
+                  "formula. The chapter's answer is the yarn: it "
                   "was worth £500 before it left the mill, and a sale at value turns £500 of yarn "
                   "into £500 of money. Whether value comes from labour at all is a separate "
                   "dispute, set out in Commodities and Money; here the claim is narrower, that on "
@@ -256,8 +266,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking the money at the end is where the surplus is made",
-             "It is the natural reading of `M…M′`, and the mercantilists made it: the gain is "
-             "made by selling dear. The unsold preset refutes it. With nothing sold, the table "
+             "It is the natural reading of `M…M′`, and the monetary system Marx names made it: "
+             "the gain is made by selling dear. The unsold preset refutes it. With nothing sold, the table "
              "still shows a product worth £500 against £422 advanced, while the tile for money "
              "returned is £0. The £78 was produced in the mill; the sale, at value, only changes "
              "its form, and at 8,440 lb sold none of it has been realised yet."),
@@ -361,10 +371,11 @@ LESSONS = [
                   "the circuit, and the whole thing looks like producing in order to consume. "
                   "Jean-Baptiste Say and James Mill built a famous argument on that look: every "
                   "sale is also a purchase, money only passes products from hand to hand, and so "
-                  "there can never be more goods in general than buyers for them. Marx's comment "
-                  "on the argument is brief, &ldquo;some economists use this sort of exchange as "
-                  "a proof that there can be no overproduction&rdquo;, and his answer is the "
-                  "money stage they treat as a veil."),
+                  "there can never be more goods in general than buyers for them. Marx does not "
+                  "name them in this chapter; his comment is one sentence, &ldquo;some economists "
+                  "use this sort of exchange as a proof that there can be no "
+                  "overproduction&rdquo;, and his answer is the money stage they treat as a "
+                  "veil."),
             ("p", "The answer runs like this. Once the yarn is sold to a merchant, the "
                   "spinner's circuit goes on, whether or not anyone has yet used the yarn. "
                   "Production can grow, wages and the capitalists' spending can grow with it, and "
@@ -554,8 +565,8 @@ LESSONS = [
         ),
         "key": [
             "C′–M′–C…P…C′: start from the product",
-            "C′ = c + v + s, in pounds and in lb",
-            "£500 of yarn: £372 c, £50 v, £78 s",
+            "C′ = c + v + s, in money and in yarn",
+            "£500 of yarn: c £372, v £50, s £78",
             "7,440 lb must buy back means of production",
             "only v + s, £128, is anyone's income",
         ],
@@ -604,7 +615,8 @@ LESSONS = [
                   "those, 5,535.36 lb replace the constant capital used up in them, 744 lb their "
                   "wages and 1,160.64 lb are surplus product. The second lot, 1,000 lb, divides "
                   "into 744, 100 and 156; the third, 1,560 lb, into 1,160.64, 156 and 243.36. "
-                  "The lab's four presets are the whole and the three lots."),
+                  "The lab's four presets are these: marx is the whole 10,000 lb, and lot-1, lot-2 "
+                  "and lot-3 are the 7,440 lb, 1,000 lb and 1,560 lb lots."),
             ("p", "Check his totals and you will find slips in the Kerr text's tables: the "
                   "first lot's surplus product printed as 1,160.740 lb, the third lot's as "
                   "343.360 lb a few lines after it was given as 243.360, and the grand total of "
@@ -635,8 +647,9 @@ LESSONS = [
                   "throughout this volume, held that the price of every commodity resolves, "
                   "finally, into wages, profit and rent. His reasoning is strong: the cotton was "
                   "grown with paid labour, the spindle was made with paid labour, and if you "
-                  "trace each input back far enough you find only incomes. Marx's reply takes "
-                  "a whole chapter later in the volume; this chapter's arithmetic already shows "
+                  "trace each input back far enough you find only incomes. Marx's reply fills "
+                  "Volume II, Chapter 19, read in Reproduction of the Social Capital as “Former "
+                  "Presentations: Quesnay and Smith”; this chapter's arithmetic already shows "
                   "the difficulty. In this year's £500 of yarn, £372 must buy back this year's "
                   "means of production, and only `£50 + £78 = £128` is income for anyone."),
             ("p", "Marx credits one economist with seeing this first. François Quesnay, court "
@@ -793,7 +806,7 @@ LESSONS = [
             "number of weeks, and see what a slow sale does to the division."
         ),
         "key": [
-            "I M…M′, II P…P, III C′…C′: one capital",
+            "M…M′, P…P, C′…C′: three circuits, one capital",
             "continuity: every form at every moment",
             "share in a form = its weeks / all weeks",
             "4, 4, 4 weeks: a third in each form",
@@ -850,9 +863,9 @@ LESSONS = [
             ("p", "How big is each part? If production runs evenly, each part's share of the "
                   "capital is the share of the circuit's time spent in that form. Four weeks "
                   "buying, four producing and four selling make a 12-week circuit, and at any "
-                  "moment a third of the capital is in each form: `4/12 = 1/3`. Let selling "
-                  "slow to eight weeks and the circuit is 16 weeks, with half of the capital in "
-                  "commodity form, `8/16 = 1/2`, and only a quarter at work. A faster business, "
+                  "moment a third of the capital is in each form, `4/12 = 1/3`: the even preset. "
+                  "In the slow-sale preset selling takes eight weeks and the circuit is 16 weeks, with half of the capital in "
+                  "commodity form, `8/16 = 1/2`, and only a quarter at work. The fast preset, "
                   "two weeks buying, six producing, two selling, has `6/10 = 3/5` of its capital "
                   "producing at any time."),
             ("p", "The price of continuity is that every interruption spreads. If one batch of "
@@ -1030,7 +1043,7 @@ LESSONS = [
             "circulation share = circulation / turnover",
             "6 + 6 weeks: 12 weeks, half circulating",
             "circulation time produces no value",
-            "the sale realises s; the purchase does not",
+            "only the sale realises s, not the purchase",
         ],
         "key_label": "Two times that exclude each other",
         "concepts_intro": (
@@ -1063,8 +1076,10 @@ LESSONS = [
             ("p", "The chapter gives no figures, so the lab supplies them. A spinner's yarn "
                   "takes six weeks from raw cotton to finished stock; selling it and buying back "
                   "cotton and labour-power takes another six. The capital's turnover, the time "
-                  "until the value advanced is back in its starting form, is `6 + 6 = 12` weeks. "
-                  "Half of those weeks, `6/12`, the capital is not in production at all."),
+                  "until the value advanced is back in its starting form, is `6 + 6 = 12` weeks, "
+                  "the slow-sale preset. Half of those weeks, `6/12`, the capital is not in "
+                  "production at all. The spinning preset sells faster, in 2 weeks: an 8-week "
+                  "turnover with a quarter of it in circulation."),
             ("p", "First, what counts as production time. It is longer than the labour time. "
                   "The mill stands at night with its machines still in it; cotton waits in "
                   "store so that spinning need not depend on each day's deliveries; grain lies in "
@@ -1072,7 +1087,8 @@ LESSONS = [
                   "time in the sphere of production. Marx's point is that only the part in which "
                   "labour is actually applied creates value, and that capitalists therefore try "
                   "to close the gap, which is why mills ran at night. That difference has its own "
-                  "lesson in The Turnover of Capital; here the production time is taken whole."),
+                  "lesson, “The Time of Production”, in The Turnover of Capital; here the "
+                  "production time is taken whole."),
             ("p", "Circulation time is the rest. If the whole capital moves in one lump, "
                   "production simply stops while it lasts. If the capital is divided, as in the "
                   "last lesson, production can continue, but the part of the capital in "
@@ -1323,9 +1339,14 @@ LESSONS = [
                   "the stock is there because it will not sell, the cost is a loss, as a buyer "
                   "would tell the seller: &ldquo;So much the worse for you,&rdquo; &ldquo;Here "
                   "is another seller, whose articles were completed the day before "
-                  "yesterday.&rdquo; Adam Smith thought keeping a stock belonged to commercial "
-                  "society; Marx answers that every society keeps one, and that capitalism "
-                  "changes its form into a stock of commodities."),
+                  "yesterday.&rdquo; Marx is careful about the first kind too. The costs of a "
+                  "necessary stock &ldquo;enter in part into the value of the commodities&rdquo;, "
+                  "which is what separates them from buying and selling, and yet from society's "
+                  "side they are still &ldquo;dead expenses&rdquo;, labour spent keeping wealth "
+                  "rather than making it; the lab keeps only the first half of that, the line "
+                  "between a cost that enters the value and one that does not. Adam Smith thought "
+                  "keeping a stock belonged to commercial society; Marx answers that every society "
+                  "keeps one, and that capitalism changes its form into a stock of commodities."),
             ("p", "<strong>Volume II, Chapter 6, §3.</strong> &ldquo;The productive capital "
                   "invested in this industry adds value to the transported products, partly by "
                   "transferring value from the means of transportation, partly by adding value "
@@ -1338,10 +1359,10 @@ LESSONS = [
                   "&ldquo;the railroad magnates show a greater talent for inventing fantastic "
                   "species than botanists and zoologists.&rdquo;"),
             ("p", "The lab's presets put the line in figures. A capital of £400 produces goods "
-                  "worth £500, a surplus value of £100. A book-keeper paid £10 is a pure cost: "
-                  "surplus value after costs is `£100 − £10 = £90`. A carter paid £10 adds £10 "
+                  "worth £500, a surplus value of £100. In the clerks preset a book-keeper paid £10 is a pure cost: "
+                  "surplus value after costs is `£100 − £10 = £90`. In the transport preset a carter paid £10 adds £10 "
                   "to the value delivered, so the goods are worth £510 against £410 laid out, and "
-                  "the surplus value is still £100. Store goods for £5 that a normal stock "
+                  "the surplus value is still £100. In the stockpile preset, store goods for £5 that a normal stock "
                   "needs, and another £5 because they would not sell, and £95 is left."),
             ("p", "This line is among the most argued-over in the book. The national accounts "
                   "of every modern economy count a shop's margin, a bank's fees and an "

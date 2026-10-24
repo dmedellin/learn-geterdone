@@ -25,9 +25,9 @@ COURSE = {
         "costs."
     ),
     "key": [
-        "I. M–C…P…C′–M′: money to more money",
-        "II. P…C′–M′–C…P: production renewed",
-        "III. C′–M′–C…P…C′: the whole product",
+        "first, M–C…P…C′–M′: money to more money",
+        "second, P…C′–M′–C…P: production renewed",
+        "third, C′–M′–C…P…C′: the whole product",
         "C′ = c + v + s; only v + s is income",
         "share in a form = its weeks / all weeks",
         "turnover = production + circulation",
