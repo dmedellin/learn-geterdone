@@ -801,51 +801,51 @@ Chapter 5 · The Time of Circulation, Chapter 6 · The Expenses of Circulation. 
 Volume III's Part One. Prose cites "Volume III, Chapter n".
 
 1. **cost-price-and-profit** — Cost Price and Profit — *Chapter 1*
-   - Read: "The value of every commodity produced in the capitalist way is represented in the formula C = c + v + s."
+   - Read: the opening formula C = c + v + s and its subtraction of s (Kerr l. 456: "produced by capitalist methods is represented by the formula"), then the sale at a profit below value (l. 539).
    - Do: compute cost price k = c + v and profit, and say why profit looks like the offspring of the whole capital.
-   - Lab: `profit`, view `cost`. Presets: `marx` (Marx's figures: 400c + 100v + 100s = 600, cost price 500), `cheap-sale` (sold at 560, still a profit), `below-cost`. Pin `prCost`, `prProfit`.
+   - Lab: `profit`, view `cost`. Presets: `marx` (Marx's figures: 400c + 100v + 100s = 600, cost price 500), `cheap-sale` (sold at 560: profit 60, 40 below value), `proudhon` (sold at cost price 500: profit 0), `below-cost` (sold at 480: profit −20). Pin `prCost`, `prProfit`.
    - Misconception: a commodity sold above its cost price is sold above its value.
    - Worked: 600 of value, 500 of cost price: a sale at 560 is profitable and still 40 below value.
 
 2. **the-rate-of-profit** — The Rate of Profit — *Chapter 2*
    - Read: the two sentences defining the rate of surplus value against v and the rate of profit against the total capital (Kerr wording).
    - Do: compute p′ = s/(c + v) beside s′ = s/v for the same capital.
-   - Lab: `profit`, view `rate`. Presets: `marx`, `labour-heavy`, `capital-heavy`. Pin `prRate`, `prSRate`.
+   - Lab: `profit`, view `rate`. Presets: `marx` (400c + 100v + 100s: 20%, 100%), `labour-heavy` (300c + 200v + 100s: 20%, 50%), `capital-heavy` (450c + 50v + 100s: 20%, 200%), `machinery` (Marx's ch. 1 figures with the £1,200 of instruments advanced, 1,580c + 100v + 100s: 5/84, 100%). Pin `prRate`, `prSRate`.
    - Misconception: the rate of profit measures exploitation.
    - Worked: 100s on 400c + 100v is 100% s′ and 20% p′.
 
 3. **rate-of-profit-and-rate-of-surplus-value** — The Rate of Profit and the Rate of Surplus Value — *Chapter 3*
    - Read: the formula p′ = s′·v/C as the Kerr text prints it.
    - Do: vary s′ and the composition one at a time and predict the effect on p′.
-   - Lab: `profit`, view `relation`. Presets: `vary-s`, `vary-composition`, `both-offset` (a rise in s′ exactly offset by a rise in c/v). Pin `prRate`.
+   - Lab: `profit`, view `relation`. Presets, all Marx's figures: `base` (80c + 20v + 20s: 20%), `vary-s` (80c + 20v + 40s: 40%, s′ 200%), `vary-composition` (100c + 20v + 20s: 1/6), `both-offset` (104c + 16v + 24s: 20%, s′ 150%), `s-up-p-down` (90c + 10v + 15s: 15%, s′ 150%). Pin `prRate`, `prSRate`.
    - Misconception: a rising rate of surplus value must raise the rate of profit.
    - Worked: s′ up from 100% to 150% while c/v rises from 4 to 6.5: p′ stays at 20%.
 
 4. **turnover-and-the-rate-of-profit** — The Effect of Turnover on the Rate of Profit — *Chapter 4*
    - Read: from Engels' text of the chapter; Engels' preface says Marx left only the title, and the lesson says so in its first paragraph.
    - Do: compute the annual rate of profit from s′, n, v and C.
-   - Lab: `profit`, view `turnover`. Presets: `engels` (Engels' Manchester spinning mill, figures from the chapter, labelled "Engels' figures"), `once`, `ten-times`. Pin `prAnnual`.
+   - Lab: `profit`, view `turnover`. Presets: `ten-times` (Engels' capital I: 10,500c + 500v, s 500, n = 10: 5/11), `once` (capital III: 6,000c + 5,000v, n = 1: 5/11), `halved` (capital I at n = 5: 5/22), `engels` (the Manchester mill, labelled "Engels' figures": c 12,182, v 318, s per turnover 318 · 80/52, n = 8½: 2,703/8,125 = 33.27%, Engels' figure; his check 4,160/12,500 = 33.28% is the exact turnover 2,704/318). Pin `prAnnual`.
    - Misconception: turnover affects only the circulating capital's profit.
    - Worked: v = 100 turned 5 times at 100% on C = 1,000 gives an annual p′ of 50%.
 
 5. **economy-in-constant-capital** — Economy in the Use of Constant Capital — *Chapter 5*
-   - Read: §1, "economy in the conditions of labour at the expense of the labourers".
+   - Read: the close of §1 (Kerr l. 1143), "Such economies are: The overcrowding…"; the phrase this entry first quoted is the title of §2 ("Economies in the conditions of labor at the expense of the laborers"), not a sentence of §1.
    - Do: compute the rise in p′ when c is cut with s and v unchanged, and say at whose cost the saving often comes.
-   - Lab: `profit`, view `economy`. Presets: `shared-building`, `waste-reuse`, `unsafe` (ventilation cut). Pin `prRate`.
+   - Lab: `profit`, view `economy`. Presets, illustrative, on 400c + 100v + 100s: `shared-building` (c − 100: 25%), `waste-reuse` (c − 40: 5/23), `unsafe` (guards and ventilation not bought, c − 20: 5/24). Pin `prRate`, `prCost`.
    - Misconception: economy in constant capital is only good management.
    - Worked: cutting c from 400 to 300 with 100v and 100s raises p′ from 20% to 25%.
 
 6. **price-fluctuations-of-raw-materials** — Price Fluctuations of Raw Materials — *Chapter 6*
-   - Read: §1, "fluctuations in the price of raw material… affect the rate of profit".
+   - Read: §1 (Kerr l. 1290-1292), the rate of profit falls and rises "inversely as the price of raw material"; second passage l. 1300-1302, the product's price does not follow in full.
    - Do: compute p′ when the raw material's price rises, with and without the product's price following.
-   - Lab: `profit`, view `price`. Presets: `cotton-famine` (cotton doubles), `passed-on`, `cheaper`. Pin `prRate`.
+   - Lab: `profit`, view `price`. Presets, illustrative, on 400c + 100v + 100s with £100 of cotton: `passed-on` (cotton doubles, passed on 1: 1/6), `half-passed` (passed on 1/2: 1/12, profit 50), `cotton-famine` (passed on 0: profit 0), `cheaper` (cotton halves, passed on 1: 2/9). Pin `prRate`, `prProfit`.
    - Misconception: a raw material price rise is always passed on in full.
    - Worked: c rises from 400 to 500; if the price follows to 700, p′ = 100/600 = 1/6; if it stays at 600, profit is 0. `price_passed_on` moves between the two.
 
 7. **supplementary-remarks-on-profit** — Supplementary Remarks on Profit — *Chapter 7*
-   - Read: the capitalist's "practical notion" of profit and why it must differ from s.
+   - Read: the chapter's opening, Kerr l. 1544-1546, "Nevertheless the bourgeois will not consider his profit as identical with the surplus-value…" (the phrase "practical notion" is not in the Kerr chapter).
    - Do: reconcile the capitalist's book-keeping view (profit on capital, cost price) with Marx's categories for the same numbers.
-   - Lab: `profit`, view `books`. Presets: `ledger`, `marx-view`, `both`. Pin `prProfit`, `prRate`.
+   - Lab: `profit`, view `books`. Presets: `ledger` (ch. 1's 400c + 100v + 100s sold at value: profit 100, 20%), `business-a` (Marx's 9,000c + 1,000v + 1,000s: 10%), `business-b` (11,000c + 1,000v + 1,000s: 1/12), `gold` (Marx's £100 earning £20 re-priced as £150, 120c + 30v + 30s: profit 30, 20%). Pin `prProfit`, `prRate`.
    - Misconception: a capitalist who sells at value makes no profit.
    - Worked: sold at its value of 600, the commodity yields a profit of 100 over its cost price of 500; the books and the analysis agree on every figure and disagree only about what the 100 is.
 
