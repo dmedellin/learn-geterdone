@@ -301,8 +301,8 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 
 1. **the-two-factors-of-a-commodity** — The Two Factors of a Commodity — *Chapter 1 · Commodities*
    - Read: §1, the opening sentence ("The wealth of those societies…"), and the definition of socially necessary labour-time ("…under the normal conditions of production, and with the average degree of skill and intensity prevalent at the time").
-   - Do: given several producers' hours and outputs, compute the socially necessary labour-time per unit and the value of a lot, and compute what the slowest producer's extra hours add to it (nothing).
-   - Lab: `value`, view `snlt`. Presets: `linen` (three weavers at 1 h, 2 h, 3 h a yard, outputs 40, 40, 20 yards), `slow` (the same three weavers, the slowest now at 5 h a yard), `power-loom` (Marx's example: after the power-loom, a hand-loom weaver's hour counts as half an hour; the two largest producers at half their hours). Pin `vaSnlt`, `vaLotValue`.
+   - Do: given several producers' hours and outputs, compute the socially necessary labour-time per unit and the value of a lot, and compute how much of the slowest producer's extra hours his own product carries (only his share of the average: in `slow`, 8 of his 40 extra hours). *Corrected in authoring: on the lab's weighted average the slow producer's hours are not "nothing"; they raise every unit's value by his share of output.*
+   - Lab: `value`, view `snlt`, `qty_unit` yards, lot 20 yards. Presets: `linen` (three weavers at 1 h, 2 h, 3 h a yard, outputs 40, 40, 20 yards: `9/5 h`, `36 h`), `slow` (the same three weavers, the slowest now at 5 h a yard: `11/5 h`, `44 h`), `power-loom` (Marx's example: after the power-loom, a hand-loom weaver's hour counts as half an hour; the two largest producers at half their hours: `6/5 h`, `24 h`). Pin `vaSnlt`, `vaLotValue`.
    - Misconception: a commodity made more slowly is worth more.
    - Worked: 100 yards made in 180 hours in all is 9/5 hour a yard; the weaver who needed 3 hours a yard sells at 9/5 like everyone else.
    - Note to author: the lab's weighted average is a model of "normal conditions", not Marx's definition; Volume III, Chapter 10 shows the regulating value need not be the average, and the `note` says so.
@@ -310,7 +310,7 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 2. **the-twofold-character-of-labour** — The Twofold Character of Labour — *Chapter 1 · Commodities*
    - Read: §2, the full sentence ending "…this point is the pivot on which a clear comprehension of political economy turns".
    - Do: separate the useful-labour side (coats, yards) from the value side (hours) for one industry, and compute what a change in productivity does to each.
-   - Lab: `value`, view `skill` with `skill` fixed at 1. Presets: `coat-linen` (tailor 10 h for 1 coat, weaver 10 h for 20 yards), `doubled` (tailoring productivity doubles: 2 coats in 10 h), `halved` (it halves). Pin `vaLotValue`, `vaPerUnit`.
+   - Lab: `value`, view `skill` with `skill` fixed at 1, `basis` total, the lot = the day's output. Presets: `coat` (tailor 10 h for 1 coat: `10 h`, `10 h`), `doubled` (tailoring productivity doubles: 2 coats in 10 h: per unit `5 h`, lot `10 h`), `halved` (it halves: ½ coat in 10 h: per unit `20 h`, lot `10 h`). Pin `vaLotValue`, `vaPerUnit`. *Changed in authoring: `coat-linen` became `coat`, because the `value` mode averages over producers of one product, so a tailor and a weaver cannot share an instance; the linen comparison (a coat at 5 h is worth 10 yards) is in prose.*
    - Misconception: more useful things always means more value.
    - Worked: double the productivity of tailoring and two coats now carry the value one did; the use-values doubled, the value did not.
    - Skilled labour as "multiplied simple labour" is stated in prose and in `note` as an assumption the chapter makes; it is not a preset, because the reduction is not computed from anything.
@@ -318,44 +318,44 @@ the chapter and the label says so ("Marx's spinning mill: 10 lb cotton").
 3. **the-form-of-value** — The Form of Value — *Chapter 1 · Commodities*
    - Read: §3, "20 yards of linen = 1 coat, or: 20 yards of linen are worth 1 coat".
    - Do: write the elementary, expanded, general and money forms for a set of commodities from their labour-values, name the relative and the equivalent form, and compute how the linen's relative value moves when only the coat's value changes.
-   - Lab: `form`, view `stage`, shipped `stage = elementary`. Presets: `marx` (Marx's figures: 20 yards linen = 1 coat = 10 lb tea = 40 lb coffee = 1 quarter corn = 2 oz gold = ½ ton iron, values in hours so the equations hold), `coat-cheapens` (the coat's hours halve, the linen's do not), `gold` (gold as the equivalent). Pin `foEquation`, `foRelative`.
+   - Lab: `form`, view `stage`, shipped `stage = elementary`. Presets: `marx` (Marx's figures: 20 yards linen = 1 coat = 10 lb tea = 40 lb coffee = 1 quarter corn = 2 oz gold = ½ ton iron, each lot 20 h so the equations hold; equivalent linen: `20 yards linen = 1 coat`, `1 coat`), `coat-cheapens` (the coat's hours halve to 10, the linen's do not: `20 yards linen = 2 coat`), `gold` (gold as the equivalent and listed second, so the elementary form is Marx's price form: `20 yards linen = 2 ounces gold`). Pin `foEquation`, `foRelative`.
    - Misconception: in "20 yards of linen = 1 coat" the coat's value is what is being expressed.
    - Worked: halve the hours in a coat and 20 yards of linen now fetch 2 coats: the linen's value is expressed differently though nothing about linen changed.
 
 4. **the-fetishism-of-commodities** — The Fetishism of Commodities — *Chapter 1 · Commodities*
    - Read: §4, "A commodity appears, at first sight, a very trivial thing…" and Robinson Crusoe's ledger.
    - Do: compute the hours behind each product in Robinson's ledger and the association's shares, and compare them with the ratios the village's prices give.
-   - Lab: `value`, view `ledger`. Presets: `robinson` (Robinson's week: hours on goats, fishing, furniture; products), `village` (four households trade by the same hours, prices shown), `association` (the same output allocated by hours contributed). Pin `vaTotalHours`, `vaPerUnit`.
+   - Lab: `value`, view `ledger`. Presets (illustrative hours): `robinson` (goats 10 h for 2, fish 15 h for 30, furniture 12 h for 2, tools 3 h for 1: `40 h`), `village` (four households, 30 h each on one product, same hours per unit: `120 h`), `association` (an association's output, 45/40/42/33 h for 9/80/7/11: `160 h`); `vaPerUnit` is `goats 5 h, fish 1/2 h, furniture 6 h, tools 3 h` in all three. Pin `vaTotalHours`, `vaPerUnit`. *The ledger view shows no prices and no allocation to members; the village's ratios and the association's shares by hours are in prose.*
    - Misconception: value is a physical property of the thing, like weight.
    - Worked: Robinson's table and the market's prices give the same ratios; only one of them tells you whose hours they were.
 
 5. **exchange** — Exchange — *Chapter 2 · Exchange*
    - Read: "It is plain that commodities cannot go to market and make exchanges of their own account."
    - Do: count the bilateral ratios a market of n owners needs with and without a single equivalent.
-   - Lab: `form`, view `count`. Presets: `four` (four commodities), `six` (six), `six-gold` (six, one chosen as equivalent). Pin `foPairs`, `foWithEquivalent`.
+   - Lab: `form`, view `count`. Presets: `four` (four commodities, linen as equivalent: `6`, `3`), `six` (six, cattle as equivalent: `15`, `5`), `six-gold` (six, gold as equivalent: `15`, `5`; identical to `six` on purpose, since the count does not depend on which commodity is the equivalent). Pin `foPairs`, `foWithEquivalent`.
    - Misconception: money is a mere symbol fixed by convention.
    - Worked: six owners need fifteen ratios to trade by barter and five once one commodity is everyone's equivalent. The count shows why one equivalent is needed; Marx's point is how it arises — "a social act" of the owners, who "acted and transacted before they thought" — and the `note` says the lab cannot show that.
 
 6. **money-as-measure-and-means-of-circulation** — Money as Measure and Means of Circulation — *Chapter 3 · Money, or the Circulation of Commodities*
    - Read: §1 on price as "the money-name of the labour realised in a commodity"; §2(b) on the quantity of money in circulation.
    - Do: compute prices from values and gold's value, and the money needed to circulate a day's sales at a given velocity; then compute prices again after gold's value changes and no commodity's does.
-   - Lab: `money`, view `circulate`. Presets: `marx` (Marx's figures: 1 quarter wheat, 20 yards linen, a bible, 4 gallons brandy at £2 each, velocity 4 when they change hands in sequence), `gold-falls` (gold's value halves), `faster` (velocity 8). Pin `moNeeded`, `moPriceSum`.
+   - Lab: `money`, view `circulate`. Each commodity 20 h, £1 = 10 h (illustrative hours, Marx's prices). Presets: `marx` (Marx's figures: 1 quarter wheat, 20 yards linen, a bible, 4 gallons brandy at £2 each, velocity 4 when they change hands in sequence: `£8`, `£2`), `side-by-side` (added in authoring: Marx's other case, the four sold simultaneously, velocity 1: `£8`, `£8`), `gold-falls` (gold's value halves, £1 = 5 h: `£16`, `£4`), `faster` (velocity 8: `£8`, `£1`). Pin `moNeeded`, `moPriceSum`.
    - Misconception (as Marx frames it, against Hume and Ricardo): with gold coin, prices are set by the quantity of money in circulation. State Hume's version at full strength; Marx argues the causation runs the other way for metal, and in §2(c) agrees that paper issued beyond the gold it represents raises prices. The measure of value is kept apart from the standard of price, and §2(a)'s point — that sale and purchase can come apart, the first possibility of crisis — is stated in prose and carried into the next lesson.
    - Worked: four commodities at £2 each, sold one after another by the same two sovereigns' worth of coin: price sum £8, velocity 4, money needed £2.
 
-7. **hoards-means-of-payment-and-world-money** — Hoards, Means of Payment and World Money — *Chapter 3 · Money, or the Circulation of Commodities*
+7. **hoards-and-means-of-payment** — Hoards and Means of Payment — *Chapter 3 · Money, or the Circulation of Commodities*
    - Read: §3(b), the law of the quantity of money once payments fall due.
    - Do: compute money needed with credit sales and mutually cancelling payments, and say why a chain of debts makes a crisis a money crisis.
-   - Lab: `money`, view `payments`. Presets: `cash` (no credit), `chain` (A owes B owes C owes A, equal sums), `broken` (the same chain with one default). Pin `moNeeded`, `moNetted`.
+   - Lab: `money`, view `payments`, velocity 1, three goods of £100. Presets: `cash` (no credit: `£300`, `£0`), `chain` (credit sales 300, due 300, cancelling 300; bills A→B, B→C, C→A £100 each: `£0`, `£0`), `broken` (the same chain, bill 1 unpaid; due 200, cancelling 100: `£100`, `£100`). Pin `moNeeded`, `moNetted`.
    - Misconception: money only matters as a medium of exchange.
    - Worked: £300 of debts in a circle cancel to £0 in cash; break one link and £100 is suddenly needed in hard money.
 
 8. **world-money** — World Money — *Chapter 3 · Money, or the Circulation of Commodities*
    - Read: §3(c), "When money leaves the home sphere of circulation, it strips off the local garbs…".
    - Do: compute the balance between two countries' payments and the bullion that settles it.
-   - Lab: `money`, view `world`. Presets: `balanced`, `deficit` (one side imports more), `drain` (deficit plus a payment due). Pin `moDrain`.
+   - Lab: `money`, view `world`. Presets: `balanced` (imports and exports £1,000: `£0`), `deficit` (imports £1,000, exports £800: `£200 out`), `drain` (the same and £100 owed abroad, other receipts −100: `£300 out`). Pin `moDrain`.
    - Misconception: world money is just a currency exchanged at a rate.
-   - Worked: imports of £1,000 against exports of £800 leave £200 to be shipped in bullion, the "universal means of payment".
+   - Worked: imports of £1,000 against exports of £800 leave £200 to be shipped in bullion, the "universal medium of payment" (Kerr's wording; corrected from "means").
 
 ### Course 2 — From Money to Surplus Value (`capital-money-into-surplus-value`, 10)
 
