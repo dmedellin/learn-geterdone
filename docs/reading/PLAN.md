@@ -1542,7 +1542,7 @@ second visit.
 
 **The practice pool** (`content/reading/passages/pool.py`, `Q01`–`Q30`): the
 Daily Drill's texts, served in order, never assigned to one lesson except the
-warm-ups `Q19`–`Q25` (§C), which the Daily Drill skips once logged. Q01–Q08
+warm-ups `Q19`–`Q25`, `Q29` and `Q30` (§C); the Daily Drill page carries the other 21. Q01–Q08
 easy, Q09–Q22 standard rising, Q23–Q30 hard; 380–480 words; six questions;
 kinds mixed. After the pool, the reader practises on their own pasted text.
 
