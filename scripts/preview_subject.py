@@ -125,6 +125,10 @@ def main():
                     fail("%s: math with no spoken form: %r" % (where, run))
                 elif run not in overrides and not code and speech.ambiguous(run):
                     guessed.append((where, run))
+            from speechcheck import prose_strings
+            for text, _ in prose_strings(lesson):
+                for op in speech.unread_operators(text):
+                    fail("%s: %r left unspoken in prose: %r" % (where, op, text[:80]))
             for kind, payload in lesson["body"]:
                 if kind == "code":
                     for problem in render.code_block_problems(payload):

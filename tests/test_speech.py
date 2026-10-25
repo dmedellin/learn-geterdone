@@ -325,10 +325,37 @@ class TestProseIslands(unittest.TestCase):
             "Factoring x² + bx + c": ["x² + bx + c"],
             "the same definition &ldquo;λ, μ and ρ&rdquo; gives": ["λ, μ", "ρ"],
             "A plain sentence with no math, not even a 2.": [],
+            # a spaced minus inside brackets does not end the island
+            "counted twice, so there are n·(n − 1)/2 possible pairs.": ["n·(n − 1)/2"],
+            "(the paths, n·(n − 1)/2)": ["n·(n − 1)/2"],
+            # an island ends at a comma that goes back to prose ...
+            "system test cost 10 × 10 = 100, 5 architecture defects": ["10 × 10 = 100"],
+            # ... but not at one that goes on to more math
+            "the edges 1→2, 1→3, 1→4 and": ["1→2, 1→3, 1→4"],
+            # nor does it run on over a full stop into the next sentence
+            "gives 2·F(n + 1) − 1 = 2·1,346,269 − 1 = 2,692,537. 30 is the depth":
+                ["2·F(n + 1) − 1 = 2·1,346,269 − 1 = 2,692,537"],
+            # `&&` written into prose is an island, as `||` always was
+            "as 1 + if 3 + for 1 + && 1 + || 1, still": ["1 + && 1 + || 1"],
+            "as 1 + &amp;&amp; 1, still": ["1 + &amp;&amp; 1"],
         }
         for text, expected in cases.items():
             with self.subTest(text=text):
                 self.assertEqual([text[a:b] for a, b in islands(text)], expected)
+
+    def test_bracketed_formula_reads_whole(self):
+        from mathpath import render
+        out = render.inline("there are n·(n − 1)/2 pairs")
+        self.assertEqual(out, 'there are <span data-say="n times the quantity n minus 1, over 2">'
+                              'n·(n − 1)/2</span> pairs')
+
+    def test_unread_operators(self):
+        """speechcheck and preview_subject flag an `&&` no island reads."""
+        from unittest import mock
+        from mathpath import speech
+        self.assertEqual(speech.unread_operators("1 + && 1 and `a && b` <b title='&&'>x</b>"), [])
+        with mock.patch.object(speech, "islands", lambda piece: []):
+            self.assertEqual(speech.unread_operators("1 + && 1 + || 1 and `a && b`"), ["&&", "||"])
 
     def test_render_marks_them_and_keeps_the_text(self):
         from mathpath import render
@@ -446,6 +473,99 @@ class TestCodeDialect(unittest.TestCase):
                 self.assertIn(word, JAVA_KEYWORDS)
                 self.assertEqual(say_code(word), word)
 
+    def test_prose_arithmetic_is_mathematics(self):
+        """Arithmetic in a prose island or a backtick run on a code path states
+        an equality: `=` is "equals", as the global reader says it. A statement
+        (a name assigned, or any operator only code writes) is still code."""
+        from mathpath.speech import say_code
+        cases = {
+            "10 × 10 = 100": "10 times 10 equals 100",
+            "20 × 10 = 200": "20 times 10 equals 200",
+            "6 * 5 / 2 = 15": "6 times 5 over 2 equals 15",
+            "n·(n − 1)/2": "n times the quantity n minus 1, over 2",
+            "0.76 × 0.71 ≈ 0.54": "0.76 times 0.71 is approximately 0.54",
+            "x = 1;": "x is set to 1",
+            "x = 1": "x is set to 1",
+            "total = 10 * 10;": "total is set to 10 times 10",
+            "x = a − b;": "x is set to A minus b",  # a Unicode minus is still minus
+        }
+        for text, spoken in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(say_code(text), spoken)
+        for text in list(cases)[:5]:
+            self.assertEqual(say_code(text), say(text))
+
+    def test_function_of_an_expression(self):
+        """F(n + 1) reads as say reads f(x + 1), not "F of n plus 1"."""
+        from mathpath.speech import say_code
+        self.assertEqual(say_code("calls: twice F(n + 1), less one"),
+                         "calls, twice F of the quantity n plus 1, less one")
+        self.assertEqual(say_code("2·F(n + 1) − 1"), say("2·F(n + 1) − 1"))
+        self.assertEqual(say_code("f(x + 1)"), say("f(x + 1)"))
+        self.assertEqual(say_code("send(message)"), "send of message")
+        self.assertEqual(say_code("max(a + b, c)"), "max of A plus b, c")
+
+    def test_the_article_a_in_prose(self):
+        """A lone `a` before an English word is the article; a variable `a`
+        sits beside an operator, a bracket, a comma or the end of the line."""
+        from mathpath.speech import say_code
+        self.assertEqual(say_code("a count is a reason to look, not a verdict"),
+                         "a count is a reason to look, not a verdict")
+        self.assertEqual(say_code("fix a defect near where it was made"),
+                         "fix a defect near where it was made")
+        for code, spoken in {"a && b": "A and b", "int a = b;": "int A is set to b",
+                             "a == b": "A equals b", "return a;": "return A",
+                             "a.name()": "A dot name", "a instanceof Dog": "A is an instance of dog",
+                             "f(a, b)": "f of A, b"}.items():
+            with self.subTest(code=code):
+                self.assertEqual(say_code(code), spoken)
+
+    def test_semicolons_and_colons_pause_mid_line(self):
+        """Between clauses a `;` or `:` is a pause, like a comma; at the end of a
+        line, or alone, it says nothing."""
+        from mathpath.speech import say_code
+        self.assertEqual(say_code("line 1 sets parcel; lines 2, 3 and 4 read it"),
+                         "line 1 sets parcel, lines 2, 3 and 4 read it")
+        self.assertEqual(say_code("x, fmt; a, x; b, x"), "x, fmt, A, x, b, x")
+        self.assertEqual(say_code("share: construction hours / all hours"),
+                         "share, construction hours divided by all hours")
+        self.assertEqual(say_code("int count;"), "int count")
+        self.assertEqual(say_code("case 1:"), "case 1")
+        self.assertEqual(say_code("for (int i = 0; i < n; i++) {"),
+                         "for int i is set to 0, i is less than n, i is incremented")
+
+    def test_prose_and_operator(self):
+        """A bare `&&` in prose on a code path reads "and", as `||` reads "or"."""
+        from mathpath import render
+        from mathpath.speech import CODE_DIALECT
+        token = render._DIALECT.set(CODE_DIALECT)
+        try:
+            out = render.inline("as 1 + if 3 + for 1 + && 1 + || 1, still")
+            arith = render.inline("cost 10 × 10 = 100, 5 more")
+        finally:
+            render._DIALECT.reset(token)
+        self.assertIn('<span data-say="1 plus and 1 plus or 1">1 + && 1 + || 1</span>', out)
+        self.assertEqual(arith, 'cost <span data-say="10 times 10 equals 100">10 × 10 = 100</span>, 5 more')
+
+    def test_string_literals(self):
+        """Only `""` is the empty string; a space or a separator is said, and a
+        format string is spelt out."""
+        from mathpath.speech import say_code
+        cases = {
+            's = "";': "s is set to the empty string",
+            'a.city() + " " + a.postcode()': "A dot city plus a string of one space plus A dot postcode",
+            'sep = "   ";': "sep is set to a string of 3 spaces",
+            'System.out.print(label + ": ");': "print label plus the string colon space",
+            'System.out.println(String.format("%,.2f", amount));':
+                "print line string dot format of the string percent comma point 2 f, amount",
+            'String label = "Sales";': "string label is set to Sales",
+            'System.out.print("\\n");': "print the string new line",
+        }
+        for code, spoken in cases.items():
+            with self.subTest(code=code):
+                self.assertEqual(say_code(code), spoken)
+                self.assertEqual(unspoken(spoken), set())
+
     def test_dialect_comes_only_from_the_path(self):
         from mathpath.speech import CODE_DIALECT, dialect_of
         self.assertIsNone(dialect_of({"slug": "algebra"}))
@@ -530,7 +650,7 @@ class TestCodeBlock(unittest.TestCase):
         self.assertEqual(spoken, "line 1, comment, generics and must show as written. "
                                  "line 2, list of string names is set to new array list. "
                                  "line 3, if not done and names dot size is greater than 0. "
-                                 "line 5, names dot add of a b")
+                                 "line 5, names dot add of the string a less than b")
 
     def test_marked_lines(self):
         """A flagged line: a gutter glyph and a hidden word, never colour

@@ -27,7 +27,8 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 sys.path.insert(0, str(REPO_ROOT / "content"))
 
 from mathpath.speech import (  # noqa: E402
-    CODE_DIALECT, ambiguous, dialect_of, is_table_row, load_overrides, say, say_code, unspoken)
+    CODE_DIALECT, ambiguous, dialect_of, is_table_row, load_overrides, say, say_code, unread_operators,
+    unspoken)
 
 _SPAN = re.compile(r"`([^`]+)`")
 
@@ -60,6 +61,28 @@ def runs(path):
                     walk(item, where, context)
 
     walk(path, "", "")
+    return out
+
+
+def prose_strings(path):
+    """(text, where) for every prose string a Subject's pages render with
+    render.inline: everything but math and code blocks and key or worked lines."""
+    out = []
+
+    def walk(node, where):
+        if isinstance(node, str):
+            out.append((node, where))
+        elif isinstance(node, dict):
+            where = "/".join(filter(None, [where, node.get("slug")])) if "slug" in node else where
+            for key, value in node.items():
+                if key not in ("key", "lines"):
+                    walk(value, where)
+        elif isinstance(node, (list, tuple)):
+            if not (isinstance(node, tuple) and len(node) == 2 and node[0] in ("math", "code")):
+                for item in node:
+                    walk(item, where)
+
+    walk(path, "")
     return out
 
 
@@ -105,6 +128,12 @@ def unresolved(path, overrides):
         if reasons:
             seen[run] = {"run": run, "reading": reader(path)(run), "reasons": reasons,
                          "where": where, "context": context}
+    for text, where in prose_strings(path):
+        # `&&` in prose that no island reads aloud reaches the voice as "and and"
+        # or nothing at all
+        if unread_operators(text) and text not in seen:
+            seen[text] = {"run": text, "reading": "", "reasons": ["unspoken"],
+                          "where": where, "context": text}
     return list(seen.values())
 
 
