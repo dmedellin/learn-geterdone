@@ -188,7 +188,7 @@ LESSONS = [
                   "later a second line added under it at the same indentation, because the "
                   "indentation said that was where it belonged. It did not. Java gives an "
                   "unbraced `if` exactly one statement, and the second line runs every time. "
-                  "Section 31.1 opens with cases of this kind (pp. 732&ndash;733). Layout is the "
+                  "Section 31.1 shows cases of this kind (pp. 732&ndash;733). Layout is the "
                   "one part of a program that the compiler ignores and a reader cannot, so a "
                   "listing can tell the reader one story and the compiler another. McConnell's "
                   "name for the rule that follows is the Fundamental Theorem of Formatting: good "
@@ -196,17 +196,18 @@ LESSONS = [
                   "is worth something, he says, but less than showing its structure, and where "
                   "the two pull apart, the structure wins."),
             ("p", "Why should the structure matter so much to a reader? The section answers with "
-                  "a line of research (pp. 733&ndash;734). In 1973 Chase and Simon found that "
-                  "chess experts remember the positions of pieces far better than novices when "
-                  "the pieces stand as they might in a game, and hardly better when they are "
-                  "placed at random. Ben Shneiderman found the same of programmers in 1976, with "
-                  "program statements in a sensible order against the same statements shuffled. "
+                  "a line of research (pp. 733&ndash;734). Chase and Simon, the book reports, "
+                  "found in 1973 that chess experts remember the positions of pieces far better "
+                  "than novices when the pieces stand as they might in a game, and hardly better "
+                  "when they are placed at random; Ben Shneiderman, it reports, found the same of "
+                  "programmers in 1976, with program statements in a sensible order against the "
+                  "same statements shuffled. "
                   "The book's reading is that experts carry a structure in their heads, and new "
                   "material is easy to hold when it fits. So the details of a layout convention "
                   "matter much less than following one consistently. McConnell tells a story to "
-                  "the point: two reviewers of his first edition, Hank and Tony, had argued over "
-                  "brace placement for a whole project and ended it each preferring the style "
-                  "the other had started with."),
+                  "the point: Hank, a reviewer of his first edition, and Tony, a colleague of "
+                  "Hank's, had argued over brace placement for a whole project and ended it each "
+                  "preferring the style the other had started with."),
             ("p", "Debates about layout, the chapter goes on, sound more like religious wars than "
                   "discussions (p. 735), because layout is partly taste and partly logic. Its "
                   "way through is to name the criteria. A good layout scheme represents the "
@@ -232,17 +233,16 @@ LESSONS = [
                   "Visual Basic, every If has its End If and the layout follows naturally. In "
                   "Java and C++ the braces are separate from the control statement, and that is "
                   "where the trouble starts. You can emulate pure blocks, treating the opening "
-                  "brace as the end of the `if` line and the closing brace as the block's last "
-                  "line, which the book calls standard in Java; you can treat the braces as the "
+                  "brace as the end of the `if` line and the closing brace, aligned with the "
+                  "`if`, as the end of the construct, which the book calls standard in Java; you "
+                  "can treat the braces as the "
                   "block's boundaries, indented with it; or you can use endline layout, which "
                   "indents a block to wherever its control statement's line happens to end, and "
                   "which McConnell rejects as inaccurate, hard to apply consistently and hard to "
                   "maintain (p. 745)."),
-            ("p", "Sections 31.4 to 31.8 (pp. 745&ndash;772) apply the principle to control "
-                  "structures, single statements, comments, routines and classes: one statement "
-                  "to a line, continuation lines indented by the standard amount, a comment "
-                  "indented with the code it describes, blank lines between the parts of a "
-                  "routine. One passage matters most here (pp. 748&ndash;749). An `if` followed "
+            ("p", "Sections 31.4 to 31.8 (pp. 745&ndash;773) apply the principle to control "
+                  "structures, single statements, comments, routines and classes, and one "
+                  "passage matters most here (pp. 748&ndash;749). An `if` followed "
                   "by a single statement needs no braces, and the book sets out the ways to lay "
                   "it out. Leaving the braces out, it warns, invites someone to add a second "
                   "statement under the `if` and forget to add them, a subtle error because the "
@@ -335,18 +335,24 @@ LESSONS = [
              "Each one governs exactly one statement: the next one."),
             ("Pair each else with its if",
              "An else belongs to the nearest if above it that has no else yet and is not shut "
-             "off by a closing brace. Write the pairs down by line number."),
+             "off by a closing brace. Write the pairs down by line number. An else sits at the "
+             "same depth as its if, and governs one statement one level deeper, exactly as the "
+             "if does."),
             ("Work out each line's depth",
-             "Count the braces open above the line, add one for each unbraced control line that "
-             "governs it, and multiply by the indent, four spaces here."),
+             "Count the braces open above the line, add one for each unbraced if, else, for or "
+             "while whose one statement the line is, and multiply by the indent, four spaces "
+             "here."),
             ("Compare, and say what runs",
              "Mark each line whose leading spaces differ from its depth, and write one sentence "
              "on what Java does with it."),
             ("Check a routine of your own",
-             "Paste a routine of yours into the lab, re-indented at four spaces a level if your "
-             "team uses another width (an editor will do it). Note the Mis-indented lines count, "
-             "and for each flagged line write one sentence on what Java does with it and whether "
-             "that is what you meant."),
+             "Paste a routine of yours into the lab. If your team indents by two spaces, widen "
+             "it first with a search-and-replace that turns each pair of leading spaces into "
+             "four, and not with your editor's re-indent command, which would move every line to "
+             "the depth Java reads and hide exactly what you are checking. If every indented line "
+             "is flagged, the width is the cause. Note the Mis-indented lines count, and for each "
+             "flagged line write one sentence on what Java does with it and whether that is what "
+             "you meant."),
         ],
         "worked": {
             "title": "Where the else on line 5 belongs",
@@ -371,11 +377,11 @@ LESSONS = [
         "quiz": [
             {"q": "In the dangling-else preset, Java binds the else on line 5 to which if? (An "
                   "else belongs to the nearest if that does not yet have one.)",
-             "a": ["The if on line 3, which tests wantsEmail",
-                   "The if on line 2, which tests isActive",
+             "a": ["The if on line 2, which tests isActive",
                    "Neither: javac rejects the else as ambiguous",
+                   "The if on line 3, which tests wantsEmail",
                    "Both: it runs when either test fails"],
-             "c": 0,
+             "c": 2,
              "why": "The nearest if without an else is line 3's, so line 6 runs for an active "
                     "user who does not want email, and an inactive user gets nothing. Line 2 is "
                     "where the indentation puts it, which is the layout's story and not Java's. "
@@ -383,18 +389,21 @@ LESSONS = [
                     "else belongs to exactly one if."},
             {"q": "In the two-statements preset, close is called with an account whose balance "
                   "is 50. Which of lines 3 and 4 run?",
-             "a": ["Line 4 only", "Lines 3 and 4", "Neither line", "Line 3 only"],
+             "a": ["Line 4 only",
+                   "Lines 3 and 4",
+                   "Neither line",
+                   "Line 3 only"],
              "c": 0,
              "why": "Line 2's if has no braces, so it governs line 3 alone; with a balance of 50 "
                     "the test fails and line 3 is skipped. Line 4 is the routine's next "
                     "statement and runs for every account. Both lines run only when the balance "
                     "is 0, and line 3 never runs without line 4."},
             {"q": "What happens when you compile the exercise's clamp exactly as written?",
-             "a": ["javac rejects it: line 7 can never be reached",
-                   "It compiles, and clamp(5, 0, 10) returns 5",
+             "a": ["It compiles, and clamp(5, 0, 10) returns 5",
                    "It compiles, and clamp(5, 0, 10) returns 10",
-                   "It compiles, and clamp(15, 0, 10) logs and returns 15"],
-             "c": 0,
+                   "It compiles with a warning about line 7, and clamp(5, 0, 10) returns 10",
+                   "javac rejects it: line 7 can never be reached"],
+             "c": 3,
              "why": "The lab flags one line, line 6 (Mis-indented lines 1, Which 6). Line 4's if "
                     "has no braces, so it governs line 5 alone, and the return on line 6 is "
                     "unconditional: every value that is not below low would return high. That "
@@ -402,15 +411,16 @@ LESSONS = [
                     "the compiler catches what the layout hid; with any statement other than a "
                     "return on line 6, a second call to log say, the routine would compile and "
                     "nothing would catch it. Returning 5 is what the indentation promises, and "
-                    "returning 10 is what the code would do if line 7 were deleted; nothing in "
-                    "the routine returns 15 for a high of 10."},
+                    "returning 10 is what the code would do if line 7 were deleted; and Java "
+                    "treats an unreachable statement as a compile error, not a warning, which is "
+                    "where a reader coming from C or Python may be caught."},
             {"q": "The book reports a 1983 study of indentation by Miara and colleagues. What "
                   "did it find?",
-             "a": ["Scores 20 to 30 percent higher with two to four spaces than with none",
-                   "The highest scores with six spaces, which subjects also preferred",
+             "a": ["The highest scores with six spaces, which subjects also preferred",
+                   "Scores 20 to 30 percent higher with two to four spaces than with none",
                    "No difference in comprehension between any of the schemes",
                    "Scores 20 to 30 percent higher with none than with two to four spaces"],
-             "c": 0,
+             "c": 1,
              "why": "Section 31.2, p. 737: subjects scored 20 to 30 percent higher on a "
                     "comprehension test with two-to-four-space indentation than with none. Six "
                     "spaces scored second lowest, though many subjects felt it was easier to "
@@ -430,9 +440,9 @@ LESSONS = [
              "chapter grants that much of layout is taste, brace placement above all, and this "
              "lesson does not argue with that."),
             ("Choosing the layout that looks best",
-             "Six-space indentation looked pleasing to the subjects of the study the book "
-             "reports, and scored second lowest on comprehension (p. 737, after Miara and "
-             "colleagues). Endline layout can look tidy on a short example and misstate the "
+             "Many of the subjects in the study the book reports felt six-space indentation was "
+             "easier to use, and it scored second lowest on comprehension (p. 737, after Miara "
+             "and colleagues). Endline layout can look tidy on a short example and misstate the "
              "structure as soon as the conditions grow (pp. 743&ndash;745). The Fundamental "
              "Theorem puts showing the structure first and looking good a distant second."),
             ("Treating one brace style as the right one",
@@ -454,9 +464,11 @@ LESSONS = [
             "its structure. Read aloud, the indentation disappears, so the body states each "
             "routine's structure in words, and the listing marks a flagged line with a glyph and "
             "the word mis-indented, never by colour alone. The lab checks indentation against "
-            "the structure Java gives each line, at four spaces a level, and nothing else: not "
-            "blank lines, brace placement, line length or names, not comment-only lines or the "
-            "lines that continue a statement, and not what the routine was meant to do. Most "
+            "the structure Java gives each line, at four spaces a level, and nothing else. Code "
+            "indented by two spaces must be widened to four first, by replacement and not by "
+            "re-indenting; a tab counts as one level. The lab does not check blank lines, brace "
+            "placement, line length or names, nor comment-only lines or the lines that continue "
+            "a statement, and it cannot tell what the routine was meant to do. Most "
             "editors now re-indent code to its structure on request, which makes a dangling else "
             "visible to anyone who looks, and fixes nothing by itself."
         ),
@@ -480,8 +492,8 @@ LESSONS = [
         "summary": (
             "Chapter 32 argues that good code is its own best documentation and that a comment "
             "should say what the code cannot. Count a routine's comment lines against its "
-            "statement lines, sort each comment by the chapter's kinds, and see two routines "
-            "with the same density and comments of opposite worth."
+            "statement lines, sort each comment by the chapter's kinds, and see why a density "
+            "cannot tell a useful comment from a useless one."
         ),
         "key": [
             "style documents more than comments",
@@ -533,15 +545,16 @@ LESSONS = [
                   "self-documenting, and in such code the comments come last, as a finishing "
                   "touch."),
             ("p", "Section 32.3 (p. 781), To Comment or Not to Comment, is written as a dialogue, "
-                  "the Commento, set at the end of a team's daily stand-up with a cast named from "
-                  "Plato. Its voices are not all McConnell's, and the section is easy to misquote "
-                  "if you forget it. Thrasymachus, a green purist, wants a standard that requires "
-                  "comments. Callicles, the veteran, holds that comments make code harder to read, "
+                  "the Commento, set at the end of a team's daily stand-up, with characters given "
+                  "ancient Greek names. Its voices are not all McConnell's, and the section is "
+                  "easy to misquote if you forget it. Thrasymachus, a green purist, wants a "
+                  "standard that requires comments, and states the principle the chapter flags: "
+                  "good comments do not repeat the code but clarify its intent. Callicles, the veteran, holds that comments make code harder to read, "
                   "are less precise than code, and go out of date. Glaucon, the young hot-shot, "
                   "says that refactoring removes most of his comments. Ismene, a senior programmer "
-                  "who maintains other people's code, grants that comments which repeat the code "
-                  "are useless, and holds that comments which state intent let her find the part "
-                  "she needs, as headings do in a technical book, and that a comment that is hard "
+                  "who maintains other people's code, agrees that comments which repeat the code "
+                  "do not help, and says that she scans the comments to find the part she needs, "
+                  "as she would the headings of a technical book, and that a comment that is hard "
                   "to write is a sign the code is not understood. Socrates closes by siding with "
                   "her: encourage comments without being naive about them, and use reviews to "
                   "learn which ones help. Ismene's is the position the rest of the chapter "
@@ -576,7 +589,7 @@ LESSONS = [
                   "step can strip them. On how many, the book reports (p. 792) that studies at "
                   "IBM, as Capers Jones described them in 2000, found clarity peaked at about one "
                   "comment for every ten statements, with fewer and with more both reducing it. "
-                  "That is an average from other people's programs, reported at second hand, and "
+                  "That is a finding from other people's programs, reported at second hand, and "
                   "McConnell warns against turning it into a quota: attend to whether each "
                   "comment earns its place, and the number will look after itself."),
             ("p", "Section 32.5 (p. 792) works through the techniques level by level: single "
@@ -599,7 +612,8 @@ LESSONS = [
             ("code", _lines(COMMENTS_REPEAT)),
             ("p", "The lab counts 12 lines, 7 code lines and 5 statement lines (the header on "
                   "line 2, and lines 4, 6, 8 and 11), 5 comment lines and no blank ones, and 1 "
-                  "parameter. The density is 5 over 5, printed 1 = 100%. Now read the comments by "
+                  "parameter. The density is 5 over 5, printed 1 = 100%: the ratio as a fraction, "
+                  "then as a percentage. Now read the comments by "
                   "kind. Lines 3, 5, 7 and 10 each restate the line under them, and line 1 "
                   "restates the routine's name: all five repeat the code. None of them says what "
                   "the code does not, such as what happens to an empty array, where line 11 "
@@ -700,28 +714,33 @@ LESSONS = [
         "quiz": [
             {"q": "Count the exercise's isLeapYear by the lab's rules (a statement line holds "
                   "more than braces; the header is one). Which is right?",
-             "a": ["2 statement lines, 2 comment lines, 100%; no comment repeats the code",
-                   "1 statement line, 2 comment lines, 200%; one comment repeats the code",
+             "a": ["1 statement line, 2 comment lines, 200%; one comment repeats the code",
+                   "2 statement lines, 2 comment lines, 100%; no comment repeats the code",
                    "2 statement lines, 1 comment line, 50%; no comment repeats the code",
                    "3 statement lines, 2 comment lines, 2/3 ≈ 66.7%; both repeat the code"],
-             "c": 0,
+             "c": 1,
              "why": "The statement lines are the header on line 2 and the return on line 4; line "
                     "5 is only a brace. The comment lines are 1 and 3, so the density is 2 over "
                     "2, which the lab prints 1 = 100%, the same as comments-repeat. Neither "
                     "comment repeats the code: line 1 states what the routine is for, a year of "
                     "366 days in the Gregorian calendar, and line 3 states the calendar's rule "
-                    "that line 4's expression implements, in the problem's words rather than the "
-                    "code's. Both are intent comments, of a kind the chapter keeps. The densities "
+                    "that line 4's expression implements. Line 1 is intent. Line 3 you may have marked explanation, since it "
+                    "sits over a dense expression, or summary, since it says the rule in one "
+                    "line; either way it is in the calendar's words and not Java's, which keeps "
+                    "it out of the first kind, and the chapter says the line between intent and "
+                    "summary is seldom clear and seldom matters (p. 788). Its advice on an "
+                    "explanation is to ask whether the code could be made to need it less; a "
+                    "reader might split the test into two named booleans. The densities "
                     "are equal and the comments are not, and the count cannot tell them apart. "
                     "One statement line forgets the header, three counts the closing brace, and "
                     "one comment line misses the header comment."},
             {"q": "What density did the IBM studies the book reports, after Capers Jones, find "
                   "clarity peaked at?",
-             "a": ["About one comment for every ten statements",
-                   "About one comment for every five statements",
+             "a": ["About one comment for every five statements",
                    "About one comment for every statement",
-                   "No peak: the more comments, the clearer the code"],
-             "c": 0,
+                   "No peak: the more comments, the clearer the code",
+                   "About one comment for every ten statements"],
+             "c": 3,
              "why": "Section 32.4, p. 792: about one comment per ten statements, with fewer and "
                     "more comments both reducing understandability (IBM studies, as Jones 2000 "
                     "reports them). One in five is the kind of standard McConnell says such "
@@ -729,8 +748,10 @@ LESSONS = [
                     "preset; and the studies found more comments hurt as well."},
             {"q": "In the dialogue of Section 32.3, who argues that comments are useless because "
                   "they repeat the code and go out of date?",
-             "a": ["Callicles, the veteran", "Ismene, the senior maintainer",
-                   "Socrates, who closes the meeting", "Thrasymachus, the purist"],
+             "a": ["Callicles, the veteran",
+                   "Ismene, the senior maintainer",
+                   "Socrates, who closes the meeting",
+                   "Thrasymachus, the purist"],
              "c": 0,
              "why": "Callicles holds that comments are less precise than code and go stale. "
                     "Ismene answers him and is the voice the chapter develops; Socrates sides "
@@ -739,8 +760,11 @@ LESSONS = [
                     "McConnell's conclusion."},
             {"q": "A routine has 20 statement lines and 4 comment lines among its 30 lines. What "
                   "is its density by the lab's rule?",
-             "a": ["1/5 = 20%", "2/15 ≈ 13.3%", "5", "1/4 = 25%"],
-             "c": 0,
+             "a": ["2/15 ≈ 13.3%",
+                   "5",
+                   "1/5 = 20%",
+                   "1/4 = 25%"],
+             "c": 2,
              "why": "Comment lines over statement lines: 4 over 20 is 1/5, 20%. Dividing by all "
                     "30 lines gives 2/15, which is not the measure the study used; 5 is the "
                     "ratio upside down; and 1/4 divides 4 by 16, as if the comment lines were "
@@ -751,7 +775,9 @@ LESSONS = [
              "On the lesson's illustration the density of comments-repeat is five times that of "
              "comments-intent, 100% against 20%, and every one of its comments repeats the "
              "code; the one comment in comments-intent states a precondition the code cannot. "
-             "The exercise has the same density as comments-repeat with every comment useful. "
+             "A routine can match that density with every comment earning its place, and the "
+             "count would not tell you; the exercise asks you to find out which kind isLeapYear "
+             "is. "
              "The chapter's argument (pp. 785&ndash;788) is that a comment is judged by its kind: "
              "a repeat of the code adds reading and no knowledge, a wrong comment does harm, and "
              "only summary, intent and what the code cannot express earn a place. The count is "
@@ -762,7 +788,7 @@ LESSONS = [
              "the advice it takes from Kernighan and Plauger is to rewrite the code. It makes "
              "one exception, for code you are maintaining and have no latitude to rewrite."),
             ("Treating one comment in ten as a quota",
-             "The figure is IBM's, from whole programs, as Jones reports it. McConnell warns that "
+             "The figure is from IBM studies, as Jones reports it. McConnell warns that "
              "such research gets turned into standards like a comment every five lines, which "
              "treat the symptom and not the cause (p. 792). His advice is to ask of each comment "
              "whether it earns its place and let the number follow."),
@@ -779,7 +805,7 @@ LESSONS = [
             "repeats the code from one that states intent, or a true comment from a stale one, "
             "and both presets would print the same densities if every comment in them were "
             "wrong. The kinds are your judgement, made with the chapter's categories. The "
-            "one-in-ten figure is IBM's, from whole programs, reported by Jones; your own code "
+            "one-in-ten figure is from IBM studies, as Jones reports it; your own code "
             "reviews are the better test of whether your comments help."
         ),
     },
@@ -852,8 +878,9 @@ LESSONS = [
                   "among programmers in the time to write a program, and in the time to debug it "
                   "and the size, speed and error rate of the result, from Sackman, Erikson and "
                   "Grant in 1968 and a line of later studies. Those are other people's "
-                  "measurements of other programmers, and McConnell's point in citing them is "
-                  "that character, not intelligence, is the more decisive factor."),
+                  "measurements of other programmers, and McConnell cites them to show how much "
+                  "room there is to improve. That character, not intelligence, is the more "
+                  "decisive factor is his own claim, which the next sections argue."),
             ("p", "Section 33.2 (p. 821) takes intelligence first, and puts it in its place. In "
                   "his Turing Award lecture of 1972, The Humble Programmer, Edsger Dijkstra "
                   "argued that most of programming is an attempt to make up for the strictly "
@@ -890,7 +917,8 @@ LESSONS = [
                   "task at once to get it over with is the enlightened kind; writing a tool so "
                   "that you never do the task again is long-term laziness, which McConnell calls "
                   "the most productive kind, provided that the tool ends up saving time. Hustle, "
-                  "visible effort for its own sake, comes off worse than any of them."),
+                  "visible effort for its own sake, the chapter counts as no virtue at all: it "
+                  "shows eagerness, not progress."),
             ("p", "That proviso is something you can compute. The chapter gives no formula, so "
                   "the lab's model is this lesson's. A tool takes some hours to build; the task "
                   "takes some minutes by hand and fewer when automated, so each run saves the "
@@ -990,7 +1018,7 @@ LESSONS = [
                 "net: 340/3 hours, about 113.33",
             ],
             "after": [
-                "The script pays for itself in the fourth week and saves about 113 hours in its "
+                "The script pays for itself midway through the fourth week and saves about 113 hours in its "
                 "first year. The rare-task preset shows the same build time failing to pay back "
                 "inside a year.",
             ],
@@ -1000,11 +1028,11 @@ LESSONS = [
             {"q": "The exercise: a 2-hour script saves a 5-minute task five times a week, and "
                   "the automated run takes none of your time. What are the runs to pay back, "
                   "the weeks, and the first year's net?",
-             "a": ["24 runs, 24/5 = 4.80 weeks, 59/3 ≈ 19.67 hours",
-                   "24 runs, 24/5 = 4.80 weeks, 65/3 ≈ 21.67 hours",
+             "a": ["24 runs, 24/5 = 4.80 weeks, 65/3 ≈ 21.67 hours",
                    "25 runs, 5 weeks, 59/3 ≈ 19.67 hours",
-                   "120 runs, 24 weeks, 59/3 ≈ 19.67 hours"],
-             "c": 0,
+                   "120 runs, 24 weeks, 59/3 ≈ 19.67 hours",
+                   "24 runs, 24/5 = 4.80 weeks, 59/3 ≈ 19.67 hours"],
+             "c": 3,
              "why": "Each run saves 5 minutes and the build is 120 minutes, so 120 / 5 = 24 runs "
                     "exactly, and at five a week 24/5 = 4.80 weeks. In 52 weeks there are 260 "
                     "runs saving 1,300 minutes, 65/3 hours, less the 2 hours of building: 59/3, "
@@ -1012,27 +1040,37 @@ LESSONS = [
                     "division that comes out whole; 120 is the build time in minutes, not runs."},
             {"q": "Section 33.7 names three kinds of laziness. Which does it call long-term "
                   "laziness?",
-             "a": ["Writing a tool so that you never do the unpleasant task again",
-                   "Putting the unpleasant task off for as long as possible",
+             "a": ["Putting the unpleasant task off for as long as possible",
+                   "Writing a tool so that you never do the unpleasant task again",
                    "Doing the unpleasant task at once to get it out of the way",
                    "Hustle: visible extra effort on every task"],
-             "c": 0,
+             "c": 1,
              "why": "Page 830: deferring the task is the chapter's true laziness, which hardly "
                     "ever helps; doing it at once is enlightened laziness; writing a tool is "
                     "long-term laziness, the most productive kind provided it ends up saving "
                     "time. Hustle is not a kind of laziness at all, and the chapter counts it "
                     "against a programmer."},
-            {"q": "The rare-task preset's tool takes 8 hours to build and saves 28 minutes a run. "
-                  "It runs 13 times in the first 52 weeks. What is its net over that year?",
-             "a": ["−29/15 ≈ −1.93 hours", "91/15 ≈ 6.07 hours", "−8 hours",
-                   "29/15 ≈ 1.93 hours"],
-             "c": 0,
-             "why": "13 runs × 28 minutes = 364 minutes, 91/15 hours, about 6.07; less the 8 hours "
-                    "of building that is −29/15, about −1.93, a loss. 6.07 forgets the build "
-                    "time, −8 forgets the runs, and 1.93 has the sign the wrong way round."},
+            {"q": "In Section 33.4's story, Bert's manager asks whether the project could be "
+                  "done in less time with fewer people, and Bert comes back with a smaller "
+                  "estimate. What does the chapter say Bert got wrong?",
+             "a": ["He should have padded the first estimate so that the negotiation landed on the "
+                   "true figure",
+                   "He should have refused to give an estimate until the design was finished",
+                   "An estimate can be revised to be more accurate but cannot be negotiated down",
+                   "Nothing: agreeing to a shorter schedule is what a team player does"],
+             "c": 2,
+             "why": "Page 827: Bert's mistake was not realising that estimates are not "
+                    "negotiable. He can revise one when he learns more, but a smaller number "
+                    "agreed under pressure is a promise the project cannot keep, and he loses "
+                    "credibility when it takes as long as it was always going to take. Padding "
+                    "is a different dishonesty; refusing to estimate is not the chapter's advice; "
+                    "and agreeing is the opposite of the honesty Section 33.4 asks for."},
             {"q": "The book reports differences among programmers of roughly what order in the "
                   "time to create a program?",
-             "a": ["About 10 to 1", "About 2 to 1", "About 100 to 1", "No measurable difference"],
+             "a": ["About 10 to 1",
+                   "About 2 to 1",
+                   "About 100 to 1",
+                   "No measurable difference"],
              "c": 0,
              "why": "Section 33.1, p. 820 (and Section 28.5): differences on the order of 10 to 1 "
                     "in the time to create and to debug a program, and in the size, speed and "
@@ -1072,7 +1110,8 @@ LESSONS = [
             "minutes a tool saves against the hours it took and nothing else. It leaves out "
             "maintenance, the errors a hand-done task makes, and what writing the tool teaches "
             "you, and every preset's figures are illustrative. The 10-to-1 differences are "
-            "averages from other people's studies, reported by the book; no lab here measures a "
+            "spreads between the fastest and slowest programmers in other people's studies, "
+            "reported by the book; no lab here measures a "
             "programmer."
         ),
     },
@@ -1140,7 +1179,7 @@ LESSONS = [
                   "More Information, from page 855 to page 862. Read Chapter 34 in your own copy "
                   "before going on."),
             ("p", "Take a routine you wrote last month, one you would rather nobody reviewed. "
-                  "Chapter 34 is the book's account of why it feels that way. The book has been "
+                  "Chapter 34 names what such a routine has lost sight of. The book has been "
                   "about details, classes, names, loops, layout, and this chapter picks the "
                   "details up again to show what they serve. The first theme is the one Chapter "
                   "5 argued (§34.1, p. 837): managing complexity is the heart of software "
@@ -1200,13 +1239,14 @@ LESSONS = [
                   "each `if`, `while`, `for`, `case`, `&&` and `||`. The Decision points tile is "
                   "that count, Breakdown shows its parts, and Band places it in the book's "
                   "ranges: 0&ndash;5, 6&ndash;10 and 10+. Deepest nesting is the greatest brace "
-                  "depth below the routine's own braces, and First line at that depth says "
-                  "where it is reached. Here is the <code>retry-delay</code> preset, which "
+                  "depth below the routine's own braces, so a statement directly in the body is at "
+                  "depth 0; this is not the layout lesson's depth, which counted the routine's "
+                  "body as one level. First line at that depth says where it is reached. Here is the <code>retry-delay</code> preset, which "
                   "decides how long to wait before retrying a failed request:"),
             ("code", _lines(RETRY_DELAY)),
             ("p", "The lab counts 7 decision points: the 1, three `if`s (lines 2, 8 and 12), one "
-                  "`for` (line 6), the `||` on line 2 and the `&&` on line 12, printed as 1 + if "
-                  "3 + for 1 + && 1 + || 1. That is in the band 6&ndash;10, where Table 19-2 "
+                  "`for` (line 6), the `||` on line 2 and the `&&` on line 12, printed as "
+                  "`1 + if 3 + for 1 + && 1 + || 1`. That is in the band 6&ndash;10, where Table 19-2 "
                   "says to start thinking about simplifying. The deepest nesting is 2, first "
                   "reached on line 9, inside the `if` inside the loop. Neither figure is a "
                   "verdict. What they point to is the loop of lines 6 to 11, which doubles a "
@@ -1216,8 +1256,8 @@ LESSONS = [
                   "first."),
             ("code", _lines(NESTED_SHIPPING)),
             ("p", "The <code>nested-shipping</code> preset is the shipping routine from the "
-                  "lesson “Nesting and Complexity”. The lab counts 9 decision points, 1 + if 5 + "
-                  "for 1 + && 1 + || 1, in the band 6&ndash;10, and a deepest nesting of 5, "
+                  "lesson “Nesting and Complexity”. The lab counts 9 decision points, "
+                  "`1 + if 5 + for 1 + && 1 + || 1`, in the band 6&ndash;10, and a deepest nesting of 5, "
                   "first reached on line 14. Five levels is past the three that Section 34.7 "
                   "names as a warning sign. That lesson rewrote the routine with guard clauses; "
                   "here the point is only that the two counts, set beside the chapter's warning "
@@ -1227,8 +1267,8 @@ LESSONS = [
                   "wrote, and without the lab count its decision points by the rule above and "
                   "its deepest nesting. Then name two changes you would make and the theme of "
                   "Chapter 34 each one serves. Paste the routine into the lab to check your "
-                  "counts. One quiz question asks for the same counts on retry-delay, so that "
-                  "you can check the method on a routine whose answer is fixed."),
+                  "counts. One quiz question applies the same counts to a changed retry-delay, so "
+                  "that you can check the method on a routine whose answer is fixed."),
             ("p", "This is the last lesson of the read-along. The book's own last word is its "
                   "reading plan; this course's is to go back to the first, “Laying the "
                   "Foundation”, with a routine of your own and see how much of what it argued you "
@@ -1259,8 +1299,10 @@ LESSONS = [
         "steps_intro": "Five steps, the last on a routine of your own.",
         "steps": [
             ("Count the decision points",
-             "Start at 1 and add one for each if, while, for, case, && and ||. An else, a default "
-             "and a do add nothing."),
+             "Start at 1 and add one for each if, while, for, case, `&&` and `||`. An else, a "
+             "default and a do add nothing. An else if is an if and counts; the while of a do "
+             "… while counts, the do does not; the ?: operator is not counted, which is the "
+             "lab's choice and not the book's."),
             ("Find the deepest nesting",
              "Count the braces open below the routine's own at each line, and note the greatest "
              "depth and where it is first reached."),
@@ -1290,56 +1332,67 @@ LESSONS = [
                 "deepest nesting 2, first on line 9",
             ],
             "after": [
-                "Seven points and a depth of two put the routine inside the book's warning "
-                "signs, and still point at the loop of lines 6 to 11 as the part to look at.",
+                "Seven points and a depth of two put the routine below the thresholds Section "
+                "34.7 names (more than about 10, more than three levels), though in Table "
+                "19-2's band to start thinking about simplifying, and the counts still point at "
+                "the loop of lines 6 to 11 as the part to look at.",
             ],
         },
         "quiz_title": "Themes and counts",
         "quiz": [
-            {"q": "Count retry-delay: decision points are 1 plus each if, while, for, case, && "
-                  "and ||, and depth is brace depth below the routine's own braces. Which is "
-                  "right?",
-             "a": ["7 decision points, deepest nesting 2",
+            {"q": "The retry-delay preset's loop caps the delay with an if on lines 8 to 10. "
+                  "Suppose line 7 became `delay = Math.min(delay * 2, 10000);` and lines 8 to "
+                  "10 were deleted, nothing else changing. By the lab's rule (1 plus each if, "
+                  "while, for, case, `&&` and `||`; depth is brace depth below the routine's own "
+                  "braces), what would the lab count?",
+             "a": ["6 decision points, deepest nesting 1",
+                   "7 decision points, deepest nesting 1",
                    "6 decision points, deepest nesting 2",
-                   "7 decision points, deepest nesting 3",
-                   "5 decision points, deepest nesting 2"],
+                   "5 decision points, deepest nesting 1"],
              "c": 0,
-             "why": "1 + three ifs (lines 2, 8, 12) + one for (line 6) + the || on line 2 + the "
-                    "&& on line 12 = 7, in the band 6–10. The deepest line is 9, inside the if "
-                    "inside the for: depth 2. Six forgets the starting 1; depth 3 counts the "
-                    "routine's own braces; five leaves out && and ||. On a routine of your own "
-                    "the method is the same, and the figures are yours to check in the lab."},
+             "why": "The if on line 8 is gone, so 1 + two ifs + one for + the `||` + the `&&` "
+                    "makes 6, still in the band 6–10; Math.min is a call, not a branch, and adds "
+                    "nothing. The deepest line is now the loop body at depth 1, since the if "
+                    "that reached depth 2 is gone. Seven keeps the deleted if; depth 2 keeps its "
+                    "braces; five drops the `||` as well. On the preset as it stands the lab "
+                    "shows 7 and 2, and the method is the same on a routine of your own."},
             {"q": "What does Section 34.7 say a routine with more than about 10 decision points "
                   "means?",
-             "a": ["A warning sign that should make you look at it skeptically",
-                   "A routine that must be split before it is merged",
+             "a": ["A routine that must be split before it is merged",
                    "Proof that the routine is poorly designed",
+                   "A warning sign that should make you look at it skeptically",
                    "Nothing: the chapter does not mention decision points"],
-             "c": 0,
+             "c": 2,
              "why": "Page 848 lists more than about 10 decision points and more than three levels "
                     "of nesting among the design metrics that should raise a warning flag, and "
                     "says none of them necessarily means poor design. It names no rule that "
                     "forces a split, and it calls the figure a warning, not proof."},
             {"q": "Section 34.9 argues against treating methods as a religion. What does it "
                   "recommend instead?",
-             "a": ["A mixture of methods: try new ones, rely on the dependable ones",
-                   "One method, chosen carefully and applied everywhere",
+             "a": ["One method, chosen carefully and applied everywhere",
+                   "A mixture of methods: try new ones, rely on the dependable ones",
                    "The newest method, adopted in full",
                    "No method: judgement case by case without any technique"],
-             "c": 0,
-             "why": "Pages 851–852: rather than latch on to the latest fad, use a mixture of "
-                    "methods, experimenting with new ones and banking on old and dependable "
-                    "ones, as tools in a toolbox. One method everywhere is the dogmatism it "
+             "c": 1,
+             "why": "Pages 851–852: use several methods, try the new ones and depend on the "
+                    "proven ones, and treat techniques as tools in a toolbox. One method everywhere is the dogmatism it "
                     "rejects, so is the newest fad, and the toolbox is full of techniques."},
-            {"q": "How does Chapter 35 organise its reading plan?",
-             "a": ["In three levels: introductory, practitioner and professional",
-                   "By programming language",
-                   "By the chapters of Code Complete",
-                   "By year of publication, newest first"],
-             "c": 0,
-             "why": "Section 35.4, pp. 860–862: the plan Construx used, in introductory, "
-                    "practitioner and professional levels. It is not arranged by language, by "
-                    "chapter or by date, and the lesson names it without reproducing it."},
+            {"q": "Section 34.4 says to program into your language, not in it. What does the "
+                  "distinction mean there?",
+             "a": ["Use every feature your language offers, since each was put there for a reason",
+                   "Write in the lowest-level constructs the language has, because the compiler "
+                   "understands them best",
+                   "Choose the language with the most features for each project",
+                   "Decide what you want to express, then find how your language can express it, "
+                   "writing your own named constants or assertions where it has none"],
+             "c": 3,
+             "why": "Page 843: a programmer who programs in a language limits their thinking to "
+                    "what the language supports directly, and takes the most obvious path; one "
+                    "who programs into it decides what to do first and then finds how the "
+                    "language can do it, supplying what it lacks with a convention or a routine "
+                    "of their own. Using every feature is programming in the language more "
+                    "thoroughly; writing at the lowest level is the opposite of the advice; and "
+                    "the section is about how you think in a language, not which one you pick."},
         ],
         "mistakes": [
             ("Thinking craftsmanship is a set of rules to follow",
@@ -1351,8 +1404,8 @@ LESSONS = [
              "settle a case (p. 848). The counts in this course are tools for judgement, which "
              "is the point of saying that a count is a reason to look."),
             ("Reading a count under the threshold as a pass",
-             "Retry-delay's 7 decision points and depth of 2 sit inside the book's warning "
-             "signs, and the counts still point at a loop that could be its own routine and two "
+             "Retry-delay's 7 decision points and depth of 2 sit below the thresholds Section "
+             "34.7 names, and the counts still point at a loop that could be its own routine and two "
              "bare numbers that could be named. A count says where to look in both directions: "
              "a low one does not certify a routine, any more than a high one condemns it."),
             ("Thinking process is overhead that gets in the way of code",
@@ -1363,7 +1416,8 @@ LESSONS = [
         "standard": (
             "Measure a routine and name the themes",
             "For the 16-line retry-delay routine, state its decision points and its deepest "
-            "nesting by the stated rules, name two improvements and the theme of Chapter 34 "
+            "nesting by the stated rules without looking at the lab or the worked example, "
+            "name two improvements and the theme of Chapter 34 "
             "each serves. You meet the standard when your counts match the lab's and each "
             "improvement names the lines it changes."
         ),

@@ -98,3 +98,41 @@ Replacement: "…set at the end of a team's daily stand-up, with characters give
 ## Where I disagree with the pedagogy assessment
 
 No pedagogy assessment exists yet for this course. Neither `docs/pedagogy/code-complete-software-craftsmanship.md` nor `docs/reviews/code-complete-software-craftsmanship-pedagogy-review.md` was present when this file was written. I have nothing to compare against. When it lands, check SF-2, SF-3 and SF-8 in particular against any praise of the same passages.
+
+## Author's response
+
+Applied, from both reviews (this file and `code-complete-software-craftsmanship-pedagogy-review.md`):
+
+- **Pedagogy must-fix 1–3.** Layout step 5 now says to widen two-space code by search-and-replace and never by re-indenting, and that every indented line being flagged means the width is the cause. The note says the same and adds that a tab counts as one level. Themes quiz 1 is now the transformation of `retry-delay` (line 7 becomes `Math.min(delay * 2, 10000)`, lines 8–10 deleted). I checked it in the built lab: 6, `1 + if 2 + for 1 + && 1 + || 1`, depth 1. The standard adds "without looking at the lab or the worked example". Self-Documenting Code's `mistakes[0]` no longer gives the exercise's answer. §C 7.2 and 7.4 are corrected to match.
+- **Pedagogy should-fix 4–9.** All applied:
+  - the else's depth in steps 2 and 3;
+  - the `isLeapYear` quiz `why` accepts the explanation and summary readings (this also covers SF-4);
+  - the Chapter 35 trivia item is replaced by §34.4, into/in;
+  - the second arithmetic item in Personal Character is replaced by Bert (§33.4, p. 827, checked);
+  - clamp's fourth option is now the "warning, not error" model;
+  - `else if`, `do … while` and `?:` are named in Themes step 1.
+- **Pedagogy consider items.**
+  - 10: the §§31.4–31.8 paragraph is trimmed to the single-statement passage.
+  - 11: "the ratio as a fraction, then as a percentage" is added.
+  - 13: `assumes_short` is now "Nothing".
+  - 14: the worked example now says "midway through the fourth week".
+  - The hustle ranking is withdrawn (SF-7).
+- **Accuracy should-fix SF-1 to SF-10.** All applied:
+  - SF-1: the `&&` breakdowns and the steps and quiz runs are in backticks, and `say_code` reads them as "and" and "or".
+  - SF-2: the summary is reworded and `mistakes[0]` is fixed.
+  - SF-3: Thrasymachus now states the intent principle, and the cast is "ancient Greek names".
+  - SF-5: "a finding from other people's programs" and "from IBM studies, as Jones reports it" replace "average" and "whole programs". The 10-to-1 figures are now called spreads.
+  - SF-6: the F29 sentence is split into what the studies show and McConnell's own claim.
+  - SF-8: the worked example and `mistakes[1]` now say "below the thresholds Section 34.7 names".
+  - SF-9: Chase and Simon and Shneiderman are introduced "as the book reports". The three works are added to §S.1, with Martin 2008 and Ousterhout 2018 as works outside the book (C-7).
+  - SF-10: the §34.9 `why` is paraphrased.
+- **Accuracy consider items.**
+  - C-1 to C-4, C-6 and C-8 are applied. C-8 corrects §C 7.1's pages to 745–773, and C-4 adds the depth-convention sentence in Themes.
+  - The Hank and Tony wording is changed to "Hank, a reviewer…, and Tony, a colleague of Hank's".
+- **Quiz positions.** The options were moved so that the correct answers sit at positions 2, 0, 3, 1 / 1, 3, 0, 2 / 3, 1, 2, 0 / 0, 2, 1, 3.
+
+Declined:
+
+- **C-5:** no change. Each "editors now" remark is already one sentence and takes no side against the book.
+- **C-9:** no change. `millisToDeadline()`'s type is undeclared, as for every call the prose names as "some routine". The snippet is §D.4's verbatim, and its figures are computed from that text.
+- **Pedagogy 12 and the status-line and tab hints in finding 1:** these are kit matters, not lesson changes. The lesson is written around them.

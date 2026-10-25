@@ -36,7 +36,7 @@ COURSE = {
         "runs to repay is build time / saving per run",
         "warning signs are reasons to look",
     ],
-    "assumes_short": "Nothing in this course",
+    "assumes_short": "Nothing",
     "assumes_long": (
         "nothing from the earlier courses, though Statements and Code Improvements make the "
         "last lesson's counts familiar; you can read a short Java routine"
