@@ -35,10 +35,10 @@ COURSE = {
         "put the most common case first",
         "check the first, middle and last pass",
         "return early when it reads better",
-        "move the logic into a table",
+        "move the logic into tables",
         "negate each part and swap && and ||",
         "points: 1 + each if, for, while, case, &&, ||",
-        "a count is a reason to look",
+        "counts are reasons to look",
     ],
     "assumes_short": "Laying the Foundation and Creating High-Quality Code",
     "assumes_long": (
@@ -92,8 +92,8 @@ COURSE = {
         "lesson uses one of the book's guidelines, such as the bands for decision points, "
         "it says whose figure it is.",
         "The course's last lesson, Nesting and Complexity, gathers the counts of the "
-        "others into one: the routine it counts has dependencies, a chain, a loop, guard "
-        "clauses and compound conditions, and its decision points add up what the earlier "
+        "others into one: the routine it counts has a loop, two compound conditions and, "
+        "in its second version, guard clauses, and its decision points add up what the earlier "
         "lessons counted one structure at a time.",
     ],
     "not_covered": [

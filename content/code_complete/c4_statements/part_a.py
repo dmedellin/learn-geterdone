@@ -97,6 +97,18 @@ FIB_LOOP = """long fibonacci(int n) {
     return newer;
 }"""
 
+# The guard-clause transformation shown before the exercise (pedagogy
+# review, finding 1): 3 decision points (1 + if 2), depth 1.
+FIRST_LINE_GUARDED = """String firstLine(File file) {
+    if (file == null) {
+        return "";
+    }
+    if (!file.canRead()) {
+        return "";
+    }
+    return readFirstLine(file);
+}"""
+
 REFUND_NESTED = """double refundAmount(Order order) {
     double refund = 0.0;
     if (order.isPaid()) {
@@ -246,8 +258,8 @@ LESSONS = [
                   "Section 14.1 recommends: `loadRates` returns a `Rates`, which you keep "
                   "in a new local variable; `addSurcharges` and `addInsurance` each take "
                   "the `Rates` the call before returned and return a new one, kept in "
-                  "its own variable; and `print` takes the last of them. Keep the routine "
-                  "to five lines. Then list, by the lab's rule, every dependency i → j in "
+                  "its own variable; and `print` takes the last of them. Keep each of the "
+                  "four statements on its own line, so that they are still lines 2 to 5 and the line numbers in your list match the listing's. Then list, by the lab's rule, every dependency i → j in "
                   "your version, and name the chain of arrows that now carries the "
                   "order. You can paste your version into the lab afterwards to check "
                   "the list."),
@@ -333,7 +345,7 @@ LESSONS = [
                     "reads three variables, not only the one set just before it."},
             {"q": "You rewrote `printQuote` so that `loadRates` returns a `Rates`, each of "
                   "the next two calls takes the previous call's result and returns a new "
-                  "one, and `print` takes the last. By the same rule, which dependencies "
+                  "one, and `print` takes the last, with the four statements still on lines 2 to 5. By the same rule, which dependencies "
                   "does your version have?",
              "a": ["1→2, 1→3, 1→4, 1→5",
                    "1→2, 1→3, 1→4, 1→5, 2→3, 3→4, 4→5",
@@ -394,7 +406,7 @@ LESSONS = [
         ],
         "standard": (
             "Finish when you can list a routine's order dependencies and reorder it so none points backwards.",
-            "For six statements, list each dependency as i → j, where line j reads what "
+            "For a routine of about six statements of your own, list each dependency as i → j, where line j reads what "
             "line i last wrote, and reorder the statements so that no dependency points "
             "backwards, by hand."
         ),
@@ -473,8 +485,8 @@ LESSONS = [
                   "sometimes in the `else`, and the same routine rewritten so that the "
                   "normal path runs straight down and the errors collect at the bottom. "
                   "Do not leave an `if` clause empty in order to act in the `else`; negate "
-                  "the test instead. Consider whether an `if` needs an `else`, test the "
-                  "`else` too, and check that the two clauses have not been reversed."),
+                  "the test instead. The section's remaining guidelines on the `else` "
+                  "clause are three checks worth reading in your copy."),
             ("p", "Chains of if-then-else tests get guidelines of their own "
                   "(pp. 358&ndash;360). Replace a complicated test with a call to a "
                   "well-named boolean function. Put the most common cases first, for two "
@@ -500,7 +512,8 @@ LESSONS = [
             ("p", "Now a chain to count. The lesson's classifier sorts HTTP status codes "
                   "into their classes by the hundreds digit. The four tests are mutually "
                   "exclusive, so any order gives the same answers, and the final `return` "
-                  "is the error trap the quotation asks for:"),
+                  "is where the quotation's error trap goes; a full one would also "
+                  "report the unexpected status to the programmer, as Section 15.1 asks:"),
             ("code", _lines(CLASSIFY)),
             ("p", "The lab's <em>chain</em> view takes the cases in the chain's order with "
                   "a frequency for each. Reaching the first condition costs one test, the "
@@ -526,8 +539,8 @@ LESSONS = [
                   "13/5 = 2.60, saving 1/5 = 0.20, because 70% of the cases still pass "
                   "all three tests on the way to the `else`. The cure there is not "
                   "reordering but testing the common case by name. On a classifier the "
-                  "difference is a few comparisons, and the chapter's first reason, the "
-                  "reader who looks for the usual case, is usually the stronger."),
+                  "difference is a few comparisons, and the chapter gives its other "
+                  "reason, the reader who looks for the usual case, first."),
             ("h3", "Exercise"),
             ("p", "(a) A request router tests `DELETE`, then `POST`, then `GET`, and "
                   "its logs show 5% of requests are `DELETE`, 15% `POST` and 80% `GET`. "
@@ -593,7 +606,9 @@ LESSONS = [
             "title": "The classifier as written",
             "intro": [
                 "Take the as-written preset: server error 5, client error 10, redirect 15, "
-                "success 70, in that order, with no final else.",
+                "success 70, in that order. The listing's `return \"unexpected\"` after the "
+                "chain is the error trap; in the illustration no status reaches it, so it "
+                "costs no tests.",
             ],
             "lines": [
                 "server error: 1 test × 5 gives 5",
@@ -718,8 +733,8 @@ LESSONS = [
         ),
         "key": [
             "choose the loop by its test and its count",
-            "treat the loop body as a black box",
-            "check the first, a middle and the last pass",
+            "treat loop bodies as black boxes",
+            "check the first, middle and last passes",
             "do not rely on the index after the loop",
             "keep loops short; nest three levels at most",
         ],
@@ -923,12 +938,15 @@ LESSONS = [
                     "afterwards. Stopping at 4 drops the pass for 1, and giving 1 for the "
                     "value after mistakes the last value in the body for the index's "
                     "final value."},
-            {"q": "How many times does `for (int i = 0; i <= 10; i++)` run?",
-             "a": ["10", "11", "9", "12"],
-             "c": 1,
-             "why": "It runs for every whole number from 0 to 10 inclusive: 10 − 0 + 1 = 11. "
-                    "With `<` it would run 10 times, which is the off-by-one the lesson's "
-                    "`hourly` loop makes in the other direction."},
+            {"q": "How many times does `for (int i = 1; i < 10; i += 3)` run, and what "
+                  "would an `i` declared before it hold afterwards?",
+             "a": ["3 times; 10 after", "3 times; 7 after", "4 times; 10 after",
+                   "3 times; 9 after"],
+             "c": 0,
+             "why": "The body runs for 1, 4 and 7: 3 times. The next value, 10, fails "
+                    "`i < 10`, so an `i` declared before the loop holds 10. 7 is the last "
+                    "value in the body, not the value after; counting 10 as a pass gives 4; "
+                    "and the index does not stop at the bound, 9, but one step past 7."},
             {"q": "Which of these headers never ends?",
              "a": ["`for (int i = 0; i != 10; i += 2)`",
                    "`for (int i = 9; i > 0; i -= 2)`",
@@ -1010,7 +1028,7 @@ LESSONS = [
             "guard clauses clear the nominal path",
             "make sure recursion stops",
             "no recursion for Fibonacci",
-            "recursive Fibonacci: 2·F(n + 1) - 1 calls",
+            "calls: twice F(n + 1), less one",
         ],
         "key_label": "The chapter in five lines",
         "concepts_intro": (
@@ -1081,6 +1099,16 @@ LESSONS = [
                   "with a perspective: the field has advanced largely by restricting what "
                   "programmers may do, and he views unusual control structures with "
                   "strong skepticism."),
+            ("p", "Here is the guard-clause transformation on a small routine written "
+                  "for the lesson. The nested version wrapped `return readFirstLine(file);` "
+                  "in `if (file != null)` and, inside that, `if (file.canRead())`, with "
+                  "`return \"\";` after both. Each enclosing condition becomes its own "
+                  "negation at the top, returning what the routine returns when it fails, "
+                  "and the nominal case ends the routine unindented:"),
+            ("code", _lines(FIRST_LINE_GUARDED)),
+            ("p", "Count it as the exercise will ask you to: two `if`s before and two "
+                  "after, so 1 + 2 = 3 decision points either way; the deepest statement "
+                  "was inside two `if`s and is now inside one."),
             ("p", "Now the counting. The lab's <em>recursion</em> view takes a routine, "
                   "`factorial` or `fibonacci`, and an `n`, and prints four figures: "
                   "<strong>calls</strong>, how many times the recursive version is "
@@ -1115,19 +1143,20 @@ LESSONS = [
             ("p", "The history behind Section 17.3 is a story with people in it, and this "
                   "course tells it once. In March 1968 Edsger Dijkstra's letter &ldquo;Go "
                   "To Statement Considered Harmful&rdquo; appeared in <em>Communications "
-                  "of the ACM</em>, observing that the quality of code fell as the number "
-                  "of its `goto`s rose. In 1974 Donald Knuth answered with "
+                  "of the ACM</em>, observing that the quality of programmers fell as the "
+                  "density of `goto`s in their programs rose, which the book renders as "
+                  "the quality of code. In 1974 Donald Knuth answered with "
                   "&ldquo;Structured Programming with go to Statements&rdquo;, which "
                   "showed cases where a `goto` made code slower and larger and a few "
                   "where it made a real gain. The book reports both, and that by the "
                   "time it was written many languages, Java among them, had no `goto` at "
                   "all. Since then the jump has survived mostly in disguise. Java gives "
                   "its uses names, a labelled `break`, an early `return`, `finally` for "
-                  "cleanup; large C programs still use a forward `goto` to a single "
+                  "cleanup; some large C programs still use a forward `goto` to a single "
                   "cleanup label, the very case the book's argument for the `goto` "
-                  "describes; and the dispute McConnell said had moved to multiple "
-                  "returns, loop exits and exceptions (p. 398) is still argued in those "
-                  "terms. Whether those structures are the `goto` tamed or the `goto` "
+                  "describes; and the debates in which McConnell saw the argument still "
+                  "cropping up, over multiple returns, loop exits and exception handling "
+                  "(p. 398), are argued in those terms today. Whether those structures are the `goto` tamed or the `goto` "
                   "back by another name is a question this lesson leaves with you."),
             ("p", "Every structure so far has been written as code. The next lesson, "
                   "Table-Driven Methods, moves some of the logic out of the code and into "
@@ -1213,8 +1242,9 @@ LESSONS = [
              "c": 1,
              "why": "The guard-clause version returns `0.0` early when the order is not "
                     "paid and when more than 30 days have passed since delivery, then "
-                    "returns `order.total()`. Both versions have two `if`s, so 1 + 2 = 3 "
-                    "decision points before and after; a `return` is not a decision. The "
+                    "returns `order.total()`. The nested version has two `if`s; the guard "
+                    "version has two `if`s, or one `if` and one `||` if you joined the two "
+                    "guards, and either way the count is 1 + 2 = 3 before and after; a `return` is not a decision. The "
                     "deepest statement was at depth 2, inside two `if`s, and is now at "
                     "depth 1, inside one. Nesting and Complexity counts the same "
                     "transformation again on a larger routine."},

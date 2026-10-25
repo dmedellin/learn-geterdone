@@ -31,7 +31,7 @@ static final int[] PRICE = {5, 9, 15, 40};"""
 
 # Boolean Expressions: a loop whose guard and inner test are one condition
 # written two ways, and the exercise.
-DRAIN = """void drain(Queue queue) {
+DRAIN = """void drain(JobQueue queue) {
     boolean done = false;
     boolean error = false;
     while (!(done || error)) {
@@ -131,7 +131,7 @@ LESSONS = [
         "key": [
             "put the knowledge into the data",
             "direct, indexed or staircase access",
-            "a step stores the top of its range",
+            "each step stores the top of its range",
             "endpoint: below the bound, or at or below",
             "long tables: search by halving",
         ],
@@ -211,7 +211,9 @@ LESSONS = [
                   "search</strong> is how many steps the loop compares the key with, from "
                   "the first, before one passes. <strong>Tests, binary search</strong> is "
                   "how many probes a search makes that tests the middle step, keeps the "
-                  "half where the answer must lie, and stops when one step is left. In "
+                  "half where the answer must lie, and stops when one place is left; it "
+                  "counts the place above the last bound as a place too, so a five-step "
+                  "table has six. In "
                   "the <code>days-20</code> preset a book 20 days overdue pays 5, after "
                   "3 linear tests, and the binary search finds it in 2."),
             ("p", "The two <code>days-60</code> presets look up the same key in the same "
@@ -223,8 +225,8 @@ LESSONS = [
                   "that the code has to state. The <code>brackets</code> preset is a "
                   "staircase of sixteen tax brackets, 1,000 wide, from 0% rising by 5% "
                   "to 75%. An income of 14,500 falls in the fifteenth, at 70%, after 15 "
-                  "linear tests; the binary search takes 4, as it does for any key in a "
-                  "sixteen-step table. That is the long table the chapter has in mind for "
+                  "linear tests; the binary search takes 4, and no key in this table "
+                  "takes more than 5 (those below 2,000 take 5). That is the long table the chapter has in mind for "
                   "a binary search. On a short one it can lose: a book 5 days overdue "
                   "needs 1 linear test and 3 binary probes."),
             ("h3", "Exercise"),
@@ -233,7 +235,8 @@ LESSONS = [
                   "does it cost, and how many comparisons do a linear search and the "
                   "lab's binary search make, if a parcel belongs to the first step whose "
                   "top it is below; and what if it belongs to the first step whose top it "
-                  "is at or below? Work it by hand, then check both in the lab, and say "
+                  "is at or below? Work it by hand, then check both in the lab, with the rule "
+                  "typed as <code>below</code> and then <code>atmost</code>, and say "
                   "what the two arrays leave unstated."),
             ("p", "A table replaced the tests; the conditions inside tests remain. The "
                   "next lesson, Boolean Expressions, goes into them."),
@@ -280,8 +283,8 @@ LESSONS = [
              "until one passes. Its value is the answer."),
             ("Search by halving",
              "Probe the middle step; if the key passes it, the answer is that step or "
-             "below, otherwise above. Repeat on the half that is left, counting probes, "
-             "until one step remains."),
+             "an earlier one, otherwise a later one. Repeat on the half that is left, counting probes, "
+             "until one place remains, counting the place above the top bound as one."),
             ("Check the boundaries",
              "Look up a key equal to each upper bound, and one past the top, under the "
              "rule you stated. Those are where a table and its code disagree."),
@@ -306,7 +309,7 @@ LESSONS = [
             "after": [
                 "Both searches find the third step and the fee of 5. The binary search "
                 "saves one comparison here and would lose two for a key of 5; on the "
-                "sixteen-step table it saves eleven.",
+                "sixteen-step table, for 14,500, it saves eleven.",
             ],
         },
         "quiz_title": "Steps, endpoints and searches",
@@ -334,13 +337,15 @@ LESSONS = [
              "why": "14 is not below 7 and not below 14, and it is below 30, so it falls "
                     "in the third step: 5. Under at or below it would pay 2, which is the "
                     "endpoint rule at work."},
-            {"q": "A stair-step table has 16 steps. How many probes does the lab's binary "
-                  "search make for a key in it?",
-             "a": ["16", "8", "5", "4"],
-             "c": 3,
-             "why": "Each probe halves what is left: 16, 8, 4, 2, 1. Four probes leave one "
-                    "step, whatever the key. A linear scan takes anywhere from 1 to 16 "
-                    "comparisons; for the brackets preset's 14,500 it takes 15."},
+            {"q": "The brackets preset has 16 steps, and the lab's binary search also keeps "
+                  "a place for a key above the last bound, so it chooses among 17 places. "
+                  "What is the most probes it makes for any key?",
+             "a": ["16", "17", "5", "4"],
+             "c": 2,
+             "why": "Each probe keeps at most the larger part of what is left: 17, 9, 5, "
+                    "3, 2, 1, which is five probes. Keys below 2,000, in the first two "
+                    "steps, take 5; most keys, 14,500 among them, take 4. A linear scan "
+                    "takes from 1 to 16 comparisons; for 14,500 it takes 15."},
             {"q": "Which three ways of looking an entry up does Chapter 18 name?",
              "a": ["Direct access, indexed access and stair-step access",
                    "Linear search, binary search and hashing",
@@ -353,7 +358,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking a table is just a faster if chain",
-             "Speed is one of the chapter's reasons, and not the main one. Its case is that "
+             "Speed is one of the chapter's reasons (p. 411), beside simplicity and ease of "
+             "change. Its case is that "
              "a table moves the program's knowledge from the logic into data, where it is "
              "easier to read and to change. The logic that remains is the lookup, and the "
              "two days-60 presets show where it sits: the same key in the same table pays "
@@ -377,7 +383,7 @@ LESSONS = [
         ),
         "note": (
             "The lab counts comparisons, not time, and its binary search always runs until "
-            "one step is left; a search that stops on an exact match could take fewer. A "
+            "one place is left, counting the place above the last bound; a search that stops on an exact match could take fewer. A "
             "key past the last bound is reported as above the table, where the lesson's "
             "code returns the top fee instead. Which endpoint rule a business means is "
             "not something the lab or the code can know."
@@ -405,7 +411,7 @@ LESSONS = [
         ),
         "key": [
             "test true and false, not 1 and 0",
-            "name a complicated test",
+            "name each complicated test",
             "state conditions positively",
             "!(a || b) is !a && !b",
             "negate each part and swap && and ||",
@@ -495,7 +501,7 @@ LESSONS = [
                   "and the lab prints &ldquo;no, on 2 of 4 rows&rdquo;, the first being "
                   "done = T, error = F: the queue is empty, nothing failed, and the "
                   "half-applied version would still try to process the next item."),
-            ("p", "Two more presets show DeMorgan used to simplify. The "
+            ("p", "Two more presets show the truth table used to simplify. The "
                   "<code>redundant</code> preset compares `(found && valid) || (found && "
                   "!valid)` with plain `found`: equivalent, true on 2 of 4 rows each, "
                   "because whatever `valid` is, one of the two halves holds whenever "
@@ -614,8 +620,8 @@ LESSONS = [
                     "division is skipped when `count` is 0. Putting the test second does "
                     "not help, because the division comes first; and Java's `&` and `|` "
                     "always evaluate both sides (p. 439)."},
-            {"q": "How does Section 19.1 tell you to apply DeMorgan's theorems to an and "
-                  "or an or and a pair of operands?",
+            {"q": "Section 19.1 gives a three-step recipe for applying DeMorgan's theorems "
+                  "to a compound condition. What are the steps?",
              "a": ["Negate each operand and keep the operator",
                    "Negate each operand, switch the ands and ors, and negate the whole "
                    "expression",
@@ -687,7 +693,7 @@ LESSONS = [
             "few readers follow three nested ifs",
             "points: 1 + each if, for, while, case, &&, ||",
             "0–5 fine; 6–10 think; 10+ split",
-            "a count says where to look",
+            "the count says where to look",
             "moving code moves its decision points",
         ],
         "key_label": "The second half of the chapter in five lines",
@@ -776,17 +782,24 @@ LESSONS = [
                   "<code>nested-shipping</code> preset, twenty-two lines written for the "
                   "lesson:"),
             ("code", {"lines": _lines(NESTED_SHIPPING), "marked": [14]}),
-            ("p", "The lab counts 9 decision points, broken down as 1 + if 5 + for 1 + && "
-                  "1 + || 1, in the band 6&ndash;10, and a deepest nesting of 5, first "
+            ("p", "The lab counts 9 decision points, broken down as "
+                  "`1 + if 5 + for 1 + && 1 + || 1`, in the band 6&ndash;10, and a deepest nesting of 5, first "
                   "reached on line 14, the `return -1.0;` inside the restricted-item "
                   "check. That return is an error sentinel, a technique Chapter 8 lists "
                   "with its costs. The count is a reason to look, and looking shows the "
-                  "domestic rules buried four levels down. Here is the "
+                  "domestic rules buried four levels down. The structures the earlier "
+                  "lessons read one at a time are all here: the `for` on line 12 is a "
+                  "header Controlling Loops would read, one pass per item; the `&&` on "
+                  "line 6 and the `||` on line 13 are the compound conditions Boolean "
+                  "Expressions compared row by row, and each counts one; and the "
+                  "<code>guard-clauses</code> version below is the transformation Unusual "
+                  "Control Structures made on `refundAmount`, now on a routine where it "
+                  "moves a loop as well. Here is the "
                   "<code>guard-clauses</code> preset, the same rules with the error cases "
                   "returned first and the international branch moved into a routine of "
                   "its own:"),
             ("code", _lines(GUARD_CLAUSES)),
-            ("p", "The lab counts 6, as 1 + if 3 + && 1 + || 1, still in 6&ndash;10, and a "
+            ("p", "The lab counts 6, as `1 + if 3 + && 1 + || 1`, still in 6&ndash;10, and a "
                   "deepest nesting of 1, first on line 3. The nesting a reader holds at "
                   "once fell from 5 to 1. The decision points fell from 9 to 6 for a "
                   "different reason: the `for`, its `if` and its `||` moved into "
