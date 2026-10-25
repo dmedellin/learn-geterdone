@@ -1006,6 +1006,69 @@ __TOGGLE_LIGHT__
 """
 
 
+# A `code` body block (render._codeblock). Shipped only on a lesson that draws
+# one, through chrome.head(extra_css=...), so no other page changes weight.
+# Theme tokens only, so both themes and both light paths come for free.
+# The line number is generated content (a CSS counter), which a selection never
+# includes: copying the listing copies the code alone. The block scrolls
+# sideways inside itself; `max-width: 100%` and `min-width: 0` keep a long line
+# from widening the card, and with it the page, at phone width.
+CODE_CSS = """
+    .codeblock {
+      margin: 12px 0;
+      padding: 12px 14px 12px 0;
+      max-width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+      tab-size: 4;
+      counter-reset: code-line;
+    }
+    .codeblock code {
+      display: block;
+      width: max-content;
+      min-width: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      white-space: pre;
+    }
+    .codeblock .cl { counter-increment: code-line; }
+    .codeblock .cl::before {
+      content: counter(code-line);
+      display: inline-block;
+      box-sizing: border-box;
+      width: 3.2em;
+      margin-right: 12px;
+      padding-right: 10px;
+      border-right: 1px solid var(--line);
+      color: var(--muted);
+      text-align: right;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    /* A flagged line: a glyph and bold in the gutter (not colour alone). The
+       word "flagged" is the generated content's alternative text, so a
+       screen reader hears it, nobody sees it, and a copy never carries it.
+       The first declaration is for a browser without alternative text. */
+    .codeblock .flag::before {
+      content: "\\25B6\\00A0" counter(code-line);
+      content: "\\25B6\\00A0" counter(code-line) / "flagged, line " counter(code-line);
+      color: var(--text);
+      font-weight: 700;
+    }
+"""
+
 # Shared visitor chrome. This exact block is also inlined by the Trading patcher.
 UI_CSS = """
     body[data-page-kind] {

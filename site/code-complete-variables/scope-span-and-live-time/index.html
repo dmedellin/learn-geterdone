@@ -1,0 +1,2684 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scope, Span and Live Time | Lesson | Variables | Code Complete, Read Along | Learn · geterdone.io</title>
+  <meta name="description" content="The second half of Chapter 10 asks how widely a variable is known and how long it is in play. McConnell measures the distance between a variable&#x27;s references, its span, and the stretch from first reference to last, its live time, and asks for both to be kept small. Compute both for a routine that declares its variables at the top, move each declaration to the loop that uses it, and compute them again." />
+  <link rel="canonical" href="https://learn.geterdone.io/code-complete-variables/scope-span-and-live-time/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Scope, Span and Live Time | Lesson | Variables | Code Complete, Read Along | Learn · geterdone.io" />
+  <meta property="og:description" content="The second half of Chapter 10 asks how widely a variable is known and how long it is in play. McConnell measures the distance between a variable&#x27;s references, its span, and the stretch from first reference to last, its live time, and asks for both to be kept small. Compute both for a routine that declares its variables at the top, move each declaration to the loop that uses it, and compute them again." />
+  <meta property="og:url" content="https://learn.geterdone.io/code-complete-variables/scope-span-and-live-time/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Scope, Span and Live Time | Lesson | Variables | Code Complete, Read Along | Learn · geterdone.io" />
+  <meta name="twitter:description" content="The second half of Chapter 10 asks how widely a variable is known and how long it is in play. McConnell measures the distance between a variable&#x27;s references, its span, and the stretch from first reference to last, its live time, and asks for both to be kept small. Compute both for a routine that declares its variables at the top, move each declaration to the loop that uses it, and compute them again." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/code-complete-variables/scope-span-and-live-time/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    /* The hero's right column carries a monospace key block, and the block is
+       authored to a fixed 46 characters because it is `white-space: pre-wrap`
+       -- a line that does not fit is not reflowed, it is broken.
+       The column holds 46 only while the shell is at its full 1160px, which
+       takes a 1192px viewport. Below that it shrinks fast: 41 characters at
+       1100, 37 at 1024, 31 at 900, and 22 at 721 -- one pixel above the old
+       720px collapse, where the same block jumps back to 63. Every width in
+       that range was WORSE than stacking, so the hero now stacks below the
+       width its own content was written for. Measured in Chrome, not derived.
+       This subsumes the supplemental-only collapse that used to sit at 920. */
+    @media (max-width: 1191px) {
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+
+    .codeblock {
+      margin: 12px 0;
+      padding: 12px 14px 12px 0;
+      max-width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+      tab-size: 4;
+      counter-reset: code-line;
+    }
+    .codeblock code {
+      display: block;
+      width: max-content;
+      min-width: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      white-space: pre;
+    }
+    .codeblock .cl { counter-increment: code-line; }
+    .codeblock .cl::before {
+      content: counter(code-line);
+      display: inline-block;
+      box-sizing: border-box;
+      width: 3.2em;
+      margin-right: 12px;
+      padding-right: 10px;
+      border-right: 1px solid var(--line);
+      color: var(--muted);
+      text-align: right;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    /* A flagged line: a glyph and bold in the gutter (not colour alone). The
+       word "flagged" is the generated content's alternative text, so a
+       screen reader hears it, nobody sees it, and a copy never carries it.
+       The first declaration is for a browser without alternative text. */
+    .codeblock .flag::before {
+      content: "\25B6\00A0" counter(code-line);
+      content: "\25B6\00A0" counter(code-line) / "flagged, line " counter(code-line);
+      color: var(--text);
+      font-weight: 700;
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/code-complete/">Code Complete, Read Along</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Variables</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Scope, Span and Live Time</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The reading the code is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Variables &middot; Chapter 10 · Using Variables</span>
+        <h1>Scope, Span and Live Time</h1>
+        <p>The second half of Chapter 10 asks how widely a variable is known and how long it is in play. McConnell measures the distance between a variable's references, its span, and the stretch from first reference to last, its live time, and asks for both to be kept small. Compute both for a routine that declares its variables at the top, move each declaration to the loop that uses it, and compute them again.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" data-say="span, lines strictly between two references. live time, last line minus first line plus 1. declare each variable just before its use. start with the smallest scope that works. one variable, one purpose" tabindex="0" role="region" aria-label="Mathematical notation">span: lines strictly between two references
+live time: last line - first line + 1
+declare each variable just before its use
+start with the smallest scope that works
+one variable, one purpose</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Scope in five lines</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Section 10.4 gives the chapter's two measures, and Sections 10.5 to 10.8 add four shorter points about a variable's life and purpose.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Scope</h3><p>How widely a variable is known: within one block, one routine, one class, one package or the whole program. McConnell's advice is to start with the smallest scope that works and widen it only when you must.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Span</h3><p>The number of lines between two consecutive references to a variable. A variable referenced on lines 3, 13 and 18 has spans of 9 and 4; its average span is the mean of its spans.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Live time</h3><p>The stretch from a variable's first reference to its last, both lines included: last minus first plus one. It does not care how often the variable is used in between, only how long a reader has to keep it in mind.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Section 10.4&#x27;s two measures, then one routine measured twice</h2></div><p>The lesson sets out Section 10.4 and the four sections after it, then measures a routine before and after its declarations are moved.</p></div>
+      <article class="card card-pad prose"><p>&ldquo;Minimize the scope of each variable. Keep references to a variable close together. Keep it local to a routine or class. Avoid global data.&rdquo; That is the second of Chapter 10's Key Points, on page 258. This lesson reads Sections 10.4 to 10.8, pages 244 to 258; read them in your own copy first.</p><p>Section 10.4 begins with a variable's celebrity: how many places know it. In Java a variable can be known to a block, a routine, a class or a whole package, and the section's argument is that the less of the program that knows a variable, the less of it you need to read to understand that variable. The code between two references to a variable is what McConnell calls a &ldquo;window of vulnerability&rdquo;: new code can be added there that changes the variable by mistake, and a reader can forget what it holds.</p><p>He then makes the idea measurable. A variable's span is the number of lines between two consecutive references to it, and its average span is the mean of those; its live time is the number of lines from its first reference to its last, both included. The two differ: a variable used on every line from 1 to 25 has spans of 0 and a live time of 25, and one used only on lines 1 and 25 has a span of 23 and the same live time. The section's own example measures a listing whose three variables are initialised at the top and averages a live time of about 54 lines; with the initialisations moved down beside their loops, the average is about 7. McConnell is candid that no one has found the number that separates a good live time from a bad one, and he takes it that smaller is better.</p><p>The section's guidelines follow. Initialise a loop's variables just before the loop, not at the top of the routine. Do not give a variable its value until just before the value is used. Group the statements that work on the same variables. Break a group out into a routine of its own, where its variables cannot live long. And begin with the most restricted visibility, widening it only when you must, because it is much harder to make a global variable local than the reverse. He frames the disagreement fairly: programmers who make variables global value convenience in writing, and those who keep them local value being able to understand one routine at a time; his own conclusion is that a program in which any routine can use any variable is harder to understand, debug and modify, so each variable should be visible to the smallest part of the program that needs it.</p><p>The four shorter sections each add a point. Section 10.5, on persistence, warns against assuming a variable lasts longer than it does, and compares it to the milk in your refrigerator, which is supposed to keep for a week. Section 10.6, on binding time, asks when a variable is tied to its value, from coding time with a literal, through compile time with a named constant, to the moment of use, and notes that later binding buys flexibility at the price of complexity. Section 10.7 matches kinds of data to control structures: sequential data to a sequence of statements, selective data to an <span class="math" data-say="if">if</span> or a <span class="math" data-say="case">case</span>, iterative data to a loop. Section 10.8 asks for each variable to have exactly one purpose, and not, for instance, to be a page count that means an error when it is &minus;1.</p><p>You have probably written a routine like <span class="math" data-say="audit shipments">auditShipments</span>: three declarations at the top, set to zero, and then the work, a screen further down. It is the <code>declared-at-top</code> preset in the lab below.</p><pre class="codeblock" data-say="line 1, void audit shipments of array of shipment shipments, int limit kg. line 2, int scanned is set to 0. line 3, int heaviest kg is set to 0. line 4, int over limit is set to 0. line 5, print title. line 6, print legend. line 7, for shipment s in shipments. line 8, s dot verify. line 9, scanned is set to scanned plus 1. line 11, print count of scanned. line 12, for shipment s in shipments. line 13, heaviest kg is set to math dot max of heaviest kg, s dot weight kg. line 14, if s dot weight kg is greater than limit kg. line 15, over limit is set to over limit plus 1. line 18, print summary of heaviest kg, over limit" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void auditShipments(Shipment[] shipments, int limitKg) {</span>
+<span class="cl">    int scanned = 0;</span>
+<span class="cl">    int heaviestKg = 0;</span>
+<span class="cl">    int overLimit = 0;</span>
+<span class="cl">    printTitle();</span>
+<span class="cl">    printLegend();</span>
+<span class="cl">    for (Shipment s : shipments) {</span>
+<span class="cl">        s.verify();</span>
+<span class="cl">        scanned = scanned + 1;</span>
+<span class="cl">    }</span>
+<span class="cl">    printCount(scanned);</span>
+<span class="cl">    for (Shipment s : shipments) {</span>
+<span class="cl">        heaviestKg = Math.max(heaviestKg, s.weightKg());</span>
+<span class="cl">        if (s.weightKg() &gt; limitKg) {</span>
+<span class="cl">            overLimit = overLimit + 1;</span>
+<span class="cl">        }</span>
+<span class="cl">    }</span>
+<span class="cl">    printSummary(heaviestKg, overLimit);</span>
+<span class="cl">}</span></code></pre><p>Count it for <span class="math" data-say="heaviest kg">heaviestKg</span>: declared on line 3, used on lines 13 and 18, so its spans are 9 and 4, and it is live for 18 &minus; 3 + 1 = 16 lines, and the nine lines between its declaration and its first use have nothing to do with it. <span class="math" data-say="scanned">scanned</span> is on lines 2, 9 and 11, spans 6 and 1, live time 10; <span class="math" data-say="over limit">overLimit</span> on lines 4, 15 and 18, spans 10 and 2, live time 15. With the three variables in its <em>Variables</em> box, the lab prints the average span over all six spans, 16/3 &asymp; 5.33, the average live time, 41/3 &asymp; 13.67, and the longest live time, <code>heaviestKg: 16</code>. The <code>declared-near-use</code> preset moves each declaration down to the loop that uses it and changes no other statement.</p><pre class="codeblock" data-say="line 1, void audit shipments of array of shipment shipments, int limit kg. line 2, print title. line 3, print legend. line 4, int scanned is set to 0. line 5, for shipment s in shipments. line 6, s dot verify. line 7, scanned is set to scanned plus 1. line 9, print count of scanned. line 10, int heaviest kg is set to 0. line 11, int over limit is set to 0. line 12, for shipment s in shipments. line 13, heaviest kg is set to math dot max of heaviest kg, s dot weight kg. line 14, if s dot weight kg is greater than limit kg. line 15, over limit is set to over limit plus 1. line 18, print summary of heaviest kg, over limit" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void auditShipments(Shipment[] shipments, int limitKg) {</span>
+<span class="cl">    printTitle();</span>
+<span class="cl">    printLegend();</span>
+<span class="cl">    int scanned = 0;</span>
+<span class="cl">    for (Shipment s : shipments) {</span>
+<span class="cl">        s.verify();</span>
+<span class="cl">        scanned = scanned + 1;</span>
+<span class="cl">    }</span>
+<span class="cl">    printCount(scanned);</span>
+<span class="cl">    int heaviestKg = 0;</span>
+<span class="cl">    int overLimit = 0;</span>
+<span class="cl">    for (Shipment s : shipments) {</span>
+<span class="cl">        heaviestKg = Math.max(heaviestKg, s.weightKg());</span>
+<span class="cl">        if (s.weightKg() &gt; limitKg) {</span>
+<span class="cl">            overLimit = overLimit + 1;</span>
+<span class="cl">        }</span>
+<span class="cl">    }</span>
+<span class="cl">    printSummary(heaviestKg, overLimit);</span>
+<span class="cl">}</span></code></pre><p>Now <span class="math" data-say="scanned">scanned</span> is on lines 4, 7 and 9, <span class="math" data-say="heaviest kg">heaviestKg</span> on 10, 13 and 18, and <span class="math" data-say="over limit">overLimit</span> on 11, 15 and 18. The average span falls to 7/3 &asymp; 2.33 and the average live time to 23/3 &asymp; 7.67, and the longest is <code>heaviestKg: 9</code>. Nothing about what the program does is different; what is different is how much of it you have to hold in your head at once, which is the complexity Chapter 5 said was the thing to manage. Notice too that each loop's <span class="math" data-say="s">s</span> is declared in its own loop header, so Java already gives it the smallest scope there is.</p><p>Two differences between the lab and the book are worth knowing. The book counts statements, and the lab counts listing lines, blank lines and lines of braces included, so the lab's numbers run a little higher than a statement count would. And the book averages the spans of one variable; the lab's single average over several variables pools all their spans, which is the lab's own extension of the measure. Either way the figure tells you where to look, not what to do.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void report sales of array of sale sales. line 2, double total is set to 0.0. line 3, int count is set to 0. line 4, print header. line 5, print date. line 6, print columns. line 7, print rule. line 8, for sale sale in sales. line 9, total is set to total plus sale dot amount. line 10, count is set to count plus 1. line 12, print totals of total, count" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void reportSales(Sale[] sales) {</span>
+<span class="cl">    double total = 0.0;</span>
+<span class="cl">    int count = 0;</span>
+<span class="cl">    printHeader();</span>
+<span class="cl">    printDate();</span>
+<span class="cl">    printColumns();</span>
+<span class="cl">    printRule();</span>
+<span class="cl">    for (Sale sale : sales) {</span>
+<span class="cl">        total = total + sale.amount();</span>
+<span class="cl">        count = count + 1;</span>
+<span class="cl">    }</span>
+<span class="cl">    printTotals(total, count);</span>
+<span class="cl">}</span></code></pre><p>For <span class="math" data-say="total">total</span> and <span class="math" data-say="count">count</span>, write down every span, the average span over the four spans and each live time. Then move both declarations below the four <span class="math" data-say="print">print</span> calls, so that they become lines 6 and 7, and compute the same figures again. You can check both versions in the lab afterwards, with <span class="math" data-say="total count">total count</span> in its Variables box.</p><p>A variable that stays live for few lines is easy to follow only if its name says what it holds. The next lesson, &ldquo;The Power of Variable Names&rdquo;, reads Chapter 11.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>lines between references, and live time</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>lines between references, and live time</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>A name's references are the lines it appears on; a span is the number of lines strictly between two consecutive references; its live time is the last reference's line minus the first's, plus one.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Span and live time</h3>
+          <p>A count over code, by the rules stated below the listing. The lab finds every line on which each named variable appears, computes the spans between consecutive references and each live time, and averages them. Leave the Variables box empty to measure every variable the routine sets.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="declared-at-top" selected>Declared at the top</option><option value="declared-near-use">Declared near their use</option></select>
+        </div>
+        <div class="field">
+          <label for="coInVars">Variables (space-separated; empty for every one set)</label>
+          <input id="coInVars" type="text" value="scanned heaviestKg overLimit" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Average span (lines)</span><strong id="coAvgSpan">&mdash;</strong></div>
+          <div class="kpi"><span>Average live time (lines)</span><strong id="coAvgLive">&mdash;</strong></div>
+          <div class="kpi"><span>Longest live time</span><strong id="coLongest">&mdash;</strong></div>
+        </div>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring span and live time</h2></div><p>Four steps; the last is yours.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List each variable&#x27;s lines</h3><p>Number every line from 1 and write down, for each variable, the lines on which it appears, its declaration included.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the spans</h3><p>For each pair of consecutive lines, the span is the later minus the earlier minus one: the lines strictly between. Average them for the variable, or over all the variables, as the lab does.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the live times</h3><p>For each variable, its last line minus its first line plus one. Note which is longest and how many of its lines come before the first real use.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Shorten a live time of your own</h3><p>Paste a routine of your own into the lab with the Variables box empty and find the local variable with the longest live time (the table lists parameters and loop variables too; a parameter's live time is the routine's). Move its declaration down to just before its first use, paste again, and note how far its live time fell.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Spans and live times</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>heaviestKg, declared at the top</h3><p>In <code>declared-at-top</code>, <span class="math" data-say="heaviest kg">heaviestKg</span> appears on lines 3, 13 and 18.</p><div class="mathblock" data-say="references, lines 3, 13, 18. spans, 13 minus 3 minus 1 is 9, and 18 minus 13 minus 1 is 4. average span, 13 divided by 2, which is 6.5. live time, 18 minus 3 plus 1 is 16. declared near use, on line 10, 18 minus 10 plus 1 is 9" tabindex="0" role="region" aria-label="Mathematical notation">references: lines 3, 13, 18
+spans: 13 - 3 - 1 is 9, and 18 - 13 - 1 is 4
+average span: 13/2, which is 6.5
+live time: 18 - 3 + 1 is 16
+declared near use, on line 10: 18 - 10 + 1 is 9</div><p>Moving the declaration cuts seven lines from its live time, all of them lines on which <span class="math" data-say="heaviest kg">heaviestKg</span> held 0 and did nothing.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Declaring every variable at the top so it is easy to find</strong><span>It is a common habit and has a real reason: one place to look. The chapter's measure says what it costs. Every line between a declaration and the variable's first use is a line on which it is live and doing nothing; on the lesson's illustration the average live time is 41/3, about 13.7 lines, against 23/3, about 7.7, for the same statements with each declaration moved down beside its loop.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking span and live time for the same measure</strong><span>A variable used on every line from 1 to 25 has spans of 0 and a live time of 25; one used only on lines 1 and 25 has a span of 23 and the same live time. Span says how far apart the references are; live time says how long the variable is in play. Section 10.4 asks for both to be small.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reusing a temporary variable for a second job</strong><span>It saves a declaration and costs a reader. Section 10.8 asks for one purpose per variable: a <span class="math" data-say="temp">temp</span> used for two unrelated values makes them look related, and a count that means an error when it is &minus;1 is, in the book's words for it, an integer &ldquo;moonlighting as a boolean&rdquo;.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute spans and live times by hand.</strong><p>Given the lines on which two variables are referenced, compute every span, the average span and each live time, and say which declaration to move to shrink them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts listing lines where the book counts statements, and its pooled average over several variables is its own extension of the book's per-variable measure. It reads names, not meanings: a variable reused for two purposes is one name to the lab, and a short live time says nothing about whether the variable's scope is wider than it needs to be.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../declaring-and-initializing-variables/" rel="prev"><span>Lesson</span><strong>Declaring and Initializing Variables</strong></a>
+      <a class="lesson-link next" href="../the-power-of-variable-names/" rel="next"><span>Lesson</span><strong>The Power of Variable Names</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="code-complete-variables/scope-span-and-live-time" data-lesson-title="Scope, Span and Live Time" data-course-title="Variables">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Variables.</strong> Every figure in this course is computed in your browser from the code or the numbers a lesson states: anomalies by reading the lines in order, spans and live times as differences of line numbers, a mean of name lengths, Java's int, long and double arithmetic simulated exactly, and the pairs of routines a global couples. The one study figure quoted, on name length, is the book's report of Gorla, Benander and Benander (1990). None of the counts says whether a routine is good; each says where to look.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the code or the quantities a lesson states, and a count over code is a reason to look at it, not a verdict on it &mdash; the rates and costs quoted from the book are averages from other people&rsquo;s projects, which your own records can test and the lab cannot.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "In the exercise's <span class=\"math\" data-say=\"report sales\">reportSales<\/span>, what are the average span over <span class=\"math\" data-say=\"total\">total<\/span> and <span class=\"math\" data-say=\"count\">count<\/span> and their live times, before and after the declarations move to lines 6 and 7?", "a": ["3.75 and live times 10 and 9 before; 1.75 and 6 and 5 after", "3.75 and live times 11 and 10 before; 1.75 and 7 and 6 after", "4.75 and live times 11 and 10 before; 2.75 and 7 and 6 after", "3.75 and live times 11 and 10 before; 3.75 and 7 and 6 after"], "c": 1, "why": "Before, <span class=\"math\" data-say=\"total\">total<\/span> is on lines 2, 9 and 12 (spans 6 and 2) and <span class=\"math\" data-say=\"count\">count<\/span> on 3, 10 and 12 (spans 6 and 1): 15/4 = 3.75, live times 12 &minus; 2 + 1 = 11 and 12 &minus; 3 + 1 = 10. After, <span class=\"math\" data-say=\"total\">total<\/span> is on 6, 9 and 12 (spans 2 and 2) and <span class=\"math\" data-say=\"count\">count<\/span> on 7, 10 and 12 (spans 2 and 1): 7/4 = 1.75, live times 7 and 6. Leaving out the + 1 gives 10 and 9; counting a span as the plain difference of line numbers gives 4.75; and the spans do change when a declaration moves."}, {"q": "A variable is referenced only on line 1 and line 25. What are its span and live time, as Section 10.4 counts them?", "a": ["Span 24, live time 24", "Span 23, live time 24", "Span 0, live time 25", "Span 23, live time 25"], "c": 3, "why": "Twenty-three lines lie strictly between lines 1 and 25, and the live time counts both ends: 25 &minus; 1 + 1 = 25. These are the book's own figures (p. 246). A span of 0 would need a reference on every line between."}, {"q": "In <code>declared-at-top<\/code> the lab's average span is 16/3. What has it averaged?", "a": ["Six spans, two for each of the three variables", "Three spans, one for each variable", "The three live times", "The two spans of heaviestKg"], "c": 0, "why": "Each variable appears on three lines and so has two spans: 6 and 1, 9 and 4, 10 and 2, which total 32, and 32/6 = 16/3. Pooling all the spans is the lab's extension of the book's per-variable average; the live times average 41/3."}, {"q": "Section 10.6 lists the times at which a variable can be bound to its value. Which of these binds latest?", "a": ["A named constant", "A literal typed into the code", "Reading the value each time a window is drawn", "Reading the value from a properties file when the program loads"], "c": 2, "why": "The section's order runs from coding time (a literal), through compile time (a named constant) and load time (a file read at start-up), to object creation and finally just in time, each time the value is used. Later binding is more flexible and, the section adds, more complex."}];
+
+  (function () {
+
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  var CC_DASH = '—', CC_MINUS = '−';
+  function ccEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function ccClean(text) { return String(text === null || text === undefined ? '' : text).replace(/\u2212/g, '-').trim(); }
+  function ccGroup(digits) { return digits.replace(/\B(?=(\d{3})+$)/g, ','); }
+  function ccInt(n) { n = BigInt(n); return (n < 0n ? CC_MINUS : '') + ccGroup(String(n < 0n ? -n : n)); }
+  function ccFrac(r) { return (r.n < 0n ? CC_MINUS : '') + Rtext(Rabs(r)); }
+  function ccFixed(r, places) {
+    var neg = r.n < 0n, num = neg ? -r.n : r.n, scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / r.d + 1n) / 2n, s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    return (neg && q !== 0n ? CC_MINUS : '') + ccGroup(s.slice(0, s.length - places))
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+  }
+  function ccExactAt(r, places) { return (r.n * 10n ** BigInt(places)) % r.d === 0n; }
+  function ccDigits(n) { return String(n < 0n ? -n : n).length; }
+  function ccBig(r) { return ccDigits(r.n) > 30 || ccDigits(r.d) > 30; }
+  function ccTen(k) { return k >= 0 ? R(10n ** BigInt(k)) : R(1n, 10n ** BigInt(-k)); }
+  function ccSci(r) {
+    var a = Rabs(r), e = ccDigits(a.n) - ccDigits(a.d);
+    if (Rcmp(a, ccTen(e)) < 0) e -= 1;
+    var t = ccFixed(Rdiv(a, ccTen(e)), 2);
+    if (t === '10.00') { t = '1.00'; e += 1; }
+    return '≈ ' + (r.n < 0n ? CC_MINUS : '') + t + ' × 10^' + (e < 0 ? CC_MINUS + (-e) : e);
+  }
+  function ccNum(r, places) {
+    if (places === undefined) places = 2;
+    if (ccBig(r)) return ccSci(r);
+    if (Rint(r)) return ccInt(r.n);
+    return ccFrac(r) + (ccExactAt(r, places) ? ' = ' : ' ≈ ') + ccFixed(r, places);
+  }
+  function ccPct(r) {
+    var p = Rmul(r, R(100n)), exact = Rint(p) || ccExactAt(p, 1);
+    var d = (Rint(p) ? ccInt(p.n) : ccFixed(p, 1)) + '%';
+    if (ccBig(r)) return (exact ? '= ' : '≈ ') + d;
+    return ccFrac(r) + (exact ? ' = ' : ' ≈ ') + d;
+  }
+  function ccRange(lo, hi) {
+    if (Requ(lo, hi)) return ccNum(lo);
+    if (Rint(lo) && Rint(hi) && !ccBig(lo) && !ccBig(hi)) return ccInt(lo.n) + '–' + ccInt(hi.n);
+    return ccNum(lo) + ' to ' + ccNum(hi);
+  }
+  function ccTimes(r) { return ccNum(r, 1) + '×'; }
+  function ccTimesRange(lo, hi) { return Requ(lo, hi) ? ccTimes(lo) : ccTimes(lo) + ' to ' + ccTimes(hi); }
+  function ccNames(list) { return list.length ? list.join(', ') : 'none'; }
+  function ccCount(list) { return list.length + ': ' + ccNames(list); }
+  function ccPlural(n, one, many) { return ccInt(n) + ' ' + (BigInt(n) === 1n ? one : many); }
+  function ccSum(v) { var s = R0; v.forEach(function (x) { s = Radd(s, x); }); return s; }
+  function ccSort(list) { return list.slice().sort(function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); }); }
+  function ccBigOf(r) { return r.n / r.d; }
+
+  function ccSplitLines(text) {
+    var t = String(text === null || text === undefined ? '' : text).replace(/\r\n?/g, '\n');
+    if (t === '') return [];
+    var lines = t.split('\n');
+    if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
+    return lines;
+  }
+
+  var CC_NAME = /^[A-Za-z0-9._-]+$/, CC_IDENT = /^[A-Za-z_$][A-Za-z0-9_$]*$/, CC_BAD_LABEL = /[,;:<>&"=]/;
+  function ccNumber(s, what) {
+    if (s === '') throw new Error(what + ' is empty');
+    var r = Rparse(s);
+    if (r === null) throw new Error(what + ' should be a number such as 3, 1/2 or 0.25, and "' + s + '" is not one');
+    return r;
+  }
+  function ccScalar(f, text, what) {
+    var s = ccClean(text), r, toks;
+    switch (f.kind) {
+      case 'label':
+        if (s === '') throw new Error(what + ' is empty');
+        if (CC_BAD_LABEL.test(s)) throw new Error(what + ' "' + s + '" may not contain , ; : = < > & or quotes');
+        return s;
+      case 'name':
+        if (s === '') throw new Error(what + ' is empty');
+        if (!CC_NAME.test(s)) throw new Error(what + ' "' + s + '" should be letters, digits, dots, hyphens or underscores');
+        return s;
+      case 'word':
+        if (f.words.indexOf(s) < 0) throw new Error(what + ' should be one of ' + f.words.join(', ') + ', not "' + s + '"');
+        return s;
+      case 'tag':
+        if (s !== '' && s !== f.tag) throw new Error(what + ' should be ' + f.tag + ' or nothing, not "' + s + '"');
+        return s === f.tag;
+      case 'names':
+      case 'idents':
+        toks = s === '' ? [] : s.split(/\s+/);
+        toks.forEach(function (t) {
+          if (!(f.kind === 'names' ? CC_NAME : CC_IDENT).test(t)) {
+            throw new Error(what + ': "' + t + '" is not ' + (f.kind === 'names' ? 'a name of letters, digits, dots, hyphens or underscores' : 'a Java name'));
+          }
+        });
+        if (f.lo !== undefined && toks.length < f.lo) throw new Error(what + ' is empty');
+        if (f.hi !== undefined && toks.length > f.hi) throw new Error(what + ' names ' + toks.length + '; this lab takes at most ' + f.hi);
+        toks.forEach(function (t, i) { if (toks.indexOf(t) !== i) throw new Error(what + ' names "' + t + '" twice'); });
+        return toks;
+      case 'text':
+        if (s === '') throw new Error(what + ' is empty');
+        if (s.length > 60 || /[<>&"]/.test(s)) throw new Error(what + ' "' + s.slice(0, 60) + '" is not a number this lab can read');
+        return s;
+      case 'pairs':
+        var out = [];
+        (s === '' ? [] : s.split(';')).forEach(function (part, i, all) {
+          part = part.trim();
+          if (part === '' && i === all.length - 1) return;
+          var m = /^([^=\s]+)\s*=\s*([^=\s]+)$/.exec(part);
+          if (!m || !CC_NAME.test(m[1]) || !CC_NAME.test(m[2])) throw new Error(what + ': "' + part + '" should be name=name');
+          if (out.some(function (o) { return o.a === m[1]; })) throw new Error(what + ' names "' + m[1] + '" twice');
+          out.push({ a: m[1], b: m[2] });
+        });
+        return out;
+      case 'cond':
+        if (s === '') throw new Error(what + ' is empty');
+        if (s.length > 300) throw new Error(what + ' has ' + s.length + ' characters; this lab reads at most 300');
+        return s;
+    }
+    r = ccNumber(s, what);
+    if (f.kind === 'pos' && Rsign(r) <= 0) throw new Error(what + ' must be more than 0, and it is ' + ccFrac(r));
+    if (f.kind === 'nn' && Rsign(r) < 0) throw new Error(what + ' cannot be negative, and it is ' + ccFrac(r));
+    if (f.kind === 'share' && (Rsign(r) < 0 || Rcmp(r, R1) > 0)) throw new Error(what + ' is a share from 0 to 1, and it is ' + ccFrac(r));
+    if ((f.kind === 'whole' || f.kind === 'count' || f.kind === 'nncount') && !Rint(r)) throw new Error(what + ' must be a whole number, not ' + ccFrac(r));
+    if (f.kind === 'count' && Rsign(r) <= 0) throw new Error(what + ' must be at least 1, not ' + ccFrac(r));
+    if (f.kind === 'nncount' && Rsign(r) < 0) throw new Error(what + ' must be 0 or more, not ' + ccFrac(r));
+    if (f.min !== undefined && Rcmp(r, Rparse(f.min)) < 0) throw new Error(what + ' must be at least ' + ccNum(Rparse(f.min)) + ', and it is ' + ccFrac(r));
+    if (f.max !== undefined && Rcmp(r, Rparse(f.max)) > 0) throw new Error(what + ' is at most ' + ccNum(Rparse(f.max)) + ', and it is ' + ccFrac(r));
+    return r;
+  }
+  function ccSized(n, f, what) {
+    if (n < f.lo) throw new Error(what + (n === 0 ? ' is empty' : ': this lab needs at least ' + f.lo + ', and there ' + (n === 1 ? 'is 1' : 'are ' + n)));
+    if (n > f.hi) throw new Error(what + ': this lab takes at most ' + f.hi + ', and there are ' + n);
+  }
+  function ccList(text, f, what) {
+    var s = ccClean(text), parts = s === '' ? [] : s.split(/[\s,]+/).filter(function (t) { return t !== ''; });
+    ccSized(parts.length, f, what);
+    return parts.map(function (t, i) { return ccScalar(f.each, t, 'Entry ' + (i + 1) + ' of ' + what); });
+  }
+  function ccRecords(text, f, what) {
+    var s = ccClean(text), rows = s === '' ? [] : s.split(';').map(function (r) { return r.trim(); });
+    if (rows.length && rows[rows.length - 1] === '') rows.pop();
+    ccSized(rows.length, f, what);
+    var seen = {}, need = f.sub.length - (f.opt || 0);
+    return rows.map(function (row, i) {
+      var cells = row.split(',').map(function (c) { return c.trim(); });
+      if (cells.length < need || cells.length > f.sub.length) {
+        throw new Error('Entry ' + (i + 1) + ' of ' + what + ' has ' + cells.length + ' part' + (cells.length === 1 ? '' : 's')
+          + '; each needs ' + (need === f.sub.length ? need : need + ' to ' + f.sub.length) + ': '
+          + f.sub.map(function (k) { return k[0]; }).join(', '));
+      }
+      var rec = {};
+      f.sub.forEach(function (k, j) {
+        rec[k[0]] = j < cells.length ? ccScalar(k[1], cells[j], 'The ' + k[0] + ' in entry ' + (i + 1) + ' of ' + what)
+          : ccScalar(k[1], '', 'The ' + k[0] + ' in entry ' + (i + 1) + ' of ' + what);
+      });
+      if (f.unique) {
+        if (seen[cells[0]]) throw new Error(what + ' names "' + cells[0] + '" twice');
+        seen[cells[0]] = true;
+      }
+      return rec;
+    });
+  }
+  function ccCode(text, what) {
+    var lines = ccSplitLines(text);
+    if (lines.length > 200) throw new Error(what + ' has ' + lines.length + ' lines; this lab reads at most 200');
+    lines.forEach(function (l, i) {
+      if (l.length > 120) throw new Error('Line ' + (i + 1) + ' has ' + l.length + ' characters; this lab reads at most 120 a line');
+    });
+    return lines;
+  }
+  function ccField(f, text) {
+    if (f.kind === 'rec') return ccRecords(text, f, f.what);
+    if (f.kind === 'list') return ccList(text, f, f.what);
+    if (f.kind === 'code') return ccCode(text, f.what);
+    return ccScalar(f, text, f.what);
+  }
+  function ccRead(spec, raw) {
+    var out = {};
+    spec.forEach(function (f) { out[f.key] = ccField(f, raw[f.key]); });
+    return out;
+  }
+
+  function ccTableHtml(t) {
+    var h = '<caption>' + ccEsc(t.caption) + '</caption><thead><tr>'
+      + t.head.map(function (x) { return '<th>' + ccEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    t.rows.forEach(function (row) {
+      h += '<tr>' + row.map(function (cell) {
+        var x = (cell && cell.t !== undefined) ? cell.t : cell, c = (cell && cell.c) ? cell.c : '';
+        return '<td' + (c ? ' class="' + c + '"' : '') + '>' + ccEsc(x) + '</td>';
+      }).join('') + '</tr>';
+    });
+    return h + '</tbody>';
+  }
+  var CC_GUTTER = 'display:inline-block;min-width:3.6em;box-sizing:border-box;padding-right:.55em;margin-right:.6em;'
+    + 'text-align:right;border-right:1px solid var(--line);user-select:none;-webkit-user-select:none;';
+  function ccListing(el, text, flags) {
+    var lines = ccSplitLines(text), h = '';
+    lines.forEach(function (s, i) {
+      var f = flags ? flags[i + 1] : null;
+      h += '<span style="' + CC_GUTTER + (f ? 'color:var(--text);font-weight:700' : 'color:var(--muted)') + '">'
+        + (f ? '▸ ' : '') + (i + 1) + (f ? '<span class="visually-hidden"> ' + ccEsc(f) + '</span>' : '') + '</span>'
+        + ccEsc(s) + '\n';
+    });
+    el.innerHTML = h || '<span style="' + CC_GUTTER + 'color:var(--muted)">0</span>(an empty listing)';
+  }
+  function ccFlag(flags, line, word) {
+    flags[line] = flags[line] ? (flags[line].indexOf(word) < 0 ? flags[line] + ', ' + word : flags[line]) : word;
+  }
+
+  function ccWords(s) { var o = {}; s.split(' ').forEach(function (w) { o[w] = true; }); return o; }
+  var CC_KW = ccWords('abstract assert boolean break byte case catch char class const continue default do double else enum '
+    + 'extends final finally float for goto if implements import instanceof int interface long native new null package '
+    + 'private protected public return short static strictfp super switch synchronized this throw throws transient true '
+    + 'false try var void volatile while');
+  var CC_PRIM = ccWords('boolean byte char double float int long short void var');
+  var CC_MODS = ccWords('public private protected static final abstract');
+  var CC_ASSIGN = ccWords('= += -= *= /= %=');
+  var CC_CONTROL = ccWords('if for while switch catch else do try synchronized return new throw case default');
+  var CC_TOK = new RegExp('\\s*(?:("(?:\\\\.|[^"\\\\])*")|(\'(?:\\\\u[0-9a-fA-F]{4}|\\\\.|[^\'\\\\])\')'
+    + '|(0[xX][0-9a-fA-F_]+[lL]?|0[bB][01_]+[lL]?|(?:\\d[\\d_]*\\.[\\d_]*|\\.\\d[\\d_]*)(?:[eE][+-]?\\d+)?[fFdD]?'
+    + '|\\d[\\d_]*(?:[eE][+-]?\\d+)?[lLfFdD]?)|([A-Za-z_$][A-Za-z0-9_$]*)'
+    + '|(->|::|\\+\\+|--|&&|\\|\\||==|!=|<=|>=|\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|[{}()\\[\\];,.<>=!+\\-*/%?:&|^~@]))', 'y');
+  var CC_KINDS = ['str', 'chr', 'num', 'id', 'op'];
+  function ccLex(src) {
+    var out = [], inBlock = false;
+    for (var n = 0; n < src.length; n += 1) {
+      var raw = src[n], code = '', comment = false, i = 0, m;
+      while (i < raw.length) {
+        if (inBlock) {
+          var j = raw.indexOf('*/', i);
+          comment = true;
+          if (j < 0) i = raw.length; else { inBlock = false; i = j + 2; code += ' '; }
+          continue;
+        }
+        if (raw.startsWith('//', i)) { comment = true; break; }
+        if (raw.startsWith('/*', i)) { inBlock = true; comment = true; i += 2; continue; }
+        var c = raw.charAt(i);
+        if (c === '"' || c === "'") {
+          var re = c === '"' ? /"(?:\\.|[^"\\])*"/y : /'(?:\\u[0-9a-fA-F]{4}|\\.|[^'\\])'/y;
+          re.lastIndex = i;
+          m = re.exec(raw);
+          if (!m) {
+            return { error: 'Line ' + (n + 1) + ' has a ' + (c === '"' ? 'string' : 'character')
+              + ' literal that does not close on that line, which this lab cannot read' };
+          }
+          code += m[0];
+          i += m[0].length;
+          continue;
+        }
+        code += c;
+        i += 1;
+      }
+      var toks = [], pos = 0;
+      while (pos < code.length && /\S/.test(code.slice(pos))) {
+        CC_TOK.lastIndex = pos;
+        m = CC_TOK.exec(code);
+        if (!m) {
+          return { error: 'Line ' + (n + 1) + ' has "' + code.slice(pos).trim().charAt(0)
+            + '", which is outside the part of Java this lab reads' };
+        }
+        for (var g = 1; g <= 5; g += 1) if (m[g] !== undefined) { toks.push({ k: CC_KINDS[g - 1], v: m[g] }); break; }
+        pos = CC_TOK.lastIndex;
+      }
+      out.push({ no: n + 1, raw: raw, code: code, comment: comment, toks: toks,
+        vals: toks.map(function (t) { return t.v; }), isCode: toks.length > 0,
+        braceOnly: toks.length > 0 && toks.every(function (t) { return t.v === '{' || t.v === '}' || t.v === ';'; }) });
+    }
+    return { lines: out };
+  }
+  function ccDepths(lines) {
+    var d = 0, at = {}, bad = null;
+    lines.forEach(function (ln) {
+      var k = 0;
+      while (k < ln.vals.length && ln.vals[k] === '}') k += 1;
+      var row = { start: d, at: d - k };
+      ln.vals.forEach(function (v) {
+        if (v === '{') d += 1;
+        else if (v === '}') { d -= 1; if (d < 0 && bad === null) bad = ln.no; }
+      });
+      if (d < 0) d = 0;
+      row.end = d;
+      at[ln.no] = row;
+    });
+    return { at: at, bad: bad };
+  }
+  function ccClose(v, i, open, close) {
+    var depth = 0;
+    for (var k = i; k < v.length; k += 1) {
+      if (v[k] === open) depth += 1;
+      else if (v[k] === close) { depth -= 1; if (depth === 0) return k; }
+    }
+    return -1;
+  }
+  function ccSplitTop(toks, sep) {
+    var out = [[]], depth = 0;
+    toks.forEach(function (t) {
+      if (t.v === '(' || t.v === '[' || t.v === '{') depth += 1;
+      else if (t.v === ')' || t.v === ']' || t.v === '}') depth -= 1;
+      if (t.v === sep && depth === 0) out.push([]); else out[out.length - 1].push(t);
+    });
+    return out;
+  }
+  function ccIndexTop(toks, seps) {
+    var depth = 0;
+    for (var k = 0; k < toks.length; k += 1) {
+      var v = toks[k].v;
+      if (v === '(' || v === '[') depth += 1;
+      else if (v === ')' || v === ']') depth -= 1;
+      else if (depth === 0 && seps.indexOf(v) >= 0) return k;
+    }
+    return -1;
+  }
+  function ccShape(toks) {
+    var v = toks.map(function (t) { return t.v; }), s = 0;
+    while (v[s] === '@' && s + 1 < v.length) {
+      s += 2;
+      if (v[s] === '(') { var e = ccClose(v, s, '(', ')'); if (e < 0) return null; s = e + 1; }
+    }
+    if (s >= v.length || CC_CONTROL[v[s]]) return null;
+    if (v.some(function (x) { return x === '=' || x === 'new' || x === 'class' || x === 'interface' || x === 'enum'; })) return null;
+    var p = v.indexOf('(', s);
+    if (p < s + 2 || toks[p - 1].k !== 'id' || CC_KW[v[p - 1]]) return null;
+    if (!(toks[p - 2].k === 'id' || v[p - 2] === '>' || v[p - 2] === ']')) return null;
+    var q = ccClose(v, p, '(', ')');
+    if (q < 0 || (q + 1 < v.length && v[q + 1] !== 'throws')) return null;
+    var params = [], cur = [], depth = 0;
+    for (var k = p + 1; k < q; k += 1) {
+      var x = v[k];
+      if (x === '(' || x === '<' || x === '[') depth += 1;
+      else if (x === ')' || x === '>' || x === ']') depth -= 1;
+      if (x === ',' && depth === 0) { if (cur.length) params.push(cur); cur = []; } else cur.push(toks[k]);
+    }
+    if (cur.length) params.push(cur);
+    return { name: v[p - 1], params: params.map(function (c) { return c[c.length - 1].v; }) };
+  }
+  function ccHeader(lines) {
+    var d = 0, cur = [], first = null;
+    for (var i = 0; i < lines.length; i += 1) {
+      var ln = lines[i];
+      for (var j = 0; j < ln.toks.length; j += 1) {
+        var v = ln.toks[j].v;
+        if (d > 0) { if (v === '{') d += 1; else if (v === '}') d -= 1; continue; }
+        if (v === '{') {
+          var h = ccShape(cur);
+          if (h) { h.first = first; h.last = ln.no; return h; }
+          cur = []; first = null; d = 1;
+        } else if (v === ';' || v === '}') {
+          cur = []; first = null;
+        } else {
+          if (!cur.length) first = ln.no;
+          cur.push(ln.toks[j]);
+        }
+      }
+    }
+    return null;
+  }
+  function ccIsName(v) { return /^[a-z_]/.test(v) && !CC_KW[v]; }
+  function ccIsVar(toks, k) {
+    var t = toks[k];
+    if (t.k !== 'id' || !ccIsName(t.v)) return false;
+    if (k + 1 < toks.length && toks[k + 1].v === '(') return false;
+    if (k > 0 && (toks[k - 1].v === '.' || toks[k - 1].v === '::')) return false;
+    return true;
+  }
+  function ccReads(toks, line, ev) {
+    for (var k = 0; k < toks.length; k += 1) {
+      if (!ccIsVar(toks, k)) continue;
+      ev.push({ line: line, name: toks[k].v, e: 'r' });
+      var nx = k + 1 < toks.length ? toks[k + 1].v : '', pv = k > 0 ? toks[k - 1].v : '';
+      if (nx === '++' || nx === '--' || pv === '++' || pv === '--') ev.push({ line: line, name: toks[k].v, e: 'w' });
+    }
+  }
+  function ccTypeEnd(toks, i) {
+    if (i >= toks.length) return -1;
+    var t = toks[i];
+    if (!(CC_PRIM[t.v] || (t.k === 'id' && /^[A-Z]/.test(t.v)))) return -1;
+    var j = i + 1;
+    if (j < toks.length && toks[j].v === '<') {
+      j = ccClose(toks.map(function (x) { return x.v; }), j, '<', '>');
+      if (j < 0) return -1;
+      j += 1;
+    }
+    while (j + 1 < toks.length && toks[j].v === '[' && toks[j + 1].v === ']') j += 2;
+    return j;
+  }
+  function ccStmt(toks, line, ev, decls, loop) {
+    var s = 0;
+    while (s < toks.length && CC_MODS[toks[s].v]) s += 1;
+    var j = ccTypeEnd(toks, s);
+    if (j > 0 && j < toks.length && toks[j].k === 'id' && !CC_KW[toks[j].v]
+        && (j + 1 === toks.length || /^(=|,|;|:)$/.test(toks[j + 1].v))) {
+      ccSplitTop(toks.slice(j), ',').forEach(function (p) {
+        if (!p.length || p[0].k !== 'id') { ccReads(p, line, ev); return; }
+        var name = p[0].v, init = p.length > 1 && p[1].v === '=';
+        decls.push({ line: line, name: name, loop: !!loop });
+        ccReads(p.slice(init ? 2 : 1), line, ev);
+        if (ccIsName(name)) ev.push({ line: line, name: name, e: init ? 'w' : 'd' });
+      });
+      return;
+    }
+    if (toks.length > 1 && CC_ASSIGN[toks[1].v] && ccIsVar(toks, 0)) {
+      if (toks[1].v !== '=') ev.push({ line: line, name: toks[0].v, e: 'r' });
+      ccReads(toks.slice(2), line, ev);
+      ev.push({ line: line, name: toks[0].v, e: 'w' });
+      return;
+    }
+    ccReads(toks, line, ev);
+  }
+  function ccSegment(seg, line, ev, decls) {
+    var v = seg.map(function (t) { return t.v; }), i = 0, q;
+    while (i < seg.length) {
+      var w = v[i];
+      if (w === 'else' || w === 'do' || w === 'try' || w === 'finally') { i += 1; continue; }
+      if ((w === 'if' || w === 'while' || w === 'switch' || w === 'catch' || w === 'synchronized') && v[i + 1] === '(') {
+        q = ccClose(v, i + 1, '(', ')');
+        if (q < 0) q = seg.length;
+        if (w !== 'catch') ccReads(seg.slice(i + 2, q), line, ev);
+        i = q + 1;
+        continue;
+      }
+      if (w === 'for' && v[i + 1] === '(') {
+        q = ccClose(v, i + 1, '(', ')');
+        if (q < 0) q = seg.length;
+        var inner = seg.slice(i + 2, q), parts = ccSplitTop(inner, ';'), c = ccIndexTop(inner, [':']);
+        if (parts.length === 1 && c >= 0) {
+          ccReads(inner.slice(c + 1), line, ev);
+          var each = inner.slice(0, c), s = 0;
+          while (s < each.length && CC_MODS[each[s].v]) s += 1;
+          var j = ccTypeEnd(each, s);
+          if (j > 0 && j === each.length - 1 && each[j].k === 'id') {
+            decls.push({ line: line, name: each[j].v, loop: true });
+            if (ccIsName(each[j].v)) ev.push({ line: line, name: each[j].v, e: 'w' });
+          } else ccReads(each, line, ev);
+        } else {
+          if (parts[0] && parts[0].length) ccStmt(parts[0], line, ev, decls, true);
+          if (parts[1]) ccReads(parts[1], line, ev);
+          if (parts[2]) ccSplitTop(parts[2], ',').forEach(function (p) { if (p.length) ccStmt(p, line, ev, decls); });
+        }
+        i = q + 1;
+        continue;
+      }
+      if (w === 'case') {
+        var col = ccIndexTop(seg.slice(i), [':', '->']);
+        ccReads(seg.slice(i + 1, col < 0 ? seg.length : i + col), line, ev);
+        i = col < 0 ? seg.length : i + col + 1;
+        continue;
+      }
+      if (w === 'default' && (v[i + 1] === ':' || v[i + 1] === '->')) { i += 2; continue; }
+      if (w === 'return' || w === 'throw' || w === 'assert') { ccReads(seg.slice(i + 1), line, ev); return; }
+      if (w === 'break' || w === 'continue') return;
+      break;
+    }
+    if (i < seg.length) ccStmt(seg.slice(i), line, ev, decls);
+  }
+  function ccSegments(toks) {
+    var out = [], cur = [], depth = 0;
+    toks.forEach(function (t) {
+      if (t.v === '(' || t.v === '[') depth += 1;
+      else if (t.v === ')' || t.v === ']') depth -= 1;
+      if (depth <= 0 && (t.v === ';' || t.v === '{' || t.v === '}')) { if (cur.length) out.push(cur); cur = []; }
+      else cur.push(t);
+    });
+    if (cur.length) out.push(cur);
+    return out;
+  }
+  function ccEvents(L) {
+    var ev = [], decls = [], H = L.header;
+    L.lines.forEach(function (ln) {
+      if (!ln.isCode) return;
+      if (H && ln.no >= H.first && ln.no <= H.last) {
+        if (ln.no === H.first) {
+          H.params.forEach(function (p) {
+            decls.push({ line: ln.no, name: p, loop: false });
+            if (ccIsName(p)) ev.push({ line: ln.no, name: p, e: 'p' });
+          });
+        }
+        return;
+      }
+      ccSegments(ln.toks).forEach(function (seg) { ccSegment(seg, ln.no, ev, decls); });
+    });
+    return { ev: ev, decls: decls };
+  }
+  function ccReadCode(src) {
+    var L = ccLex(src);
+    if (L.error) return { refuse: L.error };
+    var D = ccDepths(L.lines);
+    if (D.bad !== null) return { refuse: 'Line ' + D.bad + ' closes a brace that no earlier line opened' };
+    L.depth = D.at;
+    L.header = ccHeader(L.lines);
+    return L;
+  }
+
+  var CO_VIEW = {};
+  var CO_ORDER = ' The lab reads the lines top to bottom and does not follow branches or loops, so it is exact for '
+    + 'straight-line code and an approximation otherwise.';
+  function coCompute(view, inst, opts) {
+    var L = ccReadCode(inst.code);
+    if (L.refuse) return L;
+    return CO_VIEW[view](L, inst, opts || {});
+  }
+  function coStatements(L) { return L.lines.filter(function (ln) { return ln.isCode && !ln.braceOnly; }); }
+  function coLines(list) { return list.length === 1 ? 'line ' + list[0] : 'lines ' + list.join(', '); }
+  var CO_WORD = { r: 'read', w: 'set', d: 'declared', p: 'parameter' };
+
+  CO_VIEW.span = function (L, inst) {
+    var refs = {}, order = [], setters = {};
+    ccEvents(L).ev.forEach(function (x) {
+      if (!refs[x.name]) { refs[x.name] = []; order.push(x.name); }
+      if (refs[x.name].indexOf(x.line) < 0) refs[x.name].push(x.line);
+      if (x.e !== 'r') setters[x.name] = true;
+    });
+    var names = inst.vars.length ? inst.vars : order.filter(function (v) { return setters[v]; });
+    for (var i = 0; i < names.length; i += 1) {
+      if (!refs[names[i]]) return { refuse: '"' + names[i] + '" does not appear as a variable in the listing' };
+    }
+    if (!names.length) return { tiles: {}, table: null, status: 'The listing sets no variable, so there is nothing to measure.' };
+    var spans = [], lives = [], best = null, rows = names.map(function (v) {
+      var r = refs[v], sp = [];
+      for (var k = 1; k < r.length; k += 1) sp.push(r[k] - r[k - 1] - 1);
+      var live = r[r.length - 1] - r[0] + 1;
+      spans = spans.concat(sp);
+      lives.push(live);
+      if (!best || live > best.live) best = { name: v, live: live };
+      return [v, r.join(', '), sp.length ? sp.join(', ') : 'none', String(live)];
+    });
+    var sum = function (v) { return v.reduce(function (s, x) { return s + x; }, 0); };
+    return {
+      tiles: { coAvgSpan: spans.length ? ccNum(R(sum(spans), spans.length)) : CC_DASH, coAvgLive: ccNum(R(sum(lives), lives.length)),
+        coLongest: best.name + ': ' + best.live },
+      status: ccPlural(names.length, 'name', 'names') + ': ' + ccPlural(spans.length, 'span', 'spans') + ' pooled for the average span, '
+        + 'and the live times averaged over the names.' + (spans.length ? '' : ' Each name is on one line only, so there are no spans to average.')
+        + ' The book counts statements between references; the lab counts listing lines, and pooling the spans of several '
+        + 'names is the lab\'s extension of the book\'s per-name average.' + CO_ORDER,
+      table: { caption: 'References, spans and live time', head: ['name', 'lines', 'spans', 'live time'], rows: rows }
+    };
+  };
+  var PRESETS = {"declared-at-top": {"code": "void auditShipments(Shipment[] shipments, int limitKg) {\n    int scanned = 0;\n    int heaviestKg = 0;\n    int overLimit = 0;\n    printTitle();\n    printLegend();\n    for (Shipment s : shipments) {\n        s.verify();\n        scanned = scanned + 1;\n    }\n    printCount(scanned);\n    for (Shipment s : shipments) {\n        heaviestKg = Math.max(heaviestKg, s.weightKg());\n        if (s.weightKg() > limitKg) {\n            overLimit = overLimit + 1;\n        }\n    }\n    printSummary(heaviestKg, overLimit);\n}", "vars": "scanned heaviestKg overLimit"}, "declared-near-use": {"code": "void auditShipments(Shipment[] shipments, int limitKg) {\n    printTitle();\n    printLegend();\n    int scanned = 0;\n    for (Shipment s : shipments) {\n        s.verify();\n        scanned = scanned + 1;\n    }\n    printCount(scanned);\n    int heaviestKg = 0;\n    int overLimit = 0;\n    for (Shipment s : shipments) {\n        heaviestKg = Math.max(heaviestKg, s.weightKg());\n        if (s.weightKg() > limitKg) {\n            overLimit = overLimit + 1;\n        }\n    }\n    printSummary(heaviestKg, overLimit);\n}", "vars": "scanned heaviestKg overLimit"}};
+  var SPEC = [{"kind": "code", "what": "Java listing (the lab reads it; it never runs it)", "key": "code", "id": "coInCode"}, {"kind": "idents", "hi": 12, "what": "Variables (space-separated; empty for every one set)", "key": "vars", "id": "coInVars"}];
+  var TILES = ["coAvgSpan", "coAvgLive", "coLongest"];
+  var FIXED = {};
+  var VIEW = "span";
+  var LISTING = "code";
+
+  function field(id) { return document.getElementById(id); }
+  var presetS = field('coPreset'), statusEl = field('coStatus'), tableEl = field('coTable');
+  var listEl = LISTING ? field('coListing') : null;
+  function ccRed(why) {
+    TILES.forEach(function (id) { field(id).textContent = CC_DASH; });
+    tableEl.innerHTML = '';
+    statusEl.innerHTML = '<span class="tone-red">' + ccEsc(String(why).replace(/\.$/, '')) + '.</span>';
+  }
+  function redraw() {
+    var raw = {}, inst;
+    SPEC.forEach(function (f) { raw[f.key] = field(f.id).value; });
+    if (listEl) ccListing(listEl, raw[LISTING], null);
+    try { inst = ccRead(SPEC, raw); } catch (err) { ccRed(err.message); return; }
+    var out = coCompute(VIEW, inst, FIXED);
+    if (out.refuse) { ccRed(out.refuse); return; }
+    if (listEl && out.flags) ccListing(listEl, raw[LISTING], out.flags);
+    TILES.forEach(function (id) { field(id).textContent = out.tiles[id] === undefined ? CC_DASH : out.tiles[id]; });
+    tableEl.innerHTML = out.table ? ccTableHtml(out.table) : '';
+    statusEl.textContent = out.status;
+  }
+  function ccFill(id) {
+    var inst = PRESETS[id];
+    if (!inst) return false;
+    SPEC.forEach(function (f) { if (inst[f.key] !== undefined) field(f.id).value = inst[f.key]; });
+    return true;
+  }
+  presetS.addEventListener('change', function () { if (ccFill(presetS.value)) redraw(); });
+  SPEC.forEach(function (f) { field(f.id).addEventListener('input', redraw); });
+  ccFill(presetS.value);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "code-complete-variables/scope-span-and-live-time";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre:not([data-say])')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+  </script>
+</body>
+</html>

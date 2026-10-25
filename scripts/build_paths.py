@@ -27,6 +27,7 @@ sys.dont_write_bytecode = True
 from algebra import PATH as ALGEBRA_PATH  # noqa: E402
 from algorithms import PATH as ALGORITHMS_PATH  # noqa: E402
 from capital import PATH as CAPITAL_PATH  # noqa: E402
+from code_complete import PATH as CODE_COMPLETE_PATH  # noqa: E402
 from differential_equations import PATH as DE_PATH  # noqa: E402
 from discrete_math import PATH as DISCRETE_MATH_PATH  # noqa: E402
 from english import PATH as ENGLISH_PATH  # noqa: E402
@@ -40,7 +41,7 @@ from mathpath import render  # noqa: E402
 GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
                    ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, PHILOSOPHY_PATH,
                    ENGLISH_PATH, DE_PATH, CAPITAL_PATH, PHENOMENOLOGY_PATH,
-                   READING_PATH)
+                   READING_PATH, CODE_COMPLETE_PATH)
 
 # The content package each generated path is read from. A path's slug is its
 # URL; its package is its directory under content/ and its file under
@@ -83,7 +84,8 @@ KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "copi
                           "calckit", "dekit",
                           "capkit",
                           "phenkit",
-                          "readkit",)
+                          "readkit",
+                          "cckit",)
 
 
 def path_pages(path):

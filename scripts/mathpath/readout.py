@@ -16,7 +16,8 @@ paragraphs, list items, math blocks, the mistakes and the understanding check.
 Never read: the lab (it is driven, not read), the quiz, the feedback form,
 kickers and eyebrows (they repeat the heading), and anything marked
 data-listen="skip". A table or a code block is announced rather than read cell
-by cell.
+by cell -- except a lesson's own `code` block (render._codeblock), which carries
+its reading in data-say, line by line in the code dialect (speech.say_code).
 """
 
 READOUT_JS = r"""
@@ -52,7 +53,7 @@ READOUT_JS = r"""
     }
     function text(el) {
       if (el.matches('table')) return 'a table, shown on the page.';
-      if (el.matches('pre')) return 'a code block, shown on the page.';
+      if (el.matches('pre:not([data-say])')) return 'a code block, shown on the page.';
       // Definition · Sets: a voice may say middle dot; it is a pause
       return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
     }

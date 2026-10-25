@@ -15,6 +15,10 @@ Three layers, in order of reach:
 3. author overrides, for a reading no rule can infer (`Σ deg(v)` sums over a
    `v` the formula never writes).
 
+Program text has a dialect of its own, `say_code` (at the end of this file),
+used for every `code` block and, on a Subject whose PATH sets "speech": "code",
+for every math run too. Every other Subject is read by `say` alone.
+
 `unspoken()` is the coverage check: whatever `say()` could not turn into words.
 A run with an unspoken residue would reach the reader as symbol names, or as
 silence, so it is a defect to be fixed in the table or by an override.
@@ -892,12 +896,14 @@ def is_table_row(line):
     return len(cells) >= 3 and numeric * 2 >= len(cells)
 
 
-def say_block(lines, overrides=None):
+def say_block(lines, overrides=None, *, sayer=None):
     """A display block -> one spoken line per authored line.
 
-    Consecutive table rows collapse into a single pointer to the page.
+    Consecutive table rows collapse into a single pointer to the page. `sayer`
+    reads each remaining line: `say`, or `say_code` on a code-dialect Subject.
     """
     overrides = overrides or {}
+    sayer = sayer or say
     out = []
     for line in lines:
         if line in overrides:
@@ -908,7 +914,7 @@ def say_block(lines, overrides=None):
             if not out or out[-1] != TABLE:
                 out.append(TABLE)
         else:
-            spoken = say(line)
+            spoken = sayer(line)
             if spoken:
                 out.append(spoken)
     return out
@@ -1001,8 +1007,11 @@ def all_overrides():
 
 _SYMBOL = re.compile(r"[∀∃∄∈∉∋∪∩⊆⊂⊇⊃⊄⊈∅≤≥≠≈≡≢∝√∛∑∏Σ⟹⟺⇒⇔→←↦ℕℤℚℝℂ∞×·÷±∓∘¬∧∨⌊⌋⌈⌉|^_′″‴"
                      r"⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿⁱᵀᴺᵏʲˣ₀₁₂₃₄₅₆₇₈₉₊₋ₐₑₒₓₖₗₘₙₚₛₜᵢⱼ"
-                     r"αβγδεζηθκλμνξπρστφχψωΓΔΘΛΞΠΦΨΩ]|&(?:le|ge|ne|lt|gt);")
+                     r"αβγδεζηθκλμνξπρστφχψωΓΔΘΛΞΠΦΨΩ]|&(?:le|ge|ne|lt|gt);|&&|&amp;&amp;")
 _OPERATOR = re.compile(r"[=<>+−\-/*%(),.:;!]+|&(?:le|ge|ne|lt|gt);")
+# What holds numbers and short names together in one token with no space
+# inside: `1)/2` in `n·(n − 1)/2`, `(n`, `1)`.
+_JOINED = re.compile(r"[()\[\]/+−\-*=<>%^]")
 
 # Sounds written into prose. A pronunciation spelling such as <dfn>tə</dfn> is
 # not math, but a voice reads it letter by letter all the same, so it is an
@@ -1031,9 +1040,16 @@ def islands(text):
     """
     # Typographic entities (&ldquo; &mdash;) are prose; blank them to the same
     # width so every offset still points into the original text.
-    masked = re.sub(r"&(?!(?:le|ge|ne|lt|gt);)#?\w+;", lambda m: " " * len(m.group()), text)
+    # `&amp;&amp;` is the program operator `&&`, escaped, and is kept.
+    masked = re.sub(r"&amp;&amp;|&(?!(?:le|ge|ne|lt|gt);)#?\w+;",
+                    lambda m: m.group() if m.group() == "&amp;&amp;" else " " * len(m.group()), text)
     tokens = [(m.start(), m.end(), m.group()) for m in _ISLAND_TOKEN.finditer(masked)]
     text = masked
+
+    def short(bare):
+        """A number, or a short name that is not an English word."""
+        return bool(re.fullmatch(r"[A-Za-z0-9]{1,3}|\d[\d.]*|\d{1,3}(?:,\d{3})+(?:\.\d+)?", bare)) \
+            and bare.lower() not in COMMON_WORDS
 
     def mathy(tok):
         if re.fullmatch(r"&(?:le|ge|ne|lt|gt);", tok):
@@ -1043,7 +1059,38 @@ def islands(text):
             return False
         if _SYMBOL.search(bare) or _OPERATOR.fullmatch(bare):
             return True
-        return bool(re.fullmatch(r"[A-Za-z0-9]{1,3}|\d[\d.]*", bare)) and bare.lower() not in COMMON_WORDS
+        if _JOINED.search(bare):
+            # `1)/2`, `(n`: numbers and short names joined by brackets and operators
+            pieces = [p for p in _JOINED.split(bare) if p]
+            return bool(pieces) and all(short(p) or re.fullmatch(r"[A-Za-z]", p) for p in pieces)
+        return short(bare)
+
+    def depth(lo, hi):
+        """Brackets opened in tokens[lo..hi] and not closed there."""
+        run = "".join(tokens[k][2] for k in range(lo, hi + 1))
+        return run.count("(") + run.count("[") - run.count(")") - run.count("]")
+
+    def goes_on(lo, hi):
+        """May the island grow past tokens[hi]? Not from `10 × 10 = 100,` into
+        `5 architecture`: past a comma outside brackets, the next stretch must
+        carry an operator or a symbol of its own (`1→2, 1→3`, `λ, μ`)."""
+        if depth(lo, hi) > 0:
+            return True
+        if tokens[hi][2].endswith(".") or (tokens[hi][2].endswith(";") and not re.search(r"&#?\w+;$", tokens[hi][2])):
+            return False  # the end of a sentence or a clause: `= 2,692,537. 30 is`
+        if not tokens[hi][2].endswith(","):
+            return True
+        k = hi + 1
+        while k < len(tokens) and mathy(tokens[k][2]):
+            bare = tokens[k][2].strip(".,;:!?“”\"'")
+            if _SYMBOL.search(bare) or (_OPERATOR.fullmatch(bare) and bare not in ("(", ")")) \
+                    or re.search(r"\w[/+−\-*=<>%^]|[/+−\-*=<>%^]\w", bare) \
+                    or re.fullmatch(r"[A-Za-z]", bare):
+                return True  # more math, or a list of variables: `πₙ, L, L_q`
+            if tokens[k][2].endswith(","):
+                break
+            k += 1
+        return False
 
     out, i, floor = [], 0, 0
     while i < len(tokens):
@@ -1052,13 +1099,18 @@ def islands(text):
             continue
         lo = hi = i
         grows = bool(_SYMBOL.search(tokens[i][2]))  # a sound or a stress mark stands alone
-        while grows and lo > floor and mathy(tokens[lo - 1][2]):
+        while grows and lo > floor and mathy(tokens[lo - 1][2]) \
+                and not tokens[lo - 1][2].endswith("."):
             lo -= 1
-        while grows and hi + 1 < len(tokens) and mathy(tokens[hi + 1][2]):
+        while grows and hi + 1 < len(tokens) and mathy(tokens[hi + 1][2]) and goes_on(lo, hi):
             hi += 1
         start, end = tokens[lo][0], tokens[hi][1]
-        # sentence punctuation at the island's edge is prose, not math
-        while end > start and text[end - 1] in ".,;:!?”\"":
+        # sentence punctuation at the island's edge is prose, not math, and so
+        # is a closing bracket the island never opened: (it has n·(n − 1)/2)
+        while end > start and ((text[end - 1] in ".,;:!?”\""
+                                and not re.search(r"&#?\w+;$", text[start:end])) or (
+                text[end - 1] in ")]" and text[start:end].count(text[end - 1])
+                > text[start:end].count({")": "(", "]": "["}[text[end - 1]]))):
             end -= 1
         while start < end and text[start] in "“\"(":
             if text[start] == "(" and ")" in text[start:end]:
@@ -1067,4 +1119,411 @@ def islands(text):
         if end > start:
             out.append((start, end))
         i = floor = hi + 1
+    return out
+
+
+_RAW_CODE_OPS = re.compile(r"&&|&amp;&amp;|\|\|")
+
+
+def unread_operators(prose):
+    """Program operators (`&&`, `||`) a prose string would show a voice raw:
+    outside its backtick runs, its tags and every island. speechcheck and
+    preview_subject report each one."""
+    blanked = re.sub(r"`[^`]*`", lambda m: " " * len(m.group()), prose)
+    found = []
+    for piece in re.split(r"(<[^>]+>)", blanked):
+        if piece.startswith("<"):
+            continue
+        covered = islands(piece)
+        found.extend(m.group() for m in _RAW_CODE_OPS.finditer(piece)
+                     if not any(a <= m.start() and m.end() <= b for a, b in covered))
+    return found
+
+
+# --- program text: the code dialect ---------------------------------------------
+#
+# The rules above read mathematics, and on mathematics they are right: `||` is
+# scheduling notation in Operations Research, `!` is a factorial, `=` is an
+# equation. Read as program text the same characters mean something else, and
+# the mathematical reading teaches the opposite of the page: `!done` read as
+# "done", `a && b` as "A and and b", `a || b` as "the absolute value of".
+#
+# So program text has its own reader, `say_code`. It is never chosen by
+# guessing: a `code` body block is always program text (render._codeblock), and
+# a Subject whose PATH dict sets "speech": "code" (CODE_DIALECT) reads every
+# backtick run, key line and worked line this way too. Every other Subject is
+# read by `say` exactly as before.
+
+CODE_DIALECT = "code"
+DIALECTS = (None, CODE_DIALECT)
+
+
+def dialect_of(path):
+    """The read-out dialect a PATH dict asks for: None (mathematics) or "code"."""
+    dialect = path.get("speech")
+    if dialect not in DIALECTS:
+        raise ValueError("PATH %r: \"speech\" is %r; it is %s or absent"
+                         % (path.get("slug"), dialect, " or ".join(repr(d) for d in DIALECTS if d)))
+    return dialect
+
+
+_CODE_TOKEN = re.compile(r"""
+    (?P<comment>//.*|/\*.*?(?:\*/|$))
+  | (?P<string>"(?:\\.|[^"\\])*"?)
+  | (?P<char>'(?:\\.|[^'\\])*'?)
+  | (?P<number>0[xX][0-9a-fA-F_]+[lL]?|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?[lLfFdD]?|\.\d[\d_]*[fFdD]?)
+  | (?P<name>[A-Za-z_$][A-Za-z0-9_$]*)
+  | (?P<op>>>>=|<<=|>>=|>>>|\+\+|--|&&|\|\||==|!=|<=|>=|\+=|-=|\*=|/=|%=|&=|\|=|\^=|->|::|<<|>>
+           |[-+*/%=<>!~?:&|^.,;(){}\[\]@])
+  | (?P<space>\s+)
+  | (?P<other>.)
+""", re.X)
+
+CODE_OPS = {
+    "&&": "and", "||": "or", "!": "not", "==": "equals", "!=": "is not equal to",
+    "=": "is set to", "<": "is less than", ">": "is greater than", "<=": "is at most",
+    ">=": "is at least", "+": "plus", "-": "minus", "*": "times", "/": "divided by",
+    "%": "mod", "+=": "is increased by", "-=": "is decreased by", "*=": "is multiplied by",
+    "/=": "is divided by", "%=": "is set to itself mod", "&=": "is set to itself bitwise and",
+    "|=": "is set to itself bitwise or", "^=": "is set to itself x or",
+    "<<=": "is shifted left by", ">>=": "is shifted right by", ">>>=": "is shifted right, unsigned, by",
+    "&": "bitwise and", "|": "bitwise or", "^": "x or", "~": "bitwise not",
+    "<<": "shifted left by", ">>": "shifted right by", ">>>": "shifted right, unsigned, by",
+    "->": "goes to", "::": "method", "@": "at", ".": "dot", ",": ",",
+}
+# Java's keywords and primitive types, read as the words they are (never
+# spelt out, never split into letters or read as a product).
+JAVA_KEYWORDS = set("""
+abstract assert boolean break byte case catch char class const continue default
+do double else enum extends final finally float for if implements import int
+interface long native new null package private protected public return short
+static super switch synchronized this throw throws transient true false try void
+volatile while var
+""".split())
+# The console calls every first program makes, read as what they do.
+_PRINTS = {"println": "print line", "print": "print", "printf": "print formatted"}
+# Parentheses after these words hold a condition or a header, not a group.
+_HEADER_WORDS = {"if", "while", "for", "switch", "catch", "synchronized", "try"}
+_CAST_TYPES = {"int", "long", "short", "byte", "char", "float", "double", "boolean"}
+_CHAR_NAMES = {",": "comma", ".": "full stop", ";": "semicolon", ":": "colon", " ": "space",
+               "-": "minus", "+": "plus", "*": "star", "/": "slash", "=": "equals sign",
+               "(": "open bracket", ")": "close bracket", "\\n": "new line", "\\t": "tab",
+               "\\'": "quote", "\\\\": "backslash", "0": "zero"}
+_ESCAPES = {"n": " new line ", "t": " tab ", "0": " null "}
+
+
+def _code_words(name):
+    """An identifier as words: `isDone` "is done", `MAX_SIZE` "max size",
+    `HTTPServer` "HTTP server", `x2` "x 2". A single letter is read as `say`
+    reads it, so `a` is the letter, not the article."""
+    if name in JAVA_KEYWORDS:
+        return name
+    bare = name.strip("$_")
+    if len(bare) == 1:
+        return say(bare)
+    shouting = bare.upper() == bare
+    parts = re.findall(r"[A-Z]+(?=[A-Z][a-z])|[A-Z]?[a-z]+|[A-Z]+|\d+", bare)
+    return " ".join(p if (len(p) > 1 and p.isupper() and not shouting) else p.lower() for p in parts)
+
+
+def _literal_text(body):
+    """A string literal or a comment, as the words it holds."""
+    body = re.sub(r"\\(.)", lambda m: _ESCAPES.get(m.group(1), m.group(1)), body)
+    return " ".join("".join(c if _SPOKEN.match(c) or _latin(c) else " " for c in body).split())
+
+
+_STRING_CHARS = {" ": "space", ":": "colon", ",": "comma", ".": "point", "%": "percent",
+                 ";": "semicolon", "-": "dash", "+": "plus", "/": "slash", "|": "bar",
+                 "=": "equals", "(": "open bracket", ")": "close bracket", "#": "hash",
+                 "$": "dollar", "*": "star", "_": "underscore", "!": "exclamation mark",
+                 "?": "question mark", "'": "quote", "\\": "backslash", "[": "open square bracket",
+                 "]": "close square bracket", "<": "less than", ">": "greater than", "&": "ampersand",
+                 "@": "at", "{": "open brace", "}": "close brace", "~": "tilde", "^": "caret"}
+
+
+def _string_words(body):
+    """A string literal's body as words. Text with words in it is read as its
+    words (`"Total: "` "Total"); `""` is the empty string; spaces alone are
+    counted (`" "` "a string of one space"); and anything else, a separator or
+    a format such as `"%,.2f"`, is spelt out, so a voice never calls `" "` or
+    `": "` the empty string."""
+    if not body:
+        return "the empty string"
+    if re.search(r"[A-Za-z]{2,}", re.sub(r"\\.", " ", body)):
+        return _literal_text(body)
+    if not body.strip(" "):
+        n = len(body)
+        return "a string of %s space%s" % ("one" if n == 1 else n, "" if n == 1 else "s")
+    spelt, k = [], 0
+    while k < len(body):
+        if body[k] == "\\" and k + 1 < len(body):
+            spelt.append({"n": "new line", "t": "tab", "0": "null"}.get(body[k + 1], body[k + 1]))
+            k += 2
+            continue
+        digits = re.match(r"\d+", body[k:])
+        if digits:
+            spelt.append(digits.group())
+            k += len(digits.group())
+            continue
+        c = body[k]
+        if c == " " and body.strip(" ") and 0 < k < len(body.rstrip(" ")) and k >= len(body) - len(body.lstrip(" ")):
+            k += 1  # a space between two marks is a gap, not a character worth naming
+            continue
+        spelt.append(_STRING_CHARS.get(c) or (c if _SPOKEN.match(c) or _latin(c) else ""))
+        k += 1
+    return "the string " + " ".join(w for w in spelt if w)
+
+
+def _generic(tokens, i):
+    """`List<String>` at tokens[i] (the `<`): (words, index after the `>`), or None.
+
+    A type's angle brackets touch the name before them, and hold only names,
+    commas, `?`, `extends`, `super` and `[]`; `i<n` holds a lower-case name and
+    is a comparison, so a type must be capitalised to open one.
+    """
+    depth, j, out = 0, i, []
+    while j < len(tokens):
+        kind, tok = tokens[j]
+        if tok == "<":
+            depth += 1
+            out.append("of" if out else "")
+        elif tok in (">", ">>", ">>>"):
+            depth -= len(tok)
+            if depth < 0:
+                return None
+            if depth == 0:
+                return " ".join(w for w in out if w), j + 1
+        elif kind == "name":
+            out.append(_code_words(tok))
+        elif tok == ",":
+            out.append("and")
+        elif tok == "?":
+            out.append("anything")
+        elif tok in ("[", "]", "."):
+            out.append("array" if tok == "]" else "")
+        elif kind != "space":
+            return None
+        j += 1
+    return None
+
+
+# Operators only program text uses. A run with one of them is code, never
+# arithmetic written in prose.
+_CODE_ONLY_OPS = {";", "{", "}", "&&", "||", "==", "!=", "++", "--", "+=", "-=", "*=", "/=",
+                  "%=", "&=", "|=", "^=", "<<=", ">>=", ">>>=", "->", "::", "?", ":", ".",
+                  "!", "&", "|", "~", "@", "<<", ">>", ">>>", "[", "]"}
+
+
+def _arithmetic(tokens):
+    """Is this run arithmetic written in prose, not a statement?
+
+    `10 × 10 = 100` and `n·(n − 1)/2` are mathematics on any page: `=` there
+    states an equality, it does not assign. A run counts when it has no string,
+    char or comment, no operator that only code writes, and no name longer
+    than one letter (an assignment target is a name: `total = 10`), and when
+    it carries either a sign Java has no use for (×, ·, −, ≈, →, ...) or, with
+    no names at all, an `=` between numbers (`6 * 5 / 2 = 15`).
+    """
+    names, glyph, equals = [], False, False
+    for kind, t in tokens:
+        if kind in ("comment", "string", "char") or (kind == "op" and t in _CODE_ONLY_OPS):
+            return False
+        if kind == "name":
+            names.append(t)
+        elif kind == "other" and not t.isascii():
+            glyph = True
+        elif t == "=":
+            equals = True
+    if any(len(n) > 1 for n in names):
+        return False
+    return glyph or (equals and not names)
+
+
+def _article(tokens, k, nxt):
+    """Is the name `a` at tokens[k] the English article? It is when a space
+    and then an English-looking word follow it (`a count`, `a reason`):
+    program text never sets two plain names side by side after `a`, so a
+    variable `a` is followed by an operator, a bracket, a comma or nothing."""
+    j = nxt.get(k)
+    if j is None or j == k + 1 or tokens[j][0] != "name":
+        return False
+    word = tokens[j][1]
+    return len(word) > 1 and word.isalpha() and word.islower() \
+        and word not in JAVA_KEYWORDS and word != "instanceof"
+
+
+def say_code(line, *, override=None):
+    """One line of program text -> words.
+
+    `&&` "and", `||` "or", a prefix `!` "not", `=` "is set to", `==` "equals",
+    `!=` "is not equal to", `++` "is incremented", `+=` "is increased by",
+    `a[i]` "a at index i", braces and semicolons silent, a string literal read
+    as its text, an identifier split into words. A bracket that groups (as
+    opposed to one that calls, or holds an `if` condition) is spoken, because
+    `!(a && b)` and `!a && b` differ only in where the bracket closes.
+    """
+    if override is not None:
+        return override
+    text = html.unescape(line)
+    tokens = [(m.lastgroup, m.group()) for m in _CODE_TOKEN.finditer(text)]
+    if _arithmetic(tokens):
+        return say(line)  # `10 × 10 = 100`, `n·(n − 1)/2`: mathematics, not a statement
+    sig = [k for k, (kind, _) in enumerate(tokens) if kind != "space"]
+    nxt = {a: b for a, b in zip(sig, sig[1:])}
+    prv = {b: a for a, b in zip(sig, sig[1:])}
+
+    def tok(k):
+        return tokens[k][1] if k is not None else None
+
+    def operand_before(k):
+        p = prv.get(k)
+        return p is not None and (tokens[p][0] in ("name", "number", "string", "char")
+                                  or tokens[p][1] in (")", "]")) \
+            and tokens[p][1] not in ("return", "case", "new")
+
+    out, closers, ternary, generic_ends, silent_call = [], [], 0, set(), False
+    k = 0
+    while k < len(tokens):
+        kind, t = tokens[k]
+        if kind == "space":
+            k += 1
+            continue
+        if kind == "comment":
+            body = t[2:-2] if t.startswith("/*") and t.endswith("*/") else t[2:]
+            words = _literal_text(body.strip("*/ "))
+            out.append(", comment, " + words if words else "")
+        elif kind == "string":
+            out.append(_string_words(t[1:-1] if len(t) > 1 and t.endswith('"') else t[1:]))
+        elif kind == "char":
+            inner = t[1:-1] if len(t) > 1 and t.endswith("'") else t[1:]
+            words = _CHAR_NAMES.get(inner) or _literal_text(inner)
+            out.append("the character " + (words or "space"))
+        elif kind == "number":
+            out.append(re.sub(r"[lLfFdD]$", "", t).replace("_", "") if not t[:2].lower() == "0x"
+                       else "hex " + " ".join(t[2:].rstrip("lL").replace("_", "")))
+        elif kind == "name":
+            if tok(nxt.get(k)) == "<" and t[:1].isupper() and nxt.get(k) == k + 1:
+                found = _generic(tokens, k + 1)
+                if found:
+                    out.append(_code_words(t) + (" of " + found[0] if found[0] else ""))
+                    generic_ends.add(found[1] - 1)
+                    k = found[1]
+                    continue
+            names = [tokens[x][1] for x in sig if x >= k][:5]
+            if t == "System" and names[1:4:2] == [".", "."] and names[2] in ("out", "err") \
+                    and len(names) > 4 and names[4] in _PRINTS:
+                # System.out.println(x) -> "print line x"
+                out.append(_PRINTS[names[4]])
+                k = sig[sig.index(k) + 4] + 1
+                silent_call = True
+                continue
+            if t == "a" and _article(tokens, k, nxt):
+                out.append("a")  # `a count is a reason to look`: the article, not the letter
+            else:
+                out.append("is an instance of" if t == "instanceof" else _code_words(t))
+        elif t == "(":
+            before = tok(prv.get(k))
+            depth, j = 0, k
+            while j < len(tokens):  # the matching bracket
+                if tokens[j][1] == "(":
+                    depth += 1
+                elif tokens[j][1] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+            inner = [tokens[x][1] for x in range(k + 1, j) if tokens[x][0] != "space"]
+            after = tok(nxt.get(j)) if j < len(tokens) else None
+            after_kind = tokens[nxt[j]][0] if j in nxt else None
+            if silent_call:
+                closers.append("")
+            elif before in _HEADER_WORDS:
+                closers.append("for" if before == "for" else "")
+            elif before == "]" or prv.get(k) in generic_ends or (before is not None and tokens[prv[k]][0] == "name"
+                                   and before not in ("return", "case", "new", "else", "do")):
+                if len(before) == 1 and before.isalpha() and "," not in inner \
+                        and any(x in ("+", "-", "*", "/", "%", "−", "·", "×") for x in inner):
+                    # F(n + 1): a math-style function of an expression, read as
+                    # say reads f(x + 1), so it is not "F of n, plus 1"
+                    closers.append(",")
+                    out.append("of the quantity")
+                else:
+                    closers.append("")
+                    out.append("of" if inner else "")
+            elif len(inner) == 1 and (inner[0] in _CAST_TYPES or inner[0][:1].isupper()) \
+                    and (after_kind in ("name", "number") or after in ("(", "!", "-")):
+                out.append("cast to " + _code_words(inner[0]))
+                k = j + 1
+                continue
+            else:
+                closers.append(", close bracket,")
+                out.append(", open bracket,")
+        elif t == ")":
+            closer = closers.pop() if closers else ""
+            out.append("" if closer == "for" else closer)
+        elif t == "[":
+            if tok(nxt.get(k)) == "]":
+                # a type: double[] prices -> "array of double prices"
+                at = len(out) - 1
+                while at >= 0 and not out[at]:
+                    at -= 1
+                if at >= 0 and prv.get(k) is not None and tokens[prv[k]][0] == "name":
+                    out[at] = "array of " + out[at]
+                else:
+                    out.append("array")
+                k = nxt[k] + 1
+                continue
+            p = prv.get(k)
+            q = prv.get(p) if p is not None else None
+            out.append("array of length" if tok(q) == "new" else "at index")
+        elif t == "]":
+            pass
+        elif t in ("{", "}"):
+            pass
+        elif t == ";":
+            # a pause between clauses (`line 1 sets parcel; lines 2 and 3 read
+            # it`, `x, fmt; a, x`); silent where it ends the line
+            out.append("," if "for" in closers or k in nxt else "")
+        elif t in ("++", "--"):
+            verb = "increment" if t == "++" else "decrement"
+            out.append("is %sed" % verb if operand_before(k) else verb)
+        elif t in ("-", "+", "−"):
+            out.append(CODE_OPS["+" if t == "+" else "-"] if operand_before(k)
+                       else ("plus" if t == "+" else "minus"))
+        elif t == "?":
+            ternary += 1
+            out.append(", if so,")
+        elif t == ":":
+            if ternary:
+                ternary -= 1
+                out.append(", otherwise,")
+            elif "for" in closers:
+                out.append("in")
+            else:
+                out.append("," if k in nxt else "")  # `share: construction hours / all hours`
+        elif t in CODE_OPS:
+            out.append(CODE_OPS[t])
+        else:
+            out.append(say(t))
+        silent_call = False
+        k += 1
+    spoken = " ".join(w for w in out if w)
+    spoken = re.sub(r"\s+,", ",", spoken)
+    spoken = re.sub(r",(\s*,)+", ",", spoken)
+    return " ".join(spoken.split()).strip(" ,")
+
+
+def say_code_block(lines, overrides=None, marked=()):
+    """A code listing -> one spoken line per line that says something, each
+    announced by its number ("line 14, ..."), because the prose names lines
+    by number and the visible numbers are a CSS counter a voice cannot see.
+    A blank line, or one of braces alone, is skipped and its number not
+    announced. A line in `marked` (numbers from 1) is announced as flagged.
+    Never a table: aligned assignments have wide gaps and are still code."""
+    overrides = overrides or {}
+    out = []
+    for number, line in enumerate(lines, 1):
+        spoken = overrides.get(line) or say_code(line)
+        if spoken:
+            out.append("line %d, %s%s" % (number, "flagged, " if number in marked else "", spoken))
     return out
