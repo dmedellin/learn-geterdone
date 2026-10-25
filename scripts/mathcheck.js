@@ -20684,6 +20684,303 @@ console.log('phenomenology: phenkit, fifteen modes');
   }
 }
 // ---- end phenkit ----
+// ---- readkit (Reading Faster) ----
+// ==========================================================================
+// Reading Faster: readkit.py, readkit_b.py and readkit_core.py
+// ==========================================================================
+//
+// Its own vm context: RATIONAL_JS, RD_CORE_JS (printing, parsing), RD_TEXT_JS
+// (the word, sentence and syllable rules) and every mode's pure block, as a
+// readkit page assembles them. Each mode's <xx>Compute(view, inst, opts) is
+// called with an instance and compared on the exact tile strings a reader
+// sees; the figures are docs/reading/PLAN.md section C's. Every case below
+// was seen to FAIL when its line was broken on purpose (docs/reading/kit-report.md).
+console.log('reading: readkit formats, text rules and eight modes');
+{
+  const vm = require('vm');
+  const RC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'readkit_core.py');
+  const RK_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'readkit.py');
+  const RB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'readkit_b.py');
+  const rcSrc = fs.readFileSync(RC_SOURCE, 'utf8'), rkSrc = fs.readFileSync(RK_SOURCE, 'utf8'), rbSrc = fs.readFileSync(RB_SOURCE, 'utf8');
+  const ctx = { console: console };
+  vm.createContext(ctx);
+  vm.runInContext(block('RATIONAL_JS') + blockFrom(rcSrc, 'RD_CORE_JS', RC_SOURCE) + blockFrom(rcSrc, 'RD_TEXT_JS', RC_SOURCE)
+    + ['DRILL_JS', 'EYE_JS', 'FLASH_JS', 'SCAN_JS'].map((n) => blockFrom(rkSrc, n, RK_SOURCE)).join('')
+    + ['TRIAGE_JS', 'TEXT_JS', 'RECALL_JS', 'LOG_JS'].map((n) => blockFrom(rbSrc, n, RB_SOURCE)).join('')
+    + "function Q(t) { return Rparse(String(t)); }", ctx, { filename: 'readkit.py' });
+  const rk = (expr) => {
+    try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; }
+  };
+  const tile = (fn, view, inst, opts, id) => rk(fn + "('" + view + "', " + inst + ", " + JSON.stringify(opts || {}) + ").tiles." + id);
+  const refuse = (fn, view, inst, opts) => rk(fn + "('" + view + "', " + inst + ", " + JSON.stringify(opts || {}) + ").refuse");
+  const ONE4 = 'above the baseline range once — a fourth reading does this about one time in four';
+
+  /* --- printing (PLAN D.0 as implemented) --------------------------------- */
+  eq(rk("rdFig(Q(1825000))"), '1,825,000', 'rdFig: whole, grouped');
+  eq(rk("rdFig(Q('765/4'))"), '191.25', 'rdFig: exact in two decimals prints exactly');
+  eq(rk("rdFig(Q('800/3'))"), '≈ 266.7', 'rdFig: otherwise ≈ and one decimal');
+  eq(rk("rdFig(Q('-10/3'))"), '≈ −3.3', 'rdFig: negative, minus sign U+2212');
+  eq(rk("rdFig(Q('2999/3'))"), '≈ 999.7', 'rdFig: rounded on the rational');
+  eq(rk("rdFig(Q('29999/3'))"), '≈ 9,999.7', 'rdFig: grouped integer part of an approximation');
+  eq(rk("rdShare(Q('4/5'))"), '4/5 = 80%', 'rdShare: exact percent');
+  eq(rk("rdShare(Q('7/12'))"), '7/12 ≈ 58.3%', 'rdShare: approximate percent');
+  eq(rk("rdShare(Q('1/16'))"), '1/16 = 6.25%', 'rdShare: two exact decimals');
+  eq(rk("rdShare(Q(1))"), '1 = 100%', 'rdShare: whole');
+  eq(rk("rdShare(R(12345n, 54321n))"), '≈ 22.7%', 'rdShare: a long fraction prints the percent only');
+  eq(rk("rdSigned(Q(39), 'wpm') + ', ' + rdSigned(Q(-48), 'wpm') + ', ' + rdSigned(Q('2000/63'), 'wpm')"),
+     '+39 wpm, −48 wpm, ≈ +31.7 wpm', 'rdSigned');
+  eq(rk("Rtext(rdMedian([Q(240), Q(238), Q(251)])) + ' ' + Rtext(rdMedian([Q(1), Q(4), Q(2), Q(3)]))"), '240 5/2', 'rdMedian: odd and even');
+  eq(rk("rdRead([{key: 'x', kind: 'pos', what: 'Seconds'}], {x: '0'}).x"), 'THREW Seconds must be more than 0, and it is 0', 'rdRead: pos refuses 0');
+  eq(rk("rdRead([{key: 'x', kind: 'pos', what: 'Seconds'}], {x: '1/0'}).x"),
+     'THREW Seconds should be a number such as 3, 1/2 or 0.25, and "1/0" is not one', 'rdRead: 1/0');
+  eq(rk("rdRead([{key: 'x', kind: 'nncount', what: 'Right'}], {x: '-1'}).x"), 'THREW Right must be a whole number, 0 or more, not −1', 'rdRead: nncount');
+  eq(rk("rdRead([{key: 'e', kind: 'entries', what: 'Sessions', lo: 0, hi: 9}], {e: '240/4/5, 250/6/5'}).e"),
+     'THREW Session 2 of Sessions has more right (6) than asked (5)', 'rdRead: entries refuse more right than asked');
+  eq(rk("rdRead([{key: 'e', kind: 'entries', what: 'Sessions', lo: 0, hi: 9}], {e: '240/4/5; 238.5/5/5'}).e.map(function (x) { return Rtext(x.wpm); }).join()"),
+     '240,477/2', 'rdRead: entries read');
+  eq(rk("rdRead([{key: 's', kind: 'strings', what: 'Typed', lo: 1, hi: 9, blank: true}], {s: 'ab-de; FGHIJ'}).s.join()"), 'AB-DE,FGHIJ', 'rdRead: strings');
+  eq(rk("rdRead([{key: 's', kind: 'strings', what: 'Flashed', lo: 1, hi: 9, blank: false}], {s: 'A>B'}).s"),
+     'THREW Entry 1 of Flashed should be letters only, not "A>B"', 'rdRead: strings refuse A>B');
+
+  /* --- the text rules --------------------------------------------------- */
+  eq(rk("rdWordCount('Hello — world, 1990 | x.')"), 4, 'rdWordCount: a token with a letter or digit; | and — are not words');
+  eq(rk("rdWordCount('## The pull of the moon')"), 5, 'rdWordCount: the heading mark is not a word');
+  eq(rk("rdSentenceCount('One. Two! \"Three?\" four... e.g.x five')"), 4, 'rdSentenceCount: . ! ? runs, closing quotes, then space or end');
+  eq(rk("['make', 'table', 'the', 'reading', 'rhythm', 'free', 'Tides', '1990'].map(rdSyllables).join()"), '1,2,1,2,1,1,2,1',
+     'rdSyllables: vowel groups, a final silent e (not le), at least 1');
+  eq(rk("var c = rdCounts({paragraphs: ['## Head line', 'A cat sat. The dog ran away!', 'Done.']}); [c.words, c.sentences, c.syllables].join()"),
+     '8,3,9', 'rdCounts: body paragraphs only');
+  eq(rk("rdPassageWords({paragraphs: ['## Head line', 'A cat sat.']})"), 5, 'rdPassageWords: headings included');
+  eq(rk("rdPassageChars({paragraphs: ['## Head  line', 'A | cat sat.']})"), 20, 'rdPassageChars: markup out, whitespace runs one space');
+  eq(rk("rdWordsIn(rdGistParas({paragraphs: ['## Two tides', 'As the earth turns. Most coasts see two.', 'Short one']}))"), 8,
+     'rdGistParas: headings and first sentences');
+  eq(rk("rdPreviewParas({paragraphs: ['## H', 'first', 'middle', 'last']}).join('/')"), '## H/first/last', 'rdPreviewParas');
+  eq(rk("rdPhrases({paragraphs: ['The old wall | at the end | had leaned.', 'Every spring | she said']}).length"), 5, 'rdPhrases');
+  eq(rk("rdFirstSentence('It rained. Then it stopped.')"), 'It rained.', 'rdFirstSentence');
+
+  /* --- drill ------------------------------------------------------------ */
+  const S1 = { sides: { '': { display: 'normal' } }, lineWords: '12' };
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(2400), seconds: Q(96), correct: Q(0), total: Q(0)}", S1, 'drWpm'), '250 wpm',
+     'drCompute single: 400 words in 96 s');
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(2640), seconds: Q(96), correct: Q(0), total: Q(0)}", S1, 'drStdWpm'),
+     '275 standard wpm', 'drCompute single: 2,640 characters / 6 = 440 standard words in 96 s');
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(2400), seconds: Q(96), correct: Q(0), total: Q(0)}", S1, 'drComp'), 'no questions',
+     'drCompute single: questions off');
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(2400), seconds: Q('96.123'), correct: Q(4), total: Q(6)}", S1, 'drErr'),
+     '≈ 166.5 wpm', 'drCompute single: effective rate = rate × comprehension');
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(2400), seconds: Q(96), correct: Q(4), total: Q(6)}", S1, 'drTime'), '96 s', 'drCompute: time');
+  eq(refuse('drCompute', 'single', "{words: Q(400), chars: Q(2400), seconds: Q(96), correct: Q(6), total: Q(5)}", S1),
+     'Reading  has more questions right (6) than asked (5)', 'drCompute: refuses more right than asked');
+  const R1 = { sides: { '': { display: 'rsvp' } }, lineWords: '12' };
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(1), seconds: Q(96), correct: Q(0), total: Q(0), target: Q(250), chunk: Q(1)}", R1, 'drWordMs'),
+     '240 ms', 'drCompute rsvp: 60,000 / 250');
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(1), seconds: Q(96), correct: Q(0), total: Q(0), target: Q(500), chunk: Q(2)}", R1, 'drWordMs'),
+     '240 ms', 'drCompute rsvp: 60,000 × chunk / target');
+  const PC = { sides: { '': { display: 'pacer' } }, lineWords: '12' };
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(1), seconds: Q(96), correct: Q(0), total: Q(0), target: Q(250)}", PC, 'drPacerLineMs'),
+     '2,880 ms', 'drCompute pacer: 12 words × 60,000 / 250');
+  const G1 = { sides: { '': { display: 'gist' } }, lineWords: '12' };
+  eq(tile('drCompute', 'single', "{words: Q(560), seconds: Q(40), correct: Q(3), total: Q(4), shown: Q(112), chars: Q(1)}", G1, 'drShown'),
+     '1/5 = 20%', 'drCompute gist: 112 of 560 words shown');
+  eq(tile('drCompute', 'single', "{words: Q(560), seconds: Q(40), correct: Q(3), total: Q(4), shown: Q(112), chars: Q(1)}", G1, 'drGistPerMin'),
+     '4.5 gist answers a minute', 'drCompute gist: 3 × 60 / 40');
+  const CMP = { sides: { A: { display: 'normal', label: 'A' }, B: { display: 'phrases', label: 'B' } }, lineWords: '12', kinds: false, ratioOf: 'err' };
+  const pushed = "{wordsA: Q(400), secondsA: Q(100), correctA: Q(5), totalA: Q(5), wordsB: Q(400), secondsB: Q(50), correctB: Q(2), totalB: Q(5),"
+    + " targetB: Q(250), phrasesB: Q(100), baseLo: null, baseHi: null}";
+  eq(tile('drCompute', 'compare', pushed, CMP, 'drErrB'), '192 wpm', 'drCompute compare: 480 × 2/5');
+  eq(tile('drCompute', 'compare', pushed, CMP, 'drErrDiff'), '−48 wpm', 'drCompute compare: B − A');
+  eq(tile('drCompute', 'compare', pushed, CMP, 'drRatio'), '4/5 = 80%', 'drCompute compare: the ratio of effective rates');
+  eq(tile('drCompute', 'compare', pushed, Object.assign({}, CMP, { ratioOf: 'wpm' }), 'drRatio'), '2 = 200%', 'drCompute compare: the ratio of rates');
+  eq(tile('drCompute', 'compare', pushed, CMP, 'drPhraseMs'), '960 ms', 'drCompute compare: 400 × 60,000 / (250 × 100)');
+  eq(tile('drCompute', 'compare', pushed, CMP, 'drVerdictB'), 'no baseline readings yet', 'drVerdict: no range');
+  eq(tile('drCompute', 'compare', pushed.replace('baseLo: null, baseHi: null', 'baseLo: Q(238), baseHi: Q(251)'), CMP, 'drVerdictB'), ONE4,
+     'drVerdict: above the range');
+  eq(rk("drVerdict(Q(247), Q(238), Q(251)) + '; ' + drVerdict(Q(200), Q(238), Q(251))"), 'inside the baseline range; below the baseline range',
+     'drVerdict: inside, below');
+  eq(refuse('drCompute', 'compare', pushed.replace('baseLo: null', 'baseLo: Q(238)'), CMP), 'Give both ends of the baseline range, or neither',
+     'drBase: one end only');
+  const KCMP = { sides: { A: { display: 'gist', label: 'A' }, B: { display: 'normal', label: 'B' } }, lineWords: '12', kinds: true, ratioOf: 'err' };
+  eq(tile('drCompute', 'compare', "{wordsA: Q(560), secondsA: Q(40), gistA: Q(2), gistTotalA: Q(2), detailA: Q(1), detailTotalA: Q(3), shownA: Q(1),"
+    + " wordsB: Q(560), secondsB: Q(140), gistB: Q(2), gistTotalB: Q(2), detailB: Q(3), detailTotalB: Q(3), baseLo: null, baseHi: null}", KCMP, 'drDetailA'),
+     '1/3 ≈ 33.3%', 'drCompute compare kinds: detail 1/3');
+  const LAD = { sides: {}, lineWords: '12', hold: '4/5' };
+  const ladder = "{t1: Q(240), words1: Q(480), seconds1: Q(120), correct1: Q(5), total1: Q(5), t2: Q(288), words2: Q(480), seconds2: Q(100),"
+    + " correct2: Q(4), total2: Q(5), t3: Q(360), words3: Q(480), seconds3: Q(80), correct3: Q(2), total3: Q(5)}";
+  eq(tile('drCompute', 'ladder', ladder, LAD, 'drBestTarget'), '288 wpm', 'drCompute ladder: the fastest target holding 4/5');
+  eq(tile('drCompute', 'ladder', ladder, LAD, 'drBestErr'), '230.4 wpm', 'drCompute ladder: 288 × 4/5');
+  eq(tile('drCompute', 'ladder', ladder, LAD, 'drTopErr'), '240 wpm (target 240 wpm)', 'drCompute ladder: the highest effective rate');
+  eq(tile('drCompute', 'ladder', ladder.replace('correct1: Q(5), total1: Q(5)', 'correct1: Q(4), total1: Q(4)').replace('words1: Q(480)', 'words1: Q(576)'),
+          LAD, 'drTopErr'), '288 wpm (target 240 wpm)', 'drCompute ladder: a tie goes to the slower target');
+  const rep4 = "{words1: Q(340), seconds1: Q(85), correct1: Q(0), total1: Q(0), words2: Q(340), seconds2: Q(68), correct2: Q(0), total2: Q(0),"
+    + " words3: Q(340), seconds3: Q(60), correct3: Q(5), total3: Q(6), words4: Q(310), seconds4: Q(75), correct4: Q(4), total4: Q(6)}";
+  eq(tile('drCompute', 'repeat', rep4, { sides: {} }, 'drRepeatGain'), '+100 wpm', 'drCompute repeat: 340 − 240');
+  eq(tile('drCompute', 'repeat', rep4, { sides: {} }, 'drTransferGain'), '+8 wpm', 'drCompute repeat: 248 − 240');
+  const sec = "{words1: Q(300), seconds1: Q(58), words2: Q(300), seconds2: Q(95), correct: Q(2), total: Q(5)}";
+  eq(tile('drCompute', 'sections', sec, { sides: {} }, 'drRateS1') + '; ' + tile('drCompute', 'sections', sec, { sides: {} }, 'drRateS2'),
+     '≈ 310.3 wpm; ≈ 189.5 wpm', 'drCompute sections: rate per section');
+  eq(tile('drCompute', 'sections', sec, { sides: {} }, 'drErr'), '≈ 94.1 wpm', 'drCompute sections: 600 × 60 / 153 × 2/5');
+  eq(rk("Rtext(drHoldOf(rdEntries('300/5/6, 300/4/6, 300/6/6, 350/6/6, 350/6/6, 350/3/6, 250/6/6, 250/6/6, 250/6/6', {what: 'x', lo: 0, hi: 99}), Q('2/3')))"),
+     '300', 'drHoldOf: the fastest target whose last three runs all held');
+  eq(rk("drHoldOf(rdEntries('300/5/6, 300/4/6', {what: 'x', lo: 0, hi: 99}), Q('2/3'))"), null, 'drHoldOf: not yet');
+
+  /* --- eye -------------------------------------------------------------- */
+  const typical = "{fix: Q(225), sac: Q(30), step: Q(8), reg: Q('3/20'), cpw: Q(6)}";
+  eq(tile('eyCompute', 'budget', typical, {}, 'eyFixPerWord'), '15/17 ≈ 0.9 fixations', 'eyCompute budget: 6 / (8 × 17/20)');
+  eq(tile('eyCompute', 'budget', typical, {}, 'eyMsPerWord'), '225 ms', 'eyCompute budget: 15/17 × 255');
+  eq(tile('eyCompute', 'budget', typical, {}, 'eyWpm'), '≈ 266.7 wpm', 'eyCompute budget: 60,000 / 225');
+  eq(tile('eyCompute', 'budget', typical.replace("Q('3/20')", 'Q(0)'), {}, 'eyWpm'), '≈ 313.7 wpm', 'eyCompute budget: 60,000 / 191.25');
+  eq(tile('eyCompute', 'budget', "{fix: Q(225), sac: Q(30), step: Q(8), regNeed: Q('1/10'), regRepair: Q('1/20'), cpw: Q(6)}", { split: true }, 'eySaved'),
+     '≈ 31.4 wpm', 'eyCompute budget split: the needless share removed');
+  eq(refuse('eyCompute', 'budget', typical.replace("Q('3/20')", 'Q(1)'), {}),
+     'The regression share must be less than 1: with every fixation going back, the eye never advances', 'eyCompute: reg 1 refused');
+  const RQ = { identify: '8', perceptual: '15' };
+  eq(tile('eyCompute', 'required', "{target: Q(1000), fix: Q(225), sac: Q(30), cpw: Q(6), reg: Q(0)}", RQ, 'eyNeeded'), '25.5 characters',
+     'eyCompute required: 1,000 × 6 × 255 / 60,000');
+  eq(tile('eyCompute', 'required', "{target: Q(1000), fix: Q(225), sac: Q(30), cpw: Q(6), reg: Q('1/10')}", RQ, 'eyNeeded'), '≈ 28.3 characters',
+     'eyCompute required: divided by 1 − reg');
+  eq([300, 500, 1000].map((w) => tile('eyCompute', 'required', '{target: Q(' + w + '), fix: Q(225), sac: Q(30), cpw: Q(6), reg: Q(0)}', RQ, 'eyVerdict')).join(' | '),
+     'at these settings, within the word-identification span | at these settings, beyond the word-identification span but within the perceptual span'
+     + ' | at these settings, beyond the perceptual span', 'eyVerdictOf: the three bands');
+  eq(tile('eyCompute', 'required', "{words: Q(90000), seconds: Q(3600), comp: Q('1/2'), fix: Q(225), sac: Q(30), cpw: Q(6), reg: Q(0)}",
+          Object.assign({ claim: true }, RQ), 'eyNeeded'), '38.25 characters', 'eyCompute claim: 90,000 words in an hour');
+  eq(tile('eyCompute', 'required', "{words: Q(90000), seconds: Q(3600), comp: Q('1/2'), fix: Q(225), sac: Q(30), cpw: Q(6), reg: Q(0)}",
+          Object.assign({ claim: true }, RQ), 'eyClaimErr'), '750 wpm', 'eyCompute claim: rate × comprehension');
+  const narrow = "{cpl: Q(40), lines: Q(20), step: Q(8), fix: Q(225), sac: Q(30), sweep: Q(300)}";
+  eq(tile('eyCompute', 'lines', narrow, {}, 'eySweepShare'), '1/5 = 20%', 'eyCompute lines: 4 forward saccades + 1 sweep');
+  eq(tile('eyCompute', 'lines', narrow, {}, 'eyMsPerLine'), '1,545 ms', 'eyCompute lines: 5 × 225 + 4 × 30 + 300');
+  eq(tile('eyCompute', 'lines', narrow, {}, 'eySweepTime'), '20/103 ≈ 19.4%', 'eyCompute lines: sweep time / line time');
+  eq(tile('eyCompute', 'lines', narrow, {}, 'eyTotal'), '30.9 s', 'eyCompute lines: 20 lines');
+  eq(tile('eyCompute', 'lines', narrow.replace('Q(40)', 'Q(90)'), {}, 'eyFixPerLine'), '45/4 = 11.25 fixations', 'eyCompute lines: 90 / 8');
+
+  /* --- flash ------------------------------------------------------------ */
+  const span = "{targets: ['ABCDE', 'FGHIJ', 'KLMNO', 'PQRST'], typed: ['-BCD-', 'FGHI-', '-LMN-', 'P-RS-']}";
+  eq(tile('flCompute', 'span', span, {}, 'flCentre'), '1 = 100%', 'flCompute span: centre 4 of 4');
+  eq(tile('flCompute', 'span', span, {}, 'flEdge'), '1/4 = 25%', 'flCompute span: outermost 2 of 8');
+  eq(tile('flCompute', 'span', span, {}, 'flSpan'), 'left 2, right 1', 'flSpanOf: outermost position at 1/2 or better');
+  eq(refuse('flCompute', 'span', "{targets: ['ABCD'], typed: ['ABCD']}", {}),
+     'Flashed strings have an odd length of at least 3, so that one letter is at the centre', 'flScore: even length refused');
+  eq(rk("flTable('12345').join()"), '5,23,1,4,3,13,9,17,21,11,6,18,19,12,10,8,22,16,25,20,15,14,2,24,7', 'flTable: the stated LCG, seed 12345');
+  eq(tile('flCompute', 'schulte', "{seconds: Q(41), errors: Q(0), seed: Q(1)}", {}, 'flPerCell'), '1.64 s', 'flCompute schulte: 41 / 25');
+
+  /* --- scan, triage, text, recall --------------------------------------- */
+  const quick = "{found: Q(5), wrong: Q(1), targets: Q(5), seconds: Q(95), words: Q(600)}";
+  eq(tile('scCompute', 'find', quick, {}, 'scPerTarget'), '19 s', 'scCompute: 95 / 5');
+  eq(tile('scCompute', 'find', quick, {}, 'scWordsPerSec'), '≈ 6.3 words a second', 'scCompute: 600 / 95');
+  eq(tile('scCompute', 'find', quick.replace('found: Q(5)', 'found: Q(0)'), {}, 'scPerTarget'), 'none found', 'scCompute: none found');
+  const items = "{items: [{title: 'R', words: Q(6000), value: Q(5), choice: 'read'}, {title: 'M', words: Q(3000), value: Q(2), choice: 'skim'},"
+    + " {title: 'N', words: Q(3000), value: Q(1), choice: 'skip'}], read: Q(250), skim: Q(750), coverage: Q('1/2'), budget: Q(25)}";
+  eq(tile('trCompute', 'plan', items, {}, 'trMinutes'), '28 min', 'trCompute: 6,000 / 250 + 3,000 / 750');
+  eq(tile('trCompute', 'plan', items, {}, 'trCovered'), '3/4 = 75%', 'trCompute: (5 + 2 × 1/2) / 8');
+  eq(tile('trCompute', 'plan', items, {}, 'trFits'), 'over the budget by 3 min', 'trCompute: against the budget');
+  eq(tile('txCompute', 'readability', "{words: Q(100), sentences: Q(5), syllables: Q(140)}", {}, 'txFre'), '≈ 68.1',
+     'txFormulas: 206.835 − 1.015 × 20 − 84.6 × 1.4 = 68.095');
+  eq(tile('txCompute', 'readability', "{words: Q(100), sentences: Q(5), syllables: Q(140)}", {}, 'txGrade'), '8.73',
+     'txFormulas: 0.39 × 20 + 11.8 × 1.4 − 15.59');
+  eq(tile('txCompute', 'coverage', "{tokens: Q(500), unknown: Q(10)}", {}, 'txCoverage') + '; ' + tile('txCompute', 'coverage', "{tokens: Q(500), unknown: Q(10)}", {}, 'txOneIn'),
+     '49/50 = 98%; one unknown in every 50 tokens', 'txCompute coverage');
+  eq(tile('txCompute', 'volume', "{minutes: Q(20), wpm: Q(250), days: Q(365), bookWords: Q(90000)}", {}, 'txWordsYear'), '1,825,000 words', 'txCompute volume');
+  eq(tile('txCompute', 'volume', "{minutes: Q(20), wpm: Q(250), days: Q(365), bookWords: Q(90000)}", {}, 'txBooksYear'), '≈ 20.3 books', 'txCompute books');
+  eq(tile('reCompute', 'free', "{units: Q(12), recalled: Q(7), words: Q(400), seconds: Q(100), summaryWords: Q(40)}", {}, 'reRate'), '140 wpm',
+     'reCompute free: 240 × 7/12');
+  eq(tile('reCompute', 'free', "{units: Q(12), recalled: Q(6), words: Q(400), seconds: Q(100), summaryWords: Q(40)}", {}, 'reWordsPerUnit'), '≈ 6.7 words',
+     'reCompute free: 40 / 6');
+  eq(tile('reCompute', 'delayed', "{delA: Q(2), delB: Q(3), total: Q(6), units: Q(8), recalled: Q(5)}", {}, 'reDelayedA') + '; '
+     + tile('reCompute', 'delayed', "{delA: Q(2), delB: Q(3), total: Q(6), units: Q(8), recalled: Q(5)}", {}, 'reRecallB'),
+     '1/3 ≈ 33.3%; 5/8 = 62.5%', 'reCompute delayed');
+  eq(tile('reCompute', 'delayed', "{delA: Q(2), delB: Q(3), total: Q(6), units: Q(8), recalled: Q(5)}", {}, 'reDelayedDiff'), '≈ +16.7 points',
+     'reCompute delayed: (3/6 − 2/6) × 100');
+  eq(tile('reCompute', 'delayed', "{delA: Q(56), delB: Q(68), total: Q(100), units: Q(8), recalled: Q(5)}", {}, 'reDelayedB'), '17/25 = 68%',
+     'reCompute delayed: a published percentage as right of 100');
+  eq(tile('reCompute', 'schedule', "{first: Q(1), mult: Q(2), reviews: Q(5), minutes: Q(10)}", {}, 'reDays'), '1, 3, 7, 15, 31',
+     'reCompute schedule: gaps 1, 2, 4, 8, 16');
+  eq(tile('reCompute', 'schedule', "{first: Q(1), mult: Q(0), reviews: Q(5), minutes: Q(10)}", {}, 'reLastDay'), 'day 1', 'reCompute schedule: massed');
+
+  /* --- log -------------------------------------------------------------- */
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(290)]}", {}, 'lgMean'), '≈ 244.7 wpm', 'lgCompute noise: 734 / 3');
+  eq(tile('lgCompute', 'noise', "{base: [Q(212), Q(268), Q(240)], tests: [Q(262)]}", {}, 'lgRange'), '56 wpm', 'lgCompute noise: range');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(290)]}", {}, 'lgBeyond'), '39 wpm above the top (3 ranges)', 'lgCompute noise: beyond');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(290)]}", {}, 'lgVerdict'), ONE4, 'lgRangeVerdict: above');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(240), Q(262), Q(281), Q(270)]}", {}, 'lgTestMedian'), '270 wpm',
+     'lgCompute noise: median of the last three tests');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(240), Q(262), Q(281), Q(270)]}", {}, 'lgVerdict'),
+     'above the baseline range on the median of the last three tests', 'lgTiers: three tests, median above');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(240), Q(245), Q(290)]}", {}, 'lgVerdict'), ONE4,
+     'lgTiers: median inside, latest above: once');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(260), Q(290)]}", {}, 'lgBeyond') + '; '
+     + tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(260), Q(290)]}", {}, 'lgTestMedian'),
+     '39 wpm above the top (3 ranges); 275 wpm (of 2)', 'lgCompute noise: the latest test, and fewer than three');
+  const GE = { gears: [{ name: 'scanning', wpm: '600' }, { name: 'skimming', wpm: '450' }, { name: 'rauding', wpm: '300' },
+                       { name: 'learning', wpm: '200' }, { name: 'memorising', wpm: '138' }], average: '238' };
+  eq(tile('lgCompute', 'gears', "{wpm: Q(238)}", GE, 'lgNearest'), 'learning, 200 wpm', 'lgNearestOf: 38 < 62');
+  eq(tile('lgCompute', 'gears', "{wpm: Q(250)}", GE, 'lgNearest'), 'learning, 200 wpm', 'lgNearestOf: a tie goes to the slower gear');
+  eq(tile('lgCompute', 'gears', "{wpm: Q(1000)}", GE, 'lgNearest'), 'above every gear', 'lgNearestOf: above every gear');
+  eq(tile('lgCompute', 'gears', "{wpm: Q(320)}", GE, 'lgVsAverage'), '160/119 ≈ 134.5%', 'lgCompute gears: 320 / 238');
+  eq(tile('lgCompute', 'gears', "{wpm: Q(238), stdwpm: Q(280)}", GE, 'lgNearest') + '; ' + tile('lgCompute', 'gears', "{wpm: Q(238), stdwpm: Q(280)}", GE, 'lgVsAverage'),
+     'rauding, 300 wpm; 1 = 100%', 'lgCompute gears: the gear by standard words, the average by words');
+  const hist = (s) => "{entries: rdEntries('" + s + "', {what: 'x', lo: 0, hi: 99})}";
+  eq(tile('lgCompute', 'history', hist('240/5/5, 238/5/5, 251/5/5'), {}, 'lgBaseMedian'), '240 wpm', 'lgCompute history: baseline median');
+  eq(tile('lgCompute', 'history', hist('238/5/5, 251/5/5, 245/5/5, 262/5/5, 270/5/5, 281/5/5'), {}, 'lgRecentMedian'), '270 wpm', 'lgCompute history: recent median');
+  eq(tile('lgCompute', 'history', hist('238/5/5, 251/5/5, 245/5/5, 262/5/5, 270/5/5, 281/5/5'), {}, 'lgVerdict'),
+     'above the baseline range on the median of the last three tests', 'lgHistoryVerdict: a real change');
+  eq(tile('lgCompute', 'history', hist('238/5/5, 251/5/5, 245/5/5, 262/5/5'), {}, 'lgVerdict'), ONE4, 'lgHistoryVerdict: one reading above');
+  eq(tile('lgCompute', 'history', hist('240/5/5, 238/5/5, 251/5/5, 300/4/5, 320/4/5, 330/3/5'), {}, 'lgVerdict'), 'inside the baseline range',
+     'lgHistoryVerdict: rate up, comprehension down');
+  eq(tile('lgCompute', 'history', hist('240/5/5, 238/5/5, 251/5/5, 300/4/5, 320/4/5, 330/3/5'), {}, 'lgLatestErr'), '198 wpm', 'lgCompute history: latest effective');
+  eq(tile('lgCompute', 'plan', "{rows: [{drill: 'practice', sessions: Q(5), minutes: Q(20)}, {drill: 'long', sessions: Q(2), minutes: Q(25)},"
+    + " {drill: 'test reading', sessions: Q(1), minutes: Q(10)}], test: 'test reading', budget: Q(180)}", {}, 'lgTestShare'), '1/16 = 6.25%',
+     'lgCompute plan: 10 of 160 minutes');
+  eq(tile('lgCompute', 'profile', "{errThen: Q(244), errNow: Q(268), baseLo: Q(238), baseHi: Q(251), gistThen: Q('3/4'), gistNow: Q(1), scanThen: Q(8),"
+    + " scanNow: Q(6), recallThen: Q('7/12'), recallNow: Q('2/3')}", {}, 'lgVerdict'), ONE4, 'lgCompute profile: against the range');
+  eq(tile('lgCompute', 'profile', "{errThen: Q(244), errNow: Q(268), baseLo: Q(238), baseHi: Q(251), gistThen: Q('3/4'), gistNow: Q(1), scanThen: Q(8),"
+    + " scanNow: Q(6), recallThen: Q('7/12'), recallNow: Q('2/3')}", {}, 'lgRecall'), '7/12 ≈ 58.3% → 2/3 ≈ 66.7%', 'lgCompute profile: recall then and now');
+
+  /* --- edges: each case below pins a choice a looser line would get wrong --- */
+  eq(rk("rdSyllables('happy')"), 2, 'rdSyllables: y is a vowel');
+  eq(tile('drCompute', 'ladder', ladder.replace('words1: Q(480)', 'words1: Q(576)').replace('correct1: Q(5)', 'correct1: Q(4)'), LAD, 'drTopErr'),
+     '230.4 wpm (target 240 wpm)', 'drCompute ladder: equal effective rates go to the slower target');
+  eq(rk("drHoldOf(rdEntries('300/6/6, 300/6/6, 300/6/6, 300/2/6', {what: 'x', lo: 0, hi: 99}), Q('2/3'))"), null,
+     'drHoldOf: the last three runs count, not the first three');
+  eq(rk("Rtext(drHoldOf(rdEntries('250/6/6, 250/6/6, 250/6/6, 300/6/6, 300/6/6, 300/6/6', {what: 'x', lo: 0, hi: 99}), Q('2/3')))"), '300',
+     'drHoldOf: a faster target listed later wins');
+  eq(tile('eyCompute', 'required', "{target: Q(400), fix: Q(210), sac: Q(30), cpw: Q(5), reg: Q(0)}", RQ, 'eyVerdict'),
+     'at these settings, within the word-identification span', 'eyVerdictOf: exactly 8 characters is within');
+  eq(tile('flCompute', 'span', "{targets: ['ABC', 'DEF'], typed: ['XBC', 'DEF']}", {}, 'flEdge'), '3/4 = 75%', 'flScore: a wrong letter typed is a miss');
+  eq(tile('flCompute', 'span', "{targets: ['ABC', 'DEF'], typed: ['ABX', 'DEF']}", {}, 'flSpan'), 'left 1, right 1', 'flSpanOf: exactly 1/2 on the right counts');
+  eq(tile('scCompute', 'find', "{found: Q(4), wrong: Q(0), targets: Q(5), seconds: Q(100), words: Q(600)}", {}, 'scPerTarget'), '25 s',
+     'scCompute: seconds per target found, not per target set');
+  eq(tile('reCompute', 'schedule', "{first: Q(1), mult: Q(2), reviews: Q(5), minutes: Q(10)}", {}, 'reMinutes'), '50 min', 'reCompute schedule: 5 × 10');
+  eq(tile('lgCompute', 'plan', "{rows: [{drill: 'practice', sessions: Q(5), minutes: Q(20)}, {drill: 'test reading', sessions: Q(2), minutes: Q(10)}],"
+    + " test: 'test reading', budget: Q(180)}", {}, 'lgTestShare'), '1/6 ≈ 16.7%', 'lgCompute plan: the test row counts sessions × minutes');
+
+  /* --- PLAN D.3 additions --------------------------------------------------- */
+  const pl = (s) => "rdEntries('" + s + "', {what: 'x', lo: 0, hi: 99})";
+  const PR = { sides: { '': { display: 'normal' } }, lineWords: '12', hold: '2/3' };
+  const prac = (log, since) => "{words: Q(300), seconds: Q(60), correct: Q(5), total: Q(6), target: Q(300), pacerLog: " + pl(log) + ", sinceTest: Q(" + since + ")}";
+  eq(tile('drCompute', 'practice', prac('300/4/6, 300/5/6, 300/6/6', 0), PR, 'drNextTarget'), '315 wpm', 'drNextOf: three holds in a row: × 21/20');
+  eq(tile('drCompute', 'practice', prac('300/6/6, 300/3/6, 300/2/6', 0), PR, 'drNextTarget'), '285 wpm', 'drNextOf: two misses in a row: × 19/20');
+  eq(tile('drCompute', 'practice', prac('250/6/6, 250/6/6, 300/6/6, 300/6/6', 0), PR, 'drNextTarget'), '300 wpm',
+     'drNextOf: two holds at the new target: stay');
+  eq(tile('drCompute', 'practice', prac('300/6/6, 300/6/6, 300/3/6, 300/6/6', 0), PR, 'drNextTarget'), '300 wpm',
+     'drNextOf: a miss inside the last three: stay');
+  eq(tile('drCompute', 'practice', prac('300/6/6, 300/3/6, 300/6/6', 0), PR, 'drNextTarget'), '300 wpm', 'drNextOf: one miss is not two');
+  eq(tile('drCompute', 'practice', prac('300/4/6', 3), PR, 'drTestDue') + '; ' + tile('drCompute', 'practice', prac('300/4/6', 4), PR, 'drTestDue')
+     + '; ' + tile('drCompute', 'practice', prac('300/4/6', 0), PR, 'drTestDue'),
+     'after 1 more practice session; due now: make the next reading a test; after 4 more practice sessions', 'drTestDueOf: four practice sessions');
+  eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(1), seconds: Q(100), correct: Q(0), total: Q(0), target: Q(250), chunk: Q(2)}", R1, 'drWordMsSeen'),
+     '500 ms', 'drCompute rsvp: measured 100,000 ms × 2 / 400');
+  eq(tile('flCompute', 'span', "{targets: ['ABCDE', 'FGHIJ'], typed: ['.B..E', 'F.H..']}", {}, 'flSpan') + '; '
+     + tile('flCompute', 'span', "{targets: ['ABCDE', 'FGHIJ'], typed: ['.B..E', 'F.H..']}", {}, 'flEdge'),
+     'left 2, right 2; 1 = 100%', 'flScore: partial report, a . is a position not asked');
+  eq(tile('flCompute', 'span', "{targets: ['ABCDE', 'FGHIJ'], typed: ['.B..E', 'F.X..']}", {}, 'flCentre'), '0 = 0%', 'flScore: partial report, centre asked once, missed');
+  eq(tile('flCompute', 'span', "{targets: ['ABCDE'], typed: ['A...E']}", {}, 'flCentre'), 'not asked', 'flCompute: a position never asked');
+  eq(tile('flCompute', 'span', "{targets: ['ABCDE', 'FGHIJ'], typed: ['.B..E', 'F.H..']}", {}, 'flCentre'), '1 = 100%',
+     'flAcc: right over asked (1 of 1), not over all strings');
+  eq(tile('lgCompute', 'noise', "{base: [Q(238), Q(251), Q(245)], tests: [Q(200), Q(200), Q(200), Q(262), Q(270)]}", {}, 'lgVerdict'),
+     'above the baseline range on the median of the last three tests', 'lgTiers: the median of the LAST three, not of all tests');
+  eq(tile('lgCompute', 'history', hist('238/5/5, 251/5/5, 245/5/5, 262/5/5, 270/5/5'), {}, 'lgVerdict'), ONE4,
+     'lgHistoryVerdict: the first three are baselines, so two tests are not three');
+}
+// ---- end readkit ----
 
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
