@@ -33,12 +33,28 @@ from english import PATH as ENGLISH_PATH  # noqa: E402
 from operations_research import PATH as OPERATIONS_RESEARCH_PATH  # noqa: E402
 from phenomenology import PATH as PHENOMENOLOGY_PATH  # noqa: E402
 from philosophy import PATH as PHILOSOPHY_PATH  # noqa: E402
+from reading import PATH as READING_PATH  # noqa: E402
 from system_design import PATH as SYSTEM_DESIGN_PATH  # noqa: E402
 from mathpath import render  # noqa: E402
 
 GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
                    ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, PHILOSOPHY_PATH,
-                   ENGLISH_PATH, DE_PATH, CAPITAL_PATH, PHENOMENOLOGY_PATH)
+                   ENGLISH_PATH, DE_PATH, CAPITAL_PATH, PHENOMENOLOGY_PATH,
+                   READING_PATH)
+
+# The content package each generated path is read from. A path's slug is its
+# URL; its package is its directory under content/ and its file under
+# content/spoken/. They agree for every Subject but one: Reading Faster is
+# published at /paths/reading-faster/ from content/reading/. Anything that
+# goes from a path to its source (the content-preservation inventory,
+# speechcheck.py) asks here rather than rewriting the slug, because a
+# rewritten slug that names no directory finds nothing and fails nothing.
+PACKAGE_OF_SLUG = {"reading-faster": "reading"}
+
+
+def package_of(path):
+    """The content package name for a generated PATH dict."""
+    return PACKAGE_OF_SLUG.get(path["slug"], path["slug"].replace("-", "_"))
 
 SITE = REPO_ROOT / "site"
 # The list of pages this build produces, consumed by scripts/labcheck.js.
@@ -66,7 +82,8 @@ KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "copi
                           "argkit", "choicekit", "english",
                           "calckit", "dekit",
                           "capkit",
-                          "phenkit",)
+                          "phenkit",
+                          "readkit",)
 
 
 def path_pages(path):

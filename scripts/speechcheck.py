@@ -56,10 +56,10 @@ def runs(path):
 
 
 def subjects():
-    from build_paths import GENERATED_PATHS
+    from build_paths import GENERATED_PATHS, package_of
 
     for path in GENERATED_PATHS:
-        yield path, load_overrides(path["slug"].replace("-", "_"))
+        yield path, load_overrides(package_of(path))
 
 
 def unresolved(path, overrides):

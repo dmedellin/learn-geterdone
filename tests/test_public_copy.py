@@ -54,7 +54,7 @@ class TestPublicCopy(unittest.TestCase):
         owners = {route for route, page in pages.items()
                   if page.family in ('library', 'subject')}
         self.assertEqual(sum(page.family == 'library' for page in pages.values()), 1)
-        self.assertEqual(sum(page.family == 'subject' for page in pages.values()), 11)
+        self.assertEqual(sum(page.family == 'subject' for page in pages.values()), 12)
         records = [r for r in records if r['route'] in owners]
         self.assertGreater(len(records), 100, 'shared visitor sweep cannot be empty')
         self.assertFalse([f for r in records for f in copy.findings(r)],
@@ -92,7 +92,7 @@ class TestPublicCopy(unittest.TestCase):
         for file in SITE.rglob('*.html'):
             if copy.Document(file.read_text()).family in ('library', 'subject'):
                 owners.append(file.relative_to(SITE))
-        self.assertEqual(len(owners), 12, 'shared mutation sweep must cover all owners')
+        self.assertEqual(len(owners), 13, 'shared mutation sweep must cover all owners')
         with tempfile.TemporaryDirectory(prefix='shared-copy-', dir='/tmp') as tmp:
             site = Path(tmp)
             for relative in owners:
@@ -141,9 +141,9 @@ class TestPublicCopy(unittest.TestCase):
 
     def test_rendered_inventory_has_no_ordinal_references(self):
         pages, records = copy.scan(SITE)
-        self.assertEqual(1179, len(pages), 'visitor inventory must include every family')
-        self.assertEqual(105, sum(p.family == 'course' for p in pages.values()))
-        self.assertEqual(1058, sum(p.family == 'lesson' for p in pages.values()))
+        self.assertEqual(1230, len(pages), 'visitor inventory must include every family')
+        self.assertEqual(113, sum(p.family == 'course' for p in pages.values()))
+        self.assertEqual(1100, sum(p.family == 'lesson' for p in pages.values()))
         self.assertGreater(len(records), 45000)
         focus = os.environ.get('AB_COURSE')
         if focus:
@@ -457,11 +457,12 @@ class TestAuthoredSemanticCopy(unittest.TestCase):
                        set(contract['english_semantic_copy']['courses']) |
                        set(contract['differential_equations_semantic_copy']['courses']) |
                        set(contract['capital_semantic_copy']['courses']) |
-                       set(contract['phenomenology_semantic_copy']['courses']))
+                       set(contract['phenomenology_semantic_copy']['courses']) |
+                       set(contract['reading_semantic_copy']['courses']))
         registered = {c['slug'] for p in ui.build_paths.GENERATED_PATHS for c in p['courses']}
         registered.update(c['slug'] for c in trading)
         self.assertEqual(all_courses, registered)
-        self.assertEqual(len(all_courses), 105)
+        self.assertEqual(len(all_courses), 113)
         self.assertGreater(sum(len(p['clauses']) for p in semantic['pages'].values()), 5000)
         self.assertGreater(sum(len(p['source_records']) for p in semantic['pages'].values()), 2000)
         self.assertEqual([], authored_semantic_errors(SITE, contract))

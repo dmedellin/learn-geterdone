@@ -1878,6 +1878,97 @@ PHEN_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Reading Faster, same shape.
+READ_PATH_PAGE_PATH = "/paths/reading-faster/"
+READ_MATERIAL_MARKER = "one measurement, not your reading speed"
+READ_COURSES = (
+    ("reading-measure-your-reading", "Measure Your Reading", (
+        "words-per-minute",
+        "comprehension-and-effective-rate",
+        "one-reading-is-one-measurement",
+        "typical-rates-and-reading-gears",
+        "keeping-a-practice-log",
+    )),
+    ("reading-guided-practice", "Guided Practice", (
+        "reading-with-a-pacer",
+        "choosing-a-target-pace",
+        "the-daily-drill",
+        "sprints-above-comfort",
+        "repeated-reading-and-transfer",
+    )),
+    ("reading-how-the-eyes-read", "How the Eyes Read", (
+        "fixations-and-saccades",
+        "the-perceptual-span",
+        "looking-back",
+        "fewer-needless-regressions",
+        "the-speed-ceiling",
+        "training-the-periphery",
+    )),
+    ("reading-inner-voice-and-flashing-words", "The Inner Voice and Flashing Words", (
+        "the-inner-voice",
+        "silencing-the-inner-voice",
+        "one-word-at-a-time",
+        "reading-in-phrases",
+        "rsvp-without-looking-back",
+        "testing-a-speed-claim",
+    )),
+    ("reading-skim-scan-and-preview", "Skimming, Scanning and Previewing", (
+        "scanning-for-a-target",
+        "skimming-for-gist",
+        "what-skimming-costs",
+        "previewing-before-reading",
+        "inspectional-reading",
+        "triaging-a-reading-list",
+        "shifting-gears",
+    )),
+    ("reading-words-knowledge-and-difficulty", "Words, Knowledge and Difficulty", (
+        "your-rate-on-hard-text",
+        "measuring-difficulty",
+        "unknown-words-and-coverage",
+        "what-you-already-know",
+        "how-much-you-read",
+    )),
+    ("reading-remembering-what-you-read", "Remembering What You Read", (
+        "free-recall",
+        "retrieval-beats-rereading",
+        "spacing-your-reviews",
+        "notes-in-your-own-words",
+    )),
+    ("reading-your-training-plan", "Your Training Plan", (
+        "a-practice-week",
+        "reading-your-curve",
+        "plateaus-and-transfer",
+        "the-full-battery",
+    )),
+)
+
+READ_PATH_PAGE_MARKERS = (
+    canonical_marker(READ_PATH_PAGE_PATH),
+    html.escape(READ_COURSES[0][1]),
+    html.escape(READ_COURSES[-1][1]),
+    'href="../../%s/"' % READ_COURSES[-1][0],
+)
+
+READ_COURSE_HOMES = tuple(
+    (
+        "read-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, READ_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(READ_COURSES, start=1)
+)
+
+READ_COURSE_LESSONS = tuple(
+    (
+        "read-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), READ_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(READ_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1976,6 +2067,7 @@ def path_page_targets(args):
         ("de-path", DE_PATH_PAGE_PATH, DE_PATH_PAGE_MARKERS),
         ("cap-path", CAP_PATH_PAGE_PATH, CAP_PATH_PAGE_MARKERS),
         ("phen-path", PHEN_PATH_PAGE_PATH, PHEN_PATH_PAGE_MARKERS),
+        ("read-path", READ_PATH_PAGE_PATH, READ_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2001,7 +2093,8 @@ def course_home_targets(args):
                                     + ENG_COURSE_HOMES
                                     + DE_COURSE_HOMES
                                     + CAP_COURSE_HOMES
-                                    + PHEN_COURSE_HOMES):
+                                    + PHEN_COURSE_HOMES
+                                    + READ_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2042,6 +2135,7 @@ def lesson_targets(args):
         + DE_COURSE_LESSONS
         + CAP_COURSE_LESSONS
         + PHEN_COURSE_LESSONS
+        + READ_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:
