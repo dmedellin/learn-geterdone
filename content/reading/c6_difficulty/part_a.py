@@ -7,8 +7,8 @@ _POOL = {p["id"]: p for p in POOL}
 DAILY = (
     "Then today's Daily Drill",
     "Open The Daily Drill and do today's session as its routine says. When the pool "
-    "reaches its hard passages, find your hold target again: it will be lower, and "
-    "that is this course's subject measured on your own practice.",
+    "reaches its hard passages, find your hold target again: it will probably be "
+    "lower, and that is this course's subject measured on your own practice.",
 )
 
 LESSONS = [
@@ -297,14 +297,17 @@ LESSONS = [
         ),
         "body": [
             ("p", "Begin with the warm-up at the top of the lab, Endgame at the Rosedal, "
-                  "at your usual pace. It is a practice reading from the Daily Drill's "
-                  "pool, logged as practice, and it keeps every lesson in this Subject a "
+                  "at your usual pace. It is a practice reading from the Subject's "
+                  "passage pool, logged as practice, and it keeps every lesson in this Subject a "
                   "lesson with a timed reading in it."),
             ("def", ("Flesch Reading Ease and the Flesch–Kincaid grade",
                      "With W words, S sentences and Y syllables, Rudolf Flesch's 1948 "
-                     "<strong>Reading Ease</strong> is 206.835 − 1.015 × (W/S) − 84.6 × "
-                     "(Y/W), and the <strong>Flesch–Kincaid grade</strong>, derived by "
-                     "Kincaid and colleagues in 1975 for Navy enlisted personnel, is 0.39 × (W/S) + 11.8 × (Y/W) − 15.59.")),
+                     "<strong>Reading Ease</strong> is 206.835, less 1.015 times the words "
+                     "per sentence, less 84.6 times the syllables per word; the "
+                     "<strong>Flesch–Kincaid grade</strong>, derived by Kincaid and "
+                     "colleagues in 1975 for Navy enlisted personnel, is 0.39 times the "
+                     "words per sentence, plus 11.8 times the syllables per word, less "
+                     "15.59. The key lines above give both in symbols.")),
             ("p", "The counts need rules, and the lab states its own. A word is a "
                   "whitespace-separated token with a letter or a digit in it. A sentence "
                   "ends at a full stop, a question mark or an exclamation mark followed "
@@ -339,8 +342,8 @@ LESSONS = [
                   "words carry more than half as many syllables again, and syllables a "
                   "word are multiplied by 84.6. Most of the gap between 79.8 and 14.3 is "
                   "word length."),
-            ("p", "The passages in this Subject were sorted into bands with exactly "
-                  "these counts: easy at grades 5 to 7, standard at 8 to 11, hard at 13 "
+            ("p", "The passages you read for time in this Subject were sorted into bands by "
+                  "exactly these counts: easy at grades 5 to 7, standard at 8 to 11, hard at 13 "
                   "and above. That is the honest use of a formula: to sort many texts "
                   "quickly by how long their sentences and words are."),
             ("p", "The formulas cannot see anything else. They do not know whether a "
@@ -389,9 +392,10 @@ LESSONS = [
              "Words per sentence and syllables per word. Write them down: they are the "
              "whole of what the formulas know about the text."),
             ("Compute both scores",
-             "Reading Ease = 206.835 − 1.015 × (words per sentence) − 84.6 × (syllables "
-             "per word); grade = 0.39 × (words per sentence) + 11.8 × (syllables per "
-             "word) − 15.59. Keep one decimal."),
+             "Reading Ease is 206.835, less 1.015 times the words per sentence, less 84.6 "
+             "times the syllables per word; the grade is 0.39 times the words per "
+             "sentence, plus 11.8 times the syllables per word, less 15.59. Keep one "
+             "decimal."),
             ("Say what the score leaves out",
              "Before you trust the number, ask whether the words are common, whether you "
              "know the topic, and whether each sentence leans on the last. The formula "
@@ -550,7 +554,7 @@ LESSONS = [
                   "optimal. Schmitt, Jiang and Grabe (2011) found comprehension rising "
                   "roughly in a line with coverage and no threshold at which it jumped. "
                   "Nation (2006) used 98% to estimate how large a vocabulary reading in "
-                  "English needs. All of these studied learners of English; for a fluent "
+                  "English needs. All of these concern learners of English; for a fluent "
                   "native reader the figures are an extrapolation, and a reasonable one "
                   "only as a rough guide."),
             ("p", "Now read your own result against them. If your coverage of the "
@@ -558,14 +562,16 @@ LESSONS = [
                   "almost every sentence, and you will probably have felt it: the "
                   "passage defines many of its terms, but each definition has to be "
                   "held while the next term arrives. If your coverage was near 98% or "
-                  "above, the passage was hard for you mainly for the other reasons the "
-                  "formulas count, its long sentences and long words."),
+                  "above, the unknown words were probably not the main difficulty: look "
+                  "instead at its long sentences and long words, which the formulas "
+                  "count, and at how much each sentence asks you to hold, which they "
+                  "do not."),
             ("p", "This drill is not timed, and the heraldry passage's own six "
                   "questions are not asked: the marking interrupts the reading, so a rate "
                   "taken here would measure the marking. What the drill gives you is the "
                   "count. The step that follows from it is the slow one: a reader who "
-                  "regularly meets one unknown word in every 20 gains more from learning "
-                  "the field's words than from any change of pace."),
+                  "regularly meets one unknown word in every 20 is likely to gain more "
+                  "from learning the field's words than from a change of pace."),
             ("p", "The next lesson, What You Already Know, asks the same question about "
                   "ideas instead of words: what happens to a rate when the words are "
                   "familiar and the subject is not."),
@@ -779,8 +785,9 @@ LESSONS = [
                   "about laboratories than about suitcases."),
             ("p", "What follows for reading faster is the least glamorous finding in "
                   "the Subject and one of the most useful. In a field you read often, "
-                  "the fastest gain available is usually to know more of the field: an "
-                  "introductory text first, then the hard one. No change of technique "
+                  "the gain most within reach is often to know more of the field: an "
+                  "introductory text first, then the hard one. That is an inference "
+                  "from studies of recall, not something they timed. No change of technique "
                   "gave the expert reader their extra 100 effective words a minute on "
                   "the Gram stain; what they knew did."),
             ("p", "The next lesson, How Much You Read, turns from what you know to how "
@@ -863,8 +870,8 @@ LESSONS = [
                     "= 15/26 ≈ 57.7%. The first option compares the rates and ignores the "
                     "scores; the third is the score alone."},
             {"q": "The Gram stain passage scores a grade of about 8.9 and the packing "
-                  "passage about 9.4. Why did the formula not predict that most readers "
-                  "find the Gram stain harder?",
+                  "passage about 9.4. Why did the formula not predict that a reader new "
+                  "to microbiology finds the Gram stain harder?",
              "a": ["The syllable rule miscounted the Gram stain passage",
                    "The formula sees sentence and word length, not whether the reader "
                    "knows the subject",
@@ -936,8 +943,8 @@ LESSONS = [
         ],
         "key_label": "A year of reading",
         "concepts_intro": (
-            "This course has shown that knowing words and knowing subjects change a rate "
-            "more than technique does. Both come mostly from reading."
+            "This course has measured what knowing the words and knowing the subject do "
+            "to a reading. Much of both is thought to come from reading itself."
         ),
         "concepts": [
             ("Volume is a product",
@@ -994,12 +1001,14 @@ LESSONS = [
                   "rather than taught. Both lines of evidence are correlational or rest "
                   "on estimates: readers who read more grow more, and the studies cannot "
                   "fully separate the reading from the readers."),
-            ("p", "Put the course together and the order of the levers is plain. A rate "
+            ("p", "Put the course together. A rate "
                   "is a rate on a kind of text; it falls on hard text, on text full of "
                   "unknown words and on unfamiliar subjects; and the words and subjects "
-                  "you know come largely from what you have read. Reading faster is "
-                  "worth training, and this Subject trains it every day. Reading more is "
-                  "the larger lever, and it is the one that makes the next text easier."),
+                  "you know come, on the best estimates, largely from what you have "
+                  "read. Reading faster is worth training, and this Subject trains it "
+                  "every day. Reading more is the larger lever on how much you read, "
+                  "and if the correlational studies point the right way, it is also "
+                  "the one that makes the next text easier."),
             ("p", "The next course, Remembering What You Read, asks what is kept of all "
                   "those words, and measures it."),
         ],

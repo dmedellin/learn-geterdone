@@ -39,7 +39,7 @@ COURSE = {
     ),
     "outcomes_intro": (
         "By the end you can say what kind of text a rate was measured on, and put a "
-        "number on four things that change a rate more than any technique: "
+        "number on four things besides technique that shape a reading: "
         "difficulty, unknown words, what you already know, and how much you read."
     ),
     "outcomes": [

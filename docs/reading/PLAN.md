@@ -325,7 +325,10 @@ should see a specialist, not a drill.
      which delivered more understood words per minute.
    - **Standard:** given two readings' words, seconds and scores, compute both
      effective rates and name the larger, without the lab.
-   - **Lab:** `drill/compare`, `ratioOf: err`. Presets: `pushed-too-far` (A:
+   - **Lab:** `drill/compare`, `ratioOf: err`, `order: AB` (the natural-pace
+     baseline first, so that it is not taken straight after the fast reading;
+     with `alternate` the log's length after lesson 1 made every course-following
+     reader read B first). Presets: `pushed-too-far` (A:
      400 words, 100 s, 6/6 → 240 wpm, effective 240; B: 400, 50 s, 2/6 → 480
      wpm, effective 160), `worth-it` (A as before; B 400, 75 s, 5/6 → 320 wpm,
      effective ≈ 266.7). Pins `drWpmA`, `drWpmB`, `drErrA`, `drErrB`,
@@ -412,8 +415,10 @@ should see a specialist, not a drill.
 Modules: `The pacer`, `Pushing the pace`.
 
 The tradition's techniques, done the way the tradition does them, each
-measured. Its `how_to` says that the research finds modest rate gains with
-comprehension held, and that the large savings come in Skimming, Scanning and
+measured. Its `how_to` attributes the evidence's conclusion to Rayner et al.
+2016 at its own strength (doubling or tripling a rate with comprehension held
+is unlikely; practice in reading and language is the way to read faster with
+comprehension), and says that the large savings come in Skimming, Scanning and
 Previewing and in Words, Knowledge and Difficulty.
 
 1. **reading-with-a-pacer** — Reading with a Pacer — *The pacer* — 10 min — *drill first*
@@ -713,17 +718,17 @@ Modules: `The inner voice`, `Flashing words`.
    - **Standard:** given both readings, compute both effective rates and the
      difference, and say why a reading where the counting lapsed does not
      count.
-   - **Lab:** `drill/compare`, B `suppress: true`. Presets: `typical` (A 392
-     words in 96 s → 245, 6/6 → 245; B 393 words in 90 s → 262, 4/6 →
-     ≈ 174.7; ≈ −70.3), `easy-text` (A 403 in 93 s → 260, 6/6; B 399 in 90 s
+   - **Lab:** `drill/compare`, B `suppress: true`. Presets: `typical` (A `P27`'s
+     409 words in 98.16 s → 250, 6/6 → 250; B `P28`'s 402 words in 90 s →
+     268, 4/6 → ≈ 178.7; ≈ −71.3), `easy-text` (A 403 in 93 s → 260, 6/6; B 399 in 90 s
      → 266, 5/6 → ≈ 221.7; ≈ −38.3). Pins `drErrA`, `drErrB`, `drErrDiff`.
    - **Misconception:** "Eliminating subvocalisation is the key to speed
      reading." In studies that suppressed inner speech, comprehension of
      difficult text fell while easy text held up (Hardyck and Petrinovich, by
-     muscle feedback); counting aloud impaired passage comprehension
+     muscle feedback); counting while reading impaired passage comprehension
      (Slowiaczek and Clifton). The studies are few and small, and suppression
      also adds a second task.
-   - **Worked:** 262 × 4/6 ≈ 174.7 against 245.
+   - **Worked:** 268 × 4/6 ≈ 178.7 against 250.
    - **Sources:** Hardyck and Petrinovich 1970; Slowiaczek and Clifton 1980;
      Rayner et al. 2016.
 
@@ -828,7 +833,9 @@ Modules: `Scanning and skimming`, `Reading strategically`.
 1. **scanning-for-a-target** — Scanning for a Target — *Scanning and skimming* — 8 min
    - **Drill:** `scan/find` on `S01` (613 words; then `S02`, 590, on a second visit, first
      unread served): five targets, the reader selects the answering word by
-     click or keyboard; timed per target (`other`). On a phone the scroll is
+     click or keyboard; timed per target (`test`, so that The Full Battery's
+     profile reads the first and latest scan; a scan is not a reading and never
+     enters the rate curve). On a phone the scroll is
      inside the timing, and the panel says so.
    - **Do:** compute seconds per target and words passed over per second, and
      say why scanning is not reading.
@@ -849,7 +856,8 @@ Modules: `Scanning and skimming`, `Reading strategically`.
    - **Drill:** `drill/single` with the `gist` display on `P32` (594 words):
      headings and first sentences only (141 words), for 40 s (`limit: 40`),
      under a third of a full reading at 240 (148.5 s); then four gist
-     questions (`condition`).
+     questions (`test`, for the profile's skim row; a gist display never
+     enters the rate curve).
    - **Do:** compute the share of the text a skim shows and gist questions
      right per minute.
    - **Standard:** given words shown, words in all and the time, compute the
@@ -880,9 +888,10 @@ Modules: `Scanning and skimming`, `Reading strategically`.
      the choice.
    - **Misconception:** "A skim is a fast read with a little less
      understanding." Gist suffers less than detail (Masson 1982); skimmers who
-     choose where to look do better on the important points than readers
-     forced through the whole text at the same speed, still below a full
-     reading (Duggan and Payne 2009).
+     choose where to look, given time for half a text, remember more of its
+     important ideas than readers who read half of it, but no more of its
+     details (Duggan and Payne 2009; they had no untimed full-reading
+     condition).
    - **Worked:** detail 1/3 against 3/3; gist 2/3 against 3/3.
    - **Sources:** Masson 1982; Duggan and Payne 2009.
 
@@ -1108,7 +1117,8 @@ Modules: `Recall`, `Keeping it`.
      11 idea units → 7/11 ≈ 63.6%; illustrative) and `published-shape`
      (Roediger and Karpicke 2006, Experiment 1, rounded and labelled, as
      scores out of 100: 54 restudy and 68 test at two days → +14 points;
-     recall 75/100; the five-minute 81% and 75% are in the body). Pins
+     recall 70/100, the tested group's initial free recall (20.9 of 30 idea
+     units); the five-minute 81% and 75% are in the body). Pins
      `reDelayedA`, `reDelayedB`, `reDelayedDiff`, `reRecallB`.
    - **Misconception:** "Reading it again is the best way to remember it."
      Rereading wins on an immediate test and loses on a delayed one. Their test
@@ -1216,7 +1226,8 @@ Modules: `The plan`, `The test`.
      `drVsRecent`.
    - **Misconception:** "A plateau means I have reached my limit." It often
      means the practice has stopped asking for more, or that the gains were
-     specific to the practice material; a new kind of text tells which.
+     specific to the practice material; readings of a new kind of text help
+     tell which.
    - **Worked:** 270 on practised text, 200 on the argument (300 × 4/6): the
      gain did not carry.
    - **Sources:** Ericsson, Krampe and Tesch-Römer 1993; Rayner et al. 2016.

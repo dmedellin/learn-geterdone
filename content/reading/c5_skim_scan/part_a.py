@@ -56,7 +56,9 @@ LESSONS = [
                   "as the first Sunday sailing. Click the word that answers it, or Tab "
                   "to it and press Enter; a wrong click is counted and you keep looking. "
                   "If you cannot find a target, press Skip this one. Five prompts, one "
-                  "clock, and the result is logged as a scan, not as a reading. On a "
+                  "clock, and the result is logged as a scan test: it never enters your "
+                  "rate curve, because a scan is not a reading, but The Full Battery at "
+                  "the end of the Subject reads your first scan and your latest. On a "
                   "phone, scrolling the page is part of the search, and the clock "
                   "includes it."),
             ("p", "When the fifth prompt is answered or skipped, the panel fills with two "
@@ -108,6 +110,7 @@ LESSONS = [
             "mode": "scan",
             "view": "find",
             "passages": [PASSAGES["S01"], PASSAGES["S02"]],
+            "kind": "test",
             "preset": "quick",
             "presets": [
                 {"id": "quick", "label": "Five found in 40 seconds",
@@ -159,8 +162,8 @@ LESSONS = [
             ],
             "after": [
                 "Over nine hundred words a minute went past the reader's eyes, and they "
-                "took in five times and prices from them, because nothing else was "
-                "asked. That is what the figure measures: the speed of a search.",
+                "took in five answers from them, two times, a fare, a ship's name and a "
+                "check-in rule, because nothing else was asked. That is what the figure measures: the speed of a search.",
             ],
         },
         "quiz_title": "Check the search",
@@ -194,7 +197,7 @@ LESSONS = [
                   "measurement of scanning?",
              "a": ["On a second search you remember where things are, so it measures memory too",
                    "The clock runs more slowly on a second visit",
-                   "The kit chooses different targets on a second visit",
+                   "A second search is given a shorter time limit",
                    "A second search is always slower because of fatigue"],
              "c": 0,
              "why": "The targets and the text are the same on a second run, and knowing "
@@ -203,7 +206,7 @@ LESSONS = [
         "mistakes": [
             ("Taking scanning for fast reading",
              "In the quick preset 919.5 words a minute went past, and nothing in them "
-             "was understood except five times and prices. Scanning is a search for a "
+             "was taken in except the five answers. Scanning is a search for a "
              "known form, a number or a name, and not reading for meaning; Carver "
              "(1990) counted it a gear of its own, whose goal is finding rather than "
              "understanding. Its speed says nothing about how fast you read."),
@@ -281,7 +284,9 @@ LESSONS = [
                   "see only the headings and the first sentence of each paragraph of a "
                   "passage about glaciers, then four questions about its gist. Take in "
                   "what you are shown as quickly as you like; the display ends by "
-                  "itself, and the result is logged as a condition, not a test."),
+                  "itself. The result is logged as a skim test: a skim never enters "
+                  "your rate curve, but The Full Battery at the end of the Subject "
+                  "reads your first skim and your latest."),
             ("p", "Look at your score before anything else, because whatever it was, it "
                   "came from under a quarter of the text. The skim showed 141 of the "
                   "passage's 594 words; the rest was never on the screen. A reader who "
@@ -300,9 +305,9 @@ LESSONS = [
                   "worth reading, the 40-second skim told you nearly as much in half the "
                   "time; if one wrong idea about it would mislead you, the extra 40 "
                   "seconds bought the fourth answer."),
-            ("p", "Notice what the panel does not print. The line under the drill reports "
-                  "the passage's 594 words over your 40 seconds, 891 words a minute, "
-                  "because it reports every drill that way; the panel does not go on to "
+            ("p", "Notice what the panel does not print. It shows the passage's 594 words "
+                  "and your 40 seconds as two tiles and stops there: it does not divide "
+                  "one by the other, which would be 891 words a minute, and it does not "
                   "multiply that by your score. Three in four would make an effective "
                   "rate of about 668, nearly three times an ordinary reading, earned on "
                   "words that were never shown. A skim covers a passage the way a map "
@@ -321,12 +326,13 @@ LESSONS = [
             ("p", "The studies of skimming say the same from the other side. Masson "
                   "(1982), with readers skimming stories, found that skimming lowered "
                   "their understanding of the important points as well as the "
-                  "unimportant ones, but lowered it less. Duggan and Payne (2009) found "
-                  "that readers skimming under time pressure did better on the important "
-                  "points than readers made to go through the whole text at the same "
-                  "speed, because they chose where to look, and still worse than a full "
-                  "reading. A skim keeps more of the gist than of the detail. It does not "
-                  "keep all of it."),
+                  "unimportant ones, but lowered it less. Duggan and Payne (2009) gave "
+                  "readers only enough time to read half of an expository text: those "
+                  "who skimmed all of it remembered more of its important ideas than "
+                  "those who read half of it at a normal pace, though no more of its "
+                  "less important details, because they chose where to look. A skim "
+                  "keeps more of the gist than of the detail. It does not keep all of "
+                  "it."),
             ("p", "The 40-second limit is under a third of the time a full reading of this "
                   "passage takes for anyone reading below about 300 words a minute: at "
                   "240, the 594 words take 594 × 60 / 240 = 148.5 seconds. Set your own "
@@ -342,7 +348,7 @@ LESSONS = [
             "passage": PASSAGES["P32"],
             "display": "gist",
             "limit": 40,
-            "kind": "condition",
+            "kind": "test",
             "preset": "first-sentences",
             "presets": [
                 {"id": "first-sentences", "label": "Three of four in 40 seconds",
@@ -503,9 +509,8 @@ LESSONS = [
         "body": [
             ("p", "The drill has two readings; do them in the order the lab gives above "
                   "them. The one labelled Skim is the reef passage, shown whole for 40 "
-                  "seconds and then taken away. The prompt under it says to read at your usual pace; "
-                  "for this one, skim instead, however you skim, because the passage "
-                  "disappears when the 40 seconds run out. It is logged as a condition. "
+                  "seconds and then taken away by itself; skim it however you skim, and "
+                  "press Done only if you finish sooner. It is logged as a condition. "
                   "The other is the volcano passage, read in full at your usual pace and "
                   "logged as a test. Each is followed by six questions, three on the gist "
                   "and three on details, and the panel scores the two kinds separately."),
@@ -535,11 +540,10 @@ LESSONS = [
             ("p", "The typical preset is the pattern the studies report. Masson (1982), "
                   "with readers skimming stories, found that skimming lowered their "
                   "understanding of the important points as well as the unimportant "
-                  "ones, but lowered it less. Duggan and Payne (2009) found that readers "
-                  "skimming under time pressure did better on the important points than "
-                  "readers made to go through the whole text at the same speed, and still "
-                  "worse than readers who read it all. In a phrase: gist suffers less "
-                  "than detail. Both studies were laboratory tasks, and your two "
+                  "ones, but lowered it less. Duggan and Payne (2009), giving readers "
+                  "time for only half of a text, found that skimming all of it kept more "
+                  "of the important ideas than reading half of it, and no more of the "
+                  "less important details. In a phrase: gist suffers less than detail. Both studies were laboratory tasks, and your two "
                   "passages are not theirs."),
             ("p", "If your skim kept the details as well as your reading did, you have not "
                   "refuted the studies, and they have not refuted you. One pair of "
@@ -560,7 +564,8 @@ LESSONS = [
             "passages": [PASSAGES["P33"], PASSAGES["P34"]],
             "kinds": True,
             "a": {"display": "normal", "limit": 40, "kind": "condition",
-                  "label": "Skim (the passage disappears at 40 seconds)"},
+                  "label": "Skim (the passage disappears at 40 seconds)",
+                  "intro": "Skim this one, however you skim: the passage disappears after 40 seconds."},
             "b": {"display": "normal", "kind": "test", "label": "Full reading"},
             "preset": "typical",
             "presets": [
@@ -654,9 +659,9 @@ LESSONS = [
         "mistakes": [
             ("Treating a skim as a fast reading with a little less understanding",
              "A skim does not lose evenly. Gist suffers less than detail (Masson 1982), "
-             "and skimmers who choose where to look keep more of the important points "
-             "than readers pushed through the whole text at the same speed, still below "
-             "a full reading (Duggan and Payne 2009). In the typical preset the skim "
+             "and with time for only half of a text, skimmers who choose where to look "
+             "keep more of the important points than readers who read half of it, but "
+             "no more of the details (Duggan and Payne 2009). In the typical preset the skim "
              "lost one gist question and two of three details."),
             ("Choosing by the effective rate",
              "In the typical preset the skim's 307.5 beat the reading's 258, and the "

@@ -74,7 +74,7 @@ LESSONS = [
                   "above your aloud rate. The published averages already say "
                   "otherwise: Brysbaert's review puts silent reading of non-fiction at "
                   "about 238 words a minute and reading aloud at about 183. On average, "
-                  "adults read silently about 1.3 times as fast as they speak."),
+                  "adults read silently about 1.3 times as fast as they read aloud."),
             ("def", ("The ratio",
                      "The <strong>silent-to-aloud ratio</strong> is the silent rate "
                      "divided by the aloud rate, each in words a minute. Above 1, you "
@@ -106,7 +106,9 @@ LESSONS = [
                   "speaking pace, and a reader performing a text aloud is attending to "
                   "the performance as much as to the meaning. The silent side still "
                   "prints its comprehension and effective rate, so you can see that the "
-                  "rate was a reading and not a skim."),
+                  "rate was a reading and not a skim; and because it is logged as a test, "
+                  "the verdict tile sets its rate against your baseline range, as it does "
+                  "for any test reading."),
             ("p", "If you cannot read aloud where you are, press &ldquo;I can&rsquo;t "
                   "read aloud here&rdquo;. The lab writes Brysbaert's oral average, 183 "
                   "words in 60 seconds, into the aloud side, labels it as a published "
@@ -178,7 +180,7 @@ LESSONS = [
             ],
             "after": [
                 "The average reader reads silently about 1.3 times as fast as they "
-                "speak. The "
+                "read aloud. The "
                 "advice to eliminate the voice assumes the voice sets the speed; the "
                 "ratio shows that silent reading is already past the speed of speech.",
             ],
@@ -233,8 +235,8 @@ LESSONS = [
              "Silent reading is already faster than reading aloud on average: about "
              "238 words a minute against 183 in Brysbaert's review. Inner speech is "
              "not full articulation, so it is not held to the speed of the mouth. A "
-             "voice that accompanies reading at 1.3 times the speed of speech is not "
-             "a brake set at speaking pace."),
+             "voice that accompanies reading at 1.3 times the pace of reading aloud is "
+             "not a brake set at speaking pace."),
             ("Reading the published averages as targets",
              "238 and 183 are averages over many readers and many texts. A reader "
              "whose ratio is 1.5 or 1.1 is not ahead or behind; the ratio only has to "
@@ -321,12 +323,13 @@ LESSONS = [
                   "whole way&rdquo; only if you did. Both readings have six questions, "
                   "and both are logged as condition readings, outside your baselines "
                   "and tests."),
-            ("p", "The preset <strong>typical</strong> is a reader who read 392 words "
-                  "normally in 96 seconds with all six questions right, which is 245 "
-                  "wpm and an effective rate of 245, and 393 words while counting in 90 "
-                  "seconds with four right. The counting reading was faster, 262 wpm, "
-                  "and its effective rate is 262 × 4/6, about 174.7. The difference "
-                  "tile reads about −70.3 wpm: the reader went 17 words a minute faster "
+            ("p", "The preset <strong>typical</strong> is a reader who read the 409 words "
+                  "of <em>Riding on Warm Air</em> normally in 98.16 seconds with all six "
+                  "questions right, which is 250 wpm and an effective rate of 250, and "
+                  "the 402 words of <em>Trees That Stand in the Sea</em> while counting "
+                  "in 90 seconds with four right. The counting reading was faster, 268 "
+                  "wpm, and its effective rate is 268 × 4/6, about 178.7. The difference "
+                  "tile reads about −71.3 wpm: the reader went 18 words a minute faster "
                   "and lost two questions, and the product says the trade was a bad "
                   "one."),
             ("p", "The preset <strong>easy-text</strong> is a reader on easier text: "
@@ -341,8 +344,8 @@ LESSONS = [
                   "muscles in the throat and fed it back to readers so that they could "
                   "learn to keep it quiet; when they did, comprehension of the "
                   "difficult text fell, while comprehension of the easy text held up. "
-                  "Slowiaczek and Clifton (1980) had readers count aloud, as in this "
-                  "drill, and found that it impaired their comprehension of passages "
+                  "Slowiaczek and Clifton (1980) had readers count while they read, the "
+                  "method this drill copies, and found that it impaired their comprehension of passages "
                   "they read, though not of passages they heard."),
             ("p", "That last contrast is worth a second look. Counting did not stop "
                   "people understanding language in general; it hurt reading. The "
@@ -361,7 +364,9 @@ LESSONS = [
                   "Petrinovich found the cost."),
             ("p", "Look at the rates as well as the effective rates. If your counting "
                   "reading was a little faster, that is the experience the advice is "
-                  "built on, and it is real. The question the effective rate "
+                  "built on, and it is real. The verdict tile sets the counting reading's "
+                  "rate against your baseline range; a rate above the range once is that "
+                  "experience in a number, not a result. The question the effective rate "
                   "asks is whether what you understood kept up with the speed."),
             ("p", "Next, the tradition's other way past the voice: show the words one "
                   "at a time, faster than any voice could say them. One Word at a Time "
@@ -375,10 +380,10 @@ LESSONS = [
             "b": {"label": "Counting under your breath", "suppress": True},
             "preset": "typical",
             "presets": [
-                {"id": "typical", "label": "245 normally, 262 while counting",
-                 "wordsA": 392, "secondsA": 96, "correctA": 6, "totalA": 6,
-                 "wordsB": 393, "secondsB": 90, "correctB": 4, "totalB": 6,
-                 "expect": {"drErrA": "245 wpm", "drErrB": "≈ 174.7 wpm", "drErrDiff": "≈ −70.3 wpm"}},
+                {"id": "typical", "label": "250 normally, 268 while counting",
+                 "wordsA": 409, "secondsA": "98.16", "correctA": 6, "totalA": 6,
+                 "wordsB": 402, "secondsB": 90, "correctB": 4, "totalB": 6,
+                 "expect": {"drErrA": "250 wpm", "drErrB": "≈ 178.7 wpm", "drErrDiff": "≈ −71.3 wpm"}},
                 {"id": "easy-text", "label": "260 normally, 266 while counting",
                  "wordsA": 403, "secondsA": 93, "correctA": 6, "totalA": 6,
                  "wordsB": 399, "secondsB": 90, "correctB": 5, "totalB": 6,
@@ -416,18 +421,18 @@ LESSONS = [
         "worked": {
             "title": "The typical reader",
             "intro": [
-                "Normally: 245 wpm with six of six right. While counting: 262 wpm with "
+                "Normally: 250 wpm with six of six right. While counting: 268 wpm with "
                 "four of six.",
             ],
             "lines": [
-                "A: 245 × 6/6 = 245 words a minute",
-                "B: 262 × 4/6 ≈ 174.7 words a minute",
-                "B − A ≈ −70.3 words a minute",
+                "A: 250 × 6/6 = 250 words a minute",
+                "B: 268 × 4/6 ≈ 178.7 words a minute",
+                "B − A ≈ −71.3 words a minute",
             ],
             "after": [
-                "The counting reading was 17 words a minute faster and two questions "
-                "worse, and its effective rate is lower by about 70. Exactly, "
-                "262 × 4/6 = 524/3, and 524/3 − 245 = −211/3.",
+                "The counting reading was 18 words a minute faster and two questions "
+                "worse, and its effective rate is lower by about 71. Exactly, "
+                "268 × 4/6 = 536/3, and 536/3 − 250 = −214/3.",
             ],
         },
         "quiz_title": "Reading a suppression result",
@@ -477,8 +482,8 @@ LESSONS = [
             ("Eliminating subvocalisation is the key to speed reading",
              "In the studies that suppressed inner speech, comprehension of difficult "
              "text fell while easy text held up (Hardyck and Petrinovich, by feedback "
-             "from the speech muscles), and counting aloud impaired comprehension of "
-             "passages (Slowiaczek and Clifton). The studies are few and small, and "
+             "from the speech muscles), and counting while reading impaired comprehension "
+             "of passages (Slowiaczek and Clifton). The studies are few and small, and "
              "suppression also adds a second task, but none of them found the voice "
              "to be a cost-free brake."),
             ("Counting a reading where the counting lapsed",
@@ -486,7 +491,7 @@ LESSONS = [
              "reading. It cannot be compared with anything as a suppressed reading. "
              "The tick is there so that the log knows which readings to trust."),
             ("Reading the rate and not the effective rate",
-             "A counting reading can be a little faster. A rate that rose by 17 "
+             "A counting reading can be a little faster. A rate that rose by 18 "
              "words a minute while two questions were lost is a lower effective rate, "
              "and the effective rate is the one that counts what you understood."),
         ],
@@ -1249,7 +1254,7 @@ LESSONS = [
                   "in one fixation. You can change the fixation and saccade times in "
                   "the panel; shorter fixations help, but to bring 1,500 inside the "
                   "perceptual span, a fixation and its saccade together would have to "
-                  "take 100 ms, well under half the average fixation alone."),
+                  "take 100 ms, less than half the average fixation alone."),
             ("p", "The second computation asks what was understood. Each preset "
                   "assumes half the questions right, and the panel prints the "
                   "effective rate: 375 for the triple-speed claim, 750 for the novel an "
@@ -1258,8 +1263,9 @@ LESSONS = [
                   "of questions was answered cannot fill the box at all."),
             ("p", "The third is the bookshelf. A 90,000-word novel at Brysbaert's 238 "
                   "words a minute takes 90,000 / 238, about 378 minutes, a little over "
-                  "six hours. At the triple-speed 750 it is 120 minutes, and at 1,500 "
-                  "it is the hour the claim promises. Woody Allen's line puts the "
+                  "six hours. At the triple-speed 750 it is 120 minutes, at 1,500 "
+                  "it is the hour the claim promises, and at the page-at-a-glance 10,500 "
+                  "the book tile reads about 8.6 minutes. Woody Allen's line puts the "
                   "result of the fastest claims best: &ldquo;I took a speed-reading "
                   "course and read <em>War and Peace</em> in twenty minutes. It "
                   "involves Russia.&rdquo;"),
@@ -1402,7 +1408,8 @@ LESSONS = [
              "The verdict holds at the stated settings. Shorter fixations and skipped "
              "words raise what a skilled reader manages, which is why the settings can "
              "be changed; but a novel an hour would need a fixation and its saccade "
-             "to take 100 ms together, well under half an average fixation."),
+             "to take 100 ms together just to come within the perceptual span, less "
+             "than half an average fixation."),
         ],
         "standard": (
             "Finish when you can follow a claim through three computations and name its test.",

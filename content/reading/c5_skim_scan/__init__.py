@@ -21,7 +21,7 @@ COURSE = {
         "Time a search through a timetable, skim a passage by its first sentences, "
         "score a skim on gist and detail separately, find out whether a preview pays "
         "for its own time, inspect a book in five minutes, plan a reading list that "
-        "fits an hour, and see whether you slow down where a text gets hard."
+        "fits a 45-minute budget, and see whether you slow down where a text gets hard."
     ),
     "key": [
         "per target = seconds / targets found",
@@ -73,7 +73,7 @@ COURSE = {
         "Score by purpose. A skim is scored on its gist, a scan on its search, a "
         "preview on the effective rate with its own time counted. A rate in words a "
         "minute is the right number only for a full reading.",
-        "Keep the Daily Drill going. Nothing in this course is the practice pool, "
+        "Keep the Daily Drill going. None of this course's drills replaces it, "
         "and the last step of every lesson is today's Daily Drill, so that your log "
         "of test readings keeps filling while you learn to read less of a text.",
         "Read a comparison as one measurement. What Skimming Costs and Previewing "

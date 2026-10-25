@@ -135,7 +135,7 @@ LESSONS = [
              "Time spent deciding whether you have finished belongs to the reading; time "
              "spent on the questions does not."),
             ("Compute both rates",
-             "Words × 60 / seconds, and characters / 6 × 60 / seconds. Write both down with "
+             "`words × 60 / seconds`, and `characters / 6 × 60 / seconds`. Write both down with "
              "the date and the text, and say which one you compare with which figure."),
         ],
         "worked": {
@@ -255,8 +255,8 @@ LESSONS = [
              "score falls by more than half has gone down."),
             ("Two readings, two passages",
              "A passage cannot be read for the first time twice, so a comparison uses two "
-             "different texts, and one of them comes first. Both facts can move the result, "
-             "and the lab records which came first."),
+             "different texts, and one of them comes first. Both facts can move the result; "
+             "here the natural-pace reading always comes first, and the lab records it."),
         ],
         "read_title": "Two readings side by side",
         "read_intro": (
@@ -265,8 +265,9 @@ LESSONS = [
         "body": [
             ("p", "Do the drill below before reading on. It has two timed readings: one at your "
                   "natural pace, as in Words per Minute, and one, in the box labelled “As fast "
-                  "as you can”, as fast as you can make yourself go. The page chooses which comes first, and each passage is "
-                  "followed by its six questions, with the text hidden."),
+                  "as you can”, as fast as you can make yourself go. Read the natural-pace one first, as the page sets "
+                  "them out, and each passage is followed by its six questions, with the text "
+                  "hidden."),
             ("p", "Look at your two readings side by side. If the second was faster — and for "
                   "most people told to go as fast as they can, it is, often by a lot — look "
                   "next at the questions. The usual result is a rate that went up and a score "
@@ -296,7 +297,7 @@ LESSONS = [
                   "effective 160. The rate doubled and the effective rate fell by 80, to "
                   "two-thirds of A's."),
             ("p", "The worth-it preset changes only B: 400 words in 75 seconds with five "
-                  "right, so 320 words a minute and an effective rate of 320 × 5/6 ≈ 266.7, "
+                  "right, so 320 words a minute and an effective rate of `320 × 5/6 ≈ 266.7`, "
                   "about 26.7 more than A's 240. Here the faster reading delivered more. The "
                   "lesson is not that slow is good; it is that the product decides, and a "
                   "faster reading that keeps most of its score can win."),
@@ -308,19 +309,26 @@ LESSONS = [
             ("p", "Two readings differ in more than their pace. They are different passages, "
                   "“How Bread Rises” and “Fog on the Crossing”, an explanation and a story, "
                   "and one came first, so the second may be helped by warming up or hurt by "
-                  "fatigue; the page sets the order from your log, alternating, and records "
-                  "it. If your fast reading came out ahead, you have not refuted the usual "
+                  "fatigue. Here the natural-pace reading always comes first, because it is "
+                  "a baseline, and a baseline taken straight after a sprint would measure the "
+                  "sprint as well; so the fast reading always has the warm-up and the fatigue, "
+                  "and the lab records the order. If your fast reading came out ahead, you have not refuted the usual "
                   "result, and the usual result has not refuted you: it is one pair of "
                   "readings on two passages."),
-            ("p", "The questions were written so that a guess from general knowledge fails. "
+            ("p", "The questions were written to be answered from the passage, not from general "
+                  "knowledge, though a reader who happens to know a topic may still get one "
+                  "without it. "
                   "Rayner and his colleagues' 2016 review of speed reading, published after "
                   "Rayner's death in 2015, makes the point that a comprehension test which "
                   "can be passed without reading the text says nothing about the reading."),
             ("p", "Your natural-pace reading is logged as your second baseline. The fast one "
                   "is logged as a condition: it stays in your log, and no verdict counts it. "
-                  "The last tile sets rate B against your baseline range, and with one "
-                  "baseline so far that range is a single reading: leave the tile until One "
-                  "Reading Is One Measurement has given you three."),
+                  "The last tile will set rate B against your baseline range once your log "
+                  "holds three baselines; until then it says how many more it needs, and One "
+                  "Reading Is One Measurement supplies them. Its wording about chance is "
+                  "written for natural-pace tests: a reading you deliberately pushed is "
+                  "expected to land above the range, and for it the tile's “one time in four” "
+                  "does not apply."),
             ("p", "Next, One Reading Is One Measurement: two more natural-pace readings, and "
                   "how far your rate moves between them with nothing changed."),
         ],
@@ -333,7 +341,7 @@ LESSONS = [
                   "intro": "Read this one as fast as you can make yourself go, then answer its "
                            "questions as well as you can."},
             "ratioOf": "err",
-            "order": "alternate",
+            "order": "AB",
             "panel_intro": (
                 "Your measurement. Reading A is at your natural pace. Reading B is the other "
                 "condition: as fast as you can make yourself go, as its box says. Press Start, "
@@ -369,7 +377,7 @@ LESSONS = [
              "The text is hidden for a reason: a question answered by rereading measures the "
              "rereading."),
             ("Multiply before you compare",
-             "Rate × right / asked for each reading, then compare the two products, not the "
+             "`rate × right / asked` for each reading, then compare the two products, not the "
              "two rates."),
             ("Discount one question",
              "If the scores differ by one question, or the effective rates by less than one "
@@ -392,7 +400,7 @@ LESSONS = [
             "after": [
                 "Twice the rate, a third of the score, two-thirds of the understood words "
                 "per minute. Had B kept four questions instead of two, its effective rate "
-                "would have been 480 × 4/6 = 320, and the faster reading would have won.",
+                "would have been `480 × 4/6 = 320`, and the faster reading would have won.",
             ],
         },
         "quiz_title": "Which reading delivered more",
@@ -402,14 +410,14 @@ LESSONS = [
              "a": ["A, at 300 against 250", "B, at 250 against 200",
                    "They are equal", "A, at 200 against 166.7"],
              "c": 1,
-             "why": "A: 300 × 4/6 = 200. B: 250 × 6/6 = 250. The slower reading delivered "
+             "why": "A: `300 × 4/6 = 200`. B: `250 × 6/6 = 250`. The slower reading delivered "
                     "more understood words per minute."},
             {"q": "In the pushed-too-far preset, reading B runs at 480 words a minute with "
                   "2 of 6 right. What is its effective rate?",
              "a": ["80 words a minute", "240 words a minute", "160 words a minute",
                    "320 words a minute"],
              "c": 2,
-             "why": "480 × 2/6 = 160. Eighty is one question's worth, and 320 would need four "
+             "why": "`480 × 2/6 = 160`. Eighty is one question's worth, and 320 would need four "
                     "questions right."},
             {"q": "Two natural-pace readings score 5 of 6 and 4 of 6. What does the lesson "
                   "let you conclude about comprehension?",
@@ -455,9 +463,10 @@ LESSONS = [
         ),
         "note": (
             "Two readings, two passages, one order. The passages differ in kind as well as "
-            "content, and whichever reading came first may have helped or tired the second; "
-            "the lab alternates the order from one log to the next and records it, but one pair of "
-            "readings cannot separate pace from passage or from order."
+            "content, and the natural-pace reading always comes first, so that your baseline "
+            "is not taken after a sprint; whatever the first reading does to the second, "
+            "warming you up or tiring you, falls on the fast one. One pair of readings cannot "
+            "separate pace from passage or from order."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -656,9 +665,9 @@ LESSONS = [
         "mistakes": [
             ("“My rate on one test is my reading speed”",
              "One test is one passage on one day. The wide preset's reader read at 212 and "
-             "at 268 with nothing changed, 56 words a minute apart; the tight reader's 13 "
-             "is still more than many claimed gains. A rate describes a reading, not a "
-             "reader."),
+             "at 268 with nothing changed, 56 words a minute apart; even the tight reader's "
+             "13 is wider than the difference most comparisons in this Subject will show. A "
+             "rate describes a reading, not a reader."),
             ("“A reading above my range means I improved”",
              "With nothing changed, a fourth reading is above the range of three about one "
              "time in four. The one-high preset's 262 is a hopeful sign and nothing more "
@@ -928,7 +937,7 @@ LESSONS = [
              "questions, and they are what verdicts use. Practice, condition and other "
              "entries are kept and listed, and never counted."),
             ("The log scores effective rates",
-             "Each counted session is scored as rate × comprehension, so a reading that got "
+             "Each counted session is scored as `rate × comprehension`, so a reading that got "
              "faster by understanding less does not look like progress."),
             ("The verdict uses the rule",
              "The baseline sessions set the baseline range; the median of the last three "
@@ -959,7 +968,10 @@ LESSONS = [
                   "baselines first and treats them as the baseline. After this course your "
                   "log should hold four sessions: three baselines and “Lights on the Coast”, "
                   "your first test, which One Reading Is One Measurement set against the "
-                  "range by its rate."),
+                  "range by its rate. Here it is scored by its effective rate, so the two "
+                  "pages can give that one reading different verdicts: a fast reading with "
+                  "a question wrong can be above the range in words and inside, or even below, "
+                  "it in understood words."),
             ("p", "The starting preset is a log with three baselines, at effective rates of "
                   "238, 251 and 245: a baseline median of 245 and the verdict “needs a "
                   "reading after the three baselines”. Three readings make a range; they "
@@ -1058,7 +1070,7 @@ LESSONS = [
              "a": ["288, 354 and 488", "240, 236 and 244", "240, 295 and 407",
                    "48, 118 and 244"],
              "c": 1,
-             "why": "288 × 5/6 = 240, 354 × 4/6 = 236 and 488 × 3/6 = 244. The rate rose "
+             "why": "`288 × 5/6 = 240`, `354 × 4/6 = 236` and `488 × 3/6 = 244`. The rate rose "
                     "by 200 words a minute; the effective rate did not move."},
             {"q": "A pacer reading at 320 words a minute scores 6 of 6, logged as practice. "
                   "What does it do to the verdict?",

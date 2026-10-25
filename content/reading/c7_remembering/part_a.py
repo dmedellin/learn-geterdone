@@ -38,8 +38,8 @@ LESSONS = [
             ("Recall and recognition",
              "Choosing the right option from four is recognition: the answer is on the "
              "screen and you only have to know it when you see it. Writing down what "
-             "you remember is recall: nothing on the screen helps. Recall scores lower "
-             "for the same reading, and is closer to what you can use once the text "
+             "you remember is recall: nothing on the screen helps. Recall usually scores "
+             "lower for the same reading, and is closer to what you can use once the text "
              "is gone."),
             ("A recall-adjusted rate",
              "The effective rate multiplies your rate by the share of questions you got "
@@ -219,9 +219,9 @@ LESSONS = [
             ("Recognising the right answer is remembering it",
              "Multiple choice measures recognition: the answer is on the screen, and "
              "you need only know it when you see it. Free recall is harder, and closer "
-             "to what you can use later. A reader who picks four of six right options "
-             "may, asked to write the passage down, give back only about half of its "
-             "ideas: the typical preset recalls 7 of 12."),
+             "to what you can use later. A reader who picks five of six right options "
+             "may, asked to write the passage down, give back little more than half of "
+             "its ideas: the typical preset pairs 5 of 6 questions with 7 of 12 units."),
             ("Ticking what the list reminds you of",
              "Once the idea units are on the screen, half-remembered facts feel "
              "familiar, and familiarity is recognition again. Tick only what your "
@@ -304,12 +304,11 @@ LESSONS = [
             ("p", "From that date, every page of this Subject shows a banner with a link "
                   "back here, and this page offers the delayed test: both passages' six "
                   "questions, twelve in all, with neither passage shown. It is offered "
-                  "once, and it writes your two delayed scores into the boxes. Until "
-                  "then the boxes hold the presets, and you can finish the lesson today "
-                  "on them and come back for your own figures. The last box, the recall "
-                  "at the time, keeps the preset's count after the test: note the "
-                  "number of units you ticked when you score the recall today, and type "
-                  "it in on the day."),
+                  "once, and it writes your two delayed scores into the boxes, with the "
+                  "idea units you ticked today in the last two, so that every figure on "
+                  "the page is then your own. Until then the boxes hold the presets, and "
+                  "you can finish the lesson today on them and come back for your own "
+                  "figures."),
             ("p", "The design follows Roediger and Karpicke (2006). In their first "
                   "experiment students studied short prose passages either by reading "
                   "them twice, or by reading once and then taking a free-recall test "
@@ -321,9 +320,9 @@ LESSONS = [
             ("p", "The published-shape preset puts those two-day figures in the boxes as "
                   "scores out of 100, rounded and labelled as the study's: 54 for the "
                   "passage read twice, 68 for the passage recalled, a difference of +14 "
-                  "points. Its last box holds 75 of 100, the tested group's score on the "
-                  "five-minute test, the nearest thing in these figures to a recall at "
-                  "the time."),
+                  "points. Its last box holds 70 of 100, the recall at the time: on the "
+                  "free-recall test that took the place of a second reading, students "
+                  "wrote down about 70% of the passage's idea units."),
             ("math", [
                 "              5 minutes   2 days",
                 "read twice    ≈ 81%       ≈ 54%",
@@ -372,9 +371,9 @@ LESSONS = [
                  "expect": {"reDelayedA": "1/3 ≈ 33.3%", "reDelayedB": "2/3 ≈ 66.7%",
                             "reDelayedDiff": "≈ +33.3 points", "reRecallB": "7/11 ≈ 63.6%"}},
                 {"id": "published-shape", "label": "Published shape (Roediger and Karpicke 2006, rounded)",
-                 "delA": 54, "delB": 68, "total": 100, "units": 100, "recalled": 75,
+                 "delA": 54, "delB": 68, "total": 100, "units": 100, "recalled": 70,
                  "expect": {"reDelayedA": "27/50 = 54%", "reDelayedB": "17/25 = 68%",
-                            "reDelayedDiff": "+14 points", "reRecallB": "3/4 = 75%"}},
+                            "reDelayedDiff": "+14 points", "reRecallB": "7/10 = 70%"}},
             ],
             "panel_title": "Two ways of studying, tested two days later",
             "panel_intro": (
@@ -583,9 +582,9 @@ LESSONS = [
                   "the evidence is mixed: Karpicke and Roediger (2007) found that "
                   "expanding retrieval helped retention in the short term, and that "
                   "equally spaced retrieval did as well or better over the longer term."),
-            ("p", "A review of a reading is best done as the last lesson suggests: a "
-                  "free recall with the text closed, then a look back at what you "
-                  "missed, rather than a reread. Ten minutes covers an article."),
+            ("p", "A review of a reading is best done as Retrieval Beats Rereading "
+                  "suggests: a free recall with the text closed, then a look back at "
+                  "what you missed, rather than a reread. Ten minutes covers an article."),
             ("p", "Next, Notes in Your Own Words turns the recall into something you "
                   "keep: a short summary written from memory, counted by the idea units "
                   "it holds."),

@@ -99,7 +99,7 @@ LESSONS = [
                   "It breaks two rules all the same. An hour is four to six times the "
                   "routine's session, so most of each sitting comes after attention "
                   "has started to leave the text; and five days of the seven are "
-                  "empty, so every reading of the week shares one day's conditions."),
+                  "empty, so the week's readings share two days' conditions, not five."),
             ("p", "The preset all-sprints is seven fifteen-minute sessions of sprints "
                   "above comfort: 7 × 15 = 105 minutes, the same total as "
                   "fifteen-a-day, and the test-share tile reads no test in the week. "
@@ -115,9 +115,9 @@ LESSONS = [
                   "the result. How much of expert performance such practice explains "
                   "is contested, and their study was of music, not reading; the "
                   "routine borrows its shape, not a promise."),
-            ("p", "What a week of practice can be expected to give is modest. The "
-                  "research finds modest rate gains with comprehension held; the large "
-                  "savings are in Skimming, Scanning and Previewing and in Words, "
+            ("p", "What a week of practice can be expected to give is modest. Rayner "
+                  "and colleagues (2016) concluded that doubling or tripling a rate "
+                  "with comprehension held is unlikely; the large savings are in Skimming, Scanning and Previewing and in Words, "
                   "Knowledge and Difficulty. A good week can therefore include a "
                   "deliberate skim of something you would otherwise have read through, "
                   "written as its own row."),
@@ -327,10 +327,12 @@ LESSONS = [
         ),
         "body": [
             ("p", "The warm-up above the lab is a test reading of a passage about "
-                  "rainbows, at natural pace, with six questions. Do it first, so that "
-                  "your own curve ends with today. The passage comes from the standard "
-                  "band of the practice pool, the band of your baselines, so it can "
-                  "stand beside them on the chart."),
+                  "rainbows, at natural pace, with six questions. Do it first, then "
+                  "press Show my log under the panel, so that your own curve ends with "
+                  "today: the panel reads your log when the page opens and when you "
+                  "press the button, not when the warm-up scores. The passage comes "
+                  "from the standard band of the practice pool, the band of your "
+                  "baselines, so it can stand beside them on the chart."),
             ("p", "The lab reads your log and keeps only the baseline and test "
                   "readings that had questions. It puts every baseline first and the "
                   "tests after them, sets the box for the number of baselines, and "
@@ -430,9 +432,9 @@ LESSONS = [
              "A reading at natural pace with no pacer, with its questions, from the "
              "Daily Drill's test box or a lesson's warm-up."),
             ("Open your log and strike what does not count",
-             "On this page, check that the counted sessions are your baselines and "
-             "tests; practice, conditions, skims and readings without questions are "
-             "greyed, and stay out."),
+             "On this page, press Show my log after the test, then check that the "
+             "counted sessions are your baselines and tests; practice, conditions, "
+             "skims and readings without questions are greyed, and stay out."),
             ("Read the median, not the peak",
              "Find the median of the last three tests and set it against the "
              "baseline range. Then give the verdict in the Subject's three tiers: "
@@ -544,7 +546,7 @@ LESSONS = [
         "slug": "plateaus-and-transfer",
         "title": "Plateaus and Transfer",
         "module": "The test",
-        "one_line": "Read a dense argument, a kind of text you have not practised, and set its effective rate beside your baseline range and your recent tests.",
+        "one_line": "Read a dense argument, a kind of text you have hardly practised, and set its effective rate beside your baseline range and your recent tests.",
         "summary": (
             "Gains made on the practice passages may or may not carry to other kinds "
             "of text. The drill is one timed reading of a hard argument with six "
@@ -569,8 +571,8 @@ LESSONS = [
             ("Transfer",
              "A gain transfers when it shows on material you did not practise on. "
              "Your tests were already on fresh pool passages, which is a short step; "
-             "this lesson takes a longer one, to a kind of text the pool did not "
-             "contain."),
+             "this lesson takes a longer one, to a kind of text the pool hardly "
+             "contained."),
             ("A plateau has more than one cause",
              "Weeks of tests at the same level can mean the practice has stopped "
              "asking for more, or that the gains belonged to the practice material. "
@@ -578,9 +580,9 @@ LESSONS = [
              "helps tell them apart."),
             ("One reading, no baseline",
              "Your baselines were on standard narrative and expository passages. A "
-             "hard argument has never been measured for you before today, so today's "
-             "reading is the first of its kind, not a test against a baseline of its "
-             "kind."),
+             "hard argument has never been among your baselines, so today's reading "
+             "is the first of its kind in your series, not a test against a baseline "
+             "of its kind."),
         ],
         "read_title": "A new kind of text, read cold",
         "read_intro": (
@@ -589,8 +591,9 @@ LESSONS = [
         ),
         "body": [
             ("p", "The drill is one reading of In Praise of Maintenance, an argument "
-                  "of 389 words written at the hard band, the kind of prose the "
-                  "practice pool did not give you: long sentences, an objection "
+                  "of 389 words written at the hard band, a kind of prose the "
+                  "practice gave you rarely, if at all (the Daily Drill's eighteen "
+                  "pool passages hold one argument): long sentences, an objection "
                   "answered, a claim built across paragraphs. Read it at your natural "
                   "pace with no pacer, then answer the six questions. It is logged as "
                   "other, not as a test, for the reason this lesson is about: it "
@@ -602,7 +605,9 @@ LESSONS = [
                   "the lab fills the baseline range and the recent test median from "
                   "your log, the same figures as on the Reading Your Curve page, and "
                   "sets today's effective rate against each before you decide "
-                  "anything."),
+                  "anything. The recent median fills only once your log holds three "
+                  "tests; with fewer, its box keeps whatever it shows, so clear it, or "
+                  "read the last tile as a comparison with the example."),
             ("p", "Suppose your recent test median is 270 effective words a minute "
                   "against a baseline range of 238 to 251, a change by the Subject's "
                   "rule, and suppose the tests have stayed near 270 for some weeks. "
@@ -616,7 +621,7 @@ LESSONS = [
                   "97.25 seconds, 240 words a minute, all six questions right, an "
                   "effective rate of 240. That is inside the old baseline range and 30 "
                   "below the recent median of 270. It is slower than the practised "
-                  "kind, as harder text is for everyone, and comprehension held. It is "
+                  "kind, as harder text often is, and comprehension held. It is "
                   "consistent with some of the gain carrying over, and also with none: "
                   "without a reading of this kind from before the practice, one "
                   "reading cannot say which."),
@@ -636,9 +641,9 @@ LESSONS = [
                   "improves the practised task more than tasks that only resemble it; "
                   "Rayner and colleagues (2016) found the evidence weak that eye "
                   "exercises carry over to reading, and the brain-training games have "
-                  "met the same difficulty in general. The research on reading "
-                  "practice itself finds modest rate gains with comprehension held. "
-                  "Ericsson, Krampe and Tesch-Römer (1993) described deliberate "
+                  "met the same difficulty in general. On reading itself, Rayner "
+                  "and colleagues concluded that a large gain in rate with "
+                  "comprehension held is unlikely. Ericsson, Krampe and Tesch-Römer (1993) described deliberate "
                   "practice as practice at the edge of what you can do, which is the "
                   "first thing to check when a curve goes flat."),
             ("p", "So the reading tells you where to look. If it went like does-not, "
@@ -769,11 +774,12 @@ LESSONS = [
         "mistakes": [
             ("A plateau means I have reached my limit",
              "A plateau often means the practice has stopped asking for more, or that "
-             "the gains were specific to the practice material. A new kind of text "
-             "tells which: the reader in does-not kept the practised rate of 300 on "
-             "the argument and lost two questions, a gain tied to the practice "
-             "material, and the reader in transfers held comprehension at a slower "
-             "rate, which points back at the practice."),
+             "the gains were specific to the practice material. Readings of a new kind "
+             "of text help tell which: the reader in does-not kept the practised rate "
+             "of 300 on the argument and lost two questions, which fits a gain tied to "
+             "the practice material, and the reader in transfers held comprehension "
+             "at a slower rate, which points more toward the practice. One reading "
+             "each is a start, not the answer."),
             ("Treating a first reading as a failed test",
              "An effective rate of 240 on a hard argument against a recent median of "
              "270 on standard passages is not a fall. It is the first reading of a "
@@ -860,9 +866,12 @@ LESSONS = [
                   "gist, scan and recall rows take the first and the latest of the "
                   "skims, scans and free recalls your log holds as baseline or test "
                   "readings, from Skimming, Scanning and Previewing and from "
-                  "Remembering What You Read. A row your log cannot fill keeps the "
-                  "example: type your own figures there if you have them, and "
-                  "otherwise read that row as an example."),
+                  "Remembering What You Read. Skimming for Gist, Scanning for a Target "
+                  "and Free Recall log their drills as tests, so those rows fill "
+                  "from your log; where it holds only one reading of a kind, then "
+                  "and now are that same reading. A row your log cannot fill keeps the example: type "
+                  "your own figures there if you have them, and otherwise read that "
+                  "row as an example."),
             ("ul", [
                 "Effective rate: tests at natural pace with questions, here and in the Daily Drill.",
                 "Skim gist: the gist questions answered after a timed skim, as in Skimming for Gist.",
@@ -896,8 +905,10 @@ LESSONS = [
                   "places, not one: understanding more per minute, knowing when a "
                   "skim is enough, finding a fact without reading for it, and keeping "
                   "what was read so that it need not be read again. Skimming, "
-                  "Scanning and Previewing and Words, Knowledge and Difficulty argued "
-                  "that the large savings are in the second and third, not the first."),
+                  "Scanning and Previewing argued that the large savings are in the "
+                  "second and third, not the first; Words, Knowledge and Difficulty, "
+                  "that what you know and how much you read move a rate more than any "
+                  "technique."),
             ("p", "To make a row say something, measure it the way the effective rate "
                   "was measured: three readings to give a range, then tests. A row "
                   "that matters to you can become a row of your plan: a skim or a scan "
@@ -950,8 +961,9 @@ LESSONS = [
              "The warm-up here the first time; after that, a test at natural pace "
              "from the Daily Drill's test box."),
             ("Fill the profile",
-             "Press Fill from my log, type today's effective rate into the box for "
-             "now, and type any figures your log cannot supply from the latest skim, "
+             "Press Fill from my log: today's test is the latest it reads, and your "
+             "tests are listed so that the verdict is on the median of the last "
+             "three. Type any figures your log cannot supply from the latest skim, "
              "scan and recall you have done."),
             ("Judge each row by its readings",
              "Effective rate by the median of the last three tests against the range; "
@@ -1002,14 +1014,14 @@ LESSONS = [
                     "Subject's rule the change stands; the tile does not look at the "
                     "other rows, and it can say inside as well as once."},
             {"q": "Gist after a skim went from 2 of 3 to 3 of 3. What is that?",
-             "a": ["A 50% gain in skimming",
+             "a": ["A gain in skimming, by the Subject's rule",
                    "One question: the smallest step the measure can take, one reading each side",
                    "Proof that the skimming practice worked",
                    "A fall, because no rate is shown"],
              "c": 1,
              "why": "Three gist questions make each one a third of the score, so one "
                     "more right answer is the smallest possible move, and two readings "
-                    "make no range. A skim reports gist answers, not an effective rate."},
+                    "make no range, so it is not a gain by the rule. A skim reports gist answers, not an effective rate."},
             {"q": "Why take the battery fresh and in one sitting?",
              "a": ["The drills stop working after fifteen minutes",
                    "The log keeps only one sitting a day",
@@ -1032,10 +1044,12 @@ LESSONS = [
              "readings on two different texts. Without a range there is no telling "
              "them from the variation of an ordinary week, and the effective rate's "
              "range of 13 with nothing changed is a reminder of how large that is."),
-            ("Taking the verdict tile as the Subject's rule",
-             "The tile sets the latest test against the range, which is the one-in-four "
-             "comparison. The rule is the median of the last three tests: work it from "
-             "Reading Your Curve, and use the tile as the latest reading's place."),
+            ("Taking the preset's verdict tile as the Subject's rule",
+             "With no tests listed, as in the presets, the tile sets the one rate now "
+             "against the range, which is the one-in-four comparison. The rule is the "
+             "median of the last three tests: the fill lists yours, so your own tile "
+             "follows the rule, and for the presets work the median from the body as "
+             "Reading Your Curve does."),
         ],
         "standard": (
             "Finish when you can say which measures of a profile have changed.",
@@ -1047,9 +1061,10 @@ LESSONS = [
             "The battery's effective rate is the only row with a range; the other "
             "three are one reading against one, each on a different text, so the "
             "profile shows where to look rather than what has changed. The page's "
-            "warm-up asks no free recall and the profile's fill does not read it, so "
-            "today's rate is typed by hand and the recall row comes from Remembering "
-            "What You Read; the verdict tile judges one effective rate alone."
+            "warm-up asks no free recall, so the recall row comes from Remembering "
+            "What You Read. The fill lists your tests, today's warm-up included, and "
+            "the verdict follows the median rule on them; the presets list none, so "
+            "their tile judges one effective rate alone."
         ),
     },
 ]

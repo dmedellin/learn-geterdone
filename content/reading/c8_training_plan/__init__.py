@@ -14,7 +14,7 @@ COURSE = {
     "summary": (
         "A week of practice planned under a time budget, a log read by the "
         "Subject's rule for a real change, a first reading of a kind of text you "
-        "have not practised, and a profile of four measures set beside your first "
+        "have hardly practised, and a profile of four measures set beside your first "
         "ones. The last course of the Subject, worked on your own numbers."
     ),
     "blurb": (

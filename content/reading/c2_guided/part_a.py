@@ -42,8 +42,8 @@ LESSONS = [
         ),
         "concepts": [
             ("A pacer sets the pace, line by line",
-             "The highlight moves to the next line after that line's words × "
-             "60,000 / target milliseconds, so a line of twelve words at 250 words "
+             "The highlight moves to the next line after that line's `words × "
+             "60,000 / target` milliseconds, so a line of twelve words at 250 words "
              "a minute is lit for 2,880 ms. Your eyes still do the reading; the "
              "highlight only says when to move on."),
             ("The question is the effective rate",
@@ -92,30 +92,30 @@ LESSONS = [
                   "shows why the stops set the limit."),
             ("p", "On this page the pacer is a highlight with an underline. When you "
                   "press Start, the lab groups the passage's words into lines as your "
-                  "screen has laid them out, and lights each line for its words × "
-                  "60,000 / target milliseconds. A long line stays lit longer than a "
+                  "screen has laid them out, and lights each line for its `words × "
+                  "60,000 / target` milliseconds. A long line stays lit longer than a "
                   "short one, so the pace in words a minute is the same whatever the "
                   "layout. The tile for the pacer's time per line is computed for a "
-                  "stated line of twelve words: at a target of 250, 12 × 60,000 / 250 "
-                  "= 2,880 ms."),
+                  "stated line of twelve words: at a target of 250, `12 × 60,000 / 250 "
+                  "= 2,880 ms`."),
             ("p", "The preset <strong>steadier</strong> is one plausible pair of "
                   "readings. Reading A, unpaced: 442 words in 110.5 seconds, 240 words "
-                  "a minute, with 4 of 6 right, so an effective rate of 240 × 4/6 = "
-                  "160. Reading B, with the pacer at 250: 418 words in 100.32 seconds, "
-                  "250 words a minute, 5 of 6 right, an effective rate of ≈ 208.3. B "
-                  "is ahead by ≈ 48.3 understood words a minute, and it is tempting to "
+                  "a minute, with 4 of 6 right, so an effective rate of `240 × 4/6 = "
+                  "160`. Reading B, with the pacer at 250: 418 words in 100.32 seconds, "
+                  "250 words a minute, 5 of 6 right, an effective rate of `≈ 208.3`. B "
+                  "is ahead by `≈ 48.3` understood words a minute, and it is tempting to "
                   "stop there."),
             ("p", "Look at where the 48.3 comes from. B's rate is only 10 words a "
                   "minute higher; nearly all the difference is one more question "
-                  "right. One question in six is ≈ 16.7 points of comprehension, and "
-                  "at 250 words a minute it is worth 250/6 ≈ 41.7 understood words a "
+                  "right. One question in six is about 16.7 points of comprehension, and "
+                  "at 250 words a minute it is worth `250/6 ≈ 41.7` understood words a "
                   "minute. Give B four right instead of five and its effective rate is "
-                  "250 × 4/6 ≈ 166.7, only ≈ 6.7 above A. A one-question difference "
+                  "`250 × 4/6 ≈ 166.7`, only about 6.7 above A. A one-question difference "
                   "is not a result: a slightly easier question or a moment's "
                   "inattention moves it."),
             ("p", "The preset <strong>no-difference</strong> keeps both rates and "
-                  "gives both readings 5 of 6. A is 240 × 5/6 = 200, B is ≈ 208.3, a "
-                  "difference of ≈ 8.3, made only of the 10 words a minute the target "
+                  "gives both readings 5 of 6. A is `240 × 5/6 = 200`, B is `≈ 208.3`, a "
+                  "difference of about 8.3, made only of the 10 words a minute the target "
                   "was set above A's rate. That is the highlight doing what it was "
                   "told, with understanding unchanged. Both presets look like most "
                   "first comparisons: a small difference, inside what one question or "
@@ -127,12 +127,15 @@ LESSONS = [
                 "Was your attention on the text or on the highlight?",
             ]),
             ("p", "Those three questions are worth answering in a sentence in your "
-                  "log, because the numbers cannot. Whichever way your comparison "
+                  "log (the Add note box in Keeping a Practice Log), because the numbers "
+                  "cannot. Whichever way your comparison "
                   "went, it is one comparison. If the pacer cost you comprehension, "
                   "you have not refuted the readers who say it steadies them, and "
                   "they have not refuted you; if it helped, the same holds the other "
                   "way. The pacer stays in this course as a practice tool: a way of "
-                  "holding a pace you choose for a whole passage."),
+                  "holding a pace you choose for a whole passage. In your log the "
+                  "unpaced reading is a test and the paced one a condition, so only the "
+                  "first counts toward a verdict."),
             ("p", "The next lesson, Choosing a Target Pace, sets the pacer above your "
                   "natural rate in three steps and finds the fastest of them at which "
                   "you still understand."),
@@ -214,15 +217,15 @@ LESSONS = [
                   "of ten words?",
              "a": ["3,000 ms", "2,000 ms", "200 ms", "1,800 ms"],
              "c": 1,
-             "why": "10 × 60,000 / 300 = 2,000 ms. One word gets 60,000 / 300 = 200 "
-                    "ms, which is the per-word figure, not the line's."},
+             "why": "`10 × 60,000 / 300 = 2,000 ms`. One word gets `60,000 / 300 = 200 "
+                    "ms`, which is the per-word figure, not the line's."},
             {"q": "In the steadier preset, reading B's effective rate is ≈ 208.3 and "
                   "A's is 160. What would B's effective rate be with one question "
                   "fewer right?",
              "a": ["≈ 166.7", "≈ 191.7", "160", "200"],
              "c": 0,
              "why": "B read at 250 words a minute; with 4 of 6 right its effective rate "
-                    "is 250 × 4/6 ≈ 166.7. Nearly all of the 48.3 was one question."},
+                    "is `250 × 4/6 ≈ 166.7`. Nearly all of the 48.3 was one question."},
             {"q": "A reader's paced reading scored one question more than the unpaced "
                   "one, and its effective rate was higher. What can they conclude?",
              "a": ["The pacer improves their comprehension",
@@ -230,7 +233,7 @@ LESSONS = [
                    "Nothing yet: one question, on a different passage, is not a result",
                    "The pacer should now be used for all their reading"],
              "c": 2,
-             "why": "One question is ≈ 16.7 points, and the two readings differ in "
+             "why": "One question is about 16.7 points, and the two readings differ in "
                     "passage and in order as well as in the pacer. It takes more "
                     "comparisons, or the log's tests, to say more."},
             {"q": "What does a pacer do, on the account this lesson gives?",
@@ -257,8 +260,8 @@ LESSONS = [
              "how much of any difference is one question."),
             ("Expecting every line to take the tile's time",
              "The tile states the time for a line of twelve words. Your screen's "
-             "lines may hold eight or fifteen, and each is lit for its own words × "
-             "60,000 / target. The rate is the same; only the time per line "
+             "lines may hold eight or fifteen, and each is lit for its own `words × "
+             "60,000 / target`. The rate is the same; only the time per line "
              "differs."),
         ],
         "standard": (
@@ -328,7 +331,7 @@ LESSONS = [
             ("p", "The drill below is a ladder: three passages, each read with the "
                   "pacer, each at a faster target than the last. Before you start, "
                   "put your own rungs into the three target boxes: your baseline "
-                  "rate, that rate × 6/5, and that rate × 3/2. “Use my baseline "
+                  "rate, that `rate × 6/5`, and that `rate × 3/2`. “Use my baseline "
                   "median” fills all three from your log, or type them. From a baseline of "
                   "240 they are 240, 288 and 360; from 200, they are 200, 240 and "
                   "300. Keep your eyes on the lit line and let each reading end when "
@@ -347,8 +350,8 @@ LESSONS = [
                   "questions, and they can name different rungs."),
             ("p", "The preset <strong>holds-at-288</strong> is a reader whose "
                   "comprehension gives way as the pace rises: 6 of 6 at 240, 4 of 6 "
-                  "at 288, 2 of 6 at 360. The effective rates are 240 × 6/6 = 240, "
-                  "288 × 4/6 = 192 and 360 × 2/6 = 120. The hold target is 288, the "
+                  "at 288, 2 of 6 at 360. The effective rates are `240 × 6/6 = 240`, "
+                  "`288 × 4/6 = 192` and `360 × 2/6 = 120`. The hold target is 288, the "
                   "fastest rung with four right. The best run is 240, the slowest. At "
                   "360 this reader moved through the words half again as fast as at "
                   "240 and took away half as many understood words a minute."),
@@ -377,7 +380,7 @@ LESSONS = [
                   "pacer itself unsettled you; take the hold as your baseline rate "
                   "for now."),
             ("p", "Every rung is one reading of one passage, and the three passages "
-                  "are matched, not identical. One question is ≈ 16.7 points, so a "
+                  "are matched, not identical. One question is about 16.7 points, so a "
                   "rung that scored three instead of four may have been one hard "
                   "question away from holding. If your ladder looks unlike either "
                   "preset, you have not refuted the tradition's advice to push the "
@@ -457,7 +460,7 @@ LESSONS = [
                 "best run: 240 (highest effective rate)",
             ],
             "after": [
-                "360 × 2/6 = 120 is less than 288 × 4/6 = 192: beyond the hold, the "
+                "`360 × 2/6 = 120` is less than `288 × 4/6 = 192`: beyond the hold, the "
                 "effective rate falls. The reader practises at 288 and, for a reading "
                 "that matters today, reads at 240.",
             ],
@@ -468,7 +471,7 @@ LESSONS = [
              "a": ["200, 220 and 250", "200, 240 and 300", "200, 250 and 300",
                    "200, 240 and 400"],
              "c": 1,
-             "why": "200 × 1 = 200, 200 × 6/5 = 240, 200 × 3/2 = 300."},
+             "why": "`200 × 1 = 200`, `200 × 6/5 = 240`, `200 × 3/2 = 300`."},
             {"q": "A ladder at 250, 300 and 375 scores 5, 4 and 3 questions right of "
                   "six. What is the hold target?",
              "a": ["250", "375", "300", "There is none"],
@@ -479,7 +482,7 @@ LESSONS = [
              "a": ["250, at ≈ 208.3", "300, at 200", "375, at 187.5",
                    "All three are equal"],
              "c": 0,
-             "why": "250 × 5/6 ≈ 208.3, 300 × 4/6 = 200, 375 × 3/6 = 187.5. The best "
+             "why": "`250 × 5/6 ≈ 208.3`, `300 × 4/6 = 200`, `375 × 3/6 = 187.5`. The best "
                     "run is the slowest rung, which is not the hold."},
             {"q": "Why does the Daily Drill practise at the hold target rather than at "
                   "the best run's pace?",
@@ -521,7 +524,7 @@ LESSONS = [
         "note": (
             "A ladder is three readings of three different passages in a fixed "
             "order, so the fastest rung always comes last, when you are most "
-            "practised and perhaps most tired; and one question is ≈ 16.7 points. "
+            "practised and perhaps most tired; and one question is about 16.7 points. "
             "The hold it finds is a starting point for practice, not a measurement "
             "of what you can do."
         ),
@@ -611,16 +614,26 @@ LESSONS = [
                   "<strong>next target</strong> applies the rule to your last "
                   "readings at your latest target. The <strong>next test</strong> "
                   "counts the practice sessions since your last test; four of them "
-                  "make the fifth a test."),
+                  "make the fifth a test. Paced practice readings from other lessons "
+                  "count as sessions too, so the three rungs of your ladder already "
+                  "stand in that count, and your first test may fall due sooner than "
+                  "the fifth session here."),
+            ("p", "One caution about those tests. The pool starts with eight easy "
+                  "passages, and your baselines were standard ones, so a test that "
+                  "falls on an easy passage is likely to come out faster for that "
+                  "reason alone. Read an early test above your range as the passage "
+                  "as much as you; the tests that compare fairly with your baselines "
+                  "are the ones on standard passages, from “The Engineer of the "
+                  "Pond” on, and the tests the later lessons log."),
             ("p", "The preset <strong>three-holds</strong> is a reader with three "
                   "paced readings at 288 that scored 5, 4 and 5 of six. All three "
-                  "held, so the hold target is 288 and the next target is 288 × "
-                  "21/20 = 302.4. They have had three practice sessions since their "
+                  "held, so the hold target is 288 and the next target is `288 × "
+                  "21/20 = 302.4`. They have had three practice sessions since their "
                   "last test, so the test is one session away."),
             ("p", "The preset <strong>two-misses</strong> is a reader whose last two "
                   "paced readings at 288 scored 3 of six each. There is no hold yet "
-                  "at 288, and two misses in a row bring the target down to 288 × "
-                  "19/20 = 273.6. Two practice sessions since the last test leave "
+                  "at 288, and two misses in a row bring the target down to `288 × "
+                  "19/20 = 273.6`. Two practice sessions since the last test leave "
                   "two more before the next."),
             ("p", "The preset <strong>test-due</strong> is a reader with four paced "
                   "readings at 288 scoring 4, 3, 5 and 4. The last three are not all "
@@ -633,16 +646,19 @@ LESSONS = [
                   "you can do, with immediate feedback. Their study was of musicians, "
                   "and how much of expert performance such practice explains is "
                   "disputed. The routine borrows the shape, not a promise. On reading "
-                  "itself, Rayner and colleagues' 2016 review finds that the gains "
-                  "from training without loss of comprehension are modest. What the "
+                  "itself, Rayner and colleagues' 2016 review concluded that readers "
+                  "are unlikely to double or triple their rate while understanding as "
+                  "well as at their normal pace. What the "
                   "routine guarantees is a log in which your tests can show what "
                   "happened, whichever way it goes."),
             ("p", "If the pool runs out, the lab says so; keep going with your own "
                   "text: open &ldquo;Or paste a text of your own&rdquo; above the "
                   "Start button and paste it there. Your own text "
                   "has no questions, so it is logged as practice and its "
-                  "comprehension is not scored: it keeps the habit going, and the "
-                  "tests keep the measurement going."),
+                  "comprehension is not scored, and it cannot be a test: it keeps the "
+                  "habit going, while the tests, which need a passage with questions, "
+                  "come from the pool while it lasts and afterwards from the readings "
+                  "the later lessons log as tests."),
             ("p", "From here on, every lesson in the Subject ends with this session. "
                   "The next lesson, Sprints Above Comfort, tries one of the "
                   "tradition's ways of pushing the pace, and judges it by the same "
@@ -713,7 +729,7 @@ LESSONS = [
                 "two misses instead: 288 × 19/20 = 273.6",
             ],
             "after": [
-                "Three more holds at 302.4 would raise it to 302.4 × 21/20 = 317.52. A "
+                "Three more holds at 302.4 would raise it to `302.4 × 21/20 = 317.52`. A "
                 "twentieth at a time, the target moves slowly, which is the point: one "
                 "day's reading cannot move it far.",
             ],
@@ -724,14 +740,14 @@ LESSONS = [
                   "six. What is their next target?",
              "a": ["300", "285", "330", "315"],
              "c": 3,
-             "why": "Three holds in a row at 300 raise it by a twentieth: 300 × 21/20 "
-                    "= 315."},
+             "why": "Three holds in a row at 300 raise it by a twentieth: `300 × 21/20 "
+                    "= 315`."},
             {"q": "Their last two paced readings at 260 scored 3 of six each. What is "
                   "the next target?",
              "a": ["247", "260", "273", "234"],
              "c": 0,
-             "why": "Two misses in a row lower the target by a twentieth: 260 × 19/20 "
-                    "= 247."},
+             "why": "Two misses in a row lower the target by a twentieth: `260 × 19/20 "
+                    "= 247`."},
             {"q": "A reader has done four practice sessions since their last test. "
                   "What should today's session be?",
              "a": ["Another paced session at the hold target",
@@ -849,10 +865,12 @@ LESSONS = [
                   "rate, because the range is made of rates."),
             ("p", "The preset <strong>after-sprint</strong> is a reader with a "
                   "baseline range of 238 to 251. After the sprint, their test reads "
-                  "at 268 words a minute with 5 of 6 right, an effective rate of 268 "
-                  "× 5/6 ≈ 223.3. 268 is 268 − 251 = 17 above the top of the range: "
+                  "at 268 words a minute with 5 of 6 right, an effective rate of `268 "
+                  "× 5/6 ≈ 223.3`. 268 is `268 − 251 = 17` above the top of the range: "
                   "the lab says &ldquo;above the baseline range once &mdash; a fourth "
-                  "reading does this about one time in four&rdquo;."),
+                  "reading does this about one time in four&rdquo;. The sprint's own "
+                  "tile is the pacer's time per line: at 480, a twelve-word line is lit "
+                  "for `12 × 60,000 / 480 = 1,500 ms`, half what it had at 240."),
             ("p", "That verdict is exactly as strong as it sounds. With nothing "
                   "changed at all, a fourth reading is the highest of four about one "
                   "time in four, so a single test above a range of three baselines is "
@@ -860,7 +878,7 @@ LESSONS = [
                   "is not yet a change."),
             ("p", "The preset <strong>no-effect</strong> is the same reader on "
                   "another day: a test at 247 words a minute with 5 of 6 right, "
-                  "effective ≈ 205.8, inside the range. The sprint felt the same, and "
+                  "an effective rate of about 205.8, inside the range. The sprint felt the same, and "
                   "the test shows nothing a reading without one would not have "
                   "shown."),
             ("h3", "What would make it evidence"),

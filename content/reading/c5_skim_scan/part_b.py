@@ -108,9 +108,10 @@ LESSONS = [
                   "can begin with the fourth and fifth chapters and the calendar. That "
                   "last sentence is the best thing an inspection can find: a reason not "
                   "to start on page one."),
-            ("p", "Seconds per target found is the same figure as in Scanning for a "
-                  "Target, and here it means something a little different, because these "
-                  "targets need a moment's thought about where a book would put a thing. "
+            ("p", "Seconds per target found, which the panel here labels seconds per right "
+                  "answer, is the same arithmetic as in Scanning for a Target, and it means "
+                  "something a little different here, because these targets need a "
+                  "moment's thought about where a book would put a thing. "
                   "The panel also prints the words passed over per second, which is "
                   "beside the point for an inspection: it is not trying to cover the "
                   "text."),
@@ -316,10 +317,11 @@ LESSONS = [
                   "nearly nine-tenths of the value at the rate you already have. Skip the "
                   "four low documents instead of skimming them and it takes 30 minutes "
                   "and covers 28/36 = 7/9, about 77.8%."),
-            ("p", "Duggan and Payne (2009) studied readers with more text than time: "
-                  "readers skimming under that pressure did better on the important "
-                  "points than readers made to go through everything at the same speed, "
-                  "because they chose where to look. A reading list asks for the same "
+            ("p", "Duggan and Payne (2009) studied readers with more text than time, "
+                  "enough for half of each text: those who skimmed all of it remembered "
+                  "more of its important ideas than those who read half of it, because "
+                  "they chose where to look, and the advantage depended on how easily "
+                  "they could move around the text. A reading list asks for the same "
                   "choice one level up, between documents instead of within one."),
             ("p", "The plan is only as good as its values. If the parking study matters "
                   "more to your team than it does here, change its value and the plan; "
@@ -427,7 +429,7 @@ LESSONS = [
              "Reading the whole pile in 45 minutes would need about 333.3 words a "
              "minute, a third faster than 250. Reading four documents and skimming four "
              "fits at 250 with 5 minutes to spare and 8/9 of the value. Choosing what "
-             "not to read saves more time than any rate gain."),
+             "not to read saved more time here than a rate gain you could count on."),
             ("Working through a pile in the order it arrived",
              "The order of arrival is nobody's judgement of value. In the skip-wrong "
              "preset it put the newsletter first and left the facilities manager's "

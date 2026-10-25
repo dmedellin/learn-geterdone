@@ -264,7 +264,7 @@ LESSONS = [
              "is the question of Looking Back."),
         ],
         "standard": (
-            "Compute a budget by hand",
+            "Finish when you can compute the budget by hand.",
             "Given a fixation and a saccade duration, characters per saccade, a regression share "
             "and characters per word, compute fixations per word and words a minute by hand, "
             "exactly or to one decimal, and say which of the five quantities moves the rate most "
@@ -337,8 +337,9 @@ LESSONS = [
                   "times it was asked, and your span is the farthest position on each side where "
                   "it was at least one half. One caution before you read your own: with four "
                   "choices a pure guess is right one time in four, and twenty flashes of three "
-                  "marks ask each position only about four times, so one lucky answer can move a "
-                  "position by a quarter."),
+                  "marks ask each position only about four times on average (the positions are "
+                  "drawn at random, so some are asked more and some hardly at all), so one lucky "
+                  "answer can move a position by a quarter."),
             ("p", "The <strong>typical</strong> preset writes out a reader whose every position "
                   "was asked ten times: 10/10 at the centre, 9/10 at one letter either side, 8/10 "
                   "at two, 6/10 at three, 4/10 at four, and 2/10 from five outwards. Its tiles "
@@ -360,14 +361,14 @@ LESSONS = [
                   "reader picks up mostly the lengths of words."),
             ("p", "The lopsidedness is attention, not the eye. For readers of Hebrew, which runs "
                   "right to left, the span is larger to the left (Pollatsek, Bolozky, Well and "
-                  "Rayner 1981). The span is also smaller on hard text and somewhat larger in "
-                  "faster, more skilled readers (Rayner, Slattery and B&eacute;langer 2010). So it "
+                  "Rayner 1981). The span is also smaller on hard text (Rayner 1998) and somewhat larger "
+                  "in faster, more skilled readers (Rayner, Slattery and B&eacute;langer 2010). So it "
                   "is set by acuity and by attention together, and it does move a little."),
             ("p", "What it does not do, on any evidence, is reach a whole line. Some speed-reading "
-                  "courses teach readers to take in a line, or a page, at a glance. Your own "
-                  "drill puts a number on why that is a large claim: past three or four letters "
-                  "either side, even unrelated letters with your full attention on them were "
-                  "mostly guesses. A line of 65 characters is about eight word-identification "
+                  "courses teach readers to take in a line, or a page, at a glance. If your own "
+                  "drill came out like the typical preset, it puts a number on why that is a "
+                  "large claim: past three or four letters either side, even letters you were "
+                  "trying to catch were mostly guesses. A line of 65 characters is about eight word-identification "
                   "spans long."),
             ("p", "The worked example reads one side of the typical preset: 6/10 at +3 and 4/10 "
                   "at +4. The identification of random letters ends between those two positions, "
@@ -472,19 +473,21 @@ LESSONS = [
              "words are identified only within about 7 to 8 letters to the right. It is smaller on "
              "hard text and somewhat larger in skilled readers, but there is no evidence that "
              "training widens it to a line. Your drill measures a related but different span, "
-             "letters with no context, and it ended a few letters from the centre too."),
+             "letters with no context, and in the typical preset it ends three letters from "
+             "the centre."),
             ("Reading the drill's span as the reading span",
              "Random letters, flashed, with no words and no direction, measure letter "
              "identification by position. The reading span is measured with real text and is "
              "lopsided. A symmetric left 3, right 3 does not contradict the reading figures; it "
              "answers a different question."),
             ("Trusting one position's score",
-             "Twenty flashes of three marks ask each position about four times, and a guess "
+             "Twenty flashes of three marks ask each position about four times on average, and "
+             "by chance some far fewer; a guess "
              "among four is right one time in four. One lucky answer can lift a position over "
              "the half line. Read the pattern across positions, not one cell."),
         ],
         "standard": (
-            "Read a span from accuracies",
+            "Finish when you can read a span from accuracies and say why it is symmetric.",
             "Given accuracy by position, name the farthest position on each side with accuracy "
             "of at least one half, and say in two sentences why the span in reading is "
             "asymmetric while this one is not."
@@ -541,9 +544,11 @@ LESSONS = [
             ("p", "The lab has two readings. Reading A, The Dance in the Hive, runs with the pacer: "
                   "a highlight moving line by line at the target rate. Reading B, Hearing in the "
                   "Dark, runs with the mask: the same pacer, with each line above the highlight "
-                  "hidden as it goes. Put your hold target in both target boxes, do them in the "
-                  "order the lab names, and answer the six questions after each. Both are logged as "
-                  "condition readings, so neither counts towards your baseline or tests."),
+                  "hidden as it goes. Put your hold target in both target boxes (the button fills "
+                  "them with your baseline median instead; type your hold target over it if you "
+                  "have one), do them in the order the lab names, and answer the six questions "
+                  "after each. Both are logged as condition readings, so neither counts towards "
+                  "your baseline or tests."),
             ("p", "A reader who regresses a lot usually feels it as a fault: the eyes slip back, "
                   "the line is read twice, time is lost. The tradition agrees, and many "
                   "speed-reading courses teach readers to suppress it. The mask is a way of asking "
@@ -557,7 +562,10 @@ LESSONS = [
                   "not: the regressions came when they were needed."),
             ("p", "The kit's mask is a coarser version of their method. It hides whole lines, not "
                   "words, and only once the highlight has moved on, so you can still look back "
-                  "within the line you are on. If anything, it costs less than their mask did."),
+                  "within the line you are on. It is a different manipulation, so its cost need not match theirs: it hides "
+                  "less of what you have read, but it hides lines on the pacer's schedule, not "
+                  "your eyes', so a reader who falls behind the highlight can lose the end of a "
+                  "line before finishing it."),
             ("p", "Because both readings ran at the pacer's rate, their rates come out the same, "
                   "and the difference lies in the questions. At 300 words a minute one question "
                   "is worth 50 words a minute of effective rate, so a difference of 50 is a "
@@ -676,7 +684,7 @@ LESSONS = [
              "this drill answers is in the comprehension, and so in the effective rate."),
         ],
         "standard": (
-            "Compare two scores at one rate",
+            "Finish when you can compare two scores at one rate without the lab.",
             "Given two readings at one rate and their scores out of six, compute both effective "
             "rates and the value of one question at that rate, and say whether the difference "
             "exceeds one question."
@@ -735,12 +743,14 @@ LESSONS = [
         "body": [
             ("p", "Two readings again. Reading A, A Hand on the Wire, is at your natural pace with "
                   "no pacer, and is logged as a test. Reading B, Soup for Twenty-Six, runs behind "
-                  "the pacer at your hold target, and is logged as a condition reading. Keep a "
-                  "count as you read of how many times you lost your place or re-read for no "
-                  "reason. After each reading, before the questions, the lab asks for that "
-                  "number, puts it in the lapse boxes and logs it with the reading."),
-            ("p", "Most readers who try this find the second number smaller. The pacer gives the "
-                  "eyes a place to be, and a moving highlight is harder to drift away from than a "
+                  "the pacer at your hold target (type it into B's target box; the button offers "
+                  "your baseline median instead), and is logged as a condition reading. Keep a "
+                  "count as you read of the times your attention left the text: you lost your "
+                  "place, or re-read for no reason. After each reading, before the questions, "
+                  "the lab asks for that number (&ldquo;Times my attention left the "
+                  "text&rdquo;), puts it in the lapse boxes and logs it with the reading."),
+            ("p", "The pacer's advocates expect the second number to be smaller: the pacer gives "
+                  "the eyes a place to be, and a moving highlight is harder to drift away from than a "
                   "still page. That is the experience the tradition reports, and it is worth "
                   "having for yourself. It is also a self-report: you count the lapses you "
                   "noticed, and some lapses pass unnoticed."),
@@ -892,7 +902,7 @@ LESSONS = [
              "rate, and the difference has to exceed one question to be a result."),
         ],
         "standard": (
-            "Weigh a paced and an unpaced reading",
+            "Finish when you can weigh a paced and an unpaced reading by hand.",
             "Given two readings with their scores and lapse counts, compute both effective rates, "
             "say whether the difference exceeds one question, and say which kind of regression a "
             "pacer can reduce and which it cannot."
@@ -971,7 +981,9 @@ LESSONS = [
                   "per fixation, beyond the perceptual span. The "
                   "<strong>twenty-five-thousand</strong> preset is there for the claims far larger "
                   "than that: 25,000 words a minute needs 637.5 characters per fixation, about ten "
-                  "lines of 65 characters taken in at each glance."),
+                  "lines of 65 characters taken in at each glance. The third tile follows each rate "
+                  "to the bookshelf: a 90,000-word book takes 3 hours at 500 words a minute, an "
+                  "hour and a half at 1,000, and 3.6 minutes at 25,000."),
             ("p", "These are verdicts at stated settings, and the settings are adjustable. Skilled "
                   "readers who reach 350 to 400 words a minute do it with shorter fixations and by "
                   "skipping short words (Rayner et al. 2016). Try it: at 350 words a minute with "
@@ -981,8 +993,8 @@ LESSONS = [
                   "skipped word adds its characters to a step without a stop, which has the same "
                   "effect as a larger step."),
             ("p", "Settings do little for 1,000. Bringing it inside the identification span needs "
-                  "fixation and saccade together under 80 ms, so fixations under 50 ms, a quarter "
-                  "of the average, on every word. The tradition's answer is "
+                  "fixation and saccade together under 80 ms, so fixations under 50 ms, less than a "
+                  "quarter of the average, on every word. The tradition's answer is "
                   "that trained readers stop reading word by word and take in meaning by the "
                   "line or the page; the trainees in speed-reading courses often report that it "
                   "feels that way. The test is comprehension, and when Carver (1985) tested some "
@@ -1095,7 +1107,7 @@ LESSONS = [
              "that would require of each fixation."),
         ],
         "standard": (
-            "Test a speed claim",
+            "Finish when you can test a speed claim in one line of arithmetic.",
             "Given a claimed rate and settings for the fixation, saccade, word length and "
             "regressions, compute the characters each fixation must advance and state the verdict "
             "against the identification and perceptual spans, naming the settings."
@@ -1151,7 +1163,7 @@ LESSONS = [
                   "your eyes on the centre as well as you can, and click 1, 2, 3 and on to 25. "
                   "Do three tables in a row; each is timed and logged as <em>other</em>, with its "
                   "time. Then do the warm-up reading, The Piano on Fenwick Road, at your natural "
-                  "pace: this one is logged as a test, so it joins your baseline and tests."),
+                  "pace: this one is logged as a test, so it joins your test readings."),
             ("p", "The table is a staple of speed-reading courses, as a way to train what the eyes "
                   "take in away from the centre, and readers who practise it do get faster at it, "
                   "often quickly. The tradition's claim is that the wider awareness carries over "
@@ -1276,7 +1288,7 @@ LESSONS = [
              "reading rate are different measurements, and only the reading is a reading."),
         ],
         "standard": (
-            "Judge a transfer claim from two series",
+            "Finish when you can judge a transfer claim from two series.",
             "Given table times and test effective rates over several sessions, say whether they "
             "support transfer to reading, and name at least two other things that could explain "
             "both improving."

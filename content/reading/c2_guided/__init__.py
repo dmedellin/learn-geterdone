@@ -73,14 +73,17 @@ COURSE = {
         "read: reading a text a second time measures your memory of it as "
         "well as your reading. The drills serve passages you have not logged "
         "and say so when there are none left.",
-        "Type your own numbers into the target boxes. The labs know your log, "
-        "but a pacer's target is a box you fill: the middle of your baseline "
-        "rates from Measure Your Reading, or the hold target you find in "
-        "Choosing a Target Pace. The figures already in the boxes are a worked "
-        "example, not a recommendation.",
-        "Expect modest numbers. The research on the tradition's techniques "
-        "finds modest rate gains with comprehension held, and the large "
-        "savings of time come later, in Skimming, Scanning and Previewing and "
+        "Put your own numbers into the target boxes before you start. A "
+        "pacer's target is a box: “Use my baseline median” or “Use my next "
+        "target” fills it from your log, or you type it, from the middle of "
+        "your baseline rates in Measure Your Reading or the hold target you "
+        "find in Choosing a Target Pace. The figures already in the boxes are "
+        "a worked example, not a recommendation.",
+        "Expect modest numbers. Rayner and colleagues' 2016 review of the "
+        "research concluded that readers are unlikely to double or triple "
+        "their rate while understanding as well as at their normal pace, and "
+        "that the way to read faster with comprehension held is practice in "
+        "reading and in language itself. The large savings of time come later, in Skimming, Scanning and Previewing and "
         "in Words, Knowledge and Difficulty. This course measures what the "
         "guided techniques do for you, whichever way it comes out.",
         "Keep the Daily Drill going. From The Daily Drill on, every lesson in "
