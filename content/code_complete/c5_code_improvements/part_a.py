@@ -197,7 +197,8 @@ LESSONS = [
                   "development costs. His reason is that the largest single activity on most "
                   "projects is debugging and reworking code that does not work, so preventing "
                   "a defect is cheaper than finding it later. Quality, the Key Points put it, is "
-                  "free in the end, but only after resources are moved upstream."),
+                  "free in the end, but only once resources are moved to preventing defects "
+                  "cheaply rather than fixing them expensively."),
             ("def", ("A sequence of removal stages",
                      "Defects pass through stages in order: an inspection, then unit test, "
                      "then system test. Each stage finds its rate of the defects that reach "
@@ -232,7 +233,7 @@ LESSONS = [
                   "techniques find different defects is the chapter's claim from Jones's and "
                   "Myers's data, not something the multiplication shows. And since Jones "
                   "reports that testing combinations like this one often remove less than 60 "
-                  "percent, the 72.7 is an upper bound on the illustration, not a forecast."),
+                  "percent, the 72.7 is optimistic, as that figure suggests, and not a forecast."),
             ("h3", "Exercise"),
             ("math", [
                 "defects at the start:  1000",
@@ -241,7 +242,8 @@ LESSONS = [
             ]),
             ("p", "For each pipeline, compute by hand the defects left and the combined removal, "
                   "and say which of the two removes more. Then type each pipeline into the lab's "
-                  "stages box, with any stage names, to check your figures."),
+                  "stages box, with any stage names and the rates as fractions or decimals "
+                  "(40/100 or 0.4), to check your figures."),
             ("p", "The rates in Table 20-2 are what a technique finds. What it costs to find "
                   "them, and why reviews find different defects from tests, is the subject of "
                   "the next lesson, “Collaborative Construction”."),
@@ -293,9 +295,8 @@ LESSONS = [
              "figure is an upper bound when two stages find the same kinds of defect."),
             ("Put your own team's stages in",
              "List the stages your team actually runs, give each the book's modal rate from "
-             "Table 20-2, type them into the lab and note the combined removal. Then write one "
-             "sentence saying the rates are averages from other people's projects, and name "
-             "the record of your own that would test them."),
+             "Table 20-2, type them into the lab and note the combined removal. Then name the record "
+             "of your own that would test those rates."),
         ],
         "worked": {
             "title": "Three test stages on 1,000 defects",
@@ -323,8 +324,11 @@ LESSONS = [
             {"q": "Pipeline A has two stages at 40 percent and 50 percent; pipeline B has three "
                   "stages at 30 percent each. What combined removal does the product give for "
                   "each?",
-             "a": ["A 70%, B 65.7%", "A 90%, B 90%", "A 20%, B 2.7%", "A 70%, B 90%"],
-             "c": 0,
+             "a": ["A 20%, B 2.7%",
+                   "A 90%, B 90%",
+                   "A 70%, B 65.7%",
+                   "A 70%, B 90%"],
+             "c": 2,
              "why": "Multiply the misses. A leaves 0.6 × 0.5 = 0.30 of the defects, so it "
                     "removes 70%: 300 of 1,000 are left. B leaves 0.7 × 0.7 × 0.7 = 0.343, so "
                     "it removes 65.7%: 343 are left. A, with fewer stages, removes more. Adding "
@@ -334,11 +338,11 @@ LESSONS = [
             # F17, p. 470.
             {"q": "What does McConnell read from the modal rates of Table 20-2 (after Jones and "
                   "others)?",
-             "a": ["No technique's modal rate is above 75%, and they average about 40%",
-                   "Unit testing has the highest modal rate, at 75%",
+             "a": ["Unit testing has the highest modal rate, at 75%",
+                   "No technique's modal rate is above 75%, and they average about 40%",
                    "Formal code inspections reach 95% on their own",
                    "Every technique's modal rate is above 60%"],
-             "c": 0,
+             "c": 1,
              "why": "Section 20.3, p. 470: the modal rates do not rise above 75 percent for "
                     "any single technique and average about 40 (the book's reading of Jones "
                     "and others). Unit testing's modal rate is 30 percent and formal code "
@@ -347,14 +351,17 @@ LESSONS = [
             {"q": "Add a design inspection at 55% and a code inspection at 60% in front of "
                   "unit, integration and system testing at 30%, 35% and 40%. How many of 1,000 "
                   "defects does the product leave?",
-             "a": ["About 49", "180", "273", "450"],
-             "c": 0,
+             "a": ["180",
+                   "273",
+                   "450",
+                   "About 49"],
+             "c": 3,
              "why": "1,000 × 0.45 × 0.40 = 180 reach the tests, and 180 × 0.70 × 0.65 × 0.60 "
                     "= 49.14 are left: the <code>inspections-too</code> preset. 180 stops "
                     "after the inspections, 273 is the three tests without them, and 450 is "
                     "the design inspection alone."},
             {"q": "The lab leaves 273 of 1,000 defects after the three test stages. Which "
-                  "assumption does that figure rest on?",
+                  "assumption does the arithmetic rest on?",
              "a": ["Each stage finds its rate of whatever reaches it, independently of what "
                    "earlier stages missed",
                    "The three stages find different kinds of defect from one another",
@@ -367,6 +374,7 @@ LESSONS = [
                     "are the book's averages, not yours, and 273 defects are found by no stage "
                     "at all."},
         ],
+        # F16/F17, pp. 470-471.
         "mistakes": [
             ("Thinking testing is how you get quality",
              "Many teams rely on testing as both the measure and the source of quality, and "
@@ -382,9 +390,8 @@ LESSONS = [
              "percent of the defects, nor 100. Each stage works on what the stages before it "
              "left, so the misses multiply: 0.70 × 0.65 × 0.60 leaves 273 of 1,000."),
             ("Reading the book's rates as your project's",
-             "The rates in Table 20-2 are averages over many organisations' projects, gathered "
-             "by Jones and others mostly before 2004, with wide ranges either side of the "
-             "modal figure. They say where to look, not what your stages remove. Your own "
+             "The rates in Table 20-2 have wide ranges either side of the modal figure. They "
+             "say where to look, not what your stages remove. Your own "
              "records of defects found at each stage, and found later, are what would test "
              "them."),
         ],
@@ -395,14 +402,15 @@ LESSONS = [
             "the defects remaining and the combined removal by hand, and state in one sentence "
             "the independence assumption the product makes."
         ),
+        # F16/F17, pp. 470-471.
         "note": (
             "The lab multiplies the misses, so it assumes each stage misses independently of "
             "the stages before it. It therefore gives the same answer for two like stages as "
             "for two unlike ones; that unlike techniques find different defects is the "
             "chapter's claim from Jones's and Myers's data, which a product cannot test. The "
             "book also reports, after Jones, that real combinations of testing alone often "
-            "remove less than 60 percent, so the lab's 72.7 percent for three tests is an "
-            "upper bound on the illustration, not a forecast."
+            "remove less than 60 percent, so the lab's 72.7 percent for three tests is "
+            "optimistic, as that figure suggests, and not a forecast."
         ),
     },
     # ---------------------------------------------------------------- 02
@@ -534,7 +542,8 @@ LESSONS = [
                   "in 224. The lab prints Found 416/5 = 83.20, Remaining 84/5 = 16.80, Combined "
                   "removal 104/125 = 83.2%, Hours spent 674 and Hours per defect found 1685/208 "
                   "≈ 8.10. The <code>three-and-twelve</code> preset uses Microsoft's pair, 3 "
-                  "hours by inspection and 12 by testing: the same 83.20 found and 16.80 left, "
+                  "hours by inspection and 12 by testing, which Microsoft measured for finding "
+                  "and fixing together, so this preset prices both: the same 83.20 found and 16.80 left, "
                   "since the rates have not changed, for 2292/5 = 458.40 hours and 573/104 ≈ "
                   "5.51 per defect. On the lesson's illustration, the pipeline with the "
                   "inspection finds more and spends fewer hours; the note says what the model "
@@ -567,7 +576,7 @@ LESSONS = [
                  "expect": {"dfRemaining": "84/5 = 16.80", "dfHours": "674",
                             "dfPerDefect": "1685/208 ≈ 8.10"}},
                 {"id": "three-and-twelve",
-                 "label": "Microsoft's figures as the book reports them: 3 hours and 12",
+                 "label": "Microsoft's find-and-fix hours: 3 by inspection and 12 by test",
                  "stages": "code inspection, 6/10, 3; unit test, 3/10, 12; system test, 4/10, 12",
                  "expect": {"dfRemaining": "84/5 = 16.80", "dfHours": "2292/5 = 458.40",
                             "dfPerDefect": "573/104 ≈ 5.51"}},
@@ -588,9 +597,12 @@ LESSONS = [
              "Read the routine's comment or specification first, then each line against it. "
              "Note each suspected defect with its line number, and do not stop to fix it."),
             ("Ask the checklist's questions",
-             "For each variable, ask where it is set first and whether that value is right; "
-             "for each comparison, whether it should include its boundary; for each parameter, "
-             "whether it is used."),
+             "A review checklist asks, among other things: for each variable, where it is "
+             "first set and whether that is the right start; for each comparison, whether the "
+             "boundary belongs inside or outside; for each loop, whether it ends and where its "
+             "index is when it does; for each parameter, whether it is used and whether a "
+             "caller could pass a value the routine does not expect; for the result, whether "
+             "every path sets it. Ask all of them, and keep the ones that bite."),
             ("Run the defects through the stages",
              "Multiply the defects reaching each stage by its rate to get what it finds, and "
              "pass the rest on to the next stage."),
@@ -626,48 +638,67 @@ LESSONS = [
         "quiz": [
             {"q": "Read <code>countPassing</code> as an inspector. Which list names the defects "
                   "in it?",
-             "a": ["Line 3 starts `count` at 1; line 5 uses `>` where the comment promises at "
+             "a": ["Line 3 starts `count` at 1; line 4 should loop while "
+                   "`i <= scores.length`; the parameter `maxScore` on line 2 is never used",
+                   "Line 3 starts `count` at 1; line 5 uses `>` where the comment promises at "
                    "or above; the parameter `maxScore` on line 2 is never used",
-                   "Line 4 should loop while `i <= scores.length`; line 3 starts `count` at 1",
-                   "Line 5 should use `>=`, and nothing else is wrong",
-                   "Line 6 should be `count++`; line 5 uses `>` where the comment promises at "
-                   "or above"],
-             "c": 0,
+                   "Line 3 starts `count` at 1; line 5 uses `>` where the comment promises at "
+                   "or above; line 6 should be `count++`",
+                   "Line 2 should take the array's length as a parameter; line 5 uses `>` "
+                   "where the comment promises at or above; the parameter `maxScore` is never "
+                   "used"],
+             "c": 1,
              "why": "Line 3 starts <code>count</code> at 1 instead of 0, so every result is one "
                     "too many. Line 5 tests <code>scores[i] &gt; passMark</code>, but the "
                     "comment promises at or above the mark, so a score equal to it is not "
-                    "counted. The parameter <code>maxScore</code>, line 2, is never used. Two of "
-                    "the three are on the chapter's checklist kinds, initialisation and "
-                    "off-by-one comparisons, and the third is a parameter nobody reads. The loop "
+                    "counted. The parameter <code>maxScore</code>, line 2, is never used. Each is the "
+                    "kind of point a team's inspection checklist would hold. The book's own "
+                    "checklists elsewhere ask whether counters and accumulators are "
+                    "initialised properly (Chapter 10) and warn of <code>&gt;=</code> written "
+                    "for <code>&gt;</code> (Section 22.3, p. 513); Chapter 21's point is that a "
+                    "team builds its checklist from the errors its inspections find. A test "
+                    "whose one borderline score equals the mark passes, because the first two "
+                    "defects cancel: scores 50, 60 and 40 with mark 50 give 2, the right "
+                    "answer, which is why reading finds what that test misses. The loop "
                     "on line 4 is right as written (<code>&lt;=</code> would read past the end), "
-                    "and <code>count = count + 1</code> and <code>count++</code> do the same."},
+                    "and <code>count = count + 1</code> and <code>count++</code> do the same. "
+                    "An array carries its own length in Java, so a length parameter would be "
+                    "a fourth parameter nobody needs, not a fix."},
             # F18, p. 472.
             {"q": "In the figures the book reports from IBM (Kaplan 1995), how many staff-hours "
                   "did it take to find each error by code inspection, and by testing?",
-             "a": ["3.5 against 15 to 25", "3 against 12", "15 to 25 against 3.5",
+             "a": ["3 against 12",
+                   "15 to 25 against 3.5",
+                   "3.5 against 15 to 25",
                    "35 against 150 to 250"],
-             "c": 0,
+             "c": 2,
              "why": "Section 20.3, p. 472: 3.5 staff-hours per error found by code inspection "
                     "against 15 to 25 by testing, at IBM, as the book cites Kaplan 1995. The "
                     "pair 3 against 12 is Microsoft's, from Moore 1992, and measures finding "
                     "and fixing together. Both are those organisations' averages."},
             {"q": "100 defects pass a code inspection that finds 60 percent, then unit testing "
                   "at 30 percent. How many does unit testing find?",
-             "a": ["12", "30", "28", "18"],
-             "c": 0,
+             "a": ["30",
+                   "28",
+                   "18",
+                   "12"],
+             "c": 3,
              "why": "Unit testing sees only the 40 the inspection missed, and 30 percent of 40 "
                     "is 12. Thirty would be 30 percent of all 100, 28 is what unit testing "
                     "passes on, and 18 is 30 percent of the 60 the inspection already found."},
             {"q": "In the formal inspection the chapter describes, who reads or paraphrases the "
                   "code at the meeting?",
-             "a": ["Someone other than the author, chosen by the moderator", "The author",
-                   "The scribe", "A manager, so that the results are recorded"],
+             "a": ["Someone other than the author, chosen by the moderator",
+                   "The author",
+                   "The scribe",
+                   "A manager, so that the results are recorded"],
              "c": 0,
              "why": "Section 21.3, p. 488: the moderator chooses someone other than the author "
                     "to paraphrase the design or read the code, so that the code has to speak "
                     "for itself. The scribe records the defects, and management does not "
                     "attend."},
         ],
+        # F18, pp. 472-473.
         "mistakes": [
             ("Thinking reviews cost time that testing would not",
              "The objection is that an hour spent reading code is an hour not spent writing "
@@ -681,7 +712,7 @@ LESSONS = [
             ("Fixing the code in the inspection meeting",
              "The chapter's inspection finds defects and stops: discussion of a defect ends as "
              "soon as it is recognised, and the fixes are the author's afterwards. Solutions "
-             "debated in the meeting slow it down and turn it into an argument about style. "
+             "debated in the meeting take it off its one job, finding defects. "
              "Anyone who wants to talk about fixes can stay for the informal third-hour "
              "meeting."),
             ("Treating a walk-through as an inspection with less paperwork",
@@ -697,6 +728,7 @@ LESSONS = [
             "an inspection followed by two tests, compute the defects found, the defects left "
             "and the hours per defect found, and compare them with testing alone."
         ),
+        # F18, pp. 472-473.
         "note": (
             "The pipeline assumes each stage's hours are the defects it finds times its hours "
             "per defect found, so a stage that finds nothing costs nothing. A real test suite "
@@ -803,8 +835,9 @@ LESSONS = [
                   "<code>if</code>, <code>while</code>, <code>repeat</code> and "
                   "<code>for</code>, and for each <code>and</code> and <code>or</code>, in "
                   "Java `&&` and `||`. Add 1 for each case of a <code>case</code> statement, "
-                  "and 1 more if it has no default. It is the same count as the decision "
-                  "points of “Nesting and Complexity”, used here for a different purpose."),
+                  "and 1 more if it has no default. It is the decision-point count of “Nesting "
+                  "and Complexity”, plus one for a missing default, which the complexity "
+                  "count does not add; the book calls the two procedures similar."),
             ("def", ("Basis test cases",
                      "The number the rule gives is the fewest test cases that can make every "
                      "decision in the routine come out true once and false once. It is a "
@@ -823,7 +856,7 @@ LESSONS = [
             ("p", "Now the coverage tool's verdict. A single call with two employees, one "
                   "exempt and one with 45 hours, and <code>count</code> 2, runs every line of "
                   "the routine. It never tries a null entry, and never an employee at 40 "
-                  "hours or under, so two of the five outcomes the count asks for are "
+                  "hours or under, so two of the eight decision outcomes are "
                   "untested by a suite with full statement coverage."),
             ("code", _lines(SHIPPING_LABEL)),
             ("p", "The <code>switch-without-default</code> preset reads "
@@ -904,10 +937,10 @@ LESSONS = [
             ],
             "lines": [
                 "straight path:  1",
-                "while, line 4:  1",
-                "&& in the while, line 4:  1",
-                "if, line 6:  1",
-                "else if, line 8:  1",
+                "the while, line 4:  adds 1",
+                "the && in it, line 4:  adds 1",
+                "the if, line 6:  adds 1",
+                "the else if, line 8:  adds 1",
                 "basis test cases:  5",
             ],
             "after": [
@@ -922,19 +955,25 @@ LESSONS = [
             {"q": "By the chapter's rule (1, plus 1 for each if, while and for, each && and ||, "
                   "each case, and a missing default), how many basis test cases does "
                   "<code>archiveOld</code> need?",
-             "a": ["4", "3", "2", "5"],
-             "c": 0,
+             "a": ["3",
+                   "2",
+                   "5",
+                   "4"],
+             "c": 3,
              "why": "1 for the straight path, 1 for the <code>for</code>, 1 for the "
                     "<code>if</code> and 1 for the <code>||</code>: 4. One input each: an "
                     "empty inbox, so the loop never runs; an old message, where the first half "
                     "of the condition decides it; a spam message that is not old, where the "
                     "second half does; and a new message that is not spam, where the "
                     "<code>if</code> is false. Three forgets the <code>||</code>, and two "
-                    "counts only the straight path and the <code>if</code>."},
+                    "counts only the straight path and the <code>if</code>. Five adds one for "
+                    "the <code>i++</code> in the loop header or for the array index, neither "
+                    "of which is a decision."},
             {"q": "A single call to <code>overtimePay</code> with two employees, one exempt and "
                   "one with 45 hours, and <code>count</code> 2, runs every line. Which of these "
                   "outcomes has it not tested?",
-             "a": ["`staff[i]` being null", "An exempt employee",
+             "a": ["`staff[i]` being null",
+                   "An exempt employee",
                    "An employee with more than 40 hours",
                    "The loop ending because `i` reaches `count`"],
              "c": 0,
@@ -942,22 +981,25 @@ LESSONS = [
                     "loop when <code>i</code> reaches 2. It never meets a null entry, the second "
                     "half of the <code>while</code> condition coming out false, and it never "
                     "tests an employee at 40 hours or under either. Full statement coverage, two "
-                    "of five outcomes untried."},
+                    "of eight decision outcomes untried."},
             {"q": "<code>shippingLabel</code> has a switch of three cases with no default, "
                   "followed by one if. How many basis test cases does the rule give?",
-             "a": ["6", "5", "4", "7"],
-             "c": 0,
+             "a": ["5",
+                   "4",
+                   "6",
+                   "7"],
+             "c": 2,
              "why": "1 + 3 cases + 1 for the missing default + 1 for the <code>if</code> = 6. "
                     "Five forgets the missing default, which is the case of a zone the switch "
                     "does not name; four counts the switch once; seven counts the "
                     "<code>switch</code> keyword as well as its cases."},
             {"q": "What does Section 22.2 claim about writing test cases before the code?",
-             "a": ["It takes no more effort than writing them after, and defects are found "
+             "a": ["It takes about twice the effort, and halves the defects",
+                   "It takes no more effort than writing them after, and defects are found "
                    "sooner",
-                   "It takes about twice the effort, and halves the defects",
                    "It makes basis testing unnecessary",
                    "It guarantees branch coverage"],
-             "c": 0,
+             "c": 1,
              "why": "Pages 503 to 504: writing the tests first takes no more effort than "
                     "writing them after, since it only changes the order, and it detects "
                     "defects earlier. The book gives no doubling or halving, and it calls "
@@ -971,7 +1013,7 @@ LESSONS = [
              "asks for each decision's outcomes, both ways. On the lesson's illustration one "
              "call with an exempt employee and one at 45 hours runs every line of "
              "<code>overtimePay</code>, and never makes <code>staff[i]</code> null or tests "
-             "an employee at 40 hours: two of the five outcomes the count asks for."),
+             "an employee at 40 hours: two of the eight decision outcomes."),
             ("Taking the count as enough tests",
              "The count is a minimum. Five tests chosen carelessly, all with a non-exempt "
              "employee, can leave the exempt branch unrun; the five must be chosen so each "
@@ -1019,7 +1061,7 @@ LESSONS = [
         "key": [
             "a boundary: below, on, and above it",
             "range 1 to 99: test 0 1 2 98 99 100",
-            "qty < 99 is wrong at 99 only",
+            "quantity < 99 is wrong at 99 only",
             "a typical value passes a wrong check",
             "errors cluster in a few routines",
         ],
@@ -1055,11 +1097,13 @@ LESSONS = [
                   "on page 533 in your own copy first."),
             ("p", "Once basis tests have made every decision go both ways, what is left to "
                   "test? The chapter's answer is the data. Data-flow testing (p. 509) starts "
-                  "from the claim, which it credits to Boris Beizer, that data use is at least "
-                  "as error-prone as control flow. A variable is defined, used, and sometimes "
+                  "from the idea that data use is at least as error-prone as control flow; "
+                  "the book adds Boris Beizer's estimate that at least half of all code is "
+                  "data declarations and initialisations. A variable is defined, used, and sometimes "
                   "killed, and some sequences are suspicious, such as one defined twice before "
-                  "its value is used; the tests add a case for each place a value is defined "
-                  "and then first used. Equivalence partitioning (p. 512) is the idea that two "
+                  "its value is used; the tests add a case for each pairing of a place a "
+                  "variable is set with a place that value is used, which running every "
+                  "line does not guarantee. Equivalence partitioning (p. 512) is the idea that two "
                   "tests flushing out the same errors need not both be run, so each class of "
                   "inputs a routine treats alike needs one."),
             ("p", "Error guessing (p. 513) is a lowbrow name, the book says, for a sensible "
@@ -1192,23 +1236,30 @@ LESSONS = [
             {"q": "Passwords of 8 to 64 characters are valid, and the check is "
                   "`len > 8 && len <= 64`. Which of the six boundary tests does the check get "
                   "wrong?",
-             "a": ["8 only", "8 and 64", "64 only", "7 and 65"],
-             "c": 0,
+             "a": ["8 and 64",
+                   "8 only",
+                   "64 only",
+                   "7 and 65"],
+             "c": 1,
              "why": "The boundary tests are 7, 8, 9, 63, 64 and 65. The range says 8 to 64 are "
                     "valid; the check is true for 9 to 64. They differ at 8 only, the shortest "
                     "valid password, and only the test 8 exposes it. At 64 both say valid, and "
                     "at 7 and 65 both say invalid."},
             {"q": "Boundary analysis, as Section 22.3 describes it, tests a boundary at a "
                   "maximum with how many cases?",
-             "a": ["Three: just below it, on it and just above it", "Two: on it and above it",
-                   "One: the maximum itself", "Four: two either side of it"],
-             "c": 0,
+             "a": ["Two: on it and above it",
+                   "One: the maximum itself",
+                   "Four: two either side of it",
+                   "Three: just below it, on it and just above it"],
+             "c": 3,
              "why": "Page 513: there are three boundary cases, just less than the maximum, the "
                     "maximum itself and just greater, and it takes all three to rule out the "
                     "common mistakes. A range has two boundaries, so six tests."},
             {"q": "Which check is the same as `qty >= 1 && qty <= 99` on every integer?",
-             "a": ["`qty > 0 && qty < 100`", "`qty > 0 && qty < 99`",
-                   "`qty >= 1 || qty <= 99`", "`qty > 1 && qty <= 99`"],
+             "a": ["`qty > 0 && qty < 100`",
+                   "`qty > 0 && qty < 99`",
+                   "`qty >= 1 || qty <= 99`",
+                   "`qty > 1 && qty <= 99`"],
              "c": 0,
              "why": "On integers, <code>qty &gt; 0</code> is <code>qty &gt;= 1</code> and "
                     "<code>qty &lt; 100</code> is <code>qty &lt;= 99</code>, so the first is the "
@@ -1217,11 +1268,11 @@ LESSONS = [
             # F19, p. 517.
             {"q": "How does the book report errors are distributed among a project's classes "
                   "and routines (after Endres, Boehm and others)?",
-             "a": ["About 80% of the errors are in 20% of them",
-                   "About 20% of the errors are in 80% of them",
+             "a": ["About 20% of the errors are in 80% of them",
                    "Evenly, at about 10 per 1,000 lines in each",
+                   "About 80% of the errors are in 20% of them",
                    "About 50% of the errors are in 50% of them"],
-             "c": 0,
+             "c": 2,
              "why": "Section 22.4, p. 517: eighty percent of the errors are found in 20 percent "
                     "of a project's classes or routines, after Endres 1975, Gremillion 1984, "
                     "Boehm 1987 and Shull et al. 2002, and fifty percent in 5 percent after "

@@ -84,7 +84,7 @@ COURSE = {
         "projects, mostly before 2004, which the book quotes from Capers Jones and others. "
         "Every lesson and lab that uses them says whose they are, and your own defect "
         "records are what would test them.",
-        "Use the labs on code of your own. Four labs read Java: they count basis tests, "
+        "Use the labs on code of your own. Three labs read Java: they count basis tests, "
         "the inputs and outputs of a block, and the boundaries of a check. Each lesson's "
         "last step sends you to a routine, a review, a bisection or a profile of yours.",
         "Read every count as a reason to look. A basis count is the fewest tests, not "

@@ -105,17 +105,19 @@ LESSONS = [
                   "copy first."),
             # F20, p. 537.
             ("p", "A test that passed last month fails today, and a thousand changes have gone "
-                  "in since. You could read the code until the defect shows itself. Chapter 23 "
-                  "calls that guessing, and opens (p. 535) by saying what is at stake. "
+                  "in since. You could read the code until the defect shows itself, or change "
+                  "things until the test passes. Chapter 23 opens (p. 535) by saying what is at stake. "
                   "Debugging is identifying the root cause of an error and correcting it, and "
                   "on some projects it takes a large share of the time. Programmers differ "
                   "widely at it. The book reports a study by John Gould (1975) of experienced "
-                  "programmers debugging a program with known defects: the three fastest took "
+                  "programmers, with at least four years of experience, debugging a program "
+                  "with 12 known defects: the three fastest took "
                   "5.0 minutes on average against the slowest three's 14.1, missed 0.7 defects "
                   "against 1.7, and made 3.0 new defects while correcting against 7.7. That is "
-                  "one study's small sample, from 1975, and it is the book's evidence that "
-                  "debugging is a skill rather than a talent."),
-            ("p", "The chapter's foil is &ldquo;The Devil's Guide to Debugging&rdquo; (p. 539), "
+                  "one study, from 1975, and the book reads it two ways: not everyone knows "
+                  "how to debug, and, since the fastest were also the most accurate, quality "
+                  "and speed go together, the General Principle of Chapter 20 again."),
+            ("p", "The chapter's foil is &ldquo;The Devil’s Guide to Debugging&rdquo; (p. 539), "
                   "McConnell's description of the circle of hell where programmers find "
                   "defects by scattering print statements, change things until something "
                   "seems to work, keep no record of what they changed, and fix a wrong result "
@@ -123,13 +125,15 @@ LESSONS = [
                   "(p. 540) sets the scientific method: gather data through repeatable "
                   "experiments, form a hypothesis that accounts for it, design an experiment "
                   "to prove or disprove the hypothesis, and repeat. For a defect that becomes "
-                  "five steps. Stabilise the error, so that it happens reliably. Locate it, by "
+                  "five steps. Stabilise the error, so that it happens reliably, "
+                  "simplifying the test case until changing any part of it changes the "
+                  "error. Locate it, by "
                   "gathering data, forming a hypothesis, choosing the test or the reading that "
                   "would decide it, and deciding it. Fix it. Test the fix. Look for similar "
                   "errors."),
             ("p", "Most of Section 23.2 is tips for the locating. Use all the data, and when a "
                   "fact does not fit the hypothesis, ask why rather than drop the fact. Refine "
-                  "the test case until changing any part of it changes the failure. Reproduce "
+                  "the test cases that produce the error, varying them further. Reproduce "
                   "the error several ways, to triangulate it. A test that disproves a "
                   "hypothesis still tells you where the defect is not. And narrow the "
                   "suspicious region (p. 546): remove about half the code, see which half the "
@@ -139,6 +143,20 @@ LESSONS = [
                   "with someone, take a break, and when quick guessing has run past a time "
                   "limit you set in advance, switch to a brute-force method that is sure to "
                   "work, such as a full review or rewriting the code."),
+            ("p", "Watch the method on something small. <code>shippingLabel</code>, from "
+                  "“Structured Basis Testing”, is reported to return a label with no place "
+                  "name for some orders: an empty one, or one that reads only express. The "
+                  "data: it happens for a few zones, with <code>express</code> set or not. A "
+                  "hypothesis that accounts for it: the zone is one the <code>switch</code> "
+                  "does not name, so <code>label</code> keeps its starting empty string. The "
+                  "experiment that decides it: call with zone 4 and with zone 3, "
+                  "<code>express</code> false. Zone 4 should give an empty label and zone 3 "
+                  "should not; if zone 3 gives one too, the hypothesis is wrong and the cause "
+                  "lies elsewhere. One call each way settles it. The cause is the "
+                  "<code>switch</code> on lines 3 to 13, which has no default, and whether that "
+                  "is a defect is the specification's question: if every zone needs a label, "
+                  "the missing default is the fix. That is the whole method; at scale the only difference "
+                  "is how many suspects each test clears."),
             ("p", "Section 23.3 (p. 550) is fixing, which the chapter calls the easy part and "
                   "therefore the error-prone one. Understand the problem, and the program, "
                   "before you fix it; confirm the diagnosis; save the original code; fix the "
@@ -253,23 +271,30 @@ LESSONS = [
             {"q": "<code>overtimePay</code> is called with four employees, none null, and "
                   "<code>count</code> 5, and throws <code>ArrayIndexOutOfBoundsException</code>. "
                   "Which line throws it, and with what value of <code>i</code>?",
-             "a": ["Line 4, with `i == 4`", "Line 5, with `i == 4`",
-                   "Line 4, with `i == 5`", "Line 9, with `i == 3`"],
-             "c": 0,
+             "a": ["Line 5, with `i == 4`",
+                   "Line 4, with `i == 5`",
+                   "Line 4, with `i == 4`",
+                   "Line 9, with `i == 3`"],
+             "c": 2,
              "why": "Hypothesis: the loop reads past the end of the array, because nothing ties "
                     "<code>count</code> to <code>staff.length</code>. The test that decides it: "
                     "call with four non-null employees and <code>count</code> 4, which passes, "
                     "and with <code>count</code> 5, which fails. The line is 4: with "
                     "<code>i == 4</code>, <code>i &lt; count</code> is true, so Java evaluates "
                     "<code>staff[4]</code> in the condition and throws before line 5 is "
-                    "reached. The fix is <code>i &lt; count &amp;&amp; i &lt; staff.length</code>, "
-                    "or dropping <code>count</code>. The five basis tests of Structured Basis "
+                    "reached. The fix tests the length before the element: "
+                    "<code>i &lt; staff.length</code> goes after <code>i &lt; count</code> and "
+                    "before the null test, since Java stops at the first false part; or drop "
+                    "<code>count</code> and loop to <code>staff.length</code>. The five basis tests of Structured Basis "
                     "Testing never pass a <code>count</code> larger than the array, which is "
                     "Boundaries and Bad Data's point."},
             {"q": "A binary search among 1,000 suspect changes: what is the most tests any "
                   "position can take?",
-             "a": ["10", "9", "500", "32"],
-             "c": 0,
+             "a": ["9",
+                   "10",
+                   "500",
+                   "32"],
+             "c": 1,
              "why": "Two to the ninth is 512, less than 1,000, and two to the tenth is 1,024, "
                     "at least 1,000, so ten halvings always suffice and some positions need all "
                     "ten. Nine is what change 63 happens to take; 500 is the average for "
@@ -288,10 +313,11 @@ LESSONS = [
                     "evidence that quality and speed go together. It is one study's figures, "
                     "from 1975."},
             {"q": "Which is the first step of the chapter's method for finding a defect?",
-             "a": ["Stabilise the error, so that it occurs reliably",
-                   "Form a hypothesis about the defect", "Fix the most likely line",
-                   "Look for similar errors"],
-             "c": 0,
+             "a": ["Form a hypothesis about the defect",
+                   "Fix the most likely line",
+                   "Look for similar errors",
+                   "Stabilise the error, so that it occurs reliably"],
+             "c": 3,
              "why": "Page 541: stabilise the error, locate its source, fix it, test the fix, "
                     "look for similar errors. The hypothesis belongs to locating, which comes "
                     "second, because a failure that does not happen reliably cannot decide a "
@@ -300,9 +326,10 @@ LESSONS = [
         "mistakes": [
             ("Thinking debugging is reading the code until the defect shows itself",
              "Reading feels like progress, and a small defect sometimes does show itself. The "
-             "chapter's method is experiment instead: a hypothesis, a test that would prove or "
-             "disprove it, and another test when it is disproved, each chosen to narrow the "
-             "search. On the lesson's illustration, ten tests, each halving the suspects, "
+             "chapter's method is experiment instead: a hypothesis, a test or a reading of the "
+             "code that would prove or disprove it, and another when it is disproved, each "
+             "chosen to narrow the search. Reading the code is one of the ways it decides a "
+             "hypothesis, not a substitute for having one. On the lesson's illustration, ten tests, each halving the suspects, "
              "settle a thousand changes, where reading them would take up to a thousand "
              "looks."),
             ("Fixing the symptom",
@@ -425,8 +452,8 @@ LESSONS = [
                   "chapter gives for reviewing even small changes is other people's. "
                   "Programmers' first attempt at a change is wrong more than half the time "
                   "(Yourdon 1986). The chance of a bad change rises from one line changed to "
-                  "five and then falls, because small changes are treated casually (Weinberg "
-                  "1983). And one organisation that began reviewing one-line changes saw their "
+                  "five and then falls (Weinberg 1983); McConnell's explanation is that "
+                  "programmers treat small changes casually. And one organisation that began reviewing one-line changes saw their "
                   "error rate fall from 55 percent to 2 (Freedman and Weinberg 1982). Some "
                   "refactorings are riskier than others: a named constant is nearly risk-free, "
                   "while a change to a routine's interface or to a boolean test is not."),
@@ -462,10 +489,12 @@ LESSONS = [
                   "routines, one per result."),
             ("h3", "Exercise"),
             ("code", _lines(PRINT_INVOICE)),
-            ("p", "Find two blocks of <code>printInvoice</code> that extract cleanly into "
-                  "routines of their own. For each, give its lines, its In and its Out, and "
-                  "the call that would replace it. Then paste the routine into the lab and set "
-                  "the From and To lines to check."),
+            ("p", "Two extractions are proposed for <code>printInvoice</code>: lines 2 to 5 "
+                  "as a routine that totals the lines, and lines 7 to 9 as a routine that "
+                  "prints. For each, give its In, its Out and the call that would replace it. "
+                  "Then say whether lines 2 to 6, the total and the tax together, would "
+                  "extract as cleanly, and why. To check, paste the routine into the lab and "
+                  "set the From and To lines."),
             ("p", "Refactoring improves structure and leaves behaviour alone. The next lesson, "
                   "“Code-Tuning Strategies”, is about the opposite trade: changing code to run "
                   "faster, and why that should come last."),
@@ -543,13 +572,13 @@ LESSONS = [
         "quiz": [
             {"q": "In <code>printInvoice</code>, what are the In and Out of lines 2 to 5, and "
                   "of lines 7 to 9?",
-             "a": ["Lines 2–5: in inv, out subtotal. Lines 7–9: in subtotal and tax, out none",
-                   "Lines 2–5: in inv and subtotal, out subtotal. Lines 7–9: in tax, out none",
+             "a": ["Lines 2–5: in inv and subtotal, out subtotal. Lines 7–9: in tax, out none",
                    "Lines 2–5: in inv, out subtotal and tax. Lines 7–9: in subtotal, tax and "
                    "inv, out none",
                    "Lines 2–5: in nothing, out subtotal. Lines 7–9: in subtotal and tax, out "
-                   "the total"],
-             "c": 0,
+                   "the total",
+                   "Lines 2–5: in inv, out subtotal. Lines 7–9: in subtotal and tax, out none"],
+             "c": 3,
              "why": "Lines 2 to 5 set <code>subtotal</code> before reading it and read "
                     "<code>inv</code>, set before them; <code>subtotal</code> is read after "
                     "them. So they extract as <code>subtotalOf(inv)</code>, in "
@@ -557,7 +586,11 @@ LESSONS = [
                     "<code>subtotal</code> and <code>tax</code> and set nothing, so they extract "
                     "as <code>printTotals(subtotal, tax)</code>, out none. <code>tax</code> is "
                     "set on line 6, outside the first block, and the total is printed, not "
-                    "stored."},
+                    "stored. Lines 2 to 6 would not extract as cleanly: they set both "
+                    "<code>subtotal</code> and <code>tax</code>, and both are read on lines 7 to "
+                    "9, so a Java method could return only one of them. Lines 6 to 9 together "
+                    "would also extract cleanly, as a routine that computes the tax inside; the "
+                    "lesson's pair keeps the tax where the caller can see it."},
             {"q": "Why does extracting the loop of <code>printStatement</code>, lines 4 to 9, "
                   "need a step first?",
              "a": ["It sets two variables that are read after it, and a Java method returns one "
@@ -574,23 +607,23 @@ LESSONS = [
             # F21, pp. 580-581.
             {"q": "What does the book report about the number of lines changed and the chance "
                   "of a bad change (Weinberg 1983)?",
-             "a": ["It rises from one line to five, then falls",
-                   "It rises steadily with every line changed",
+             "a": ["It rises steadily with every line changed",
+                   "It rises from one line to five, then falls",
                    "It falls from one line to five, then rises",
                    "It is about the same for any number of lines"],
-             "c": 0,
+             "c": 1,
              "why": "Figure 24-1, p. 581, after Weinberg 1983: the chance of a bad change rises "
-                    "as the lines changed go from one to five, and falls after that, because "
-                    "small changes are treated casually. The book adds that one organisation "
+                    "as the lines changed go from one to five, and falls after that; McConnell's "
+                    "explanation is that programmers treat small changes casually. The book adds that one organisation "
                     "that began reviewing one-line changes saw its error rate fall from 55 "
                     "percent to 2 (Freedman and Weinberg 1982)."},
             {"q": "Which change to <code>printStatement</code> is a refactoring in Fowler's "
                   "sense, as the chapter adopts it?",
-             "a": ["Replacing the literal 25.0 with a named constant OVERDRAFT_FEE",
-                   "Changing the fee from 25.0 to 30.0",
+             "a": ["Changing the fee from 25.0 to 30.0",
                    "Charging the fee only once per statement",
+                   "Replacing the literal 25.0 with a named constant OVERDRAFT_FEE",
                    "Printing the number of overdrafts as well"],
-             "c": 0,
+             "c": 2,
              "why": "A refactoring changes internal structure without changing observable "
                     "behaviour. The named constant prints exactly what the literal did. A "
                     "different fee, a fee charged once, and an extra line of output each "
@@ -598,7 +631,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking Extract Routine is always safe",
-             "Extract Routine is the refactoring most programmers reach for first, and its "
+             "Extract Routine is a refactoring many programmers reach for first, and its "
              "mechanics look trivial: cut the lines, paste them into a new routine, call it. "
              "It is clean when the block leaves at most one result. On the lesson's "
              "illustration the loop of <code>printStatement</code> leaves two, balance and "
@@ -839,9 +872,11 @@ LESSONS = [
             {"q": "A program spends 95% of its time in one routine and 5% elsewhere. What share "
                   "of the total does each change save: A, the 5% made a thousand times faster; "
                   "B, the hot routine made twice as fast?",
-             "a": ["A about 5.0%, B 47.5%", "A about 99.9%, B 50%", "A 5%, B 95%",
+             "a": ["A about 99.9%, B 50%",
+                   "A about 5.0%, B 47.5%",
+                   "A 5%, B 95%",
                    "A about 0.5%, B 47.5%"],
-             "c": 0,
+             "c": 1,
              "why": "A: the 5 parts become 5/1000, so it saves 4.995 of 100, 999/20000, about "
                     "5.0%. B: the 95 parts become 47.5, so it saves 19/40 = 47.5%. Making the "
                     "small part a thousand times faster can never save more than the 5% it "
@@ -850,26 +885,29 @@ LESSONS = [
                     "take no time at all."},
             {"q": "A routine taking 100 ms of a 1,000 ms run is made ten times faster. What is "
                   "the new total?",
-             "a": ["910 ms", "900 ms", "100 ms", "990 ms"],
-             "c": 0,
+             "a": ["900 ms",
+                   "100 ms",
+                   "990 ms",
+                   "910 ms"],
+             "c": 3,
              "why": "1,000 − 100 + 100/10 = 910 ms. 900 forgets the 10 ms the routine still "
                     "takes, 100 divides the whole run by ten, and 990 takes 10 ms off instead "
                     "of 90."},
             # F22, p. 592.
             {"q": "What did Knuth find in his 1971 study of Fortran programs, as the book reports "
                   "it?",
-             "a": ["Less than 4% of a program usually accounts for more than 50% of its run time",
-                   "20% of a program's routines consume 80% of its time",
+             "a": ["20% of a program's routines consume 80% of its time",
                    "Half the code accounts for half the time",
+                   "Less than 4% of a program usually accounts for more than 50% of its run time",
                    "Most of the time is spent in input and output"],
-             "c": 0,
+             "c": 2,
              "why": "Section 25.2, p. 592: Knuth (1971) found that less than four percent of a "
                     "program usually accounts for more than half its run time. The 20 and 80 "
                     "figure is Boehm's (1987), which the book reports beside it. Input and "
                     "output are among the chapter's usual sources of slowness, not Knuth's "
                     "finding."},
-            {"q": "The chapter's approach to code tuning (Section 25.6) says what to do with a "
-                  "change that does not make the measured time fall?",
+            {"q": "By the chapter's approach to code tuning (Section 25.6), what do you do with "
+                  "a change that does not make the measured time fall?",
              "a": ["Revert to the saved working version",
                    "Keep it, since a tuning change cannot hurt",
                    "Combine it with the next change and measure both together",
@@ -938,7 +976,7 @@ LESSONS = [
         "key": [
             "a catalogue of things to try",
             "nest: outer + outer × inner passes",
-            "outer 100, inner 5: 600 passes",
+            "outer 100, inner 5 make 600 passes",
             "invariant work moves out of the loop",
             "fewer passes is not less time",
             "measure each change",
@@ -1033,7 +1071,7 @@ LESSONS = [
             ("p", "That is all the lab can say. It counts passes, not time, and the book's own "
                   "measurements of this very change run from a third of the time saved to "
                   "almost nothing, depending on the language. In Java a just-in-time compiler "
-                  "may reorder or simplify loops itself, as an optimising C++ compiler may, so "
+                  "may simplify loops itself, as an optimising C++ compiler may, so "
                   "the count is a reason to try the change and measure it, and not a "
                   "prediction of what you will see."),
             ("h3", "Exercise"),
@@ -1115,8 +1153,10 @@ LESSONS = [
             {"q": "In the exercise's loop, with n = 1,000, the call <code>config.taxRate()</code> "
                   "is moved before the loop. How many times does the body run, and how many "
                   "times is <code>taxRate()</code> called, after the change?",
-             "a": ["Body 1,000 times; taxRate once", "Body once; taxRate once",
-                   "Body 1,000 times; taxRate 1,000 times", "Body 999 times; taxRate once"],
+             "a": ["Body 1,000 times; taxRate once",
+                   "Body once; taxRate once",
+                   "Body 1,000 times; taxRate 1,000 times",
+                   "Body 999 times; taxRate once"],
              "c": 0,
              "why": "<code>double rate = config.taxRate();</code> moves before the loop, and the "
                     "body keeps only <code>gross[i] = net[i] * (1 + rate);</code>. The body still "
@@ -1126,34 +1166,38 @@ LESSONS = [
                     "which is what moving it assumes."},
             {"q": "A nest has an outer loop of 50, a middle loop of 10 and an inner loop of 2. "
                   "How many passes do the three loops make in that order?",
-             "a": ["1,550", "1,000", "1,022", "62"],
-             "c": 0,
+             "a": ["1,000",
+                   "1,022",
+                   "1,550",
+                   "62"],
+             "c": 2,
              "why": "50 + 50 × 10 + 50 × 10 × 2 = 50 + 500 + 1,000 = 1,550. 1,000 is how often "
                     "the innermost body runs, 1,022 is the passes with the smallest loop "
                     "outside (2 + 20 + 1,000), and 62 adds the sizes."},
             # F23, p. 623.
             {"q": "The book measured putting the busiest loop inside on its 100 by 5 example "
                   "(p. 623). What did it find?",
-             "a": ["Savings from 33% in C++ and 34% in Java to 4% in Python",
-                   "About 16% in every language, as the count predicts",
+             "a": ["About 16% in every language, as the count predicts",
+                   "Savings from 33% in C++ and 34% in Java to 4% in Python",
                    "No saving in any language",
                    "A slowdown in Java and a saving elsewhere"],
-             "c": 0,
+             "c": 1,
              "why": "The count predicts about 16 percent fewer iterations; the book's "
                     "measurements were 33 percent less time in C++, 34 in Java, 12 in PHP and 4 "
                     "in Python. The book's conclusion is that you have to measure in your own "
                     "environment."},
             {"q": "Why does the chapter call its techniques anti-refactorings?",
-             "a": ["They make the code's internal structure worse in exchange for speed",
-                   "They change what the program does",
+             "a": ["They change what the program does",
                    "They undo the refactorings of Chapter 24 one by one",
-                   "They are refactorings that happen to run backwards in time"],
-             "c": 0,
+                   "They make the code faster without changing its internal structure",
+                   "They make the code's internal structure worse in exchange for speed"],
+             "c": 3,
              "why": "Page 609: refactorings improve a program's internal structure; these "
                     "changes degrade it in exchange for performance, by definition, since a "
                     "change that did both would be standard practice. They are meant to leave "
                     "behaviour unchanged."},
         ],
+        # F23, p. 623.
         "mistakes": [
             ("Thinking a technique that saves 16% of iterations saves 16% of time",
              "The count is easy to make and looks like a prediction. But the lab counts loop "
@@ -1178,6 +1222,7 @@ LESSONS = [
             "in each order and the share saved; for a loop with an invariant call, write the "
             "moved version and state the calls before and after."
         ),
+        # F23, p. 623.
         "note": (
             "The lab counts loop passes, not time, and treats every pass as costing the same. "
             "The book's own measurements of the same change ranged from a third of the time "
