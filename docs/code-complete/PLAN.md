@@ -674,6 +674,11 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
      presents: `kitchen-sink` exposes two fields and six public routines that
      serve three unrelated abstractions — tickets, the weather forecast and
      an audit log — in one class; no accessor discipline fixes that.
+     (Corrected at authoring: the book, after Riel, does call a `Point` with
+     get and set routines perfect encapsulation of its representation,
+     p. 139; the lesson grants that and refutes the misconception as "makes
+     a good interface". Because the grouping is exercise (b)'s answer, the
+     lesson's `mistakes[0]` does not name the three abstractions.)
    - **Worked:** `public-fields` exposes all five fields: any change to how
      salary is stored reaches every caller.
    - **Exercise:** (a) `public class Point { public double x; public double
@@ -747,7 +752,7 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
    - **Do:** name a routine's cohesion by the chapter's kinds, and find the
      duplicated lines a routine would remove, with its name and parameters.
    - **Standard:** for six one-line routine descriptions, name each one's
-     cohesion and rewrite the weakest as two routines; in a listing, mark the
+     cohesion and rewrite the weakest as separate routines; in a listing, mark the
      repeated block and write the header of the routine that replaces it.
    - **Lab:** `code/dupes`, family 1 (`cfg["min_run"] = 2`). Presets, in this
      order: `copied` (the label printer reusing one variable `a` → 1 block,
@@ -762,16 +767,21 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
      complexity, and its cohesion scale has nothing to do with repetition.
    - **Worked:** in `copied`, lines 3–5 equal lines 7–9: one block, two
      copies, six lines; `printAddress(Address a)` replaces them.
-   - **Exercise:** (a) six routines: "computes age and retirement date from a
-     birth date"; "reads the record, then validates it, then writes it";
-     "prints the report and resets the totals"; "opens the log, the cache
-     and the network at startup"; "handles every kind of input depending on a
-     flag"; "returns the tax for an amount". (b) `printSummary` in §D.4.
-     **Answer:** (a) two jobs on the same data — communicational; three
-     steps in sequence — sequential (it is procedural if the steps share no
-     data); report and reset — communicational at best, and the one to split
-     into `printReport()` and `resetTotals()` if they share nothing;
-     startup — temporal; the flag — logical; the tax — functional.
+   - **Exercise:** (a) six routines (replaced at authoring: the first and
+     third descriptions were the book's own examples of sequential and
+     communicational cohesion, pp. 168–169, and the first had two answers
+     depending on whether the age feeds the retirement date): "returns the
+     sales tax on an amount"; "works out a parcel's volume, then uses that
+     volume to choose a box size"; "from an order's list of items, adds up
+     the total weight and, separately, counts the distinct suppliers"; "at
+     startup, opens the log, loads the settings and connects to the
+     database"; "asks for a customer's name and then the delivery date, in
+     the order the form shows them, with nothing passed between the two";
+     "formats an invoice, a receipt or a refund note, depending on a flag
+     passed in". (b) `printSummary` in §D.4.
+     **Answer:** (a) functional; sequential; communicational; temporal;
+     procedural; logical — the weakest, split into `formatInvoice`,
+     `formatReceipt` and `formatRefundNote` with no flag.
      (b) The lab finds 1 block, `coDupLines` 4, "lines 4–5 and lines 8–9";
      `printMoney(String label, double amount)` replaces it, and
      `printSummary` becomes two calls.
@@ -801,8 +811,10 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
      line printer whose header spans three lines → `coParams` 9, `coCode` 9,
      `coLines` 10), `parameter-objects` (the same printer taking an
      `InvoiceLine`, a `TaxRule` and a `Format` → 3, 5, 6). Pins `coParams`,
-     `coCode`. The body says `coCode` counts brace lines, which the book's
-     line does not.
+     `coCode`. (Corrected at authoring: `coCode` counts lines that are
+     neither blank nor comment, which is exactly the book's line, p. 174,
+     braces included; `coStatements` is the count without brace-only lines.
+     The body says so.)
    - **Misconception:** "A routine that returns a value can also change
      state on the way; the caller will read the code." §7.6 is firm: a
      function's job is the value its name describes. The short-function
@@ -962,8 +974,9 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
 ### Course 3 — Variables (`code-complete-variables`, 6)
 
 Part III, Chapters 10–13. Declaring, initialising, scoping and naming
-variables, and the data types. Its `how_to` says every lab here but one reads
-code, and that the reader should paste a routine of their own into each.
+variables, and the data types. Its `how_to` says that four of the six labs
+read code (`run/arith` and `deps/shared` do not; corrected at authoring), and
+that the reader should paste a routine of their own into each code lab.
 
 1. **declaring-and-initializing-variables** — Declaring and Initializing Variables — *Chapter 10 · Using Variables* — 15 min
    - **Read:** pp. 237–243. §10.1 (p. 238), data literacy; §10.2 (p. 239),
@@ -1048,7 +1061,9 @@ code, and that the reader should paste a routine of their own into each.
      `print…` calls on lines 2–5, to lines 6 and 7. **Answer:** before: spans
      6, 2 and 6, 1, average 15/4 = 3.75, live times 11 and 10; after: `total`
      on 6, 9, 12 and `count` on 7, 10, 12, spans 2, 2 and 2, 1, average 7/4 =
-     1.75, live times 7 and 6.
+     1.75, live times 7 and 6. (As authored: `reportSales`, 13 lines; the
+     lab with `vars` `total count` prints `coAvgSpan` 15/4 = 3.75 and
+     `coAvgLive` 21/2 = 10.50 before, 7/4 = 1.75 and 13/2 = 6.50 after.)
    - **Own:** a routine of the reader's pasted into the lab with `vars`
      empty, and the variable with the longest live time moved.
    - **Sources:** McConnell §§10.4–10.8; *F10*.
@@ -1088,7 +1103,10 @@ code, and that the reader should paste a routine of their own into each.
    - **Exercise:** `double f(double p, int n, double r)` with `m` and `t`.
      **Answer:** average 1; renamed `totalInterest(double principal, int
      months, double annualRate)` with `monthlyInterest`, `totalInterest` →
-     53/5 = 10.6, and only `months` is under eight.
+     53/5 = 10.6, and only `months` is under eight. (As authored: the routine
+     is `simpleInterest`, so that no local shares the routine's name; the
+     lab counts neither, so the figures are unchanged, checked in the lab:
+     `coAvgLen` 1, then `53/5 = 10.60`, `coShort` "months".)
    - **Own:** a routine of the reader's pasted into the lab, its short names
      renamed for the problem.
    - **Sources:** McConnell §§11.1–11.7; *F11*.
@@ -1168,7 +1186,9 @@ code, and that the reader should paste a routine of their own into each.
    - **Worked:** `0.0725 / 12` becomes `ANNUAL_RATE / MONTHS_PER_YEAR`.
    - **Exercise:** a monitoring loop with `38.5`, `3` and `900`. **Answer:**
      3 magic numbers, 3 distinct (`FEVER_CELSIUS`, `URGENT_PRIORITY`,
-     `CHECK_INTERVAL_SECONDS`).
+     `CHECK_INTERVAL_SECONDS`). (As authored: `watchWard`, 10 lines, the
+     literals on lines 4, 5 and 8; the lab prints `coMagicList` "38.5
+     (line 4), 3 (line 5), 900 (line 8)".)
    - **Own:** a routine of the reader's pasted into the lab, and a constant
      declared for each literal it lists.
    - **Sources:** McConnell §§12.4–12.9; *F12*.
@@ -1416,7 +1436,7 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
    - **Sources:** McConnell §§18.1–18.5.
 
 6. **boolean-expressions** — Boolean Expressions — *Chapter 19 · General Control Issues* — 15 min
-   - **Read:** pp. 431–444. §19.1 (p. 431), boolean expressions: `true` and
+   - **Read:** pp. 431–445 (§19.3 runs onto p. 445, where §19.4 begins; corrected at authoring). §19.1 (p. 431), boolean expressions: `true` and
      `false` rather than 1 and 0, simplifying with well-named boolean
      variables or functions, forming them positively, DeMorgan's theorems
      (Table 19-1, named), parentheses, short-circuit evaluation, number-line
@@ -1649,7 +1669,10 @@ Chapters 20–22, `part_b.py` 23–26.
      catches it, 50 does not.
    - **Exercise:** passwords of 8 to 64 characters, check `len > 8 && len <=
      64`. **Answer:** tests 7, 8, 9, 63, 64, 65; the check is wrong at 8
-     only, and only the test 8 exposes it.
+     only, and only the test 8 exposes it. (As authored, the check is set
+     in a five-line routine written for the lesson, `validLength`; not a
+     preset. The built lab, `cond/range` with lo 8, hi 64, prints
+     `cdDisagree` 8, `cdTests` 7, 8, 9, 63, 64, 65, `cdExposed` 8.)
    - **Own:** one validation in the reader's code, its documented range,
      and the six boundary tests — which of them exist.
    - **Sources:** McConnell §§22.3–22.7; Myers 1979; *F2*, *F19*.
@@ -1812,6 +1835,14 @@ Chapters 20–22, `part_b.py` 23–26.
 Part VI, Chapters 27–30. Program size, managing construction, integration and
 tools. Its `how_to` says the course is for anyone who works on a team, and that
 its figures are the book's quotations of industry averages.
+
+*As authored:* every instance and figure below stands; the pinned strings follow
+§D.0's two decimals (`pjStaffYears` "2/5 = 0.40 to 5", `pjSpread` "25/2 = 12.50",
+`pjProduct` "1349/2500 ≈ 0.54", "4757/2500 ≈ 1.90"). The exercises of lessons 3
+and 4 are given as code the reader reads the records off: four Java classes whose
+calls are the exercise's pairs, and the build's three makefile dependency lines.
+Lesson 2's `hard-product` glosses time and storage constraint as the program's
+own run time and memory, as Table 28-1 defines them, not the schedule.
 
 1. **how-program-size-affects-construction** — How Program Size Affects Construction — *Chapter 27 · Program Size* — 15 min
    - **Read:** pp. 649–659. §27.1 (p. 650), communication and size (the paths
@@ -2052,8 +2083,11 @@ book's themes. Its `how_to` says the course can be read alone.
      (with the differences among programmers, *F29*); §33.2 (p. 821),
      intelligence and humility; §33.3 (p. 822), curiosity; §33.4 (p. 826),
      intellectual honesty; §33.5 (p. 828), communication and cooperation;
-     §33.6 (p. 829), creativity and discipline; §33.7 (p. 830), laziness (the
-     enlightened kind: writing a tool to do an unpleasant job); §33.8
+     §33.6 (p. 829), creativity and discipline; §33.7 (p. 830), laziness (three
+     kinds: deferring a task is "true laziness", doing it at once is the
+     enlightened kind, and writing a tool to do it is "long-term laziness",
+     the most productive kind provided the tool saves time — corrected from
+     the text at authoring); §33.8
      (p. 830), characteristics that matter less than you think; §33.9
      (p. 833), habits.
    - **Quote:** p. 835, 23 words — “The characteristics of a superior
@@ -3426,7 +3460,7 @@ this table is not attributed to the book.
 | --- | --- | --- | --- | --- |
 | F1 | share of a project's time construction takes | 30 to 80 percent of the total time, depending on size; as much as 65% on small projects, about 50% on medium | §1.2, p. 7; §27.5, p. 654 | the book's synthesis |
 | F2 | construction errors as a share of all errors | at least 35% of all defects regardless of size; 45–75% even on the largest projects (Figure 22-2); about 75% on small projects, about 50% on larger | §22.4, pp. 520–521; §27.3, p. 652 | Grady 1987 and others as cited there |
-| F3 | relative cost of fixing a defect by phase introduced × phase detected | requirements: 1, 3, 5–10, 10, 10–100; architecture: 1, 10, 15, 25–100; construction: 1, 10, 10–25 (detected at requirements, architecture, construction, system test, post-release) | §3.1, Table 3-1, p. 29 | Fagan 1976; Humphrey, Snyder and Willis 1991; Leffingwell 1997; Willis et al. 1998; Grady 1999; Shull et al. 2002; Boehm and Turner 2004; Dunn 1984 |
+| F3 | relative cost of fixing a defect by phase introduced × phase detected | requirements: 1, 3, 5–10, 10, 10–100; architecture: 1, 10, 15, 25–100; construction: 1, 10, 10–25 (detected at requirements, architecture, construction, system test, post-release); the table's example, an architecture defect costing $1,000 at architecture and $15,000 in system test; on smaller projects the post-release multiplier for a requirements error is closer to 5–10 than 100 | §3.1, Table 3-1, p. 29; §3.4, p. 39 for smaller projects | Fagan 1976; Humphrey, Snyder and Willis 1991; Leffingwell 1997; Willis et al. 1998; Grady 1999; Shull et al. 2002; Boehm and Turner 2004; Dunn 1984 |
 | F4 | statements equivalent to one C statement | C 1, C++ 2.5, Fortran 95 2, Java 2.5, Perl 6, Python 6, Smalltalk 6, Visual Basic 4.5 | §4.1, Table 4-1, p. 62 | Jones 1998; Boehm 2000; Prechelt 2000 |
 | F5 | productivity with experience in the language | about 30% higher with three or more years | §4.1, p. 62 | Boehm et al. 2000 (Cocomo II) |
 | F6 | a class's data members | consider decomposing above about seven | §6.3, pp. 143–144 | Miller 1956; Riel 1996 |
