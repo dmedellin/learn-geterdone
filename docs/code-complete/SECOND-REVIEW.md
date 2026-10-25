@@ -22,15 +22,17 @@ findings. Then read it and record where you disagree.
 
 `AGENTS.md` §0, §7, §8 (never read `site/`), `content/AGENTS.md`,
 `docs/code-complete/PLAN.md` (the status note, §0, §B, the course's §C
-entries, §D.0, §D.4, §E, §F, §G, §S and §R), the spec accuracy review if one
-exists (`docs/reviews/code-complete-spec-accuracy-review.md`: what was
-already corrected, and how), `docs/code-complete/AUTHORING.md`, and
+entries, §D.0, §D.4, §E, §F, §G, §S and §R — §R records what the two
+pre-authoring reviews found and what was done, so do not re-raise a settled
+point without new evidence), `docs/code-complete/AUTHORING.md`, and
 `docs/code-complete/kit-report.md`.
 
-Find out first whether the book's text is in hand (AUTHORING.md, "The text").
-If it is, every check below against "the book" is against the page; if it is
-not, it is against §C and §S.2 as corrected by the accuracy review, and every
-claim you cannot settle is listed for the third pass, not guessed at.
+The book's text is in hand: a private extraction outside the repository,
+with `ccbook.py` to grep it and `cc_quotes.py` to check quotations
+(AUTHORING.md, "The text"; printed page = PDF page − 37). Every check below
+against "the book" is against the page. Grep it; never read it whole, and
+never copy its text into your findings beyond a phrase that identifies a
+claim.
 
 ## What to look for
 
@@ -46,17 +48,21 @@ claim you cannot settle is listed for the third pass, not guessed at.
    Basili, Knuth…) must match §S.2 at the same strength: whose figure, from
    which projects or population, which year, an average or a range. A modal
    rate stated as a guarantee; one study generalised to all programmers; a
-   correlation stated as a cause. Run `grep -n "# verify" <course-package>`:
-   every book figure in the course has a marker with its §S.2 id, and no
-   figure lacks one. Where a claim goes beyond §S, use WebSearch/WebFetch
-   (load with ToolSearch) and say what you checked; a figure you cannot
-   confirm is listed, not corrected from memory.
+   correlation stated as a cause. Run `grep -n "# F[0-9]" <course-package>`:
+   every book figure in the course has a comment with its §S.2 id and page,
+   and no figure lacks one; check each against the page with `ccbook.py`.
+   Where a claim goes beyond the book (an original study), use
+   WebSearch/WebFetch (load with ToolSearch) and say what you checked; a
+   figure you cannot confirm is listed, not corrected from memory.
 3. **Copyright.** No code listing, checklist, table or figure of the book's
    reproduced or adapted line by line; at most two or three points of a
-   checklist, paraphrased; quotations only if the text is in hand, at most
-   40 words for the opening and 60 a lesson, each with its page (PLAN §E.3).
-   Until the text is in hand there are no quotations at all; a phrase in
-   quotation marks attributed to McConnell is a finding.
+   checklist, paraphrased; quotations at most 40 words for the opening and
+   60 a lesson, each with its page (PLAN §E.3). Run every quotation in the
+   course through `cc_quotes.py` (a line `tag|page|quote` per quotation): a
+   MISS, a word count over the limit, a page that differs, or a quotation
+   other than §C's **Quote** that §C does not record is a finding. A phrase in
+   quotation marks attributed to McConnell that is not on the page is a
+   finding of the first rank.
 4. **The code.** For every snippet: does the Java compile as the fragment the
    lesson presents (types declared, braces balanced, no feature PLAN §D.0
    excludes)? Does it do what the prose says it does? Trace it by hand for
@@ -82,15 +88,21 @@ claim you cannot settle is listed for the third pass, not guessed at.
    pre-installed: `require('playwright')`, `chromium.launch()`; serve the
    output with `python3 -m http.server`). Load each preset; edit the code as
    the exercise asks; read the tiles and the listing's line numbers against
-   the prose. Does the lesson's text match what the lab does?
+   the prose. Does the lesson's text match what the lab does? Check that the
+   preset's code and the body's `code` block are the same constant (PLAN
+   §E.4 item 2), and that the exercise's answer appears only in a quiz
+   `why`.
 7. **The read-out.** Run `/usr/bin/python3 scripts/speechcheck.py`, and listen
    to (or read the spoken text of) each lesson's code lines and backtick
-   runs: `&&`, `||` and a prefix `!` must be said "and", "or", "not". A
-   negation dropped is a finding of the first rank.
+   runs: `&&`, `||` and a prefix `!` must be said "and", "or", "not"; a
+   `code` block's lines are announced by number; `%` is "mod". A negation
+   dropped is a finding of the first rank.
 8. **Quiz.** Exactly one defensible answer per question; argue for every
    distractor. A wrong answer that the book partly supports (it does tolerate
    long routines in some cases) is defensible: sharpen it into the reading the
-   lesson argues against.
+   lesson argues against. Distractors that are the same condition or the same
+   integer check as the answer, a quizzed verdict, and a decision-point
+   question without the rule in its stem are findings (PLAN §E.4 item 5).
 9. **Voice** against §F: the chapter first, then the code; warm, practical,
    about the reader's own code; McConnell presented, not endorsed; the
    numbers named as other people's; at most one modern aside in the course,
@@ -109,7 +121,8 @@ share this checkout. Do not commit. If the package fails to import because
 another course is mid-edit, wait and retry.
 
 Write the findings file (each finding with lesson, what was wrong, what you
-changed or recommend; then a list of every claim left for the third pass
-against the book; then where you disagree with the pedagogy assessment) and
-report a short summary with the final preview output line and the count of
-`# verify` markers in the course.
+changed or recommend; then any claim you could not settle against the page,
+with what you searched; then where you disagree with the pedagogy
+assessment) and report a short summary with the final preview output line,
+the count of `# F` figure comments in the course, and the `cc_quotes.py`
+results.

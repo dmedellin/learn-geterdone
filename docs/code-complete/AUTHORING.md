@@ -8,12 +8,13 @@ built the way Capital and Phenomenology of Perception were
 sections apply here in full), with one difference that runs through
 everything: every lesson is applied, and the code in it is the lesson's own.
 
-**Do not start until both blockers in the status note at the top of PLAN are cleared, or
-the orchestrator says which one you are working around:** the renderer's
-`code` block and code read-out (PLAN §H.1, R1 and R2) and the book's text
-(PLAN §E.2). Without R1 there is nowhere to put a snippet; without R2 a
-lesson on `!done` is read aloud as "done". Without the text you can write a
-course, under the rules in "The text" below, and a later pass fills it in.
+**Do not start until the renderer's `code` block and code read-out (PLAN
+§H.1, R1 and R2, including the review's R2 additions) have landed**, unless
+the orchestrator says you are working around them. Without R1 there is
+nowhere to put a snippet; without R2 a lesson on `!done` is read aloud as
+"done" and a listing is read without the line numbers the prose refers to.
+The book's text is in hand (PLAN §E.2), and PLAN has been reviewed and
+reconciled (§R): read §R's entries for your course before you start.
 
 ## Read first, in this order
 
@@ -40,46 +41,54 @@ course, under the rules in "The text" below, and a later pass fills it in.
 The source is McConnell, *Code Complete*, 2nd edition (Microsoft Press,
 2004), PLAN §E.2. It is in copyright.
 
-**Until the text is in hand** (the state when this brief was written):
+**Where it is.** A private extraction of the operator's copy, outside the
+repository:
+`/tmp/claude-0/-home-claude/3b1d3502-1b81-5554-ace3-d7f9f019031f/scratchpad/book/cc2.txt`
+(`pdftotext -layout`, one form feed per PDF page). **Printed page = PDF page
+− 37.** If the orchestrator has moved it, the new route is in your brief.
+Two helpers sit in `…/scratchpad/tools/`:
 
-- every page reference is `TBD`, in the lesson's comment
-  (`# McConnell §10.4, p. TBD`) and nowhere in the reader's prose: the
-  opening `p` names the chapter and sections and invites the reader to read
-  them in their own copy first;
-- section numbers and titles come from §C; where §C marks one *(check)*, use
-  it and list it in your report;
-- every figure you attribute to the book carries `# verify F<n>` in a comment
-  beside the dict, with its id from §S.2, and is written in the lesson as the
-  book's report of someone's figure ("the book's table, after Jones, gives
-  …"), at the strength §S.2 gives; a figure §S.2 says the lessons do not use
-  until checked (F2) is not used;
-- no quotation, of McConnell or of anyone he cites, inside `&ldquo;…&rdquo;`
-  or anywhere else. Paraphrase, and say whose claim it is.
+- `python3 ccbook.py '<regex>'` prints each matching line as
+  `printed page | line`. Use it to find a passage; then read the section you
+  need with a narrow `sed -n` on the page, never the file whole.
+- `python3 cc_quotes.py <file>` checks lines `tag|page|quote` against the
+  page (and the next) and prints OK, LOOSE or MISS with the word count. Run
+  it on every quotation you use.
 
-**Once the text is in hand**, the orchestrator records here where the private
-extraction lives (outside the repository, as for Phenomenology) and how to
-find a printed page from a line. Then:
+**What is settled.** Every page, section number and title in PLAN §C is the
+book's, checked against the text. Every figure in §S.2 (F1–F30) is settled,
+with its page and the sources the book names. Each lesson's opening
+quotation is chosen in §C's **Quote** line, with its page and word count.
 
-- find the lesson's pages with `grep -n` and read the whole section, not only
-  the passage you need;
-- fill every `TBD`; resolve every `# verify` and *(check)* in your course
-  against the page: if the book differs from §S.2 or §C, the book wins;
-  correct the entry in `docs/code-complete/PLAN.md` in the same change, delete
-  the marker, and say so in your report;
-- a lesson may open with one quotation of at most **40 words**, only where
-  the sentence is the chapter's own summary of its argument; a lesson's
-  quotations total at most **60 words** (PLAN §E.3). Copy character for
-  character, the page in a comment beside the dict; never from memory, a blog,
-  a secondary source or the PLAN;
-- a line McConnell quotes from someone else (Knuth, Brooks, Dijkstra) is
-  attributed to its author and counted against the same limits.
+- Put the page in a comment beside the dict (`# McConnell §10.4,
+  pp. 244–258`); in prose, name the chapter and sections and invite the
+  reader to read them in their own copy first.
+- Every figure you attribute to the book carries a comment with its §S.2 id
+  and page (`# F17, p. 470`) and is written as the book's report of
+  someone's figure ("the book's table, after Jones, gives …"), at the
+  strength §S.2 gives. A figure not in §S.2 is not attributed to the book; if
+  you need one, find it with `ccbook.py`, add the row to §S.2 in the same
+  change, and say so in your report.
+- Read the section, not only the line: before you write "McConnell argues",
+  grep the passage and read the paragraph around it. If the book differs
+  from §C, the book wins; correct §C in the same change and report it.
+- **Quotations.** Open with §C's **Quote** or none. One quotation of at most
+  **40 words**; a lesson's quotations total at most **60 words** (PLAN
+  §E.3). Copy character for character from the text (curly quotes and
+  apostrophes as the book prints them; inner quotation marks as
+  `&lsquo;…&rsquo;`), the page in a comment beside the dict, and check it
+  with `cc_quotes.py`. Never from memory, a blog, a secondary source or the
+  PLAN's line wrapping. A line McConnell quotes from someone else (Knuth,
+  Brooks, Dijkstra) is attributed to its author and counted against the same
+  limits.
 
-**Never, with or without the text:** reproduce the book's code listings,
-checklists, tables or figures, retyped or "adapted" line by line. A table's
-figures may be used a few at a time as facts with their source; a checklist
-may be named and two or three of its points paraphrased; no more. Never copy
-the text, or any long stretch of it, into the repository, the project files or
-a report.
+**Never:** reproduce the book's code listings, checklists, tables or
+figures, retyped or "adapted" line by line (the review found four
+adaptations in the first draft of this plan, all since replaced: PLAN §R,
+MF-1). A table's figures may be used a few at a time as facts with their
+source; a checklist may be named and two or three of its points paraphrased;
+no more. Never copy the text, or any stretch of it beyond the quotations
+above, into the repository, the project files or a report.
 
 ## The code
 
@@ -90,14 +99,20 @@ never one found online.
   no lambdas, no streams, no annotations. It must compile as a fragment a
   reader would accept: declared types, balanced braces, no undeclared names
   except calls the prose names as "some routine that …".
-- As short as the point allows: about 20 lines, never more than 24 (the
-  renderer allows 30; §D.4's longest, `nested-shipping`, is 22, and a reader
-  should see a snippet whole), at most 72 characters a line, four-space
-  indentation, no tabs.
-- A snippet that is in §D.4 is copied from §D.4 exactly, because its figures
-  are computed from that text. A changed or new snippet is run through the
-  built lab (`labcheck.js --observe`, below) and its figures are recorded in
-  your course's §C entry in the same change.
+- As short as the point allows: at most 20 lines (the renderer allows 30;
+  `nested-shipping`, 22, is the one exception, because the nesting is the
+  lesson), at most 72 characters a line where possible and never more than
+  80 (R1's limit), four-space indentation, no tabs.
+- **One constant per snippet.** Each snippet is one Python string constant
+  in your course module, used by the lesson's `code` block (split into
+  lines) and by the preset's cfg, so the line numbers the prose names are
+  the lab's. Never paste the same code twice. The test
+  `test_code_complete_presets_use_the_lessons_snippets` checks it.
+- A snippet that is in §D.4 (or `presets.py`) is copied from there exactly,
+  because its figures are computed from that text. A changed or new snippet
+  is run through the reference model or the built lab (`labcheck.js
+  --observe`, below) and its figures are recorded in your course's §C entry
+  in the same change.
 - The snippet must do what the lesson says it does. Trace it by hand for the
   values the prose names; a deliberately buggy snippet (the off-by-one, the
   dangling `else`, the `clamp` whose `return high;` is unconditional) is
@@ -133,8 +148,11 @@ never one found online.
 1. Write the dict from the §C entry; §C's misconception is `mistakes[0]`;
    the `standard` measures §C's **Standard**; the exercise is §C's
    **Exercise**, laid out as PLAN §E.4 item 4 says (an `h3` "Exercise", the
-   `code` block, a `p` saying what to find; the answer in `worked` or a quiz
-   `why`, never on the same screen).
+   `code` block, a `p` saying what to find). §C's **Answer** is the `why` of
+   one quiz item that asks for it, and appears nowhere else on the page;
+   `worked` works the preset §C's **Worked** names. The last of the `steps`
+   is §C's **Own:** line, as an instruction with an observable result.
+   §C's **Also** misconception, where given, is `mistakes[1]`.
 2. Write the lab cfg and presets with `expect: {}`.
 3. Render your course only:
    `python3 scripts/preview_subject.py code-complete --course <course-slug> --out <dir>`
@@ -157,9 +175,17 @@ never one found online.
    `/usr/bin/python3 scripts/speechcheck.py` with the code dialect on. Listen
    to one lesson per course with the read-out: every `&&`, `||` and prefix
    `!` must be said as "and", "or" and "not".
-7. Try to argue for every wrong quiz answer. If you can, rewrite it.
-8. `grep -n "# verify" <your course package>` and check that every figure
-   attributed to the book has its marker and §S.2 id, and nothing else does.
+7. Try to argue for every wrong quiz answer. If you can, rewrite it. The
+   rules (PLAN §E.4 item 5): every distractor differs from the answer on a
+   row of a truth table or an integer, and the `why` names it (`!isAdmin &&
+   isOwner` and `isOwner && !isAdmin` are the same condition; `qty >= 1 &&
+   qty <= 99` and `qty > 0 && qty < 100` are the same check); never quiz a
+   verdict ("is this routine too complex?"); a question on decision points
+   states the rule in the stem; a figure from the book is asked only as §S.2
+   gives it, with its source in the `why`.
+8. `grep -n "# F[0-9]" <your course package>` and check that every figure
+   attributed to the book has its §S.2 id and page, and nothing else does;
+   run `cc_quotes.py` on your quotations.
 
 ## What every lesson must do (from §B, §C, §E and §F)
 
@@ -208,8 +234,12 @@ cannot settle.
 
 - Do not give McConnell a verdict the book does not contain. Re-read every
   sentence that begins "McConnell says", "argues", "recommends" or
-  paraphrases him; until the text is in hand, it must match §C at the
-  strength §C states, and the third pass checks it against the page.
+  paraphrases him, against the page (`ccbook.py`), at the strength the page
+  states.
+- A misconception is refuted by the chapter's argument; a lab run on the
+  lesson's illustrative instance illustrates the refutation and is said to
+  ("on the lesson's illustration, …"). The later view named as a course's
+  modern aside is never `mistakes[0]` (PLAN §C preamble, §F.4).
 - A view McConnell states in order to qualify it (the case for long routines
   in §7.4, the case against comments in §32.3's dialogue) is not his
   conclusion. Say whose voice it is.
@@ -230,6 +260,6 @@ cannot settle.
 
 End with a short report: lessons written, every §C deviation and why (each
 changed or new snippet with its figures), any kit gap, any renderer or
-read-out problem, every *(check)* you relied on, the count of `# verify`
-markers in your course, the preview command's final output line, and any
-spoken forms added.
+read-out problem, every page or figure you corrected against the text, each
+quotation used with its `cc_quotes.py` result, the preview command's final
+output line, and any spoken forms added.
