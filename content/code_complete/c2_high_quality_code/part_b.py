@@ -245,9 +245,7 @@ LESSONS = [
             ("p", "Section 7.3 is on names. A routine's name should describe everything the "
                   "routine does; the cure for a long, silly name is not a vaguer one but a "
                   "routine without side effects. Avoid verbs like handle, process and deal "
-                  "with, which say only that something happens; never tell routines apart by "
-                  "a number; name a function for what it returns and a procedure with a verb "
-                  "and its object; and use opposites precisely."),
+                  "with, which say only that something happens."),
             ("p", "Now the count. One reason on section 7.1's list is visible to a machine: "
                   "duplicated code. The lab compares statement lines as text, with spacing "
                   "collapsed, and reports each block of at least two lines that appears more "
@@ -273,12 +271,12 @@ LESSONS = [
                   "kinds, and rewrite the weakest as separate routines:"),
             ("ol", [
                 "returns the sales tax on an amount;",
-                "works out a parcel's volume, then uses that volume to choose a box size;",
+                "works out a parcel's volume and then, from that volume, its box size, and returns both;",
                 "from an order's list of items, adds up the total weight and, separately, "
                 "counts the distinct suppliers;",
-                "at startup, opens the log, loads the settings and connects to the database;",
-                "asks for a customer's name and then the delivery date, in the order the "
-                "form shows them, with nothing passed between the two;",
+                "at the end of each night, archives the day's orders, empties the shopping baskets and rotates the logs;",
+                "prints a shipping label and then writes a line to the dispatch log, in the "
+                "order the warehouse procedure lists them, with nothing passed between the two;",
                 "formats an invoice, a receipt or a refund note, depending on a flag passed in.",
             ]),
             ("code", _lines(PRINT_SUMMARY_EXERCISE)),
@@ -365,14 +363,16 @@ LESSONS = [
                    "Functional, sequential, communicational, temporal, procedural, "
                    "coincidental"],
              "c": 0,
-             "why": "The tax is one operation: functional. The volume feeds the box size: "
-                    "sequential. Weight and supplier count share only the item list: "
-                    "communicational. Startup groups things by when they run: temporal. The "
-                    "name and date are ordered only by the form and share no data: "
+             "why": "The tax is one operation: functional. The volume feeds the box size and both are "
+                    "returned: sequential; it would be functional if it returned the box size "
+                    "alone. Weight and supplier count share only the item list: "
+                    "communicational. The nightly jobs are grouped by when they run: temporal. The "
+                    "label and the log line are ordered only by the warehouse procedure and share no data: "
                     "procedural. The flag picks among three unrelated jobs: logical, the "
                     "weakest here, and it becomes three routines, `formatInvoice`, "
                     "`formatReceipt` and `formatRefundNote`, with no flag. Coincidental "
-                    "would mean no relation at all; these three are at least all documents."},
+                    "cohesion has no tie at all; here a flag passed in picks the operation, "
+                    "which is what makes it logical (p. 170)."},
             {"q": "Paste the exercise's `printSummary` into the lab. What does it report?",
              "a": ["1 block, 6 lines: lines 3–5 and lines 7–9",
                    "1 block, 4 lines: lines 4–5 and lines 8–9",
@@ -499,13 +499,15 @@ LESSONS = [
                   "he says, argued about the best maximum length for a routine all the way "
                   "across the Atlantic, and never settled it."),
             ("p", "Section 7.4 reviews the studies, which the book cites from Basili and "
-                  "Perricone (1984) to Jones (1986a), and they do not say what you might "
-                  "expect: several found larger routines no more error-prone than small ones, "
-                  "and some found them cheaper. The book's conclusion is that a routine with "
-                  "a complex algorithm may be allowed to grow organically up to 100 to 200 "
-                  "lines, a line being one that is neither a comment nor blank, and that "
-                  "past about 200 you should be careful, because none of the studies looked "
-                  "beyond it. Length should follow from cohesion, nesting, the number of "
+                  "Perricone (1984) to Jones (1986a), and most do not say what you might "
+                  "expect: several found larger routines no more error-prone per line than "
+                  "small ones, and some found them cheaper to develop; one, at IBM, found "
+                  "routines over 500 lines the most error-prone. The book's conclusion is "
+                  "that a routine with a complex algorithm may be allowed to grow "
+                  "organically up to 100 to 200 lines, a line being one that is neither a "
+                  "comment nor blank, and that past about 200 you should be careful: none "
+                  "of the studies that favoured longer routines distinguished sizes beyond "
+                  "200, and somewhere past it a routine becomes hard to understand. Length should follow from cohesion, nesting, the number of "
                   "variables and decision points, not from a limit imposed for its own sake."),
             ("p", "Section 7.5 is the longest, because interfaces between routines are, it "
                   "says, among the most error-prone parts of a program. Put parameters in "
@@ -518,9 +520,9 @@ LESSONS = [
                   "settled by what the routine is about, not by a rule. Java has no "
                   "<em>in</em> or <em>out</em> keywords; `final` on a parameter stops it "
                   "being reassigned, but not an object it refers to being changed."),
-            ("p", "Section 7.6 draws the line between functions and procedures. A function, "
-                  "in the strict sense, takes input and returns one value through its name, "
-                  "as `sin` or `screenHeight` do. A routine that does something and returns "
+            ("p", "Section 7.6 draws the line between functions and procedures. Purists, "
+                  "the section says, would have a function take only input and return one "
+                  "value through its name, as `sin` or `screenHeight` do. A routine that does something and returns "
                   "a status is common, and the book accepts it if used consistently, while "
                   "preferring a procedure with an explicit status variable. Its rule is the "
                   "key point above. Section 7.7, on macros and inline routines, is about C "
@@ -553,7 +555,7 @@ LESSONS = [
             ("p", "Count this header's parameters, find the ones that travel together, and "
                   "write a header with fewer parameters that keeps what `schedule` is "
                   "about. Use a type from the Java library if one fits. You can paste the "
-                  "header into the lab afterwards to check both counts."),
+                  "header into the lab afterwards to check the parameter count."),
             ("p", "A routine's parameters are where bad data arrives. The next lesson, "
                   "Assertions and Error Handling, begins Chapter 8, on what a routine should "
                   "do about it."),
@@ -623,15 +625,18 @@ LESSONS = [
         },
         "quiz_title": "Length, parameters and functions",
         "quiz": [
-            {"q": "How many parameters has the exercise's `schedule`, and how many could it "
-                  "have with its time fields grouped?",
+            {"q": "How many parameters has the exercise's `schedule`, and how many once the "
+                  "five fields that name a moment, `year` to `minute`, become one "
+                  "`LocalDateTime`?",
              "a": ["8, then 4", "8, then 6", "7, then 4", "8, then 1"],
              "c": 0,
              "why": "`name`, `year`, `month`, `day`, `hour`, `minute`, `durationMinutes` and "
                     "`room` are 8. The five fields from `year` to `minute` are one moment, "
                     "a `LocalDateTime`, so the header becomes `schedule(String name, "
-                    "LocalDateTime start, int durationMinutes, String room)`: 4. One "
-                    "parameter would be a grab-bag holding the name and room as well."},
+                    "LocalDateTime start, int durationMinutes, String room)`: 4. `durationMinutes` "
+                    "could become a `Duration` as well; the header would still have four "
+                    "parameters. One parameter would be a grab-bag holding the name and room "
+                    "as well."},
             {"q": "In <code>nine-parameters</code>, the lab prints 9 code lines and 8 "
                   "statement lines. What is the one line in the first count and not the "
                   "second?",
@@ -647,8 +652,9 @@ LESSONS = [
                    "About 500 lines", "No limit at all"],
              "c": 1,
              "why": "Up to 100 to 200 lines, a line being neither a comment nor blank "
-                    "(pp. 173–174), with care past 200 because the studies the book cites "
-                    "did not distinguish sizes beyond it. One screen is the traditional "
+                    "(pp. 173–174), with care past 200, because none of the studies that "
+                    "found longer routines cheaper or less error-prone distinguished sizes "
+                    "beyond it. One screen is the traditional "
                     "figure the section reports and does not adopt."},
             {"q": "A routine named `totalPrice` returns the order's total and also marks the "
                   "order as priced. By section 7.6, what should change?",
@@ -694,7 +700,8 @@ LESSONS = [
             "only a few lines long, and that length alone is a reason to extract a routine: "
             "small routines, it holds, are easier to name, test and reuse. The book's position "
             "is that length should follow from complexity, and that the evidence it reviewed "
-            "did not find small routines less error-prone. The two are stated here side by "
+            "did not find routines of 100 to 200 lines more error-prone than shorter ones. "
+            "The two are stated here side by "
             "side; this course does not settle between them, and your own records of where "
             "defects were found can test either."
         ),
@@ -723,7 +730,7 @@ LESSONS = [
             "expected errors: handle them",
             "impossible conditions: assert them",
             "test each end, inside and outside",
-            "a check needs both ends joined by &&",
+            "inside a range: join both ends with &&",
             "how to handle bad input is design",
         ],
         "key_label": "Sections 8.1 to 8.3 in five lines",
@@ -947,11 +954,11 @@ LESSONS = [
              "whether the program meets its requirements, and should be made once, at the "
              "level of the architecture, and followed consistently. That is the key point "
              "this lesson opens with."),
-            ("Testing only values inside the range",
-             "A check that accepts 5 and rejects 50 can still be wrong at either end. On "
-             "the lesson's illustration, <code>never-fires</code> looks fine on any valid "
-             "month and fails only on 0 and 13, the values just outside. The boundary tests "
-             "exist to try exactly those."),
+            ("Testing only values far from the ends",
+             "A check that flags 0 and 50 can still be wrong at an end. Type "
+             "`month < 1 || month > 13` into the lab: it flags 0 and 50 correctly, lets 13 "
+             "through, and only the boundary test 13 shows it. The boundary tests exist to "
+             "try exactly the values next to each end."),
         ],
         "standard": (
             "Finish when you can find where a range check is wrong by hand.",
@@ -1082,7 +1089,7 @@ LESSONS = [
                   "the barricade promised. In <code>barricaded</code> the three outside "
                   "values are validated and the three inside asserted, and all four lists "
                   "print 0: none. In <code>checks-everywhere</code> all six are validated, "
-                  "and the last list prints 3: lineTotal, customerId, taxRate."),
+                  "and the last list prints 3: lineTotal, customerId, taxDue."),
             ("p", "The counts are the rule applied to the records, not a verdict. Section 8.2 "
                   "itself allows a large, long-lived system to assert a condition and handle "
                   "it anyway, so an entry in the last list can be a choice. What the lab "
@@ -1116,7 +1123,7 @@ LESSONS = [
                  "label": "Mixed: some values on the wrong side of the rule (illustrative)",
                  "values": "quantityField, outside, validate; uploadName, outside, none; "
                            "feedPrice, outside, assert; lineTotal, inside, assert; "
-                           "customerId, inside, none; taxRate, inside, assert",
+                           "customerId, inside, none; taxDue, inside, assert",
                  "expect": {"cdOutsideUnchecked": "1: uploadName",
                             "cdOutsideAsserted": "1: feedPrice",
                             "cdInsideUnchecked": "1: customerId",
@@ -1125,7 +1132,7 @@ LESSONS = [
                  "label": "Barricaded: outside validated, inside asserted",
                  "values": "quantityField, outside, validate; uploadName, outside, validate; "
                            "feedPrice, outside, validate; lineTotal, inside, assert; "
-                           "customerId, inside, assert; taxRate, inside, assert",
+                           "customerId, inside, assert; taxDue, inside, assert",
                  "expect": {"cdOutsideUnchecked": "0: none",
                             "cdOutsideAsserted": "0: none",
                             "cdInsideUnchecked": "0: none",
@@ -1134,11 +1141,11 @@ LESSONS = [
                  "label": "Checks everywhere: every value validated",
                  "values": "quantityField, outside, validate; uploadName, outside, validate; "
                            "feedPrice, outside, validate; lineTotal, inside, validate; "
-                           "customerId, inside, validate; taxRate, inside, validate",
+                           "customerId, inside, validate; taxDue, inside, validate",
                  "expect": {"cdOutsideUnchecked": "0: none",
                             "cdOutsideAsserted": "0: none",
                             "cdInsideUnchecked": "0: none",
-                            "cdInsideValidated": "3: lineTotal, customerId, taxRate"}},
+                            "cdInsideValidated": "3: lineTotal, customerId, taxDue"}},
             ],
             "panel_title": "Apply the barricade rule",
             "panel_intro": (
@@ -1203,7 +1210,9 @@ LESSONS = [
                     "order class validated and the discount computed after validation, four "
                     "inside. The tax rate is the one to argue about: the team writes the "
                     "configuration, but it is read from outside the program, and section "
-                    "8.1 treats a file as an external source."},
+                    "8.1 treats a file as an external source. Nothing here is neither: the "
+                    "array index never crossed the barricade, but section 8.2 still asks for a "
+                    "precondition on it, which is what an assertion is for."},
             {"q": "A routine inside the barricade finds a negative quantity. By section 8.5, "
                   "what has gone wrong?",
              "a": ["The user typed a bad value, which the routine should handle",
@@ -1366,7 +1375,8 @@ LESSONS = [
                   "(flagged in the listing), and the most code under any one step. The preset "
                   "<code>free-slot</code>, below, has 5 steps and 7 statement lines; the most "
                   "code under one step is 3 lines, under line 8; and one step is empty, "
-                  "line 14."),
+                  "line 14. A step's code runs to the next comment, so a loop header and "
+                  "an `if` belong to the step above them."),
             ("code", {"lines": _lines(FREE_SLOT), "marked": [14]}),
             ("p", "Line 14 says that if no slot is free the routine logs the overflow, and "
                   "nothing under it does: a full table is reported to nobody. The process kept "

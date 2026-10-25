@@ -137,8 +137,8 @@ _EVERYTHING_TALKS = "; ".join("%s, %s" % (a, b) for a in _FIVE for b in _FIVE if
 LESSONS = [
     # ---------------------------------------------------------------- 01
     # McConnell Chapter 5, sections 5.1-5.2, pp. 73-86.
-    # Quote: p. 123 (Key Points), 17 words, cc_quotes.py OK; Brooks's title
-    # "No Silver Bullets", p. 77, 3 words. Lesson total: 20 words.
+    # Quote: p. 123 (Key Points), 17 words, cc_quotes.py OK. Brooks's essay is
+    # named by its own title, No Silver Bullet, not quoted. Lesson total: 17 words.
     # Wicked problems after Rittel and Webber 1973 (p. 74); Tacoma Narrows
     # (pp. 74-75); accidental and essential difficulties after Brooks 1987
     # (pp. 77-78); the primary technical imperative (p. 78); Dijkstra 1972
@@ -216,7 +216,7 @@ LESSONS = [
                   "and design is emergent: it evolves through reviews, discussion and the "
                   "experience of writing and revising the code."),
             ("p", "Section 5.2 asks what all this difficulty is made of, and answers with "
-                  "Fred Brooks's essay &ldquo;No Silver Bullets&rdquo; (1987). Brooks "
+                  "Fred Brooks's essay <em>No Silver Bullet</em> (1987). Brooks "
                   "divided software's difficulties, after Aristotle, into the accidental and "
                   "the essential. Assembly language, batch computers and tools that did not "
                   "work together were accidental, and were largely dealt with decades ago. "
@@ -256,8 +256,8 @@ LESSONS = [
                   "`ui` uses `orders` and `billing`, each of those uses `stock` and `db`, and "
                   "`stock` uses `db`. That is 7 uses touching 7 of the 10 pairs, 7/10 = 70%. "
                   "The largest fan-in is db 3, and the largest fan-out billing 2, tied with "
-                  "`ui` and `orders`. In <code>strict-layers</code> each layer talks only to "
-                  "the one below: `ui` to `orders` and `billing`, `orders` to `stock`, `stock` "
+                  "`ui` and `orders`. In <code>strict-layers</code> each module talks only to "
+                  "modules below it, and to fewer of them: `ui` to `orders` and `billing`, `orders` to `stock`, `stock` "
                   "and `billing` to `db`. Five uses, half the pairs, 1/2 = 50%, and the "
                   "largest fan-in falls to db 2."),
             ("p", "What do the counts show? Not that one design is good. They show how many "
@@ -298,7 +298,7 @@ LESSONS = [
                           "orders, db; billing, db; stock, db",
                  "expect": {"dgEdges": "7", "dgConnected": "7/10 = 70%", "dgFanIn": "db 3"}},
                 {"id": "strict-layers",
-                 "label": "Strict layers: each module uses only the layer below",
+                 "label": "Strict layers: each module uses fewer modules, all below it",
                  "edges": "ui, orders; orders, stock; stock, db; ui, billing; billing, db",
                  "expect": {"dgEdges": "5", "dgConnected": "1/2 = 50%", "dgFanIn": "db 2"}},
             ],
@@ -339,7 +339,7 @@ LESSONS = [
             "lines": [
                 "possible pairs: 5 * 4 / 2, which is 10",
                 "everything talks: 20 uses, all 10 pairs",
-                "layered: 7 uses, each joins a different pair",
+                "layered: 7 uses, each joins its own pair",
                 "layered: 7 of 10 pairs connected, 70 per cent",
                 "db is used by orders, billing and stock: 3",
                 "strict layers: 5 uses, 5 of 10 pairs",
@@ -360,14 +360,15 @@ LESSONS = [
              "a": ["6 of 15 pairs, 40%; stock, with fan-in 2",
                    "6 of 30 pairs, 20%; stock, with fan-in 2",
                    "6 of 15 pairs, 40%; api, with fan-in 2",
-                   "6 of 12 pairs, 50%; stock, with fan-in 2"],
+                   "5 of 15 pairs, 33.3%; stock, with fan-in 2"],
              "c": 0,
              "why": "Six modules give 6 × 5 / 2 = 15 possible pairs. When every module uses "
                     "every other there are 30 uses and all 15 pairs are connected. Layered, the "
                     "6 uses join 6 different pairs, 6/15 = 2/5 = 40%, and `stock` is used by "
                     "`orders` and `billing`, a fan-in of 2. Thirty is the number of uses when "
                     "all talk, not the number of pairs. `api` uses two modules: that is its "
-                    "fan-out; only `ui` uses it."},
+                    "fan-out; only `ui` uses it. Six records join six pairs: count the records before "
+                    "the pairs."},
             {"q": "In a design, `a` uses `b` and `c`, `d` uses `c`, and `e` uses `c`. Which "
                   "module has the largest fan-in, and what is it?",
              "a": ["`a`, 2", "`c`, 4", "`c`, 3", "`e`, 1"],
@@ -439,8 +440,8 @@ LESSONS = [
     # Parnas 1972 and Boehm 1987 (p. 92); secrets and the right to privacy
     # (pp. 92-93); the ID example (pp. 93-94); two categories of secrets
     # (p. 94); barriers (pp. 95-96); likely change (pp. 97-99); section 5.4
-    # (pp. 110-118); enough design and the two positions always wrong
-    # (p. 119); section 5.5 (pp. 118-119).
+    # (pp. 110-118); section 5.5 (pp. 118-119), with enough design and the
+    # two positions always wrong on p. 119.
     {
         "slug": "design-heuristics-and-information-hiding",
         "title": "Design Heuristics and Information Hiding",
@@ -491,8 +492,7 @@ LESSONS = [
                   "practices and 5.5 on methodologies, pages 87 to 123. Read them in your own "
                   "copy first."),
             ("p", "If design is heuristic, as the first lesson read, the next question is "
-                  "which heuristics. Section 5.3 gives a list, and says plainly that its items "
-                  "overlap: find real-world objects; form consistent abstractions; "
+                  "which heuristics. Section 5.3 gives a list: find real-world objects; form consistent abstractions; "
                   "encapsulate implementation details; inherit when that simplifies the "
                   "design; hide secrets; identify areas likely to change; keep coupling "
                   "loose; look for common design patterns. A shorter list follows, from "
@@ -521,16 +521,17 @@ LESSONS = [
                   "areas likely to change, with three steps: identify the items likely to "
                   "change, separate each into its own class, and isolate it behind an "
                   "interface that does not change with it. Business rules, hardware "
-                  "dependencies, input and output and complex data structures are on its "
-                  "list of the usual suspects."),
+                  "dependencies, input and output, status variables and data-size "
+                  "constraints are on its list of the usual suspects."),
             ("p", "Section 5.4 turns from heuristics to practice: iterate; divide and "
                   "conquer; work top down and bottom up, which it says are complementary "
                   "rather than rival; build experimental prototypes; design with others, "
                   "formally or informally; and capture the design cheaply, in comments, "
-                  "on a wiki, in photographs of a whiteboard. How much design is enough? A "
-                  "judgement call, it says, but two amounts are wrong every time: designing "
-                  "every last detail, and designing nothing at all. Section 5.5 adds that "
-                  "dogmatic adherence to any one method hurts."),
+                  "on a wiki, in photographs of a whiteboard. Section 5.5, on "
+                  "methodologies, comes back to how much design is enough: a judgement "
+                  "call, it says, but two amounts are wrong every time, designing every "
+                  "last detail and designing nothing at all, and dogmatic adherence to any "
+                  "one method hurts."),
             ("p", "Now the count. The lab reads a design as records `dependent, dependency` "
                   "and a module that changes, and prints two tiles: the modules that depend "
                   "on it directly, and every module the change reaches by following the "
@@ -654,7 +655,7 @@ LESSONS = [
                     "and `b` use `x`, and `c` uses `a`, so 4 modules are reached: x, a, b and "
                     "c. Three reached leaves out `x` itself; three direct counts modules that "
                     "only reach `fmt` through `x`."},
-            {"q": "According to section 5.4, which two amounts of design are wrong every "
+            {"q": "According to section 5.5, which two amounts of design are wrong every "
                   "time?",
              "a": ["Designing before the requirements are final, and designing after coding "
                    "starts",
@@ -669,8 +670,8 @@ LESSONS = [
             {"q": "Into which two kinds does section 5.3 divide the secrets a module hides?",
              "a": ["Data and routines",
                    "Hiding complexity, and hiding sources of change",
-                   "Public secrets and private secrets",
-                   "Secrets of the user interface, and secrets of the database"],
+                   "Hiding from users, and hiding from other programmers",
+                   "Hiding data, and hiding routines"],
              "c": 1,
              "why": "The two categories are hiding complexity, so that your mind need not deal "
                     "with it unless you are working on it, and hiding sources of change, so "
@@ -780,8 +781,8 @@ LESSONS = [
                   "lists follow from that: implementation details hidden, the effect of a "
                   "change limited, an interface that says what it means, code that is more "
                   "obviously correct, and a program that works with real-world entities "
-                  "rather than low-level ones. A class, he says, is an abstract data type "
-                  "plus inheritance and polymorphism."),
+                  "rather than low-level ones. One way to think of a class, he says, is "
+                  "as an abstract data type plus inheritance and polymorphism."),
             ("p", "Section 6.2 asks what makes a class interface good, and its first answer "
                   "is abstraction: each class should implement one abstract data type and no "
                   "more, and its public routines should belong together. Its examples include "
@@ -901,19 +902,20 @@ LESSONS = [
         "quiz_title": "Interfaces, counted and read",
         "quiz": [
             {"q": "In the exercise's `Point`, how many fields and public fields are there, and "
-                  "into how many classes do <code>kitchen-sink</code>'s six public routines "
-                  "fall?",
-             "a": ["3 fields, 2 public; three classes",
-                   "3 fields, 3 public; three classes",
-                   "2 fields, 2 public; three classes",
-                   "3 fields, 2 public; two classes"],
+                  "what does a caller need once `x` and `y` are private?",
+             "a": ["3 fields, 2 public; a reader for each, or whatever the callers do with them",
+                   "3 fields, 3 public; nothing, since `label` is already private",
+                   "2 fields, 2 public; a reader for each",
+                   "3 fields, 2 public; nothing, since `distanceTo` already reads them"],
              "c": 0,
              "why": "`Point` declares `x`, `y` and `label`, and `x` and `y` are public: 3 and "
                     "2. Made private, a caller needs `x()` and `y()`, or better whatever the "
                     "callers actually do with them. The kiosk's routines serve three "
                     "abstractions: tickets (`issueTicket`, `refundTicket`), the weather "
                     "forecast (`fetchForecast`, `showForecast`) and an audit log "
-                    "(`openAuditLog`, `closeAuditLog`), so three classes."},
+                    "(`openAuditLog`, `closeAuditLog`), so three classes. That is by the names "
+                    "alone; a reader who keeps the audit log with the tickets has made a "
+                    "design decision, not a counting error."},
             {"q": "A class declares `public static final int MAX = 10;`, `public String name;` "
                   "and `private int age;`. What do the lab's first two tiles print?",
              "a": ["3 fields, 2 public", "3 fields, 1 public",
@@ -1044,7 +1046,8 @@ LESSONS = [
                   "holding another as a field, is the workhorse; more is written about "
                   "inheritance, it says, because inheritance is trickier and more "
                   "error-prone, not because it is better. Private inheritance to get at a "
-                  "contained class's protected members is a last resort."),
+                  "contained class's protected members is a last resort, a C++ device; Java has no private inheritance, so "
+                  "the question does not arise there."),
             ("p", "Inheritance means &ldquo;is a&rdquo;: the new class is a more specialised "
                   "version of the old, and must keep the contract the old one sets. The book "
                   "quotes Joshua Bloch: &ldquo;Design and document for inheritance, or "
@@ -1066,7 +1069,8 @@ LESSONS = [
                   "Briand and Melo 1996). If inheritance is a chain saw, he adds, multiple "
                   "inheritance is a 1950s chain saw with no blade guard. The section's "
                   "summary is a heavy bias against inheritance: contain when classes share "
-                  "data, inherit when they share behaviour and an interface."),
+                  "only data; inherit when they share behaviour, or when the base class "
+                  "should control the interface."),
             ("p", "The section ends with members and constructors: keep the number of "
                   "routines in a class small; minimise the routines a class calls and the "
                   "classes it uses; follow the Law of Demeter (Lieberherr and Holland), "
