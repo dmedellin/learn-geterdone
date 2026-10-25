@@ -8,8 +8,8 @@ here; scripts/ turns it into pages. The design is docs/reading/PLAN.md.
 
 from . import (
     c1_measure,
-    c2_eyes,
-    c3_guided,
+    c2_guided,
+    c3_eyes,
     c4_inner_voice,
     c5_skim_scan,
     c6_difficulty,
@@ -22,8 +22,8 @@ from . import (
 # visible in the source and cannot be forgotten.
 COURSES = [c for c in [
     c1_measure.COURSE,
-    c2_eyes.COURSE,
-    c3_guided.COURSE,
+    c2_guided.COURSE,
+    c3_eyes.COURSE,
     c4_inner_voice.COURSE,
     c5_skim_scan.COURSE,
     c6_difficulty.COURSE,
