@@ -1637,10 +1637,90 @@ READ_COURSES = (
 READ_PATH_COURSE_COUNT = 8
 READ_UPCOMING_COURSES = ()
 
+# The Code Complete path: seven courses, all published. Generated from
+# content/code_complete/ so these cannot disagree with what is built.
+CC_PATH_PAGE = "/paths/code-complete/"
+
+CC_COURSE_1_HOME = "/code-complete-laying-the-foundation/"
+CC_COURSE_1_LESSONS = (
+    "construction-and-its-metaphors",
+    "upstream-prerequisites",
+    "key-construction-decisions",
+)
+CC_COURSE_2_HOME = "/code-complete-high-quality-code/"
+CC_COURSE_2_LESSONS = (
+    "design-challenges-and-complexity",
+    "design-heuristics-and-information-hiding",
+    "abstract-data-types-and-interfaces",
+    "inheritance-containment-and-members",
+    "reasons-to-create-a-routine",
+    "routine-length-and-parameters",
+    "assertions-and-error-handling",
+    "exceptions-and-barricades",
+    "the-pseudocode-programming-process",
+)
+CC_COURSE_3_HOME = "/code-complete-variables/"
+CC_COURSE_3_LESSONS = (
+    "declaring-and-initializing-variables",
+    "scope-span-and-live-time",
+    "the-power-of-variable-names",
+    "integers-and-floating-point",
+    "named-constants-and-other-types",
+    "structures-pointers-and-global-data",
+)
+CC_COURSE_4_HOME = "/code-complete-statements/"
+CC_COURSE_4_LESSONS = (
+    "organizing-straight-line-code",
+    "using-conditionals",
+    "controlling-loops",
+    "unusual-control-structures",
+    "table-driven-methods",
+    "boolean-expressions",
+    "nesting-and-complexity",
+)
+CC_COURSE_5_HOME = "/code-complete-code-improvements/"
+CC_COURSE_5_LESSONS = (
+    "the-software-quality-landscape",
+    "collaborative-construction",
+    "structured-basis-testing",
+    "boundaries-and-bad-data",
+    "debugging-as-science",
+    "refactoring-safely",
+    "code-tuning-strategies",
+    "code-tuning-techniques",
+)
+CC_COURSE_6_HOME = "/code-complete-system-considerations/"
+CC_COURSE_6_LESSONS = (
+    "how-program-size-affects-construction",
+    "managing-construction",
+    "integration-order",
+    "programming-tools",
+)
+CC_COURSE_7_HOME = "/code-complete-software-craftsmanship/"
+CC_COURSE_7_LESSONS = (
+    "layout-and-style",
+    "self-documenting-code",
+    "personal-character",
+    "themes-of-craftsmanship",
+)
+
+CC_COURSES = (
+    ("Laying the Foundation", CC_COURSE_1_HOME, CC_COURSE_1_LESSONS),
+    ("Creating High-Quality Code", CC_COURSE_2_HOME, CC_COURSE_2_LESSONS),
+    ("Variables", CC_COURSE_3_HOME, CC_COURSE_3_LESSONS),
+    ("Statements", CC_COURSE_4_HOME, CC_COURSE_4_LESSONS),
+    ("Code Improvements", CC_COURSE_5_HOME, CC_COURSE_5_LESSONS),
+    ("System Considerations", CC_COURSE_6_HOME, CC_COURSE_6_LESSONS),
+    ("Software Craftsmanship", CC_COURSE_7_HOME, CC_COURSE_7_LESSONS),
+)
+
+CC_PATH_COURSE_COUNT = 7
+CC_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
-               + READ_COURSES)
+               + READ_COURSES + CC_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1761,7 +1841,8 @@ def source_of(url):
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
-                       CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE)
+                       CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
+                       CC_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1790,6 +1871,8 @@ PATHS = (
      PHEN_UPCOMING_COURSES),
     ("Reading Faster", READ_PATH_PAGE, READ_COURSES, READ_PATH_COURSE_COUNT,
      READ_UPCOMING_COURSES),
+    ("Code Complete, Read Along", CC_PATH_PAGE, CC_COURSES, CC_PATH_COURSE_COUNT,
+     CC_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2002,6 +2085,12 @@ PHEN_DISCLAIMER_RE = re.compile(
 # which only a log can answer. Stopping short of the em dash, for OR's reason.
 READ_DISCLAIMER_RE = re.compile(
     r"(?i)one measurement, not your reading speed")
+# Code Complete promises that every figure is computed from the code or the
+# quantities a lesson states, and warns that a count over code is a reason to
+# look at it, not a verdict on it. Stopping short of the em dash, for OR's
+# reason.
+CC_DISCLAIMER_RE = re.compile(
+    r"(?i)a reason to look at it, not a verdict")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2026,6 +2115,8 @@ PATH_MATERIAL_DISCLAIMER = {
                      PHEN_DISCLAIMER_RE),
     READ_PATH_PAGE: ("the one-reading-is-one-measurement disclaimer",
                      READ_DISCLAIMER_RE),
+    CC_PATH_PAGE: ("the a-count-is-not-a-verdict disclaimer",
+                   CC_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2365,10 +2456,16 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(READ_COURSES)
             + sum(len(slugs) for _t, _h, slugs in READ_COURSES)
         )
+        cc_tree = (
+            1  # the Code Complete path page
+            + len(CC_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in CC_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
-                       + cap_tree + phen_tree + read_tree)  # 1 for the index
+                       + cap_tree + phen_tree + read_tree
+                       + cc_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2442,9 +2539,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 51 pages, got %d" % read_tree,
         )
         self.assertEqual(
-            1226,
+            49,
+            cc_tree,
+            "the Code Complete path is 1 + 7 + 3 + 9 + 6 + 7 + 8 + 4 + 4 "
+            "= 49 pages, got %d" % cc_tree,
+        )
+        self.assertEqual(
+            1275,
             course_tree,
-            "the site index plus all twelve path trees is 1226 pages, got %d" % course_tree,
+            "the site index plus all thirteen path trees is 1275 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2455,9 +2558,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1230,
+            1279,
             expected,
-            "1226 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1230, "
+            "1275 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1279, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2675,6 +2778,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "capital": getattr(smoke, "CAP_COURSES", ()),
             "phenomenology": getattr(smoke, "PHEN_COURSES", ()),
             "reading": getattr(smoke, "READ_COURSES", ()),
+            "code_complete": getattr(smoke, "CC_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3087,9 +3191,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1213,
+            1261,
             len(course_pages),
-            "one hundred and thirteen course homes and 1100 lessons carry a material "
+            "one hundred and twenty course homes and 1141 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4080,7 +4184,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(113, checked, "every published course must be checked")
+        self.assertEqual(120, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4381,6 +4485,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from capital import PATH as CAPITAL
             from phenomenology import PATH as PHENOMENOLOGY
             from reading import PATH as READING
+            from code_complete import PATH as CODE_COMPLETE
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4394,6 +4499,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("capital", CAP_COURSES, CAP_PATH_PAGE, CAPITAL),
             ("phenomenology", PHEN_COURSES, PHEN_PATH_PAGE, PHENOMENOLOGY),
             ("reading faster", READ_COURSES, READ_PATH_PAGE, READING),
+            ("code complete", CC_COURSES, CC_PATH_PAGE, CODE_COMPLETE),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4529,11 +4635,12 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from capital import PATH as CAPITAL
             from phenomenology import PATH as PHENOMENOLOGY
             from reading import PATH as READING
+            from code_complete import PATH as CODE_COMPLETE
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL, PHENOMENOLOGY, READING):
+                     CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4719,12 +4826,13 @@ class TestEveryLabBuilds(unittest.TestCase):
             from capital import PATH as CAPITAL
             from phenomenology import PATH as PHENOMENOLOGY
             from reading import PATH as READING
+            from code_complete import PATH as CODE_COMPLETE
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL, PHENOMENOLOGY, READING):
+                     CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]
@@ -6000,3 +6108,110 @@ class TestLabcheckSweepsTextareas(unittest.TestCase):
         code, out = self.run_labcheck("", {"coPreset2": {}})
         self.assertEqual(1, code, out)
         self.assertIn("#coPreset rewrites other controls when it changes", out)
+
+
+class TestCodeCompleteContent(unittest.TestCase):
+    """The Code Complete Subject's own content rules (docs/code-complete/PLAN.md
+    sections D.4 and E.4 item 2).
+
+    A snippet is one Python constant used by the lesson's `code` block AND by
+    its lab preset, so the listing the reader reads and the listing the lab
+    counts cannot drift. Nothing else would notice if they did: both render,
+    the lab's figures are pinned against the PRESET, and the prose cites line
+    numbers in the BLOCK.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        sys.path.insert(0, str(REPO_ROOT / "content"))
+        try:
+            import importlib
+            import pkgutil
+            import code_complete
+            from mathpath import render
+        except ImportError as exc:  # pragma: no cover
+            raise unittest.SkipTest("cannot import the Code Complete package: %s" % exc)
+        cls.render = render
+        cls.path = code_complete.PATH
+        # Each course's named exercise constants: module-level strings named
+        # *_EXERCISE in any module of the course's package (E.4 item 2).
+        cls.exercises = {}
+        for info in pkgutil.iter_modules(code_complete.__path__):
+            package = importlib.import_module("code_complete." + info.name)
+            course = getattr(package, "COURSE", None)
+            if course is None:
+                continue
+            found = {}
+            modules = [package] + [importlib.import_module("code_complete.%s.%s" % (info.name, sub.name))
+                                   for sub in pkgutil.iter_modules(package.__path__)]
+            for module in modules:
+                for name, value in vars(module).items():
+                    if name.endswith("_EXERCISE") and isinstance(value, str):
+                        found[name] = value
+            cls.exercises[course["slug"]] = found
+
+    @classmethod
+    def snippet_errors(cls, path, exercises):
+        """(errors, presets checked) for every cckit `code` lab of a PATH."""
+        errors, checked = [], 0
+        for course in path["courses"]:
+            allowed_named = exercises.get(course["slug"], {})
+            for lesson in course["lessons"]:
+                key, cfg = lesson["lab"]
+                if key != "cckit" or cfg.get("mode") != "code":
+                    continue
+                blocks = {"\n".join(cls.render.code_lines(payload))
+                          for kind, payload in lesson["body"] if kind == "code"}
+                for preset in cfg["presets"]:
+                    checked += 1
+                    code = preset.get("code", cfg.get("code"))
+                    if code not in blocks and code not in allowed_named.values():
+                        errors.append("%s/%s preset %r: its code is neither a `code` block on the "
+                                      "lesson nor a named *_EXERCISE constant of the course"
+                                      % (course["slug"], lesson["slug"], preset.get("id")))
+        return errors, checked
+
+    def test_code_complete_presets_use_the_lessons_snippets(self):
+        errors, checked = self.snippet_errors(self.path, self.exercises)
+        # 36 presets across 17 code labs when wired; an empty sweep must fail.
+        self.assertGreater(checked, 30, "found only %d code-lab presets to check" % checked)
+        self.assertEqual([], errors, "\n".join(errors))
+
+    def test_the_snippet_check_is_not_inert(self):
+        """Change one character of one preset's code and the check must name it."""
+        import copy as _copy
+        path = _copy.deepcopy(self.path)
+        target = None
+        for course in path["courses"]:
+            for lesson in course["lessons"]:
+                key, cfg = lesson["lab"]
+                if key == "cckit" and cfg.get("mode") == "code" and target is None:
+                    target = (course["slug"], lesson["slug"], cfg["presets"][0])
+        self.assertIsNotNone(target)
+        course_slug, lesson_slug, preset = target
+        preset["code"] = preset.get("code", "") + " "
+        errors, _ = self.snippet_errors(path, self.exercises)
+        self.assertEqual(1, len(errors), errors)
+        self.assertIn("%s/%s preset %r" % (course_slug, lesson_slug, preset.get("id")), errors[0])
+        # ...and a named exercise constant of that course is accepted.
+        exercises = {course_slug: {"FIXTURE_EXERCISE": preset["code"]}}
+        self.assertEqual([], self.snippet_errors(path, exercises)[0])
+
+    def test_cckit_refuses_source_beside_a_panel_intro(self):
+        """A panel_intro replaces the intro cfg["source"] is appended to, so the
+        pair would publish the panel without its "Figures:" sentence."""
+        from mathpath.labs import cckit
+        cfg = None
+        for course in self.path["courses"]:
+            for lesson in course["lessons"]:
+                key, lab = lesson["lab"]
+                if key == "cckit" and lab.get("mode") in ("defects", "profile", "project") and lab.get("panel_intro"):
+                    cfg = dict(lab)
+        self.assertIsNotNone(cfg, "no family-3 cckit lab with a panel_intro to test against")
+        cckit.cckit_lab(dict(cfg))  # builds as published
+        with self.assertRaisesRegex(ValueError, "both 'source' and 'panel_intro'"):
+            cckit.cckit_lab(dict(cfg, source="Table 3-1, p. 29"))
+        without = dict(cfg, source="Table 3-1, p. 29")
+        del without["panel_intro"]
+        self.assertIn("Figures: Table 3-1, p. 29.", cckit.cckit_lab(without).panel_intro)

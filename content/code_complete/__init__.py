@@ -67,7 +67,7 @@ PATH = {
     ],
     "prerequisites": [
         "You can read a short routine in a C-family language. Every snippet is Java, kept under twenty lines, and uses nothing past what a first course teaches: if, loops, methods, arrays, a class with fields. A reader who knows C#, C++, JavaScript or Python reads it without trouble; where Java behaves in a way another language does not (integer overflow, integer division, switch fall-through), the lesson says so.",
-        "No other Subject. Boolean algebra is taught where the book uses it, in Boolean Expressions; Logic and Proof on the Discrete Mathematics path goes further and is optional. The arithmetic is counting, a product and a share; the labs do it, and what is asked of you is to say what each count is evidence of.",
+        "No other Subject. Boolean algebra is taught where the book uses it, in Boolean Expressions; Logic and Proof, a course in Discrete Mathematics, goes further and is optional. The arithmetic is counting, a product and a share; the labs do it, and what is asked of you is to say what each count is evidence of.",
         "A copy of the book is strongly recommended. The book is in copyright, so a lesson states each chapter's argument in its own words, points to the section by number and page, and quotes at most a sentence or two. The code is written for these lessons; none of the book's listings or checklists is reproduced, and the book's own versions are better read in the book.",
         "Some code of your own. Every code lab takes a routine you paste in, and the most useful thing a lesson can do is send you back to your own work with a number to look at.",
     ],

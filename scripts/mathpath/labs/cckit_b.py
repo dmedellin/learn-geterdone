@@ -1320,8 +1320,17 @@ def mode_lab(cfg, mode):
     intro = cc.FAMILY[family] + " " + _INTRO[mode]
     if (mode, view) in _VIEW_INTRO:
         intro += " " + _VIEW_INTRO[(mode, view)]
+    # cfg["source"] is appended to the kit's own intro, and a custom panel_intro
+    # replaces that intro whole (cckit_core.build_lab), so the two together
+    # would publish the panel without its "Figures:" sentence and say nothing.
+    # Every family-3 lesson writes its "Figures:" sentence into its panel_intro
+    # already; appending source as well would print it twice. So refuse the pair.
+    if cfg.get("source") and cfg.get("panel_intro"):
+        raise ValueError("%s: cfg sets both 'source' and 'panel_intro'; a panel_intro replaces the intro that source "
+                         "is appended to, so the source would be dropped. Write the \"Figures: ...\" sentence into "
+                         "panel_intro and drop 'source', or drop panel_intro" % kit)
     if family == 3 and cfg.get("source"):
-        intro += " Figures: %s." % cc.plain(cfg, kit, "source", "", limit=200).rstrip(".")
+        intro +=" Figures: %s." % cc.plain(cfg, kit, "source", "", limit=200).rstrip(".")
     lab = cc.build_lab(cfg, kit=kit, prefix=prefix, view=view, fields=fields, tiles=_tiles(cfg, mode, view, tiles, fixed), fn=fn,
                        js=base + view_js[view], fixed=fixed,
                        title="Java's arithmetic" if view == "arith" else title, subtitle=subtitles[view],

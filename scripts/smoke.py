@@ -1969,6 +1969,94 @@ READ_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Code Complete, same shape.
+CC_PATH_PAGE_PATH = "/paths/code-complete/"
+CC_MATERIAL_MARKER = "a reason to look at it, not a verdict"
+CC_COURSES = (
+    ("code-complete-laying-the-foundation", "Laying the Foundation", (
+        "construction-and-its-metaphors",
+        "upstream-prerequisites",
+        "key-construction-decisions",
+    )),
+    ("code-complete-high-quality-code", "Creating High-Quality Code", (
+        "design-challenges-and-complexity",
+        "design-heuristics-and-information-hiding",
+        "abstract-data-types-and-interfaces",
+        "inheritance-containment-and-members",
+        "reasons-to-create-a-routine",
+        "routine-length-and-parameters",
+        "assertions-and-error-handling",
+        "exceptions-and-barricades",
+        "the-pseudocode-programming-process",
+    )),
+    ("code-complete-variables", "Variables", (
+        "declaring-and-initializing-variables",
+        "scope-span-and-live-time",
+        "the-power-of-variable-names",
+        "integers-and-floating-point",
+        "named-constants-and-other-types",
+        "structures-pointers-and-global-data",
+    )),
+    ("code-complete-statements", "Statements", (
+        "organizing-straight-line-code",
+        "using-conditionals",
+        "controlling-loops",
+        "unusual-control-structures",
+        "table-driven-methods",
+        "boolean-expressions",
+        "nesting-and-complexity",
+    )),
+    ("code-complete-code-improvements", "Code Improvements", (
+        "the-software-quality-landscape",
+        "collaborative-construction",
+        "structured-basis-testing",
+        "boundaries-and-bad-data",
+        "debugging-as-science",
+        "refactoring-safely",
+        "code-tuning-strategies",
+        "code-tuning-techniques",
+    )),
+    ("code-complete-system-considerations", "System Considerations", (
+        "how-program-size-affects-construction",
+        "managing-construction",
+        "integration-order",
+        "programming-tools",
+    )),
+    ("code-complete-software-craftsmanship", "Software Craftsmanship", (
+        "layout-and-style",
+        "self-documenting-code",
+        "personal-character",
+        "themes-of-craftsmanship",
+    )),
+)
+
+CC_PATH_PAGE_MARKERS = (
+    canonical_marker(CC_PATH_PAGE_PATH),
+    html.escape(CC_COURSES[0][1]),
+    html.escape(CC_COURSES[-1][1]),
+    'href="../../%s/"' % CC_COURSES[-1][0],
+)
+
+CC_COURSE_HOMES = tuple(
+    (
+        "cc-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, CC_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(CC_COURSES, start=1)
+)
+
+CC_COURSE_LESSONS = tuple(
+    (
+        "cc-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), CC_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(CC_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2068,6 +2156,7 @@ def path_page_targets(args):
         ("cap-path", CAP_PATH_PAGE_PATH, CAP_PATH_PAGE_MARKERS),
         ("phen-path", PHEN_PATH_PAGE_PATH, PHEN_PATH_PAGE_MARKERS),
         ("read-path", READ_PATH_PAGE_PATH, READ_PATH_PAGE_MARKERS),
+        ("cc-path", CC_PATH_PAGE_PATH, CC_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2094,7 +2183,8 @@ def course_home_targets(args):
                                     + DE_COURSE_HOMES
                                     + CAP_COURSE_HOMES
                                     + PHEN_COURSE_HOMES
-                                    + READ_COURSE_HOMES):
+                                    + READ_COURSE_HOMES
+                                    + CC_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2136,6 +2226,7 @@ def lesson_targets(args):
         + CAP_COURSE_LESSONS
         + PHEN_COURSE_LESSONS
         + READ_COURSE_LESSONS
+        + CC_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

@@ -36,8 +36,9 @@ GROUPS = (
     {
         "key": "computing",
         "title": "Computing and decisions",
-        "note": "All three build on Discrete Mathematics; System Design and "
-                "Operations Research use Algebra as well.",
+        "note": "Algorithms, System Design and Operations Research build on "
+                "Discrete Mathematics, the last two on Algebra as well; Code "
+                "Complete assumes only that you can read a short routine.",
     },
     {
         "key": "philosophy",
@@ -110,6 +111,15 @@ SUBJECTS = (
         "card": "Deciding under constraints: linear and integer programming, "
                 "networks, scheduling, inventory, queues and simulation.",
         "builds_on": ("algebra", "discrete-math"),
+    },
+    {
+        "slug": "code-complete",
+        "group": "computing",
+        "short_title": "Code Complete",
+        "kind": "Read along",
+        "card": "Steve McConnell&rsquo;s <em>Code Complete</em>, chapter by "
+                "chapter, with each chapter&rsquo;s guidance measured on short "
+                "pieces of code.",
     },
     {
         "slug": "philosophy",

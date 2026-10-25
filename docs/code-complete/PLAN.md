@@ -456,12 +456,17 @@ says requirements engineering and architecture are named, not taught.
      the construction activities are two-thirds of the hours.
    - **Worked:** 120 + 320 + 130 + 90 = 660 of 1,000 hours: 66%.
    - **Exercise:** requirements 40, detailed design 30, coding 90, code
-     review 20, unit testing 40, system testing 50, user documentation 30.
-     **Answer:** construction is detailed design, coding, code review and
-     unit testing, 180 of 300 hours, 3/5 = 60%.
+     review 20, unit testing 40, system testing 50, user-interface design 30
+     (changed from user documentation after the course's review: §1.1 names
+     user-interface design as outside construction and says nothing of
+     documentation). **Answer:** construction is detailed design, coding,
+     code review and unit testing, 180 of 300 hours, 3/5 = 60%.
    - **Own:** last week's calendar, each block marked construction or not by
      §1.1's list, pasted into the lab as `name, hours, c` records.
    - **Sources:** McConnell §§1.1–1.3, 2.1–2.3; *F1*.
+   - **Other quotations** (as authored): p. 14, Brooks's line as the book
+     quotes it, 8 words; p. 12, "an algorithm in a clown suit", 6 words.
+     Lesson total 35 words.
 
 2. **upstream-prerequisites** — Upstream Prerequisites — *Chapter 3 · Upstream Prerequisites* — 15 min
    - **Read:** pp. 23–60. §3.1 (p. 24), why prerequisites matter, and the
@@ -478,9 +483,10 @@ says requirements engineering and architecture are named, not taught.
    - **Do:** compute the relative cost of a set of defects from the phase each
      was introduced in and the phase it was found in, against finding each in
      the phase it was made.
-   - **Standard:** given defects by introduced and detected phase and the
-     cost table, compute the total cost range and the ratio to finding them
-     early.
+   - **Standard:** given short descriptions of defects and the phase each
+     was found in, place each by §§3.3–3.5, then compute the total cost range
+     by the cost table and the ratio to finding them early (changed after
+     the course's review, with the exercise below).
    - **Lab:** `defects/cost`, family 3. `cfg["table"]` is Table 3-1 as the
      lesson gives it (*F3*): introduced in requirements and found in
      requirements 1, architecture 3, construction 5–10, system test 10, after
@@ -502,14 +508,23 @@ says requirements engineering and architecture are named, not taught.
      course's §F.4 aside, in the `note`, at strength and unsettled.
    - **Worked:** 10 × 10 + 5 × (25 to 100) + 20 × 10 = 425 to 800 units,
      against 35 if each defect is caught where it was made.
-   - **Exercise:** eight requirements defects found after release.
-     **Answer:** 8 × (10 to 100) = 80 to 800 units against 8 caught in
-     requirements, a ratio of 10× to 100×.
+   - **Exercise** (changed after the course's review, so that the reader
+     places defects by phase, the act the lab cannot do, rather than
+     repeating `requirements-late`): three defects found after release, given
+     as descriptions: a rounding rule the specification got wrong (half up
+     where the contracts require half to even); tax computed in both the
+     order screen and the invoice service, disagreeing on a boundary date;
+     a loop that totals a basket and skips its last line. **Answer:**
+     requirements (10–100), architecture (25–100), construction (10–25):
+     45 to 225 units against 3, a ratio of 15× to 75× (lab: `req, post, 1;
+     arch, post, 1; cons, post, 1`).
    - **Own:** the last five defects in the reader's tracker, each with the
      phase it was introduced in and the phase it was found in, as records.
    - **Sources:** McConnell §§3.1–3.6; Table 3-1 and its sources (*F3*);
      §3.6's effort and schedule shares (*F30*); Boehm and Turner 2004 for the
      iterative discussion as the book cites it.
+   - **Other quotations** (as authored): p. 26, "Why Isn’t Sam Coding
+     Anything?", 5 words. Lesson total 26 words.
 
 3. **key-construction-decisions** — Key Construction Decisions — *Chapter 4 · Key Construction Decisions* — 12 min
    - **Read:** pp. 61–70. §4.1 (p. 61), the choice of language, Table 4-1's
@@ -550,6 +565,12 @@ says requirements engineering and architecture are named, not taught.
      the convention their team uses (or should use) to supply it.
    - **Sources:** McConnell §§4.1–4.4; Table 4-1 and its sources (*F4*);
      *F5*.
+   - **Body snippet** (new, written for the lesson; no lab figures):
+     `SEND_WITH_DEFAULT`, 16 lines: Java has no default arguments, so
+     `send(message)` on line 6 forwards `DEFAULT_RETRIES` (line 3) to the
+     full `send(message, retries)` on lines 9–16.
+   - **Other quotations** (as authored): p. 63, "disguised Fortran", 2
+     words. Lesson total 34 words.
 
 ### Course 2 — Creating High-Quality Code (`code-complete-high-quality-code`, 9)
 
@@ -770,13 +791,16 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
    - **Exercise:** (a) six routines (replaced at authoring: the first and
      third descriptions were the book's own examples of sequential and
      communicational cohesion, pp. 168–169, and the first had two answers
-     depending on whether the age feeds the retirement date): "returns the
-     sales tax on an amount"; "works out a parcel's volume, then uses that
-     volume to choose a box size"; "from an order's list of items, adds up
+     depending on whether the age feeds the retirement date; the fourth and
+     fifth replaced after the accuracy review, as close to the book's
+     temporal and procedural examples, pp. 169–170): "returns the
+     sales tax on an amount"; "works out a parcel's volume and then, from that volume,
+     its box size, and returns both"; "from an order's list of items, adds up
      the total weight and, separately, counts the distinct suppliers"; "at
-     startup, opens the log, loads the settings and connects to the
-     database"; "asks for a customer's name and then the delivery date, in
-     the order the form shows them, with nothing passed between the two";
+     the end of each night, archives the day's orders, empties the shopping
+     baskets and rotates the logs"; "prints a shipping label and then writes
+     a line to the dispatch log, in the order the warehouse procedure lists
+     them, with nothing passed between the two";
      "formats an invoice, a receipt or a refund note, depending on a flag
      passed in". (b) `printSummary` in §D.4.
      **Answer:** (a) functional; sequential; communicational; temporal;
@@ -896,15 +920,18 @@ is Chapters 5–6 (lessons 1–4), `part_b.py` Chapters 7–9 (lessons 5–9).
      (`side` `outside` or `inside`; `handling` `validate`, `assert` or
      `none`). Presets (illustrative): `mixed` (`quantityField, outside,
      validate; uploadName, outside, none; feedPrice, outside, assert;
-     lineTotal, inside, assert; customerId, inside, none; taxRate, inside,
+     lineTotal, inside, assert; customerId, inside, none; taxDue, inside,
      assert` → `cdValues` 6, `cdOutsideUnchecked` "1: uploadName",
      `cdOutsideAsserted` "1: feedPrice", `cdInsideUnchecked` "1:
      customerId", `cdInsideValidated` "0: none"), `barricaded` (the three
      outside values validated, the three inside asserted → all four tiles
      "0: none"), `checks-everywhere` (all six validated → `cdInsideValidated`
-     "3: lineTotal, customerId, taxRate", the rest "0: none"). Pins the four
+     "3: lineTotal, customerId, taxDue", the rest "0: none"). Pins the four
      tiles. The panel says the counts are the chapter's rule applied to the
-     records, not a verdict: §8.8 allows judgement.
+     records, not a verdict: §8.8 allows judgement. (`taxDue` was `taxRate`
+     until the pedagogy review: the exercise argues that a tax rate read
+     from a configuration file is outside, so the preset names a computed
+     value.)
    - **Misconception:** "Defensive programming means checking everything
      everywhere." `checks-everywhere` is that program: §8.5 puts the checks at
      the barricade and assertions inside it, and §8.8 warns that too much
@@ -979,7 +1006,8 @@ read code (`run/arith` and `deps/shared` do not; corrected at authoring), and
 that the reader should paste a routine of their own into each code lab.
 
 1. **declaring-and-initializing-variables** — Declaring and Initializing Variables — *Chapter 10 · Using Variables* — 15 min
-   - **Read:** pp. 237–243. §10.1 (p. 238), data literacy; §10.2 (p. 239),
+   - **Read:** pp. 237–244 (§10.3's last guideline, on input parameters, is
+     on p. 244). §10.1 (p. 238), data literacy; §10.2 (p. 239),
      making declarations easy and the danger of implicit declarations; §10.3
      (p. 240), guidelines for initialising: initialise each variable as it is
      declared, or close to where it is first used, use `final` where
@@ -1016,8 +1044,8 @@ that the reader should paste a routine of their own into each code lab.
      line 4 sets `result` before line 6 reads it; on the path where the `if`
      is false, line 6 reads an unset variable. `javac` rejects the routine
      ("variable result might not have been initialized"); a C or C++
-     compiler accepts its equivalent. The lab, like C, reads top to bottom;
-     the `note` names that limit.
+     compiler accepts its equivalent. The lab reads top to bottom; the `note`
+     names that limit without naming the exercise.
    - **Own:** a routine of the reader's pasted into the lab, and each
      anomaly it reports checked against what the compiler said.
    - **Sources:** McConnell §§10.1–10.3, and §22.3 for the anomaly names.
@@ -1033,6 +1061,8 @@ that the reader should paste a routine of their own into each code lab.
    - **Quote:** p. 258, 24 words — “Minimize the scope of each variable.
      Keep references to a variable close together. Keep it local to a
      routine or class. Avoid global data.”
+     Also quoted in the lesson: “window of vulnerability” (p. 245, 3 words)
+     and “moonlighting as a boolean” (p. 257, 4 words); lesson total 31.
    - **Do:** compute each variable's spans and live time and the averages,
      and move declarations to shrink them.
    - **Standard:** given the lines on which two variables are referenced,
@@ -1323,6 +1353,7 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
      frequencies from a log or a guess (and the sentence that says which),
      typed into the lab.
    - **Sources:** McConnell §§15.1–15.2.
+   - **Recorded at second review:** a second quotation, p. 365, 19 words (the Pontiac Aztek line on fall-through; lesson total 40). New snippets: `classify` (12 lines; the HTTP classifier the `chain` presets price) and `route` (11 lines; the exercise's chain with no final `else`).
 
 3. **controlling-loops** — Controlling Loops — *Chapter 16 · Loops* — 15 min
    - **Read:** pp. 367–389. §16.1 (p. 367), selecting the kind of loop;
@@ -1359,6 +1390,7 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
      iterations (10, 7, 4, 1); last value 1; −2 after.
    - **Own:** four loop headers from the reader's code, typed into the lab.
    - **Sources:** McConnell §§16.1–16.4; *F13*.
+   - **Recorded at second review:** new snippets `hourly` (4 lines; `fencepost`'s header, `hourly[10]` throws) and the exercise's `for (int i = 10; i > 0; i -= 3)` (3 lines).
 
 4. **unusual-control-structures** — Unusual Control Structures — *Chapter 17 · Unusual Control Structures* — 15 min
    - **Read:** pp. 391–410. §17.1 (p. 391), multiple returns from a routine,
@@ -1398,7 +1430,12 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
      and Complexity counts again on a larger routine.
    - **Own:** one routine of the reader's with an `if` nested inside
      another, rewritten with guard clauses.
+   - **Added at authoring** (pedagogy review of Course 4, finding 1): a
+     demonstration snippet `firstLine(File)` with two guard clauses, shown
+     before the exercise; `code/complexity` gives 3 decision points
+     (1 + if 2), depth 1. Not a preset.
    - **Sources:** McConnell §§17.1–17.4; Dijkstra 1968; Knuth 1974.
+   - **Recorded at second review:** new snippets, recursive `fibonacci` (6 lines) and its loop (13 lines; i from 2 to n, n − 1 passes), the two the `recursion` presets model.
 
 5. **table-driven-methods** — Table-Driven Methods — *Chapter 18 · Table-Driven Methods* — 15 min
    - **Read:** pp. 411–430. §18.1 (p. 411), general considerations (how to
@@ -1434,6 +1471,7 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
    - **Own:** one lookup in the reader's code written as a chain of `if`s,
      and the table that would replace it, with its endpoint rule stated.
    - **Sources:** McConnell §§18.1–18.5.
+   - **Recorded at second review:** new snippets, `lateFee` (11 lines, the instance as two arrays and a `<` loop; above 365 it returns the top fee, where the lab says "above the table") and the exercise's two arrays (3 lines). The lab's binary search counts n + 1 places (the steps and "above the table"): `brackets` keys below 2,000 take 5 probes, the rest 4.
 
 6. **boolean-expressions** — Boolean Expressions — *Chapter 19 · General Control Issues* — 15 min
    - **Read:** pp. 431–445 (§19.3 runs onto p. 445, where §19.4 begins; corrected at authoring). §19.1 (p. 431), boolean expressions: `true` and
@@ -1465,6 +1503,7 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
    - **Own:** one negated compound condition from the reader's code,
      rewritten positively and checked in the lab.
    - **Sources:** McConnell §§19.1–19.3.
+   - **Recorded at second review:** new snippets `drain` (11 lines; the guard on line 4 and the test on line 7 are `demorgan`'s A and B) and the exercise's three-line `if`.
 
 7. **nesting-and-complexity** — Nesting and Complexity — *Chapter 19 · General Control Issues* — 15 min
    - **Read:** pp. 445–460. §19.4 (p. 445), taming deep nesting (*F15*;
@@ -1504,6 +1543,7 @@ others into one. `part_a.py` is Chapters 14–17, `part_b.py` 18–19.
    - **Own:** the reader's most-nested routine pasted into the lab.
    - **Sources:** McConnell §§19.4–19.6; McCabe 1976; Böhm and Jacopini 1966;
      *F14*, *F15*.
+   - **Recorded at second review:** two phrases quoted besides the opening, "structured goofing off" (p. 454, 3 words) and "or their equivalents" (p. 458, 3 words); lesson total 21.
 
 ### Course 5 — Code Improvements (`code-complete-code-improvements`, 8)
 
@@ -1600,9 +1640,13 @@ Chapters 20–22, `part_b.py` 23–26.
    - **Exercise:** the `countPassing` routine in §D.4, read as the
      inspection's reader role would. **Answer:** line 3 starts `count` at 1
      instead of 0; line 5 tests `>` where the comment promises "at or
-     above"; the parameter `maxScore` (line 2) is never used. Two of the
-     three are on the chapter's own checklist kinds (initialisation,
-     off-by-one comparisons; parameters used) — named, not reproduced.
+     above"; the parameter `maxScore` (line 2) is never used. Each is the
+     kind of point a team's inspection checklist would hold; the book's own
+     checklists elsewhere ask whether counters and accumulators are
+     initialised (Chapter 10, p. 257) and warn of `>=` written for `>`
+     (p. 513). Chapter 21's checklists are about running the practice
+     (pp. 484, 491–492); its point is that a team builds its inspection
+     checklist from the errors its inspections find (p. 489).
    - **Own:** the last change the reader reviewed (or had reviewed), and
      what each reviewer found that tests had not.
    - **Sources:** McConnell §§21.1–21.4; Fagan 1976; *F18*.
@@ -1688,6 +1732,8 @@ Chapters 20–22, `part_b.py` 23–26.
    - **Quote:** p. 562, 30 words — “A systematic approach to finding and
      fixing errors is critical to success. Focus your debugging so that each
      test moves you a step forward. Use the Scientific Method of Debugging.”
+     Also quoted: the section title “The Devil’s Guide to Debugging”
+     (p. 539, 5 words).
    - **Do:** state a hypothesis about a failure, name the test that halves the
      suspects, and compute the steps a binary search takes among n suspects.
    - **Standard:** for a failing input and a routine, state the hypothesis,
@@ -1710,7 +1756,9 @@ Chapters 20–22, `part_b.py` 23–26.
      array because nothing ties `count` to `staff.length`; the test that
      decides it: call it with four non-null employees and `count` 4 (passes)
      and 5 (fails); the line is 4, where `staff[i]` is read with `i == 4`.
-     The fix is `i < count && i < staff.length` (or dropping `count`). The
+     The fix tests the length before the element:
+     `i < count && i < staff.length && staff[i] != null` (or drop `count`
+     and loop to `staff.length`). The
      five basis tests of the earlier lesson did not include it, which is
      Boundaries and Bad Data's point.
    - **Own:** the reader's last bisection (of commits, input or code): how
@@ -1728,6 +1776,8 @@ Chapters 20–22, `part_b.py` 23–26.
    - **Quote:** p. 585, 24 words — “Software can either improve or degrade
      as it’s changed. The Cardinal Rule of Software Evolution is that
      internal quality should improve with code evolution.”
+     Also quoted: “factoring” (p. 565, 1 word) and “parking lot” (p. 580,
+     2 words).
    - **Do:** compute the inputs and outputs of a block before extracting it
      into a routine, and decide whether it extracts cleanly.
    - **Standard:** for a block in a routine, list the variables it reads that
@@ -1843,6 +1893,12 @@ and 4 are given as code the reader reads the records off: four Java classes whos
 calls are the exercise's pairs, and the build's three makefile dependency lines.
 Lesson 2's `hard-product` glosses time and storage constraint as the program's
 own run time and memory, as Table 28-1 defines them, not the schedule.
+Short quotations beyond each lesson's **Quote**, all checked with `cc_quotes.py`:
+lesson 1 "right-weight" (p. 658; total 22 words); lesson 2 "religious" (p. 683;
+total 36); lesson 3 "big bang integration" (p. 691), "dump truck full of stubs"
+(p. 696) and "smokes" (p. 702; total 30); lesson 4 "Tool Fantasyland" (p. 722,
+the section title) and "too much of a good thing" (p. 706; total 22). Lesson 2
+names van Genuchten 1991 (p. 675) as the book cites it.
 
 1. **how-program-size-affects-construction** — How Program Size Affects Construction — *Chapter 27 · Program Size* — 15 min
    - **Read:** pp. 649–659. §27.1 (p. 650), communication and size (the paths
@@ -2005,7 +2061,7 @@ book's themes. Its `how_to` says the course can be read alone.
      logical structure; the objectives of good layout); §31.2 (p. 736),
      techniques (white space and the indentation study, p. 737, *F27*;
      parentheses); §31.3 (p. 738), layout styles (pure blocks, emulating pure
-     blocks, begin-end pairs, endline layout); §31.4–31.8 (pp. 745–768),
+     blocks, begin-end pairs, endline layout); §31.4–31.8 (pp. 745–773),
      control structures, individual statements, comments, routines,
      classes.
    - **Quote:** p. 775, 15 words — “The first priority of visual layout is to
@@ -2038,8 +2094,10 @@ book's themes. Its `how_to` says the course can be read alone.
      `javac` rejects line 7 as unreachable — here the compiler catches what
      the layout hid, and with any statement other than a `return` on line 6
      nothing would.
-   - **Own:** a routine of the reader's pasted into the lab with the team's
-     indent width.
+   - **Own:** a routine of the reader's pasted into the lab, widened to four
+     spaces by search-and-replace (never by an editor's re-indent, which
+     would remove what the lab checks; the lab's indent is a lesson-level
+     cfg key, not a reader input).
    - **Sources:** McConnell §§31.1–31.8; *F27*.
 
 2. **self-documenting-code** — Self-Documenting Code — *Chapter 32 · Self-Documenting Code* — 15 min
@@ -2065,8 +2123,10 @@ book's themes. Its `how_to` says the course can be read alone.
    - **Misconception:** "More comments make code better documented." The
      density on `comments-repeat` is five times the other's and every one of
      its comments repeats the code; the chapter's kinds are the test, not the
-     count — and the exercise has the same density with every comment
-     useful. The modern aside of this course lives here (the comment debate
+     count — and a routine can match that density with every comment
+     useful, which the count cannot tell apart (the lesson does not say
+     which case the exercise is: its answer stays in the quiz). The modern
+     aside of this course lives here (the comment debate
      since, §F.4).
    - **Worked:** 5 comment lines over 5 statement lines: 100%; one in five:
      20%.
@@ -2144,9 +2204,12 @@ book's themes. Its `how_to` says the course can be read alone.
      clause.
    - **Worked:** 1 + `if` ×3 + `for` + `&&` + `||` = 7.
    - **Exercise:** the reader's own routine, pasted in. **Answer:** none
-     fixed; the quiz item that carries the exercise asks about `retry-delay`
-     instead, so that it has one (7, depth 2), and the `standard` uses it
-     too.
+     fixed; the quiz item that carries the exercise asks about a changed
+     `retry-delay` (line 7 becomes `delay = Math.min(delay * 2, 10000);` and
+     lines 8–10 go: 6 decision points, depth 1), so that it has a fixed
+     answer the page does not print; the preset's own 7 and depth 2 are in
+     the body (pedagogy review of Course 7, finding 2). The `standard` uses
+     the preset, worked without the lab.
    - **Own:** the exercise is the own-code step: the reader's routine, its
      decision points, its depth, and one sentence per theme it touches.
    - **Sources:** McConnell Chapters 34–35.
@@ -3443,6 +3506,15 @@ a lesson needs only author and year.
 - Yourdon, E. (1986a). *Managing the Structured Techniques*. Yourdon Press;
   and (1986b) *Nations at Risk*. Yourdon Press.
 
+Added for Software Craftsmanship (Course 7), each as the book cites it on
+the page given: Chase, W. G. and Simon, H. A. (1973), "Perception in chess"
+(p. 733); Shneiderman, B. (1976), "Exploratory experiments in programmer
+behavior" (p. 734); Fjelstad, R. K. and Hamlen, W. T. (1979), the IBM
+maintenance study (p. 788). Two works outside the book, named only in Self-
+Documenting Code's §F.4 aside and not cited by the book: Martin, R. C.
+(2008), *Clean Code*, Prentice Hall; Ousterhout, J. (2018), *A Philosophy of
+Software Design*, Yaknyam Press.
+
 Dropped in review, because the book does not cite them: Feldman 1979 (`make`)
 and Goldberg 1991 (floating point). Simon 1996 is cited in Chapter 5 for
 another point and is not the source of "wicked problems".
@@ -3482,7 +3554,7 @@ this table is not attributed to the book.
 | F22 | the Pareto principle in performance | 20% of routines take 80% of the time; under 4% of a program accounts for more than 50% of its run time | §25.2, p. 592 | Boehm 1987b; Knuth 1971 |
 | F23 | measured effect of a tuning technique | the busiest-loop example: outer 100 and inner 5 against the reverse, 600 against 505 iterations (about 16%), measured savings 33% C++, 34% Java, 12% PHP, 4% Python; other techniques' per-language timings through Chapter 26 | §26.2, p. 623; §§26.1–26.7 | the book's own measurements |
 | F24 | defect density by project size | under 2K lines 0–25 per KLOC; 2K–16K 0–40; 16K–64K 0.5–50; 64K–512K 2–70; 512K or more 4–100 | §27.3, Table 27-1, p. 652 | Jones 1977; Jones 1998 |
-| F25 | productivity by project size (lines per staff-year) | 1K: 2,500–25,000; 10K: 2,000–25,000; 100K: 1,000–20,000; 1M: 700–10,000; 10M: 300–5,000 (Cocomo II nominal 4,000 / 3,200 / 2,600 / 2,000 / 1,600) | §27.4, Table 27-2, p. 653 | Putnam and Meyers 1992, 1997; Boehm et al. 2000; Cusumano et al. 2003 |
+| F25 | productivity by project size (lines per staff-year) | 1K: 2,500–25,000; 10K: 2,000–25,000; 100K: 1,000–20,000; 1M: 700–10,000; 10M: 300–5,000 (Cocomo II nominal 4,000 / 3,200 / 2,600 / 2,000 / 1,600) | §27.4, Table 27-2, p. 653 | Putnam and Myers 1992, 1997 (the source line under the table misprints "Meyers"; the bibliography, pp. 878–879, gives Ware Myers); Boehm et al. 2000; Cusumano et al. 2003 |
 | F26 | effort factors | Table 28-1 prints percentages: programmer capability −24%/+34%; requirements analyst capability −29%/+42%; product complexity −27%/+74%; time constraint 0/+63%; storage constraint 0/+46%; use of software tools −22%/+17%; personnel continuity −19%/+29%. As multipliers: 0.76–1.34, 0.71–1.42, 0.73–1.74, 1.00–1.63, 1.00–1.46, 0.78–1.17, 0.81–1.29 | §28.3, Table 28-1, p. 674 | Boehm et al. 2000 |
 | F27 | indentation | subjects scored 20–30% higher on comprehension with two-to-four-space indentation than with none; six spaces scored second lowest | §31.2, p. 737 | Miara et al. 1983 |
 | F28 | comment density | about one comment per ten statements gave the highest clarity; both fewer and more reduced understandability | §32.4, p. 792 | IBM studies, via Jones 2000 |

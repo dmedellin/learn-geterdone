@@ -21207,6 +21207,10 @@ console.log('code complete: cckit, eight modes');
      'code/extract: a name set first in the block is not taken in');
   eq(C('ppp', 'void f() {\n    // step one\n    x = 1; // note\n}', 'coSteps coCode'), '1 | 1', 'code/ppp: a step is a comment-only line');
   eq(C('names', SN['names-short'], 'coShort', '{}', { min: 3 }), 'a, n, r, t, x', 'code/names: a name at the minimum is not short');
+  eq(/mean length is 1 character; /.test(co("coCompute('names', {code: ccSplitLines('void f(int a) {\\n  int b = a;\\n}')}, {min: 8}).status")), true,
+     'code/names: a mean of 1 is one character, not "1 characters"');
+  eq(/mean length is 2 characters; /.test(co("coCompute('names', {code: ccSplitLines('void f(int ab) {\\n  int cd = ab;\\n}')}, {min: 8}).status")), true,
+     'code/names: a mean of 2 is characters');
   eq(C('complexity', 'int f(int a) {\n    if (a > 0) { a = 1; }\n    if (a > 1) { a = 2; }\n    return a;\n}', 'coDecisions coBand', '{}', { bands: [3, 5] }),
      '3 | 0–3', 'code/complexity: a band includes its top');
   eq(C('complexity', 'void f() {\n    if (a) {\n    } else {\n    }\n}', 'coDepth coDeepest', '{}', { bands: [5, 10] }), '0 | line 2',

@@ -2,9 +2,9 @@
 
 `learn-geterdone` is the repository, the application slug and the image
 title. What it publishes at `https://learn.geterdone.io/` is a **library of
-learning paths** — twelve paths, one hundred and thirteen interactive courses and 1,100 lessons
+learning paths** — thirteen paths, one hundred and twenty interactive courses and 1,141 lessons
 today: trading, discrete mathematics, algebra, system design, algorithms,
-operations research, philosophy, English, differential equations, Marx's *Capital*, Merleau-Ponty's *Phenomenology of Perception* and reading faster, every one of them complete end to end. Every page is a single HTML file with its CSS, JavaScript and graphics
+operations research, philosophy, English, differential equations, Marx's *Capital*, Merleau-Ponty's *Phenomenology of Perception*, reading faster and McConnell's *Code Complete*, every one of them complete end to end. Every page is a single HTML file with its CSS, JavaScript and graphics
 inline — it loads no fonts, no frameworks, no analytics, and no third-party
 requests of any kind.
 
@@ -580,10 +580,10 @@ and nothing is served at `/paths/` itself — the list of paths is the site inde
 Every course on the path has its own URLs; nothing on the path page is an entry
 without a page behind it.
 
-**1,230 pages and eight assets. Nothing else is served** — 1,226 pages of the course tree (the site index and twelve path trees), plus the capstone's two pages, the two sign-in pages (`/progress/` and `/oauth2/spa/callback/`), and the seven course schemas plus the capstone's dataset.
+**1,279 pages and eight assets. Nothing else is served** — 1,275 pages of the course tree (the site index and thirteen path trees), plus the capstone's two pages, the two sign-in pages (`/progress/` and `/oauth2/spa/callback/`), and the seven course schemas plus the capstone's dataset.
 
 The table below enumerates the **Trading** path, which is hand-authored and whose
-pages are its source of truth. The other eleven paths are GENERATED from
+pages are its source of truth. The other twelve paths are GENERATED from
 `content/<package>/` by `scripts/build_paths.py`, so their URL space is declared
 by the content packages rather than by a table here:
 
@@ -600,6 +600,7 @@ by the content packages rather than by a table here:
 | Capital | `/paths/capital/` | 14 | 119 | 134 | `content/capital/` |
 | Phenomenology | `/paths/phenomenology/` | 7 | 44 | 52 | `content/phenomenology/` |
 | Reading Faster | `/paths/reading-faster/` | 8 | 42 | 51 | `content/reading/` |
+| Code Complete | `/paths/code-complete/` | 7 | 41 | 49 | `content/code_complete/` |
 
 `python3 scripts/build_paths.py --check` is the authority on it, and
 `scripts/generated-pages.txt` is the list that build writes. Never edit a page
@@ -944,11 +945,11 @@ The normative rules live in `dmedellin/platform-ops`
 **Live on the Hetzner container platform.** `https://learn.geterdone.io/` is served
 by Caddy from an immutable GHCR digest, deployed through `platform-ops` and recorded
 in its app registry under the slug `learn-geterdone`. The published tree is this
-`site/` directory: the subject-agnostic site index, twelve path pages, 113 course
-homes, 1,100 lessons, the seven published schemas (trade journal, options trade plan,
+`site/` directory: the subject-agnostic site index, thirteen path pages, 120 course
+homes, 1,141 lessons, the seven published schemas (trade journal, options trade plan,
 indicator rule, volume and order flow rule, trading risk plan, trading system
 specification, and automated trading system), the dated real-data capstone with its
-dataset, `/progress/` and the sign-in redirect target. 1,230 pages and 8 assets; the
+dataset, `/progress/` and the sign-in redirect target. 1,279 pages and 8 assets; the
 trading path is complete at eight courses, the capstone is a worked example and not
 a ninth, and nothing in the library is announced without a page behind it.
 

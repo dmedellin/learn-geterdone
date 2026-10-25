@@ -10,7 +10,6 @@ own; the cost table and the statement ratios are the book's, after the
 sources it names. The one Java snippet is written for this course.
 """
 
-from fractions import Fraction
 
 # Key Construction Decisions: Java has no default parameter values, and this
 # convention supplies them. Written for the lesson; nothing in it is the
@@ -36,12 +35,14 @@ boolean send(Message message, int retries) {
 # Table 3-1 as the lesson gives it (F3, p. 29): (introduced, detected) to the
 # relative cost of the fix. The stages are requirements, architecture,
 # construction, system test and post-release.
+# Keys are "introduced found" strings, which the kit reads as the pair
+# and which keep the PATH dict JSON-serialisable.
 COST_TABLE = {
-    ("req", "req"): 1, ("req", "arch"): 3, ("req", "cons"): (5, 10),
-    ("req", "test"): 10, ("req", "post"): (10, 100),
-    ("arch", "arch"): 1, ("arch", "cons"): 10, ("arch", "test"): 15,
-    ("arch", "post"): (25, 100),
-    ("cons", "cons"): 1, ("cons", "test"): 10, ("cons", "post"): (10, 25),
+    "req req": 1, "req arch": 3, "req cons": (5, 10),
+    "req test": 10, "req post": (10, 100),
+    "arch arch": 1, "arch cons": 10, "arch test": 15,
+    "arch post": (25, 100),
+    "cons cons": 1, "cons test": 10, "cons post": (10, 25),
 }
 
 LESSONS = [
@@ -1027,7 +1028,7 @@ LESSONS = [
             "presets": [
                 {"id": "java",
                  "label": "10,000 statements of C, in Java (ratio 2.5)",
-                 "ratio": Fraction(5, 2),
+                 "ratio": "5/2",
                  "expect": {"pjEquivalent": "4,000"}},
                 {"id": "python",
                  "label": "10,000 statements of C, in Python (ratio 6)",
@@ -1035,7 +1036,7 @@ LESSONS = [
                  "expect": {"pjEquivalent": "5000/3 ≈ 1,666.67"}},
                 {"id": "visual-basic",
                  "label": "10,000 statements of C, in Visual Basic (ratio 4.5)",
-                 "ratio": Fraction(9, 2),
+                 "ratio": "9/2",
                  "expect": {"pjEquivalent": "20000/9 ≈ 2,222.22"}},
             ],
             "panel_title": "The same work in another language, by the book's ratio",

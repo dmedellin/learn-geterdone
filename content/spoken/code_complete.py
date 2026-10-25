@@ -5,16 +5,40 @@ Keyed by the exact run text; see content/AGENTS.md, "Write math a voice can read
 
 SPOKEN = {}
 
+# The Subject page's key (PATH["key"]). These are formulas and a maxim, not
+# Java statements, so the code reader would say "is set to" for `=`, "negative"
+# for a spaced `−` and "A" for the article; each line is read as written.
+SPOKEN.update({
+    "points = 1 + each if, for, while, case, &&, ||":
+        "decision points equal 1, plus one for each if, for, while, case, and operator and or operator",
+    "span = lines between two references":
+        "span equals the lines between two references",
+    "live time = last line − first line + 1":
+        "live time equals the last line minus the first line, plus 1",
+    "paths in a team of n = n·(n − 1)/2":
+        "paths in a team of n equal n times the quantity n minus 1, over 2",
+    "left = N·(1 − e₁)·(1 − e₂)·…":
+        "defects left equal N, times 1 minus e 1, times 1 minus e 2, and so on",
+    "speedup = old time / new time":
+        "speedup equals the old time divided by the new time",
+    # A worked line (Unusual Control Structures): `calls` is a function, and
+    # "calls of n minus 1" could be calls(n) - 1.
+    "calls(n) is 1 + calls(n - 1) + calls(n - 2)":
+        "calls of n is 1, plus calls of the quantity n minus 1, plus calls of the quantity n minus 2",
+    "a count is a reason to look, not a verdict":
+        "a count is a reason to look, not a verdict",
+})
+
 # System Considerations
 SPOKEN.update({
     "paths among n people: n·(n − 1)/2":
-        "paths among n people, n times n minus 1, divided by 2",
+        "paths among n people, n times the quantity n minus 1, halved",
     "defects = size in KLOC × errors per KLOC":
         "defects equal the size in K L O C times the errors per K L O C",
     "effort = nominal × each factor":
         "effort equals the nominal estimate times each factor",
     "paths = n·(n − 1)/2":
-        "paths equal n times n minus 1, divided by 2",
+        "paths equal n times the quantity n minus 1, halved",
     "defects = KLOC × errors per KLOC":
         "defects equal K L O C times errors per K L O C",
     "staff-years = lines / lines per year":

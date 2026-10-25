@@ -384,11 +384,13 @@ CO_VIEW_JS["names"] = r"""
     var counted = names.filter(function (v) { return !loop[v]; });
     var short = counted.filter(function (v) { return v.length < min; });
     var total = counted.reduce(function (s, v) { return s + v.length; }, 0);
+    var mean = counted.length ? R(total, counted.length) : null;
     return {
       tiles: { coNames: ccInt(names.length), coAvgLen: counted.length ? ccNum(R(total, counted.length)) : CC_DASH, coShort: ccNames(short) },
       status: ccPlural(names.length, 'declared name', 'declared names') + ', ' + counted.length + ' counted'
         + (names.length > counted.length ? ' (loop indexes are listed and not counted)' : '') + '. '
-        + (counted.length ? 'Their mean length is ' + ccNum(R(total, counted.length)) + ' characters; ' + ccPlural(short.length, 'is', 'are')
+        + (counted.length ? 'Their mean length is ' + ccNum(mean) + (Requ(mean, R1) ? ' character; ' : ' characters; ')
+          + ccPlural(short.length, 'is', 'are')
           + ' shorter than ' + min + '.' : 'No name is counted, so there is no mean length.'),
       table: names.length ? { caption: 'Declared names, in order', head: ['name', 'length', 'counted'],
         rows: names.map(function (v) { return [v, String(v.length), loop[v] ? 'no: a loop index' : (v.length < min ? { t: 'yes, short', c: 'tone-amber' } : 'yes')]; }) } : null

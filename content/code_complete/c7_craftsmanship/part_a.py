@@ -8,7 +8,6 @@ lesson's code block and by the lab preset that counts it, so the line numbers
 the prose names are the lab's.
 """
 
-from fractions import Fraction
 
 # ---------------------------------------------------------------- snippets
 
@@ -968,7 +967,7 @@ LESSONS = [
                  "expect": {"pjRuns": "35", "pjWeeks": "7/2 = 3.50", "pjYear": "340/3 ≈ 113.33"}},
                 {"id": "rare-task",
                  "label": "A rare task: 8 hours to automate a job done once in four weeks",
-                 "build": 8, "manual": 30, "auto": 2, "perWeek": Fraction(1, 4),
+                 "build": 8, "manual": 30, "auto": 2, "perWeek": "1/4",
                  "expect": {"pjRuns": "18", "pjWeeks": "72", "pjYear": "−29/15 ≈ −1.93"}},
                 {"id": "big-tool",
                  "label": "A big tool: 40 hours to save 9 minutes, five times a week",
