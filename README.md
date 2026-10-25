@@ -607,7 +607,7 @@ under one of their course slugs by hand; see AGENTS.md section 1a.
 
 | # | URL | Page | Source |
 | --- | --- | --- | --- |
-| — | `https://learn.geterdone.io/` | Site index — the paths, plus course search | `site/index.html` |
+| — | `https://learn.geterdone.io/` | Site index — Subjects grouped by domain, plus course search | `site/index.html` |
 | path | `https://learn.geterdone.io/paths/trading/` | **Trading path** — the eight courses in order | `site/paths/trading/index.html` |
 | capstone | `https://learn.geterdone.io/paths/trading/iren-analysis-2026-08-16/` | **IREN worked analysis, as of August 16, 2026** — the interactive lab; real data, not a course | `site/paths/trading/iren-analysis-2026-08-16/index.html` |
 | capstone | `https://learn.geterdone.io/paths/trading/iren-analysis-2026-08-16/slides/` | The same analysis as a slide deck (keyboard navigation, print one slide per page) | `site/paths/trading/iren-analysis-2026-08-16/slides/index.html` |

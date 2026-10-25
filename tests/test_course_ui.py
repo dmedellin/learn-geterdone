@@ -296,6 +296,41 @@ console.log('library search: subject names, factual lesson counts, neutral empty
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
 
+class TestLibraryCatalog(unittest.TestCase):
+    """The index lists Subjects in the catalog's order, not the order they were wired."""
+
+    def test_catalog_lists_exactly_the_published_subjects(self):
+        import catalog
+        published = {"trading"} | {path["slug"] for path in build_paths.GENERATED_PATHS}
+        listed = [entry["slug"] for entry in catalog.SUBJECTS]
+        self.assertEqual(len(listed), len(set(listed)), "a Subject is listed twice")
+        self.assertEqual(published, set(listed),
+                         "every published Subject needs one entry in scripts/catalog.py")
+        groups = [g["key"] for g in catalog.GROUPS]
+        for entry in catalog.SUBJECTS:
+            self.assertIn(entry["group"], groups, entry["slug"])
+            for slug in entry.get("builds_on", ()):
+                self.assertIn(slug, listed, entry["slug"])
+                self.assertLess(catalog.order_of(slug), catalog.order_of(entry["slug"]),
+                                "%s is listed before %s, which it builds on" % (entry["slug"], slug))
+
+    def test_index_cards_follow_the_catalog_and_are_current(self):
+        import build_index
+        import catalog
+        markup = (SITE / "index.html").read_text()
+        self.assertEqual(markup, build_index.render(markup),
+                         "site/index.html is stale; run scripts/build_index.py")
+        cards = re.findall(r'<article class="subject-card[^"]*">.*?<h4><a href="\./paths/([a-z-]+)/">',
+                           markup, re.S)
+        self.assertEqual([entry["slug"] for entry in catalog.SUBJECTS], cards)
+
+    def test_progress_inventory_follows_the_catalog(self):
+        import build_auth_pages
+        import catalog
+        self.assertEqual([entry["slug"] for entry in catalog.SUBJECTS],
+                         [subject["slug"] for subject in build_auth_pages.library_inventory()])
+
+
 class TestMarkLabels(unittest.TestCase):
     def test_course_marks_have_readable_state(self):
         for script in (progress.COURSE_JS, trading.COURSE_JS):
