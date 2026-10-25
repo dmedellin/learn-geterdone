@@ -1787,6 +1787,97 @@ CAP_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Phenomenology, same shape.
+PHEN_PATH_PAGE_PATH = "/paths/phenomenology/"
+PHEN_MATERIAL_MARKER = "what perception gives is not a figure"
+PHEN_COURSES = (
+    ("perception-what-phenomenology-is", "What Phenomenology Is", (
+        "description-not-explanation",
+        "the-reduction-and-its-limit",
+        "essences-and-existence",
+        "intentionality-and-rationality",
+    )),
+    ("perception-classical-prejudices", "Classical Prejudices", (
+        "the-idea-of-pure-sensation",
+        "the-constancy-hypothesis",
+        "association-and-the-projection-of-memories",
+        "attention-and-judgment",
+        "the-phenomenal-field",
+    )),
+    ("perception-the-lived-body", "The Lived Body", (
+        "experience-and-objective-thought",
+        "the-phantom-limb",
+        "the-habitual-body",
+        "the-permanence-of-ones-own-body",
+        "the-body-schema",
+        "schneider-concrete-and-abstract-movement",
+        "the-intentional-arc",
+        "habit-and-the-blind-mans-cane",
+    )),
+    ("perception-the-expressive-body", "The Expressive Body", (
+        "the-body-as-a-work-of-art",
+        "the-body-as-a-sexed-being",
+        "speech-as-gesture",
+        "the-spoken-word-and-thought",
+    )),
+    ("perception-sensing-and-space", "Sensing and Space", (
+        "the-body-and-perception",
+        "the-motor-physiognomy-of-colours",
+        "the-anonymous-subject-of-sensing",
+        "the-unity-of-the-senses",
+        "up-and-down",
+        "depth",
+        "movement",
+        "lived-space",
+    )),
+    ("perception-things-world-and-others", "Things, the World and Others", (
+        "size-and-shape-constancy",
+        "colour-and-lighting",
+        "the-thing-and-the-real",
+        "the-natural-world",
+        "hallucination",
+        "the-cultural-world-and-others",
+        "the-truth-of-solipsism",
+    )),
+    ("perception-cogito-time-and-freedom", "The Cogito, Time and Freedom", (
+        "the-cogito-and-the-certainty-of-seeing",
+        "the-triangle",
+        "the-tacit-cogito",
+        "time-is-not-in-things",
+        "the-field-of-presence",
+        "time-as-subject",
+        "the-rock-and-the-project",
+        "freedom-in-situation",
+    )),
+)
+
+PHEN_PATH_PAGE_MARKERS = (
+    canonical_marker(PHEN_PATH_PAGE_PATH),
+    html.escape(PHEN_COURSES[0][1]),
+    html.escape(PHEN_COURSES[-1][1]),
+    'href="../../%s/"' % PHEN_COURSES[-1][0],
+)
+
+PHEN_COURSE_HOMES = tuple(
+    (
+        "phen-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, PHEN_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(PHEN_COURSES, start=1)
+)
+
+PHEN_COURSE_LESSONS = tuple(
+    (
+        "phen-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), PHEN_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(PHEN_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1884,6 +1975,7 @@ def path_page_targets(args):
         ("eng-path", ENG_PATH_PAGE_PATH, ENG_PATH_PAGE_MARKERS),
         ("de-path", DE_PATH_PAGE_PATH, DE_PATH_PAGE_MARKERS),
         ("cap-path", CAP_PATH_PAGE_PATH, CAP_PATH_PAGE_MARKERS),
+        ("phen-path", PHEN_PATH_PAGE_PATH, PHEN_PATH_PAGE_MARKERS),
     ]
 
 
@@ -1908,7 +2000,8 @@ def course_home_targets(args):
                                     + PHIL_COURSE_HOMES
                                     + ENG_COURSE_HOMES
                                     + DE_COURSE_HOMES
-                                    + CAP_COURSE_HOMES):
+                                    + CAP_COURSE_HOMES
+                                    + PHEN_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -1948,6 +2041,7 @@ def lesson_targets(args):
         + ENG_COURSE_LESSONS
         + DE_COURSE_LESSONS
         + CAP_COURSE_LESSONS
+        + PHEN_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

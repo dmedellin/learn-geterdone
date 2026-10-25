@@ -11,6 +11,7 @@ from . import (
     calckit,
     dekit,
     capkit,
+    phenkit,
     argkit,
     choicekit,
     algebra_equations,
@@ -167,6 +168,7 @@ REGISTRY = {
     "calckit": calckit.calckit_lab,
     "dekit": dekit.dekit_lab,
     "capkit": capkit.capkit_lab,
+    "phenkit": phenkit.phenkit_lab,
 }
 
 

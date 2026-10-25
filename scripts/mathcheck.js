@@ -20239,6 +20239,452 @@ console.log('capital: capkit_b Volume II and III modes');
 }
 // ---- end capkit_b ----
 
+// ---- phenkit ----
+// ==========================================================================
+// Phenomenology of Perception: phenkit.py's fifteen modes and phenkit_core.py
+// ==========================================================================
+//
+// RATIONAL_JS, PH_CORE_JS and every <MODE>_JS of phenkit.py run in a vm
+// context of their own, as a phenkit page assembles them (a page ships only
+// its own mode's block; together here they show no two blocks collide). Each
+// mode's pure <xx>Compute(view, inst, opts) is called on an instance parsed by
+// phRead -- the parser the page uses -- and compared on the exact tile string
+// a reader sees. The figures are docs/phenomenology/PLAN.md section C's. Every
+// case below was seen to FAIL when the line it tests was broken on purpose
+// (docs/phenomenology/kit-report.md lists the mutations).
+console.log('phenomenology: phenkit, fifteen modes');
+{
+  const vm = require('vm');
+  const PK_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'phenkit.py');
+  const PC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'phenkit_core.py');
+  const pkSrc = fs.readFileSync(PK_SOURCE, 'utf8'), pcSrc = fs.readFileSync(PC_SOURCE, 'utf8');
+  const MODE_BLOCKS = ['STIMULUS_JS', 'GROUPING_JS', 'CUES_JS', 'SIZE_JS', 'PERSPECTIVE_JS', 'VARIATION_JS', 'CASES_JS',
+    'SCHEMA_JS', 'SORTING_JS', 'LEVEL_JS', 'DEPTH_JS', 'MOTION_JS', 'LIGHT_JS', 'TRIANGLE_JS', 'TIME_JS'];
+  const ctx = { console: console };
+  vm.createContext(ctx);
+  vm.runInContext(block('RATIONAL_JS') + blockFrom(pcSrc, 'PH_CORE_JS', PC_SOURCE)
+    + MODE_BLOCKS.map((n) => blockFrom(pkSrc, n, PK_SOURCE)).join('')
+    + "function Q(t) { return Rparse(String(t)); }", ctx, { filename: 'phenkit.py' });
+  const pk = (expr) => {
+    try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; }
+  };
+  /* A field spec as the page ships it: {key, kind, what, ...}. */
+  const F = (key, kind, extra) => Object.assign({ key: key, kind: kind, what: key }, extra || {});
+  const call = (fn, view, spec, raw, opts) =>
+    fn + "('" + view + "', phRead(" + JSON.stringify(spec) + ', ' + JSON.stringify(raw) + '), ' + JSON.stringify(opts || {}) + ')';
+  const tile = (fn, view, spec, raw, opts, id) => pk(call(fn, view, spec, raw, opts) + '.tiles.' + id);
+  const said = (fn, view, spec, raw, opts) => pk(call(fn, view, spec, raw, opts) + '.status');
+  const refused = (fn, view, spec, raw, opts) => pk(call(fn, view, spec, raw, opts) + '.refuse');
+  const M = { model: 'the model' };
+  /* A refusal's first sentence, exactly. */
+  const first = (text) => String(text).split('. ')[0];
+
+  /* --- phenkit_core: printing ---------------------------------------------- */
+  eq(pk("phFixed(Q('1737/192200'), 4)"), '0.0090', 'phFixed: four places, trailing zero kept');
+  eq(pk("phFixed(Q('-1/3'), 1)"), '−0.3', 'phFixed: a negative, with the minus sign');
+  eq(pk("phFixed(Q('1/20000'), 4)"), '0.0001', 'phFixed: half away from zero, on the exact value');
+  eq(pk("phApprox(Q('13/100'), 4, 'rad')"), '13/100 = 0.1300 rad', 'phApprox: an exact decimal is marked =');
+  eq(pk("phApprox(Q('13/120'), 4, 'rad')"), '13/120 ≈ 0.1083 rad', 'phApprox: an inexact one is marked ≈');
+  eq(pk("phApprox(Q(0), 4, 'rad')"), '0 rad', 'phApprox: a whole number alone');
+  eq(pk("phPct(Q('47/51'))"), '47/51 ≈ 92.2%', 'phPct: Brunswik 47/51');
+  eq(pk("phPct(Q(1)) + ' ' + phPct(Q(0)) + ' ' + phPct(Q('1/2'))"), '1 = 100% 0 = 0% 1/2 = 50%', 'phPct: exact percentages');
+  eq(pk("phPct(Q('-1/3'))"), '−1/3 ≈ −33.3%', 'phPct: negative');
+  eq(pk("phQty(Q('85/2'), 'cm') + ' ' + phDeg(Q('-45/2'))"), '85/2 cm −45/2°', 'phQty and phDeg: reduced, U+2212');
+  eq(pk("phNames([]) + ' / ' + phNames(['a', 'b'])"), 'none / a, b', 'phNames');
+  eq(pk("phAngleText(phAngle('3-4-5', 'x'))"), '3-4-5: cos 4/5, ≈ 36.87°', 'phAngleText: D.0 example');
+  eq(pk("phAngleText(phAngle('north', 'x'))"), 'north (90): cos 0, 90°', 'phAngleText: a compass point');
+  eq(pk("Rtext(phAngle('8-15-17', 'x').sin) + ' ' + Rtext(phAngle('270', 'x').sin)"), '8/17 -1', 'phAngle: a-b-c is sin a/c');
+  eq(pk("phAngle('45', 'The facing')"), 'THREW The facing "45" is not one of the angles this lab can turn by exactly: '
+     + '0, 3-4-5, 4-3-5, 5-12-13, 12-5-13, 8-15-17, 15-8-17, 90, 180, 270 (or east, north, west, south)', 'phAngle refuses 45');
+
+  /* --- phenkit_core: view directions and parsing ----------------------------- */
+  eq(pk("var d = phDir('2 -3 6', 'v'); d.text + ' ' + d.len"), '2 -3 6 7', 'phDir: a quadruple of length 7');
+  eq(pk("phDir('back', 'v').v.join(' ')"), '0 0 -1', 'phDir: a named view');
+  eq(first(pk("phDir('1 1 1', 'The view')")), 'THREW The view "1 1 1" has length √3, not a whole number',
+     'phDir refuses a length that is not whole');
+  eq(first(pk("phDir('21 0 0', 'The view')")), 'THREW The view "21 0 0" has a component past 20', 'phDir refuses past 20');
+  eq(pk("phDir('0 0 0', 'The view')").split('. ')[1], 'A view is front, back, right, left, above or below, or three whole numbers of '
+     + 'whole-number length, such as 3 0 4, 1 2 2, 2 3 6, 1 4 8 or 4 4 7, with any signs and in any order', 'phDir: the refusal gives D.0\'s examples');
+  eq(first(pk("phDir('0 0 0', 'The view')")), 'THREW The view is 0 0 0, which points nowhere', 'phDir refuses zero');
+  eq(pk("phRead([{key: 'x', kind: 'pos', what: 'The size'}], {x: '-1'}).x"), 'THREW The size must be more than 0, and it is −1',
+     'phRead refuses -1 where a positive is needed');
+  eq(pk("phRead([{key: 'x', kind: 'pos', what: 'The size'}], {x: '0'}).x"), 'THREW The size must be more than 0, and it is 0',
+     'phRead refuses 0 where a positive is needed');
+  eq(pk("phRead([{key: 'x', kind: 'nn', what: 'The size'}], {x: '-1/2'}).x"), 'THREW The size cannot be negative, and it is −1/2',
+     'phRead refuses a negative where 0 or more is needed');
+  eq(pk("phRead([{key: 'x', kind: 'nn', what: 'The size'}], {x: '1/0'}).x"),
+     'THREW The size should be a number such as 3, 1/2 or 0.25, and "1/0" is not one', 'phRead refuses 1/0');
+  eq(pk("phRead([{key: 'x', kind: 'name', what: 'The start'}], {x: 'A>B'}).x"),
+     'THREW The start "A>B" may not contain , ; : = < > & or quotes', 'phRead refuses A>B in a name');
+  eq(pk("phRead([{key: 'x', kind: 'word', words: ['cm', 'm'], what: 'The unit'}], {x: 'banana'}).x"),
+     'THREW The unit should be one of cm, m, not "banana"', 'phRead refuses banana for a word');
+  eq(pk("phRead([{key: 'x', kind: 'cell', what: 'The cell'}], {x: 'yes'}).x"),
+     'THREW The cell should be y (consistent), n (inconsistent) or - (silent), not "yes"', 'phRead: a cases cell is y, n or -');
+  eq(pk("phRead([{key: 'x', kind: 'l10', what: 'The lightness'}], {x: '11'}).x"),
+     'THREW The lightness must be a whole number from 0 to 10, not 11', 'phRead: lightness 0..10');
+  eq(pk("phNum(phRead([{key: 'x', kind: 'deg', what: 't'}], {x: '-180'}).x)"), '180', 'phRead: -180° is read as 180°');
+  eq(pk("var r = phRead([{key: 'x', kind: 'reach', what: 'r'}], {x: 'right 0, left 70'}).x; phNum(r.left) + ' ' + phNum(r.right)"),
+     '70 0', 'phRead: a reach by side');
+  eq(pk("var o = phRead([{key: 'x', kind: 'necker', what: 'o'}], {x: 'wire box 3 2 1'}).x; o.wire + ' ' + phNum(o.w) + phNum(o.d) + phNum(o.h)"),
+     'true 321', 'phRead: a wire box, width depth height');
+  eq(pk("phRead([{key: 'x', kind: 'rec', what: 'Views', lo: 1, hi: 6, opt: 2, sub: [['direction', {kind: 'dir'}], ['name', {kind: 'label'}], ['reports', {kind: 'tokens'}]]}],"
+        + " {x: '1 2 2, east, front right; back'}).x.map(function (r) { return r.direction.text + '/' + r.name + '/' + (r.reports || []).join('+'); }).join(' ')"),
+     '1 2 2/east/front+right back/null/', 'phRead: records with optional trailing parts');
+  eq(pk("phRead([{key: 'x', kind: 'list', each: {kind: 'num'}, sep: 'ws', lo: 2, hi: 16, what: 'The dots'}], {x: '4'}).x"),
+     'THREW The dots: this lab needs at least 2, and there is 1', 'phRead: a list below its limit');
+
+  /* --- stimulus -------------------------------------------------------------- */
+  const ST = [F('a', 'nn'), F('b', 'nn'), F('unit', 'word', { words: ['mm', 'cm', 'm', 'km'] }), F('reported', 'num')];
+  eq(tile('stCompute', 'illusion', ST, { a: '10', b: '10', unit: 'cm', reported: '2' }, M, 'stPredicted'), '0 cm',
+     'stCompute: Müller-Lyer, the constancy hypothesis predicts 0');
+  eq(tile('stCompute', 'illusion', ST, { a: '12', b: '10', unit: 'cm', reported: '-1' }, M, 'stGap'), '−3 cm',
+     'stCompute: the gap is the report minus the prediction');
+  eq(tile('stCompute', 'illusion', ST, { a: '12', b: '10', unit: 'cm', reported: '-1' }, M, 'stReported'), '−1 cm',
+     'stCompute: a reported difference keeps its sign');
+  eq(tile('stCompute', 'illusion', ST, { a: '0', b: '0', unit: 'cm', reported: '6' }, M, 'stReported'), '6 cm',
+     'stCompute: the reported deviation, as typed');
+
+  /* --- grouping ------------------------------------------------------------- */
+  const GR = [F('points', 'list', { each: { kind: 'num' }, sep: 'ws', lo: 2, hi: 16 }), F('ratio', 'pos')];
+  eq(tile('grCompute', 'proximity', GR, { points: '0, 1, 4, 5, 8, 9', ratio: '2' }, M, 'grGroups'), '{0, 1} {4, 5} {8, 9}',
+     'grCompute: three pairs');
+  eq(tile('grCompute', 'proximity', GR, { points: '0, 1, 4, 6, 8, 9', ratio: '2' }, M, 'grGaps'), '1, 3, 2, 2, 1', 'grCompute: the gaps');
+  eq(tile('grCompute', 'proximity', GR, { points: '0, 1, 4, 6, 8, 9', ratio: '2' }, M, 'grCount'), '4', 'grCompute: the shift breaks a pair');
+  eq(tile('grCompute', 'proximity', GR, { points: '0 2 4 6 8', ratio: '2' }, M, 'grCount'), '1', 'grCompute: even dots, one group');
+  eq(tile('grCompute', 'proximity', GR, { points: '9 4 0 8 5 1', ratio: '2' }, M, 'grGroups'), '{0, 1} {4, 5} {8, 9}',
+     'grCompute: the dots are sorted first');
+  eq(tile('grCompute', 'proximity', GR, { points: '0 1 4 5 8 9', ratio: '3' }, M, 'grCount'), '3', 'grCompute: a gap equal to the threshold separates');
+  eq(refused('grCompute', 'proximity', GR, { points: '0 1 1', ratio: '2' }, M), 'Two dots are at 1; every dot needs its own position',
+     'grCompute refuses two dots at one place');
+
+  /* --- cues ------------------------------------------------------------------- */
+  const WORDS = 'house, horse, gate:door, game, gave, have, hate, lake:water, make, name, same, take, cake, late, sale, tale, wave, cane, date, page:book';
+  const CP = [F('words', 'list', { each: { kind: 'wordtag' }, sep: 'ws', lo: 1, hi: 40, unique: true }), F('pattern', 'pattern'), F('context', 'tag')];
+  eq(tile('cuCompute', 'pattern', CP, { words: WORDS, pattern: 'ho_se', context: '' }, M, 'cuCandidates'), 'house, horse',
+     'cuCompute: ho_se fits house and horse, in list order');
+  eq(tile('cuCompute', 'pattern', CP, { words: WORDS, pattern: '_a_e', context: '' }, M, 'cuCount'), '18', 'cuCompute: _a_e fits 18');
+  eq(tile('cuCompute', 'pattern', CP, { words: WORDS, pattern: '_a_e', context: 'door' }, M, 'cuCandidates'), 'gate',
+     'cuCompute: the context selects gate');
+  eq(tile('cuCompute', 'pattern', CP, { words: WORDS, pattern: '_a_e', context: '' }, M, 'cuContext'), '—', 'cuCompute: no context');
+  eq(refused('cuCompute', 'pattern', CP, { words: WORDS, pattern: '_a_e', context: 'banana' }, M),
+     'No remembered word carries the context "banana"; the tags are door, water, book', 'cuCompute refuses an unknown tag');
+  eq(pk("cuFits('horse', 'ho_se') + ' ' + cuFits('horses', 'ho_se') + ' ' + cuFits('hoise', 'ha_s_')"), 'true false false',
+     'cuFits: length and every seen letter');
+  const CS = [F('candidates', 'rec', { lo: 1, hi: 8, unique: true, sub: [['name', { kind: 'name' }], ['cues', { kind: 'tokens' }]] }),
+    F('cues', 'list', { each: { kind: 'name' }, sep: 'ws', lo: 1, hi: 6 })];
+  const SHIP = 'trees at the forest’s edge, c1 c2; masts and funnel of a ship, c1 c2 c3';
+  eq(tile('cuCompute', 'sequence', CS, { candidates: SHIP, cues: 'c1, c2' }, { model: 'm', step: 3 }, 'cuCount'), '2',
+     'cuCompute: ship, the model keeps both after c2');
+  eq(first(said('cuCompute', 'sequence', CS, { candidates: SHIP, cues: 'c1, c2' }, { model: 'm', step: 3 })),
+     'Step 3 is past this instance\'s 2 cues, so the lab shows step 2', 'cuCompute: a step past the data is clamped, and said');
+  eq(tile('cuCompute', 'sequence', CS, { candidates: SHIP, cues: 'c1 c2 c3' }, { model: 'm', step: 3 }, 'cuRemoved'),
+     'trees at the forest’s edge', 'cuCompute: the hull removes the trees');
+  eq(tile('cuCompute', 'sequence', CS, { candidates: SHIP, cues: 'c1 c2 c3' }, { model: 'm', step: 2 }, 'cuRemoved'), 'none',
+     'cuCompute: c2 removes nothing');
+  eq(tile('cuCompute', 'sequence', CS, { candidates: 'a, c1; b, c1 c2; c, c1 c2 c3', cues: 'c1 c2 c3' }, { model: 'm', step: 2 }, 'cuCandidates'),
+     'b, c', 'cuCompute: the stone, two after c2');
+  eq(refused('cuCompute', 'sequence', CS, { candidates: SHIP, cues: 'c1 banana' }, { model: 'm', step: 2 }),
+     'No candidate is consistent with the cue "banana"; the cues the candidates list are c1, c2, c3', 'cuCompute refuses an unknown cue');
+
+  /* --- size ----------------------------------------------------------------- */
+  const SA = [F('size', 'pos'), F('distance', 'pos'), F('unit', 'word', { words: ['mm', 'cm', 'm', 'km'] })];
+  eq(tile('szCompute', 'angle', SA, { size: '3474', distance: '384400', unit: 'km' }, M, 'szRatio'), '1737/192200 ≈ 0.0090 rad',
+     'szCompute: the moon at the horizon');
+  eq(tile('szCompute', 'angle', SA, { size: '3474', distance: '384400', unit: 'km' }, M, 'szDegrees'), '≈ 0.52°', 'szCompute: in degrees');
+  eq(tile('szCompute', 'angle', SA, { size: '3474', distance: '378029', unit: 'km' }, M, 'szDegrees'), '≈ 0.53°', 'szCompute: the zenith moon');
+  const SC = SA.concat([F('standard_distance', 'pos'), F('assumed', 'optpos'), F('reported', 'nn')]);
+  const far = { size: '170', distance: '800', unit: 'cm', standard_distance: '200', assumed: '', reported: '160' };
+  eq(tile('szCompute', 'constancy', SC, far, M, 'szRetinal'), '85/2 cm', 'szCompute: the retinal-image prediction');
+  eq(tile('szCompute', 'constancy', SC, far, M, 'szInferred'), '170 cm', 'szCompute: the inference, distance assumed correctly');
+  eq(tile('szCompute', 'constancy', SC, far, M, 'szBrunswik'), '47/51 ≈ 92.2%', 'szCompute: Brunswik 47/51');
+  eq(tile('szCompute', 'constancy', SC, Object.assign({}, far, { assumed: '400' }), M, 'szInferred'), '85 cm',
+     'szCompute: the distance misjudged as 4 m');
+  eq(refused('szCompute', 'constancy', SC, Object.assign({}, far, { standard_distance: '800' }), M),
+     'The distance equals the standard distance, 800 cm, so both accounts predict the size itself and there is nothing to correct', 'szCompute refuses distance = standard distance');
+
+  /* --- perspective ----------------------------------------------------------- */
+  const PV = [F('object', 'solid'), F('views', 'rec', { lo: 1, hi: 6, opt: 2,
+    sub: [['direction', { kind: 'dir' }], ['name', { kind: 'label' }], ['reports', { kind: 'tokens' }]] })];
+  const three = { object: 'cube', views: '1 2 2, front-right-above; -2 1 -2, back-left-above; front' };
+  eq(tile('peCompute', 'faces', PV, three, M, 'peVisible'),
+     'front-right-above: front 2/3, right 1/3, above 2/3; back-left-above: back 2/3, left 2/3, above 1/3; front: front 1',
+     'peCompute: faces and foreshortening from three views');
+  eq(tile('peCompute', 'faces', PV, three, M, 'peUnion'), '5 of 6', 'peCompute: no view sees below');
+  eq(tile('peCompute', 'faces', PV, { object: 'cube', views: '1 2 2, a, front right below; front' }, M, 'peConsistent'),
+     'no: a (below)', 'peCompute: a report the direction cannot see');
+  eq(tile('peCompute', 'faces', PV, { object: 'cube', views: '1 2 2, a, front right; front' }, M, 'peConsistent'), 'yes',
+     'peCompute: reports the directions allow');
+  eq(tile('peCompute', 'faces', PV, three, M, 'peConsistent'), '—', 'peCompute: no reports at all');
+  const house = { object: 'box 4 3 2', views: '0 3 4, street; 0 3 -4, garden; 1 2 2, east; -1 2 -2, west' };
+  eq(tile('peCompute', 'faces', PV, house, M, 'peCover'), 'east, west (2 views)', 'peCompute: the smallest cover, first in list order');
+  eq(tile('peCompute', 'faces', PV, house, M, 'peMax'), '3', 'peCompute: no view sees more than 3');
+  eq(tile('peCompute', 'faces', PV, { object: 'cube', views: 'front; 0 3 4; right; 3 4 0' }, M, 'peCover'), 'front, 3 4 0 (2 views)',
+     'peCompute: the smallest cover, not the first views listed');
+  eq(tile('peCompute', 'faces', PV, { object: 'cube', views: 'front; 3 0 4, a; 4 0 3, b' }, M, 'peCover'), 'a (1 view)',
+     'peCompute: among equal covers, the first in list order');
+  eq(tile('peCompute', 'faces', PV, { object: 'cube', views: '3 0 4' }, M, 'peVisible'), '3 0 4: front 4/5, right 3/5',
+     'peCompute: turned by 3-4-5');
+  eq(refused('peCompute', 'faces', PV, { object: 'cube', views: 'front, a; back, a' }, M), 'Two views are named a; give each its own name',
+     'peCompute refuses two views of one name');
+  eq(refused('peCompute', 'faces', PV, { object: 'cube', views: 'front, a, nose' }, M),
+     'View a reports "nose", which is not a face: the faces are front, back, right, left, above, below', 'peCompute refuses a report that is not a face');
+  const own = { object: 'cube', views: '0 3 4; 3 4 0; -3 4 0' };
+  eq(tile('peCompute', 'own', PV, own, { model: 'm', allowed: ['0 3 4', '3 4 0', '-3 4 0'] }, 'peUnseen'), 'back, below',
+     'peCompute: one\'s own body never sees its back or below');
+  eq(refused('peCompute', 'own', PV, { object: 'cube', views: 'back' }, { model: 'm', allowed: ['0 3 4'] }),
+     'This lesson\'s views are 0 3 4, and back is not one of them', 'peCompute: own keeps to the lesson\'s views');
+  const PN = [F('object', 'necker'), F('offset', 'num')];
+  eq(tile('peCompute', 'necker', PN, { object: 'wire cube', offset: '1/2' }, M, 'peReadings'), '2', 'peCompute: a wire cube, two readings');
+  eq(tile('peCompute', 'necker', PN, { object: 'wire cube', offset: '1/2' }, M, 'peEdges'), '12', 'peCompute: twelve edges');
+  eq(tile('peCompute', 'necker', PN, { object: 'solid cube', offset: '1/2' }, M, 'peEdges'), '9', 'peCompute: a solid cube draws nine');
+  eq(tile('peCompute', 'necker', PN, { object: 'solid cube', offset: '1/2' }, M, 'peSame'), 'different drawings',
+     'peCompute: the solid cube\'s mirror image draws a different nine');
+  eq(tile('peCompute', 'necker', PN, { object: 'wire box 2 1 1', offset: '1/2' }, M, 'peSame'), 'identical drawings', 'peCompute: the wire box');
+  eq(tile('peCompute', 'necker', PN, { object: 'solid cube', offset: '0' }, M, 'peReadings'), '2',
+     'peCompute: a solid cube seen square on fits both readings');
+  eq(tile('peCompute', 'necker', PN, { object: 'wire cube', offset: '0' }, M, 'peEdges'), '4', 'peCompute: square on, the edges coincide');
+  eq(pk("peReflect([Q(0), Q(0), Q(0)], [Q('1/2'), Q('1/2'), Q('1/2')], [Q('1/2'), Q('1/2'), Q(1)]).map(Rtext).join(' ')"), '2/3 2/3 4/3',
+     'peReflect: a corner of the cube across the plane perpendicular to (1/2, 1/2, 1)');
+  eq(refused('peCompute', 'necker', PN, { object: 'wire cube', offset: '3' }, M), 'The offset is 3; this lab draws offsets from −2 to 2',
+     'peCompute refuses an offset past 2');
+
+  /* --- variation ----------------------------------------------------------------- */
+  const VR = [F('variants', 'rec', { lo: 1, hi: 10, opt: 1, unique: true,
+    sub: [['name', { kind: 'name' }], ['kind', { kind: 'yesno' }], ['properties', { kind: 'tokens' }]] })];
+  const sig = 'paper, yes, fingers shapes order rhythm; board, yes, arm shapes order rhythm; tracing, no, fingers shapes order';
+  eq(tile('vrCompute', 'core', VR, { variants: sig }, M, 'vrCore'), 'shapes, order, rhythm', 'vrCompute: the signature\'s core');
+  eq(tile('vrCompute', 'core', VR, { variants: sig }, M, 'vrVary'), 'fingers, arm', 'vrCompute: what varies');
+  eq(tile('vrCompute', 'core', VR, { variants: sig }, M, 'vrBreak'), 'tracing lacks rhythm', 'vrCompute: the tracing lacks the rhythm');
+  eq(tile('vrCompute', 'core', VR, { variants: 'anger, yes, smile; pleasure, no, smile' }, M, 'vrBreak'), 'pleasure lacks none of the core',
+     'vrCompute: the sign does not decide the emotion');
+  eq(tile('vrCompute', 'core', VR, { variants: 'a, yes, x; b, yes, y' }, M, 'vrCore'), 'none', 'vrCompute: an empty core');
+  eq(tile('vrCompute', 'core', VR, { variants: 'a, yes, x; b, yes, x' }, M, 'vrBreak'), 'no variant is marked no', 'vrCompute: no variant left the kind');
+  eq(refused('vrCompute', 'core', VR, { variants: 'a, no, x' }, M), 'No variant is marked yes, so there is no kind whose core could be found',
+     'vrCompute refuses a set with no variant of the kind');
+
+  /* --- cases --------------------------------------------------------------------- */
+  const CA = [F('observations', 'rec', { lo: 1, hi: 10, unique: true, sub: [['observation', { kind: 'name' }], ['a0', { kind: 'cell' }], ['a1', { kind: 'cell' }]] })];
+  const intro = { observations: 'Müller-Lyer, n, n; misprint, n, y; attention, n, n; ship, y, n' };
+  const CO = { model: 'the lesson\'s coding', accounts: ['empiricism', 'intellectualism'], pair: '0-1' };
+  eq(tile('caCompute', 'table', CA, intro, CO, 'caRecord'),
+     'empiricism: absorbs 1 of 4, fails 3, silent 0; intellectualism: absorbs 1 of 4, fails 3, silent 0', 'caCompute: the Introduction\'s records');
+  eq(tile('caCompute', 'table', CA, intro, CO, 'caSurvivors'), 'none', 'caCompute: no survivor');
+  eq(tile('caCompute', 'table', CA, intro, CO, 'caSplit'), 'misprint, ship', 'caCompute: the two part on the misprint and the ship');
+  const phantom = { observations: 'paths, y, n; emotion, n, y; posture, n, y; shrinks, -, y' };
+  const PO = { model: 'm', accounts: ['physiological', 'psychological'], pair: '0-1' };
+  eq(tile('caCompute', 'table', CA, phantom, PO, 'caRecord'),
+     'physiological: absorbs 1 of 4, fails 2, silent 1; psychological: absorbs 3 of 4, fails 1, silent 0', 'caCompute: silent counted apart');
+  eq(tile('caCompute', 'table', CA, { observations: 'paths, y, n' }, PO, 'caSurvivors'), 'physiological', 'caCompute: a survivor on a subset');
+  eq(tile('caCompute', 'table', CA, { observations: 'shrinks, -, y' }, PO, 'caSplit'), 'none', 'caCompute: silent against y is no split');
+  const CA3 = [F('observations', 'rec', { lo: 1, hi: 10, sub: [['observation', { kind: 'name' }], ['a0', { kind: 'cell' }], ['a1', { kind: 'cell' }], ['a2', { kind: 'cell' }]] })];
+  eq(tile('caCompute', 'table', CA3, { observations: 'one, y, n, y; two, n, y, n; three, -, y, n' }, { model: 'm', accounts: ['a', 'b', 'c'], pair: '1-2' }, 'caSplit'),
+     'one, two, three', 'caCompute: the pair caPair chooses');
+  eq(tile('caCompute', 'table', CA3, { observations: 'one, y, n, y; two, n, y, n; three, -, y, n' }, { model: 'm', accounts: ['a', 'b', 'c'], pair: '0-2' }, 'caSplit'),
+     'none', 'caCompute: a and c agree wherever both speak');
+
+  /* --- schema -------------------------------------------------------------------- */
+  const BODY = F('body', 'rec', { lo: 1, hi: 1, sub: [['x', { kind: 'num' }], ['y', { kind: 'num' }], ['facing', { kind: 'angle' }]] });
+  const OBJS = F('objects', 'rec', { lo: 1, hi: 6, opt: 1, unique: true, sub: [['name', { kind: 'name' }], ['x', { kind: 'num' }], ['y', { kind: 'num' }],
+    ['given', { kind: 'word', words: ['body', 'objective'] }]] });
+  const SCC = [BODY, OBJS];
+  eq(tile('scCompute', 'coordinates', SCC, { body: '0, 0, east', objects: 'cup, 2, 1' }, M, 'scBody'), 'cup ahead 2, left 1',
+     'scCompute: facing east');
+  eq(tile('scCompute', 'coordinates', SCC, { body: '0, 0, north', objects: 'cup, 2, 1' }, M, 'scBody'), 'cup ahead 1, right 2',
+     'scCompute: facing north');
+  eq(tile('scCompute', 'coordinates', SCC, { body: '1, 0, east', objects: 'cup, 2, 1' }, M, 'scBody'), 'cup ahead 1, left 1',
+     'scCompute: after walking 1 m east');
+  eq(tile('scCompute', 'coordinates', SCC, { body: '0, 0, 3-4-5', objects: 'cup, 5, 0' }, M, 'scBody'), 'cup ahead 4, right 3',
+     'scCompute: facing 3-4-5, exact');
+  eq(tile('scCompute', 'coordinates', SCC, { body: '0, 0, 180', objects: 'cup, 2, 1' }, M, 'scBody'), 'cup behind 2, right 1',
+     'scCompute: facing west, behind');
+  eq(tile('scCompute', 'coordinates', SCC, { body: '0, 0, east', objects: 'cup, 2, 1' }, M, 'scRoom'), 'cup (2, 1)', 'scCompute: room coordinates');
+  eq(tile('scCompute', 'coordinates', SCC, { body: '0, 0, north', objects: 'pocket, 0, -1, body; nose, 1, 0, objective' }, M, 'scFrame'),
+     'pocket: given in the body\'s situation: no conversion; nose: given as a position in objective space: converted to ahead 0, right 1',
+     'scCompute: the frame each target is given in');
+  const SCH = [F('habitual_reach', 'reach'), F('present_reach', 'reach'),
+    F('objects', 'rec', { lo: 1, hi: 8, sub: [['name', { kind: 'name' }], ['side', { kind: 'word', words: ['left', 'right'] }], ['distance', { kind: 'nn' }]] })];
+  const U = { model: 'm', unit: 'cm' };
+  const cup = { habitual_reach: '70', present_reach: 'left 70, right 0', objects: 'cup, right, 60' };
+  eq(tile('scCompute', 'habitual', SCH, cup, U, 'scAppeal'), 'cup', 'scCompute: the cup appeals to the habitual body only');
+  eq(tile('scCompute', 'habitual', SCH, cup, U, 'scPresent'), 'none', 'scCompute: not within the present reach');
+  eq(tile('scCompute', 'habitual', SCH, Object.assign({}, cup, { objects: 'cup, left, 70' }), U, 'scPresent'), 'cup',
+     'scCompute: a reach includes its own distance');
+  eq(tile('scCompute', 'habitual', SCH, Object.assign({}, cup, { objects: 'cup, right, 70' }), U, 'scHabitual'), 'cup',
+     'scCompute: the habitual reach includes its own distance');
+  eq(tile('scCompute', 'habitual', SCH, Object.assign({}, cup, { objects: 'cup, left, 60' }), U, 'scAppeal'), 'none',
+     'scCompute: within both reaches, the cup appeals to neither alone');
+  const SCT = [F('reach', 'nn'), F('tool', 'nn'), F('height', 'nn'), F('clearance', 'nn'),
+    F('objects', 'rec', { lo: 0, hi: 8, sub: [['name', { kind: 'name' }], ['distance', { kind: 'nn' }]] }),
+    F('openings', 'list', { each: { kind: 'pos' }, sep: 'ws', lo: 0, hi: 4 })];
+  eq(tile('scCompute', 'tool', SCT, { reach: '70', tool: '100', height: '0', clearance: '0', objects: 'kerb, 150', openings: '' }, U, 'scReach'),
+     '170 cm', 'scCompute: arm and cane');
+  eq(tile('scCompute', 'tool', SCT, { reach: '70', tool: '100', height: '0', clearance: '0', objects: 'kerb, 150; wall, 171', openings: '' }, U, 'scWithin'),
+     'kerb', 'scCompute: the kerb within the cane\'s reach');
+  eq(tile('scCompute', 'tool', SCT, { reach: '70', tool: '0', height: '165', clearance: '30', objects: '', openings: '200' }, U, 'scClears'),
+     'clears by 5 cm', 'scCompute: the feather under the door');
+  eq(tile('scCompute', 'tool', SCT, { reach: '70', tool: '0', height: '180', clearance: '30', objects: '', openings: '200' }, U, 'scClears'),
+     'does not clear by 10 cm', 'scCompute: too tall for the door');
+  eq(tile('scCompute', 'tool', SCT, { reach: '70', tool: '0', height: '180', clearance: '0', objects: '', openings: '200 170' }, U, 'scClears'),
+     '200 cm: clears by 20 cm; 170 cm: does not clear by 10 cm', 'scCompute: two openings');
+  const SCO = [F('rocks', 'list', { each: { kind: 'pos' }, sep: 'ws', lo: 1, hi: 8 }), F('project', 'word', { words: ['climb', 'pass', 'none'] }),
+    F('capacity', 'nn'), F('general_level', 'nn')];
+  const UM = { model: 'm', unit: 'm' };
+  eq(tile('scCompute', 'obstacle', SCO, { rocks: '1 2 3', project: 'climb', capacity: '2', general_level: '2' }, UM, 'scProject'), '3 m',
+     'scCompute: the 3 m rock is an obstacle for climbing');
+  eq(tile('scCompute', 'obstacle', SCO, { rocks: '1 2 3', project: 'pass', capacity: '2', general_level: '2' }, UM, 'scProject'), 'none',
+     'scCompute: none for walking past');
+  eq(tile('scCompute', 'obstacle', SCO, { rocks: '1 2 3', project: 'none', capacity: '0', general_level: '2' }, UM, 'scLevel'), '3 m',
+     'scCompute: the body\'s level, whatever the project');
+
+  /* --- sorting -------------------------------------------------------------------- */
+  const SO = [F('samples', 'rec', { lo: 2, hi: 12, unique: true, sub: [['name', { kind: 'name' }], ['hue', { kind: 'name' }], ['lightness', { kind: 'l10' }]] }),
+    F('start', 'name')];
+  const seven = { samples: 'pale red, red, 9; mid red, red, 6; dark red, red, 3; pale green, green, 8; mid green, green, 5; brown, brown, 2; dark brown, brown, 1',
+    start: 'pale red' };
+  eq(tile('soCompute', 'sort', SO, seven, M, 'soChain'), 'pale red → pale green → mid red → mid green → dark red → brown → dark brown',
+     'soCompute: the chain from pale red, ties in list order');
+  eq(tile('soCompute', 'sort', SO, seven, M, 'soCategorical'), 'red: pale red, mid red, dark red; green: pale green, mid green; brown: brown, dark brown',
+     'soCompute: the categorical sort');
+  eq(tile('soCompute', 'sort', SO, seven, M, 'soPart'), 'pale green', 'soCompute: the chain leaves red at once');
+  eq(tile('soCompute', 'sort', SO, { samples: 'dark red, red, 2; pale red, red, 9; light red, red, 8; brown, brown, 2', start: 'dark red' }, M, 'soChain'),
+     'dark red → brown → light red → pale red', 'soCompute: a hue change costs 1');
+  eq(tile('soCompute', 'sort', SO, { samples: 'a, red, 5; b, red, 3; c, red, 7', start: 'a' }, M, 'soChain'), 'a → b → c',
+     'soCompute: a tie goes to the first in list order');
+  eq(tile('soCompute', 'sort', SO, { samples: 'a, red, 5; b, green, 5; c, red, 5', start: 'a' }, M, 'soChain'), 'a → c → b',
+     'soCompute: a change of hue costs 1');
+  eq(tile('soCompute', 'sort', SO, { samples: 'a, red, 5; b, red, 9; c, red, 1; d, red, 10', start: 'a' }, M, 'soChain'), 'a → b → d → c',
+     'soCompute: each step is measured from the sample last picked');
+  eq(refused('soCompute', 'sort', SO, { samples: 'a, red, 5; b, red, 3', start: 'z' }, M), 'The start, "z", is not one of the samples: a, b',
+     'soCompute refuses a start that is not a sample');
+
+  /* --- level ----------------------------------------------------------------------- */
+  const LE = [F('image', 'deg'), F('level', 'deg'), F('rule', 'word', { words: ['switch', 'share'] }), F('at', 'count'), F('share', 'share')];
+  const wert = { image: '45', level: '0', rule: 'switch', at: '3', share: '1/2' };
+  eq(tile('leCompute', 'tilt', LE, wert, { model: 'm', period: 1 }, 'leSeries'), '45°, 45°, 0°, 0°, 0°', 'leCompute: Wertheimer\'s mirror');
+  eq(tile('leCompute', 'tilt', LE, wert, { model: 'm', period: 3 }, 'lePerceived'), '0°', 'leCompute: re-anchored at period 3');
+  eq(tile('leCompute', 'tilt', LE, wert, { model: 'm', period: 3 }, 'leLevel'), '45°', 'leCompute: the level has jumped');
+  eq(tile('leCompute', 'tilt', LE, { image: '180', level: '0', rule: 'share', at: '2', share: '1/2' }, { model: 'm', period: 1 }, 'leSeries'),
+     '180°, 90°, 45°, 45/2°, 45/4°', 'leCompute: Stratton, halving');
+  eq(tile('leCompute', 'tilt', LE, { image: '-170', level: '170', rule: 'switch', at: '9', share: '0' }, { model: 'm', period: 1 }, 'lePerceived'),
+     '20°', 'leCompute: image minus level normalised to (−180, 180]');
+  eq(pk("phNum(leNorm(Q(-180))) + ' ' + phNum(leNorm(Q(540)))"), '180 180', 'leNorm: −180 and 540 are 180');
+  eq(refused('leCompute', 'tilt', LE, Object.assign({}, wert, { at: '1' }), { model: 'm', period: 1 }),
+     'The jump comes at period 2 or later; period 1 is the starting level', 'leCompute refuses a jump at period 1');
+
+  /* --- depth -------------------------------------------------------------------------- */
+  const DE = [F('iod', 'pos'), F('near', 'pos'), F('far', 'pos')];
+  eq(tile('deCompute', 'binocular', DE, { iod: '6.5', near: '50', far: '60' }, U, 'deConvergence'),
+     '50 cm: 13/100 = 0.1300 rad; 60 cm: 13/120 ≈ 0.1083 rad', 'deCompute: convergence at 50 cm and 60 cm');
+  eq(tile('deCompute', 'binocular', DE, { iod: '6.5', near: '50', far: '60' }, U, 'deDisparity'), '13/600 ≈ 0.0217 rad', 'deCompute: disparity');
+  eq(tile('deCompute', 'binocular', DE, { iod: '6.5', near: '500', far: '510' }, U, 'deDisparity'), '13/51000 ≈ 0.0003 rad',
+     'deCompute: the same interval five metres off');
+  eq(refused('deCompute', 'binocular', DE, { iod: '6.5', near: '60', far: '50' }, U), 'The near distance, 60 cm, is farther than the far one, 50 cm',
+     'deCompute refuses near past far');
+
+  /* --- motion -------------------------------------------------------------------------- */
+  const MO = [F('separation', 'pos'), F('interval', 'pos'), F('simultaneous', 'pos'), F('succession', 'pos')];
+  const mo = (iv) => ({ separation: '5', interval: iv, simultaneous: '30', succession: '200' });
+  eq(tile('moCompute', 'phi', MO, mo('60'), U, 'moSpeed'), '1/12 cm per ms', 'moCompute: 5 cm in 60 ms');
+  eq(tile('moCompute', 'phi', MO, mo('20'), U, 'moBand') + ', ' + tile('moCompute', 'phi', MO, mo('30'), U, 'moBand') + ', '
+     + tile('moCompute', 'phi', MO, mo('200'), U, 'moBand') + ', ' + tile('moCompute', 'phi', MO, mo('250'), U, 'moBand'),
+     'seen together, motion, motion, seen in succession', 'moCompute: the bands, thresholds inclusive of motion');
+  eq(refused('moCompute', 'phi', MO, { separation: '5', interval: '60', simultaneous: '300', succession: '200' }, U),
+     'The simultaneity threshold, 300 ms, is above the succession threshold, 200 ms', 'moCompute refuses thresholds out of order');
+
+  /* --- light ---------------------------------------------------------------------------- */
+  const LI = [F('surfaces', 'rec', { lo: 1, hi: 6, unique: true, sub: [['name', { kind: 'name' }], ['reflectance', { kind: 'share' }], ['illumination', { kind: 'nn' }]] }),
+    F('surround', 'name')];
+  const room = 'paper, 4/5, 1; disc, 1/20, 1; wall, 1/2, 1';
+  eq(tile('liCompute', 'ratio', LI, { surfaces: room, surround: 'wall' }, M, 'liRatio'), 'paper 8/5, disc 1/10, wall 1', 'liCompute: ratios to the wall');
+  eq(tile('liCompute', 'ratio', LI, { surfaces: 'paper, 4/5, 1; disc, 1/20, 16; wall, 1/2, 1', surround: 'wall' }, M, 'liBrightest'),
+     'paper, disc', 'liCompute: Gelb\'s disc ties with the paper');
+  eq(tile('liCompute', 'ratio', LI, { surfaces: 'disc, 1/20, 16; beam paper, 4/5, 16', surround: 'beam paper' }, M, 'liLuminance'),
+     'disc 4/5, beam paper 64/5', 'liCompute: luminance in the beam');
+  eq(tile('liCompute', 'ratio', LI, { surfaces: 'disc, 1/20, 16; beam paper, 4/5, 16', surround: 'beam paper' }, M, 'liRatio'),
+     'disc 1/16, beam paper 1', 'liCompute: the disc falls to 1/16');
+  eq(refused('liCompute', 'ratio', LI, { surfaces: 'disc, 1/20, 16; wall, 1/2, 0', surround: 'wall' }, M),
+     'The surround sends no light, so no ratio to it exists', 'liCompute refuses a dark surround');
+
+  /* --- triangle --------------------------------------------------------------------------- */
+  const TR = [F('a', 'num'), F('b', 'num')];
+  const T = (v) => ({ model: 'm', vertex: v });
+  eq(tile('trCompute', 'parallel', TR, { a: '60', b: '70' }, T('C'), 'trC'), '50°', 'trCompute: the third angle');
+  eq(tile('trCompute', 'parallel', TR, { a: '60', b: '70' }, T('C'), 'trStraight'), '60° + 50° + 70° = 180°', 'trCompute: at C');
+  eq(tile('trCompute', 'parallel', TR, { a: '60', b: '70' }, T('A'), 'trAlternate'), '70° and 50°', 'trCompute: at A, b and c');
+  eq(tile('trCompute', 'parallel', TR, { a: '60', b: '70' }, T('B'), 'trStraight'), '60° + 70° + 50° = 180°', 'trCompute: at B');
+  eq(tile('trCompute', 'parallel', TR, { a: '1/2', b: '1' }, T('C'), 'trC'), '357/2°', 'trCompute: exact for a fraction of a degree');
+  eq(refused('trCompute', 'parallel', TR, { a: '100', b: '90' }, T('C')),
+     'No triangle has angles of 100° and 90° at A and B: each must be more than 0°, and together less than 180°',
+     'trCompute refuses 100° and 90°');
+  eq(first(refused('trCompute', 'parallel', TR, { a: '0', b: '90' }, T('C'))).split(':')[0], 'No triangle has angles of 0° and 90° at A and B',
+     'trCompute refuses 0°');
+
+  /* --- time --------------------------------------------------------------------------------- */
+  const RV = [F('parcels', 'rec', { lo: 1, hi: 9, unique: true, sub: [['name', { kind: 'name' }], ['position', { kind: 'num' }]] }),
+    F('observer', 'numnone'), F('standpoint', 'word', { words: ['bank', 'current'] })];
+  const water = 'w1, 1; w2, 2; w3, 3; w4, 4; w5, 5; w6, 6; w7, 7';
+  eq(tile('tiCompute', 'river', RV, { parcels: water, observer: '4', standpoint: 'bank' }, M, 'tiPast'), 'w5, w6, w7', 'tiCompute: on the bank');
+  eq(tile('tiCompute', 'river', RV, { parcels: water, observer: '4', standpoint: 'current' }, M, 'tiPast'), 'w1, w2, w3', 'tiCompute: with the current');
+  eq(tile('tiCompute', 'river', RV, { parcels: water, observer: '4', standpoint: 'current' }, M, 'tiFuture'), 'w5, w6, w7', 'tiCompute: the future, reversed');
+  eq(tile('tiCompute', 'river', RV, { parcels: water, observer: 'none', standpoint: 'bank' }, M, 'tiFuture'), 'none', 'tiCompute: no observer');
+  eq(tile('tiCompute', 'river', RV, { parcels: water, observer: 'none', standpoint: 'bank' }, M, 'tiPast'), 'none', 'tiCompute: no observer, no past');
+  eq(tile('tiCompute', 'river', RV, { parcels: 'w1, 1; w2, 2', observer: 'none', standpoint: 'bank' }, M, 'tiWorld'), 'w1 at 1, w2 at 2',
+     'tiCompute: every parcel where it is');
+  const DG = [F('moments', 'list', { each: { kind: 'name' }, sep: 'comma', lo: 1, hi: 9, unique: true }), F('present', 'name'), F('protention', 'nncount')];
+  eq(tile('tiCompute', 'diagram', DG, { moments: 'A, B, C', present: 'C', protention: '0' }, M, 'tiRetained'), 'A at depth 2, B at depth 1',
+     'tiCompute: retention at the present C');
+  eq(tile('tiCompute', 'diagram', DG, { moments: 'A, B, C, D', present: 'D', protention: '0' }, M, 'tiColumn'), 'D, C′, B′′, A′′′',
+     'tiCompute: the vertical at D');
+  eq(tile('tiCompute', 'diagram', DG, { moments: 'A, B, C, D, E', present: 'C', protention: '2' }, M, 'tiProtended'), 'D, E', 'tiCompute: protention');
+  eq(tile('tiCompute', 'diagram', DG, { moments: 'A, B, C, D', present: 'C', protention: '2' }, M, 'tiProtended'), 'D',
+     'tiCompute: protention stops at the last moment named');
+  const EK = [DG[0], F('presents', 'list', { each: { kind: 'name' }, sep: 'comma', lo: 1, hi: 9 })];
+  const walk = { moments: 'A, B, C, D', presents: 'B, C, D' };
+  eq(tile('tiCompute', 'ekstasis', EK, walk, M, 'tiColumns'), 'B: A 1; C: A 2, B 1; D: A 3, B 2, C 1', 'tiCompute: one column per present');
+  eq(tile('tiCompute', 'ekstasis', EK, walk, M, 'tiDepths'), 'A: 1, 2, 3; B: 1, 2; C: 1', 'tiCompute: each moment sinks');
+  eq(tile('tiCompute', 'ekstasis', EK, walk, M, 'tiOrder'), 'the order A, B, C is the same in every column', 'tiCompute: the order kept');
+  eq(tile('tiCompute', 'ekstasis', EK, { moments: 'A, B, C, D', presents: 'A' }, M, 'tiColumns'), 'A: none', 'tiCompute: the first moment retains nothing');
+  eq(pk("tiOrderOf([{present: 'C', seq: ['A', 'B']}, {present: 'X', seq: ['B', 'A']}])"), 'the column at X breaks the order A, B',
+     'tiOrderOf: a column out of order is named');
+  eq(refused('tiCompute', 'ekstasis', EK, { moments: 'A, B', presents: 'B, B' }, M), 'The present B is listed twice', 'tiCompute refuses a present twice');
+
+  /* --- PH_WIRE_JS, run as a page runs it: the preset menu rewrites the text
+     boxes and never the redraw-only step range; the step clamps per instance;
+     a hostile value paints the banner red and blanks every tile. */
+  {
+    function Fake(id) { this.id = id; this.value = ''; this.textContent = ''; this.innerHTML = ''; this.listeners = {}; }
+    Fake.prototype.addEventListener = function (t, fn) { (this.listeners[t] = this.listeners[t] || []).push(fn); };
+    Fake.prototype.fire = function (t) { (this.listeners[t] || []).forEach((fn) => fn.call(this, { target: this })); };
+    const els = {};
+    const byId = (id) => els[id] || (els[id] = new Fake(id));
+    const wctx = { console: console, document: { getElementById: byId }, window: {} };
+    vm.createContext(wctx);
+    const lit = (name, value) => 'var ' + name + ' = ' + JSON.stringify(value) + ';\n';
+    const spec = CS.map((f) => Object.assign({ id: 'cuIn' + f.key }, f));
+    const presets = { ship: { candidates: SHIP, cues: 'c1, c2' }, hull: { candidates: SHIP, cues: 'c1, c2, c3' } };
+    byId('cuIncandidates').value = SHIP; byId('cuIncues').value = 'c1, c2, c3';
+    byId('cuPreset').value = 'hull'; byId('cuStep').value = '3';
+    vm.runInContext(block('RATIONAL_JS') + blockFrom(pcSrc, 'PH_CORE_JS', PC_SOURCE) + blockFrom(pkSrc, 'CUES_JS', PK_SOURCE)
+      + lit('PRESETS', presets) + lit('SPEC', spec) + lit('TILES', ['cuCount', 'cuCandidates', 'cuRemoved'])
+      + lit('REDRAW', [{ key: 'step', id: 'cuStep', label: 'Cues shown', lo: 1, hi: 3 }]) + lit('FIXED', { model: 'm', cue_text: {} })
+      + lit('VIEW', 'sequence')
+      + blockFrom(pcSrc, 'PH_WIRE_JS', PC_SOURCE).replace(/%\(p\)s/g, 'cu').replace(/%\(fn\)s/g, 'cuCompute'),
+    wctx, { filename: 'phenkit_core.py' });
+    eq(byId('cuCount').textContent, '1', 'PH_WIRE_JS: first paint, hull at step 3');
+    byId('cuPreset').value = 'ship'; byId('cuPreset').fire('change');
+    eq(byId('cuStep').value + ' ' + byId('cuCount').textContent + ' ' + byId('cuIncues').value, '3 2 c1, c2',
+       'PH_WIRE_JS: a preset rewrites the boxes and leaves the step range alone');
+    eq(/past this instance/.test(byId('cuStatus').innerHTML), true, 'PH_WIRE_JS: the banner says the step was clamped');
+    byId('cuIncues').value = 'A>B'; byId('cuIncues').fire('input');
+    eq(/tone-red/.test(byId('cuStatus').innerHTML) + ' ' + ['cuCount', 'cuCandidates', 'cuRemoved'].map((t) => byId(t).textContent).join(''),
+       'true ———', 'PH_WIRE_JS: a hostile value reddens the banner and blanks the tiles');
+    byId('cuIncues').value = 'c1'; byId('cuIncues').fire('input');
+    byId('cuStep').value = '4'; byId('cuStep').fire('input');
+    eq(byId('cuStatus').innerHTML, '<span class="tone-red">Cues shown runs from 1 to 3.</span>', 'PH_WIRE_JS: a range value past the cfg is refused');
+  }
+}
+// ---- end phenkit ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the
