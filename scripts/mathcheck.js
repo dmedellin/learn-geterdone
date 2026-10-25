@@ -21067,6 +21067,382 @@ console.log('reading: readkit formats, text rules and eight modes');
      'scCompute: no "none found per target found"');
 }
 // ---- end readkit ----
+// ---- cckit (Code Complete) ----
+// ==========================================================================
+// Code Complete, Read Along: cckit.py, cckit_b.py and cckit_core.py
+// ==========================================================================
+//
+// RATIONAL_JS and CC_CORE_JS, then one vm context per mode holding that mode's
+// base block and every one of its view blocks (a page ships one view; together
+// here they show the views do not collide), and CC_LEX_JS for `code` only, as
+// a page assembles them. Each mode's pure <xx>Compute(view, inst, opts) is
+// called and compared on the exact tile string a reader sees. The figures are
+// docs/code-complete/PLAN.md section C's; the listings are section D.4's. Every
+// case below was seen to FAIL when the line it tests was broken on purpose
+// (docs/code-complete/kit-report.md lists the mutations).
+console.log('code complete: cckit, eight modes');
+{
+  const vm = require('vm');
+  const ckFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const ckSrc = { core: fs.readFileSync(ckFile('cckit_core.py'), 'utf8'), a: fs.readFileSync(ckFile('cckit.py'), 'utf8'),
+    b: fs.readFileSync(ckFile('cckit_b.py'), 'utf8') };
+  /* NAME = r"""...""", or NAME["view"] = r"""...""" for a view's block. */
+  const ckBlock = (src, name) => blockFrom(ckSrc[src], name.replace(/[[\]]/g, '\\$&'), 'cckit (' + src + ')');
+  const views = (src, dict, list) => list.map((v) => ckBlock(src, dict + '["' + v + '"]')).join('');
+  const HELP = "function Q(t) { return Rparse(String(t)); }\n"
+    + "function SUB(s) { return s.split(' ').map(function (p) { var kv = p.split(':'), f = { kind: kv[1] };"
+    + " if (kv[2]) f.words = kv[2].split('|'); if (kv[1] === 'tag') f.tag = 'c'; return [kv[0], f]; }); }\n"
+    + "function RC(text, sub, opt) { return ccRecords(text, { sub: SUB(sub), lo: 0, hi: 99, opt: opt || 0 }, 'the records'); }\n"
+    + "function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse"
+    + " : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }\n";
+  const mk = (code) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + ckBlock('core', 'CC_CORE_JS') + code + HELP, ctx, { filename: 'cckit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const SN = {
+    "size-params": "// Prints one line of an invoice.\nvoid printInvoiceLine(String sku, String description, int quantity,\n        int unitPriceCents, int discountPercent, boolean taxable,\n        int taxRatePermille, String currency, boolean showSku) {\n    int gross = quantity * unitPriceCents;\n    int net = gross - gross * discountPercent / 100;\n    int tax = taxable ? net * taxRatePermille / 1000 : 0;\n    String label = showSku ? sku + \" \" + description : description;\n    System.out.println(label + \" \" + (net + tax) + \" \" + currency);\n}",
+    "class-public": "public class Employee {\n    public String name;\n    public String address;\n    public String phone;\n    public int salaryCents;\n    public int vacationDays;\n\n    public Employee(String name) {\n        this.name = name;\n    }\n\n    public int monthlyPayCents() {\n        return salaryCents / 12;\n    }\n}",
+    "dupes-copied": "void printLabels(Order order) {\n    Address a = order.shipTo();\n    System.out.println(a.name());\n    System.out.println(a.street());\n    System.out.println(a.city() + \" \" + a.postcode());\n    a = order.billTo();\n    System.out.println(a.name());\n    System.out.println(a.street());\n    System.out.println(a.city() + \" \" + a.postcode());\n}",
+    "extract": "void printStatement(Account account) {\n    double balance = account.openingBalance();\n    double fees = 0.0;\n    for (Transaction t : account.transactions()) {\n        balance = balance + t.amount();\n        if (t.amount() < 0 && balance < 0) {\n            fees = fees + 25.0;\n        }\n    }\n    balance = balance - fees;\n    System.out.println(\"Fees: \" + fees);\n    System.out.println(\"Closing balance: \" + balance);\n}",
+    "ppp": "// Returns the index of the first free slot, or -1 if the table is full.\nint findFreeSlot(Slot[] table) {\n    // start at the slot after the one used last\n    int start = (lastUsed + 1) % table.length;\n    // look at each slot once, wrapping around the end\n    for (int step = 0; step < table.length; step++) {\n        int i = (start + step) % table.length;\n        // if the slot is free, remember it and return it\n        if (table[i].isFree()) {\n            lastUsed = i;\n            return i;\n        }\n    }\n    // if no slot is free, log the overflow\n    // return -1\n    return -1;\n}",
+    "init-bad": "double averagePrice(double[] prices) {\n    int count;\n    double total = 0.0;\n    for (int i = 0; i < prices.length; i++) {\n        total = total + prices[i];\n        count = count + 1;\n    }\n    return total / count;\n}",
+    "init-twice": "double averagePrice(double[] prices) {\n    double total = 0.0;\n    int count = 0;\n    total = prices[0];\n    count = prices.length;\n    double average = total / count;\n    return total / count;\n}",
+    "count-passing": "// Returns how many scores are at or above the pass mark.\nint countPassing(int[] scores, int passMark, int maxScore) {\n    int count = 1;\n    for (int i = 0; i < scores.length; i++) {\n        if (scores[i] > passMark) {\n            count = count + 1;\n        }\n    }\n    return count;\n}",
+    "span-top": "void auditShipments(Shipment[] shipments, int limitKg) {\n    int scanned = 0;\n    int heaviestKg = 0;\n    int overLimit = 0;\n    printTitle();\n    printLegend();\n    for (Shipment s : shipments) {\n        s.verify();\n        scanned = scanned + 1;\n    }\n    printCount(scanned);\n    for (Shipment s : shipments) {\n        heaviestKg = Math.max(heaviestKg, s.weightKg());\n        if (s.weightKg() > limitKg) {\n            overLimit = overLimit + 1;\n        }\n    }\n    printSummary(heaviestKg, overLimit);\n}",
+    "names-short": "double calc(double[] a, int n, double r) {\n    double t = 0.0;\n    for (int i = 0; i < n; i++) {\n        double x = a[i] * r;\n        t = t + x;\n    }\n    double tmp = t / n;\n    return tmp;\n}",
+    "magic": "double monthlyPayment(double principal, int years) {\n    double rate = 0.0725 / 12;\n    int months = years * 12;\n    if (months > 360) {\n        months = 360;\n    }\n    double factor = Math.pow(1 + rate, months);\n    return principal * rate * factor / (factor - 1);\n}",
+    "nested": "double shippingCost(Order order) {\n    double cost = 0.0;\n    if (order != null) {\n        if (order.weight() > 0) {\n            if (order.isDomestic()) {\n                if (order.weight() < 2 && !order.isExpress()) {\n                    cost = 5.0;\n                } else {\n                    cost = 9.0 + order.weight();\n                }\n            } else {\n                for (Item item : order.items()) {\n                    if (item.isRestricted() || item.weight() > 30) {\n                        return -1.0;\n                    }\n                }\n                cost = 25.0 + 2 * order.weight();\n            }\n        }\n    }\n    return cost;\n}",
+    "basis-switch": "String shippingLabel(int zone, boolean express) {\n    String label = \"\";\n    switch (zone) {\n        case 1:\n            label = \"local\";\n            break;\n        case 2:\n            label = \"regional\";\n            break;\n        case 3:\n            label = \"national\";\n            break;\n    }\n    if (express) {\n        label = label + \" express\";\n    }\n    return label;\n}",
+    "layout-dangling": "void notifyUser(User user) {\n    if (user.isActive())\n        if (user.wantsEmail())\n            sendEmail(user);\n    else\n        sendLetter(user);\n    log(user);\n}",
+    "clamp": "int clamp(int value, int low, int high) {\n    if (value < low)\n        return low;\n    if (value > high)\n        log(\"clamped\");\n        return high;\n    return value;\n}",
+  };
+  const J = (k) => JSON.stringify(SN[k]);
+  const starts = (got, want, label) => eq(String(got).slice(0, want.length), want, label);
+
+  /* --- cckit_core: printing and parsing (D.0) ------------------------------ */
+  const cc = mk('');
+  eq(cc("ccInt(2692537n) + ' ' + ccInt(-1n) + ' ' + ccInt(0)"), '2,692,537 −1 0', 'ccInt: grouped, U+2212');
+  eq(cc("[ccNum(Q('11/4')), ccNum(Q('28/3')), ccNum(Q('-29/15')), ccNum(Q(4000))].join('; ')"),
+     '11/4 = 2.75; 28/3 ≈ 9.33; −29/15 ≈ −1.93; 4,000', 'ccNum: = only when the two places are exact');
+  eq(cc("ccNum(Q('-399/40')) + '; ' + ccNum(Q('1/8')) + '; ' + ccNum(Q('47543/50'))"), '−399/40 ≈ −9.98; 1/8 ≈ 0.13; 47543/50 = 950.86',
+     'ccNum: half away from zero on the exact value');
+  eq(cc("ccNum(R(10n ** 40n, 3n)) + '; ' + ccNum(R(-1n, 10n ** 40n))"), '≈ 3.33 × 10^39; ≈ −1.00 × 10^−40', 'ccNum: past 30 digits');
+  eq(cc("[ccPct(Q('33/50')), ccPct(Q('31/60')), ccPct(Q(1)), ccPct(Q(0)), ccPct(Q('2997/20000'))].join('; ')"),
+     '33/50 = 66%; 31/60 ≈ 51.7%; 1 = 100%; 0 = 0%; 2997/20000 ≈ 15.0%', 'ccPct');
+  eq(cc("[ccRange(Q(425), Q(800)), ccRange(Q(35), Q(35)), ccRange(Q('2/5'), Q(5)), ccRange(Q(100), Q(100000))].join('; ')"),
+     '425–800; 35; 2/5 = 0.40 to 5; 100–100,000', 'ccRange: en dash between whole ends, collapsed when equal');
+  eq(cc("ccTimesRange(Q('85/7'), Q('160/7')) + '; ' + ccTimesRange(Q(1), Q(1))"), '85/7 ≈ 12.1× to 160/7 ≈ 22.9×; 1×', 'ccTimesRange');
+  eq(cc("ccCount([]) + '; ' + ccCount(['a', 'b'])"), '0: none; 2: a, b', 'ccCount');
+  eq(cc("ccSplitLines('a\\r\\nb\\n').length + ' ' + ccSplitLines('').length + ' ' + ccSplitLines('\\n').length"), '2 0 1', 'ccSplitLines');
+  eq(cc("ccRead([{key: 'x', kind: 'pos', what: 'Ratio'}], {x: '0'})"), 'THREW Ratio must be more than 0, and it is 0', 'ccRead: pos refuses 0');
+  eq(cc("ccRead([{key: 'x', kind: 'nn', what: 'Rate'}], {x: '1/0'})"),
+     'THREW Rate should be a number such as 3, 1/2 or 0.25, and "1/0" is not one', 'ccRead: 1/0');
+  eq(cc("ccRead([{key: 'x', kind: 'share', what: 'Rate'}], {x: '6/5'})"), 'THREW Rate is a share from 0 to 1, and it is 6/5', 'ccRead: share');
+  eq(cc("ccRead([{key: 'x', kind: 'count', what: 'n', max: '90'}], {x: '91'})"), 'THREW n is at most 90, and it is 91', 'ccRead: max');
+  eq(cc("ccRead([{key: 'x', kind: 'word', what: 'Test', words: ['lt', 'le']}], {x: 'A>B'})"),
+     'THREW Test should be one of lt, le, not "A>B"', 'ccRead: word');
+  eq(cc("ccRead([{key: 'x', kind: 'label', what: 'Name'}], {x: 'A>B'})"), 'THREW Name "A>B" may not contain , ; : = < > & or quotes', 'ccRead: label');
+  eq(cc("RC('a, b, c', 'x:name y:name')"), 'THREW Entry 1 of the records has 3 parts; each needs 2: x, y', 'ccRecords: arity');
+  eq(cc("RC('a, 1; b', 'x:name y:nn z:tag', 1)"), 'THREW Entry 2 of the records has 1 part; each needs 2 to 3: x, y, z', 'ccRecords: optional part');
+  eq(cc("RC('a, 1, c; b, 2', 'x:name y:nn z:tag', 1).map(function (r) { return r.z; }).join()"), 'true,false', 'ccRecords: a tag part');
+  eq(cc("ccRecords('a, b; a, c', { sub: SUB('x:name y:name'), lo: 1, hi: 9, unique: true }, 'Uses')"), 'THREW Uses names "a" twice', 'ccRecords: unique');
+  eq(cc("ccList('1 2 3 4 5 6', { lo: 1, hi: 5, each: { kind: 'count' } }, 'Sizes')"), 'THREW Sizes: this lab takes at most 5, and there are 6', 'ccList: size');
+  eq(cc("ccCode('x'.repeat(121), 'Code')"), 'THREW Line 1 has 121 characters; this lab reads at most 120 a line', 'ccCode: line length');
+  eq(cc("var el = {}; ccListing(el, 'a < b\\ny', {2: 'flagged'}); /user-select:none/.test(el.innerHTML) + ' '"
+        + " + (el.innerHTML.indexOf('▸ 2<span class=\"visually-hidden\"> flagged</span></span>y') > 0) + ' ' + /a &lt; b/.test(el.innerHTML)"),
+     'true true true', 'ccListing: a non-selectable gutter, a glyph and a hidden word on a flagged line');
+
+  /* --- code ---------------------------------------------------------------- */
+  const co = mk(ckBlock('core', 'CC_LEX_JS') + ckBlock('a', 'CO_JS') + ckBlock('a', 'CO_DECIDE_JS')
+    + views('a', 'CO_VIEW_JS', ['size', 'class', 'dupes', 'extract', 'ppp', 'dataflow', 'span', 'names', 'literals', 'complexity', 'basis', 'layout']));
+  const C = (view, code, ids, extra, opts) =>
+    co("T(coCompute('" + view + "', Object.assign({code: ccSplitLines(" + JSON.stringify(code) + ")}, " + (extra || '{}') + "), " + JSON.stringify(opts || {}) + "), '" + ids + "')");
+  eq(C('size', SN['size-params'], 'coLines coCode coStatements coComment coBlank coParams coDensity'), '10 | 9 | 8 | 1 | 0 | 9 | 1/8 = 12.5%',
+     'code/size: size-params');
+  eq(C('size', '', 'coLines coParams coDensity'), '0 | none (a fragment) | —', 'code/size: an empty listing is not refused');
+  eq(/no statement lines, so there is no comment density/.test(co("coCompute('size', {code: []}, {}).status")), true, 'code/size: the banner says why');
+  eq(C('size', 'int f(int a) {\n  // c\n\n  return a; // d\n}', 'coCode coStatements coComment coBlank coParams coDensity'),
+     '3 | 2 | 2 | 1 | 1 | 1 = 100%', 'code/size: a code line with a comment counts as both');
+  eq(C('class', SN['class-public'], 'coFields coPublicFields coRoutines coPublicRoutines'), '5 | 5 | 2 | 2', 'code/class: class-public');
+  eq(C('dupes', SN['dupes-copied'], 'coDupBlocks coDupLines coDupWhere', '{}', { min_run: 2 }), '1 | 6 | lines 3–5 and lines 7–9', 'code/dupes: dupes-copied');
+  eq(C('dupes', SN['dupes-copied'], 'coDupBlocks', '{}', { min_run: 4 }), '0', 'code/dupes: the lesson\'s minimum run');
+  eq(co("coCompute('dupes', {code: ccSplitLines(" + J('dupes-copied') + ")}, {min_run: 2}).flags[7]"), 'repeated', 'code/dupes: flags a repeated line');
+  eq(C('extract', SN.extract, 'coIn coOut coParams coOutside', '{from: Q(4), to: Q(9)}'), 'account, balance, fees | balance, fees | 3 | none',
+     'code/extract: fee-loop 4–9');
+  eq(C('extract', SN.extract, 'coIn coOut coParams', '{from: Q(11), to: Q(12)}'), 'fees, balance | none | 2', 'code/extract: print-lines 11–12');
+  eq(C('extract', SN.extract, 'coIn', '{from: Q(2), to: Q(10)}'), 'account', 'code/extract: from the top');
+  starts(C('extract', SN.extract, 'coIn', '{from: Q(9), to: Q(40)}'), 'REFUSED ', 'code/extract: a range past the listing');
+  eq(C('ppp', SN.ppp, 'coSteps coCode coEmpty coMaxUnder'), '5 | 7 | line 14 | 3 lines, under line 8', 'code/ppp: free-slot');
+  eq(co("coCompute('ppp', {code: ccSplitLines(" + J('ppp') + ")}, {}).flags[14]").indexOf('empty') >= 0, true, 'code/ppp: the empty step is flagged');
+  eq(C('ppp', 'x = 1;', 'coSteps'), 'none (a fragment)', 'code/ppp: a fragment');
+  const DF = 'coAnomalies coUsedBeforeSet coSetTwice coUnused coDeps';
+  eq(C('dataflow', SN['init-bad'], DF), '1 | count (line 6) | none | none | 1→4, 1→5, 3→5, 4→5, 5→8, 6→8', 'code/dataflow: init-bad');
+  eq(C('dataflow', SN['init-twice'], DF), '3 | none | total (lines 2, 4), count (lines 3, 5) | average (line 6) | 1→4, 1→5, 4→6, 4→7, 5→6, 5→7',
+     'code/dataflow: init-twice');
+  eq(C('dataflow', SN['count-passing'], 'coAnomalies coUnused'), '1 | maxScore (line 2)', 'code/dataflow: an unused parameter is set, never used');
+  eq(C('dataflow', 'int f(int[] a) {\n  int s = 0;\n  for (int x : a) s += x;\n  return s;\n}', DF),
+     '0 | none | none | none | 1→3, 2→3, 3→4', 'code/dataflow: an enhanced for reads its collection and sets its variable');
+  eq(C('span', SN['span-top'], 'coAvgSpan coAvgLive coLongest', "{vars: ['scanned', 'heaviestKg', 'overLimit']}"),
+     '16/3 ≈ 5.33 | 41/3 ≈ 13.67 | heaviestKg: 16', 'code/span: span-top');
+  starts(C('span', SN['span-top'], 'coAvgSpan', "{vars: ['nothere']}"), 'REFUSED ', 'code/span: an unknown variable');
+  eq(C('names', SN['names-short'], 'coNames coAvgLen coShort', '{}', { min: 8 }), '7 | 4/3 ≈ 1.33 | a, n, r, t, x, tmp', 'code/names: names-short');
+  eq(C('names', SN['names-short'], 'coShort', '{}', { min: 2 }), 'a, n, r, t, x', 'code/names: the lesson\'s minimum');
+  eq(C('literals', SN.magic, 'coMagic coDistinct coMagicList'), '5 | 3 | 0.0725 (line 2), 12 (lines 2, 3), 360 (lines 4, 5)', 'code/literals: magic');
+  eq(C('literals', 'static final int N = 7;\nint x = N * 0 + 1;', 'coMagic'), '0', 'code/literals: 0, 1 and final lines do not count');
+  const CX = 'coDecisions coBreakdown coBand coDepth coDeepest';
+  eq(C('complexity', SN.nested, CX, '{}', { bands: [5, 10] }), '9 | 1 + if 5 + for 1 + && 1 + || 1 | 6–10 | 5 | line 14', 'code/complexity: nested');
+  eq(C('complexity', SN.nested, 'coBand', '{}', { bands: [3, 8] }), '8+', 'code/complexity: the lesson\'s bands');
+  eq(C('complexity', 'int f(int a) {\n  return a > 0 ? a : -a;\n}', 'coDecisions coDepth', '{}', { bands: [5, 10] }), '1 | 0', 'code/complexity: ?: adds nothing');
+  eq(C('basis', SN['basis-switch'], 'coBasis coNoDefault coPoints'), '6 | 1 | case line 4, case line 7, case line 10, if line 14',
+     'code/basis: a switch without default');
+  eq(C('layout', SN['layout-dangling'], 'coMisIndented coLines', '{}', { indent: 4 }), '2 | 5, 6', 'code/layout: layout-dangling');
+  eq(C('layout', SN.clamp, 'coMisIndented coLines', '{}', { indent: 4 }), '1 | 6', 'code/layout: clamp');
+  eq(C('layout', SN.clamp, 'coMisIndented', '{}', { indent: 2 }), '6', 'code/layout: the lesson\'s indent');
+  eq(C('size', '/* a\n   b */ int x = 1;\nint y; /* c */', 'coCode coStatements coComment coBlank'), '2 | 2 | 3 | 0', 'code/size: block comments');
+  eq(C('class', 'public class A {\n    public static final int MAX = 3;\n    public int count;\n    private int size = compute(2);\n    public int size() { return size; }\n}',
+       'coFields coPublicFields coRoutines coPublicRoutines'), '3 | 1 | 1 | 1', 'code/class: a final field is not public data; an initialiser call is a field');
+  eq(C('extract', 'int f(int a) {\n    int t = a;\n    t = 5;\n    return t;\n}', 'coIn coOut', '{from: Q(3), to: Q(3)}'), 'none | t',
+     'code/extract: a name set first in the block is not taken in');
+  eq(C('ppp', 'void f() {\n    // step one\n    x = 1; // note\n}', 'coSteps coCode'), '1 | 1', 'code/ppp: a step is a comment-only line');
+  eq(C('names', SN['names-short'], 'coShort', '{}', { min: 3 }), 'a, n, r, t, x', 'code/names: a name at the minimum is not short');
+  eq(C('complexity', 'int f(int a) {\n    if (a > 0) { a = 1; }\n    if (a > 1) { a = 2; }\n    return a;\n}', 'coDecisions coBand', '{}', { bands: [3, 5] }),
+     '3 | 0–3', 'code/complexity: a band includes its top');
+  eq(C('complexity', 'void f() {\n    if (a) {\n    } else {\n    }\n}', 'coDepth coDeepest', '{}', { bands: [5, 10] }), '0 | line 2',
+     'code/complexity: a line\'s depth is taken after the braces that open it');
+  eq(C('size', 'int f() {\n}\n}', 'coLines'), 'REFUSED Line 3 closes a brace that no earlier line opened', 'code: an unbalanced brace');
+  starts(C('size', 'String s = "abc;', 'coLines'), 'REFUSED Line 1 has a string literal that does not clo', 'code: an unclosed string');
+  starts(C('size', 'int x = a # b;', 'coLines'), 'REFUSED Line 1 has "#", whi', 'code: a character outside the subset');
+
+  /* --- deps ---------------------------------------------------------------- */
+  const dg = mk(ckBlock('b', 'DG_JS') + views('b', 'DG_VIEW_JS', ['coupling', 'ripple', 'tree', 'shared', 'integrate']));
+  const D = (view, inst, ids) => dg("T(dgCompute('" + view + "', " + inst + ", {}), '" + ids + "')");
+  const UE = (t) => "{edges: RC('" + t + "', 'user:name used:name')}";
+  eq(D('coupling', UE('ui, orders; ui, billing; orders, stock; billing, stock; orders, db; billing, db; stock, db'),
+       'dgModules dgEdges dgPairs dgConnected dgFanOut dgFanIn'), '5 | 7 | 10 | 7/10 = 70% | billing 2 | db 3', 'deps/coupling: layered');
+  eq(D('coupling', UE('a, b; a, b; b, a'), 'dgEdges dgConnected'), '2 | 1 = 100%', 'deps/coupling: distinct ordered pairs');
+  eq(/shared by billing, db, orders, stock, ui/.test(dg("dgCompute('coupling', " + UE(['ui', 'orders', 'billing', 'stock', 'db'].flatMap((a, i, all) => all.filter((b) => b !== a).map((b) => a + ', ' + b)).join('; ')) + ").status")),
+     true, 'deps/coupling: the banner names every tied module');
+  eq(D('coupling', UE('a, a'), 'dgEdges'), 'REFUSED Entry 1 of the uses names a on both sides', 'deps/coupling: a self-use');
+  const DE = (t, ch) => "{edges: RC('" + t + "', 'dependent:name dependency:name'), changed: '" + ch + "'}";
+  eq(D('ripple', DE('store, csvformat; invoice, store; report, store; export, store; audit, store; backup, store; ui, report', 'csvformat'),
+       'dgDirect dgAffected'), '1: store | 7: audit, backup, export, invoice, report, store, ui', 'deps/ripple: hidden');
+  eq(D('ripple', DE('app, main.o; app, util.o; main.o, main.c; main.o, util.h; util.o, util.c; util.o, util.h', 'util.h'), 'dgDirect dgAffected'),
+     '2: main.o, util.o | 3: app, main.o, util.o', 'deps/ripple: header');
+  starts(D('ripple', DE('a, b', 'zz'), 'dgDirect'), 'REFUSED No entry names zz', 'deps/ripple: an unknown name');
+  const TE = (t) => "{edges: RC('" + t + "', 'child:name parent:name')}";
+  eq(D('tree', TE('Circle, Shape; Square, Shape; Triangle, Shape'), 'dgDepth dgDeepest dgClasses dgLeaves'), '2 | Circle | 4 | 3', 'deps/tree: shallow');
+  eq(/Circle, Square, Triangle/.test(dg("dgCompute('tree', " + TE('Circle, Shape; Square, Shape; Triangle, Shape') + ").status")), true,
+     'deps/tree: the banner names the tie');
+  eq(D('tree', TE('Account, Record; DepositAccount, Account; SavingsAccount, DepositAccount; BonusSavings, SavingsAccount; HolidayBonusSavings, BonusSavings; ChristmasHolidaySavings, HolidayBonusSavings; CheckingAccount, DepositAccount'),
+       'dgDepth dgDeepest dgClasses dgLeaves'), '7 | ChristmasHolidaySavings | 8 | 2', 'deps/tree: deep');
+  eq(D('tree', TE('A, B; A, C'), 'dgDepth'), 'REFUSED A has two parents, B and C; this view reads single inheritance', 'deps/tree: two parents');
+  eq(D('tree', TE('A, B; B, A'), 'dgDepth'), 'REFUSED A is its own ancestor (A → B → A); an inheritance tree has no cycle', 'deps/tree: a cycle');
+  const GL = 'readInput, w, current; validate, r, current; validate, w, errors; report, r, errors; report, r, current; '
+    + 'reset, w, errors; reset, w, current; addLine, r, current; addLine, rw, total; printTotals, r, total';
+  const SHU = (t, o) => "{uses: RC('" + t + "', 'routine:name access:word:r|w|rw global:name'), owners: ccScalar({kind: 'pairs'}, '" + (o || '') + "', 'o')}";
+  eq(D('shared', SHU(GL), 'dgGlobals dgRoutines dgCoupled dgMostShared dgDirectAccess dgWriters'),
+     '3 | 6 | 9 | current, 5 routines | 10 | current: readInput, reset; errors: reset, validate; total: addLine', 'deps/shared: globals');
+  eq(D('shared', SHU(GL, 'current=currentRecord; errors=errorLog; total=runningTotal'), 'dgCoupled dgDirectAccess dgWriters'),
+     '9 | 3 | current: currentRecord; errors: errorLog; total: runningTotal', 'deps/shared: access routines leave the coupling');
+  eq(D('shared', SHU('a, r, g; b, r, g'), 'dgCoupled'), '0', 'deps/shared: two readers are not coupled');
+  eq(D('shared', SHU('a, r, g', 'h=x'), 'dgCoupled'), 'REFUSED The owners name h, which no entry uses', 'deps/shared: an unknown owner');
+  const IE = (o) => "{edges: RC('main, ui; main, orders; ui, widgets; orders, pricing; orders, db; pricing, db', 'caller:name callee:name'), order: '" + o + "'.split(' ')}";
+  eq(D('integrate', IE('pricing db orders main ui widgets'), 'dgStubs dgDrivers'), '3: db, ui, widgets | 2: orders, pricing', 'deps/integrate: risk-first');
+  eq(D('integrate', IE('main ui orders widgets pricing db'), 'dgStubs dgDrivers'), '5: db, orders, pricing, ui, widgets | 0: none', 'deps/integrate: top-down');
+  eq(D('integrate', IE('main ui'), 'dgStubs'), 'REFUSED The order leaves out db, orders, pricing, widgets; it names every component once',
+     'deps/integrate: an incomplete order');
+
+  /* --- cond ---------------------------------------------------------------- */
+  const cd = mk(ckBlock('b', 'CD_JS') + views('b', 'CD_VIEW_JS', ['truth', 'range', 'barricade']));
+  const TT = (a, b) => cd("T(cdCompute('truth', {a: " + JSON.stringify(a) + ", b: " + JSON.stringify(b) + "}, {}), 'cdAtoms cdRows cdTrueA cdTrueB cdEquivalent cdFirstDiff')");
+  eq(TT('!(done || error)', '!done || !error'), '2 | 4 | 1 | 3 | no, on 2 of 4 rows | done = T, error = F', 'cond/truth: half-demorgan');
+  eq(TT('(found && valid) || (found && !valid)', 'found'), '2 | 4 | 2 | 2 | yes | none', 'cond/truth: redundant');
+  eq(TT('a || b && c', '(a || b) && c'), '3 | 8 | 5 | 3 | no, on 2 of 8 rows | a = T, b = T, c = F', 'cond/truth: && binds tighter than ||');
+  starts(TT('a && b && c', 'd || e || f'), 'REFUSED The two conditions name 6 varia', 'cond/truth: at most 5 variables');
+  eq(TT('a &&', 'b'), 'REFUSED Condition A ends where a variable belongs', 'cond/truth: a condition that stops short');
+  const RG = (cond, lo, hi, means) => cd("T(cdCompute('range', {cond: " + JSON.stringify(cond) + ", lo: Q(" + lo + "), hi: Q(" + hi + "), means: '" + means + "'}, {}), 'cdDisagree cdTests cdExposed')");
+  eq(RG('month < 1 && month > 12', 1, 12, 'invalid'), '0 and below, 13 and above | 0, 1, 2, 11, 12, 13 | 0, 13', 'cond/range: never-fires');
+  eq(RG('month >= 1 || month <= 12', 1, 12, 'invalid'), '1 to 12 | 0, 1, 2, 11, 12, 13 | 1, 2, 11, 12', 'cond/range: always-fires');
+  eq(RG('score >= 0 || score <= 100', 0, 100, 'valid'), '−1 and below, 101 and above | −1, 0, 1, 99, 100, 101 | −1, 101', 'cond/range: negatives');
+  eq(RG('qty > 0 && qty < 99', 1, 99, 'valid'), '99 | 0, 1, 2, 98, 99, 100 | 99', 'cond/range: strict-top');
+  eq(RG('x != 7 && x >= 1 && x <= 99', 1, 99, 'valid'), '7 | 0, 1, 2, 98, 99, 100 | none', 'cond/range: each literal itself is a point');
+  eq(RG('7 < x', 1, 99, 'valid'), '1 to 7, 100 and above | 0, 1, 2, 98, 99, 100 | 1, 2, 100', 'cond/range: a literal on the left');
+  eq(RG('true', -2147483648, 2147483647, 'valid'), 'none | −2,147,483,648, −2,147,483,647, 2,147,483,646, 2,147,483,647 | none', 'cond/range: the ends of int');
+  eq(RG('false', 1, 2, 'valid').split(' | ')[0], '1 to 2', 'cond/range: false');
+  eq(RG('x < 1 || y > 2', 1, 2, 'valid'), 'REFUSED The check names x and y; this view reads a condition over one integer variable', 'cond/range: two variables');
+  eq(RG('!x < 5', 1, 2, 'valid'), 'REFUSED The check negates a number; put the comparison in parentheses', 'cond/range: ! on a number');
+  eq(RG('x < 3000000000', 1, 2, 'valid'), "REFUSED The check compares with 3,000,000,000, which is outside Java's int", 'cond/range: a literal outside int');
+  starts(RG('x < 5', 3, 2, 'valid'), 'REFUSED The valid range runs fr', 'cond/range: an empty range');
+  eq(cd("T(cdCompute('barricade', {values: RC('quantityField, outside, validate; uploadName, outside, none; feedPrice, outside, assert; lineTotal, inside, assert; customerId, inside, none; taxRate, inside, assert', 'value:name side:word:outside|inside handling:word:validate|assert|none')}, {}), 'cdValues cdOutsideUnchecked cdOutsideAsserted cdInsideUnchecked cdInsideValidated')"),
+     '6 | 1: uploadName | 1: feedPrice | 1: customerId | 0: none', 'cond/barricade: mixed');
+  eq(cd("T(cdCompute('barricade', {values: RC('a, inside, validate; b, inside, validate', 'value:name side:word:outside|inside handling:word:validate|assert|none')}, {}), 'cdInsideValidated cdOutsideUnchecked')"),
+     '2: a, b | 0: none', 'cond/barricade: in record order');
+
+  /* --- search -------------------------------------------------------------- */
+  const se = mk(ckBlock('b', 'SE_JS') + views('b', 'SE_VIEW_JS', ['chain', 'stairs', 'bisect']));
+  const CH = (t) => se("T(seCompute('chain', {cases: RC('" + t + "', 'case:label frequency:nn')}, {}), 'seExpected seBest seSaved')");
+  eq(CH('server error, 5; client error, 10; redirect, 15; success, 70'), '7/2 = 3.50 | 3/2 = 1.50 | 2', 'search/chain: as-written');
+  eq(CH('server error, 5; client error, 10; redirect, 15; else, 70'), '14/5 = 2.80 | 13/5 = 2.60 | 1/5 = 0.20', 'search/chain: the else costs as many as the conditions');
+  eq(CH('success, 70; redirect, 15; client error, 10; else, 5'), '29/20 = 1.45 | 29/20 = 1.45 | 0', 'search/chain: common-first');
+  eq(CH('a, 5; b, 5; c, 1'), '18/11 ≈ 1.64 | 18/11 ≈ 1.64 | 0', 'search/chain: ties keep the given order');
+  eq(CH('else, 5; a, 1'), 'REFUSED else is entry 1 of 2; the final else comes last', 'search/chain: else in the middle');
+  eq(CH('a, 0; b, 0'), 'REFUSED The frequencies add up to 0; an expected number of tests needs a total above 0', 'search/chain: a zero total');
+  const STS = (steps, key, rule) => se("T(seCompute('stairs', {steps: RC('" + steps + "', 'bound:num value:label'), key: Q(" + key + "), rule: '" + rule + "'}, {}), 'seValue seLinear seBinary')");
+  const FEES = '7, 0; 14, 2; 30, 5; 60, 10; 365, 20';
+  eq(STS(FEES, 20, 'below'), '5 | 3 | 2', 'search/stairs: days-20');
+  eq(STS(FEES, 60, 'below'), '20 | 5 | 3', 'search/stairs: days-60-below');
+  eq(STS(FEES, 60, 'atmost'), '10 | 4 | 3', 'search/stairs: days-60-atmost');
+  eq(STS(Array.from({ length: 16 }, (_, i) => (1000 * (i + 1)) + ', ' + (5 * i) + '%').join('; '), 14500, 'below'), '70% | 15 | 4', 'search/stairs: brackets');
+  eq(STS(FEES, 400, 'below'), 'above the table | 5 | 2', 'search/stairs: above the table');
+  starts(STS('7, 0; 7, 2', 1, 'below'), 'REFUSED The upper bounds must rise from s', 'search/stairs: bounds that do not rise');
+  const BI = (n, k) => se("T(seCompute('bisect', {n: Q(" + n + "), k: Q(" + k + ")}, {}), 'seSteps seWorst')");
+  eq(BI(1000, 637) + '; ' + BI(1000, 63) + '; ' + BI(64, 1) + '; ' + BI(1, 1), '10 | 10; 9 | 10; 6 | 6; 0 | 0', 'search/bisect');
+  eq(se("seCompute('bisect', {n: Q(1000), k: Q(637)}, {}).table.rows.map(function (r) { return r[1]; }).join(', ')"),
+     '1–1,000, 501–1,000, 501–750, 626–750, 626–688, 626–657, 626–641, 634–641, 634–637, 636–637', 'search/bisect: the intervals');
+  eq(BI(5, 6), 'REFUSED The defect is at 6, past the last of the 5 positions', 'search/bisect: k past n');
+
+  /* --- run ----------------------------------------------------------------- */
+  const lp = mk(ckBlock('b', 'LP_JS') + views('b', 'LP_VIEW_JS', ['loop', 'nested', 'recursion', 'arith']));
+  const LO = (s, c, b, st) => lp("T(lpCompute('loop', {start: Q(" + s + "), cmp: '" + c + "', bound: Q(" + b + "), step: Q(" + st + ")}, {}), 'lpIterations lpLast lpAfter')");
+  eq(LO(0, 'le', 10, 1), '11 | 10 | 11', 'run/loop: fencepost');
+  eq(LO(0, 'lt', 10, 1), '10 | 9 | 10', 'run/loop: half-open');
+  eq(LO(10, 'ge', 0, -1), '11 | 0 | −1', 'run/loop: counting-down');
+  eq(LO(10, 'gt', 0, -3), '4 | 1 | −2', 'run/loop: by threes');
+  eq(LO(0, 'ne', 9, 2), 'never ends | — | —', 'run/loop: skips-the-bound');
+  eq(LO(0, 'ne', -9, 3), 'never ends without overflow | — | —', 'run/loop: ne meets the bound only by wrapping');
+  eq(LO(0, 'ne', 12, 3), '4 | 9 | 12', 'run/loop: ne that meets the bound');
+  eq(LO(0, 'lt', 10, -1), 'never ends without overflow | — | —', 'run/loop: wrong-direction');
+  eq(LO(0, 'gt', -10, 1), 'never ends without overflow | — | —', 'run/loop: gt, wrong direction');
+  eq(LO(10, 'lt', 10, 1), '0 | — | 10', 'run/loop: zero-times');
+  eq(LO(10, 'lt', 10, -1) + '; ' + LO(10, 'gt', 10, 1), '0 | — | 10; 0 | — | 10', 'run/loop: a loop that never starts, whatever its step');
+  eq(LO(0, 'le', 2147483647, 1), 'overflows int after 2,147,483,648 iterations | 2,147,483,647 | —', 'run/loop: i <= MAX overflows');
+  eq(LO(0, 'lt', 10, 0), 'REFUSED The step is 0, so i never changes; this view needs a step that is not 0', 'run/loop: a zero step');
+  const NE = (s) => lp("T(lpCompute('nested', {sizes: [" + s.split(' ').map((x) => 'Q(' + x + ')').join(', ') + "]}, {}), 'lpBody lpIterations lpBest lpSaved')");
+  eq(NE('100 5'), '500 | 600 | 505 | 19/120 ≈ 15.8%', 'run/nested: busiest-outside, the book\'s own');
+  eq(NE('50 10 2'), '1,000 | 1,550 | 1,022 | 264/775 ≈ 34.1%', 'run/nested: three-levels');
+  eq(NE('5 100'), '500 | 505 | 505 | 0 = 0%', 'run/nested: already best');
+  const RE = (fn, n) => lp("T(lpCompute('recursion', {fn: '" + fn + "', n: Q(" + n + ")}, {}), 'lpCalls lpDepth lpValue lpLoop')");
+  eq(RE('fibonacci', 30), '2,692,537 | 30 | 832,040 | 29', 'run/recursion: fibonacci-30');
+  eq(RE('fibonacci', 90).split(' | ')[2], '2,880,067,194,370,816,120', 'run/recursion: fibonacci-90 fits a long');
+  eq(RE('fibonacci', 0) + '; ' + RE('fibonacci', 1), '1 | 1 | 0 | 0; 1 | 1 | 1 | 0', 'run/recursion: fibonacci 0 and 1');
+  eq(RE('factorial', 10) + '; ' + RE('factorial', 0), '10 | 10 | 3,628,800 | 9; 1 | 1 | 1 | 0', 'run/recursion: factorial');
+  eq(RE('factorial', 21), 'REFUSED factorial(21) does not fit a Java long; this view stops at n = 20', 'run/recursion: factorial past 20');
+  const AR = (type, start, op, operand, times, ids) => lp("T(lpCompute('arith', {type: '" + type + "', start: '" + start + "', op: '" + op
+    + "', operand: '" + operand + "', times: Q(" + times + ")}, {}), '" + (ids || 'nuJava nuExact nuEqual nuStored') + "')");
+  eq(AR('int', '2147483647', '+', '1', 1), '-2147483648 | 2,147,483,648 | no | −2,147,483,648', 'run/arith: int-max-plus-one');
+  eq(AR('int', '46341', '*', '46341', 1, 'nuJava nuEqual'), '-2147479015 | no', 'run/arith: square-overflow');
+  eq(AR('long', '46341', '*', '46341', 1, 'nuJava nuEqual'), '2147488281 | yes', 'run/arith: long-square');
+  eq(AR('int', '7', '/', '2', 1, 'nuJava nuExact'), '3 | 7/2 = 3.50', 'run/arith: int-division truncates');
+  eq(AR('int', '-7', '/', '2', 1, 'nuJava') + ' ' + AR('int', '-7', '%', '2', 1, 'nuJava nuExact'), '-3 -1 | −1', 'run/arith: / toward zero, % takes the dividend\'s sign');
+  eq(AR('int', '-2147483648', '/', '-1', 1, 'nuJava'), '-2147483648', 'run/arith: MIN / -1 wraps');
+  eq(AR('double', '0', '+', '0.1', 10), '0.9999999999999999 | 1 | no | 9007199254740991/9007199254740992 ≈ 1.00', 'run/arith: tenth-ten-times, the book\'s own');
+  eq(AR('double', '0.1', '+', '0.2', 1, 'nuJava'), '0.30000000000000004', 'run/arith: 0.1 + 0.2');
+  eq(AR('double', '1e-5', '*', '1', 1, 'nuJava') + ' ' + AR('double', '10000000', '+', '0', 1, 'nuJava') + ' ' + AR('double', '0.001', '*', '1', 1, 'nuJava')
+     + ' ' + AR('double', '9999999', '+', '0', 1, 'nuJava'), '1.0E-5 1.0E7 0.001 9999999.0', 'run/arith: plain from 10^-3 to below 10^7');
+  eq(AR('double', '1e23', '*', '1', 1, 'nuJava') + ' ' + AR('double', '2e-3', '*', '1', 1, 'nuJava'), '1.0E23 0.002', 'run/arith: JDK 19 picks among one and two digits');
+  eq(AR('double', '2', '/', '3', 1, 'nuJava') + ' ' + AR('double', '1.7976931348623157E308', '*', '1', 1, 'nuJava'),
+     '0.6666666666666666 1.7976931348623157E308', 'run/arith: shortest digits, the largest double');
+  eq(AR('double', '0', '*', '-1', 1, 'nuJava') + ' ' + AR('double', '-0.0', '+', '0', 1, 'nuJava') + ' ' + AR('double', '-0.0', '-', '0', 1, 'nuJava'),
+     '-0.0 0.0 -0.0', 'run/arith: signed zero');
+  eq(AR('double', '1', '/', '0', 1), 'REFUSED Division by zero: Java would print Infinity or NaN; this lab does not model it', 'run/arith: double division by zero');
+  eq(AR('double', '1e308', '*', '10', 1), 'REFUSED Step 1 passes the largest double: Java would print Infinity or NaN; this lab does not model it', 'run/arith: overflow');
+  starts(AR('double', '1e-300', '*', '1e-10', 1), 'REFUSED Step 1 falls below the smallest normal double', 'run/arith: subnormals are not modelled');
+  eq(AR('int', '7', '/', '0', 1), 'ArithmeticException | — | — | —', 'run/arith: integer division by zero');
+  eq(AR('int', '2147483648', '+', '0', 1), 'REFUSED The start 2,147,483,648 does not fit a Java int', 'run/arith: an int literal past int');
+  eq(AR('long', '3000000000L', '+', '1', 1, 'nuJava') + ' ' + AR('int', '0', '+', '3000000', 1000, 'nuJava'), '3000000001 -1294967296', 'run/arith: long, and int wrapping');
+  eq(AR('int', '1.5', '+', '1', 1), 'REFUSED The start "1.5" is not an int literal such as 7 or -12', 'run/arith: not an int literal');
+
+  /* --- defects ------------------------------------------------------------- */
+  const df = mk(ckBlock('b', 'DF_JS') + views('b', 'DF_VIEW_JS', ['cost', 'removal', 'pipeline']));
+  const TAB = { 'req req': ['1', '1'], 'req arch': ['3', '3'], 'req cons': ['5', '10'], 'req test': ['10', '10'], 'req post': ['10', '100'],
+    'arch arch': ['1', '1'], 'arch cons': ['10', '10'], 'arch test': ['15', '15'], 'arch post': ['25', '100'],
+    'cons cons': ['1', '1'], 'cons test': ['10', '10'], 'cons post': ['10', '25'] };
+  const STG = 'word:req|arch|cons|test|post';
+  const CO = (t) => df("T(dfCompute('cost', {defects: RC('" + t + "', 'introduced:" + STG + " detected:" + STG + " count:nncount')}, " + JSON.stringify({ table: TAB }) + "), 'dfCost dfEarly dfRatio')");
+  eq(CO('req, test, 10; arch, post, 5; cons, test, 20'), '425–800 | 35 | 85/7 ≈ 12.1× to 160/7 ≈ 22.9×', 'defects/cost: found-late');
+  eq(CO('req, req, 10; arch, arch, 5; cons, cons, 20'), '35 | 35 | 1×', 'defects/cost: found-early');
+  eq(CO('req, post, 10'), '100–1,000 | 10 | 10× to 100×', 'defects/cost: requirements-late');
+  eq(CO('req, post, 0'), '0 | 0 | —', 'defects/cost: no defects, no ratio');
+  eq(df("T(dfCompute('cost', {defects: RC('req, post, 3', 'introduced:" + STG + " detected:" + STG + " count:nncount')}, {table: {'req req': ['2', '2'], 'req post': ['10', '100']}}), 'dfCost dfEarly dfRatio')"),
+     '30–300 | 6 | 5× to 50×', 'defects/cost: the baseline is the table\'s own cell');
+  eq(CO('cons, req, 1'), "REFUSED The lesson's table has no figure for a defect introduced in cons and found in req", 'defects/cost: a pair not in the table');
+  const RM = (n, t, h) => df("T(dfCompute('" + (h ? 'pipeline' : 'removal') + "', {injected: Q(" + n + "), stages: RC('" + t + "', 'stage:label rate:share" + (h ? ' hours:nn' : '') + "')}, {}), 'dfFound dfRemaining dfCombined" + (h ? ' dfHours dfPerDefect' : '') + "')");
+  eq(RM(1000, 'unit test, 3/10; integration test, 35/100; system test, 40/100'), '727 | 273 | 727/1000 = 72.7%', 'defects/removal: testing-only');
+  eq(RM(1000, 'design inspection, 55/100; code inspection, 60/100; unit test, 3/10; integration test, 35/100; system test, 40/100'),
+     '47543/50 = 950.86 | 2457/50 = 49.14 | 47543/50000 ≈ 95.1%', 'defects/removal: inspections-too');
+  eq(RM(100, 'code inspection, 6/10, 7/2; unit test, 3/10, 20; system test, 4/10, 20', true),
+     '416/5 = 83.20 | 84/5 = 16.80 | 104/125 = 83.2% | 674 | 1685/208 ≈ 8.10', 'defects/pipeline: inspect-first');
+  eq(RM(100, 'unit test, 0, 20', true), '0 | 100 | 0 = 0% | 0 | —', 'defects/pipeline: nothing found, no hours per defect');
+
+  /* --- profile ------------------------------------------------------------- */
+  const pf = mk(ckBlock('b', 'PF_JS') + views('b', 'PF_VIEW_JS', ['shares', 'speedup']));
+  const SHR = (t, target) => pf("T(pfCompute('shares', {entries: RC('" + t + "', 'name:label amount:nn tag:tag', 1)}, {target: '" + (target || '4/5') + "', tag_label: 'Construction'}), 'pfTotal pfTagged pfTop pfPareto')");
+  const SMALL = 'requirements, 80; architecture, 50; detailed design, 120, c; coding and debugging, 320, c; unit testing, 130, c; integration, 90, c; system testing, 110; planning and management, 100';
+  eq(SHR(SMALL), '1,000 | 33/50 = 66% | coding and debugging, 8/25 = 32% | 6 of 8', 'profile/shares: small-project');
+  eq(SHR(SMALL, '1/2'), '1,000 | 33/50 = 66% | coding and debugging, 8/25 = 32% | 3 of 8', 'profile/shares: the lesson\'s target');
+  eq(SHR('a, 1; b, 1', '1/2').split(' | ')[3], '1 of 2', 'profile/shares: an entry that reaches the target exactly');
+  eq(SHR('a, 0; b, 0'), 'REFUSED The amounts add up to 0; a share needs a total above 0', 'profile/shares: a zero total');
+  const SPD = (t) => pf("T(pfCompute('speedup', {routines: RC('" + t + "', 'name:label time:nn factor:pos')}, {target: '4/5'}), 'pfBefore pfAfter pfSpeedup pfSaved pfPareto')");
+  eq(SPD('parse, 600, 1; compute, 250, 1; format, 100, 1000; write, 50, 1000'), '1,000 | 17003/20 = 850.15 | 20000/17003 ≈ 1.18 | 2997/20000 ≈ 15.0% | 2 of 4',
+     'profile/speedup: tune-the-small-ones');
+  eq(SPD('parse, 600, 1; compute, 250, 1; format, 100, 10; write, 50, 1'), '1,000 | 910 | 100/91 ≈ 1.10 | 9/100 = 9% | 2 of 4', 'profile/speedup: tune-format');
+
+  /* --- project ------------------------------------------------------------- */
+  const pj = mk(ckBlock('b', 'PJ_JS') + views('b', 'PJ_VIEW_JS', ['language', 'scale', 'effort', 'breakeven']));
+  const PJ = (view, inst, ids) => pj("T(pjCompute('" + view + "', " + inst + ", {}), '" + ids + "')");
+  eq(PJ('language', "{size: Q(10000), ratio: Q(6)}", 'pjEquivalent') + '; ' + PJ('language', "{size: Q(10000), ratio: Q('5/2')}", 'pjEquivalent'),
+     '5000/3 ≈ 1,666.67; 4,000', 'project/language');
+  eq(PJ('scale', "{people: Q(50), kloc: Q(1000), densityLow: Q(4), densityHigh: Q(100), prodLow: Q(700), prodHigh: Q(10000)}", 'pjPaths pjDefects pjStaffYears pjSpread'),
+     '1,225 | 4,000–100,000 | 100 to 10000/7 ≈ 1,428.57 | 100/7 ≈ 14.29', 'project/scale: large-team');
+  eq(PJ('scale', "{people: Q(3), kloc: Q(10), densityLow: Q(0), densityHigh: Q(40), prodLow: Q(2000), prodHigh: Q(25000)}", 'pjPaths pjDefects pjStaffYears pjSpread'),
+     '3 | 0–400 | 2/5 = 0.40 to 5 | 25/2 = 12.50', 'project/scale: small-team');
+  eq(PJ('scale', "{people: Q(3), kloc: Q(10), densityLow: Q(50), densityHigh: Q(40), prodLow: Q(2000), prodHigh: Q(25000)}", 'pjPaths'),
+     'REFUSED The low defect density is above the high one', 'project/scale: a reversed range');
+  eq(PJ('effort', "{nominal: Q(100), factors: RC('product complexity, 1.74; time constraint, 1.63; storage constraint, 1.46', 'factor:label multiplier:pos')}", 'pjProduct pjEffort'),
+     '1035213/250000 ≈ 4.14 | 1035213/2500 ≈ 414.09', 'project/effort: hard-product');
+  const BE = (b, m, a, w) => PJ('breakeven', "{build: Q(" + b + "), manual: Q(" + m + "), auto: Q(" + a + "), perWeek: Q('" + w + "')}", 'pjRuns pjWeeks pjYear');
+  eq(BE(8, 15, 1, 10), '35 | 7/2 = 3.50 | 340/3 ≈ 113.33', 'project/breakeven: weekly-report');
+  eq(BE(8, 30, 2, '1/4'), '18 | 72 | −29/15 ≈ −1.93', 'project/breakeven: rare-task loses time in the first year');
+  eq(BE(2, 5, 0, 5), '24 | 24/5 = 4.80 | 59/3 ≈ 19.67', 'project/breakeven: whole runs exactly');
+  eq(BE(8, 1, 1, 1), 'REFUSED A run by hand must take longer than an automated run, or the tool never pays back', 'project/breakeven: no gain');
+
+  /* --- CC_WIRE_JS on a fake DOM: presets fill the boxes; a hostile value is red ---- */
+  {
+    const els = new Map();
+    const byId = (id) => {
+      if (!els.has(id)) {
+        const el = { id: id, value: '', textContent: '', innerHTML: '', l: {} };
+        el.addEventListener = (t, f) => { (el.l[t] = el.l[t] || []).push(f); };
+        el.fire = (t) => (el.l[t] || []).forEach((f) => f({ target: el }));
+        els.set(id, el);
+      }
+      return els.get(id);
+    };
+    const wctx = { console: console, document: { getElementById: byId }, window: {} };
+    vm.createContext(wctx);
+    const lit = (name, value) => 'var ' + name + ' = ' + JSON.stringify(value) + ';\n';
+    const spec = [{ key: 'code', id: 'coInCode', kind: 'code', what: 'Java' }];
+    const presets = { a: { code: 'int f(int x) {\n  return x;\n}' }, b: { code: '// only\nint y = 1;' } };
+    byId('coPreset').value = 'a';
+    vm.runInContext(block('RATIONAL_JS') + ckBlock('core', 'CC_CORE_JS') + ckBlock('core', 'CC_LEX_JS') + ckBlock('a', 'CO_JS') + ckBlock('a', 'CO_VIEW_JS["size"]')
+      + lit('PRESETS', presets) + lit('SPEC', spec) + lit('TILES', ['coLines', 'coParams']) + lit('FIXED', {}) + lit('VIEW', 'size')
+      + lit('LISTING', 'code') + ckBlock('core', 'CC_WIRE_JS').replace(/%P%/g, 'co').replace(/%FN%/g, 'coCompute'), wctx, { filename: 'cckit_core.py' });
+    eq(byId('coInCode').value + ' / ' + byId('coLines').textContent + ' ' + byId('coParams').textContent, presets.a.code + ' / 3 1',
+       'CC_WIRE_JS: the preset fills the code box at load, and the tiles follow');
+    eq((byId('coListing').innerHTML.match(/-webkit-user-select:none/g) || []).length, 3, 'CC_WIRE_JS: the listing has a gutter per line');
+    byId('coPreset').value = 'b'; byId('coPreset').fire('change');
+    eq(byId('coInCode').value + ' / ' + byId('coLines').textContent + ' ' + byId('coParams').textContent, presets.b.code + ' / 2 none (a fragment)',
+       'CC_WIRE_JS: a preset change rewrites the box and redraws');
+    byId('coInCode').value = '}'; byId('coInCode').fire('input');
+    eq(/tone-red/.test(byId('coStatus').innerHTML) + ' ' + byId('coLines').textContent + byId('coParams').textContent, 'true ——',
+       'CC_WIRE_JS: a refusal reddens the banner and blanks the tiles');
+    eq(/^<span class="tone-red">Line 1 closes a brace that no earlier line opened\.<\/span>$/.test(byId('coStatus').innerHTML), true,
+       'CC_WIRE_JS: the banner is one sentence');
+  }
+}
+// ---- end cckit ----
 
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,

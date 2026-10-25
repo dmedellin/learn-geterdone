@@ -13,6 +13,7 @@ from . import (
     capkit,
     phenkit,
     readkit,
+    cckit,
     argkit,
     choicekit,
     algebra_equations,
@@ -171,6 +172,7 @@ REGISTRY = {
     "capkit": capkit.capkit_lab,
     "phenkit": phenkit.phenkit_lab,
     "readkit": readkit.readkit_lab,
+    "cckit": cckit.cckit_lab,
 }
 
 
