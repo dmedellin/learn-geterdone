@@ -454,7 +454,9 @@ Previewing and in Words, Knowledge and Difficulty.
      after two misses; at most two timed readings in a sitting; if attention
      left the text, shorten the session rather than slow the pacer. When the
      pool reaches hard texts, find the hold again: it will be lower.
-   - **Lab:** `drill/practice`, pool `Q01`–`Q30`. Presets (log excerpts):
+   - **Lab:** `drill/practice`, pool `Q01`–`Q18` and `Q26`–`Q28` (21 passages,
+     under the 67 KB ceiling; `Q19`–`Q25`, `Q29` and `Q30` are warm-ups
+     elsewhere, so the reader meets every pool passage once). Presets (log excerpts):
      `three-holds` (pacer 288: 5/6, 4/6, 5/6 → next target ≈ 302.4), `two-misses`
      (288: 3/6, 3/6 → ≈ 273.6), `test-due` (four practice sessions since the
      last test → "today is a test"). Pins `drHold`, `drNextTarget`,
@@ -979,7 +981,7 @@ Modules: `Difficulty`, `Knowledge`.
    - **Sources:** Recht and Leslie 1988; Rayner et al. 2016.
 
 5. **how-much-you-read** — How Much You Read — *Knowledge* — 8 min
-   - **Drill:** `warmup` `Q23` (`practice`); then `text/volume` with the
+   - **Drill:** `warmup` `[Q23, Q30]` (`practice`); then `text/volume` with the
      reader's minutes a day and rate.
    - **Do:** compute annual reading volume and compare what a rate gain and a
      time gain each add.
@@ -1043,7 +1045,7 @@ Modules: `Recall`, `Keeping it`.
 
 3. **spacing-your-reviews** — Spacing Your Reviews — *Keeping it* — 8 min
    - **Drill:** the due test from Retrieval Beats Rereading if it is due, else
-     `warmup` `Q24` (`practice`); then `recall/schedule`.
+     `warmup` `[Q24, Q29]` (`practice`); then `recall/schedule`.
    - **Do:** compute a review schedule and its total time, and compare spaced
      with massed review.
    - **Standard:** given a first gap, a multiplier and a count, list the review
@@ -1365,6 +1367,10 @@ photosensitive conditions and can be skipped without losing the lesson.
 ---
 
 ### D.3 Amendments from the pre-authoring reviews (these win over D.0–D.2)
+
+Where `docs/reading/kit-report.md` records a deviation from D.0–D.3, the
+report describes what the kit does and wins; authors work from it. A ladder
+carries no warm-up (page weight).
 
 1. **Six questions** per passage (three gist, three detail); one question is
    1/6 of comprehension, and every compare, ladder and repeat panel prints
