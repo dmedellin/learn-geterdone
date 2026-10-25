@@ -32,7 +32,7 @@ COURSE = {
         "effort = nominal × each factor",
         "stub: called before it is integrated",
         "driver: integrated before any caller",
-        "a build redoes what depends on the change",
+        "each build redoes what depends on the change",
         "the rates are averages from other projects",
     ],
     "assumes_short": "Laying the Foundation",
@@ -47,7 +47,7 @@ COURSE = {
     ),
     "outcomes": [
         ("Count a team's communication paths",
-         "Compute the paths among n people as n·(n − 1)/2, and say how they grow when a team "
+         "Compute the paths among n people as n times n minus one, halved, and say how they grow when a team "
          "doubles."),
         ("Work the book's size tables into ranges",
          "For a size in thousands of lines, choose the rows of Tables 27-1 and 27-2, compute the "
@@ -85,7 +85,7 @@ COURSE = {
     ],
     "not_covered": [
         "Estimation as a discipline. Chapter 28 points to whole books on it, among them "
-        "McConnell's own later work; the lesson does only the chapter's arithmetic with Table "
+        "Boehm's on Cocomo II and McConnell's own Rapid Development of 1996; the lesson does only the chapter's arithmetic with Table "
         "28-1, and does not teach Cocomo II's size equation.",
         "The book's tables and checklists. Table 27-1, Table 27-2 and Table 28-1 are used a few "
         "figures at a time, with their sources; the configuration-management, integration and "
@@ -101,7 +101,7 @@ COURSE = {
     ],
     "footer_lead": (
         "Every figure in this course is computed in your browser from what a lesson states: "
-        "communication paths as n·(n − 1)/2, a defect range as a size times the book's densities, "
+        "communication paths as the team size times one less, halved, a defect range as a size times the book's densities, "
         "an adjusted estimate as a product of multipliers, stubs and drivers by walking an order "
         "through a call list, and a rebuild by following a dependency list. The densities, "
         "productivities and effort factors are the book's quotations of other people's averages, "

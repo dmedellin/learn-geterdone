@@ -18,17 +18,19 @@ class App {
         Core.load();
     }
 }
-
 class Ui {
-    static void show() { Core.load(); }
+    static void show() {
+        Core.load();
+    }
 }
-
 class Core {
-    static void load() { Store.read(); }
+    static void load() {
+        Store.read();
+    }
 }
-
 class Store {
-    static void read() { }
+    static void read() {
+    }
 }"""
 
 # Lesson 4's exercise: the build the lab's records describe, as the
@@ -57,7 +59,7 @@ LESSONS = [
     # F2, p. 652 (construction errors about 75% small, about 50% larger;
     #   up to 75% on some 500,000-line projects, Grady 1987).
     # F24, p. 652 (Table 27-1, after Jones 1977 and 1998).
-    # F25, p. 653 (Table 27-2, after Putnam and Meyers 1992 and 1997,
+    # F25, p. 653 (Table 27-2, after Putnam and Myers 1992 and 1997 (the book prints "Meyers"),
     #   Boehm et al. 2000, Cusumano et al. 2003).
     {
         "slug": "how-program-size-affects-construction",
@@ -76,7 +78,7 @@ LESSONS = [
             "staff-years = lines / lines per year",
             "spread = high rate / low rate",
             "larger: more errors per line, less per head",
-            "construction: a smaller share as size grows",
+            "construction: smaller share as size grows",
         ],
         "key_label": "Chapter 27 in six lines",
         "concepts_intro": (
@@ -86,16 +88,16 @@ LESSONS = [
         "concepts": [
             ("Communication paths",
              "A path is a pair of people who may need to talk. Among n people there are "
-             "n·(n − 1)/2 of them, so the count grows with the square of the team, not in "
+             "n times n minus one, halved, so the count grows with the square of the team, not in "
              "proportion to it. Two people have one path; ten have forty-five."),
             ("Error density",
              "Errors found per thousand lines of code, written KLOC. Table 27-1, which the "
              "book takes from Jones, gives a range of densities for each band of project size, "
-             "and both ends of the range rise as the size does."),
+             "and from the smallest band to the largest both ends rise."),
             ("Productivity",
              "Lines of code per staff-year, a staff-year being one person's work for a year. "
-             "Table 27-2 gives a range for each size, from Putnam and Meyers, Cocomo II and "
-             "Cusumano's survey, and the ranges fall as the size grows."),
+             "Table 27-2 gives a range for each size, from Putnam and Myers, Cocomo II and "
+             "Cusumano's survey, and from the smallest row to the largest both ends fall."),
         ],
         "read_title": "The chapter's argument, then the book's tables at three sizes",
         "read_intro": (
@@ -126,7 +128,8 @@ LESSONS = [
             ("def", ("Communication paths in a team of n",
                      "Each pair of people is one path. There are n choices for the first "
                      "person and n − 1 for the second, and each pair is counted twice that "
-                     "way, so the team has n·(n − 1)/2 paths.")),
+                     "way, so the team has n times n minus one, halved: ten people have 10 "
+                     "times 9, halved, which is 45.")),
             ("p", "Section 27.2 (p. 651) asks whether your project is a typical size, and "
                   "answers that no size is. Most projects are done by small teams, but because "
                   "large projects use many more people each, a large share of all programmers "
@@ -141,7 +144,8 @@ LESSONS = [
                   "single biggest influence is the individual programmer's skill; as size grows, "
                   "the team and its organisation matter more. Table 27-2 gives the lines of code "
                   "per staff-year the book's sources report: 2,000 to 25,000 at 10K lines, "
-                  "1,000 to 20,000 at 100K, 700 to 10,000 at a million. McConnell says plainly "
+                  "1,000 to 20,000 at 100K, 700 to 10,000 at a million, with Cocomo II's nominal figure, 2,600 at 100K "
+                  "for instance, printed beside each range as a point inside it. McConnell says plainly "
                   "that the specific figures vary dramatically with the kind of software, the "
                   "people, the language and how lines are counted, and that the trend is what "
                   "matters. These are other people's projects, averaged; your own records are "
@@ -159,7 +163,7 @@ LESSONS = [
             ("h3", "The book's rows, at three sizes"),
             ("p", "The lab takes a team size, a size in thousands of lines and one row from "
                   "each table, and does four pieces of arithmetic. Communication paths is "
-                  "n·(n − 1)/2. Defects multiplies the size by each end of the density range. "
+                  "the team size times one less, halved. Defects multiplies the size by each end of the density range. "
                   "Staff-years divides the lines by each end of the productivity range, the "
                   "fast end first. Spread of the productivity range divides the high by the low: how many "
                   "times the slowest estimate exceeds the fastest. The <code>small-team</code> "
@@ -220,7 +224,7 @@ LESSONS = [
                 "densities and productivities are the book's quotations of other people's "
                 "averages; the lab multiplies and divides them, and cannot say what your "
                 "project will see. Figures: the book's Table 27-1 (p. 652), after Jones 1977 "
-                "and 1998, and Table 27-2 (p. 653), after Putnam and Meyers, Boehm et al. 2000 "
+                "and 1998, and Table 27-2 (p. 653), after Putnam and Myers, Boehm et al. 2000 "
                 "and Cusumano et al. 2003."
             ),
         }),
@@ -232,8 +236,8 @@ LESSONS = [
              "3 paths; fifty have 1,225."),
             ("Find the rows",
              "Put the size in thousands of lines into the band of Table 27-1 that contains "
-             "it, and into the nearest row of Table 27-2. A 100K-line project falls in the "
-             "64K–512K density band."),
+             "it, and into the nearest row of Table 27-2; both tables are on pp. 652–653. A "
+             "100K-line project falls in the 64K–512K density band."),
             ("Multiply and divide",
              "Multiply the size in KLOC by each end of the density range for defects. Divide "
              "the size in lines by each end of the productivity range for staff-years; the "
@@ -242,8 +246,10 @@ LESSONS = [
              "Divide the high productivity by the low. That ratio is how wide the staff-year "
              "range is, and it is the first thing to report alongside it."),
             ("Place your own project",
-             "Type your team's size and your project's size in thousands of lines into the "
-             "lab with the book's rows for that size. Note the paths, the defect range and the "
+             "With your copy open at Tables 27-1 and 27-2 (pp. 652–653), type your team's "
+             "size, your project's size in thousands of lines and the two rows for that size "
+             "into the "
+             "lab. Note the paths, the defect range and the "
              "staff-year range, and write one sentence comparing the staff-years with what "
              "your project actually took."),
         ],
@@ -273,7 +279,7 @@ LESSONS = [
              "a": ["12 before, 24 after", "15 before, 66 after", "30 before, 132 after",
                    "36 before, 144 after"],
              "c": 1,
-             "why": "Each pair is one path, n·(n − 1)/2: 6 × 5 / 2 = 15 and 12 × 11 / 2 = 66, "
+             "why": "Each pair is one path, n times n minus one, halved: 6 × 5 / 2 = 15 and 12 × 11 / 2 = 66, "
                     "so doubling the team multiplies the paths by 4.4. Twelve and 24 count "
                     "people, not pairs; 30 and 132 count every pair twice; 36 and 144 are n "
                     "squared, which also pairs each person with themselves."},
@@ -289,24 +295,25 @@ LESSONS = [
                   "staff-year range does it give a 100,000-line project, and how many times the "
                   "fast end is the slow end?",
              "a": ["5 to 100 staff-years; 20 times", "5 to 100 staff-years; 95 times",
-                   "0.05 to 1 staff-year; 20 times", "100 to 2,000 staff-years; 20 times"],
+                   "0.005 to 0.1 staff-years; 20 times", "100 to 2,000 staff-years; 20 times"],
              "c": 0,
              "why": "100,000 / 20,000 = 5 and 100,000 / 1,000 = 100, and 20,000 / 1,000 = 20 "
-                    "(F25, p. 653). 95 is the difference of the ends, not their ratio; 0.05 to "
-                    "1 divides the size in thousands, not in lines; 100 to 2,000 multiplies by "
+                    "(F25, p. 653). 95 is the difference of the ends, not their ratio; 0.005 to "
+                    "0.1 divides the size in thousands, not in lines; 100 to 2,000 multiplies by "
                     "the spread instead of dividing by the rates."},
             {"q": "What does Section 27.5 say happens to construction's share of a project's "
                   "time as the project grows?",
              "a": ["It stays about the same, since coding grows with the lines",
                    "It falls: as much as 65 percent on a small project, about 50 on a medium one",
                    "It rises, since a larger project has more code to write",
-                   "It falls to nothing past 512K lines"],
+                   "It falls, and so does the amount of coding and unit testing"],
              "c": 1,
              "why": "The book gives as much as 65 percent on small projects and about 50 on "
                     "medium ones, falling further on large ones (F1, p. 654), because other "
-                    "activities grow faster than construction. Construction does grow with the "
-                    "lines, but its share falls. Cutting the chart off at 512K is McConnell's "
-                    "joke about protecting his job, not a claim that construction vanishes."},
+                    "activities grow faster than construction. Construction's own work, coding "
+                    "and unit testing among it, grows with the lines; only its share falls. "
+                    "The first option misses the fall in share, the third gets its direction "
+                    "wrong."},
         ],
         "mistakes": [
             ("Thinking a ten-times-larger program is ten times the work",
@@ -323,7 +330,7 @@ LESSONS = [
              "book's figures do not support that: construction is about half the errors on "
              "larger projects, about three quarters on small ones, and on some very large "
              "projects still up to three quarters (F2, p. 652). Half of a larger number of "
-             "errors is still the largest single share."),
+             "errors is still a great many."),
             ("Starting from a heavy method and paring it down",
              "A team that expects to grow may adopt the full apparatus of a large-project "
              "methodology at once and plan to drop what a small project does not need. The book "
@@ -352,8 +359,9 @@ LESSONS = [
     # p. 671 (Table 28-1, p. 674; what to do if you're behind, pp. 675-676;
     # Brooks's law and its qualification, p. 676), §28.4 p. 677, §28.5 p. 680
     # (individual variation, p. 682), §28.6 p. 686. Brooks and OS/360: pp. 658
-    # and 687. Opening quotation: Key Points, p. 688 (35 words); the lesson
-    # quotes nothing else.
+    # and 687. Opening quotation: Key Points, p. 688 (35 words); "religious",
+    # p. 683 (1 word). Quotations in all: 36 words. The delay survey (van
+    # Genuchten 1991, over 300 projects) is p. 675, cited as the book cites it.
     # F26, p. 674 (Table 28-1, after Boehm et al. 2000; percentages and the
     #   multipliers they give).
     # F29, p. 682 (order-of-magnitude differences among programmers, Sackman,
@@ -413,14 +421,13 @@ LESSONS = [
             ("p", "Someone has asked you how long the next feature will take, and you gave a "
                   "number. Chapter 28 is written for that moment and the ones around it, from "
                   "both sides: it tells a developer what a manager has to worry about, and a "
-                  "manager how construction looks from the developer's chair. It covers only the "
+                  "manager how management looks from the developer's chair. It covers only the "
                   "parts of management that touch construction, and points to other books for "
                   "the rest."),
             ("p", "Section 28.1 (p. 662) asks how to encourage good code, and advises against "
-                  "standards handed down from management. Programmers, McConnell says, tend to "
-                  "rank managers somewhere between single-celled organisms and the woolly "
-                  "mammoth, so if there are to be standards, a respected architect should set "
-                  "them and the team should accept them. Lighter means work too: two people on "
+                  "standards handed down from management: if there are to be standards, a "
+                  "respected architect should set them and the team should accept them, "
+                  "because programmers follow expertise as much as authority. Lighter means work too: two people on "
                   "every part of the code, a review of every line, good code circulated as an "
                   "example, and code treated as the project's property rather than its "
                   "author's."),
@@ -437,16 +444,16 @@ LESSONS = [
                   "than from too much."),
             ("p", "Section 28.3 (p. 671) is estimation. The book lists several approaches, from "
                   "estimating software and algorithmic models such as Cocomo II to estimating the "
-                  "pieces and adding them up, and a procedure it adapts from Boehm's 1981 book: "
-                  "establish why you need the estimate, give the estimate time of its own, spell "
-                  "out the requirements, estimate at a low level of detail so that the pieces' "
-                  "errors tend to cancel, use several techniques and compare them, and estimate "
-                  "again as the project goes. Then come the influences on the schedule. Table "
+                  "pieces and adding them up, and a procedure it adapts from Boehm's 1981 book, "
+                  "of which three steps carry the argument: estimate at a low level of detail "
+                  "so that the pieces' errors tend to cancel, use several techniques and compare "
+                  "them, and estimate again as the project goes. Then come the influences on the schedule. Table "
                   "28-1, from Boehm and his colleagues' Cocomo II, gives each factor a helpful "
                   "and a harmful percentage: programmer capability −24 and +34 percent, "
                   "requirements analyst capability −29 and +42, product complexity −27 and +74."),
-            ("p", "What if you are behind? Hoping to catch up rarely works: the survey the "
-                  "book cites found delays growing toward a project's end, not shrinking. Adding people is the move the book weighs most "
+            ("p", "What if you are behind? Hoping to catch up rarely works: a survey of over "
+                  "300 projects that the book cites, van Genuchten's of 1991, found delays "
+                  "growing toward a project's end, not shrinking. Adding people is the move the book weighs most "
                   "carefully, by way of Fred Brooks, who managed IBM's OS/360 and wrote "
                   "<em>The Mythical Man-Month</em> about it. His law, as the book cites it from "
                   "the 1995 edition, is that adding people to a late project makes it later: new "
@@ -502,7 +509,8 @@ LESSONS = [
             ("p", "Turn the two percentages into multipliers, multiply them, and give the "
                   "adjusted effort in staff-months. Work it by hand first; then put 50 in the "
                   "Nominal effort box and the two factors in the Factors box, each as a name, "
-                  "a comma and its multiplier, to check."),
+                  "a comma and its multiplier, with a semicolon between the two, as the preset's "
+                  "line shows, to check."),
             ("p", "An estimate assumes the pieces will fit together; the next chapter is about "
                   "the order in which they are made to. The next lesson is "
                   "&ldquo;Integration Order&rdquo;."),
@@ -581,7 +589,7 @@ LESSONS = [
              "a": ["56 staff-months", "52.26 staff-months", "67 staff-months",
                    "106 staff-months"],
              "c": 1,
-             "why": "The multipliers are 1.34 and 0.78, and 1.34 × 0.78 = 1.0452, so the effort "
+             "why": "The multipliers are 1 + 0.34 = 1.34 and 1 − 0.22 = 0.78, and 1.34 × 0.78 = 1.0452, so the effort "
                     "is 50 × 1.0452 = 52.26 staff-months (F26, Table 28-1, p. 674, after Boehm "
                     "et al. 2000). Adding the percentages, 1 + 0.34 − 0.22 = 1.12, gives 56; "
                     "ignoring the tools gives 50 × 1.34 = 67; adding the multipliers, "
@@ -660,13 +668,13 @@ LESSONS = [
     # feature-oriented p. 700, T-shaped p. 701, summary p. 702), §29.4 p. 702
     # (daily build and smoke test, pp. 702-706). Opening quotation: Key Points,
     # p. 708 (21 words); "big bang integration", p. 691 (3 words); "dump truck
-    # full of stubs", p. 696 (5 words). Quotations in all: 29 words. No figure
-    # from the book is used.
+    # full of stubs", p. 696 (5 words); "smokes", p. 702 (1 word). Quotations
+    # in all: 30 words. No figure from the book is used.
     {
         "slug": "integration-order",
         "title": "Integration Order",
         "module": "Chapter 29 · Integration",
-        "one_line": "Integrating a system one piece at a time beats putting it all together at the end, and every incremental order pays for itself in stubs, drivers or both.",
+        "one_line": "Integrating a system one piece at a time beats putting it all together at the end, and every incremental order pays for it in stubs, drivers or both.",
         "summary": (
             "Chapter 29 argues for incremental integration over the phased kind, and surveys the "
             "orders it can take: top-down, bottom-up, sandwich, risk-oriented, feature-oriented "
@@ -677,7 +685,7 @@ LESSONS = [
             "stub: called before it is integrated",
             "driver: no caller integrated yet",
             "phased: every piece at once",
-            "incremental: one piece at a time",
+            "incremental: one piece each time",
             "build daily, smoke test daily",
         ],
         "key_label": "Chapter 29 in five lines",
@@ -837,10 +845,12 @@ LESSONS = [
             ],
             "lines": [
                 "main: calls ui and orders, not yet in, so 2 stubs",
-                "ui: called by main, already in; calls widgets, a stub",
+                "ui: called by main, already in",
+                "ui calls widgets, which needs one more stub",
                 "orders: calls pricing and db, both stubs",
                 "widgets, pricing, db: each replaces its stub",
-                "stubs: db, orders, pricing, ui, widgets; drivers: none",
+                "stubs: db, orders, pricing, ui, widgets",
+                "drivers: none",
             ],
             "after": [
                 "Every component below the top is called before it arrives, so every one of them "
@@ -890,12 +900,13 @@ LESSONS = [
              "a": ["A tiny program of two or three classes",
                    "A project of fifty or more people",
                    "A system whose interfaces are well documented",
-                   "Any program built daily"],
+                   "A program whose classes were each unit-tested first"],
              "c": 0,
              "why": "The book allows phased integration for tiny programs, two or three classes, "
                     "and then only if you are lucky (p. 692). It prefers incremental integration "
-                    "for everything larger, and a daily build is itself a form of frequent, "
-                    "incremental integration."},
+                    "for everything larger. Unit-testing every class first is phased integration's own "
+                    "first step, and the chapter's point is that it does not prevent the problems "
+                    "that surface when all the classes meet at once."},
         ],
         "mistakes": [
             ("Thinking integration is a phase at the end of construction",
@@ -941,8 +952,12 @@ LESSONS = [
     # §30.5 p. 721 (scripts, p. 722), §30.6 p. 722 (Fortran, p. 722; why
     # programming stays hard, p. 723). The modern aside cites §29.4's
     # continuous-integration passage, p. 706. Opening quotation: Key Points,
-    # p. 725 (14 words); "too much of a good thing", p. 706 (6 words).
-    # Quotations in all: 20 words. No figure from the book is used.
+    # p. 725 (14 words); "Tool Fantasyland", p. 722 (2 words, the section
+    # title); "too much of a good thing", p. 706 (6 words). Quotations in all:
+    # 22 words. No research figure from the book is used; the rules of thumb
+    # are the five-hour job against 4 h 45 min of tool-building and 15 minutes
+    # of running it (p. 721) and the script for anything longer than about
+    # five characters typed more than a few times a day (p. 722).
     {
         "slug": "programming-tools",
         "title": "Programming Tools",
@@ -955,11 +970,11 @@ LESSONS = [
             "every target it reaches."
         ),
         "key": [
-            "a build redoes what depends on a change",
+            "each build redoes what depends on the change",
             "direct: one edge from the changed file",
             "affected: reached by any chain of edges",
-            "a header reaches every file including it",
-            "tools cut tedium; programming stays hard",
+            "each header reaches every file including it",
+            "tools cut tedium, not the need to program",
         ],
         "key_label": "Chapter 30 in five lines",
         "concepts_intro": (
@@ -1125,7 +1140,8 @@ LESSONS = [
                 "main.o lists util.h: out of date",
                 "util.o lists util.h: out of date",
                 "app lists main.o and util.o: out of date",
-                "direct: main.o, util.o; in all: app, main.o, util.o",
+                "direct: main.o, util.o",
+                "in all: app, main.o, util.o",
             ],
             "after": [
                 "Three targets are remade for one edited file, and the edit touched no source "
@@ -1163,16 +1179,16 @@ LESSONS = [
                     "fourth-generation languages and visual programming come later in its list "
                     "of tools that carried the same promise."},
             {"q": "By Section 30.5's rule of thumb, which of these is a candidate for a script?",
-             "a": ["A five-hour job done once",
+             "a": ["A three-character command typed a few times a day",
                    "A command longer than about five characters typed several times a day",
                    "Any command typed more than once a week",
                    "Only a job that takes longer than writing the script"],
              "c": 1,
              "why": "The book suggests scripting anything longer than about five characters that "
                     "you type more than a few times a day, such as compile and link sequences "
-                    "and backup commands (p. 722). Its five-hour example is about building a "
-                    "tool for a job, not a script, and it states no weekly rule or "
-                    "break-even condition."},
+                    "and backup commands (p. 722). A three-character command falls short of the "
+                    "length; a weekly command falls short of the frequency; and the book states "
+                    "no break-even condition."},
         ],
         "mistakes": [
             ("Thinking a build tool rebuilds what you edited",
