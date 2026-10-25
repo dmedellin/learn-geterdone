@@ -353,6 +353,273 @@ class TestReaderScript(unittest.TestCase):
         self.assertNotIn('"', READOUT_JS)
 
 
+# Program text, read by speech.say_code. Each of the first five was measured
+# wrong under the mathematical rules before the dialect existed
+# (docs/code-complete/PLAN.md section H.1): `!done` lost its negation and read
+# the opposite of the page.
+CODE_READINGS = {
+    "a && b": "A and b",
+    "a || b": "A or b",
+    "!done": "not done",
+    "int[] a = new int[n];": "array of int A is set to new int array of length n",
+    "double[] prices = new double[n];": "array of double prices is set to new double array of length n",
+    "x = -1.0;": "x is set to minus 1.0",
+    "r = total % size;": "r is set to total mod size",
+    "x = a - b;": "x is set to A minus b",
+    "System.out.print(x);": "print x",
+    "boolean isDomestic = MAX_RETRIES > 0;": "boolean is domestic is set to max retries is greater than 0",
+    "public static void main(String[] args) {": "public static void main of array of string args",
+    "final char sep = ',';": "final char sep is set to the character comma",
+    "x != y": "x is not equal to y",
+    "x == y": "x equals y",
+    "if (!done && count < max) {": "if not done and count is less than max",
+    "for (int i = 0; i < n; i++) {": "for int i is set to 0, i is less than n, i is incremented",
+    "total += values[i];": "total is increased by values at index i",
+    "count -= 2;": "count is decreased by 2",
+    "i--;": "i is decremented",
+    "--i;": "decrement i",
+    "x = y++ + ++z;": "x is set to y is incremented plus increment z",
+    "} else {": "else",
+    "return !(a && b);": "return not, open bracket, A and b, close bracket",
+    "return !a || !b;": "return not A or not b",
+    "List<String> names = new ArrayList<>();": "list of string names is set to new array list",
+    "Map<String, List<Integer>> byName;": "map of string and list of integer by name",
+    "isDone = MAX_SIZE >= HTTPServer.count();":
+        "is done is set to max size is at least HTTP server dot count",
+    "System.out.println(\"Total: \" + total);": "print line Total plus total",
+    "s = \"\";": "s is set to the empty string",
+    "char c = 'a';": "char c is set to the character a",
+    "double r = (double) a / b;": "double r is set to cast to double A divided by b",
+    "for (String s : names) {": "for string s in names",
+    "y = x > 0 ? x : -x;": "y is set to x is greater than 0, if so, x, otherwise, minus x",
+    "x = (a + b) * c; // the sum first": "x is set to, open bracket, A plus b, close bracket, "
+                                       "times c, comment, the sum first",
+    "a &amp;&amp; b": "A and b",
+}
+
+
+class TestCodeDialect(unittest.TestCase):
+    """speech.say_code: program text read as program text."""
+
+    def test_pinned_readings(self):
+        from mathpath.speech import say_code
+        for text, spoken in CODE_READINGS.items():
+            with self.subTest(text=text):
+                self.assertEqual(say_code(text), spoken)
+                self.assertEqual(unspoken(spoken), set())
+
+    def test_the_global_rules_are_unchanged(self):
+        """`!` is a factorial and `=` an equation everywhere the dialect is not
+        asked for; Operations Research writes `||` as scheduling notation. The
+        dialect is a second reader, never a change to the first."""
+        self.assertEqual(say("n!"), "n factorial")
+        self.assertEqual(say("x = 1"), "x equals 1")
+        self.assertEqual(say("!done"), "done")
+        self.assertEqual(say("a && b"), "A and and b")
+        from mathpath.speech import say_code
+        self.assertEqual(say_code("x = 1"), "x is set to 1")
+        self.assertEqual(say_code("x = 1", override="x becomes one"), "x becomes one")
+
+    def test_braces_and_semicolons_are_silent(self):
+        from mathpath.speech import say_code
+        for line in ("{", "}", ";", "};", "  }  "):
+            with self.subTest(line=line):
+                self.assertEqual(say_code(line), "")
+
+    def test_a_block_skips_blank_lines_and_reads_no_table(self):
+        from mathpath.speech import say_code_block
+        lines = ["int a    = 1;", "", "int bb   = 22;", "int ccc  = 333;", "}"]
+        # each line announced by its number; the blank line and the lone brace
+        # say nothing, so their numbers are not announced either
+        self.assertEqual(say_code_block(lines),
+                         ["line 1, int A is set to 1", "line 3, int bb is set to 22",
+                          "line 4, int ccc is set to 333"])
+        self.assertEqual(say_code_block(lines, marked={3}),
+                         ["line 1, int A is set to 1", "line 3, flagged, int bb is set to 22",
+                          "line 4, int ccc is set to 333"])
+
+    def test_keywords_are_words(self):
+        """A three-letter keyword at the head of a line is a word, never letters."""
+        from mathpath.speech import JAVA_KEYWORDS, say_code
+        for word in ("int", "for", "new", "void", "char", "boolean", "static", "final"):
+            with self.subTest(word=word):
+                self.assertIn(word, JAVA_KEYWORDS)
+                self.assertEqual(say_code(word), word)
+
+    def test_dialect_comes_only_from_the_path(self):
+        from mathpath.speech import CODE_DIALECT, dialect_of
+        self.assertIsNone(dialect_of({"slug": "algebra"}))
+        self.assertEqual(dialect_of({"slug": "cc", "speech": "code"}), CODE_DIALECT)
+        with self.assertRaises(ValueError):
+            dialect_of({"slug": "cc", "speech": "java"})
+
+
+def _code_path():
+    """A copy of a real Subject marked "speech": "code", with a code block,
+    prose runs, and code in its key and worked lines, as the Code Complete
+    lessons will be written."""
+    import copy
+    from discrete_math import PATH
+    path = copy.deepcopy(PATH)
+    path["speech"] = "code"
+    course = path["courses"][0]
+    lesson = course["lessons"][0]
+    lesson["key"] = ["if (!done && i < n)", "List<String> names", "a || b"]
+    lesson["worked"]["lines"] = ["count += 1;", "return !(a && b);"]
+    lesson["body"].insert(1, ("code", CODE_BLOCK))
+    lesson["body"].insert(2, ("p", "So `!done && ready` holds, `List<String>` is a type, `a || b`."))
+    return path, course, lesson
+
+
+CODE_BLOCK = [
+    "// generics and && must show as written",
+    "List<String> names = new ArrayList<>();",
+    "if (!done && names.size() > 0) {",
+    "",
+    "    names.add(\"a < b\");",
+    "}",
+]
+
+
+def _render(path, course, lesson):
+    from mathpath import render
+    return render.lesson_page(path=path, course=course, lesson=lesson, index=0,
+                              prev_lesson=None, next_lesson=course["lessons"][1])
+
+
+class TestCodeBlock(unittest.TestCase):
+    """The `code` body block (render._codeblock)."""
+
+    def test_a_string_payload_is_refused(self):
+        from mathpath import render
+        with self.assertRaises(TypeError):
+            render._block("code", "x = 1;")
+        with self.assertRaises(TypeError):
+            render._block("code", ["x = 1;", 2])
+
+    def test_limits(self):
+        from mathpath import render
+        for bad in (["x;"] * 31, ["x" * 81], ["\tx = 1;"], ["a &lt; b"], ["a\nb"], []):
+            with self.subTest(bad=bad[:2]):
+                self.assertTrue(render.code_block_problems(bad))
+                with self.assertRaises(ValueError):
+                    render._block("code", bad)
+        self.assertEqual(render.code_block_problems(["x;"] * 30 + []), [])
+        self.assertEqual(render.code_block_problems(["x" * 80]), [])
+
+    def test_markup_escapes_and_numbers_by_css(self):
+        from mathpath import render
+        out = render._block("code", CODE_BLOCK)
+        self.assertTrue(out.startswith('<pre class="codeblock" data-say="'))
+        self.assertIn("<code>", out)
+        self.assertIn('<span class="cl">List&lt;String&gt; names = new ArrayList&lt;&gt;();</span>', out)
+        self.assertIn('<span class="cl">if (!done &amp;&amp; names.size() &gt; 0) {</span>', out)
+        self.assertIn('<span class="cl">    names.add(&quot;a &lt; b&quot;);</span>', out)
+        self.assertIn('<span class="cl"></span>', out)  # a blank line keeps its number
+        # one span per line, newline-separated, and no number in the text:
+        # copying the listing copies the code alone
+        body = re.search(r"<code>(.*)</code>", out, re.S).group(1)
+        self.assertEqual(re.sub(r"<[^>]+>", "", body).split("\n"),
+                         [__import__("html").escape(l) for l in CODE_BLOCK])
+        self.assertNotRegex(body, r">\s*\d+\s*<")
+
+    def test_spoken_in_the_code_dialect_on_every_subject(self):
+        from mathpath import render
+        out = render._block("code", CODE_BLOCK)
+        spoken = __import__("html").unescape(re.search(r'data-say="([^"]*)"', out).group(1))
+        self.assertEqual(spoken, "line 1, comment, generics and must show as written. "
+                                 "line 2, list of string names is set to new array list. "
+                                 "line 3, if not done and names dot size is greater than 0. "
+                                 "line 5, names dot add of a b")
+
+    def test_marked_lines(self):
+        """A flagged line: a gutter glyph and a hidden word, never colour
+        alone; both are generated content, so a copy is still the code."""
+        from mathpath import render, theme
+        out = render._block("code", {"lines": CODE_BLOCK, "marked": [3]})
+        self.assertIn('<span class="cl flag">if (!done &amp;&amp; names.size() &gt; 0) {</span>', out)
+        self.assertEqual(out.count('"cl flag"'), 1)
+        self.assertIn("line 3, flagged, if not done", out)
+        rule = re.search(r"\.codeblock \.flag::before \{([^}]*)\}", theme.CODE_CSS).group(1)
+        self.assertIn('/ "flagged, line " counter(code-line);', rule)  # the hidden word
+        self.assertIn("25B6", rule)                                     # the glyph
+        self.assertIn("font-weight: 700", rule)                         # not colour alone
+        self.assertEqual(render.code_lines({"lines": CODE_BLOCK, "marked": [3]}), CODE_BLOCK)
+        for bad in ({"lines": CODE_BLOCK, "marked": [7]}, {"lines": CODE_BLOCK, "marked": "3"},
+                    {"lines": CODE_BLOCK, "flag": [1]}, {"marked": [1]}):
+            with self.subTest(bad=bad.get("marked")):
+                self.assertTrue(render.code_block_problems(bad))
+                with self.assertRaises((TypeError, ValueError)):
+                    render._block("code", bad)
+
+    def test_styles_ship_only_with_a_code_block(self):
+        from mathpath import theme
+        path, course, lesson = _code_path()
+        with_code = _render(path, course, lesson)
+        self.assertEqual(with_code.count(theme.CODE_CSS), 1)
+        self.assertIn('aria-label="Code listing"', with_code)
+        lesson["body"] = [b for b in lesson["body"] if b[0] != "code"]
+        self.assertNotIn(".codeblock", _render(path, course, lesson))
+
+    def test_listen_reads_a_code_block_and_announces_any_other_pre(self):
+        from mathpath.readout import READOUT_JS
+        self.assertIn("el.matches('pre:not([data-say])')", READOUT_JS)
+        self.assertIn("table,pre,", READOUT_JS)  # a <pre> is still a block Listen visits
+
+
+class TestCodeDialectRendering(unittest.TestCase):
+    """On a "speech": "code" Subject every run, key line and worked line is
+    program text; on every other Subject nothing changes."""
+
+    def test_runs_key_and_worked_lines_use_the_dialect(self):
+        import html as h
+        path, course, lesson = _code_path()
+        page = _render(path, course, lesson)
+        said = [h.unescape(x) for x in re.findall(r'data-say="([^"]*)"', page)]
+        self.assertIn("not done and ready", said)
+        self.assertIn("list of string", said)
+        self.assertIn("A or b", said)
+        self.assertIn("if not done and i is less than n. list of string names. A or b", said)
+        self.assertIn("count is increased by 1. return not, open bracket, A and b, close bracket", said)
+        # shown exactly as written, not opened as a tag
+        self.assertIn(">!done &amp;&amp; ready</span>", page)
+        self.assertIn(">List&lt;String&gt;</span>", page)
+
+    def test_no_code_run_reaches_plain_say(self):
+        """On a code Subject, a run holding `&&`, `||` or a prefix `!` read by
+        the mathematical rules is a failure: it is how `!done` read "done"."""
+        from mathpath import render, speech
+        code_op = re.compile(r"&&|&amp;&amp;|\|\||(?<![\w)\]!=<>])!(?!=)")
+        real, leaked = speech.say, []
+
+        def watched(text, **kw):
+            if code_op.search(text):
+                leaked.append(text)
+            return real(text, **kw)
+
+        render._say_in.cache_clear()
+        speech.say = watched
+        try:
+            _render(*_code_path())
+            self.assertEqual(leaked, [])
+            # the watch is not inert: the same content on a math Subject does
+            # reach plain say
+            path, course, lesson = _code_path()
+            del path["speech"]
+            render._say_in.cache_clear()
+            _render(path, course, lesson)
+            self.assertIn("!done && ready", leaked)
+        finally:
+            speech.say = real
+            render._say_in.cache_clear()
+
+    def test_an_unknown_dialect_is_refused(self):
+        path, course, lesson = _code_path()
+        path["speech"] = "java"
+        with self.assertRaises(ValueError):
+            _render(path, course, lesson)
+
+
 def _prose_islands(path):
     """Every math island in a Subject's prose: the runs written without
     backticks that render._prose gives a spoken form (speech.islands), read
@@ -368,7 +635,7 @@ def _prose_islands(path):
                 if key not in ("key", "lines"):
                     yield from strings(value)
         elif isinstance(node, (list, tuple)):
-            if not (isinstance(node, tuple) and len(node) == 2 and node[0] == "math"):
+            if not (isinstance(node, tuple) and len(node) == 2 and node[0] in ("math", "code")):
                 for item in node:
                     yield from strings(item)
 
@@ -393,22 +660,45 @@ class TestCoverage(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        from speechcheck import runs, subjects, unresolved
+        from speechcheck import code_lines, reading, runs, subjects, unresolved
 
         cls.subjects = list(subjects())
         cls.runs, cls.unresolved = staticmethod(runs), staticmethod(unresolved)
+        cls.code_lines, cls.reading = staticmethod(code_lines), staticmethod(reading)
 
     def test_every_run_is_spoken(self):
         for path, overrides in self.subjects:
             residue = {}
             for run, _, _ in self.runs(path):
-                for ch in unspoken(overrides.get(run) or say(run)):
+                for ch in unspoken(self.reading(path, run, overrides)):
                     residue.setdefault(ch, run)
             with self.subTest(path=path["slug"]):
                 self.assertEqual(
                     residue, {},
                     "symbols with no spoken form (add them to speech.SYMBOLS, "
                     "or give the run a spoken form): %r" % residue)
+
+    def test_every_code_line_is_spoken(self):
+        """A `code` block is read by say_code on every Subject."""
+        from mathpath.speech import say_code
+        for path, overrides in self.subjects:
+            residue = {}
+            for line, _ in self.code_lines(path):
+                for ch in unspoken(overrides.get(line) or say_code(line)):
+                    residue.setdefault(ch, line)
+            with self.subTest(path=path["slug"]):
+                self.assertEqual(residue, {}, "code with no spoken form: %r" % residue)
+
+    def test_the_coverage_checks_use_the_subjects_reader(self):
+        from speechcheck import reader, reading, unresolved
+        from mathpath.speech import say_code
+        path, _, _ = _code_path()
+        self.assertIs(reader(path), say_code)
+        self.assertEqual(reading(path, "!done", {}), "not done")
+        self.assertEqual(reading(path, "!done", {"!done": "not yet done"}), "not yet done")
+        self.assertEqual(unresolved(path, {}), [])  # f(x) is a call in code, not a guess
+        path.pop("speech")
+        self.assertIs(reader(path), say)
 
     def test_spoken_forms_are_words(self):
         for path, overrides in self.subjects:
@@ -423,7 +713,8 @@ class TestCoverage(unittest.TestCase):
         island counts as present: render._prose speaks it with its spoken
         form (Phenomenology's `ho_se` and `_a_e` are read that way)."""
         for path, overrides in self.subjects:
-            present = {run for run, _, _ in self.runs(path)} | _prose_islands(path)
+            present = {run for run, _, _ in self.runs(path)} | _prose_islands(path) \
+                | {line for line, _ in self.code_lines(path)}
             with self.subTest(path=path["slug"]):
                 self.assertEqual(sorted(set(overrides) - present), [])
 

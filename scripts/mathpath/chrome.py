@@ -399,7 +399,8 @@ def name_horizontal_scrollers(text):
             attrs = dict(attrs)
             classes = attrs.get('class', '').split()
             label = next((name for cls, name in (
-                ('mathblock', 'Mathematical notation'), ('table-wrap', 'Data table'),
+                ('mathblock', 'Mathematical notation'), ('codeblock', 'Code listing'),
+                ('table-wrap', 'Data table'),
                 ('data-table', 'Data table'), ('heatmap-wrap', 'Sensitivity grid'),
                 ('calc-table', 'Calculation table'), ('schema-output', 'Exported plan data'),
                 ('footprint', 'Bid and ask volume by price'),

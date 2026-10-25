@@ -5,12 +5,13 @@ chrome.py or theme.py, so a page produced here cannot ship a variant of the
 pager, the palette or the theme toggle even if a lesson wanted one.
 """
 
+import contextvars
 import functools
 import html
 import json
 import re
 
-from . import chrome, feedback, labs, progress, readout, speech
+from . import chrome, feedback, labs, progress, readout, speech, theme
 from .chrome import esc
 
 ORIGIN = chrome.CANONICAL_ORIGIN
@@ -28,9 +29,47 @@ _MATH_RE = re.compile(r"`([^`]+)`")
 _SPOKEN = speech.all_overrides()
 
 
-@functools.lru_cache(maxsize=None)
+# The read-out dialect of the page being rendered: None reads every run as
+# mathematics (speech.say), "code" as program text (speech.say_code). It is the
+# PATH dict's "speech" field, set for the length of one page by _dialect below,
+# so the dozens of inline() calls a page makes need not each be handed it.
+_DIALECT = contextvars.ContextVar("speech_dialect", default=None)
+
+
+def _dialect(page):
+    """Render `page(..., path=...)` with its Subject's read-out dialect."""
+    @functools.wraps(page)
+    def rendered(*args, **kwargs):
+        path = kwargs["path"] if "path" in kwargs else args[0]
+        token = _DIALECT.set(speech.dialect_of(path))
+        try:
+            return page(*args, **kwargs)
+        finally:
+            _DIALECT.reset(token)
+    return rendered
+
+
 def _say(run):
+    return _say_in(run, _DIALECT.get())
+
+
+@functools.lru_cache(maxsize=None)
+def _say_in(run, dialect):
+    if dialect == speech.CODE_DIALECT:
+        return speech.say_code(run, override=_SPOKEN.get(run))
     return speech.say(run, override=_SPOKEN.get(run))
+
+
+_BARE_MARKUP = re.compile(r"&(?!#?\w+;)|[<>]")
+
+
+def _code_run(part):
+    """A backtick run on a code-dialect Subject is program text: `List<String>`
+    and `a && b` must show as written, not open a tag. A character reference
+    the author wrote (`&lt;`, or one esc_inline already made) is kept as it is."""
+    if _DIALECT.get() != speech.CODE_DIALECT:
+        return part
+    return _BARE_MARKUP.sub(lambda m: {"&": "&amp;", "<": "&lt;", ">": "&gt;"}[m.group()], part)
 
 
 def _prose(segment):
@@ -53,7 +92,8 @@ def _prose(segment):
 def inline(text):
     parts = _MATH_RE.split(text)
     return "".join(
-        '<span class="math" data-say="%s">%s</span>' % (esc(_say(part)), part) if odd else _prose(part)
+        '<span class="math" data-say="%s">%s</span>' % (esc(_say(part)), _code_run(part)) if odd
+        else _prose(part)
         for odd, part in ((i % 2, part) for i, part in enumerate(parts)))
 
 
@@ -98,9 +138,107 @@ def _mathblock(lines):
     # lessons shipped that way before this guard.
     if isinstance(lines, str) or not all(isinstance(line, str) for line in lines):
         raise TypeError("a math block takes a list of lines, not %r" % (lines,))
-    spoken = ". ".join(speech.say_block(lines, _SPOKEN))
+    sayer = speech.say_code if _DIALECT.get() == speech.CODE_DIALECT else speech.say
+    spoken = ". ".join(speech.say_block(lines, _SPOKEN, sayer=sayer))
     return '<div class="mathblock" data-say="%s">%s</div>' % (
         esc(spoken), "\n".join(esc(line) for line in lines))
+
+
+# A code block's limits. 80 characters is the widest line that still scrolls
+# only a little inside the block on a phone; 30 lines is a listing a reader can
+# hold while reading the paragraph about it. A tab has no fixed width, so the
+# listing would not look as it was written. tests/test_site_invariants.py
+# (TestLessonDataMatchesTheRenderer) checks every Subject's data against these.
+CODE_MAX_LINES = 30
+CODE_MAX_WIDTH = 80
+# The references an author writing HTML reaches for. Not any `&name;`: Java's
+# `x = a&b;` is a bitwise and.
+_ENTITY = re.compile(r"&(?:lt|gt|amp|quot|apos|nbsp|ndash|mdash|middot|hellip|minus|times"
+                     r"|[lr][sd]quo|#\d+|#x[0-9A-Fa-f]+);")
+
+
+def code_lines(payload):
+    """The lines of a code block's payload: ["line", ...] or {"lines": [...], ...}.
+    The snippet test (docs/code-complete/PLAN.md section H.3) compares a lab
+    preset's code with "\\n".join(code_lines(payload))."""
+    return payload["lines"] if isinstance(payload, dict) else payload
+
+
+def code_marked(payload):
+    """The flagged line numbers (from 1) of a code block's payload."""
+    return frozenset(payload.get("marked", ())) if isinstance(payload, dict) else frozenset()
+
+
+def code_block_problems(payload):
+    """Why a ("code", payload) block cannot be drawn, or [] when it can.
+
+    The payload is a list of lines, or {"lines": [...], "marked": [n, ...]}
+    when some lines are flagged (drawn with a gutter mark and the hidden word
+    "flagged", and announced as flagged by the read-out)."""
+    if isinstance(payload, dict):
+        extra = sorted(set(payload) - {"lines", "marked"})
+        if extra or "lines" not in payload:
+            return ["a code block's dict takes \"lines\" and optionally \"marked\", not %r"
+                    % (sorted(payload),)]
+        marked = payload.get("marked", [])
+        lines = payload["lines"]
+        if isinstance(marked, (str, dict)) or not all(
+                isinstance(n, int) and not isinstance(n, bool) for n in marked):
+            return ["a code block's \"marked\" is a list of line numbers, not %r" % (marked,)]
+        if isinstance(lines, (list, tuple)):
+            outside = sorted(n for n in marked if not 1 <= n <= len(lines))
+            if outside:
+                return ["marked line(s) %s are not lines of this block (1-%d)"
+                        % (outside, len(lines))]
+    else:
+        lines = payload
+    if isinstance(lines, str) or not isinstance(lines, (list, tuple)) \
+            or not all(isinstance(line, str) for line in lines):
+        return ["a code block takes a list of lines, not %r" % (lines,)]
+    problems = []
+    if not lines:
+        problems.append("a code block has no lines")
+    if len(lines) > CODE_MAX_LINES:
+        problems.append("%d lines; a code block holds at most %d" % (len(lines), CODE_MAX_LINES))
+    for number, line in enumerate(lines, 1):
+        if len(line) > CODE_MAX_WIDTH:
+            problems.append("line %d is %d characters; at most %d" % (number, len(line), CODE_MAX_WIDTH))
+        if "\t" in line:
+            problems.append("line %d holds a tab; indent with spaces" % number)
+        if "\n" in line or "\r" in line:
+            problems.append("line %d holds a line break; give each line its own string" % number)
+        if _ENTITY.search(line):
+            problems.append("line %d holds %r; a code line is shown exactly as written, so write "
+                            "the character itself" % (number, _ENTITY.search(line).group()))
+    return problems
+
+
+def _codeblock(payload):
+    """("code", ["line", ...]) -> a numbered listing, spoken as program text.
+
+    Each line is escaped and wrapped in a span whose number the stylesheet
+    draws with a CSS counter (theme.CODE_CSS), so selecting and copying the
+    listing copies the code and no numbers. Read-out speaks the block line by
+    line in the code dialect on every Subject: a code block is program text
+    wherever it appears, each line announced by its number.
+
+    A flagged line (payload {"lines": [...], "marked": [n]}) gets a gutter
+    glyph and the hidden word "flagged" (theme.CODE_CSS): never colour alone.
+    Both are generated content, so a copy of the listing is the code alone.
+    (A visually hidden <span> would be text in the page that nobody sees,
+    which tests/browser_contrast.js rightly fails.)
+    """
+    problems = code_block_problems(payload)
+    if problems:
+        if isinstance(payload, str) or problems[0].startswith(("a code block takes", "a code block's")):
+            raise TypeError(problems[0])
+        raise ValueError("code block: " + "; ".join(problems))
+    lines, marked = code_lines(payload), code_marked(payload)
+    spoken = ". ".join(speech.say_code_block(lines, _SPOKEN, marked))
+    return '<pre class="codeblock" data-say="%s"><code>%s</code></pre>' % (
+        esc(spoken), "\n".join(
+            '<span class="cl flag">%s</span>' % esc(line) if number in marked else '<span class="cl">%s</span>' % esc(line)
+            for number, line in enumerate(lines, 1)))
 
 
 def _block(kind, payload):
@@ -115,6 +253,8 @@ def _block(kind, payload):
         return "<h3>%s</h3>" % esc_inline(payload)
     if kind == "math":
         return _mathblock(payload)
+    if kind == "code":
+        return _codeblock(payload)
     if kind == "ul":
         return "<ul>%s</ul>" % "".join("<li>%s</li>" % inline(item) for item in payload)
     if kind == "ol":
@@ -140,6 +280,7 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
         prev_lesson=prev_lesson, next_lesson=next_lesson)[0]
 
 
+@_dialect
 def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesson):
     """(markup, the Lab it was built from).
 
@@ -159,6 +300,9 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
             description=plain(lesson["summary"]),
             canonical_path=url,
             favicon=chrome.FAVICON_LESSON, page_kind="lesson",
+            # only a page that draws a listing carries its styles, so every
+            # other page is byte-for-byte what it was before code blocks existed
+            extra_css=theme.CODE_CSS if any(kind == "code" for kind, _ in lesson["body"]) else "",
         ),
         chrome.topbar(up="../../"),
         chrome.crumbs([
@@ -370,6 +514,7 @@ def _first_upper(text):
     return text[:1].upper() + text[1:]
 
 
+@_dialect
 def course_home(*, course, index, courses, path):
     """One course home: /<course-slug>/ ."""
     total_courses = len(courses)
@@ -497,6 +642,7 @@ def course_home(*, course, index, courses, path):
     return chrome.name_horizontal_scrollers("".join(parts))
 
 
+@_dialect
 def path_page(path):
     """Subject catalog at the stable /paths/<slug>/ URL."""
     courses = path["courses"]

@@ -200,7 +200,20 @@ function initialValues(markup) {
     const vm2 = /\bvalue="([^"]*)"/.exec(m[1]);
     if (idm) out.set(idm[1], vm2 ? vm2[1] : '');
   }
+  // A <textarea>'s value is its text content, decoded, less one leading
+  // newline (the HTML parser drops it). The code kits ship them empty and fill
+  // them by script; the value the sweep restores is read after that.
+  for (const [id, text] of textareasOf(markup)) out.set(id, text);
   return out;
+}
+
+/* Every <textarea> with an id: [id, its initial text]. */
+function textareasOf(markup) {
+  const body = markup.replace(/<script[\s\S]*?<\/script>/gi, ' ');
+  return [...body.matchAll(/<textarea\b([^>]*)>([\s\S]*?)<\/textarea>/gi)]
+    .map((m) => [/\bid="([^"]+)"/.exec(m[1]), m[2]])
+    .filter(([idm]) => idm)
+    .map(([idm, text]) => [idm[1], attrText(text.replace(/^\r?\n/, ''))]);
 }
 
 // Every value each control can take, which is what AGENTS.md §1a has always
@@ -218,6 +231,8 @@ function initialValues(markup) {
 // boxes get the inputs that have actually broken labs here -- empty, a word, a
 // bare operator -- because a parser that returns undefined on "banana" and a
 // panel that then formats it is the shape of the bug.
+const HOSTILE = ['', 'banana', '0', '-1', '1/0', 'A>B'];
+
 function controlValues(markup) {
   const out = [];
   let m;
@@ -242,9 +257,12 @@ function controlValues(markup) {
     } else if (type === 'checkbox' || type === 'radio') {
       out.push([idm[1], ['', 'on']]);
     } else {
-      out.push([idm[1], ['', 'banana', '0', '-1', '1/0', 'A>B']]);
+      out.push([idm[1], HOSTILE]);
     }
   }
+  // A <textarea> is a text box with more room, and the code kits parse what is
+  // typed into one: it gets the same inputs.
+  for (const [id] of textareasOf(markup)) out.push([id, HOSTILE]);
   return out;
 }
 
@@ -336,7 +354,7 @@ function presetSelects(file, markup) {
     const el = page.doc.getElementById(selectId);
     if (!el) continue;
     const others = [...page.doc.byId.values()].filter(
-      (e) => e !== el && (e.tagName === 'INPUT' || e.tagName === 'SELECT'));
+      (e) => e !== el && ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.tagName));
     const before = others.map((e) => e.value);
     for (const value of values) {
       if (value === el.value) continue;

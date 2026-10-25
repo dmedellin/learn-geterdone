@@ -4630,6 +4630,39 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
                     )
 
 
+    # The body block kinds render._block draws; anything else raises at build.
+    BODY_KINDS = {"p", "h3", "math", "code", "ul", "ol", "def", "thm", "example", "proof"}
+
+    def test_body_blocks_are_kinds_the_renderer_draws(self):
+        """Every generated Subject, so a newly wired one is covered without
+        an edit here. A `code` block must fit render.code_block_problems: at
+        most 30 lines of at most 80 characters, no tab, no character reference
+        (a code line is shown exactly as written)."""
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        from build_paths import GENERATED_PATHS
+        from mathpath import render
+        for path in GENERATED_PATHS:
+            for course in path["courses"]:
+                for lesson in course["lessons"]:
+                    for i, (kind, payload) in enumerate(lesson["body"]):
+                        where = "%s/%s body[%d]" % (course["slug"], lesson["slug"], i)
+                        with self.subTest(block=where):
+                            self.assertIn(kind, self.BODY_KINDS)
+                            if kind == "code":
+                                self.assertEqual([], render.code_block_problems(payload), where)
+
+    def test_the_code_block_limits_are_not_inert(self):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        from mathpath import render
+        self.assertEqual((30, 80), (render.CODE_MAX_LINES, render.CODE_MAX_WIDTH))
+        self.assertEqual([], render.code_block_problems(["int x = 0;"] * 30 + []))
+        self.assertEqual([], render.code_block_problems(["x" * 80, "", "if (a && b) {", "x = a&b;"]))
+        self.assertEqual([], render.code_block_problems({"lines": ["x;", "y;"], "marked": [2]}))
+        for bad in ("x = 1;", ["x;"] * 31, ["x" * 81], ["\tx;"], ["a &amp;&amp; b"], [], ["x", 1],
+                    {"lines": ["x;"], "marked": [2]}, {"lines": ["x;"], "flagged": [1]}):
+            with self.subTest(bad=str(bad)[:30]):
+                self.assertTrue(render.code_block_problems(bad))
+
 class TestCourseFieldsCarryNoHtml(unittest.TestCase):
     """The course home escapes some course fields too, and nothing checked them.
 
@@ -5901,3 +5934,69 @@ class TestNoEntityReachesTextContent(unittest.TestCase):
         self.assertGreater(seen, 200,
                            "found only %d textContent assignments to scan; the kits moved" % seen)
         self.assertEqual([], leaks, "these reach the reader as literal characters: %s" % leaks[:8])
+
+
+class TestLabcheckSweepsTextareas(unittest.TestCase):
+    """scripts/labcheck.js treats a <textarea> as the text box it is.
+
+    The Code Complete kit takes code in <textarea>s filled by script
+    (docs/code-complete/PLAN.md section D.0), and readkit already ships them.
+    Until labcheck learned them they were never swept with the hostile
+    strings, and a preset menu that rewrote only a textarea was not seen to be
+    a preset menu, so it escaped the expectations gate. Each fixture below
+    fails without the change it pins.
+    """
+
+    PAGE = (
+        '<!doctype html><html><body>'
+        '<select id="coPreset"><option value="a">a</option><option value="b">b</option></select>'
+        '<textarea id="coInCode" rows="12"></textarea>'
+        '<div class="kpi"><span>Lines</span><strong id="coLines">—</strong></div>'
+        '<script>(function () {'
+        ' var CODE = {a: "x = 1;", b: "x = 1;\\ny = 2;"};'
+        ' var box = document.getElementById("coInCode"), menu = document.getElementById("coPreset");'
+        ' function redraw() { %s'
+        '   document.getElementById("coLines").textContent = String(box.value.split("\\n").length); }'
+        ' menu.addEventListener("change", function () { box.value = CODE[menu.value]; redraw(); });'
+        ' box.addEventListener("input", redraw);'
+        ' box.value = CODE[menu.value]; window.redrawLab = redraw; redraw();'
+        '})();</script></body></html>'
+    )
+
+    def run_labcheck(self, guard, selects):
+        import shutil
+        import subprocess
+        import tempfile
+        if not shutil.which("node"):
+            raise unittest.SkipTest("node is not installed")
+        with tempfile.TemporaryDirectory() as tmp:
+            page = Path(tmp) / "site" / "fixture" / "index.html"
+            page.parent.mkdir(parents=True)
+            page.write_text(self.PAGE % guard, encoding="utf-8")
+            manifest = Path(tmp) / "scripts" / "expectations.json"
+            manifest.parent.mkdir()
+            manifest.write_text(json.dumps({"pages": {"site/fixture/index.html":
+                                                      {"kit": "fixture", "selects": selects}}}))
+            result = subprocess.run(["node", str(REPO_ROOT / "scripts" / "labcheck.js"),
+                                     "--expect", str(manifest)],
+                                    capture_output=True, text=True, timeout=120)
+        return result.returncode, result.stdout + result.stderr
+
+    PINNED = {"coPreset": {"a": {"coLines": "1"}, "b": {"coLines": "2"}}}
+
+    def test_a_well_behaved_textarea_passes(self):
+        code, out = self.run_labcheck("", self.PINNED)
+        self.assertEqual(0, code, out)
+
+    def test_a_textarea_is_swept_with_the_hostile_strings(self):
+        code, out = self.run_labcheck('if (box.value === "banana") throw new Error("unparsed");',
+                                      self.PINNED)
+        self.assertEqual(1, code, out)
+        self.assertIn('coInCode = "banana": unparsed', out)
+
+    def test_a_menu_that_rewrites_a_textarea_is_a_preset_menu(self):
+        # declared under another select's name only: coPreset must be found by
+        # what it does, and then it has no expectations
+        code, out = self.run_labcheck("", {"coPreset2": {}})
+        self.assertEqual(1, code, out)
+        self.assertIn("#coPreset rewrites other controls when it changes", out)

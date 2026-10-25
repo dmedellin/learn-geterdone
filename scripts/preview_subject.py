@@ -118,11 +118,20 @@ def main():
             if kit in KITS_WITH_EXPECTATIONS or lab.expect:
                 expectations["site/" + relative] = {"kit": kit, "selects": lab.expect}
             # read-out coverage for this lesson's math
+            code = speech.dialect_of(path) == speech.CODE_DIALECT
+            sayer = speech.say_code if code else speech.say
             for run, _, _ in _runs(lesson):
-                if speech.unspoken(overrides.get(run) or speech.say(run)):
+                if speech.unspoken(overrides.get(run) or sayer(run)):
                     fail("%s: math with no spoken form: %r" % (where, run))
-                elif run not in overrides and speech.ambiguous(run):
+                elif run not in overrides and not code and speech.ambiguous(run):
                     guessed.append((where, run))
+            for kind, payload in lesson["body"]:
+                if kind == "code":
+                    for problem in render.code_block_problems(payload):
+                        fail("%s: code block: %s" % (where, problem))
+                    for line in render.code_lines(payload) if not render.code_block_problems(payload) else []:
+                        if speech.unspoken(overrides.get(line) or speech.say_code(line)):
+                            fail("%s: code line with no spoken form: %r" % (where, line))
 
     for relative, markup in pages:
         target = out / "site" / relative
