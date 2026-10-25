@@ -91,6 +91,7 @@ RD_DRILL_JS = r"""
       var id = rdFirstUnlogged(S.pool);
       if (!id) { rdMsg(k, 'Every passage offered here is already in your log; reading one again would measure your memory of it.'); return; }
       st.passage = PASSAGES[id];
+      if (S.kinds && S.kinds[id]) st.kind = S.kinds[id];
     }
     var P = rdPassageOf(k);
     if (!P) { rdMsg(k, 'There is no passage to read.'); return; }
@@ -110,7 +111,7 @@ RD_DRILL_JS = r"""
     rdButtons(k, false, true, S.flow === 'sections' || S.flow === 'find');
     if (S.flow === 'find') { rdFindBegin(k); return; }
     if (S.flow === 'coverage') {
-      text.innerHTML = rdTokHtml(P.paragraphs, true); st.phase = 'mark';
+      text.innerHTML = rdTokHtml(P.paragraphs, true); st.phase = 'mark'; st.t0 = performance.now();
       rdE('rdDone', k).textContent = 'Count my marks';
       rdMsg(k, 'Click (or Tab to and press Enter on) every word you do not know; click again to unmark. Then press Count my marks.');
       return;
@@ -130,7 +131,10 @@ RD_DRILL_JS = r"""
                 mask: 'Keep up with the highlighted line; the lines above it disappear.',
                 gist: 'Skim: only headings and first sentences are shown, and they disappear after ' + S.limit + ' s.',
                 preview: 'Preview: headings, the first and the last paragraph, for ' + S.limit + ' s; then the whole passage. The clock runs through both.' };
-    rdMsg(k, again ? 'Read it again, then press Done.' : (S.flow === 'sections' ? 'Section 1 of 2. Press Next section when you reach its end. ' : '') + (say[d] || say.normal));
+    var m = say[d] || say.normal;
+    if (d === 'normal' && S.limit && S.flow !== 'inspect') m = 'The passage disappears after ' + S.limit + ' s; press Done if you finish first.';
+    if (S.say) m = S.say + ' Press Done when you finish.';
+    rdMsg(k, again ? 'Read it again, then press Done.' : (S.flow === 'sections' ? 'Section 1 of 2. Press Next section when you reach its end. ' : '') + m);
     if (d === 'pacer' || d === 'mask') rdPacer(k);
     if (d === 'gist' || (S.limit && S.flow === 'inspect')) rdLater(st, function () { rdFinish(k); }, S.limit * 1000);
     if (d === 'preview') rdLater(st, function () {
@@ -175,10 +179,12 @@ RD_DRILL_JS = r"""
   function rdTickAsk(k) {
     var S = SLOTS[k], w = rdE('rdWork', k), st = RD_ST[k];
     rdShow(w, true);
-    w.innerHTML = '<label class="small-copy"><input type="checkbox"> ' + rdEsc(S.tick.label) + '</label> '
-      + '<button class="btn small" type="button">Continue</button>';
+    /* A count tick (lapses) is a number box; any other is a checkbox. */
+    w.innerHTML = '<label class="small-copy">' + (S.tick.count ? rdEsc(S.tick.label) + ': <input type="number" min="0" step="1" value="0" style="width:5rem;">'
+      : '<input type="checkbox"> ' + rdEsc(S.tick.label)) + '</label> <button class="btn small" type="button">Continue</button>';
     w.getElementsByTagName('button')[0].addEventListener('click', function () {
-      st.tick = !!w.getElementsByTagName('input')[0].checked;
+      var box = w.getElementsByTagName('input')[0];
+      st.tick = S.tick.count ? Math.max(0, Math.floor(+box.value) || 0) : !!box.checked;
       rdAfterReading(k);
     });
   }
@@ -240,6 +246,7 @@ RD_DRILL_JS = r"""
                 gist: t.gist, gistTotal: t.gistTotal, detail: t.detail, detailTotal: t.detailTotal,
                 found: t.correct, targets: t.total, phrases: rdPhrases(P).length };
     if (st.display === 'gist') got.shown = rdWordsIn(rdGistParas(P));
+    if (S.tick && S.tick.count) got.lapses = st.tick;
     if (S.flow === 'sections') {
       got.words1 = rdWordsIn(P.paragraphs.slice(0, S.split)); got.words2 = rdWordsIn(P.paragraphs.slice(S.split));
       got.seconds1 = rdMsText(st.split); got.seconds2 = rdMsText(st.ms - st.split);
@@ -247,21 +254,23 @@ RD_DRILL_JS = r"""
     Object.keys(S.write || {}).forEach(function (g) { if (got[g] !== undefined) vals[S.write[g]] = got[g]; });
     if (Object.keys(vals).length) rdWrite(vals);
     var rate = rdRate(R(BigInt(words)), Rparse(sec));
-    var line = rdFig(R(BigInt(words))) + ' words in ' + rdUnit(Rparse(sec), 's') + ': ' + rdUnit(rate, 'wpm')
+    /* A skim is not a reading rate: its line gives the time and the gist score only. */
+    var line = (st.display === 'gist' ? 'Skimmed for ' + rdUnit(Rparse(sec), 's') : rdFig(R(BigInt(words))) + ' words in ' + rdUnit(Rparse(sec), 's') + ': ' + rdUnit(rate, 'wpm'))
       + (t.total ? ', ' + t.correct + ' of ' + t.total + ' right' : ', no questions') + '.'
-      + (S.tick && st.tick !== undefined ? ' (' + S.tick.label + ': ' + (st.tick ? 'yes' : 'no') + '.)' : '');
+      + (S.tick && st.tick !== undefined ? ' (' + S.tick.label + ': ' + (S.tick.count ? st.tick : st.tick ? 'yes' : 'no') + '.)' : '');
     rdE('rdOut', k).innerHTML = rdEsc(line) + rdReview(st.qs || [], answers);
     rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id || 'pasted', display: st.display, words: words, chars: got.chars,
                   ms: st.ms, correct: t.correct, total: t.total, kind: st.kind,
                   extra: { gist: t.gist, gistTotal: t.gistTotal, detail: t.detail, detailTotal: t.detailTotal,
                            target: st.target || null, split: st.split === undefined ? null : st.split, order: S.order || null,
                            kept: S.tick && S.tick.key === 'kept' ? !!st.tick : null,
-                           lapse: S.tick && S.tick.key === 'lapse' ? !!st.tick : null } }, rdE('rdMsg', k));
+                           lapse: S.tick && S.tick.key === 'lapse' ? !!st.tick : null,
+                           lapses: S.tick && S.tick.count ? st.tick : null } }, rdE('rdMsg', k));
     var w = rdE('rdWork', k); w.innerHTML = ''; rdShow(w, false);
     st.phase = 'idle';
     var s = rdE('rdStart', k); s.textContent = 'Start again'; rdShow(s, true);
     rdMsg(k, 'Scored and logged. Reading the same passage again measures your memory of it, not your reading.');
-    if (S.flow === 'practice' && typeof rdPracticeAfter === 'function') rdPracticeAfter(k);
+    if (typeof rdAfterScore === 'function') rdAfterScore(k);
   }
   function rdDrillInit() {
     Object.keys(SLOTS).forEach(function (k) {
@@ -272,40 +281,8 @@ RD_DRILL_JS = r"""
       rdE('rdReset', k).addEventListener('click', function () { rdResetSlot(k, false); rdMsg(k, 'Reset: nothing was logged. ' + S.intro); });
       var nx = rdE('rdNext', k);
       if (nx) nx.addEventListener('click', function () { rdNextSection(k); });
-      /* Cannot read aloud here: the side takes the published figure instead
-         of a reading (words = the figure, seconds = 60), labelled, not logged. */
-      var alt = rdE('rdAlt', k);
-      if (alt) alt.addEventListener('click', function () {
-        var vals = {}, W = S.write || {};
-        rdResetSlot(k, false);
-        if (W.words) vals[W.words] = S.published;
-        if (W.seconds) vals[W.seconds] = 60;
-        if (W.correct) vals[W.correct] = 0;
-        if (W.total) vals[W.total] = 0;
-        rdWrite(vals);
-        rdShow(alt, false); rdShow(rdE('rdStart', k), false);
-        rdE('rdOut', k).textContent = 'This side now holds the published figure for reading aloud, ' + S.published
-          + ' wpm (Brysbaert 2019), as ' + S.published + ' words in 60 s. It is not your reading, and nothing was logged.';
-        rdMsg(k, 'Using the published figure. Reset brings the drill back.');
-      });
-      rdE('rdReset', k).addEventListener('click', function () { if (alt) rdShow(alt, true); });
-      if (S.flow === 'find' || S.flow === 'coverage') {
-        var text = rdE('rdText', k);
-        text.addEventListener('click', function (e) {
-          var t = e.target;
-          if (t && t.classList && t.classList.contains('rdw')) rdTokenHit(k, t);
-        });
-        text.addEventListener('keydown', function (e) {
-          var t = e.target;
-          if (!t || !t.classList || !t.classList.contains('rdw')) return;
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); rdTokenHit(k, t); return; }
-          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-            var all = text.querySelectorAll('.rdw[tabindex]'), i = Array.prototype.indexOf.call(all, t);
-            var j = i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1);
-            if (j >= 0 && j < all.length) { e.preventDefault(); all[j].focus(); }
-          }
-        });
-      }
+      if (rdE('rdAlt', k) && typeof rdAloudInit === 'function') rdAloudInit(k);
+      if ((S.flow === 'find' || S.flow === 'coverage') && typeof rdFindInit === 'function') rdFindInit(k);
     });
   }
 """
@@ -365,6 +342,29 @@ RD_TIMED_JS = r"""
   }
 """
 
+# The aloud fallback: shipped only where a slot reads aloud.
+RD_ALOUD_JS = r"""
+  /* Cannot read aloud here: the side takes the published figure instead of a
+     reading (words = the figure, seconds = 60), labelled, not logged. */
+  function rdAloudInit(k) {
+    var S = SLOTS[k], alt = rdE('rdAlt', k);
+    alt.addEventListener('click', function () {
+      var vals = {}, W = S.write || {};
+      rdResetSlot(k, false);
+      if (W.words) vals[W.words] = S.published;
+      if (W.seconds) vals[W.seconds] = 60;
+      if (W.correct) vals[W.correct] = 0;
+      if (W.total) vals[W.total] = 0;
+      rdWrite(vals);
+      rdShow(alt, false); rdShow(rdE('rdStart', k), false);
+      rdE('rdOut', k).textContent = 'This side now holds the published figure for reading aloud, ' + S.published
+        + ' wpm (Brysbaert 2019), as ' + S.published + ' words in 60 s. It is not your reading, and nothing was logged.';
+      rdMsg(k, 'Using the published figure. Reset brings the drill back.');
+    });
+    rdE('rdReset', k).addEventListener('click', function () { rdShow(alt, true); });
+  }
+"""
+
 # Reread and free recall (the recall mode): shipped only where a slot uses them.
 RD_RECALL_JS = r"""
   /* ---- reread (delayed recall, side A): two readings, no questions ---- */
@@ -372,7 +372,7 @@ RD_RECALL_JS = r"""
     var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k);
     var due = new Date(Date.now() + S.days * 86400000).toISOString();
     rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id, display: 'normal', words: rdPassageWords(P) * 2,
-                  ms: st.ms, correct: 0, total: 0, kind: st.kind, due: due,
+                  ms: st.ms, correct: 0, total: 0, kind: st.kind, due: due, title: P.title,
                   url: String((window.location && window.location.pathname) || '') }, rdE('rdMsg', k));
     rdE('rdOut', k).textContent = 'Read twice in ' + rdUnit(Rparse(rdMsText(st.ms)), 's') + '. The test on this passage is due on '
       + due.slice(0, 10) + '; this page will offer it then.';
@@ -402,26 +402,59 @@ RD_RECALL_JS = r"""
     w.getElementsByTagName('button')[0].addEventListener('click', function () {
       var boxes = w.getElementsByTagName('input'), n = 0;
       for (var i = 0; i < boxes.length; i++) if (boxes[i].checked) n += 1;
-      var words = rdPassageWords(P), sec = rdMsText(st.ms), sw = rdWordCount(st.written || ''), vals = {};
-      var got = { units: P.ideas.length, recalled: n, words: words, seconds: sec, summaryWords: sw };
-      Object.keys(S.write || {}).forEach(function (g) { if (got[g] !== undefined) vals[S.write[g]] = got[g]; });
-      rdWrite(vals);
-      rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id, display: 'normal', words: words, ms: st.ms,
-                    correct: 0, total: 0, kind: st.kind, extra: { units: P.ideas.length, recalled: n, summaryWords: sw },
-                    due: S.days ? new Date(Date.now() + S.days * 86400000).toISOString() : undefined,
-                    url: String((window.location && window.location.pathname) || '') }, rdE('rdMsg', k));
-      rdE('rdOut', k).textContent = n + ' of ' + P.ideas.length + ' idea units ticked; ' + sw + ' words written.'
-        + (S.days ? ' The test on this passage is due in ' + S.days + ' days; this page will offer it then.' : '');
-      w.innerHTML = ''; rdShow(w, false);
-      st.phase = 'idle';
-      var s = rdE('rdStart', k); s.textContent = 'Start again'; rdShow(s, true);
-      rdMsg(k, 'Scored and logged.');
+      /* With questions on, the passage's questions follow the ticks. */
+      if (S.questions && P.questions && P.questions.length) {
+        rdMsg(k, 'Now the passage\'s questions, one at a time; there is no going back.');
+        rdAsk(w, P.questions, function (answers) { rdRecallScore(k, n, rdTally(P.questions, answers), rdReview(P.questions, answers)); });
+        return;
+      }
+      rdRecallScore(k, n, null, '');
     });
+  }
+  function rdRecallScore(k, n, q, review) {
+    var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k), w = rdE('rdWork', k);
+    var words = rdPassageWords(P), sec = rdMsText(st.ms), sw = rdWordCount(st.written || ''), vals = {};
+    var got = { units: P.ideas.length, recalled: n, words: words, seconds: sec, summaryWords: sw,
+                correct: q ? q.correct : 0, total: q ? q.total : 0 };
+    Object.keys(S.write || {}).forEach(function (g) { if (got[g] !== undefined) vals[S.write[g]] = got[g]; });
+    rdWrite(vals);
+    rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id, display: 'normal', words: words, ms: st.ms,
+                  correct: got.correct, total: got.total, kind: st.kind,
+                  extra: { units: P.ideas.length, recalled: n, summaryWords: sw, summary: S.summary },
+                  due: S.days ? new Date(Date.now() + S.days * 86400000).toISOString() : undefined, title: S.days ? P.title : undefined,
+                  url: String((window.location && window.location.pathname) || '') }, rdE('rdMsg', k));
+    rdE('rdOut', k).innerHTML = rdEsc(n + ' of ' + P.ideas.length + ' idea units ticked; ' + sw + ' words written'
+      + (q ? '; ' + q.correct + ' of ' + q.total + ' questions right.' : '.')
+      + (S.days ? ' The test on this passage is due in ' + S.days + ' days; this page will offer it then.' : '')) + review;
+    w.innerHTML = ''; rdShow(w, false);
+    st.phase = 'idle';
+    var s = rdE('rdStart', k); s.textContent = 'Start again'; rdShow(s, true);
+    rdMsg(k, 'Scored and logged.');
   }
 """
 
 # Find and coverage (click the words): shipped only where a slot uses them.
 RD_FIND_JS = r"""
+  /* Click and key handlers on the passage's words (find and coverage). */
+  function rdFindInit(k) {
+    var text = rdE('rdText', k);
+    text.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.classList && t.classList.contains('rdw')) rdTokenHit(k, t);
+    });
+    text.addEventListener('keydown', function (e) {
+      var t = e.target;
+      if (!t || !t.classList || !t.classList.contains('rdw')) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); rdTokenHit(k, t); return; }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        var all = text.querySelectorAll('.rdw[tabindex]'), i = Array.prototype.indexOf.call(all, t);
+        var j = i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1);
+        if (j >= 0 && j < all.length) { e.preventDefault(); all[j].focus(); }
+      }
+    });
+  }
+  /* A slot's targets: one list, or one list per passage of its pool. */
+  function rdTargetsOf(k) { var T = SLOTS[k].targets; return Array.isArray(T) ? T : T[rdPassageOf(k).id]; }
   /* ---- find: click the word that answers each prompt ---- */
   function rdFindBegin(k) {
     var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k);
@@ -435,14 +468,15 @@ RD_FIND_JS = r"""
   }
   function rdFindPrompt(k) {
     var S = SLOTS[k], st = RD_ST[k];
-    rdMsg(k, 'Target ' + (st.ti + 1) + ' of ' + S.targets.length + ': ' + S.targets[st.ti].q + ' Click the word that answers it.');
+    var T = rdTargetsOf(k);
+    rdMsg(k, 'Target ' + (st.ti + 1) + ' of ' + T.length + ': ' + T[st.ti].q + ' Click the word that answers it.');
   }
   function rdFindStep(k, hit) {
     var S = SLOTS[k], st = RD_ST[k];
     if (st.phase !== 'find') return;
     if (hit) st.found += 1;
     st.ti += 1;
-    if (st.ti >= S.targets.length) { rdFindEnd(k); return; }
+    if (st.ti >= rdTargetsOf(k).length) { rdFindEnd(k); return; }
     rdFindPrompt(k);
   }
   function rdFindEnd(k) {
@@ -452,13 +486,13 @@ RD_FIND_JS = r"""
     st.ms = Math.max(1, Math.round(performance.now() - st.t0));
     st.phase = 'idle';
     rdHideText(k); rdButtons(k, true, false, false);
-    var words = rdPassageWords(P), vals = {}, got = { found: st.found, wrong: st.wrong, seconds: rdMsText(st.ms), words: words,
-      targets: S.targets.length };
+    var words = rdPassageWords(P), n = rdTargetsOf(k).length, vals = {}, got = { found: st.found, wrong: st.wrong, seconds: rdMsText(st.ms), words: words,
+      targets: n };
     Object.keys(S.write || {}).forEach(function (g) { if (got[g] !== undefined) vals[S.write[g]] = got[g]; });
     rdWrite(vals);
     rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id, display: 'normal', words: words, ms: st.ms,
-                  correct: st.found, total: S.targets.length, kind: st.kind, extra: { wrong: st.wrong } }, rdE('rdMsg', k));
-    rdE('rdOut', k).textContent = st.found + ' of ' + S.targets.length + ' found, ' + st.wrong + ' wrong clicks, in '
+                  correct: st.found, total: n, kind: st.kind, extra: { wrong: st.wrong } }, rdE('rdMsg', k));
+    rdE('rdOut', k).textContent = st.found + ' of ' + n + ' found, ' + st.wrong + ' wrong clicks, in '
       + rdUnit(Rparse(rdMsText(st.ms)), 's') + '.';
     rdE('rdStart', k).textContent = 'Start again';
     rdMsg(k, 'Logged.');
@@ -466,7 +500,7 @@ RD_FIND_JS = r"""
   function rdTokenHit(k, span) {
     var S = SLOTS[k], st = RD_ST[k], i = +span.getAttribute('data-i');
     if (st.phase === 'find') {
-      var at = S.targets[st.ti].at;
+      var at = rdTargetsOf(k)[st.ti].at;
       if (i >= at[0] && i <= at[1]) { span.style.outline = '2px solid var(--green, green)'; rdFindStep(k, true); }
       else { st.wrong += 1; span.style.outline = '2px dashed var(--red, #b00)'; }
     } else if (st.phase === 'mark' && span.getAttribute('data-w')) {
@@ -480,16 +514,30 @@ RD_FIND_JS = r"""
   function rdCoverageScore(k) {
     var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k), spans = rdE('rdText', k).getElementsByClassName('rdw'), n = 0;
     for (var i = 0; i < spans.length; i++) if (spans[i].getAttribute('data-u') === '1') n += 1;
-    var vals = {}, got = { tokens: rdPassageWords(P), unknown: n };
+    st.ms = Math.max(1, Math.round(performance.now() - st.t0));
+    st.phase = 'idle';
+    rdHideText(k); rdButtons(k, false, false, false);
+    /* With questions on, the passage's questions follow, the passage hidden. */
+    if (S.questions && P.questions && P.questions.length) {
+      rdMsg(k, 'The passage is hidden. Answer each question; there is no going back.');
+      rdAsk(rdE('rdWork', k), P.questions, function (a) { rdCoverageEnd(k, n, rdTally(P.questions, a), rdReview(P.questions, a)); });
+      return;
+    }
+    rdCoverageEnd(k, n, null, '');
+  }
+  function rdCoverageEnd(k, n, q, review) {
+    var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k), vals = {}, sec = rdMsText(st.ms);
+    var got = { tokens: rdPassageWords(P), unknown: n, seconds: sec, correct: q ? q.correct : 0, total: q ? q.total : 0 };
     Object.keys(S.write || {}).forEach(function (g) { if (got[g] !== undefined) vals[S.write[g]] = got[g]; });
     rdWrite(vals);
-    rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id, display: 'normal', words: got.tokens, ms: 0,
-                  correct: 0, total: 0, kind: st.kind, extra: { unknown: n } }, rdE('rdMsg', k));
-    st.phase = 'idle';
-    rdHideText(k); rdButtons(k, true, false, false);
-    rdE('rdOut', k).textContent = n + ' unknown words marked out of ' + got.tokens + '.';
+    rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id, display: 'normal', words: got.tokens, ms: S.timed ? st.ms : 0,
+                  correct: got.correct, total: got.total, kind: st.kind, extra: { unknown: n } }, rdE('rdMsg', k));
+    var w = rdE('rdWork', k); w.innerHTML = ''; rdShow(w, false);
+    rdButtons(k, true, false, false);
+    rdE('rdOut', k).innerHTML = rdEsc(n + ' unknown words marked out of ' + got.tokens + (S.timed ? ', in ' + rdUnit(Rparse(sec), 's') : '')
+      + (q ? '; ' + q.correct + ' of ' + q.total + ' questions right.' : '.')) + review;
     rdMsg(k, 'Counted and logged.');
   }
 """
 
-__all__ = ["RD_DRILL_JS", "RD_TIMED_JS", "RD_RECALL_JS", "RD_FIND_JS"]
+__all__ = ["RD_DRILL_JS", "RD_TIMED_JS", "RD_RECALL_JS", "RD_FIND_JS", "RD_ALOUD_JS"]

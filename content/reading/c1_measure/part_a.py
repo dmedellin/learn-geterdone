@@ -329,16 +329,16 @@ LESSONS = [
             "view": "compare",
             "passages": [PASSAGES["P02"], PASSAGES["P03"]],
             "a": {"label": "Your natural pace", "kind": "baseline"},
-            "b": {"label": "As fast as you can", "kind": "condition"},
+            "b": {"label": "As fast as you can", "kind": "condition",
+                  "intro": "Read this one as fast as you can make yourself go, then answer its "
+                           "questions as well as you can."},
             "ratioOf": "err",
             "order": "alternate",
             "panel_intro": (
                 "Your measurement. Reading A is at your natural pace. Reading B is the other "
-                "condition: read it as fast as you can make yourself go, whatever its box says "
-                "about pace, and then answer its questions as well as you can. Press Start, "
+                "condition: as fast as you can make yourself go, as its box says. Press Start, "
                 "read, press Done, answer, press Score, and the boxes fill with what you did; "
-                "before that they hold a worked example. One question is ≈ 16.7 points; a "
-                "one-question difference is not a result."
+                "before that they hold a worked example."
             ),
             "preset": "pushed-too-far",
             "presets": [
@@ -505,15 +505,14 @@ LESSONS = [
         "body": [
             ("p", "Start with the two warm-up readings above the lab: “The Seed Tin”, then "
                   "“Lights on the Coast”, each at your natural pace with its six questions, "
-                  "a minute or two apart. Both are logged as baselines. Then press “Use my "
-                  "baselines”."),
-            ("p", "The button fills the first box with the rates of your first three "
-                  "baselines: “The Church Clock at Wexley”, your natural-pace reading in "
-                  "Comprehension and the Effective Rate, and “The Seed Tin”. Your fourth, "
-                  "“Lights on the Coast”, is the experiment. Nothing changed between it and "
-                  "the others, so type its rate, which the warm-up printed when you scored "
-                  "it, into the test box, and see what the lab makes of a reading with no "
-                  "reason to differ."),
+                  "a minute or two apart. The first is logged as a baseline and the second "
+                  "as a test. Then press “Use my baselines”."),
+            ("p", "The button fills the first box with the rates of your three baselines: "
+                  "“The Church Clock at Wexley”, your natural-pace reading in Comprehension "
+                  "and the Effective Rate, and “The Seed Tin”. It puts your fourth reading, "
+                  "“Lights on the Coast”, in the test box, and that one is the experiment. "
+                  "Nothing changed between it and the others, so see what the lab makes of "
+                  "a reading with no reason to differ."),
             ("def", ("Baseline range",
                      "Your <strong>baseline range</strong> runs from the lowest to the "
                      "highest of your first three natural-pace rates, in words a minute. A "
@@ -561,7 +560,7 @@ LESSONS = [
             "mode": "log",
             "view": "noise",
             "warmup": [PASSAGES["P04"], PASSAGES["P05"]],
-            "warmup_kind": "baseline",
+            "warmup_kind": ["baseline", "test"],
             "preset": "tight",
             "presets": [
                 {"id": "tight", "label": "Baselines 238, 251, 245; test 247",
@@ -680,8 +679,8 @@ LESSONS = [
             "The rule is a rule of thumb, not a guarantee: with nothing changed, the median of "
             "three tests still clears a range of three baselines about one time in five, "
             "because that happens whenever the two fastest of six readings are both tests. "
-            "That is why the verdict is read again each week, never once. This lab uses your "
-            "first three baselines for the range, and compares rates in words."
+            "That is why the verdict is read again each week, never once. This lab uses all "
+            "your baselines for the range, and compares rates in words."
         ),
     },
     # ---------------------------------------------------------------- 04
@@ -731,8 +730,8 @@ LESSONS = [
         "body": [
             ("p", "Begin with the warm-up above the lab, “The Night Train”, at your natural "
                   "pace. It is logged as practice and does not change your baselines. Then "
-                  "press “Use my baseline median”: the lab takes the median of your first "
-                  "three baselines, in words a minute and, from the characters you read, in "
+                  "press “Use my baseline median”: the lab takes the median of your three "
+                  "baselines, in words a minute and, from the characters you read, in "
                   "standard-length words."),
             ("p", "Carver (1990) described reading as five processes, each with its own "
                   "typical rate for college students, measured in standard-length words a "
@@ -791,13 +790,13 @@ LESSONS = [
             "presets": [
                 {"id": "average", "label": "238 words a minute, long words",
                  "wpm": 238, "stdwpm": "261.8",
-                 "expect": {"lgNearest": "rauding, 300 wpm", "lgVsAverage": "1 = 100%"}},
+                 "expect": {"lgNearest": "rauding, 300 standard wpm", "lgVsAverage": "1 = 100%"}},
                 {"id": "short-words", "label": "238 words a minute, short words",
                  "wpm": 238, "stdwpm": "214.2",
-                 "expect": {"lgNearest": "learning, 200 wpm", "lgVsAverage": "1 = 100%"}},
+                 "expect": {"lgNearest": "learning, 200 standard wpm", "lgVsAverage": "1 = 100%"}},
                 {"id": "slower", "label": "190 words a minute",
                  "wpm": 190, "stdwpm": 209,
-                 "expect": {"lgNearest": "learning, 200 wpm",
+                 "expect": {"lgNearest": "learning, 200 standard wpm",
                             "lgVsAverage": "95/119 ≈ 79.8%"}},
                 {"id": "claim", "label": "A claimed 1,000 words a minute",
                  "wpm": 1000, "stdwpm": 1100,
@@ -915,7 +914,7 @@ LESSONS = [
         "key": [
             "counted: baseline and test readings",
             "effective rate = rate × right / asked",
-            "first three sessions: the baseline",
+            "baseline sessions: the range",
             "verdict: median of last three tests",
         ],
         "key_label": "A log in four lines",
@@ -932,7 +931,7 @@ LESSONS = [
              "Each counted session is scored as rate × comprehension, so a reading that got "
              "faster by understanding less does not look like progress."),
             ("The verdict uses the rule",
-             "The first three sessions set the baseline range; the median of the last three "
+             "The baseline sessions set the baseline range; the median of the last three "
              "tests is compared with it, and a single test only says “once”."),
         ],
         "read_title": "What the log keeps, and what it counts",
@@ -947,7 +946,7 @@ LESSONS = [
             ("p", "Each entry carries one of five kinds, set by the drill that wrote it:"),
             ("ul", [
                 "<strong>baseline</strong>: a natural-pace reading of a fresh passage, with "
-                "questions, before any technique. This course took four.",
+                "questions, before any technique. This course took three.",
                 "<strong>test</strong>: a reading made like a baseline, later, to see whether "
                 "anything has changed.",
                 "<strong>practice</strong>: a reading done to train, with a pacer or on the "
@@ -956,11 +955,11 @@ LESSONS = [
                 "as-fast-as-you-can reading.",
                 "<strong>other</strong>: notes, plans and drills that are not readings.",
             ]),
-            ("p", "The lab scores each counted session by its effective rate and treats the "
-                  "first three as the baseline. After this course your log should hold four "
-                  "sessions: three baselines and “Lights on the Coast”, which the verdict "
-                  "treats as your first test, as One Reading Is One Measurement did with its "
-                  "rate."),
+            ("p", "The lab scores each counted session by its effective rate, puts your "
+                  "baselines first and treats them as the baseline. After this course your "
+                  "log should hold four sessions: three baselines and “Lights on the Coast”, "
+                  "your first test, which One Reading Is One Measurement set against the "
+                  "range by its rate."),
             ("p", "The starting preset is a log with three baselines, at effective rates of "
                   "238, 251 and 245: a baseline median of 245 and the verdict “needs a "
                   "reading after the three baselines”. Three readings make a range; they "
@@ -1102,9 +1101,9 @@ LESSONS = [
         ),
         "note": (
             "The log is kept in this browser and nowhere else: another device or a cleared "
-            "browser starts empty, and only the export keeps a copy. The lab treats the "
-            "first three counted sessions as the baseline, so a fourth natural-pace reading "
-            "is read as the first test."
+            "browser starts empty, and only the export keeps a copy. The lab treats every "
+            "reading logged as a baseline as the baseline and every test as a test; a "
+            "verdict waits for three baselines."
         ),
     },
 ]

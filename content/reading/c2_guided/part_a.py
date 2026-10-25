@@ -65,10 +65,10 @@ LESSONS = [
         "body": [
             ("p", "Before you read on, do the drill below: two timed readings, one at "
                   "your usual pace and one with the pacer, each followed by six "
-                  "questions. Before you start the paced reading, type into its "
-                  "target box the middle of your baseline rates from Measure Your "
-                  "Reading (240 if you have none), and read the two in the order the "
-                  "lab gives."),
+                  "questions. Before you start the paced reading, press “Use my "
+                  "baseline median”, which puts the middle of your baseline rates "
+                  "from Measure Your Reading into its target box (type 240 if you have "
+                  "none), and read the two in the order the lab gives."),
             ("p", "Now look at your two readings side by side. The paced rate probably "
                   "came out close to the target, because the highlight set it: if you "
                   "kept to the lit line, the reading ended when the highlight left the "
@@ -160,8 +160,9 @@ LESSONS = [
             ],
             "panel_title": "Your two readings, in numbers",
             "panel_intro": (
-                "Your measurement: before you start Reading B, type the middle of "
-                "your baseline rates into its target box (240 if you have none). "
+                "Your measurement: before you start Reading B, press Use my baseline "
+                "median to put the middle of your baseline rates into its target box "
+                "(type 240 if you have none). "
                 "Press Start, read, press Done, answer the questions and press Score "
                 "for each reading, in the order shown; the boxes fill with what you "
                 "did. Until then they hold a worked example. " + ONE_Q
@@ -326,8 +327,9 @@ LESSONS = [
         "body": [
             ("p", "The drill below is a ladder: three passages, each read with the "
                   "pacer, each at a faster target than the last. Before you start, "
-                  "type your own rungs into the three target boxes: your baseline "
-                  "rate, that rate × 6/5, and that rate × 3/2. From a baseline of "
+                  "put your own rungs into the three target boxes: your baseline "
+                  "rate, that rate × 6/5, and that rate × 3/2. “Use my baseline "
+                  "median” fills all three from your log, or type them. From a baseline of "
                   "240 they are 240, 288 and 360; from 200, they are 200, 240 and "
                   "300. Keep your eyes on the lit line and let each reading end when "
                   "the highlight does."),
@@ -411,8 +413,9 @@ LESSONS = [
             ],
             "panel_title": "Your ladder, in numbers",
             "panel_intro": (
-                "Your measurement: type your three targets into the target boxes "
-                "first (your baseline rate, × 6/5 and × 3/2), then run the three "
+                "Your measurement: fill the three target boxes first (your baseline "
+                "rate, × 6/5 and × 3/2; Use my baseline median does it from your "
+                "log), then run the three "
                 "readings in order. Each one fills its own boxes when you press "
                 "Score; until then they hold a worked example. Comprehension holds "
                 "at 2/3, four questions in six. " + ONE_Q
@@ -668,7 +671,8 @@ LESSONS = [
             ],
             "panel_title": "Today's session, in numbers",
             "panel_intro": (
-                "Your measurement: type your hold target into the target box, tick "
+                "Your measurement: type your hold target into the target box, or "
+                "press Use my next target once your log has pacer readings, tick "
                 "the pacer box (or the test box, when a test is due) and press "
                 "Start. When you press Score, the boxes fill with what you did and "
                 "the pacer log and sessions since your last test are read from your "
@@ -685,8 +689,8 @@ LESSONS = [
              "The next pacer target and the next test come from your log. If a test "
              "is due, tick the test box and leave the pacer off."),
             ("Type the target and start",
-             "Type the next target into the target box, tick the pacer box, and "
-             "press Start. Keep your eyes on the lit line until it ends."),
+             "Press “Use my next target” (or type it into the target box), tick the "
+             "pacer box, and press Start. Keep your eyes on the lit line until it ends."),
             ("Tick the attention box honestly, then answer",
              "If your attention left the text, say so. It goes into your log, and "
              "it means tomorrow's session should be shorter, not the pacer slower."),
@@ -824,9 +828,10 @@ LESSONS = [
             "treatment, then the test."
         ),
         "body": [
-            ("p", "The drill below runs in a fixed order. First the sprint: type "
+            ("p", "The drill below runs in a fixed order. First the sprint: put "
                   "twice your baseline rate into the target box (480 from a baseline "
-                  "of 240), press Start, and keep up with the highlight for the whole "
+                  "of 240; “Use my baseline median” does it from your log), press "
+                  "Start, and keep up with the highlight for the whole "
                   "passage, about a minute, taking in what you can. There are no "
                   "questions. Then, straight after, the test: a new passage at your "
                   "natural pace, with six questions."),
@@ -836,10 +841,11 @@ LESSONS = [
                   "felt it, the drill takes the feeling seriously enough to measure "
                   "it. The feeling is one thing; the rate and the "
                   "score of the test after it are another."),
-            ("p", "Before you read the verdict, press &ldquo;Use my baseline "
-                  "range&rdquo; under the drill, so that the lab compares your test "
-                  "with the range of your own baseline rates rather than the worked "
-                  "example's. The verdict reads your test's rate, not its effective "
+            ("p", "When you score the test, the lab puts the range of your own "
+                  "baseline rates into the range boxes in place of the worked "
+                  "example's (&ldquo;Use my baseline range&rdquo; under the drill "
+                  "does the same at any time), and the verdict compares your test "
+                  "with it. The verdict reads your test's rate, not its effective "
                   "rate, because the range is made of rates."),
             ("p", "The preset <strong>after-sprint</strong> is a reader with a "
                   "baseline range of 238 to 251. After the sprint, their test reads "
@@ -877,10 +883,10 @@ LESSONS = [
             "view": "compare",
             "passages": [PASSAGES["P17"], PASSAGES["P18"]],
             "a": {"label": "The sprint", "display": "pacer", "target": 480, "questions": False,
-                  "kind": "condition"},
+                  "kind": "condition", "fromBase": 2},
             "b": {"label": "The test after it", "kind": "test"},
             "lineWords": 12,
-            "ratioOf": "wpm",
+            "ratio": False,
             "order": "AB",
             "preset": "after-sprint",
             "presets": [
@@ -897,12 +903,12 @@ LESSONS = [
             ],
             "panel_title": "The sprint and the test, in numbers",
             "panel_intro": (
-                "Your measurement: type twice your baseline rate into the sprint's "
-                "target box, run the sprint, then the test, and press Use my "
-                "baseline range before you read the verdict. The sprint has no "
-                "questions, so only the test has an effective rate; the verdict "
-                "compares the test's rate with your baseline range. The B / A tile "
-                "compares the test with the sprint's pace and means nothing here. " + ONE_Q
+                "Your measurement: put twice your baseline rate into the sprint's "
+                "target box (Use my baseline median does it), run the sprint, then "
+                "the test; scoring the test puts your own baseline range in the range "
+                "boxes. The sprint has no questions, so only the test has an "
+                "effective rate; the verdict compares the test's rate with your "
+                "baseline range. " + ONE_Q
             ),
         }),
         "steps_title": "Trying a sprint on another day",
@@ -1088,9 +1094,10 @@ LESSONS = [
                   "speed. If your new passage gained nothing, you have not refuted "
                   "Therrien, whose readers were children, and the meta-analysis has "
                   "not refuted you."),
-            ("p", "One limit of the lab: every reading in this drill is logged as a "
-                  "condition, so even the new passage does not enter the verdicts. "
-                  "The Daily Drill's tests are the readings that do."),
+            ("p", "The three readings of the repeated passage are logged as a "
+                  "condition and stay out of the verdicts. The new passage, read at "
+                  "your natural pace with its questions, is logged as a test, like "
+                  "the Daily Drill's tests, and counts in your log."),
             ("p", "Then today's Daily Drill. The next course, How the Eyes Read, "
                   "computes the limits every technique here is read against: what a "
                   "stop of the eyes costs, and how far one glance can reach."),
@@ -1100,7 +1107,7 @@ LESSONS = [
             "view": "repeat",
             "passages": [PASSAGES["P23"], PASSAGES["P24"]],
             "questions": [False, False, True, True],
-            "kind": "condition",
+            "kind": ["condition", "condition", "condition", "test"],
             "preset": "practice-effect",
             "presets": [
                 {"id": "practice-effect", "label": "practice-effect: new passage at 248",

@@ -81,11 +81,11 @@ LESSONS = [
                 "typical:  240 × 7/12 = 140",
                 "strong:   240 × 10/12 = 200",
             ]),
-            ("p", "The drill asks no multiple-choice questions on this passage. Set your "
-                  "share beside the comprehension your timed drills have printed since "
-                  "Comprehension and the Effective Rate, and expect the recall share to "
-                  "be the lower of the two. That gap is not a contradiction. The two "
-                  "tests ask different things of memory:"),
+            ("p", "After your ticks the drill asks the passage's six multiple-choice "
+                  "questions, and the lab prints your score beside the recall share. "
+                  "Expect the recall share to be the lower of the two: the typical preset "
+                  "pairs 7 of 12 units with 5 of 6 questions. That gap is not a "
+                  "contradiction. The two tests ask different things of memory:"),
             ("ul", [
                 "a multiple-choice question puts the right answer on the screen, and it "
                 "only has to look familiar;",
@@ -114,20 +114,23 @@ LESSONS = [
             "view": "free",
             "passage": PASSAGES["P43"],
             "kind": "test",
+            "questions": True,
             "preset": "typical",
             "presets": [
                 {"id": "typical", "label": "Typical: 7 of 12 units",
-                 "recalled": 7, "seconds": "95.75", "summaryWords": 84,
-                 "expect": {"reRecall": "7/12 ≈ 58.3%", "reRate": "140 wpm"}},
+                 "recalled": 7, "seconds": "95.75", "summaryWords": 84, "correct": 5,
+                 "expect": {"reRecall": "7/12 ≈ 58.3%", "reRate": "140 wpm",
+                            "reComp": "5/6 ≈ 83.3%"}},
                 {"id": "strong", "label": "Strong: 10 of 12 units",
-                 "recalled": 10, "seconds": "95.75", "summaryWords": 120,
-                 "expect": {"reRecall": "5/6 ≈ 83.3%", "reRate": "200 wpm"}},
+                 "recalled": 10, "seconds": "95.75", "summaryWords": 120, "correct": 6,
+                 "expect": {"reRecall": "5/6 ≈ 83.3%", "reRate": "200 wpm",
+                            "reComp": "1 = 100%"}},
             ],
             "panel_title": "What one reading kept",
             "panel_intro": (
                 "Your measurement, scored by your own ticks. Before you do the drill, "
-                "the boxes hold the typical preset: 383 words in 95.75 seconds and 7 of "
-                "12 idea units recalled."
+                "the boxes hold the typical preset: 383 words in 95.75 seconds, 7 of "
+                "12 idea units recalled and 5 of 6 questions right afterwards."
             ),
         }),
         "steps_title": "A free recall on another day",
@@ -240,8 +243,8 @@ LESSONS = [
         "note": (
             "One passage on one day: the share depends on the passage's units and on how "
             "strictly you tick, so compare it with your own next recall, not with a "
-            "norm. The drill asks no multiple-choice questions on this passage, so its "
-            "comparison with recognition is with your earlier drills, on other passages."
+            "norm. The questions come after the recall, so they cannot prompt it, but "
+            "six questions on one passage are a small sample of recognition."
         ),
     },
     # ---------------------------------------------------------------- 2
@@ -795,8 +798,9 @@ LESSONS = [
                   "A summary written from memory, with the passage hidden, is a "
                   "different act: it turns the summary into retrieval practice, the kind "
                   "of study the review rated high, and that is what this drill makes it."),
-            ("p", "The drill logs your reading as a test, beside the free recall from "
-                  "Free Recall. The two shares are not the same measure: a three-sentence "
+            ("p", "The drill logs your reading as other, apart from the free recall "
+                  "from Free Recall, so a summary does not enter your recall tests. The "
+                  "two shares are not the same measure: a three-sentence "
                   "summary is not asked to hold every unit, so expect a lower share "
                   "here, and compare a summary with your next summary."),
             ("p", "That ends Remembering What You Read. The next course, Your Training "
@@ -809,7 +813,7 @@ LESSONS = [
             "view": "free",
             "passage": PASSAGES["P46"],
             "summary": True,
-            "kind": "test",
+            "kind": "other",
             "preset": "tight",
             "presets": [
                 {"id": "tight", "label": "Tight: 40 words, 6 units",

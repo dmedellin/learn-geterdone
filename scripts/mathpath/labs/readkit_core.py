@@ -99,6 +99,21 @@ RD_CORE_JS = r"""
   }
   /* words x 60 / seconds */
   function rdRate(words, seconds) { return Rdiv(Rmul(words, R(60n)), seconds); }
+  /* A figure as a box holds it: a plain decimal, at most two places, no
+     grouping ("251.07"), never a long fraction. rdWhole rounds to a whole number. */
+  function rdDec(r) { return rdFixed(r, 2).replace(/,/g, '').replace(/\.?0+$/, ''); }
+  function rdWhole(r) { return rdFixed(r, 0).replace(/,/g, ''); }
+  /* The verdict on one reading above a range of n readings: with nothing
+     changed, a new reading is the highest of n + 1 one time in n + 1. */
+  var RD_NW = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  var RD_ORD = ['', '', '', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth'];
+  function rdOnce(n) {
+    var m = n + 1;
+    return 'above the baseline range once — ' + (m < 13 ? 'a ' + RD_ORD[m] + ' reading does this about one time in ' + RD_NW[m]
+      : 'a reading after ' + n + ' baselines does this about one time in ' + m);
+  }
+  /* The Subject's rule needs three baselines before a range judges anything. */
+  function rdNeedBase(n) { var k = 3 - n; return 'needs ' + RD_NW[k] + ' more baseline reading' + (k === 1 ? '' : 's'); }
 
   function rdNum(text, what) {
     var s = rdClean(text), r = s === '' ? null : Rparse(s);
@@ -126,6 +141,34 @@ RD_CORE_JS = r"""
     if (kind === 'nncount' && (!Rint(r) || Rsign(r) < 0)) throw new Error(what + ' must be a whole number, 0 or more, not ' + rdFig(r));
     return r;
   }
+  function rdField(f, text) {
+    if (f.kind === 'rec') return rdRecords(text, f);
+    if (f.kind === 'nums') return rdNumbers(text, f);
+    if (f.kind === 'entries') return rdEntries(text, f);
+    if (f.kind === 'strings') return rdStrings(text, f);
+    return rdScalar(f.kind, text, f.what, f.words);
+  }
+  function rdRead(spec, raw) {
+    var out = {};
+    spec.forEach(function (f) { out[f.key] = rdField(f, raw[f.key]); });
+    return out;
+  }
+  function rdSet(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
+  function rdRefuse(statusEl, ids, why) {
+    ids.forEach(function (id) { rdSet(id, RD_DASH); });
+    statusEl.innerHTML = '<span class="tone-red">' + rdEsc(String(why).replace(/\.$/, '')) + '.</span>';
+  }
+  function rdTable(caption, head, rows) {
+    var h = '<caption>' + rdEsc(caption) + '</caption><thead><tr>'
+      + head.map(function (x) { return '<th>' + rdEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    rows.forEach(function (row) { h += '<tr>' + row.map(function (c) { return '<td>' + rdEsc(c) + '</td>'; }).join('') + '</tr>'; });
+    return h + '</tbody>';
+  }
+"""
+
+RD_LIST_JS = r"""
+  /* The list-valued inputs (records, numbers, sessions, letter strings):
+     shipped only on a page with such an input. */
   function rdLimit(n, f) {
     if (n < f.lo) throw new Error(f.what + (n === 0 ? ' is empty' : ': this lab needs at least ' + f.lo + ', and there ' + (n === 1 ? 'is 1' : 'are ' + n)));
     if (n > f.hi) throw new Error(f.what + ': this lab takes at most ' + f.hi + ', and there are ' + n);
@@ -161,10 +204,12 @@ RD_CORE_JS = r"""
     var parts = rdSplit(rdClean(text), /[\s,;]+/);
     rdLimit(parts.length, f);
     return parts.map(function (t, i) {
+      /* Split from the right: an older log wrote the rate as a fraction
+         ("1964000/7823/5/6"), and the rate is everything before the last two parts. */
       var c = t.split('/'), where = 'Session ' + (i + 1) + ' of ' + f.what;
-      if (c.length !== 3) throw new Error(where + ' should be rate/correct/total, such as 240/4/5, not "' + t + '"');
-      var e = { wpm: rdScalar('pos', c[0], where + ': the rate'), correct: rdScalar('nncount', c[1], where + ': correct'),
-                total: rdScalar('count', c[2], where + ': questions') };
+      if (c.length < 3 || c.length > 4) throw new Error(where + ' should be rate/correct/total, such as 240/4/5, not "' + t + '"');
+      var e = { wpm: rdScalar('pos', c.slice(0, -2).join('/'), where + ': the rate'), correct: rdScalar('nncount', c[c.length - 2], where + ': correct'),
+                total: rdScalar('count', c[c.length - 1], where + ': questions') };
       if (Rcmp(e.correct, e.total) > 0) throw new Error(where + ' has more right (' + rdFig(e.correct) + ') than asked (' + rdFig(e.total) + ')');
       return e;
     });
@@ -177,29 +222,6 @@ RD_CORE_JS = r"""
       if (!ok.test(t)) throw new Error('Entry ' + (i + 1) + ' of ' + f.what + ' should be letters only' + (f.blank ? ' (- for a letter asked and not seen, . for a position not asked)' : '') + ', not "' + t + '"');
       return t.toUpperCase();
     });
-  }
-  function rdField(f, text) {
-    if (f.kind === 'rec') return rdRecords(text, f);
-    if (f.kind === 'nums') return rdNumbers(text, f);
-    if (f.kind === 'entries') return rdEntries(text, f);
-    if (f.kind === 'strings') return rdStrings(text, f);
-    return rdScalar(f.kind, text, f.what, f.words);
-  }
-  function rdRead(spec, raw) {
-    var out = {};
-    spec.forEach(function (f) { out[f.key] = rdField(f, raw[f.key]); });
-    return out;
-  }
-  function rdSet(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
-  function rdRefuse(statusEl, ids, why) {
-    ids.forEach(function (id) { rdSet(id, RD_DASH); });
-    statusEl.innerHTML = '<span class="tone-red">' + rdEsc(String(why).replace(/\.$/, '')) + '.</span>';
-  }
-  function rdTable(caption, head, rows) {
-    var h = '<caption>' + rdEsc(caption) + '</caption><thead><tr>'
-      + head.map(function (x) { return '<th>' + rdEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
-    rows.forEach(function (row) { h += '<tr>' + row.map(function (c) { return '<td>' + rdEsc(c) + '</td>'; }).join('') + '</tr>'; });
-    return h + '</tbody>';
   }
 """
 
@@ -300,6 +322,18 @@ RD_LOG_JS = r"""
     }
     return false;
   }
+  /* Readings the verdicts may use: timed readings of a passage (a drill or a
+     warm-up), not a skim. rate = words x 60,000 / ms, exact; eff: x right / asked. */
+  function rdIsReading(e) { return (e.mode === 'drill' || e.mode === 'warmup') && e.display !== 'gist' && e.words > 0 && e.ms > 0; }
+  function rdEntryRate(e, eff) {
+    var r = R(BigInt(Math.round(e.words)) * 60000n, BigInt(Math.round(e.ms)));
+    return eff ? Rmul(r, R(BigInt(e.correct), BigInt(e.total))) : r;
+  }
+  /* The rates of every reading of one kind, in log order (eff: with questions, effective). */
+  function rdKindRates(kind, eff, list) {
+    return (list || rdLogRead()).filter(function (e) { return e.kind === kind && rdIsReading(e) && (!eff || e.total > 0); })
+      .map(function (e) { return rdEntryRate(e, eff); });
+  }
   /* A delayed test that has fallen due is offered on EVERY readkit page: a
      link to the lesson that set it (its path, as logged). Reading the log at
      load starts nothing; it only fills this line. */
@@ -319,7 +353,7 @@ RD_LOG_JS = r"""
       var u = String(e.url || '');
       if (!/^\/[a-z0-9\-\/]*$/.test(u) || u === here || seen[u]) return;
       seen[u] = true;
-      links.push('<a href="' + rdEsc(u) + '">' + rdEsc(e.lesson || u) + '</a>');
+      links.push('<a href="' + rdEsc(u) + '">' + (e.title ? 'the test on “' + rdEsc(e.title) + '”' : rdEsc(e.lesson || u)) + '</a>');
     });
     if (links.length) {
       el.innerHTML = 'A delayed test is due: open ' + links.join(', ') + ' to take it.';
@@ -615,8 +649,21 @@ _LETTERS = re.compile(r"^[A-Za-z]+$")
 _TYPED = re.compile(r"[A-Za-z?_.\-]*")
 
 
+def _unfloat(v):
+    """A float in a preset (110.5) is taken as the decimal it prints as ("110.5")."""
+    if isinstance(v, float):
+        return repr(v)
+    if isinstance(v, (list, tuple)):
+        return type(v)(_unfloat(x) for x in v)
+    if isinstance(v, dict):
+        return {k: _unfloat(x) for k, x in v.items()}
+    return v
+
+
 def field_text(where, key, kind, value):
-    """A preset's value for one field -> the exact text the box holds."""
+    """A preset's value for one field -> the exact text the box holds. A float
+    is read as the decimal it prints as, so seconds may be 110.5 or "110.5"."""
+    value = _unfloat(value)
     if isinstance(kind, tuple) and kind[0] == "entries":
         _, lo, hi = kind
         if not isinstance(value, (list, tuple)) or not lo <= len(value) <= hi:
@@ -747,13 +794,15 @@ def slot_html(key, heading, intro, extra_buttons=""):
 
 def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, subtitle,
               panel_title, panel_intro, main_html="", passages=None, slots=None, ui_js="",
-              extra_keys=(), check=None, needs_log=False, needs_text=False, table=True):
+              extra_keys=(), check=None, needs_log=False, needs_text=False, table=True, intro_tail="", lists=False):
     """Assemble one Lab: the preset menu, the text inputs, the tiles, the
     status banner, the drill slots (if any), and the script.
 
     js: the mode's pure block(s); ui_js: browser-only code that runs after the
     wiring (it may use redraw, rdWrite, field). slots: {key: slot config} for
-    RD_DRILL_JS; when given, the drill engine and the log ship.
+    RD_DRILL_JS; when given, the drill engine and the log ship. intro_tail: a
+    sentence the panel intro always ends with, even when the cfg gives its own
+    intro (unless that intro already carries it).
     """
     tbl, menu, expect, chosen = presets(cfg, kit, fields, extra_keys, check)
     here = tbl[chosen]
@@ -775,7 +824,12 @@ def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, sub
         wl = cfg["warmup"] if isinstance(cfg["warmup"], list) else [cfg["warmup"]]
         if not wl:
             raise ValueError("%s: cfg[\"warmup\"] is a passage dict or a non-empty list of them" % kit)
-        wkind = log_kind(kit + " warm-up", cfg.get("warmup_kind"), "practice")
+        wk = cfg.get("warmup_kind")
+        wks = wk if isinstance(wk, list) else [wk] * len(wl)
+        if len(wks) != len(wl):
+            raise ValueError("%s: cfg[\"warmup_kind\"] is one kind or one per warm-up passage" % kit)
+        wks = [log_kind(kit + " warm-up", k, "practice") for k in wks]
+        wkind = wks[0]
         for wp in wl:
             check_passage(kit + " warm-up", wp)
             if not wp.get("questions"):
@@ -785,9 +839,12 @@ def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, sub
         if len({wp["id"] for wp in wl}) != len(wl):
             raise ValueError("%s: a warm-up passage is listed twice" % kit)
         passages += wl
+        said = wkind if len(set(wks)) == 1 else ", then ".join("%s (%s)" % (k, wp["title"]) for k, wp in zip(wks, wl))
         slots["W"] = slot("W", wl[0], intro="A warm-up: a timed reading at your usual pace, then its questions. It is "
-                          "logged as %s and fills none of the boxes below." % wkind,
+                          "logged as %s and fills none of the boxes below." % said,
                           kind=wkind, mode="warmup", view="warmup", pool=[wp["id"] for wp in wl])
+        if len(set(wks)) > 1:
+            slots["W"]["kinds"] = {wp["id"]: k for k, wp in zip(wks, wl)}
         main_html = slot_html("W", "Warm-up reading" + (": " + wl[0]["title"] if len(wl) == 1 else ""),
                               slots["W"]["intro"]) + main_html
     for key in cfg:
@@ -799,6 +856,8 @@ def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, sub
     # Idea units ship only where a free-recall drill ticks them.
     keep = ("id", "title", "paragraphs", "questions") + (("ideas",) if any(sl["flow"] == "recall" for sl in slots.values()) else ())
     script = RATIONAL_JS + RD_CORE_JS
+    if any(s["kind"] in ("rec", "nums", "entries", "strings") for s in spec) or lists:
+        script += RD_LIST_JS
     if needs_text or slots:
         script += RD_TEXT_JS
     script += RD_LOG_JS
@@ -819,6 +878,7 @@ def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, sub
     if slots:
         script += "  rdDrillInit();\n"
     script += ui_js
+    script = _COMMENT_LINES.sub("", script)
     markup = ('      <div class="lab-toolbar">\n'
               '        <div class="lab-title"><strong>%s</strong><span>%s</span></div>\n'
               "      </div>\n" % (esc(title), esc(subtitle))
@@ -828,10 +888,17 @@ def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, sub
               + ('      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="%sTable"></table></div>\n'
                  % prefix)
               + '      <div class="status-banner" id="%sStatus" style="margin-top:12px;"></div>\n' % prefix)
+    intro = cfg.get("panel_intro", panel_intro)
+    if intro_tail and intro_tail.lower().rstrip(".") not in intro.lower() and "a one-question difference is not a result" not in intro.lower():
+        intro = intro.rstrip() + " " + intro_tail
     return Lab(title=cfg.get("title", title), subtitle=subtitle, markup=markup, controls=controls, script=script,
-               panel_title=cfg.get("panel_title", panel_title), panel_intro=cfg.get("panel_intro", panel_intro),
+               panel_title=cfg.get("panel_title", panel_title), panel_intro=intro,
                expect={prefix + "Preset": expect})
 
+
+# Whole-line /* ... */ comments are for the source and for scripts/mathcheck.js,
+# which reads the blocks from this file; a page ships the code without them.
+_COMMENT_LINES = re.compile(r"^[ \t]*/\*(?:(?!\*/).)*\*/[ \t]*\n", re.S | re.M)
 
 COMMON_CFG = {"mode", "view", "presets", "preset", "title", "panel_title", "panel_intro", "lesson", "warmup", "warmup_kind"}
 LOG_KINDS = ("baseline", "test", "practice", "condition", "other")
@@ -846,7 +913,7 @@ def log_kind(kit, value, default):
 
 def slot(key, passage, *, intro, kind, mode, view, display="normal", questions=True, qkinds="all", flow="read",
          write=None, target=None, target_key=None, chunk=1, limit=None, split=None, targets=None, suppress=False,
-         days=None, summary=False, pool=None, tick=None, published=None, order=None):
+         days=None, summary=False, pool=None, tick=None, published=None, order=None, say=None):
     """One drill's configuration as RD_DRILL_JS reads it.
 
     pool: passage ids; Start serves the first one not yet in the log. tick: {label, key}, a box
@@ -859,12 +926,12 @@ def slot(key, passage, *, intro, kind, mode, view, display="normal", questions=T
             "display": display, "questions": bool(questions), "qkinds": qkinds, "flow": flow, "write": write or {},
             "target": target, "targetKey": target_key, "chunk": chunk, "limit": limit, "split": split,
             "targets": targets, "suppress": bool(suppress), "days": days, "summary": bool(summary),
-            "pool": pool, "tick": tick, "published": published, "order": order}
+            "pool": pool, "tick": tick, "published": published, "order": order, "say": say}
 
 
 def num(kit, cfg, key, default, lo=None, hi=None, whole=False):
     """A numeric cfg value (int, Fraction or "a/b"), range-checked; returned as text the JS parses."""
-    v = cfg.get(key, default)
+    v = _unfloat(cfg.get(key, default))
     if v is None:
         return None
     if isinstance(v, bool) or not isinstance(v, (int, str, Fraction)):
@@ -884,6 +951,6 @@ def ftext(f):
     return str(f.numerator) if f.denominator == 1 else "%d/%d" % (f.numerator, f.denominator)
 
 
-__all__ = ["RD_CORE_JS", "RD_TEXT_JS", "RD_LOG_JS", "RD_WIRE_JS", "LOG_KEY", "check_passage", "passage_counts",
+__all__ = ["RD_CORE_JS", "RD_LIST_JS", "RD_TEXT_JS", "RD_LOG_JS", "RD_WIRE_JS", "LOG_KEY", "check_passage", "passage_counts",
            "passages_of", "resolve_targets", "section_starts", "all_tokens", "embed", "field_text", "presets",
            "camel", "build_lab", "slot_html", "btn", "esc", "attr", "num", "ftext", "PHOTO_NOTE", "word_count"]

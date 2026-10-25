@@ -114,10 +114,15 @@ TEXT_JS = r"""
     }
     if (view === 'coverage') {
       if (Rcmp(inst.unknown, inst.tokens) > 0) return { refuse: 'More unknown words than words in the text' };
+      if (inst.total !== undefined && Rcmp(inst.correct, inst.total) > 0) return { refuse: 'More questions right than asked' };
       t.txCoverage = rdShare(Rdiv(Rsub(inst.tokens, inst.unknown), inst.tokens));
       t.txOneIn = Rzero(inst.unknown) ? 'no unknown words' : 'one unknown in every ' + rdFig(Rdiv(inst.tokens, inst.unknown)) + ' tokens';
+      /* Timed: the rate while marking; with questions: comprehension afterwards. */
+      if (inst.seconds !== undefined) t.txWpm = rdUnit(rdRate(inst.tokens, inst.seconds), 'wpm');
+      if (inst.total !== undefined) t.txComp = Rzero(inst.total) ? 'no questions' : rdShare(Rdiv(inst.correct, inst.total));
       return { tiles: t, status: rdFig(inst.unknown) + ' unknown of ' + rdFig(inst.tokens) + ' words: coverage ' + t.txCoverage
-        + ', one unknown word every ' + (Rzero(inst.unknown) ? '(none)' : rdFig(Rdiv(inst.tokens, inst.unknown))) + ' words. Hu and Nation put unassisted reading near 98%.' };
+        + ', one unknown word every ' + (Rzero(inst.unknown) ? '(none)' : rdFig(Rdiv(inst.tokens, inst.unknown))) + ' words. Hu and Nation put unassisted reading near 98%.'
+        + (t.txWpm ? ' Read while marking at ' + t.txWpm + (t.txComp ? ', comprehension ' + t.txComp : '') + '.' : t.txComp ? ' Comprehension ' + t.txComp + '.' : '') };
     }
     var w = Rmul(Rmul(inst.minutes, inst.wpm), inst.days);
     t.txWordsYear = rdUnit(w, 'words');
@@ -193,13 +198,30 @@ def _text(cfg, view, kit):
                                                   "then Flesch's two formulas.")
     elif view == "coverage":
         (p,) = rc.passages_of(cfg, kit, 1)
-        opts["_cfg_keys"] = ("passage", "kind")
+        opts["_cfg_keys"] = ("passage", "kind", "timed", "questions")
+        timed, qs = cfg.get("timed", False), cfg.get("questions", False)
+        if not isinstance(timed, bool) or not isinstance(qs, bool):
+            raise ValueError("%s: cfg[\"timed\"] and cfg[\"questions\"] are True or False" % kit)
+        if qs and not p.get("questions"):
+            raise ValueError("%s: passage %s has no questions to ask" % (kit, p["id"]))
         fields = [F("tokens", "Words in the text", "count", rc.word_count_passage(p)), F("unknown", "Words you do not know", "nncount")]
         tiles = [("Coverage", "txCoverage"), ("Unknown words", "txOneIn")]
+        write = {"tokens": "tokens", "unknown": "unknown"}
+        if timed:
+            fields.append(F("seconds", "Seconds, reading and marking", "pos"))
+            tiles.append(("Rate while marking", "txWpm"))
+            write["seconds"] = "seconds"
+        if qs:
+            fields += [F("correct", "Questions right", "nncount"), F("total", "Questions asked", "nncount", len(p["questions"]))]
+            tiles.append(("Comprehension", "txComp"))
+            write.update(correct="correct", total="total")
         slots = {"": rc.slot("", p, intro="Press Start, then mark every word you do not know (click it, or Tab to it and press "
-                             "Enter). Press Count my marks when you reach the end. Nothing is timed.",
+                             "Enter). Press Count my marks when you reach the end. "
+                             + ("The clock runs from Start to Count my marks, so read as you mark. " if timed else "Nothing is timed. ")
+                             + ("Then the passage's questions, with the passage hidden." if qs else ""),
                              kind=rc.log_kind(kit, cfg.get("kind"), "other"), mode="text", view="coverage", flow="coverage",
-                             questions=False, write={"tokens": "tokens", "unknown": "unknown"})}
+                             questions=qs, write=write)}
+        slots[""]["timed"] = timed
         main = rc.slot_html("", "Mark the unknown words: " + p["title"], slots[""]["intro"])
         passages = [p]
         title, intro = "Vocabulary coverage", "Your measurement: coverage = known words / all words, counted by the kit's word rule."
@@ -230,8 +252,13 @@ RECALL_JS = r"""
       t.reRecall = rdShare(share);
       t.reRate = rdUnit(Rmul(wpm, share), 'wpm');
       t.reWordsPerUnit = Rzero(inst.recalled) ? 'no units recalled' : rdUnit(Rdiv(inst.summaryWords, inst.recalled), 'words');
+      if (inst.total !== undefined) {
+        if (Rcmp(inst.correct, inst.total) > 0) return { refuse: 'More questions right than asked' };
+        t.reComp = Rzero(inst.total) ? 'no questions' : rdShare(Rdiv(inst.correct, inst.total));
+      }
       return { tiles: t, status: rdFig(inst.recalled) + ' of ' + rdFig(inst.units) + ' idea units: ' + t.reRecall + '. Rate ' + rdUnit(wpm, 'wpm')
-        + ' × ' + Rtext(share) + ' = ' + t.reRate + ' of recalled reading; ' + rdFig(inst.summaryWords) + ' words written.' };
+        + ' × ' + Rtext(share) + ' = ' + t.reRate + ' of recalled reading; ' + rdFig(inst.summaryWords) + ' words written.'
+        + (t.reComp ? ' The questions afterwards: ' + t.reComp + '.' : '') };
     }
     if (view === 'delayed') {
       if (Rcmp(inst.delA, inst.total) > 0 || Rcmp(inst.delB, inst.total) > 0) return { refuse: 'More right than asked on the delayed test' };
@@ -275,7 +302,10 @@ DELAYED_UI_JS = r"""
       var work = box.getElementsByTagName('div')[0], qa = PASSAGES[RE_A].questions, qb = PASSAGES[RE_B].questions;
       rdAsk(work, qa.concat(qb), function (answers) {
         var ta = rdTally(qa, answers.slice(0, qa.length)), tb = rdTally(qb, answers.slice(qa.length));
-        rdWrite({ delA: ta.correct, delB: tb.correct, total: qa.length });
+        var v = { delA: ta.correct, delB: tb.correct, total: qa.length };
+        /* B's recall at the time, from its log entry, so every box is the reader's own. */
+        if (b.extra && b.extra.units > 0) { v.units = b.extra.units; v.recalled = b.extra.recalled; }
+        rdWrite(v);
         rdLogAppend({ mode: 'recall', view: 'delayed-test', side: '', passage: RE_A + '+' + RE_B, display: 'none', words: 0, ms: 0,
                       correct: ta.correct + tb.correct, total: qa.length + qb.length, kind: a.kind,
                       extra: { delA: ta.correct, delB: tb.correct } }, box);
@@ -294,17 +324,26 @@ def _recall(cfg, view, kit):
         summary = cfg.get("summary", False)
         if not isinstance(summary, bool):
             raise ValueError("%s: cfg[\"summary\"] is True or False" % kit)
-        opts["_cfg_keys"] = ("passage", "summary", "kind")
+        qs = cfg.get("questions", False)
+        if not isinstance(qs, bool) or (qs and not p.get("questions")):
+            raise ValueError("%s: cfg[\"questions\"] is True or False, and True needs a passage with questions" % kit)
+        opts["_cfg_keys"] = ("passage", "summary", "kind", "questions")
         fields = [F("units", "Idea units in the passage", "count", len(p["ideas"])), F("recalled", "Idea units you ticked", "nncount"),
                   F("words", "Words read", "count", rc.word_count_passage(p)), F("seconds", "Seconds reading", "pos"),
                   F("summaryWords", "Words you wrote", "nncount", 0)]
         tiles = [("Idea units recalled", "reRecall"), ("Rate × recall", "reRate"), ("Words written per unit recalled", "reWordsPerUnit")]
+        if qs:
+            fields += [F("correct", "Questions right, after the recall", "nncount"),
+                       F("total", "Questions asked", "nncount", len(p["questions"]))]
+            tiles.append(("Questions right, after the recall", "reComp"))
         slots = {"": rc.slot("", p, intro=("Read at your usual pace and press Done. Then " + ("write a three-sentence summary"
                              if summary else "write everything you remember") + " with the passage hidden, and tick the idea "
-                             "units your writing contains. You are the judge; the kit does not score your writing."),
+                             "units your writing contains. You are the judge; the kit does not score your writing."
+                             + (" Then the passage's questions, one at a time." if qs else "")),
                              kind=rc.log_kind(kit, cfg.get("kind"), "condition"), mode="recall", view="free", flow="recall",
-                             summary=summary, write={"units": "units", "recalled": "recalled", "words": "words",
-                                                     "seconds": "seconds", "summaryWords": "summaryWords"})}
+                             summary=summary, questions=qs,
+                             write=dict({"units": "units", "recalled": "recalled", "words": "words", "seconds": "seconds",
+                                         "summaryWords": "summaryWords"}, **({"correct": "correct", "total": "total"} if qs else {})))}
         main = rc.slot_html("", "Read, then recall: " + p["title"], slots[""]["intro"])
         passages = [p]
         title = "Free recall" if not summary else "A summary in your own words"
@@ -326,7 +365,7 @@ def _recall(cfg, view, kit):
         slots = {"A": rc.slot("A", pa, intro="Condition 1: read this passage twice through. There is no test now.", kind=kind,
                               mode="recall", view="delayed", flow="reread", questions=False, days=days),
                  "B": rc.slot("B", pb, intro="Condition 2: read this passage once, then write what you remember and tick the "
-                              "idea units.", kind=kind, mode="recall", view="delayed", flow="recall", days=days,
+                              "idea units.", kind=kind, mode="recall", view="delayed", flow="recall", days=days, questions=False,
                               write={"units": "units", "recalled": "recalled"})}
         main = ('      <div class="status-banner" id="reDelayed" style="display:none;margin-top:12px;"></div>\n'
                 + rc.slot_html("A", "Read twice: " + pa["title"], slots["A"]["intro"])
@@ -356,35 +395,34 @@ def _recall(cfg, view, kit):
 LOG_JS = r"""
   /* log: the reader's numbers. History, noise and profile use readings
      logged as "baseline" or "test" only. */
-  var LG_ONE_IN_FOUR = 'above the baseline range once — a fourth reading does this about one time in four';
-  function lgRangeVerdict(x, lo, hi) {
-    if (Rcmp(x, hi) > 0) return LG_ONE_IN_FOUR;
+  /* n: the number of baseline readings the range comes from. */
+  function lgRangeVerdict(x, lo, hi, n) {
+    if (Rcmp(x, hi) > 0) return rdOnce(n);
     if (Rcmp(x, lo) < 0) return 'below the baseline range';
     return 'inside the baseline range';
   }
   function lgMinMax(v) { var s = v.slice().sort(Rcmp); return { lo: s[0], hi: s[s.length - 1] }; }
   function lgErr(e) { return Rmul(e.wpm, Rdiv(e.correct, e.total)); }
-  /* The history verdict: the median of the last three tests against the
-     range of the first three (the Subject's rule for a real change), else
-     the latest reading against it. */
   /* The three tiers (PLAN D.3.3): with three tests or more, the median of the
-     last three against the range; else (or when that median is inside) the
-     latest test, which above the range is "once". */
-  function lgTiers(tests, lo, hi) {
+     last three against the range of n baselines; else (or when that median is
+     inside) the latest test, which above the range is "once". */
+  function lgTiers(tests, lo, hi, n) {
     var last = tests[tests.length - 1];
     if (tests.length >= 3) {
       var med = rdMedian(tests.slice(-3));
       if (Rcmp(med, hi) > 0) return 'above the baseline range on the median of the last three tests';
       if (Rcmp(med, lo) < 0) return 'below the baseline range on the median of the last three tests';
-      return Rcmp(last, hi) > 0 ? LG_ONE_IN_FOUR : 'inside the baseline range';
+      return Rcmp(last, hi) > 0 ? rdOnce(n) : 'inside the baseline range';
     }
-    return lgRangeVerdict(last, lo, hi);
+    return lgRangeVerdict(last, lo, hi, n);
   }
-  /* History: the first three sessions are the baselines, the rest tests. */
-  function lgHistoryVerdict(errs) {
-    if (errs.length < 4) return 'needs a reading after the three baselines';
-    var base = lgMinMax(errs.slice(0, 3));
-    return lgTiers(errs.slice(3), base.lo, base.hi);
+  /* History: the first nb sessions are the baselines (all of them, three at
+     least), the rest tests. */
+  function lgHistoryVerdict(errs, nb) {
+    if (nb < 3) return rdNeedBase(nb);
+    if (errs.length <= nb) return 'needs a reading after the ' + (RD_NW[nb] || nb) + ' baselines';
+    var base = lgMinMax(errs.slice(0, nb));
+    return lgTiers(errs.slice(nb), base.lo, base.hi, nb);
   }
   /* The chart: baseline and test sessions as the line; practice sessions,
      when given, as a lighter dashed series spread over the same width. */
@@ -427,7 +465,7 @@ LOG_JS = r"""
       var later = inst.tests[inst.tests.length - 1], recent = inst.tests.slice(-3);
       t.lgMean = rdUnit(mean, 'wpm'); t.lgRange = rdUnit(range, 'wpm');
       t.lgTestMedian = rdUnit(rdMedian(recent), 'wpm') + (recent.length < 3 ? ' (of ' + recent.length + ')' : '');
-      t.lgVerdict = lgTiers(inst.tests, mm.lo, mm.hi);
+      t.lgVerdict = lgTiers(inst.tests, mm.lo, mm.hi, inst.base.length);
       var off = Rcmp(later, mm.hi) > 0 ? Rsub(later, mm.hi) : (Rcmp(later, mm.lo) < 0 ? Rsub(mm.lo, later) : null);
       t.lgBeyond = off === null ? 'inside' : rdUnit(off, 'wpm') + (Rcmp(later, mm.hi) > 0 ? ' above the top' : ' below the bottom')
         + (Rzero(range) ? '' : ' (' + rdFig(Rdiv(off, range)) + ' ranges)');
@@ -439,7 +477,7 @@ LOG_JS = r"""
       /* The gears are in standard-length words, the average in words (D.3.15). */
       var std = (inst.stdwpm === undefined || inst.stdwpm === null) ? null : inst.stdwpm, gw = std || inst.wpm;
       var g = lgNearestOf(gw, opts.gears.map(function (x) { return { name: x.name, wpm: Rparse(x.wpm) }; }));
-      t.lgNearest = g ? g.name + ', ' + rdUnit(g.wpm, 'wpm') : 'above every gear';
+      t.lgNearest = g ? g.name + ', ' + rdUnit(g.wpm, 'standard wpm') : 'above every gear';
       t.lgVsAverage = rdShare(Rdiv(inst.wpm, Rparse(opts.average)));
       return { tiles: t, status: rdUnit(inst.wpm, 'wpm') + ' is ' + t.lgVsAverage + ' of the ' + opts.average + ' wpm average for silent reading of '
         + 'nonfiction (Brysbaert 2019, in words); the nearest of Carver\'s gears (in standard-length words) to '
@@ -447,14 +485,15 @@ LOG_JS = r"""
         + ' is ' + t.lgNearest + '.' };
     }
     if (view === 'history') {
-      var errs = inst.entries.map(lgErr), n = errs.length, out;
+      var errs = inst.entries.map(lgErr), n = errs.length, nb = Number(inst.baseN.n), out;
+      if (nb > n) return { refuse: 'There are ' + n + ' sessions, so ' + nb + ' of them cannot be baselines' };
       t.lgSessions = String(n);
-      t.lgBaseMedian = n ? rdUnit(rdMedian(errs.slice(0, 3)), 'wpm') : 'no sessions';
-      t.lgRecentMedian = n >= 6 ? rdUnit(rdMedian(errs.slice(-3)), 'wpm') : 'after 6 sessions';
+      t.lgBaseMedian = nb ? rdUnit(rdMedian(errs.slice(0, nb)), 'wpm') : 'no baselines';
+      t.lgRecentMedian = n - nb >= 3 ? rdUnit(rdMedian(errs.slice(-3)), 'wpm') : 'after ' + (Math.max(nb, 3) + 3) + ' sessions';
       t.lgLatestErr = n ? rdUnit(errs[n - 1], 'wpm') : 'no sessions';
-      t.lgVerdict = lgHistoryVerdict(errs);
-      out = { tiles: t, status: n + ' sessions with questions. Baseline median (first three) ' + t.lgBaseMedian + '; recent median (last three) '
-        + t.lgRecentMedian + '; ' + t.lgVerdict + '.' };
+      t.lgVerdict = lgHistoryVerdict(errs, nb);
+      out = { tiles: t, status: n + ' sessions with questions, the first ' + nb + ' of them baselines. Baseline median ' + t.lgBaseMedian
+        + '; recent median (last three tests) ' + t.lgRecentMedian + '; ' + t.lgVerdict + '.' };
       var prac = (inst.practice || []).map(lgErr);
       if (n || prac.length) {
         out.svg = lgChart(errs, prac);
@@ -482,7 +521,10 @@ LOG_JS = r"""
     if ((lo === null) !== (hi === null)) return { refuse: 'Give both ends of the baseline range, or neither' };
     if (lo !== null && Rcmp(lo, hi) > 0) return { refuse: 'The baseline range runs from the lower rate to the higher one' };
     t.lgErrThen = rdUnit(inst.errThen, 'wpm'); t.lgErrNow = rdUnit(inst.errNow, 'wpm');
-    t.lgVerdict = lo === null ? 'no baseline range given' : lgRangeVerdict(inst.errNow, lo, hi);
+    var nb = Number(inst.baseN.n);
+    /* With the recent tests given, the tier rule on them; else the one reading now. */
+    t.lgVerdict = lo === null ? 'no baseline range given' : nb < 3 ? rdNeedBase(nb)
+      : inst.tests.length ? lgTiers(inst.tests, lo, hi, nb) : lgRangeVerdict(inst.errNow, lo, hi, nb);
     t.lgGist = rdShare(inst.gistThen) + ' → ' + rdShare(inst.gistNow);
     t.lgScan = rdUnit(inst.scanThen, 's') + ' → ' + rdUnit(inst.scanNow, 's');
     t.lgRecall = rdShare(inst.recallThen) + ' → ' + rdShare(inst.recallNow);
@@ -493,8 +535,8 @@ LOG_JS = r"""
 LOG_FILL_JS = r"""
   /* Reading the log (at load, and on the buttons). Only "baseline" and "test"
      readings with questions count; every other entry is listed, greyed. */
-  function lgCounted(e) { return (e.kind === 'baseline' || e.kind === 'test') && e.total > 0 && e.words > 0 && e.ms > 0; }
-  function lgRate(e) { return R(BigInt(Math.round(e.words)) * 60000n, BigInt(Math.round(e.ms))); }
+  function lgCounted(e) { return (e.kind === 'baseline' || e.kind === 'test') && e.total > 0 && rdIsReading(e); }
+  function lgRate(e) { return rdEntryRate(e, false); }
   function lgLogTable(list) {
     var el = document.getElementById('lgLog');
     if (!el) return;
@@ -508,9 +550,9 @@ LOG_FILL_JS = r"""
           + '</td><td>' + rate + '</td><td>' + (e.total ? e.correct + ' of ' + e.total : '') + '</td></tr>';
       }).join('') + '</tbody></table></div>';
   }
-  function lgEntriesText(list, kind) {
-    return list.filter(kind ? function (e) { return e.kind === kind && e.total > 0 && e.words > 0 && e.ms > 0; } : lgCounted)
-      .slice(-200).map(function (e) { return Rtext(lgRate(e)) + '/' + e.correct + '/' + e.total; }).join(', ');
+  /* rate/right/asked, the rate a decimal of at most two places ("251.07/5/6"). */
+  function lgEntriesText(list) {
+    return list.map(function (e) { return rdDec(lgRate(e)) + '/' + e.correct + '/' + e.total; }).join(', ');
   }
 """
 
@@ -518,13 +560,19 @@ LOG_HISTORY_UI_JS = r"""
   (function () {
     var list = rdLogRead(), msg = document.getElementById('lgMsg');
     lgLogTable(list);
-    function mine(l) { return { entries: lgEntriesText(l), practice: lgEntriesText(l, 'practice') }; }
-    if (lgEntriesText(list) !== '') { rdWrite(mine(list)); msg.textContent = 'The boxes hold your own log.'; }
+    /* Every baseline first (all of them), then the tests, oldest first; practice apart. */
+    function mine(l) {
+      var c = l.filter(lgCounted), b = c.filter(function (e) { return e.kind === 'baseline'; }).slice(0, 200);
+      var t = c.filter(function (e) { return e.kind === 'test'; }), p = l.filter(function (e) { return e.kind === 'practice' && e.total > 0 && rdIsReading(e); });
+      return c.length ? { entries: lgEntriesText(b.concat(t.slice(Math.max(0, t.length - 200 + b.length)))), baseN: b.length,
+                          practice: lgEntriesText(p.slice(-200)) } : null;
+    }
+    if (mine(list)) { rdWrite(mine(list)); msg.textContent = 'The boxes hold your own log.'; }
     document.getElementById('lgMine').addEventListener('click', function () {
-      var l = rdLogRead(), t = lgEntriesText(l);
+      var l = rdLogRead(), v = mine(l);
       lgLogTable(l);
-      if (t === '') { msg.textContent = 'Your log has no baseline or test readings with questions yet.'; return; }
-      rdWrite(mine(l)); msg.textContent = 'The boxes hold your own log.';
+      if (!v) { msg.textContent = 'Your log has no baseline or test readings with questions yet.'; return; }
+      rdWrite(v); msg.textContent = 'The boxes hold your own log.';
     });
     document.getElementById('lgNoteAdd').addEventListener('click', function () {
       var box = document.getElementById('lgNote'), text = rdClean(box.value);
@@ -558,11 +606,11 @@ LOG_NOISE_UI_JS = r"""
   (function () {
     var msg = document.getElementById('lgMsg');
     document.getElementById('lgMine').addEventListener('click', function () {
-      var c = rdLogRead().filter(lgCounted), base = c.filter(function (e) { return e.kind === 'baseline'; }).slice(0, 3);
+      var c = rdLogRead().filter(lgCounted), base = c.filter(function (e) { return e.kind === 'baseline'; }).slice(-20);
       var tests = c.filter(function (e) { return e.kind === 'test'; });
       if (base.length < 2) { msg.textContent = 'Your log needs at least two baseline readings with questions.'; return; }
-      var v = { base: base.map(function (e) { return Rtext(lgRate(e)); }).join(', ') };
-      if (tests.length) v.tests = tests.slice(-20).map(function (e) { return Rtext(lgRate(e)); }).join(', ');
+      var v = { base: base.map(function (e) { return rdDec(lgRate(e)); }).join(', ') };
+      if (tests.length) v.tests = tests.slice(-20).map(function (e) { return rdDec(lgRate(e)); }).join(', ');
       rdWrite(v);
       msg.textContent = 'Your baselines' + (tests.length ? ' and your test readings.' : '; type a test rate to compare.');
     });
@@ -573,14 +621,14 @@ LOG_GEARS_UI_JS = r"""
   (function () {
     var msg = document.getElementById('lgMsg');
     document.getElementById('lgMine').addEventListener('click', function () {
-      var base = rdLogRead().filter(function (e) { return e.kind === 'baseline' && e.words > 0 && e.ms > 0; }).slice(0, 3);
+      var base = rdLogRead().filter(function (e) { return e.kind === 'baseline' && rdIsReading(e); });
       if (!base.length) { msg.textContent = 'Your log has no baseline readings yet.'; return; }
-      var v = { wpm: Rtext(rdMedian(base.map(lgRate))) };
-      if (base.every(function (e) { return e.chars > 0; })) v.stdwpm = Rtext(rdMedian(base.map(function (e) {
+      var v = { wpm: rdDec(rdMedian(base.map(lgRate))), stdwpm: '' };
+      if (base.every(function (e) { return e.chars > 0; })) v.stdwpm = rdDec(rdMedian(base.map(function (e) {
         return R(BigInt(Math.round(e.chars)) * 10000n, BigInt(Math.round(e.ms)));
       })));
       rdWrite(v);
-      msg.textContent = 'The median of your first ' + base.length + ' baseline reading' + (base.length === 1 ? '' : 's') + '.';
+      msg.textContent = 'The median of your ' + base.length + ' baseline reading' + (base.length === 1 ? '' : 's') + '.';
     });
   })();
 """
@@ -602,17 +650,16 @@ LOG_PROFILE_UI_JS = r"""
     var msg = document.getElementById('lgMsg');
     document.getElementById('lgMine').addEventListener('click', function () {
       var c = rdLogRead().filter(function (e) { return e.kind === 'baseline' || e.kind === 'test'; }), v = {};
-      var reads = c.filter(lgCounted).filter(function (e) { return e.display !== 'gist' && e.mode === 'drill'; });
-      var base = reads.filter(function (e) { return e.kind === 'baseline'; }).slice(0, 3).map(function (e) { return lgErr({ wpm: lgRate(e), correct: R(BigInt(e.correct)), total: R(BigInt(e.total)) }); });
-      var tests = reads.filter(function (e) { return e.kind === 'test'; });
-      if (base.length) { var mm = lgMinMax(base); v.errThen = Rtext(rdMedian(base)); v.baseLo = Rtext(mm.lo); v.baseHi = Rtext(mm.hi); }
-      if (tests.length) { var l = tests[tests.length - 1]; v.errNow = Rtext(lgErr({ wpm: lgRate(l), correct: R(BigInt(l.correct)), total: R(BigInt(l.total)) })); }
+      /* Readings (drills and warm-ups, not skims) with questions, as effective rates: every baseline, every test. */
+      var base = rdKindRates('baseline', true, c), tests = rdKindRates('test', true, c);
+      if (base.length) { var mm = lgMinMax(base); v.errThen = rdDec(rdMedian(base)); v.baseLo = rdDec(mm.lo); v.baseHi = rdDec(mm.hi); v.baseN = base.length; }
+      if (tests.length) { v.errNow = rdDec(tests[tests.length - 1]); v.tests = tests.slice(-20).map(rdDec).join(', '); }
       function ends(list, f) { if (list.length) { return [f(list[0]), f(list[list.length - 1])]; } return null; }
       var g = ends(c.filter(function (e) { return e.display === 'gist' && e.extra && e.extra.gistTotal > 0; }), function (e) { return e.extra.gist + '/' + e.extra.gistTotal; });
       if (g) { v.gistThen = g[0]; v.gistNow = g[1]; }
       var s = ends(c.filter(function (e) { return e.mode === 'scan' && e.view === 'find' && e.correct > 0 && e.ms > 0; }), function (e) { return Rtext(R(BigInt(Math.round(e.ms)), BigInt(e.correct) * 1000n)); });
       if (s) { v.scanThen = s[0]; v.scanNow = s[1]; }
-      var r = ends(c.filter(function (e) { return e.mode === 'recall' && e.extra && e.extra.units > 0; }), function (e) { return e.extra.recalled + '/' + e.extra.units; });
+      var r = ends(c.filter(function (e) { return e.mode === 'recall' && e.view === 'free' && e.extra && e.extra.units > 0 && !e.extra.summary; }), function (e) { return e.extra.recalled + '/' + e.extra.units; });
       if (r) { v.recallThen = r[0]; v.recallNow = r[1]; }
       if (!Object.keys(v).length) { msg.textContent = 'Your log has no baseline or test readings yet.'; return; }
       rdWrite(v);
@@ -634,7 +681,7 @@ def _log(cfg, view, kit):
     opts = {"_cfg_keys": ()}
     ui = LOG_FILL_JS
     if view == "noise":
-        fields = [F("base", "Baseline rates, wpm, separated by commas", ("nums", "pos", 2, 10)),
+        fields = [F("base", "Baseline rates, wpm, separated by commas", ("nums", "pos", 2, 20)),
                   F("tests", "Test rates, wpm, oldest first, separated by commas", ("nums", "pos", 1, 20))]
         tiles = [("Baseline mean", "lgMean"), ("Baseline range", "lgRange"), ("Median of the last three tests", "lgTestMedian"),
                  ("Verdict", "lgVerdict"), ("Latest test, how far outside", "lgBeyond")]
@@ -659,10 +706,11 @@ def _log(cfg, view, kit):
         ui += LOG_GEARS_UI_JS
         title = "Typical rates and reading gears"
     elif view == "history":
-        fields = [F("entries", "Sessions: rate/right/asked, oldest first", ("entries", 0, 200)),
+        fields = [F("entries", "Sessions: rate/right/asked, baselines first, then tests, oldest first", ("entries", 0, 200)),
+                  F("baseN", "How many of the sessions are baselines (the first ones)", "nncount", 3),
                   F("practice", "Practice readings (drawn lighter): rate/right/asked", ("entries", 0, 200), [])]
-        tiles = [("Sessions", "lgSessions"), ("Baseline median (first three)", "lgBaseMedian"),
-                 ("Recent median (last three)", "lgRecentMedian"), ("Latest effective rate", "lgLatestErr"), ("Verdict", "lgVerdict")]
+        tiles = [("Sessions", "lgSessions"), ("Baseline median", "lgBaseMedian"),
+                 ("Recent median (last three tests)", "lgRecentMedian"), ("Latest effective rate", "lgLatestErr"), ("Verdict", "lgVerdict")]
         main = _log_controls("Show my log", (
             '        ' + rc.btn("lgExport", "Export as text") + ' ' + rc.btn("lgClearAsk", "Clear my log") + ' '
             + rc.btn("lgClearYes", "Yes, clear it", hidden=True) + ' ' + rc.btn("lgClearNo", "Keep it", hidden=True) + '\n'
@@ -685,6 +733,8 @@ def _log(cfg, view, kit):
         fields = [F("errThen", "Effective rate, first", "pos"), F("errNow", "Effective rate, now", "pos"),
                   F("baseLo", "Baseline range of effective rates: lowest", "opt", ""),
                   F("baseHi", "Baseline range of effective rates: highest", "opt", ""),
+                  F("baseN", "Baseline readings in the range", "nncount", 3),
+                  F("tests", "Your test effective rates, oldest first (empty: the one rate now)", ("nums", "pos", 0, 20), []),
                   F("gistThen", "Skim gist score, first (share)", "share"), F("gistNow", "Skim gist score, now (share)", "share"),
                   F("scanThen", "Scan seconds per target, first", "pos"), F("scanNow", "Scan seconds per target, now", "pos"),
                   F("recallThen", "Free recall share, first", "share"), F("recallNow", "Free recall share, now", "share")]

@@ -25,6 +25,7 @@ lab, so element ids shared with other kits' pages never meet).
 """
 
 from . import readkit_core as rc
+from .readkit_drill import RD_ALOUD_JS as RD_ALOUD
 
 KIT = "readkit"
 DISPLAYS = ("normal", "pacer", "mask", "rsvp", "phrases", "gist", "preview", "aloud")
@@ -34,9 +35,13 @@ TIMED = ("pacer", "mask", "rsvp", "phrases")
 # drill
 # ---------------------------------------------------------------------------
 
-DRILL_JS = r"""
+DR_BASE_JS = r"""
   /* drill: rate = words x 60 / seconds; comprehension = correct / total;
-     effective rate = rate x comprehension (Jackson and McClelland 1979). */
+     effective rate = rate x comprehension (Jackson and McClelland 1979).
+     Each view's computation is its own block, DR[view], and a page ships only
+     its view's (scripts/mathcheck.js runs them all). */
+  var DR = {};
+  function drCompute(view, inst, opts) { return DR[view](inst, opts, view); }
   function drSide(inst, s, kinds) {
     var o = { s: s, words: inst['words' + s], seconds: inst['seconds' + s] };
     o.wpm = rdRate(o.words, o.seconds);
@@ -56,19 +61,75 @@ DRILL_JS = r"""
   function drCompText(o) { return o.comp ? rdShare(o.comp) : 'no questions'; }
   function drErrText(o) { return o.err ? rdUnit(o.err, 'wpm') : 'no questions'; }
   function drMs(x) { return rdUnit(x, 'ms'); }
-  /* The baseline range verdict, on a single reading's rate. */
-  function drVerdict(wpm, lo, hi) {
+  /* One reading against a baseline range of n readings (n absent: three).
+     Fewer than three baselines judge nothing. */
+  function drVerdict(x, lo, hi, n) {
     if (lo === null && hi === null) return 'no baseline readings yet';
-    if (Rcmp(wpm, hi) > 0) return 'above the baseline range once — a fourth reading does this about one time in four';
-    if (Rcmp(wpm, lo) < 0) return 'below the baseline range';
+    var k = n === undefined || n === null ? 3 : Number(n.n);
+    if (k < 3) return rdNeedBase(k);
+    if (Rcmp(x, hi) > 0) return rdOnce(k);
+    if (Rcmp(x, lo) < 0) return 'below the baseline range';
     return 'inside the baseline range';
   }
   function drBase(inst) {
     var lo = inst.baseLo === undefined ? null : inst.baseLo, hi = inst.baseHi === undefined ? null : inst.baseHi;
     if ((lo === null) !== (hi === null)) return { refuse: 'Give both ends of the baseline range, or neither' };
     if (lo !== null && Rcmp(lo, hi) > 0) return { refuse: 'The baseline range runs from the lower rate to the higher one' };
-    return { lo: lo, hi: hi };
+    return { lo: lo, hi: hi, n: inst.baseN };
   }
+"""
+
+DR_SINGLE_JS = r"""
+  DR.single = DR.practice = function (inst, opts, view) {
+    var t = {}, said, d = opts.sides[''].display, o = drSide(inst, '', false), nx;
+    if (o.refuse) return o;
+    t.drWords = rdFig(o.words) + ' words';
+    t.drTime = rdUnit(o.seconds, 's');
+    t.drWpm = rdUnit(o.wpm, 'wpm');
+    t.drComp = drCompText(o);
+    if (d === 'gist') {
+      if (Rcmp(inst.shown, o.words) > 0) return { refuse: 'The words shown cannot be more than the words in the passage' };
+      t.drShown = rdShare(Rdiv(inst.shown, o.words));
+      t.drGistPerMin = Rzero(o.total) ? 'no questions' : rdUnit(Rdiv(Rmul(o.correct, R(60n)), o.seconds), 'gist answers a minute');
+      said = 'The skim showed ' + rdFig(inst.shown) + ' of ' + rdFig(o.words) + ' words for ' + rdUnit(o.seconds, 's')
+        + (Rzero(o.total) ? '.' : ', and ' + rdFig(o.correct) + ' of ' + rdFig(o.total) + ' gist questions were right: '
+        + rdFig(o.correct) + ' × 60 / ' + rdFig(o.seconds) + ' = ' + t.drGistPerMin + '. A skim is scored on gist, not as an effective reading rate.');
+      return { tiles: t, status: said };
+    }
+    t.drErr = drErrText(o);
+    if (view === 'single') t.drStdWpm = rdUnit(rdRate(Rdiv(inst.chars, R(6n)), o.seconds), 'standard wpm');
+    if (d === 'rsvp') {
+      t.drWordMs = drMs(Rdiv(Rmul(R(60000n), inst.chunk), inst.target));
+      t.drWordMsSeen = drMs(Rdiv(Rmul(Rmul(o.seconds, R(1000n)), inst.chunk), o.words));
+    }
+    if (d === 'pacer' || d === 'mask') t.drPacerLineMs = drMs(Rdiv(Rmul(R(60000n), Rparse(opts.lineWords)), inst.target));
+    if (d === 'phrases') t.drPhraseMs = drMs(Rdiv(Rmul(o.words, R(60000n)), Rmul(inst.target, inst.phrases)));
+    if (view === 'practice') {
+      var h = drHoldOf(inst.pacerLog, Rparse(opts.hold));
+      nx = drNextOf(inst.pacerLog, Rparse(opts.hold));
+      t.drHold = h === null ? 'not yet' : rdUnit(h, 'wpm');
+      t.drNextTarget = nx === null ? 'no pacer readings yet' : rdUnit(nx.wpm, 'wpm');
+      t.drTestDue = drTestDueOf(inst.sinceTest);
+    }
+    /* Against the reader's log: the baseline range of effective rates and the
+       median of the last three tests (both from the boxes, which the log fills). */
+    if (opts.vsLog) {
+      var base = drBase(inst);
+      if (base.refuse) return base;
+      t.drVsBase = o.err ? drVerdict(o.err, base.lo, base.hi, base.n) : 'needs questions';
+      t.drVsRecent = inst.recent === null ? 'no recent test median given' : o.err ? rdSigned(Rsub(o.err, inst.recent), 'wpm') : 'needs questions';
+    }
+    said = rdFig(o.words) + ' words in ' + rdUnit(o.seconds, 's') + ' is ' + rdFig(o.words) + ' × 60 / ' + rdFig(o.seconds)
+      + ' = ' + t.drWpm + (o.comp ? '; with ' + rdFig(o.correct) + ' of ' + rdFig(o.total) + ' right the effective rate is '
+      + t.drErr : '; no questions were asked, so comprehension is not scored') + '. One reading is one measurement.'
+      + (t.drWordMsSeen ? ' Each flash was requested for ' + t.drWordMs + '; the reading took ' + t.drWordMsSeen + ' a flash.' : '')
+      + (view === 'practice' ? ' Next pacer target: ' + t.drNextTarget + (nx ? ' (' + nx.why + ')' : '') + '. A test reading: ' + t.drTestDue + '.' : '')
+      + (t.drVsBase ? ' Against your baseline range of effective rates: ' + t.drVsBase + '.' : '');
+    return { tiles: t, status: said };
+  };
+"""
+
+DR_PRACTICE_JS = r"""
   /* The hold target: the fastest pacer target whose last three readings all
      scored at least the hold share. entries: [{wpm (the target), correct, total}] in log order. */
   function drHoldOf(entries, hold) {
@@ -100,114 +161,89 @@ DRILL_JS = r"""
     var n = Number(since.n), left = DR_TEST_EVERY - n;
     return left <= 0 ? 'due now: make the next reading a test' : 'after ' + left + ' more practice session' + (left === 1 ? '' : 's');
   }
-  function drCompute(view, inst, opts) {
-    var t = {}, said, rows = [], sides = opts.sides, o, k;
-    if (view === 'single' || view === 'practice') {
-      var d = sides[''].display;
-      o = drSide(inst, '', false);
+"""
+
+DR_COMPARE_JS = r"""
+  DR.compare = function (inst, opts) {
+    var t = {}, rows = [], sides = opts.sides, A = drSide(inst, 'A', opts.kinds), B = drSide(inst, 'B', opts.kinds), base = drBase(inst);
+    if (A.refuse) return A; if (B.refuse) return B; if (base.refuse) return base;
+    [A, B].forEach(function (x) {
+      t['drWpm' + x.s] = rdUnit(x.wpm, 'wpm'); t['drComp' + x.s] = drCompText(x); t['drErr' + x.s] = drErrText(x);
+      if (opts.kinds) {
+        t['drGist' + x.s] = Rzero(inst['gistTotal' + x.s]) ? 'no gist questions' : rdShare(Rdiv(inst['gist' + x.s], inst['gistTotal' + x.s]));
+        t['drDetail' + x.s] = Rzero(inst['detailTotal' + x.s]) ? 'no detail questions' : rdShare(Rdiv(inst['detail' + x.s], inst['detailTotal' + x.s]));
+      }
+      if (opts.lapses) t['drLapses' + x.s] = rdFig(inst['lapses' + x.s]);
+      rows.push([sides[x.s].label, rdFig(x.words), rdUnit(x.seconds, 's'), t['drWpm' + x.s], t['drComp' + x.s], t['drErr' + x.s]]);
+    });
+    var useErr = opts.ratioOf === 'err' && A.err && B.err && !Rzero(A.err);
+    t.drErrDiff = (A.err && B.err) ? rdSigned(Rsub(B.err, A.err), 'wpm') : 'needs questions on both';
+    if (opts.ratio) t.drRatio = (opts.ratioOf === 'err' && A.err && B.err && Rzero(A.err)) ? 'A\'s effective rate is 0' : rdShare(useErr ? Rdiv(B.err, A.err) : Rdiv(B.wpm, A.wpm));
+    /* A paced B (pacer, mask, stream) ran at the display's rate, not the reader's: no verdict. */
+    if (opts.verdict) t.drVerdictB = drVerdict(B.wpm, base.lo, base.hi, base.n);
+    ['B', 'A'].forEach(function (s) {
+      var d = sides[s].display;
+      if ((d === 'pacer' || d === 'mask') && !t.drPacerLineMs) t.drPacerLineMs = drMs(Rdiv(Rmul(R(60000n), Rparse(opts.lineWords)), inst['target' + s]));
+      if (d === 'rsvp' && !t.drWordMs) {
+        t.drWordMs = drMs(Rdiv(Rmul(R(60000n), inst['chunk' + s]), inst['target' + s]));
+        t.drWordMsSeen = drMs(Rdiv(Rmul(Rmul(inst['seconds' + s], R(1000n)), inst['chunk' + s]), inst['words' + s]));
+      }
+      if (d === 'phrases' && !t.drPhraseMs) t.drPhraseMs = drMs(Rdiv(Rmul(inst['words' + s], R(60000n)), Rmul(inst['target' + s], inst['phrases' + s])));
+    });
+    var said = 'Reading A: ' + t.drWpmA + ', effective ' + t.drErrA + '. Reading B: ' + t.drWpmB + ', effective ' + t.drErrB + '.'
+      + (opts.ratio ? ' B against A: ' + t.drRatio + (useErr ? ' of the effective rate.' : ' of the rate.') : '')
+      + ' Two readings of two passages differ for reasons other than the condition; your baseline range says by how much.'
+      + (opts.verdict ? '' : ' Reading B was paced, so the display set its rate, and it is not set against your baseline range.');
+    return { tiles: t, status: said, table: { caption: 'The two readings', head: ['reading', 'words', 'time', 'rate', 'comprehension', 'effective rate'], rows: rows } };
+  };
+"""
+
+DR_LADDER_JS = r"""
+  DR.ladder = function (inst, opts) {
+    var t = {}, rows = [], runs = [], o, k;
+    for (k = 1; k <= 3; k++) {
+      o = drSide(inst, String(k), false);
       if (o.refuse) return o;
-      t.drWords = rdFig(o.words) + ' words';
-      t.drTime = rdUnit(o.seconds, 's');
-      t.drWpm = rdUnit(o.wpm, 'wpm');
-      t.drComp = drCompText(o);
-      if (d === 'gist') {
-        if (Rcmp(inst.shown, o.words) > 0) return { refuse: 'The words shown cannot be more than the words in the passage' };
-        t.drShown = rdShare(Rdiv(inst.shown, o.words));
-        t.drGistPerMin = Rzero(o.total) ? 'no questions' : rdUnit(Rdiv(Rmul(o.correct, R(60n)), o.seconds), 'gist answers a minute');
-        said = 'The skim showed ' + rdFig(inst.shown) + ' of ' + rdFig(o.words) + ' words for ' + rdUnit(o.seconds, 's')
-          + (Rzero(o.total) ? '.' : ', and ' + rdFig(o.correct) + ' of ' + rdFig(o.total) + ' gist questions were right: '
-          + rdFig(o.correct) + ' × 60 / ' + rdFig(o.seconds) + ' = ' + t.drGistPerMin + '. A skim is scored on gist, not as an effective reading rate.');
-        return { tiles: t, status: said };
-      }
-      t.drErr = drErrText(o);
-      if (view === 'single') t.drStdWpm = rdUnit(rdRate(Rdiv(inst.chars, R(6n)), o.seconds), 'standard wpm');
-      if (d === 'rsvp') {
-        t.drWordMs = drMs(Rdiv(Rmul(R(60000n), inst.chunk), inst.target));
-        t.drWordMsSeen = drMs(Rdiv(Rmul(Rmul(o.seconds, R(1000n)), inst.chunk), o.words));
-      }
-      if (d === 'pacer' || d === 'mask') t.drPacerLineMs = drMs(Rdiv(Rmul(R(60000n), Rparse(opts.lineWords)), inst.target));
-      if (d === 'phrases') t.drPhraseMs = drMs(Rdiv(Rmul(o.words, R(60000n)), Rmul(inst.target, inst.phrases)));
-      if (view === 'practice') {
-        var h = drHoldOf(inst.pacerLog, Rparse(opts.hold)), nx = drNextOf(inst.pacerLog, Rparse(opts.hold));
-        t.drHold = h === null ? 'not yet' : rdUnit(h, 'wpm');
-        t.drNextTarget = nx === null ? 'no pacer readings yet' : rdUnit(nx.wpm, 'wpm');
-        t.drTestDue = drTestDueOf(inst.sinceTest);
-      }
-      said = rdFig(o.words) + ' words in ' + rdUnit(o.seconds, 's') + ' is ' + rdFig(o.words) + ' × 60 / ' + rdFig(o.seconds)
-        + ' = ' + t.drWpm + (o.comp ? '; with ' + rdFig(o.correct) + ' of ' + rdFig(o.total) + ' right the effective rate is '
-        + t.drErr : '; no questions were asked, so comprehension is not scored') + '. One reading is one measurement.'
-        + (t.drWordMsSeen ? ' Each flash was requested for ' + t.drWordMs + '; the reading took ' + t.drWordMsSeen + ' a flash.' : '')
-        + (view === 'practice' ? ' Next pacer target: ' + t.drNextTarget + (nx ? ' (' + nx.why + ')' : '') + '. A test reading: ' + t.drTestDue + '.' : '');
-      return { tiles: t, status: said };
+      o.target = inst['t' + k];
+      runs.push(o);
+      t['drWpm' + k] = rdUnit(o.wpm, 'wpm'); t['drErr' + k] = drErrText(o);
+      rows.push(['run ' + k, rdUnit(o.target, 'wpm'), t['drWpm' + k], drCompText(o), t['drErr' + k]]);
     }
-    if (view === 'compare') {
-      var A = drSide(inst, 'A', opts.kinds), B = drSide(inst, 'B', opts.kinds), base = drBase(inst);
-      if (A.refuse) return A; if (B.refuse) return B; if (base.refuse) return base;
-      [A, B].forEach(function (x) {
-        t['drWpm' + x.s] = rdUnit(x.wpm, 'wpm'); t['drComp' + x.s] = drCompText(x); t['drErr' + x.s] = drErrText(x);
-        if (opts.kinds) {
-          t['drGist' + x.s] = Rzero(inst['gistTotal' + x.s]) ? 'no gist questions' : rdShare(Rdiv(inst['gist' + x.s], inst['gistTotal' + x.s]));
-          t['drDetail' + x.s] = Rzero(inst['detailTotal' + x.s]) ? 'no detail questions' : rdShare(Rdiv(inst['detail' + x.s], inst['detailTotal' + x.s]));
-        }
-        rows.push([sides[x.s].label, rdFig(x.words), rdUnit(x.seconds, 's'), t['drWpm' + x.s], t['drComp' + x.s], t['drErr' + x.s]]);
-      });
-      var useErr = opts.ratioOf === 'err' && A.err && B.err && !Rzero(A.err);
-      t.drErrDiff = (A.err && B.err) ? rdSigned(Rsub(B.err, A.err), 'wpm') : 'needs questions on both';
-      t.drRatio = (opts.ratioOf === 'err' && A.err && B.err && Rzero(A.err)) ? 'A\'s effective rate is 0' : rdShare(useErr ? Rdiv(B.err, A.err) : Rdiv(B.wpm, A.wpm));
-      t.drVerdictB = drVerdict(B.wpm, base.lo, base.hi);
-      ['B', 'A'].forEach(function (s) {
-        var d = sides[s].display;
-        if ((d === 'pacer' || d === 'mask') && !t.drPacerLineMs) t.drPacerLineMs = drMs(Rdiv(Rmul(R(60000n), Rparse(opts.lineWords)), inst['target' + s]));
-        if (d === 'rsvp' && !t.drWordMs) {
-          t.drWordMs = drMs(Rdiv(Rmul(R(60000n), inst['chunk' + s]), inst['target' + s]));
-          t.drWordMsSeen = drMs(Rdiv(Rmul(Rmul(inst['seconds' + s], R(1000n)), inst['chunk' + s]), inst['words' + s]));
-        }
-        if (d === 'phrases' && !t.drPhraseMs) t.drPhraseMs = drMs(Rdiv(Rmul(inst['words' + s], R(60000n)), Rmul(inst['target' + s], inst['phrases' + s])));
-      });
-      said = 'Reading A: ' + t.drWpmA + ', effective ' + t.drErrA + '. Reading B: ' + t.drWpmB + ', effective ' + t.drErrB
-        + '. B against A: ' + t.drRatio + (useErr ? ' of the effective rate.' : ' of the rate.')
-        + ' Two readings of two passages differ for reasons other than the condition; your baseline range says by how much.';
-      return { tiles: t, status: said, table: { caption: 'The two readings', head: ['reading', 'words', 'time', 'rate', 'comprehension', 'effective rate'], rows: rows } };
+    var best = null, top = null;
+    runs.forEach(function (r) {
+      if (r.comp && Rcmp(r.comp, Rparse(opts.hold)) >= 0 && (best === null || Rcmp(r.target, best.target) > 0)) best = r;
+      if (r.err && (top === null || Rcmp(r.err, top.err) > 0 || (Rcmp(r.err, top.err) === 0 && Rcmp(r.target, top.target) < 0))) top = r;
+    });
+    t.drBestTarget = best ? rdUnit(best.target, 'wpm') : 'none at ' + opts.hold + ' or better';
+    t.drBestErr = best ? rdUnit(best.err, 'wpm') : RD_DASH;
+    t.drTopErr = top ? rdUnit(top.err, 'wpm') + ' (target ' + rdUnit(top.target, 'wpm') + ')' : 'no questions';
+    return { tiles: t, status: 'The fastest target at which comprehension held at ' + opts.hold + ' or better: ' + t.drBestTarget
+      + '. The highest effective rate of the three runs: ' + t.drTopErr + '.',
+      table: { caption: 'Three pacer runs', head: ['run', 'target', 'rate', 'comprehension', 'effective rate'], rows: rows } };
+  };
+"""
+
+DR_REPEAT_JS = r"""
+  DR.repeat = function (inst) {
+    var t = {}, rows = [], w = [], o;
+    for (var k = 1; k <= 4; k++) {
+      o = drSide(inst, String(k), false);
+      if (o.refuse) return o;
+      w.push(o.wpm);
+      t['drWpm' + k] = rdUnit(o.wpm, 'wpm');
+      rows.push([k < 4 ? 'repeated passage, reading ' + k : 'new passage', t['drWpm' + k], drCompText(o)]);
     }
-    if (view === 'ladder') {
-      var runs = [];
-      for (k = 1; k <= 3; k++) {
-        o = drSide(inst, String(k), false);
-        if (o.refuse) return o;
-        o.target = inst['t' + k];
-        runs.push(o);
-        t['drWpm' + k] = rdUnit(o.wpm, 'wpm'); t['drErr' + k] = drErrText(o);
-        rows.push(['run ' + k, rdUnit(o.target, 'wpm'), t['drWpm' + k], drCompText(o), t['drErr' + k]]);
-      }
-      var best = null, top = null;
-      runs.forEach(function (r) {
-        if (r.comp && Rcmp(r.comp, Rparse(opts.hold)) >= 0 && (best === null || Rcmp(r.target, best.target) > 0)) best = r;
-        if (r.err && (top === null || Rcmp(r.err, top.err) > 0 || (Rcmp(r.err, top.err) === 0 && Rcmp(r.target, top.target) < 0))) top = r;
-      });
-      t.drBestTarget = best ? rdUnit(best.target, 'wpm') : 'none at ' + opts.hold + ' or better';
-      t.drBestErr = best ? rdUnit(best.err, 'wpm') : RD_DASH;
-      t.drTopErr = top ? rdUnit(top.err, 'wpm') + ' (target ' + rdUnit(top.target, 'wpm') + ')' : 'no questions';
-      said = 'The fastest target at which comprehension held at ' + opts.hold + ' or better: ' + t.drBestTarget
-        + '. The highest effective rate of the three runs: ' + t.drTopErr + '.';
-      return { tiles: t, status: said, table: { caption: 'Three pacer runs', head: ['run', 'target', 'rate', 'comprehension', 'effective rate'], rows: rows } };
-    }
-    if (view === 'repeat') {
-      var w = [];
-      for (k = 1; k <= 4; k++) {
-        o = drSide(inst, String(k), false);
-        if (o.refuse) return o;
-        w.push(o.wpm);
-        t['drWpm' + k] = rdUnit(o.wpm, 'wpm');
-        rows.push([k < 4 ? 'repeated passage, reading ' + k : 'new passage', t['drWpm' + k], drCompText(o)]);
-      }
-      t.drRepeatGain = rdSigned(Rsub(w[2], w[0]), 'wpm');
-      t.drTransferGain = rdSigned(Rsub(w[3], w[0]), 'wpm');
-      said = 'On the repeated passage the rate moved ' + t.drRepeatGain + ' from the first reading to the third; on the new passage, '
-        + t.drTransferGain + ' against the first. Only the second is a change in the reader.';
-      return { tiles: t, status: said, table: { caption: 'Four readings', head: ['reading', 'rate', 'comprehension'], rows: rows } };
-    }
-    /* sections */
-    var r1 = rdRate(inst.words1, inst.seconds1), r2 = rdRate(inst.words2, inst.seconds2);
+    t.drRepeatGain = rdSigned(Rsub(w[2], w[0]), 'wpm');
+    t.drTransferGain = rdSigned(Rsub(w[3], w[0]), 'wpm');
+    return { tiles: t, status: 'On the repeated passage the rate moved ' + t.drRepeatGain + ' from the first reading to the third; on the new passage, '
+      + t.drTransferGain + ' against the first. Only the second is a change in the reader.',
+      table: { caption: 'Four readings', head: ['reading', 'rate', 'comprehension'], rows: rows } };
+  };
+"""
+
+DR_SECTIONS_JS = r"""
+  DR.sections = function (inst) {
+    var t = {}, r1 = rdRate(inst.words1, inst.seconds1), r2 = rdRate(inst.words2, inst.seconds2);
     var whole = { words: Radd(inst.words1, inst.words2), seconds: Radd(inst.seconds1, inst.seconds2), correct: inst.correct, total: inst.total };
     if (Rcmp(inst.correct, inst.total) > 0) return { refuse: 'More questions right than asked' };
     whole.wpm = rdRate(whole.words, whole.seconds);
@@ -215,10 +251,13 @@ DRILL_JS = r"""
     whole.err = whole.comp ? Rmul(whole.wpm, whole.comp) : null;
     t.drRateS1 = rdUnit(r1, 'wpm'); t.drRateS2 = rdUnit(r2, 'wpm'); t.drWpm = rdUnit(whole.wpm, 'wpm');
     t.drComp = drCompText(whole); t.drErr = drErrText(whole);
-    said = 'Section 1: ' + t.drRateS1 + '; section 2: ' + t.drRateS2 + '. The whole passage: ' + t.drWpm + ', effective ' + t.drErr + '.';
-    return { tiles: t, status: said };
-  }
+    return { tiles: t, status: 'Section 1: ' + t.drRateS1 + '; section 2: ' + t.drRateS2 + '. The whole passage: ' + t.drWpm + ', effective ' + t.drErr + '.' };
+  };
 """
+
+DR_VIEW_JS = {"single": DR_SINGLE_JS, "practice": DR_SINGLE_JS + DR_PRACTICE_JS, "compare": DR_COMPARE_JS,
+              "ladder": DR_LADDER_JS, "repeat": DR_REPEAT_JS, "sections": DR_SECTIONS_JS}
+
 
 PRACTICE_JS = r"""
   /* drill/practice: the pool passage not yet in the log, a pacer or not, a
@@ -252,42 +291,64 @@ PRACTICE_JS = r"""
     rdMsg(k, 'Next unread passage: ' + st.passage.title + '.');
     return true;
   }
-  function rdPracticeAfter() { var v = { sinceTest: rdSinceTest() }, t = rdPacerLogText(); if (t !== '') v.pacerLog = t; rdWrite(v); }
+  /* After a Score (and at load, once the log holds anything): the boxes hold
+     the reader's own pacer log and count, never the worked example's. */
+  function rdAfterScore() { rdWrite({ pacerLog: rdPacerLogText(), sinceTest: rdSinceTest() }); }
 """
 
 PRACTICE_INIT_JS = r"""
   (function () {
-    var t = rdPacerLogText(), v = {};
-    if (t !== '') v.pacerLog = t;
-    if (rdLogRead().length) v.sinceTest = rdSinceTest();
-    if (t !== '' || v.sinceTest !== undefined) rdWrite(v);
+    if (rdLogRead().length) rdAfterScore();
     var id = rdPoolNext(), m = document.getElementById('rdPool');
     if (m) m.textContent = id ? 'Next unread passage: ' + PASSAGES[id].title + '.' : 'Every passage in the pool is in your log.';
   })();
 """
 
 BASELINE_UI_JS = r"""
-  /* The baseline range from the log: the first three readings logged as
-     "baseline" (rate = words x 60,000 / ms, exact). Filled at load only when
-     the shipped preset leaves the range empty; the button fills it on request. */
-  function rdBaselineRange() {
-    var rates = rdLogRead().filter(function (e) { return e.kind === 'baseline' && e.words > 0 && e.ms > 0; }).slice(0, 3)
-      .map(function (e) { return R(BigInt(Math.round(e.words)) * 60000n, BigInt(Math.round(e.ms))); });
-    if (!rates.length) return null;
-    var s = rates.slice().sort(Rcmp);
-    return { baseLo: Rtext(s[0]), baseHi: Rtext(s[s.length - 1]), n: rates.length };
+  /* The baseline range from the log: every reading logged as "baseline"
+     (rate = words x 60,000 / ms; DR_EFF: effective rates, with the median of
+     the last three tests). Filled at load when the boxes are empty, after each
+     Score, and on the button; as decimals of at most two places. */
+  function rdBaseFill(quiet) {
+    var note = document.getElementById('rdBaseNote'), list = rdLogRead(), r = rdKindRates('baseline', DR_EFF, list), v = {}, ts;
+    if (!r.length) { if (!quiet) note.textContent = 'Your log has no readings marked as baselines yet.'; return; }
+    r.sort(Rcmp);
+    v.baseLo = rdDec(r[0]); v.baseHi = rdDec(r[r.length - 1]); v.baseN = r.length;
+    if (DR_EFF && (ts = rdKindRates('test', true, list).slice(-3)).length === 3) v.recent = rdDec(rdMedian(ts));
+    rdWrite(v);
+    note.textContent = 'From your log: ' + r.length + ' baseline reading' + (r.length === 1 ? '' : 's') + (r.length < 3 ? '; a verdict needs three.' : '.');
   }
+  function rdAfterScore() { rdBaseFill(true); }
   (function () {
-    var btnEl = document.getElementById('rdUseBase'), note = document.getElementById('rdBaseNote');
-    function fill() {
-      var r = rdBaselineRange();
-      if (!r) { if (note) note.textContent = 'Your log has no readings marked as baselines yet.'; return false; }
-      rdWrite({ baseLo: r.baseLo, baseHi: r.baseHi });
-      if (note) note.textContent = 'Baseline range from your first ' + r.n + ' baseline reading' + (r.n === 1 ? '' : 's') + '.';
-      return true;
-    }
-    if (btnEl) btnEl.addEventListener('click', fill);
-    if (field('drInBaseLo') && field('drInBaseLo').value === '' && rdBaselineRange()) fill();
+    var n = rdKindRates('baseline', DR_EFF).length;
+    document.getElementById('rdUseBase').addEventListener('click', function () { rdBaseFill(false); });
+    if (field('drInBaseLo').value === '') rdBaseFill(true);
+    else if (n) document.getElementById('rdBaseNote').textContent = 'Your log has ' + n + ' baseline reading' + (n === 1 ? '' : 's') + '; the button puts them in the boxes.';
+  })();
+"""
+
+TARGET_UI_JS = r"""
+  /* The target box(es) from the log: the median of the baseline rates times
+     each box's stated multiple, in whole wpm; on the practice page, the next
+     pacer target when the pacer log has one. Only on the button. */
+  (function () {
+    var note = document.getElementById('rdTargetNote');
+    document.getElementById('rdUseTarget').addEventListener('click', function () {
+      var v = {}, nx = null, r, med, why;
+      if (VIEW === 'practice') {
+        try { nx = drNextOf(rdEntries(field('drInPacerLog').value, { what: 'x', lo: 0, hi: 200 }), Rparse(OPTS.hold)); } catch (err) { nx = null; }
+      }
+      if (nx) { v.target = rdDec(nx.wpm); why = 'your next pacer target (' + nx.why + ')'; }
+      else {
+        r = rdKindRates('baseline', false);
+        if (!r.length) { note.textContent = 'Your log has no baseline readings yet; type a target.'; return; }
+        med = rdMedian(r);
+        DR_TGT.forEach(function (x) { v[x[0]] = rdWhole(Rmul(med, Rparse(x[1]))); });
+        why = 'the median of your ' + r.length + ' baseline reading' + (r.length === 1 ? '' : 's') + ', ' + rdUnit(med, 'wpm');
+      }
+      rdWrite(v);
+      note.textContent = 'Filled from ' + why + '.';
+    });
   })();
 """
 
@@ -310,6 +371,7 @@ def F(key, label, kind, default=None):
 
 
 ATTENTION = {"label": "My attention left the text at some point", "key": "lapse"}
+LAPSES = {"label": "Times my attention left the text", "key": "lapses", "count": True}
 
 
 def one_question_note(n):
@@ -332,7 +394,7 @@ def _side_cfg(kit, name, sc, passage, default_kind):
     """A drill side's settings, checked: display, questions, target, chunk, limit, kind."""
     if not isinstance(sc, dict):
         raise ValueError("%s: cfg[%r] must be a dict of that reading's settings" % (kit, name))
-    allowed = {"display", "questions", "target", "chunk", "limit", "kind", "label", "suppress", "published"}
+    allowed = {"display", "questions", "target", "chunk", "limit", "kind", "label", "suppress", "published", "intro", "fromBase"}
     extra = sorted(set(sc) - allowed)
     if extra:
         raise ValueError("%s: cfg[%r] has %s; a reading's settings are %s" % (kit, name, ", ".join(extra), ", ".join(sorted(allowed))))
@@ -361,6 +423,12 @@ def _side_cfg(kit, name, sc, passage, default_kind):
     out["limit"] = None if lim is None else int(lim)
     pub = rc.num(kit, sc, "published", 183, lo=1, hi=1000, whole=True)
     out["published"] = int(pub)
+    say = sc.get("intro")
+    if say is not None and (not isinstance(say, str) or not say.strip() or "<" in say):
+        raise ValueError("%s: %s intro is a plain-text instruction for that reading" % (kit, name))
+    out["say"] = say.strip() if say else None
+    fb = rc.num(kit, sc, "fromBase", 1, lo=rc.Fraction(1, 10), hi=10)
+    out["fromBase"] = rc.ftext(fb)
     return out
 
 
@@ -409,12 +477,16 @@ def _write_map(fields, s):
 def _slot_intro(sc, passage):
     d = sc["display"]
     base = {"normal": "Read at your usual pace.", "aloud": "Read this one aloud.",
-            "pacer": "A highlight moves line by line at the target rate in the box below; read with it.",
+            "pacer": "A highlight moves line by line at the rate in the target box; read with it.",
             "mask": "A highlight moves line by line and the lines above it disappear.",
             "rsvp": "The passage is flashed a word at a time at the target rate.",
             "phrases": "The passage is shown a phrase at a time at the target rate.",
             "gist": "A skim: only headings and first sentences, for a fixed time.",
             "preview": "A preview of headings, the first and the last paragraph, then the whole passage."}[d]
+    if d == "normal" and sc.get("limit"):
+        base = "The passage disappears after %d seconds; press Done if you finish first." % sc["limit"]
+    if sc.get("say"):
+        base = sc["say"]
     if d in ("rsvp", "phrases"):
         base += " " + rc.PHOTO_NOTE
     if sc["suppress"]:
@@ -434,11 +506,32 @@ def _slot_markup(k, sc, passage, heading, flow="read"):
     return rc.slot_html(k, heading, _slot_intro(sc, passage), extra)
 
 
+def _target_markup(button):
+    return ('      <p class="small-copy" style="margin-top:8px;">' + rc.btn("rdUseTarget", button)
+            + ' <span id="rdTargetNote"></span></p>\n')
+
+
+def _base_fields(recent=False):
+    f = [F("baseLo", "Baseline range: lowest %s (empty if none)" % ("effective rate" if recent else "rate"), "opt", ""),
+         F("baseHi", "Baseline range: highest %s (empty if none)" % ("effective rate" if recent else "rate"), "opt", ""),
+         F("baseN", "Baseline readings in the range", "nncount", 3)]
+    if recent:
+        f.append(F("recent", "Median of your last three tests, effective (empty if none)", "opt", ""))
+    return f
+
+
+def _base_markup():
+    return ('      <p class="small-copy" style="margin-top:8px;">' + rc.btn("rdUseBase", "Use my baseline range")
+            + ' <span id="rdBaseNote"></span></p>\n')
+
+
 def _drill(cfg, view, kit):
     lw = rc.num(kit, cfg, "lineWords", 12, lo=1, hi=40, whole=True)
     hold = rc.num(kit, cfg, "hold", "2/3", lo=0, hi=1)
     opts = {"lineWords": rc.ftext(lw), "_cfg_keys": ("passage", "passages", "lineWords")}
-    fields, tiles, slots, main, js, extra_keys = [], [], {}, "", DRILL_JS, ()
+    fields, tiles, slots, main, extra_keys = [], [], {}, "", ()
+    js = DR_BASE_JS + DR_VIEW_JS[view] if view in DR_VIEW_JS else ""
+    ui, tgt, note_q, eff = "", [], [], None
     if view in ("single", "practice"):
         if view == "single":
             (p,) = rc.passages_of(cfg, kit, 1)
@@ -448,7 +541,7 @@ def _drill(cfg, view, kit):
             if not pool:
                 raise ValueError("%s: drill/practice needs cfg[\"pool\"], a list of passages" % kit)
             p = pool[0]
-        sc_cfg = {k: cfg[k] for k in ("display", "questions", "target", "chunk", "limit", "kind", "suppress") if k in cfg}
+        sc_cfg = {k: cfg[k] for k in ("display", "questions", "target", "chunk", "limit", "kind", "suppress", "fromBase") if k in cfg}
         if view == "practice" and "pool" in cfg:
             if "passages" in cfg or "passage" in cfg:
                 raise ValueError("%s: give the pool as cfg[\"pool\"] or cfg[\"passages\"], not both" % kit)
@@ -464,9 +557,14 @@ def _drill(cfg, view, kit):
             sc["display"] = "normal"
             for q in pool:
                 _kinds_ok(kit, "pool", q, "all")
-        opts["_cfg_keys"] += ("display", "questions", "target", "chunk", "limit", "kind", "suppress", "published")
+        opts["_cfg_keys"] += ("display", "questions", "target", "chunk", "limit", "kind", "suppress", "published", "fromBase")
         if view == "practice":
             opts["_cfg_keys"] += ("hold", "pool")
+        vs = cfg.get("vsLog", False)
+        if view == "single":
+            opts["_cfg_keys"] += ("vsLog",)
+            if not isinstance(vs, bool) or (vs and (sc["display"] == "gist" or not sc["questions"])):
+                raise ValueError("%s: cfg[\"vsLog\"] is True or False, and needs questions and a display other than gist" % kit)
         fields = _side_fields("", dict(sc, display="pacer") if view == "practice" else sc, p, "", chars=(view == "single"))
         if view == "practice":
             for i, f in enumerate(fields):
@@ -474,6 +572,9 @@ def _drill(cfg, view, kit):
                     fields[i] = F(f[0], f[1], "nncount", 0)
             fields.append(F("pacerLog", "Your pacer practice: target/right/asked, oldest first", ("entries", 0, 200), []))
             fields.append(F("sinceTest", "Practice sessions since your last test reading", "nncount", 0))
+        if vs:
+            fields += _base_fields(recent=True)
+            opts["vsLog"] = True
         d = sc["display"]
         tiles = [("Words", "drWords"), ("Time", "drTime")]
         if d == "gist":
@@ -488,16 +589,25 @@ def _drill(cfg, view, kit):
                 tiles.append(("Pacer time for a line of %s words" % rc.ftext(lw), "drPacerLineMs"))
             if d == "phrases":
                 tiles.append(("Mean time per phrase", "drPhraseMs"))
+        if vs:
+            tiles += [("Effective rate against your baseline range", "drVsBase"),
+                      ("Effective rate against your recent test median", "drVsRecent")]
         if view == "practice":
             tiles += [("Hold target: last three pacer runs at it all at %s or better" % rc.ftext(hold), "drHold"),
                       ("Next pacer target", "drNextTarget"), ("Next test reading", "drTestDue")]
             opts["hold"] = rc.ftext(hold)
         opts["sides"] = {"": {"display": d, "label": ""}}
-        slots[""] = rc.slot("", None if view == "practice" else p, intro=_slot_intro(sc, p), kind=sc["kind"], mode="drill",
+        intro = _slot_intro(sc, p)
+        if view == "practice":
+            intro = ("Press Start for the next unread passage of the pool: at your usual pace, or with the pacer at the rate in "
+                     "the target box when its box is ticked. Then its questions, one at a time, with the passage hidden.")
+        slots[""] = rc.slot("", None if view == "practice" else p, intro=intro, kind=sc["kind"], mode="drill",
                             view=view, display=d, questions=sc["questions"], qkinds=sc["qkinds"], flow=view if view == "practice" else "read",
                             write=_write_map(fields, ""), target_key="target" if d in TIMED or view == "practice" else None,
                             chunk=int(sc["chunk"]), limit=sc["limit"], suppress=sc["suppress"], published=sc["published"],
-                            tick=ATTENTION if view == "practice" else None)
+                            tick=ATTENTION if view == "practice" else None, say=sc["say"])
+        if d in TIMED or view == "practice":
+            tgt = [["target", sc["fromBase"]]]
         if view == "practice":
             main = ('      <div class="card card-pad" style="margin-top:12px;">\n'
                     '        <p class="small-copy" id="rdPool" style="margin:0 0 8px;"></p>\n'
@@ -509,31 +619,47 @@ def _drill(cfg, view, kit):
                     '      </div>\n')
             main += rc.slot_html("", "Practice reading", slots[""]["intro"])
             js += PRACTICE_JS
-            opts["_pool"] = [q["id"] for q in pool]
+            ui = "  var RD_POOL = %s;\n" % rc.json.dumps([q["id"] for q in pool]) + PRACTICE_INIT_JS
         else:
             main = _slot_markup("", sc, p, "Timed reading: " + p["title"])
+        if vs:
+            main += _base_markup()
+            eff = True
         passages = pool
     elif view == "compare":
         pa, pb = rc.passages_of(cfg, kit, 2)
         kinds = cfg.get("kinds", False)
-        if not isinstance(kinds, bool):
-            raise ValueError("%s: cfg[\"kinds\"] is True or False" % kit)
-        ratio = cfg.get("ratioOf", "err")
-        if ratio not in ("err", "wpm"):
+        lapses = cfg.get("lapses", False)
+        ratio = cfg.get("ratio", True)
+        for key, v in (("kinds", kinds), ("lapses", lapses), ("ratio", ratio)):
+            if not isinstance(v, bool):
+                raise ValueError("%s: cfg[%r] is True or False" % (kit, key))
+        ratio_of = cfg.get("ratioOf", "err")
+        if ratio_of not in ("err", "wpm"):
             raise ValueError("%s: cfg[\"ratioOf\"] is \"err\" (effective rate) or \"wpm\" (rate)" % kit)
         sa = _side_cfg(kit, "a", cfg.get("a", {}), pa, "condition")
         sb = _side_cfg(kit, "b", cfg.get("b", {}), pb, "condition")
         sa["label"] = cfg.get("a", {}).get("label", "Reading A")
         sb["label"] = cfg.get("b", {}).get("label", "Reading B")
-        fields = (_side_fields("A", sa, pa, "A", kinds=kinds) + _side_fields("B", sb, pb, "B", kinds=kinds)
-                  + [F("baseLo", "Baseline range: lowest rate (empty if none)", "opt", ""),
-                     F("baseHi", "Baseline range: highest rate (empty if none)", "opt", "")])
+        if lapses and (sa["suppress"] or sb["suppress"]):
+            raise ValueError("%s: a side with suppress asks its own tick, so cfg[\"lapses\"] cannot go with it" % kit)
+        verdict = sb["display"] not in TIMED
+        fields = _side_fields("A", sa, pa, "A", kinds=kinds) + _side_fields("B", sb, pb, "B", kinds=kinds)
+        if lapses:
+            fields += [F("lapsesA", "Times attention left the text (A)", "nncount", 0),
+                       F("lapsesB", "Times attention left the text (B)", "nncount", 0)]
+        if verdict:
+            fields += _base_fields()
         tiles = [("Rate A", "drWpmA"), ("Rate B", "drWpmB"), ("Comprehension A", "drCompA"), ("Comprehension B", "drCompB")]
         if kinds:
             tiles += [("Gist A", "drGistA"), ("Detail A", "drDetailA"), ("Gist B", "drGistB"), ("Detail B", "drDetailB")]
-        tiles += [("Effective rate A", "drErrA"), ("Effective rate B", "drErrB"), ("Effective rate, B − A", "drErrDiff"),
-                  ("B / A, " + ("effective rate" if ratio == "err" else "rate"), "drRatio"),
-                  ("Rate B against your baseline range", "drVerdictB")]
+        tiles += [("Effective rate A", "drErrA"), ("Effective rate B", "drErrB"), ("Effective rate, B − A", "drErrDiff")]
+        if ratio:
+            tiles.append(("B / A, " + ("effective rate" if ratio_of == "err" else "rate"), "drRatio"))
+        if lapses:
+            tiles += [("Times attention left the text, A", "drLapsesA"), ("Times attention left the text, B", "drLapsesB")]
+        if verdict:
+            tiles.append(("Rate B against your baseline range", "drVerdictB"))
         ds = (sa["display"], sb["display"])
         if "pacer" in ds or "mask" in ds:
             tiles.append(("Pacer time for a line of %s words" % rc.ftext(lw), "drPacerLineMs"))
@@ -542,21 +668,28 @@ def _drill(cfg, view, kit):
         if "phrases" in ds:
             tiles.append(("Mean time per phrase", "drPhraseMs"))
         opts.update(sides={"A": {"display": sa["display"], "label": sa["label"]}, "B": {"display": sb["display"], "label": sb["label"]}},
-                    kinds=kinds, ratioOf=ratio)
-        opts["_cfg_keys"] += ("a", "b", "kinds", "ratioOf", "order")
+                    kinds=kinds, ratioOf=ratio_of, ratio=ratio, lapses=lapses, verdict=verdict)
+        opts["_cfg_keys"] += ("a", "b", "kinds", "ratioOf", "order", "ratio", "lapses")
         order = cfg.get("order", "alternate")
         if order not in ("AB", "BA", "alternate"):
             raise ValueError("%s: cfg[\"order\"] is \"AB\", \"BA\" or \"alternate\"" % kit)
         for k, sc, p in (("A", sa, pa), ("B", sb, pb)):
+            wm = _write_map(fields, k)
+            if lapses:
+                wm["lapses"] = "lapses" + k
             slots[k] = rc.slot(k, p, intro=_slot_intro(sc, p), kind=sc["kind"], mode="drill", view="compare",
                                display=sc["display"], questions=sc["questions"], qkinds=sc["qkinds"],
-                               write=_write_map(fields, k), target_key=("target" + k) if sc["display"] in TIMED else None,
-                               chunk=int(sc["chunk"]), limit=sc["limit"], suppress=sc["suppress"], published=sc["published"])
+                               write=wm, target_key=("target" + k) if sc["display"] in TIMED else None,
+                               chunk=int(sc["chunk"]), limit=sc["limit"], suppress=sc["suppress"], published=sc["published"],
+                               tick=LAPSES if lapses else None, say=sc["say"])
             main += _slot_markup(k, sc, p, "%s: %s" % (sc["label"], p["title"]))
+            if sc["display"] in TIMED:
+                tgt.append(["target" + k, sc["fromBase"]])
         main = '      <p class="small-copy" id="rdOrder" style="margin:12px 0 0;"></p>\n' + main
-        main += ('      <p class="small-copy" style="margin-top:8px;">' + rc.btn("rdUseBase", "Use my baseline range")
-                 + ' <span id="rdBaseNote"></span></p>\n')
-        extra_ui = BASELINE_UI_JS + "  var DR_ORDER = %s;\n" % rc.json.dumps(order) + ORDER_UI_JS
+        if verdict:
+            main += _base_markup()
+            eff = False
+        ui = "  var DR_ORDER = %s;\n" % rc.json.dumps(order) + ORDER_UI_JS
         note_q = [pa, pb]
         passages = [pa, pb]
     elif view == "ladder":
@@ -579,6 +712,9 @@ def _drill(cfg, view, kit):
                                     display=disp, write=_write_map(fs, str(i)), target_key="t%d" % i if disp != "normal" else None)
             main += _slot_markup(str(i), sc, p, "Run %d: %s" % (i, p["title"]))
             tiles += [("Rate, run %d" % i, "drWpm%d" % i), ("Effective rate, run %d" % i, "drErr%d" % i)]
+            if disp != "normal":
+                # The targets keep the cfg's proportions: run i is the median times targets[i] / targets[0].
+                tgt.append(["t%d" % i, rc.ftext(rc.num(kit, {"t": tgs[i - 1]}, "t", None) / rc.num(kit, {"t": tgs[0]}, "t", None))])
         tiles += [("Fastest target holding %s" % rc.ftext(hold), "drBestTarget"), ("Its effective rate", "drBestErr"),
                   ("Highest effective rate of the three", "drTopErr")]
         opts["sides"] = {}
@@ -589,10 +725,14 @@ def _drill(cfg, view, kit):
         qs = cfg.get("questions", [False, False, True, True])
         if not isinstance(qs, list) or len(qs) != 4 or not all(isinstance(x, bool) for x in qs):
             raise ValueError("%s: cfg[\"questions\"] lists, for each of the four readings, True or False" % kit)
+        kd = cfg.get("kind", "condition")
+        kd = kd if isinstance(kd, list) else [kd] * 4
+        if len(kd) != 4:
+            raise ValueError("%s: cfg[\"kind\"] is one log kind, or a list of four, one per reading" % kit)
         opts["_cfg_keys"] += ("questions", "kind")
         for i in range(1, 5):
             p = pa if i < 4 else pb
-            sc = _side_cfg(kit, "reading %d" % i, {"questions": qs[i - 1], "kind": cfg.get("kind", "condition")}, p, "condition")
+            sc = _side_cfg(kit, "reading %d" % i, {"questions": qs[i - 1], "kind": kd[i - 1]}, p, "condition")
             fs = _side_fields(str(i), sc, p, "reading %d" % i)
             fields += fs
             slots[str(i)] = rc.slot(str(i), p, intro=_slot_intro(sc, p), kind=sc["kind"], mode="drill", view="repeat",
@@ -628,19 +768,22 @@ def _drill(cfg, view, kit):
         passages = [p]
     else:
         raise ValueError("%s: unknown view %r" % (kit, view))
+    if tgt:
+        main += _target_markup("Use my next target" if view == "practice" else "Use my baseline median")
+        ui += "  var DR_TGT = %s;\n" % rc.json.dumps(tgt) + TARGET_UI_JS
+    if eff is not None:
+        ui = "  var DR_EFF = %s;\n" % ("true" if eff else "false") + BASELINE_UI_JS + ui
+    if any(sl["display"] == "aloud" for sl in slots.values()):
+        js += RD_ALOUD
     title, sub = "Timed reading drill", "rate, comprehension and the effective rate, measured on your own reading"
     intro = ("Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill "
              "with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way.")
-    nq = sorted({len(q.get("questions") or []) for q in locals().get("note_q") or []} - {0})
-    if nq:
-        intro += " " + one_question_note(nq[-1])
-    lab = rc.build_lab(cfg, kit=kit, prefix="dr", view=view, fields=fields, tiles=tiles, fn="drCompute", js=js,
-                       opts=opts, title=title, subtitle=sub, panel_title="Your reading, in numbers", panel_intro=intro,
-                       main_html=main, passages=passages, slots=slots,
-                       ui_js=(locals().get("extra_ui") or "")
-                       + ("  var RD_POOL = %s;\n" % rc.json.dumps(opts.get("_pool", [])) + PRACTICE_INIT_JS
-                          if view == "practice" else ""))
-    return lab
+    nq = sorted({len(q.get("questions") or []) for q in note_q} - {0})
+    tail = one_question_note(nq[-1]) if nq else ""
+    return rc.build_lab(cfg, kit=kit, prefix="dr", view=view, fields=fields, tiles=tiles, fn="drCompute", js=js,
+                        opts=opts, title=title, subtitle=sub, panel_title="Your reading, in numbers", panel_intro=intro,
+                        main_html=main, passages=passages, slots=slots, ui_js=ui, intro_tail=tail,
+                        lists=view == "practice")
 
 
 # ---------------------------------------------------------------------------
@@ -696,8 +839,10 @@ EYE_JS = r"""
         t.eyClaimWpm = rdUnit(target, 'wpm');
         t.eyClaimErr = rdUnit(Rmul(target, inst.comp), 'wpm');
       }
-      var need = eyNeededOf(target, inst.cpw, inst.fix, inst.sac, inst.reg);
+      var need = eyNeededOf(target, inst.cpw, inst.fix, inst.sac, inst.reg), mins = Rdiv(Rparse(opts.book), target);
       t.eyNeeded = rdUnit(need, 'characters');
+      /* A book at that rate: hours from an hour up, else minutes. */
+      t.eyBook = Rcmp(mins, R(60n)) >= 0 ? rdUnit(Rdiv(mins, R(60n)), 'h') : rdUnit(mins, 'min');
       t.eyVerdict = eyVerdictOf(need, Rparse(opts.identify), Rparse(opts.perceptual));
       said = rdUnit(target, 'wpm') + ' × ' + rdFig(inst.cpw) + ' characters × ' + rdFig(Radd(inst.fix, inst.sac)) + ' ms / (60,000 × (1 − '
         + Rtext(inst.reg) + ')) = ' + t.eyNeeded + ' a forward fixation must advance: ' + t.eyVerdict
@@ -749,15 +894,17 @@ def _eye(cfg, view, kit):
         percep = rc.num(kit, cfg, "perceptual", 15, lo=1, hi=200)
         if percep < ident:
             raise ValueError("%s: the perceptual span cannot be narrower than the identification span" % kit)
-        opts.update(claim=claim, identify=rc.ftext(ident), perceptual=rc.ftext(percep),
-                    _cfg_keys=("claim", "identify", "perceptual"))
+        book = rc.num(kit, cfg, "book", 90000, lo=1, whole=True)
+        opts.update(claim=claim, identify=rc.ftext(ident), perceptual=rc.ftext(percep), book=rc.ftext(book),
+                    _cfg_keys=("claim", "identify", "perceptual", "book"))
         fields = ([F("words", "Words the claim says were read", "pos"), F("seconds", "In this many seconds", "pos"),
                    F("comp", "Comprehension the claim allows (share)", "share", 1)] if claim
                   else [F("target", "Target rate, wpm", "pos")])
         fields += [F("fix", "Fixation, ms", "pos", 225), F("sac", "Saccade, ms", "nn", 30),
                    F("cpw", "Characters per word, space included", "pos", 6), F("reg", "Regressions, share of fixations", "share", 0)]
         tiles = ([("The claimed rate", "eyClaimWpm"), ("Effective rate at that comprehension", "eyClaimErr")] if claim else [])
-        tiles += [("Characters a forward fixation must advance", "eyNeeded"), ("Against the spans", "eyVerdict")]
+        tiles += [("Characters a forward fixation must advance", "eyNeeded"), ("Against the spans", "eyVerdict"),
+                  ("A %s-word book at that rate" % "{:,}".format(int(book)), "eyBook")]
         intro = ("A stated model: characters per fixation = rate × characters per word × (fixation + saccade) / (60,000 × (1 − "
                  "regression share)), set against a word-identification span of %s characters and a perceptual span of %s "
                  "(Rayner 1998). It says what a claim would need, not whether a reader did it." % (rc.ftext(ident), rc.ftext(percep)))
@@ -1042,57 +1189,87 @@ SCAN_JS = r"""
     t.scFound = rdFig(inst.found) + ' of ' + rdFig(inst.targets);
     t.scPerTarget = Rzero(inst.found) ? 'none found' : rdUnit(Rdiv(inst.seconds, inst.found), 's');
     t.scWordsPerSec = rdUnit(Rdiv(inst.words, inst.seconds), 'words a second');
-    if (view === 'find') t.scWrong = rdFig(inst.wrong);
-    return { tiles: t, status: t.scFound + ' in ' + rdUnit(inst.seconds, 's') + ': ' + t.scPerTarget + ' per target found, over a text of '
-      + rdFig(inst.words) + ' words, ' + t.scWordsPerSec + ' (' + rdUnit(Rdiv(Rmul(inst.words, R(60n)), inst.seconds), 'a minute') + ')'
+    if (inst.wrong !== undefined) t.scWrong = rdFig(inst.wrong);
+    return { tiles: t, status: t.scFound + ' in ' + rdUnit(inst.seconds, 's') + ': ' + (Rzero(inst.found) ? 'none found' : t.scPerTarget + ' per target found')
+      + ', over a text of ' + rdFig(inst.words) + ' words, ' + t.scWordsPerSec + ' (' + rdUnit(Rdiv(Rmul(inst.words, R(60n)), inst.seconds), 'a minute') + ')'
       + '. Scanning is a search for a known form, not reading; its speed says nothing about reading rate.' };
   }
 """
 
 
+def _scan_targets(kit, cfg, plist):
+    """{passage id: resolved targets}: cfg["targets"] (one passage only) or each passage's own."""
+    if "targets" in cfg:
+        if len(plist) != 1:
+            raise ValueError("%s: with more than one passage, each carries its own \"targets\"" % kit)
+        return {plist[0]["id"]: rc.resolve_targets(kit, plist[0], cfg["targets"])}
+    if all("targets" in p for p in plist):
+        return {p["id"]: rc.resolve_targets(kit, p, p["targets"]) for p in plist}
+    return None
+
+
 def _scan(cfg, view, kit):
-    (p,) = rc.passages_of(cfg, kit, 1)
+    plist = rc.passages_of(cfg, kit)
+    if not plist:
+        raise ValueError("%s: a scan needs cfg[\"passage\"], or cfg[\"passages\"] served first unread" % kit)
+    p = plist[0]
     kind = rc.log_kind(kit, cfg.get("kind"), "other")
     words = rc.word_count_passage(p)
+    tmap = _scan_targets(kit, cfg, plist)
+    lim = rc.num(kit, cfg, "limit", None if view == "find" else 300, lo=10, hi=1800, whole=True)
+    find = view == "find" or (tmap is not None and not p.get("questions"))
+    if view not in ("find", "inspect"):
+        raise ValueError("%s: unknown view %r" % (kit, view))
+    if find and tmap is None:
+        raise ValueError("%s: scan/find needs targets, in cfg[\"targets\"] or each passage's \"targets\"" % kit)
+    if not find and len(plist) != 1:
+        raise ValueError("%s: scan/inspect with questions takes one passage" % kit)
+    targets = (tmap[p["id"]] if len(plist) == 1 else tmap) if find else None
     if view == "find":
-        if "targets" in cfg:
-            targets = rc.resolve_targets(kit, p, cfg["targets"])
-        elif "targets" in p:
-            targets = rc.resolve_targets(kit, p, p["targets"])
-        else:
-            raise ValueError("%s: scan/find needs targets, in cfg[\"targets\"] or the passage's \"targets\"" % kit)
-        lim = rc.num(kit, cfg, "limit", None, lo=10, hi=1800, whole=True)
         fields = [F("found", "Targets found", "nncount"), F("wrong", "Wrong clicks", "nncount", 0),
-                  F("targets", "Targets", "count", len(targets)), F("seconds", "Seconds", "pos"), F("words", "Words in the text", "count", words)]
+                  F("targets", "Targets", "count", len(tmap[p["id"]])), F("seconds", "Seconds", "pos"), F("words", "Words in the text", "count", words)]
         tiles = [("Found", "scFound"), ("Seconds per target found", "scPerTarget"), ("Words passed over", "scWordsPerSec"),
                  ("Wrong clicks", "scWrong")]
-        sl = rc.slot("", p, intro="Each prompt names something to find. Click the word that answers it (or Tab to it and press "
-                     "Enter); a wrong click is counted and you keep looking. Press Start when you are ready.",
-                     kind=kind, mode="scan", view="find", flow="find", questions=False, targets=targets,
-                     limit=None if lim is None else int(lim),
-                     write={"found": "found", "wrong": "wrong", "seconds": "seconds", "words": "words", "targets": "targets"})
-        main = rc.slot_html("", "Scan: " + p["title"], sl["intro"], rc.btn("rdNext", "Skip this one", hidden=True))
-        cfgk = ("passage", "targets", "limit", "kind")
-    elif view == "inspect":
-        lim = rc.num(kit, cfg, "limit", 300, lo=10, hi=1800, whole=True)
+        intro = ("Each prompt names something to find. Click the word that answers it (or Tab to it and press Enter); a wrong "
+                 "click is counted and you keep looking." + (" The search stops after %d seconds." % lim if lim else "")
+                 + (" Each visit serves the first of %d texts not yet in your log." % len(plist) if len(plist) > 1 else "")
+                 + " Press Start when you are ready.")
+        head = "Scan: " + p["title"] if len(plist) == 1 else "Scan"
+    elif find:
+        # inspect with targets: a time-limited look at a document with no questions, each target a question
+        # about it answered by clicking the word in the document that answers it.
+        fields = [F("found", "Questions answered right", "nncount"), F("wrong", "Wrong clicks", "nncount", 0),
+                  F("targets", "Questions", "count", len(tmap[p["id"]])), F("seconds", "Seconds of inspection", "pos"),
+                  F("words", "Words in the document", "count", words)]
+        tiles = [("Answered", "scFound"), ("Seconds per right answer", "scPerTarget"), ("Words passed over", "scWordsPerSec"),
+                 ("Wrong clicks", "scWrong")]
+        intro = ("Inspect the document for up to %d seconds. Each prompt is a question about it: click the word in the "
+                 "document that answers it (or Tab to it and press Enter); a wrong click is counted. Press Start when you "
+                 "are ready." % lim)
+        head = "Inspect: " + p["title"]
+    else:
         if not p.get("questions"):
-            raise ValueError("%s: scan/inspect asks the passage's questions, and %s has none" % (kit, p["id"]))
+            raise ValueError("%s: scan/inspect asks the passage's questions or its targets, and %s has neither" % (kit, p["id"]))
         fields = [F("found", "Questions answered right", "nncount"), F("targets", "Questions", "count", len(p["questions"])),
                   F("seconds", "Seconds of inspection", "pos"), F("words", "Words in the document", "count", words)]
         tiles = [("Answered", "scFound"), ("Seconds per right answer", "scPerTarget"), ("Words passed over", "scWordsPerSec")]
-        sl = rc.slot("", p, intro="Inspect the document for up to %d seconds (it disappears then, or press Done), then answer "
-                     "questions about what it is and where things are in it." % lim, kind=kind, mode="scan", view="inspect",
-                     flow="inspect", limit=int(lim), write={"found": "found", "targets": "targets", "seconds": "seconds", "words": "words"})
-        main = rc.slot_html("", "Inspect: " + p["title"], sl["intro"])
-        cfgk = ("passage", "limit", "kind")
-    else:
-        raise ValueError("%s: unknown view %r" % (kit, view))
+        intro = ("Inspect the document for up to %d seconds (it disappears then, or press Done), then answer "
+                 "questions about what it is and where things are in it." % lim)
+        head = "Inspect: " + p["title"]
+    write = {"found": "found", "targets": "targets", "seconds": "seconds", "words": "words"}
+    if find:
+        write["wrong"] = "wrong"
+    sl = rc.slot("", p, intro=intro, kind=kind, mode="scan", view=view, flow="find" if find else "inspect",
+                 questions=not find, targets=targets, limit=None if lim is None else int(lim), write=write,
+                 pool=[x["id"] for x in plist] if len(plist) > 1 else None)
+    main = rc.slot_html("", head, sl["intro"], rc.btn("rdNext", "Skip this one", hidden=True) if find else "")
     return rc.build_lab(cfg, kit=kit, prefix="sc", view=view, fields=fields, tiles=tiles, fn="scCompute", js=SCAN_JS,
-                        opts={"_cfg_keys": cfgk}, title="Scanning" if view == "find" else "Inspectional reading",
+                        opts={"_cfg_keys": ("passage", "passages", "targets", "limit", "kind")},
+                        title="Scanning" if view == "find" else "Inspectional reading",
                         subtitle="a search for a known form, timed",
                         panel_title="The search, in numbers",
                         panel_intro="Your measurement: the boxes fill when the drill ends; before that they hold a worked example.",
-                        main_html=main, passages=[p], slots={"": sl})
+                        main_html=main, passages=plist, slots={"": sl})
 
 
 # ---------------------------------------------------------------------------

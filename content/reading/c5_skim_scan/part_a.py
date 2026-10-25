@@ -96,8 +96,10 @@ LESSONS = [
             ("p", "The figures belong to this text and these five targets. A search of a "
                   "page you have just searched is quicker because you remember where "
                   "things are, so only your first run is a measurement of scanning; a "
-                  "second run on the same timetable measures your memory of it. Compare "
-                  "a scan with a scan of a similar document, never with a reading."),
+                  "second run on the same timetable measures your memory of it, so a "
+                  "second visit to this page serves a different document, a museum's "
+                  "visitor guide with five targets of its own. Compare a scan with a scan "
+                  "of a similar document, never with a reading."),
             ("p", "Scanning finds a thing you can name. When you cannot name it, when you "
                   "want to know what a text is about, you skim, and Skimming for Gist "
                   "times that next."),
@@ -105,7 +107,7 @@ LESSONS = [
         "lab": ("readkit", {
             "mode": "scan",
             "view": "find",
-            "passage": PASSAGES["S01"],
+            "passages": [PASSAGES["S01"], PASSAGES["S02"]],
             "preset": "quick",
             "presets": [
                 {"id": "quick", "label": "Five found in 40 seconds",

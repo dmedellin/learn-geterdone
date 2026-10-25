@@ -10,14 +10,16 @@ implemented. Where D.3 and D.0–D.2 disagree, D.3 wins.
 - `scripts/mathpath/labs/readkit.py`: the entry point `readkit_lab(cfg)` and the modes drill, eye, flash and scan. It dispatches triage, text, recall and log to `readkit_b.readkit_b_lab` through a lazy import, and raises on an unknown mode or view.
 - `scripts/mathpath/labs/readkit_b.py`: the modes triage, text, recall and log.
 - `scripts/mathpath/labs/readkit_core.py`: the shared parts.
-  - The JS blocks: `RD_CORE_JS` (printing and parsing), `RD_TEXT_JS` (word, sentence and syllable rules), `RD_LOG_JS` (the log and the due banner), and `RD_WIRE_JS` (preset menu, inputs, redraw).
+  - The JS blocks: `RD_CORE_JS` (printing and parsing), `RD_LIST_JS` (the list inputs: records, numbers, entries, strings; shipped only on a page with such an input), `RD_TEXT_JS` (word, sentence and syllable rules), `RD_LOG_JS` (the log and the due banner), and `RD_WIRE_JS` (preset menu, inputs, redraw).
   - The Python mirror of the text rules, passage validation, `slot()` and `build_lab()`.
   - It imports `attr`, `field_text`, `kpis_html`, `select_html` and `text_html` from `capkit_core`, read-only.
 - `scripts/mathpath/labs/readkit_drill.py`: the drill engine, browser only.
   - `RD_DRILL_JS` is the core.
-  - `RD_TIMED_JS` (pacer, mask, RSVP, phrases), `RD_RECALL_JS` (reread, free recall) and `RD_FIND_JS` (scan, coverage) ship only on pages that use them.
+  - `RD_TIMED_JS` (pacer, mask, RSVP, phrases), `RD_ALOUD_JS` (the aloud fallback), `RD_RECALL_JS` (reread, free recall) and `RD_FIND_JS` (scan, coverage) ship only on pages that use them.
+- In `readkit.py` the drill's pure JS is split per view (`DR_BASE_JS` plus one of `DR_SINGLE_JS`, `DR_PRACTICE_JS`, `DR_COMPARE_JS`, `DR_LADDER_JS`, `DR_REPEAT_JS`, `DR_SECTIONS_JS`), and only the page's view ships.
+- `build_lab` strips whole-line `/* … */` comments from the assembled script; the Python source keeps them.
 - `scripts/mathpath/labs/__init__.py`: one import (`readkit,`) and one registry line (`"readkit": readkit.readkit_lab,`). readkit is NOT added to `KITS_WITH_EXPECTATIONS`, which is left to wiring (D.0).
-- `scripts/mathcheck.js`: one self-contained block, `// ---- readkit (Reading Faster) ----` … `// ---- end readkit ----`, just before "THE VERDICT". It runs in its own vm context with RATIONAL_JS, RD_CORE_JS, RD_TEXT_JS and the eight modes' pure blocks, and has 147 cases.
+- `scripts/mathcheck.js`: one self-contained block, `// ---- readkit (Reading Faster) ----` … `// ---- end readkit ----`, just before "THE VERDICT". It runs in its own vm context with RATIONAL_JS, RD_CORE_JS, RD_LIST_JS, RD_TEXT_JS, the drill's DR_* blocks and the other modes' pure blocks, and has 167 cases.
 
 The kit never imports `content/`. Passages arrive in the cfg as dicts. The real bank (`content.reading.passages`) was imported only from a scratch script, to check that every bank passage validates: 79 of 82 build a drill, and the other 3 (B01, S01, S02) have no questions by design.
 
@@ -30,6 +32,8 @@ The kit never imports `content/`. Passages arrive in the cfg as dicts. The real 
   - `title`, `panel_title`, `panel_intro`;
   - `lesson` (the slug written into log entries; default the last segment of the page's path);
   - `warmup` and `warmup_kind` (see Warm-up).
+- Every panel intro ends with the one-question sentence ("One question is ≈ 16.7 points; a one-question difference is not a result.") where the page has questions, even when `panel_intro` overrides the intro; it is not added twice.
+- Numeric cfg and preset values may be ints, Fractions, strings or floats (`"seconds": 95.75` works; a float is read through its shortest decimal text).
 - A cfg key that a view does not take raises, naming the keys it does take.
 
 **Ids.**
@@ -125,35 +129,39 @@ The kit never imports `content/`. Passages arrive in the cfg as dicts. The real 
 **The log** (`localStorage` key `learn-reading-log`; every read and write is in try/catch).
 - With storage blocked, every drill runs and the slot's message says once: "This browser is not keeping data for this page, so your results will not be kept. Every drill still runs."
 - A drill entry is:
-  `{v: 1, at, lesson, mode, view, side, passage, display, words, chars, ms, correct, total, kind, extra: {gist, gistTotal, detail, detailTotal, target, split, order, kept, lapse}}`
+  `{v: 1, at, lesson, mode, view, side, passage, title?, display, words, chars, ms, correct, total, kind, extra: {gist, gistTotal, detail, detailTotal, target, split, order, kept, lapse, lapses}}`
+- A *reading* (what the log views count) is a `drill` or `warmup` entry with a display other than gist, words > 0 and ms > 0 (`rdIsReading`).
 - Other entries:
   - reread (recall/delayed A): `words` = 2 × the passage, `due`, `url`;
-  - free recall: `extra {units, recalled, summaryWords}`, plus `due` and `url` on the delayed view;
+  - free recall: `extra {units, recalled, summaryWords, summary}`, plus `correct`/`total` with `questions`, and `due`, `url` and `title` on the delayed view;
   - scan/find: `extra {wrong}`;
-  - coverage: `extra {unknown}`;
+  - coverage: `extra {unknown}`, plus `ms` when `timed` and `correct`/`total` with `questions`;
   - flash/span: `extra {len, ms, cues, measured}`;
   - Schulte: `ms`, `extra {errors, seed}`;
-  - delayed test: view `delayed-test`, `extra {delA, delB}`;
+  - delayed test: view `delayed-test`, `extra {delA, delB}`; it also writes B's `units` and `recalled` back into the boxes from B's logged entry;
   - notes: view `note`, `extra {text}`;
   - a saved plan: view `plan`, `extra {text}`;
   - warm-up: mode and view `warmup`.
 - `kind` is required: baseline, test, practice, condition or other (D.3.2).
 
 **Warm-up** (any view; D.3.5).
-- `cfg["warmup"]` is a passage dict or a list. `cfg["warmup_kind"]` defaults to practice.
+- `cfg["warmup"]` is a passage dict or a list. `cfg["warmup_kind"]` defaults to practice. It may be a list with one kind per warm-up passage (for example `["baseline", "test"]`); the slot intro then names each passage's kind.
 - It renders slot `W` ("Warm-up reading") above the view.
 - Start serves the first listed passage whose id is not in the log. When every one is logged, it says so and does not start.
 - It fills none of the view's boxes.
-- When a delayed test is due elsewhere, the `rdDue` banner shows and the warm-up box is hidden.
+- When a delayed test is due elsewhere, the `rdDue` banner shows and the warm-up box is hidden. The banner's link reads `the test on “<passage title>”` when the entry carries a title.
 
 **Verdict wording** (`drVerdictB`, `lgVerdict`; D.3.3). Exactly these strings:
 - `inside the baseline range`
-- `above the baseline range once — a fourth reading does this about one time in four`
+- `above the baseline range once — a fourth reading does this about one time in four` (with n baselines, `rdOnce(n)`: "a <(n+1)th> reading … one time in <n+1>", for example `a fifth reading … one time in five`; from 12 baselines up, `a reading after n baselines does this about one time in n+1`)
 - `above the baseline range on the median of the last three tests`
 - `below the baseline range` and `below the baseline range on the median of the last three tests`
 - `no baseline readings yet` (compare, when there is no range)
-- `needs a reading after the three baselines` (history, with fewer than 4 sessions)
+- `needs a reading after the three baselines` (history, with no session after the baselines; the number word follows the baseline count)
+- `needs one more baseline reading` / `needs two more baseline readings` (`rdNeedBase`: any range built from fewer than three baselines; D.3.3 needs three)
 - `no baseline range given` (profile)
+
+Every range carries its baseline count `baseN` (an input, nncount, default 3), filled from the log with all the baseline entries, not the first three.
 
 The tier rule (`lgTiers`): with three or more tests, the median of the last three is compared first. If it is inside the range, the latest test decides between `once` and `inside`. With fewer than three tests, the latest test is compared on its own.
 
@@ -181,7 +189,7 @@ Every drill reading's side cfg (`cfg` itself for single and practice; `cfg["a"]`
 - `kind` (log kind);
 - `suppress` (bool, default False: adds the counting instruction and the tick "I kept counting the whole way", stored as `extra.kept`);
 - `published` (aloud fallback figure, default 183);
-- `label` (compare only).
+- `label`, `intro` (compare only: the side's own instruction, which replaces the slot intro's opening sentence) and `fromBase` (the multiple of the baseline median that "Use my baseline median" writes into the side's target box; default 1).
 
 The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerLineMs`.
 
@@ -192,6 +200,7 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
   - With rsvp: `target` and `chunk` (count, cfg chunk).
   - With phrases: `target` and `phrases` (count, the passage's phrases).
   - With gist: `shown` (nncount, the words in headings and first sentences).
+- `vsLog` (bool, default False; needs questions and a non-gist display): adds `baseLo`, `baseHi` (opt), `baseN` (nncount, 3) and `recent` (opt: the median of the last three tests, effective) and the tiles `drVsBase` (the effective rate against the range: a verdict string) and `drVsRecent` (`−30 wpm`, or `no recent test median given`). Scoring, and the load when the boxes are empty, fill them from the log's effective rates.
 - Tiles:
   - `drWords` `400 words`; `drTime` `96 s` or `≈ 96.1 s`; `drWpm` `250 wpm`; `drStdWpm` `275 standard wpm` (chars / 6 × 60 / seconds); `drComp` `2/3 ≈ 66.7%` or `no questions`; `drErr` `≈ 166.7 wpm` or `no questions`.
   - With pacer or mask: `drPacerLineMs` `2,880 ms` (lineWords × 60,000 / target).
@@ -208,7 +217,8 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
   - a collapsed `rdPaste` textarea for the reader's own text. Paragraphs are split on blank lines; it has no questions, total 0, and is logged as `practice` with passage `pasted`.
 - After Done comes the tick "My attention left the text at some point" (`extra.lapse`).
 - Inputs: `words`, `seconds`, `correct` (nncount, 0), `total` (nncount, 0), `target` (pos, cfg target), `pacerLog` (entries, default empty: target/right/asked of the reader's pacer practice readings with questions, oldest first), `sinceTest` (nncount, 0: practice drill readings logged since the last `test` entry).
-  - At load and after each Score, the page fills `pacerLog` and `sinceTest` from the log.
+  - At load (when the log is not empty) and after each Score, the page fills `pacerLog` and `sinceTest` from the log, replacing the example.
+  - The button `rdUseTarget` "Use my next target" writes `drNextTarget` into the target box (`rdTargetNote` says so).
 - Tiles: `drWords`, `drTime`, `drWpm` `300 wpm`, `drComp`, `drErr`, and:
   - `drHold` `300 wpm` or `not yet`: the fastest target whose last three pacer readings at it all scored at least `hold`.
   - `drNextTarget` `315 wpm`, `285 wpm`, or `no pacer readings yet`. T is the last reading's target. Three holds in a row at T give T × 21/20; two misses in a row at T give T × 19/20; otherwise T.
@@ -216,25 +226,26 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
 - A pool page may weigh up to 67 KB gzipped. Measured with the real bank's Q01–Q30 (see Page weight): 20 passages give 64.4 KB, and all 30 give 78.6 KB.
 
 **compare**
-- cfg: `passages` (two: A, then B), `a` and `b` (side cfgs; kind defaults to condition; `label` defaults to "Reading A"/"Reading B"), `kinds` (bool, default False: gist and detail inputs instead of right/asked), `ratioOf` (`err`, the default, or `wpm`), and `order` (`AB`, `BA` or `alternate`, the default; D.3.11).
+- cfg: `passages` (two: A, then B), `a` and `b` (side cfgs; kind defaults to condition; `label` defaults to "Reading A"/"Reading B"), `kinds` (bool, default False: gist and detail inputs instead of right/asked), `ratioOf` (`err`, the default, or `wpm`), `ratio` (bool, default True: False drops `drRatio`), `lapses` (bool, default False: after each side a number box "Times my attention left the text", stored as `extra.lapses`, with inputs `lapsesA`/`lapsesB` and tiles `drLapsesA`/`drLapsesB`; not with `suppress`), and `order` (`AB`, `BA` or `alternate`, the default; D.3.11).
   - With `alternate`, the order comes from the parity of the log's length at load: even gives AB, odd gives BA.
   - With BA, box B is moved above box A. `rdOrder` says the order, and every entry records `extra.order`.
 - Inputs, per side s = A or B:
   - `words<s>`, `seconds<s>`, and `correct<s>`/`total<s>`; with `kinds`, `gist<s>`, `gistTotal<s>`, `detail<s>` and `detailTotal<s>`.
   - Display extras as in single: `target<s>`, `chunk<s>`, `phrases<s>`, `shown<s>`.
-  - Then `baseLo` and `baseHi` (opt, empty).
-  - When both range boxes are empty at load and the log holds baseline entries, the range is filled from the first three. The button `rdUseBase` "Use my baseline range" does the same on demand, and `rdBaseNote` says what happened.
+  - Then `baseLo`, `baseHi` (opt, empty) and `baseN` (nncount, 3), unless B is paced (below).
+  - When both range boxes are empty at load and the log holds baseline entries, the range is filled from all of them, and every Score refills it. The button `rdUseBase` "Use my baseline range" does the same on demand, and `rdBaseNote` says what happened (when a preset holds the boxes, it counts the baselines the log holds).
+  - A side with a target gets `rdUseTarget` "Use my baseline median": the median of the logged baselines × the side's `fromBase`, as whole wpm.
 - Tiles:
   - `drWpmA`, `drWpmB` (`240 wpm`, `480 wpm`); `drCompA`, `drCompB`; `drErrA`, `drErrB` (`192 wpm`).
   - `drErrDiff` `−48 wpm`, `+16 wpm`, or `needs questions on both`.
   - `drRatio` `4/5 = 80%` (of the effective rate, or of the rate when `ratioOf` is `wpm`, as in `238/183 ≈ 130.1%`).
-  - `drVerdictB` (rate B against the range): one of the verdict strings above.
+  - `drVerdictB` (rate B against the range): one of the verdict strings above; with fewer than three baselines, `rdNeedBase`. When B's display is pacer, mask, rsvp or phrases the display set B's rate, so there is no `drVerdictB`, no range inputs and no button, and the status says why.
   - With `kinds`: `drGistA`, `drDetailA`, `drGistB`, `drDetailB` (`1/3 ≈ 33.3%`).
   - Where a side has the display: `drPacerLineMs`, `drWordMs` and `drWordMsSeen`, `drPhraseMs`.
 - The panel intro prints "One question is ≈ 16.7 points; a one-question difference is not a result." (computed from the passages' question count; D.3.1).
 
 **ladder**
-- cfg: `passages` (three), `targets` (three, default `[250, 300, 375]`), `display` (`pacer` (default), `mask` or `normal`), `hold` (default 2/3; D.3.6), `kind`.
+- cfg: `passages` (three), `targets` (three, default `[250, 300, 375]`), `display` (`pacer` (default), `mask` or `normal`), `hold` (default 2/3; D.3.6), `kind`. `rdUseTarget` writes the baseline median × each target's ratio to the first.
 - Inputs, for i = 1..3: `t<i>` (pos, the target), `words<i>`, `seconds<i>`, `correct<i>`, `total<i>`.
 - Tiles:
   - `drWpm1..3`, `drErr1..3`;
@@ -244,7 +255,7 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
 - The panel prints the one-question note.
 
 **repeat**
-- cfg: `passages` (two: readings 1–3 on the first, reading 4 on the second), `questions` (four bools, default `[False, False, True, True]`), `kind`.
+- cfg: `passages` (two: readings 1–3 on the first, reading 4 on the second), `questions` (four bools, default `[False, False, True, True]`), `kind` (one kind, or a list of four, one per run). With a pacer, `rdUseTarget` fills the target from the baseline median.
 - Inputs, for i = 1..4: `words<i>`, `seconds<i>`, `correct<i>`, `total<i>`.
 - Tiles: `drWpm1..4` `248 wpm`; `drRepeatGain` `+100 wpm` (reading 3 − reading 1); `drTransferGain` `+8 wpm` (reading 4 − reading 1).
 - The panel prints the one-question note.
@@ -270,7 +281,8 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
 - Tiles:
   - `eyNeeded` `25.5 characters`, `≈ 28.3 characters`;
   - `eyVerdict`: `at these settings, within the word-identification span`, `at these settings, beyond the word-identification span but within the perceptual span`, or `at these settings, beyond the perceptual span`;
-  - with claim, `eyClaimWpm` `1,500 wpm` and `eyClaimErr` `750 wpm`.
+  - with claim, `eyClaimWpm` `1,500 wpm` and `eyClaimErr` `750 wpm`;
+  - `eyBook` `6 h` or `3.6 min`: a `book`-word book (cfg, default 90000) at the target (or claimed) rate, in hours from 60 minutes up.
 
 **lines**
 - Inputs: `cpl` (pos, —), `lines` (count, —), `step` (8), `fix` (225), `sac` (30), `sweep` (nn, —).
@@ -306,16 +318,16 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
 ### scan (`sc`)
 
 **find**
-- cfg: `passage`, `targets` (or the passage's own `targets`), `limit` (optional seconds), `kind` (default other).
-- Drill: a prompt per target. Clicking (or Enter on) a word inside the target's token range counts as found; any other word counts a wrong click. `rdNext` skips a target.
+- cfg: `passage`, or `passages` (a pool: Start serves the first one not in the log, each with its own targets); `targets` (a list, or a dict keyed by passage id; else the passage's own `targets`); `limit` (optional seconds), `kind` (default other).
+- Drill: a prompt per target. With a limit the message reads "The passage disappears after N s; press Done if you finish first." Clicking (or Enter on) a word inside the target's token range counts as found; any other word counts a wrong click. `rdNext` skips a target.
 - Inputs: `found` (nncount), `wrong` (0), `targets` (count, the number of targets), `seconds`, `words` (the passage's words).
-- Tiles: `scFound` `5 of 5`; `scPerTarget` `19 s` (seconds / found), or `none found`; `scWordsPerSec` `≈ 6.3 words a second`; `scWrong` `1`.
+- Tiles: `scFound` `5 of 5`; `scPerTarget` `19 s` (seconds / found), or `none found` (the status then says no target was found, with no rate per target); `scWordsPerSec` `≈ 6.3 words a second`; `scWrong` `1`.
 
 **inspect**
-- cfg: `passage` (with questions), `limit` (default 300), `kind`.
-- Drill: a time-limited look, then the passage's questions.
-- Inputs: `found` (questions right), `targets` (questions), `seconds`, `words`.
-- Tiles: `scFound` `4 of 5`; `scPerTarget` `75 s` (per right answer); `scWordsPerSec`.
+- cfg: `passage`, `targets` (optional), `limit` (default 300), `kind`.
+- Drill: a time-limited look, then the passage's questions. With `targets` (for a passage without questions, such as B01) it runs the find flow under the limit instead.
+- Inputs: `found` (questions right, or targets found), `targets`, `seconds`, `words`; with targets also `wrong` (0).
+- Tiles: `scFound` `4 of 5`; `scPerTarget` `75 s` (per right answer); `scWordsPerSec`; with targets `scWrong`.
 
 ### triage (`tr`)
 
@@ -334,10 +346,10 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
 - Tiles: `txWords` `139`; `txSentences` `11`; `txSyllables` `190 (by the rule)`; `txFre` `≈ 78.4`; `txGrade` `≈ 5.5` or `8.73`.
 
 **coverage**
-- cfg: `passage`, `kind` (default other).
+- cfg: `passage`, `kind` (default other), `timed` (bool: the clock runs from the first mark screen to "Count my marks"), `questions` (bool: the passage's questions after the count).
 - Drill: click (or Enter or Space on) every unknown word; a second hit unmarks. The Done button reads "Count my marks".
-- Inputs: `tokens` (count, the passage's words), `unknown` (nncount, —).
-- Tiles: `txCoverage` `49/50 = 98%`; `txOneIn` `one unknown in every 50 tokens` or `no unknown words` (D.3.16).
+- Inputs: `tokens` (count, the passage's words), `unknown` (nncount, —); with timed `seconds`; with questions `correct`, `total`.
+- Tiles: `txCoverage` `49/50 = 98%`; `txOneIn` `one unknown in every 50 tokens` or `no unknown words` (D.3.16); with timed `txWpm` `240 wpm`; with questions `txComp` `5/6 ≈ 83.3%`.
 
 **volume**
 - Inputs: `minutes` (nn), `wpm` (pos), `days` (365), `bookWords` (90000).
@@ -346,13 +358,14 @@ The drill-wide cfg `lineWords` (default 12) states the line length for `drPacerL
 ### recall (`re`)
 
 **free**
-- cfg: `passage` (with ideas), `summary` (bool: ask for a three-sentence summary instead of everything remembered), `kind` (default condition).
+- cfg: `passage` (with ideas), `summary` (bool: ask for a three-sentence summary instead of everything remembered), `questions` (bool: the passage's questions after the ticks), `kind` (default condition).
 - Drill:
   1. Read, then Done.
   2. With the passage hidden, write in a textarea, then press Finished writing.
   3. The idea units are shown, and the reader ticks the ones the writing contains. The kit never scores the writing itself.
   4. Score.
 - Inputs: `units` (count, the passage's ideas), `recalled` (nncount, —), `words`, `seconds`, `summaryWords` (nncount, 0).
+- With questions: inputs `correct`, `total`, and the tile `reComp` `5/6 ≈ 83.3%`.
 - Tiles: `reRecall` `7/12 ≈ 58.3%`; `reRate` `140 wpm` (rate × recall); `reWordsPerUnit` `≈ 6.7 words`.
 
 **delayed** (D.3.9)
@@ -376,7 +389,7 @@ Each view has a button `lgMine` and a message `lgMsg`. Noise, history and profil
 
 **noise**
 - Inputs: `base` (2–10 numbers, —), `tests` (1–20 numbers, oldest first, —).
-- "Use my baselines" fills the first three baseline rates and up to 20 test rates.
+- "Use my baselines" fills every baseline rate (the box takes 2–20) and up to 20 test rates, as decimals (`251.05`), never fractions.
 - Tiles:
   - `lgMean` `≈ 244.7 wpm`; `lgRange` `13 wpm`;
   - `lgTestMedian` `270 wpm`, or `275 wpm (of 2)`;
@@ -386,18 +399,18 @@ Each view has a button `lgMine` and a message `lgMsg`. Noise, history and profil
 **gears**
 - cfg: `gears` (up to 8 `(name, wpm)` pairs; default scanning 600, skimming 450, rauding 300, learning 200, memorising 138), `average` (default 238).
 - Inputs: `wpm` (pos, —), `stdwpm` (opt, empty).
-- "Use my baseline median" fills both. `stdwpm` is filled from the logged `chars`.
+- "Use my baseline median" fills both, from every baseline. `stdwpm` is filled from the logged `chars`, and emptied when an entry has none.
 - Tiles:
-  - `lgNearest` `rauding, 300 wpm` or `above every gear`. It is computed from `stdwpm` when given, else from `wpm`; ties go to the slower gear.
+  - `lgNearest` `rauding, 300 standard wpm` or `above every gear`. It is computed from `stdwpm` when given, else from `wpm`; ties go to the slower gear.
   - `lgVsAverage` `160/119 ≈ 134.5%`, always from `wpm` (D.3.15).
 
 **history**
-- Inputs: `entries` (rate/right/asked, 0–200), `practice` (the same, default empty).
+- Inputs: `entries` (rate/right/asked, 0–200), `baseN` (nncount, 3: how many of the entries are baselines), `practice` (the same, default empty). Entries are written with decimal rates (`251.05/5/6`); the parser splits from the right, so an old fraction rate (`1161/5/5/6`) still reads.
 - At load, and on "Show my log", the page fills both from the log and lists every entry in `lgLog`, with uncounted entries greyed. The other controls:
   - `lgExport` writes CSV text into the read-only textarea `lgCsv`;
   - `lgNote` with `lgNoteAdd` adds a note entry;
   - `lgClearAsk` then `lgClearYes` (or `lgClearNo`) clears the log after an in-page confirmation.
-- Tiles: `lgSessions` `3`; `lgBaseMedian` `240 wpm`; `lgRecentMedian` `270 wpm`, or `after 6 sessions`; `lgLatestErr` `251 wpm`; `lgVerdict`. The first three sessions are the baselines and the rest are tests.
+- Tiles: `lgSessions` `3`; `lgBaseMedian` `240 wpm`; `lgRecentMedian` `270 wpm`, or `after 6 sessions`; `lgLatestErr` `251 wpm`; `lgVerdict`. The first `baseN` sessions are the baselines and the rest are tests; the fill puts every baseline first and sets `baseN`. Fewer than three gives `rdNeedBase`; `baseN` above the sessions is refused.
 - The SVG chart in `lgExtra` draws baselines and tests as the line, and practice as a lighter dashed series (D.3.2).
 
 **plan**
@@ -406,9 +419,9 @@ Each view has a button `lgMine` and a message `lgMsg`. Noise, history and profil
 - Tiles: `lgWeekMinutes` `160 min`; `lgTestShare` `1/16 = 6.25%` or `no test in the week`; `lgFits` `fits, 20 min to spare`.
 
 **profile**
-- Inputs: `errThen`, `errNow` (pos); `baseLo`, `baseHi` (opt); `gistThen`, `gistNow` (share); `scanThen`, `scanNow` (pos, seconds per target); `recallThen`, `recallNow` (share).
-- "Fill from my log" takes the first and last baseline or test entries of each kind. For the skim, scan and recall rows to fill, those lessons must log their drills with kind `baseline` (the first) and `test` (later).
-- Tiles: `lgErrThen` `244 wpm`; `lgErrNow` `268 wpm`; `lgVerdict` (the latest against the range); `lgGist` `3/4 = 75% → 1 = 100%`; `lgScan` `8 s → 6 s`; `lgRecall` `7/12 ≈ 58.3% → 2/3 ≈ 66.7%`.
+- Inputs: `errThen`, `errNow` (pos); `baseLo`, `baseHi` (opt); `baseN` (nncount, 3); `tests` (0–20 numbers: recent effective test rates, oldest first); `gistThen`, `gistNow` (share); `scanThen`, `scanNow` (pos, seconds per target); `recallThen`, `recallNow` (share).
+- "Fill from my log" takes the first and last baseline or test entries of each kind, warm-ups included; the effective rate then is the median of all baselines. The recall row reads free-recall entries only, not summaries. For the skim, scan and recall rows to fill, those lessons must log their drills with kind `baseline` (the first) and `test` (later).
+- Tiles: `lgErrThen` `244 wpm`; `lgErrNow` `268 wpm`; `lgVerdict` (with `tests` given, the tier rule on them, so the median of the last three; else `errNow` against the range); `lgGist` `3/4 = 75% → 1 = 100%`; `lgScan` `8 s → 6 s`; `lgRecall` `7/12 ≈ 58.3% → 2/3 ≈ 66.7%`.
 
 ## Deviations from PLAN §D, with reasons
 
@@ -417,7 +430,7 @@ Each view has a button `lgMine` and a message `lgMsg`. Noise, history and profil
    - Rounding is half away from zero, which is the same as half up for every positive tile.
    - A share whose fraction has more than 4 digits prints the percent only.
 2. **eyFixPerWord** prints the fraction with its decimal (`15/17 ≈ 0.9 fixations`), so the model's arithmetic shows.
-3. **drVerdictB** compares rate B, not effective rate B, with the baseline range, because the range is built from baseline rates. It reads the range from the boxes, from the log at load when the boxes are empty, or from the `rdUseBase` button.
+3. **drVerdictB** compares rate B, not effective rate B, with the baseline range, because the range is built from baseline rates. It reads the range from the boxes, from the log at load when the boxes are empty, after each Score, or from the `rdUseBase` button. When B is paced (pacer, mask, rsvp, phrases) there is no verdict at all: D.3.3 judges a reader's rate, and a paced rate is the display's.
 4. **compare** has no `chars` inputs and no standard-word tile, to stay within the page budget. `baseLo` and `baseHi` are inputs.
 5. **ladder** follows D.3.6, and `drTopErr` names the target in brackets.
 6. **eye/required** has a claim variant (`claim: True`: words, seconds and comprehension instead of a target) for the "a novel an hour" lessons. eye/lines adds `eySweepTime` and `eyTotal`. The budget split and lines views are kept, although D.3.10 drops them from §C.
@@ -435,7 +448,7 @@ Each view has a button `lgMine` and a message `lgMsg`. Noise, history and profil
 12. **log/noise** keeps `lgMean` and `lgBeyond` beside D.3.3's `lgRange`, `lgTestMedian` and `lgVerdict`. `lgBeyond` is about the latest test.
 13. **The log** also records `mode`, `side`, `chars`, `due` and `url`. The lesson slug is `cfg["lesson"]`, or the page path's last segment. D.0 says only log views and delayed recall read the log; under D.3 the practice pool, `sinceTest`/`pacerLog`, the warm-up pool, the compare baseline range and order, and the due banner on every page also read it at load. None of them starts anything.
 14. **Aloud fallback** (D.3.13) writes the published figure (side cfg `published`, default 183) into the boxes, labelled and not logged. "Brysbaert 2019" is named in the label.
-15. **The attention tick** is a single box, "My attention left the text at some point" (`extra.lapse`, true or false), rather than a lapse count.
+15. **The attention tick** is a single box, "My attention left the text at some point" (`extra.lapse`, true or false), rather than a lapse count. compare with `lapses: True` asks for a count instead.
 16. **practice.**
     - `drNextTarget` is defined on the run of readings at the latest target (see practice above).
     - `drTestDue` needs an input (`sinceTest`), because tiles come from inputs only. The page fills it from the log.
@@ -464,6 +477,17 @@ Each view has a button `lgMine` and a message `lgMsg`. Noise, history and profil
 - With bank-length passages (480 words, six questions): median 39.1 KB; compare 43.2 KB; ladder 44.0 KB (the heaviest under 45 KB); practice with an 8-passage pool 50.3 KB.
 - With the real pool: 20 passages give 64.4 KB, and all 30 give 78.6 KB.
 - Only the active mode's JS ships. The timed, recall and find engines ship only where a slot uses them, and `ideas` only for free recall.
+- After the authoring fixes (every Subject page, rendered by `preview_subject.py reading`): no page grew. The Subject's 51 pages total 1,826,811 bytes gzipped, against 1,983,706 before. The heaviest five:
+
+  | page | before | after |
+  |---|---|---|
+  | the-daily-drill (18-passage pool) | 67,815 | 64,352 |
+  | choosing-a-target-pace | 47,149 | 42,197 |
+  | reading-with-a-pacer | 46,955 | 41,748 |
+  | fewer-needless-regressions | 46,674 | 41,570 |
+  | looking-back | 46,140 | 40,874 |
+
+  The new features cost about 0.8 KB on the pages that use them. Per-view drill JS, `RD_LIST_JS` only where a list input exists, and stripping whole-line comments more than pay for it; measuring-difficulty is now the heaviest single-passage page at 42,312.
 
 **mathcheck.** `node scripts/mathcheck.js` passes in full ("every arithmetic assertion passes"). The readkit block has 147 cases, one per formula and edge, including the eye/budget figure from the brief: (225, 30, 8, 3/20, 6) gives 15/17 fixations per word, 225 ms per word and ≈ 266.7 wpm.
 
@@ -500,4 +524,13 @@ The scripts are in /tmp/claude-0/-home-claude/291ed4a3-3972-5b4f-bb6a-9013cbbfac
 - **log history:** baseline and test entries only, practice in the lighter series, notes, CSV export, clear after confirmation;
 - **every page:** no console errors or page errors; no horizontal overflow at 360 px, on all 42 pages and while RSVP, mask and Schulte run.
 
-**Unit tests.** `python3 -m unittest tests.test_canvas_contract tests.test_browser_source` reports `Ran 5 tests … OK`.
+**Log smoke (after the authoring fixes).** Playwright with Chromium on the rendered Subject, with a log of four real-shape baselines (one a warm-up, one 491 words in 117.345 s) and two tests: keeping-a-practice-log and reading-your-curve fill `lgSessions` 6, `lgBaseMedian` `≈ 216.0 wpm` (all four baselines), `lgLatestErr` 240 wpm and a verdict; the-full-battery fills the profile with warm-ups included; plateaus-and-transfer shows `drVsBase`. No console or page errors. The script is /tmp/claude-0/-home-claude/291ed4a3-3972-5b4f-bb6a-9013cbbfacc9/scratchpad/smoke.js.
+
+**Not done, by choice** (page weight, or outside the kit):
+- log/history has no Schulte series;
+- sections has no per-section comprehension;
+- a warm-up cannot be a free recall;
+- the felt-pace stream cannot sit beside eye/required on one page;
+- passage question issues and the reading-your-curve warm-up swap (Q25 to a standard passage) are for the passages and lessons, not the kit.
+
+**Unit tests.** `python3 -m unittest tests.test_canvas_contract tests.test_browser_source` reports `Ran 5 tests … OK`. After the authoring fixes, `python3 -m unittest discover -s tests` reports `Ran 329 tests … OK (skipped=7)`, and `node scripts/labcheck.js --generated` reports 995 pages, 0 failing.

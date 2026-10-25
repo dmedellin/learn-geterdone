@@ -332,13 +332,12 @@ LESSONS = [
                   "practice pool, harder than the passages of your baselines; keep "
                   "that in mind when you find it on the chart."),
             ("p", "The lab reads your log and keeps only the baseline and test "
-                  "readings that had questions. It takes the first three as the "
-                  "baselines and the rest as tests, and prints the median of the "
-                  "baselines, the median of the last three readings, the latest "
-                  "effective rate and the verdict. Measure Your Reading took four "
-                  "baselines: the lab's range is built from the first three, and it "
-                  "lists the fourth among the sessions after them, so count that one "
-                  "as a baseline when you read the table. Practice readings are drawn "
+                  "readings that had questions. It puts every baseline first and the "
+                  "tests after them, sets the box for the number of baselines, and "
+                  "prints the median of the baselines, the median of the last three "
+                  "readings, the latest effective rate and the verdict. Measure Your "
+                  "Reading took three baselines; if you added a fourth, the range is "
+                  "built from all four. Practice readings are drawn "
                   "as a lighter dashed line and enter no tile; notes and every other "
                   "entry are listed, greyed, under the chart. With an empty log, the "
                   "boxes hold one of three example logs."),
@@ -419,8 +418,8 @@ LESSONS = [
             "panel_title": "Your curve, by the Subject's rule",
             "panel_intro": (
                 "Your measurement, from your log: baseline and test readings with "
-                "questions only, as effective rates, the first three taken as the "
-                "baselines. Until your log has some, the boxes hold an example log. "
+                "questions only, as effective rates, every baseline in the range. "
+                "Until your log has some, the boxes hold an example log. "
                 "Nothing leaves your browser."
             ),
         }),
@@ -599,9 +598,11 @@ LESSONS = [
                   "median of your tests on standard passages."),
             ("p", "Then set three figures side by side: the effective rate you just "
                   "measured, your baseline range, and the median of your last three "
-                  "tests. The drill's tiles give the first. The other two are on the "
-                  "Reading Your Curve page, from your own log; write them beside the "
-                  "first before you decide anything."),
+                  "tests. The drill's tiles give all three: when you score the reading, "
+                  "the lab fills the baseline range and the recent test median from "
+                  "your log, the same figures as on the Reading Your Curve page, and "
+                  "sets today's effective rate against each before you decide "
+                  "anything."),
             ("p", "Suppose your recent test median is 270 effective words a minute "
                   "against a baseline range of 238 to 251, a change by the Subject's "
                   "rule, and suppose the tests have stayed near 270 for some weeks. "
@@ -659,21 +660,27 @@ LESSONS = [
             "passage": PASSAGES["P47"],
             "display": "normal",
             "kind": "other",
+            "vsLog": True,
             "preset": "transfers",
             "presets": [
                 {"id": "transfers", "label": "240 words a minute, 6 of 6",
                  "seconds": "97.25", "correct": 6, "total": 6,
-                 "expect": {"drWpm": "240 wpm", "drComp": "1 = 100%", "drErr": "240 wpm"}},
+                 "baseLo": 238, "baseHi": 251, "recent": 270,
+                 "expect": {"drWpm": "240 wpm", "drComp": "1 = 100%", "drErr": "240 wpm",
+                            "drVsBase": "inside the baseline range", "drVsRecent": "−30 wpm"}},
                 {"id": "does-not", "label": "300 words a minute, 4 of 6",
                  "seconds": "77.8", "correct": 4, "total": 6,
-                 "expect": {"drWpm": "300 wpm", "drComp": "2/3 ≈ 66.7%", "drErr": "200 wpm"}},
+                 "baseLo": 238, "baseHi": 251, "recent": 270,
+                 "expect": {"drWpm": "300 wpm", "drComp": "2/3 ≈ 66.7%", "drErr": "200 wpm",
+                            "drVsBase": "below the baseline range", "drVsRecent": "−70 wpm"}},
             ],
             "panel_title": "A first reading of an argument",
             "panel_intro": (
                 "Your measurement: one timed reading at natural pace, scored by its six "
-                "questions; one question is about 16.7 points. Set its effective rate "
-                "beside your baseline range and recent test median from Reading Your "
-                "Curve. Before you read, the boxes hold a worked example."
+                "questions; one question is about 16.7 points. Scoring it fills your "
+                "baseline range and recent test median from your log, as on Reading "
+                "Your Curve. Before you read, the boxes hold a worked example: a range "
+                "of 238 to 251 and a recent median of 270."
             ),
         }),
         "steps_title": "Testing for transfer",
@@ -688,7 +695,7 @@ LESSONS = [
              "three main points and then check them."),
             ("Set three figures side by side",
              "Today's effective rate, your baseline range and the median of your last "
-             "three tests, the last two from Reading Your Curve."),
+             "three tests; the lab fills the last two from your log."),
             ("Decide what to measure next",
              "If the rate held and the understanding did not, practise on that kind; "
              "if both held, look at the practice itself and find the hold target "
@@ -787,9 +794,9 @@ LESSONS = [
         ),
         "note": (
             "One passage, one day, and a passage harder than your baselines: this "
-            "drill cannot separate the kind of text from its difficulty. The drill's "
-            "tiles show only today's reading, so the comparison with your log is made "
-            "by you, from the Reading Your Curve page. What the reading starts is a "
+            "drill cannot separate the kind of text from its difficulty. The lab's "
+            "comparison with your log is only as good as the log: with fewer than "
+            "three baselines it gives no verdict. What the reading starts is a "
             "series on a new kind of text."
         ),
     },
@@ -846,12 +853,10 @@ LESSONS = [
                   "dry, at natural pace with no pacer, then six questions. That is "
                   "your newest test."),
             ("p", "Then press Fill from my log. The effective rate then is the median "
-                  "of your first three baselines, with their range; the effective rate "
-                  "now is the latest test the log holds from a drill page, such as the "
-                  "Daily Drill's test box. The fill does not read warm-ups, so to put "
-                  "today's reading in the profile, multiply the rate printed under the "
-                  "warm-up by the share of questions you got right, and type that into "
-                  "the box for the effective rate now. The "
+                  "of all your baselines, with their range; the effective rate now is "
+                  "the latest test the log holds, today's warm-up included, and the "
+                  "fill lists your recent tests so that the verdict is on the median "
+                  "of the last three, by the Subject's rule. The "
                   "gist, scan and recall rows take the first and the latest of the "
                   "skims, scans and free recalls your log holds as baseline or test "
                   "readings, from Skimming, Scanning and Previewing and from "

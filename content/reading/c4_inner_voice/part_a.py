@@ -629,8 +629,8 @@ LESSONS = [
                 "Your measurement: one streamed reading at the rate in the target box, "
                 "then six questions. The tiles give the time each word was requested "
                 "and the time it was actually shown, the rate, comprehension and "
-                "effective rate. Type your baseline median as the target before you "
-                "press Start."
+                "effective rate. Put your baseline median in the target box before you "
+                "press Start: type it, or press Use my baseline median."
             ),
         }),
         "steps_title": "Trying the stream on another day",
@@ -786,9 +786,10 @@ LESSONS = [
                   "three or four words at a time, with fewer stops along a line. The "
                   "drill tests a narrower version: two streams at one rate, the "
                   "first, <em>Building a Campfire</em>, one word at a time, the second, "
-                  "<em>Planting a Young Tree</em>, one marked phrase at a time. Type "
+                  "<em>Planting a Young Tree</em>, one marked phrase at a time. Put "
                   "your baseline median into both boxes labelled Target rate, wpm, "
-                  "(A) and (B), before you start."),
+                  "(A) and (B), before you start: type it, or press “Use my "
+                  "baseline median”."),
             ("p", "A phrase stays on screen as long as its words would at that "
                   "rate. At 250 words a minute a four-word phrase is shown for "
                   "4 × 60,000 / 250 = 960 milliseconds, and a two-word phrase for 480. "
@@ -849,8 +850,8 @@ LESSONS = [
             "panel_title": "Words or phrases, at one rate",
             "panel_intro": (
                 "Your measurement: two streamed readings of a matched pair at the same "
-                "rate, each with six questions. Type your baseline median into both "
-                "target boxes. The tiles add the time per word of the first stream and "
+                "rate, each with six questions. Put your baseline median into both "
+                "target boxes (Use my baseline median fills them). The tiles add the time per word of the first stream and "
                 "the mean time per phrase of the second."
             ),
         }),
@@ -986,9 +987,9 @@ LESSONS = [
             "found when going back was made useless."
         ),
         "body": [
-            ("p", "Both readings in the lab run at one rate: type your baseline median "
-                  "into both boxes labelled Target rate, wpm, or 300 to match the "
-                  "presets. "
+            ("p", "Both readings in the lab run at one rate: put your baseline median "
+                  "into both boxes labelled Target rate, wpm (“Use my baseline "
+                  "median” does it), or 300 to match the presets. "
                   "<em>The Harvest Supper</em> is read with the pacer, a highlight "
                   "moving line by line with the whole story on screen. <em>The Red "
                   "Flag</em> is read in the stream, one word at a time. Each has six "
@@ -1062,7 +1063,8 @@ LESSONS = [
             "panel_intro": (
                 "Your measurement: two readings of a matched pair at one rate, the "
                 "first behind a pacer that leaves the page on screen, the second in a "
-                "stream that does not. Type the same target into both boxes. Each "
+                "stream that does not. Type the same target into both boxes, or press "
+                "Use my baseline median. Each "
                 "story has one sentence that is easy to misread; after Score, find its "
                 "question among your answers."
             ),

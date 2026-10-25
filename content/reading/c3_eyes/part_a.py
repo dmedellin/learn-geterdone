@@ -735,10 +735,10 @@ LESSONS = [
         "body": [
             ("p", "Two readings again. Reading A, A Hand on the Wire, is at your natural pace with "
                   "no pacer, and is logged as a test. Reading B, Soup for Twenty-Six, runs behind "
-                  "the pacer at your hold target, and is logged as a condition reading. After "
-                  "each, before the questions, write down one number: how many times you lost "
-                  "your place or re-read for no reason. The kit has no box for it, so the count is "
-                  "yours to keep, on paper or in a note in your log."),
+                  "the pacer at your hold target, and is logged as a condition reading. Keep a "
+                  "count as you read of how many times you lost your place or re-read for no "
+                  "reason. After each reading, before the questions, the lab asks for that "
+                  "number, puts it in the lapse boxes and logs it with the reading."),
             ("p", "Most readers who try this find the second number smaller. The pacer gives the "
                   "eyes a place to be, and a moving highlight is harder to drift away from than a "
                   "still page. That is the experience the tradition reports, and it is worth "
@@ -777,8 +777,8 @@ LESSONS = [
             ("p", "If your readings look like no-change, you have not refuted anyone, and nobody "
                   "has refuted you: the two passages differ, one came first, and B's rate was set "
                   "by the pacer rather than by you. Reading A is logged as a test at natural pace, "
-                  "so it joins your history; the tile that sets rate B against your baseline "
-                  "range is about B, which the pacer drove, so read it with that in mind."),
+                  "so it joins your history. B's rate was the pacer's, so the lab does not set "
+                  "it against your baseline range."),
             ("p", "A pacer can do something for drift. What it cannot do is widen the window a "
                   "fixation takes in, or make a regression that repairs the sense unnecessary. "
                   "The next lesson, The Speed Ceiling, turns the window into a limit on speed."),
@@ -790,17 +790,21 @@ LESSONS = [
             "a": {"display": "normal", "kind": "test", "label": "Reading A, natural pace"},
             "b": {"display": "pacer", "target": 264, "kind": "condition",
                   "label": "Reading B, with the pacer"},
+            "lapses": True,
             "preset": "pacer-steadies",
             "presets": [
                 {"id": "pacer-steadies", "label": "Pacer: 4 lapses became 1",
                  "wordsA": 484, "secondsA": 121, "correctA": 5, "totalA": 6,
                  "wordsB": 457, "secondsB": "103.864", "correctB": 5, "totalB": 6, "targetB": 264,
+                 "lapsesA": 4, "lapsesB": 1,
                  "expect": {"drErrA": "200 wpm", "drErrB": "≈ 220.0 wpm", "drErrDiff": "≈ +20.0 wpm",
-                            "drWpmB": "≈ 264.0 wpm"}},
+                            "drWpmB": "≈ 264.0 wpm", "drLapsesA": "4", "drLapsesB": "1"}},
                 {"id": "no-change", "label": "No change: 2 lapses both times",
                  "wordsA": 484, "secondsA": "116.16", "correctA": 5, "totalA": 6,
                  "wordsB": 457, "secondsB": "109.68", "correctB": 5, "totalB": 6, "targetB": 250,
-                 "expect": {"drErrA": "≈ 208.3 wpm", "drErrB": "≈ 208.3 wpm", "drErrDiff": "0 wpm"}},
+                 "lapsesA": 2, "lapsesB": 2,
+                 "expect": {"drErrA": "≈ 208.3 wpm", "drErrB": "≈ 208.3 wpm", "drErrDiff": "0 wpm",
+                            "drLapsesA": "2", "drLapsesB": "2"}},
             ],
         }),
         "steps_title": "Doing it again on another day",
@@ -810,8 +814,8 @@ LESSONS = [
              "Put your current hold target in B's target box. A has no pacer: read it at your "
              "natural pace."),
             ("Read, then count, then answer",
-             "After each reading, before the questions, write down how many times you lost your "
-             "place or re-read for no reason. Count only the ones you noticed."),
+             "After each reading, before the questions, give the lab the number of times you lost "
+             "your place or re-read for no reason. Count only the ones you noticed."),
             ("Compare effective rates, then lapses",
              "Compute both effective rates and what one question is worth. Then set the two "
              "lapse counts side by side, and remember which one the pacer drove."),

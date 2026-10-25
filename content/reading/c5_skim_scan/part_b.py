@@ -123,10 +123,9 @@ LESSONS = [
         ],
         "lab": ("readkit", {
             "mode": "scan",
-            "view": "find",
+            "view": "inspect",
             "passage": PASSAGES["B01"],
             "limit": 300,
-            "title": "Inspectional reading",
             "preset": "five-minutes",
             "presets": [
                 {"id": "five-minutes", "label": "Four of five when the five minutes ran out",
