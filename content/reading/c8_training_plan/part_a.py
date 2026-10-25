@@ -327,14 +327,13 @@ LESSONS = [
         ),
         "body": [
             ("p", "The warm-up above the lab is a test reading of a passage about "
-                  "rainbows, at natural pace, with six questions. Do it first, then "
-                  "press Show my log under the panel, so that your own curve ends with "
-                  "today: the panel reads your log when the page opens and when you "
-                  "press the button, not when the warm-up scores. The passage comes "
+                  "rainbows, at natural pace, with six questions. Do it first: when it "
+                  "scores, the panel reads your log again, so your own curve ends with "
+                  "today. The passage comes "
                   "from the standard band of the practice pool, the band of your "
                   "baselines, so it can stand beside them on the chart."),
             ("p", "The lab reads your log and keeps only the baseline and test "
-                  "readings that had questions. It puts every baseline first and the "
+                  "readings of standard passages that had questions. It puts every baseline first and the "
                   "tests after them, sets the box for the number of baselines, and "
                   "prints the median of the baselines, the median of the last three "
                   "readings, the latest effective rate and the verdict. Measure Your "
@@ -342,7 +341,10 @@ LESSONS = [
                   "built from all four. Practice readings are drawn "
                   "as a lighter dashed line and enter no tile; notes and every other "
                   "entry are listed, greyed, under the chart. With an empty log, the "
-                  "boxes hold one of three example logs."),
+                  "boxes hold one of three example logs. A test on an easy or a hard "
+                  "passage is greyed too: it says more about the passage than about "
+                  "you. An entry with no band, such as one logged before the log "
+                  "recorded bands, is counted."),
             ("p", "The rule is the one from One Reading Is One Measurement. The "
                   "baselines give a range: how far apart your readings fall with "
                   "nothing changed. A single test above the top of that range happens "
@@ -432,9 +434,10 @@ LESSONS = [
              "A reading at natural pace with no pacer, with its questions, from the "
              "Daily Drill's test box or a lesson's warm-up."),
             ("Open your log and strike what does not count",
-             "On this page, press Show my log after the test, then check that the "
-             "counted sessions are your baselines and tests; practice, conditions, "
-             "skims and readings without questions are greyed, and stay out."),
+             "On this page, after the test, check that the counted sessions are "
+             "your baselines and tests of standard passages; practice, conditions, "
+             "skims, tests on easy, hard or mixed passages and readings without "
+             "questions are greyed, and stay out."),
             ("Read the median, not the peak",
              "Find the median of the last three tests and set it against the "
              "baseline range. Then give the verdict in the Subject's three tiers: "
@@ -606,8 +609,8 @@ LESSONS = [
                   "your log, the same figures as on the Reading Your Curve page, and "
                   "sets today's effective rate against each before you decide "
                   "anything. The recent median fills only once your log holds three "
-                  "tests; with fewer, its box keeps whatever it shows, so clear it, or "
-                  "read the last tile as a comparison with the example."),
+                  "tests of standard passages; with fewer, its box is left empty and "
+                  "the last tile says so."),
             ("p", "Suppose your recent test median is 270 effective words a minute "
                   "against a baseline range of 238 to 251, a change by the Subject's "
                   "rule, and suppose the tests have stayed near 270 for some weeks. "

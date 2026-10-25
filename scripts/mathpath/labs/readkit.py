@@ -161,6 +161,26 @@ DR_PRACTICE_JS = r"""
     var n = Number(since.n), left = DR_TEST_EVERY - n;
     return left <= 0 ? 'due now: make the next reading a test' : 'after ' + left + ' more practice session' + (left === 1 ? '' : 's');
   }
+  /* Practice sessions since the last test that counts. A session is a reading
+     logged as practice on the Daily Drill's own page (drill/practice): the
+     ladder's rungs and other lessons' warm-ups are not sessions. The count
+     restarts only at a test READING of standard text (rdIsReading, rdStandard):
+     not at a scan, a skim, or a test on easy or hard text. list: the log, oldest first. */
+  function drSinceTestOf(list) {
+    var n = 0;
+    list.forEach(function (e) {
+      if (e.kind === 'test' && rdIsReading(e) && rdStandard(e)) n = 0;
+      else if (e.kind === 'practice' && e.mode === 'drill' && e.view === 'practice') n += 1;
+    });
+    return n;
+  }
+  /* The next pool passage: the first of ids not in used. A test takes the first
+     unused one of standard band (bands: id -> band), so that it compares with
+     standard baselines however far the easy-first pool has got. */
+  function drPoolPick(ids, bands, used, test) {
+    for (var i = 0; i < ids.length; i++) if (!used[ids[i]] && (!test || rdStdBand(bands[ids[i]]))) return ids[i];
+    return null;
+  }
 """
 
 DR_COMPARE_JS = r"""
@@ -236,7 +256,7 @@ DR_REPEAT_JS = r"""
     t.drRepeatGain = rdSigned(Rsub(w[2], w[0]), 'wpm');
     t.drTransferGain = rdSigned(Rsub(w[3], w[0]), 'wpm');
     return { tiles: t, status: 'On the repeated passage the rate moved ' + t.drRepeatGain + ' from the first reading to the third; on the new passage, '
-      + t.drTransferGain + ' against the first. Only the second is a change in the reader.',
+      + t.drTransferGain + ' against the first. Only the second could be a change in the reader.',
       table: { caption: 'Four readings', head: ['reading', 'rate', 'comprehension'], rows: rows } };
   };
 """
@@ -268,12 +288,21 @@ PRACTICE_JS = r"""
       return e.mode === 'drill' && e.view === 'practice' && e.display === 'pacer' && e.total > 0 && e.extra && e.extra.target;
     }).map(function (e) { return Math.round(e.extra.target) + '/' + e.correct + '/' + e.total; }).join(', ');
   }
-  function rdPoolNext() { return rdFirstUnlogged(RD_POOL); }
-  /* Practice sessions logged since the last test reading (any lesson). */
-  function rdSinceTest() {
-    var n = 0;
-    rdLogRead().forEach(function (e) { if (e.kind === 'test') n = 0; else if (e.kind === 'practice' && e.mode === 'drill') n += 1; });
-    return n;
+  function rdPoolNext(test) {
+    var used = {}, bands = {};
+    rdLogRead().forEach(function (e) { used[e.passage] = true; });
+    RD_POOL.forEach(function (id) { bands[id] = PASSAGES[id].band; });
+    return drPoolPick(RD_POOL, bands, used, test);
+  }
+  function rdSinceTest() { return drSinceTestOf(rdLogRead()); }
+  /* The line above Start: what the next Start serves (a test: the next standard
+     passage), redrawn at load, after each Score and when the test box changes. */
+  function rdPoolLine() {
+    var m = document.getElementById('rdPool'), test = document.getElementById('rdTest').checked, id = rdPoolNext(test);
+    if (!m) return;
+    m.textContent = (id ? (test ? 'Next test passage (the first unread standard one): ' : 'Next unread passage: ') + PASSAGES[id].title + '.'
+      : test ? 'No unread standard passage is left in the pool for a test.' : 'Every passage in the pool is in your log.')
+      + (!test && rdSinceTest() >= DR_TEST_EVERY ? ' A test is due: tick the test box, and Start serves the next standard passage.' : '');
   }
   function rdPracticeSetup(k) {
     var st = RD_ST[k], test = document.getElementById('rdTest').checked, pace = document.getElementById('rdPacer').checked;
@@ -285,38 +314,42 @@ PRACTICE_JS = r"""
       st.kind = 'practice';
       return true;
     }
-    var id = rdPoolNext();
-    if (!id) { rdMsg(k, 'You have read every passage in this pool. Paste a text of your own to keep practising.'); return false; }
+    var id = rdPoolNext(test);
+    if (!id) {
+      rdMsg(k, test ? 'No unread standard passage is left in this pool for a test; the later lessons log tests of their own.'
+        : 'You have read every passage in this pool. Paste a text of your own to keep practising.');
+      return false;
+    }
     st.passage = PASSAGES[id];
-    rdMsg(k, 'Next unread passage: ' + st.passage.title + '.');
     return true;
   }
   /* After a Score (and at load, once the log holds anything): the boxes hold
      the reader's own pacer log and count, never the worked example's. */
-  function rdAfterScore() { rdWrite({ pacerLog: rdPacerLogText(), sinceTest: rdSinceTest() }); }
+  function rdAfterScore() { rdWrite({ pacerLog: rdPacerLogText(), sinceTest: rdSinceTest() }); rdPoolLine(); }
 """
 
 PRACTICE_INIT_JS = r"""
   (function () {
-    if (rdLogRead().length) rdAfterScore();
-    var id = rdPoolNext(), m = document.getElementById('rdPool');
-    if (m) m.textContent = id ? 'Next unread passage: ' + PASSAGES[id].title + '.' : 'Every passage in the pool is in your log.';
+    if (rdLogRead().length) rdAfterScore(); else rdPoolLine();
+    document.getElementById('rdTest').addEventListener('change', rdPoolLine);
   })();
 """
 
 BASELINE_UI_JS = r"""
-  /* The baseline range from the log: every reading logged as "baseline"
+  /* The baseline range from the log: every reading of standard text logged as "baseline"
      (rate = words x 60,000 / ms; DR_EFF: effective rates, with the median of
      the last three tests). Filled at load when the boxes are empty, after each
      Score, and on the button; as decimals of at most two places. */
   function rdBaseFill(quiet) {
     var note = document.getElementById('rdBaseNote'), list = rdLogRead(), r = rdKindRates('baseline', DR_EFF, list), v = {}, ts;
-    if (!r.length) { if (!quiet) note.textContent = 'Your log has no readings marked as baselines yet.'; return; }
+    /* Fewer than three tests: the recent box is emptied, not left at the example's value. */
+    if (DR_EFF) v.recent = (ts = rdKindRates('test', true, list).slice(-3)).length === 3 ? rdDec(rdMedian(ts)) : '';
+    if (!r.length) { if (DR_EFF && quiet) rdWrite(v); if (!quiet) note.textContent = 'Your log has no readings marked as baselines yet.'; return; }
     r.sort(Rcmp);
     v.baseLo = rdDec(r[0]); v.baseHi = rdDec(r[r.length - 1]); v.baseN = r.length;
-    if (DR_EFF && (ts = rdKindRates('test', true, list).slice(-3)).length === 3) v.recent = rdDec(rdMedian(ts));
     rdWrite(v);
-    note.textContent = 'From your log: ' + r.length + ' baseline reading' + (r.length === 1 ? '' : 's') + (r.length < 3 ? '; a verdict needs three.' : '.');
+    note.textContent = 'From your log: ' + r.length + ' baseline reading' + (r.length === 1 ? '' : 's') + (r.length < 3 ? '; a verdict needs three.' : '.')
+      + (DR_EFF && v.recent === '' ? ' Fewer than three tests on standard passages, so the recent median is left empty.' : '');
   }
   function rdAfterScore() { rdBaseFill(true); }
   (function () {
@@ -354,12 +387,13 @@ TARGET_UI_JS = r"""
 
 ORDER_UI_JS = r"""
   /* The order of a compare: cfg AB, BA, or alternate by the parity of the
-     log's length (read at load; nothing starts). B first moves its box up. */
+     log's length (read at load; nothing starts). B first shows its box first
+     (CSS order inside the #rdPair column; each box is found by its own id). */
   (function () {
     var o = DR_ORDER === 'alternate' ? (rdLogRead().length % 2 ? 'BA' : 'AB') : DR_ORDER;
     SLOTS.A.order = SLOTS.B.order = o;
-    var a = document.getElementById('rdBoxA'), b = document.getElementById('rdBoxB'), note = document.getElementById('rdOrder');
-    if (o === 'BA' && a && b && a.parentNode && a.parentNode === b.parentNode && a.parentNode.insertBefore) a.parentNode.insertBefore(b, a);
+    var b = document.getElementById('rdBoxB'), note = document.getElementById('rdOrder');
+    if (o === 'BA' && b) b.style.order = '-1';
     if (note) note.textContent = (o === 'AB' ? 'Read A first, then B.' : 'Read B first, then A.')
       + (DR_ORDER === 'alternate' ? ' The order alternates from one comparison to the next, so neither condition always comes second.' : '');
   })();
@@ -612,7 +646,7 @@ def _drill(cfg, view, kit):
             main = ('      <div class="card card-pad" style="margin-top:12px;">\n'
                     '        <p class="small-copy" id="rdPool" style="margin:0 0 8px;"></p>\n'
                     '        <label class="small-copy"><input type="checkbox" id="rdPacer"> Read with the pacer at the target rate in the panel</label><br>\n'
-                    '        <label class="small-copy"><input type="checkbox" id="rdTest"> This is a test reading (natural pace, no pacer)</label>\n'
+                    '        <label class="small-copy"><input type="checkbox" id="rdTest"> This is a test reading (natural pace, no pacer; Start serves the next standard passage)</label>\n'
                     '        <details style="margin-top:8px;"><summary class="small-copy">Or paste a text of your own</summary>\n'
                     '        <textarea id="rdPaste" rows="6" style="width:100%;box-sizing:border-box;" aria-label="Your own text"></textarea>\n'
                     '        <p class="small-copy">Paragraphs are separated by a blank line. Your own text has no questions, so its comprehension is not scored; it is logged as practice.</p></details>\n'
@@ -685,7 +719,8 @@ def _drill(cfg, view, kit):
             main += _slot_markup(k, sc, p, "%s: %s" % (sc["label"], p["title"]))
             if sc["display"] in TIMED:
                 tgt.append(["target" + k, sc["fromBase"]])
-        main = '      <p class="small-copy" id="rdOrder" style="margin:12px 0 0;"></p>\n' + main
+        main = ('      <p class="small-copy" id="rdOrder" style="margin:12px 0 0;"></p>\n'
+                '      <div id="rdPair" style="display:flex;flex-direction:column;">\n' + main + '      </div>\n')
         if verdict:
             main += _base_markup()
             eff = False

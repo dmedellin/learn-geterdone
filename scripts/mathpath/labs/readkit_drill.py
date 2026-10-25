@@ -259,7 +259,7 @@ RD_DRILL_JS = r"""
       + (t.total ? ', ' + t.correct + ' of ' + t.total + ' right' : ', no questions') + '.'
       + (S.tick && st.tick !== undefined ? ' (' + S.tick.label + ': ' + (S.tick.count ? st.tick : st.tick ? 'yes' : 'no') + '.)' : '');
     rdE('rdOut', k).innerHTML = rdEsc(line) + rdReview(st.qs || [], answers);
-    rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id || 'pasted', display: st.display, words: words, chars: got.chars,
+    rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id || 'pasted', band: P.band, display: st.display, words: words, chars: got.chars,
                   ms: st.ms, correct: t.correct, total: t.total, kind: st.kind,
                   extra: { gist: t.gist, gistTotal: t.gistTotal, detail: t.detail, detailTotal: t.detailTotal,
                            target: st.target || null, split: st.split === undefined ? null : st.split, order: S.order || null,
@@ -378,6 +378,7 @@ RD_RECALL_JS = r"""
       + due.slice(0, 10) + '; this page will offer it then.';
     rdMsg(k, 'Logged. There is no test now: that is the point of this condition.');
     var s = rdE('rdStart', k); s.textContent = 'Start again'; rdShow(s, true);
+    if (typeof rdAfterScore === 'function') rdAfterScore(k);
   }
   /* ---- free recall: write, then tick the idea units (the reader scores it) ---- */
   function rdRecallWrite(k) {
@@ -430,6 +431,7 @@ RD_RECALL_JS = r"""
     st.phase = 'idle';
     var s = rdE('rdStart', k); s.textContent = 'Start again'; rdShow(s, true);
     rdMsg(k, 'Scored and logged.');
+    if (typeof rdAfterScore === 'function') rdAfterScore(k);
   }
 """
 

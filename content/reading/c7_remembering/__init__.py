@@ -67,8 +67,8 @@ COURSE = {
         "about it.",
         "Start Retrieval Beats Rereading early. Its comparison finishes two or more "
         "days later, when this Subject's pages offer you the delayed test. Do its two "
-        "readings on your first day with this course and take the next lesson two or "
-        "more days on, and the test will be waiting when you reach Spacing Your Reviews.",
+        "readings on your first day with this course and open Spacing Your Reviews two "
+        "or more days on, and the test will be waiting when you reach it.",
         "Do not look at a passage before its drill. Each passage is used by one lesson "
         "only, and a passage you have seen before measures your memory of it rather "
         "than a first reading. If you are interrupted during a drill, Reset it and do "

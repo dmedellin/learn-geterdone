@@ -286,7 +286,7 @@ RECALL_JS = r"""
 DELAYED_UI_JS = r"""
   /* The delayed test: offered when both conditions are logged for this lesson
      and their due date has passed. The questions of both passages, no passage shown. */
-  (function () {
+  function reDelayedShow() {
     var box = document.getElementById('reDelayed');
     function lessonId() { return LESSON || String((window.location && window.location.pathname) || '').split('/').filter(Boolean).pop() || ''; }
     var here = lessonId(), list = rdLogRead(), mine = list.filter(function (e) { return e.lesson === here && e.view === 'delayed'; });
@@ -312,7 +312,10 @@ DELAYED_UI_JS = r"""
         work.innerHTML = rdReview(qa.concat(qb), answers);
       });
     });
-  })();
+  }
+  /* At load, and after each side is logged, so "due on" shows without a reload. */
+  function rdAfterScore() { reDelayedShow(); }
+  reDelayedShow();
 """
 
 
@@ -394,7 +397,7 @@ def _recall(cfg, view, kit):
 
 LOG_JS = r"""
   /* log: the reader's numbers. History, noise and profile use readings
-     logged as "baseline" or "test" only. */
+     logged as "baseline" or "test" only, of standard text (rdStandard). */
   /* n: the number of baseline readings the range comes from. */
   function lgRangeVerdict(x, lo, hi, n) {
     if (Rcmp(x, hi) > 0) return rdOnce(n);
@@ -534,19 +537,19 @@ LOG_JS = r"""
 
 LOG_FILL_JS = r"""
   /* Reading the log (at load, and on the buttons). Only "baseline" and "test"
-     readings with questions count; every other entry is listed, greyed. */
-  function lgCounted(e) { return (e.kind === 'baseline' || e.kind === 'test') && e.total > 0 && rdIsReading(e); }
+     readings of standard text with questions count; every other entry is listed, greyed. */
+  function lgCounted(e) { return (e.kind === 'baseline' || e.kind === 'test') && e.total > 0 && rdIsReading(e) && rdStandard(e); }
   function lgRate(e) { return rdEntryRate(e, false); }
   function lgLogTable(list) {
     var el = document.getElementById('lgLog');
     if (!el) return;
     if (!list.length) { el.innerHTML = '<p class="small-copy">Your log is empty: the boxes hold an example log. Do a drill and it appears here.</p>'; return; }
-    el.innerHTML = '<div class="table-wrap"><table class="tt"><caption>Your log (only baseline and test readings with questions are counted)</caption>'
+    el.innerHTML = '<div class="table-wrap"><table class="tt"><caption>Your log (only baseline and test readings of standard passages, with questions, are counted)</caption>'
       + '<thead><tr><th>date</th><th>lesson</th><th>kind</th><th>what</th><th>rate</th><th>right</th></tr></thead><tbody>'
       + list.map(function (e) {
         var rate = e.words > 0 && e.ms > 0 ? rdUnit(lgRate(e), 'wpm') : '';
         return '<tr' + (lgCounted(e) ? '' : ' style="opacity:0.55"') + '><td>' + rdEsc(String(e.at || '').slice(0, 10)) + '</td><td>'
-          + rdEsc(e.lesson || '') + '</td><td>' + rdEsc(e.kind || '') + '</td><td>' + rdEsc((e.view || '') + (e.view === 'note' && e.extra ? ': ' + e.extra.text : ''))
+          + rdEsc(e.lesson || '') + '</td><td>' + rdEsc(e.kind || '') + '</td><td>' + rdEsc((e.view || '') + (e.view === 'note' && e.extra ? ': ' + e.extra.text : '') + (rdStandard(e) ? '' : ', ' + e.band + ' passage'))
           + '</td><td>' + rate + '</td><td>' + (e.total ? e.correct + ' of ' + e.total : '') + '</td></tr>';
       }).join('') + '</tbody></table></div>';
   }
@@ -557,6 +560,8 @@ LOG_FILL_JS = r"""
 """
 
 LOG_HISTORY_UI_JS = r"""
+  var lgAfter = null;
+  function rdAfterScore() { if (lgAfter) lgAfter(); }
   (function () {
     var list = rdLogRead(), msg = document.getElementById('lgMsg');
     lgLogTable(list);
@@ -568,12 +573,15 @@ LOG_HISTORY_UI_JS = r"""
                           practice: lgEntriesText(p.slice(-200)) } : null;
     }
     if (mine(list)) { rdWrite(mine(list)); msg.textContent = 'The boxes hold your own log.'; }
-    document.getElementById('lgMine').addEventListener('click', function () {
+    function fill(quiet) {
       var l = rdLogRead(), v = mine(l);
       lgLogTable(l);
-      if (!v) { msg.textContent = 'Your log has no baseline or test readings with questions yet.'; return; }
+      if (!v) { if (!quiet) msg.textContent = 'Your log has no baseline or test readings with questions yet.'; return; }
       rdWrite(v); msg.textContent = 'The boxes hold your own log.';
-    });
+    }
+    document.getElementById('lgMine').addEventListener('click', function () { fill(false); });
+    /* A warm-up scored on this page is in the log at once: read it again. */
+    lgAfter = function () { fill(true); };
     document.getElementById('lgNoteAdd').addEventListener('click', function () {
       var box = document.getElementById('lgNote'), text = rdClean(box.value);
       if (text === '') return;
@@ -621,7 +629,7 @@ LOG_GEARS_UI_JS = r"""
   (function () {
     var msg = document.getElementById('lgMsg');
     document.getElementById('lgMine').addEventListener('click', function () {
-      var base = rdLogRead().filter(function (e) { return e.kind === 'baseline' && rdIsReading(e); });
+      var base = rdLogRead().filter(function (e) { return e.kind === 'baseline' && rdIsReading(e) && rdStandard(e); });
       if (!base.length) { msg.textContent = 'Your log has no baseline readings yet.'; return; }
       var v = { wpm: rdDec(rdMedian(base.map(lgRate))), stdwpm: '' };
       if (base.every(function (e) { return e.chars > 0; })) v.stdwpm = rdDec(rdMedian(base.map(function (e) {

@@ -424,7 +424,14 @@ Previewing and in Words, Knowledge and Difficulty.
 1. **reading-with-a-pacer** — Reading with a Pacer — *The pacer* — 10 min — *drill first*
    - **Drill:** `drill/compare`: A `P12` at natural pace (`test`); B `P13`
      with the `pacer` display at the reader's baseline median rate
-     (`condition`); order alternates.
+     (`condition`); order alternates (B first is shown first by CSS `order`
+     inside `#rdPair`, never by moving nodes).
+   - **The tradition at its strongest** (§F), before the evidence: the Evelyn
+     Wood courses (from 1959) taught the hand as a guide and held that with
+     training the eyes take in whole lines, or more, at a glance, so that a
+     reader moving down the page reads far faster with comprehension intact;
+     practitioners describe the experience in those terms. Then Rayner et al.
+     2016 on why no guide widens what a fixation takes in.
    - **Do:** compute a pacer's time per line from a target rate and a line
      length, and compare effective rate with and without it.
    - **Standard:** given a target and words per line, compute ms per line;
@@ -464,8 +471,10 @@ Previewing and in Words, Knowledge and Difficulty.
 
 3. **the-daily-drill** — The Daily Drill — *The pacer* — 15 min, then daily
    - **Drill:** `drill/practice` on the practice pool (§P): the next unread
-     pool passage with the pacer at the reader's hold target (`practice`), or
-     at natural pace with no pacer when the session is a test (`test`); or
+     pool passage with the pacer at the reader's hold target (`practice`), or,
+     when the test box is ticked, the next unread STANDARD-band pool passage
+     (`Q09` on) at natural pace with no pacer (`test`; the easy-first pool
+     must not put a test on an easy passage); or
      the reader's own pasted text (`practice`, unscored). An attention tick
      after Done: "did your attention leave the text?".
    - **Do:** run a practice session by the routine and record it.
@@ -487,6 +496,13 @@ Previewing and in Words, Knowledge and Difficulty.
      after 1 more session), `two-misses` (288: 3/6, 3/6, two since → 273.6),
      `test-due` (288: 4/6, 3/6, 5/6, 4/6, four since → "due now: make the
      next reading a test"). Pins `drHold`, `drNextTarget`, `drTestDue`.
+     "Sessions since the last test" counts only `practice` entries of
+     `drill/practice` (the ladder's rungs and other lessons' warm-ups are not
+     sessions) and restarts only at a `test` READING of standard text
+     (`rdIsReading` and `rdStandard`: not a scan, a skim, or a test on an
+     easy, hard or mixed passage). The line above Start names what the next
+     Start serves and is redrawn after each Score and when the test box
+     changes; when a test is due it says so.
    - **Misconception:** "Read as much as possible, as fast as possible." Short, regular sessions at a pace you still
      understand, with regular tests, are the routine; a session's length is
      limited by attention, not ambition.
@@ -690,7 +706,9 @@ Modules: `The inner voice`, `Flashing words`.
 
 1. **the-inner-voice** — The Inner Voice — *The inner voice* — 10 min
    - **Drill:** `drill/compare`: A `P25` read aloud — a whisper is enough —
-     no questions (`other`); B `P26` silently with questions (`test`). A
+     no questions (`other`); B `P26` silently with questions (`test`, easy
+     band: recorded with its band, so it stays out of every test median; the
+     body says its verdict flatters). A
      reader who cannot read aloud where they are uses the fallback: Brysbaert's
      oral average, 183, labelled a published figure.
    - **Do:** compute oral and silent rates and their ratio, and explain how
@@ -958,8 +976,9 @@ Modules: `Scanning and skimming`, `Reading strategically`.
 7. **shifting-gears** — Shifting Gears — *Reading strategically* — 12 min
    - **Drill:** `drill/sections` on `P37` (578 words: an easy narrative
      section of 292, then a dense report of 286), the instruction to change
-     speed by section; time per section; six questions on the whole (`test`;
-     the kit has no per-section score); the attention tick.
+     speed by section; time per section; six questions on the whole (`test`,
+     mixed band, so outside the test medians; the kit has no per-section
+     score); the attention tick.
    - **Do:** compute the rate for each section and say whether the reader
      shifted gear to match difficulty and purpose.
    - **Standard:** given section times and scores, compute both rates and say
@@ -981,7 +1000,8 @@ Modules: `Difficulty`, `Knowledge`.
 
 1. **your-rate-on-hard-text** — Your Rate on Hard Text — *Difficulty* — 12 min — *drill first*
    - **Drill:** `drill/compare`: A `P38` (easy) and B `P39` (hard), each at
-     natural pace with questions (`test`).
+     natural pace with questions (`test`; both carry their band into the log,
+     so neither enters a median set against the standard baselines).
    - **Do:** compute the change in rate and effective rate between an easy and a
      hard text and decide which a speed claim should be measured on.
    - **Standard:** given both readings, compute both ratios and say what a
@@ -1041,8 +1061,11 @@ Modules: `Difficulty`, `Knowledge`.
      Ravenhorst-Kalovski 2010; Schmitt, Jiang and Grabe 2011.
 
 4. **what-you-already-know** — What You Already Know — *Knowledge* — 12 min
-   - **Drill:** `drill/compare`: A `P41` (familiar everyday topic) and B `P42`
-     (unfamiliar specialist procedure), matched within one grade (`test`).
+   - **Drill:** `drill/compare`: A `P41` (familiar everyday topic, `test`) and
+     B `P42` (unfamiliar specialist procedure, `condition`: standard by the
+     formula, so the band filter would not catch it, and a reading slowed by an
+     unfamiliar topic does not measure the reader's usual pace), matched
+     within one grade.
    - **Do:** compute the effect of topic familiarity on rate and comprehension
      with readability held close.
    - **Standard:** given both readings, compute both effective rates and the
@@ -1055,8 +1078,11 @@ Modules: `Difficulty`, `Knowledge`.
    - **Misconception:** "Speed is a skill independent of what you know."
      Recht and Leslie found junior-high readers' knowledge of baseball
      mattered more than their reading ability for what they recalled of a
-     baseball passage; background knowledge is among the strongest
-     influences on comprehension.
+     baseball passage (recall, not speed, in junior-high readers). Rayner et
+     al. 2016 is cited only for "language skill, including vocabulary, is at
+     the heart of reading speed"; the earlier wording, that it counts
+     background knowledge among the strongest influences on comprehension,
+     could not be found in the review and was withdrawn (§R).
    - **Worked:** 150 / 240 = 5/8 = 62.5%.
    - **Sources:** Recht and Leslie 1988; Rayner et al. 2016.
 
@@ -1192,7 +1218,10 @@ Modules: `The plan`, `The test`.
 2. **reading-your-curve** — Reading Your Curve — *The plan* — 8 min
    - **Drill:** `warmup` `Q16` (standard band, `test`: a hard-band warm-up
      would drag the test median down); then `log/history` on the reader's
-     log.
+     log, which reads the log again when the warm-up scores (no "Show my log"
+     step). Counted: `baseline` and `test` readings of standard passages
+     (or with no band recorded) with questions; the log table greys the rest
+     and names a non-standard band ("easy passage").
    - **Do:** decide from a log whether effective rate has changed.
    - **Standard:** given a log, state the verdict by the Subject's rule and
      name the entries that do not count.
@@ -1214,7 +1243,9 @@ Modules: `The plan`, `The test`.
      the reader has not practised; logged `other`, because a first reading of
      a kind with no baseline would pull down the median of tests on standard
      passages); `vsLog: true` prints the reader's effective rate on it beside
-     the baseline range and the recent test median from the log.
+     the baseline range and the recent test median from the log (standard
+     passages only; with fewer than three such tests the recent box is
+     emptied, not left at the preset's 270).
    - **Do:** compare a first reading of a new kind of text with the practised
      kind and say what a plateau in each would mean.
    - **Standard:** given the three figures, say whether the practice
@@ -1326,8 +1357,10 @@ says questions are off.
 - `aloud` — `normal`, with the instruction to read aloud.
 
 **The log.** One `localStorage` key, `learn-reading-log`, holding a JSON array
-of entries `{v: 1, at: ISO date, lesson: slug, view, passage, display, words,
-ms, correct, total, kind?, extra?}`. Reads and writes are wrapped in
+of entries `{v: 1, at: ISO date, lesson: slug, view, passage, band?, display, words,
+ms, correct, total, kind?, extra?}`; `band` is the passage's §P band, recorded on
+every drill and warm-up reading (absent for pasted text and for entries logged
+before bands were recorded; D.3.17). Reads and writes are wrapped in
 try/catch; a page with storage blocked runs every drill and says, once, that
 results will not be kept. Only `log/*` views and the delayed recall read it.
 `log/history` can export the log as CSV text in a read-only textarea and can
@@ -1549,6 +1582,29 @@ carries no warm-up (page weight).
     (Brysbaert's 238 is in words).
 16. **`text/coverage`** tile `txOneIn` ("one unknown in every N tokens")
     replaces `txRun`.
+17. **Tests compare on standard text only** (after the second reviews). A
+    drill entry records its passage's `band`. Every baseline and test range,
+    median, verdict and curve counts only entries whose band is `standard`
+    or absent (`rdStandard`; absent = an old log or the reader's own text,
+    which keep the earlier behaviour): `rdKindRates`, `lgCounted` (history,
+    noise, the log table), the gears fill and the profile fill. An easy-,
+    hard- or mixed-band reading logged `test` stays in the log, greyed and
+    labelled with its band, and enters no median. A topic effect on a
+    standard-band passage is not a band, so Course 6's unfamiliar side is
+    logged `condition`.
+18. **The Daily Drill's tests and count.** With the test box ticked, Start
+    serves the next unread standard-band pool passage (`drPoolPick`); the
+    count of sessions since the last test (`drSinceTestOf`) counts only
+    `practice` entries of `drill/practice` and restarts only at a `test`
+    reading (`rdIsReading`) of standard text. The pool line is redrawn after
+    Score and on the test box.
+19. **Refresh without reload.** A warm-up scored on a `log/history` page
+    refills the history; `recall/delayed` redraws its "due on" line after
+    each side is logged; the `vsLog` recent-median box is emptied when the
+    log holds fewer than three standard tests. A compare whose order is `BA`
+    shows B first by CSS `order` inside `#rdPair`, finding each box by its id
+    (no `parentNode`). The repeat status says the transfer gain "could be" a
+    change in the reader.
 
 ## §P The passage bank
 
@@ -1957,3 +2013,34 @@ search on the doubtful claims). Resolution:
   count or correct-answer index changed.
 - Reading Your Curve's test warm-up moved from the hard-band `Q25` to the standard-band
   `Q16`.
+
+### Cross-course follow-ups from the second reviews, 2026-10-25
+
+- **Test medians on standard text only** (D.3.17, D.3.18): band recorded on each
+  drill entry; baselines, tests, verdicts and the curve count only standard (or
+  unbanded) readings; the Daily Drill serves a standard passage for a test; the
+  session count is scoped to the Daily Drill and restarts only at a standard test
+  reading. Lesson prose changed to match: The Daily Drill (the caution paragraph
+  became the rule it now enforces; the ladder-rungs note reversed), The Inner Voice,
+  Shifting Gears, Your Rate on Hard Text, What You Already Know (unfamiliar side
+  now `condition`), Reading Your Curve (no "Show my log" step), Plateaus and
+  Transfer (the recent box empties).
+- **Small kit items** (D.3.19); compare ordering no longer walks `parentNode`
+  (the site suite's `test_no_lab_reaches_through_parent_element`).
+- **Reading with a Pacer** states the Evelyn Wood claim (whole lines or more at a
+  glance) at its strongest before the evidence (§F).
+- **Rayner et al. 2016 and background knowledge.** The review's abstract puts
+  "language skill", vocabulary in particular, at the heart of reading speed; no
+  sentence ranking background knowledge among the strongest influences on
+  comprehension could be found (full text not reachable). What You Already Know now
+  cites the review only for language skill and states Recht and Leslie at their own
+  strength (recall, junior-high readers).
+- **Passages: questions answerable without reading, rewritten** (same correct-answer
+  index, kind and word count; only `P31`'s character count changed, 2,082 → 2,078,
+  which no figure uses): `P02` Q5, `P03` Q5, `P05` Q3 and Q5, `P13` Q4, `P15` Q3 and
+  Q6, `P16` Q4, `P32` Q4 (now answerable from the skim's shown first sentence),
+  `P34` Q2, `P41` Q3–Q5, `P43` Q1 and Q6, `P44` Q6, `P45` Q6, `P47` Q1 and Q6,
+  `P48` Q5, `P49` Q1 and Q6. `P31`: the two remaining cues to its garden-path
+  question ("would not be pulling an oar for a fortnight", "Emil sitting in the
+  stern") replaced with sentences of the same length. Left as reported and
+  judged acceptable: `P13` Q2, `P12` Q5, `P18`, `P23`, `P24`, `P30` Q2, `Q16` Q1/Q4.

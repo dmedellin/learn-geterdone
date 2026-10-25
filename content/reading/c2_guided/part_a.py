@@ -79,11 +79,16 @@ LESSONS = [
                   "wanted to read again, and the score drops. Your two effective rates "
                   "say which happened today."),
             ("h3", "Where the pacer comes from"),
-            ("p", "The pacer is the oldest technique in the speed-reading tradition. "
-                  "The Evelyn Wood courses, from 1959, taught readers to sweep a hand "
-                  "down the page and let the eyes follow it, on the claim that the "
-                  "hand keeps a reader moving, keeps the mind from drifting and "
-                  "stops the eyes going back over lines already read. The "
+            ("p", "The pacer is the oldest technique in the speed-reading tradition, "
+                  "and the tradition's claim for it is a large one. The Evelyn Wood "
+                  "courses, from 1959, taught readers to sweep a hand down the page and "
+                  "let the eyes follow it, and held that with training the eyes stop "
+                  "working along a line word by word and take in whole lines, or more, "
+                  "at a glance, so that a reader moving down the page behind the hand "
+                  "reads far faster and understands as well. Practitioners describe "
+                  "the experience in those terms: the page goes by in blocks, and the "
+                  "hand keeps them moving, keeps the mind from drifting and stops the "
+                  "eyes going back over lines already read. The "
                   "review of the research that Keith Rayner wrote with four "
                   "colleagues, published in 2016 after his death, describes the "
                   "method and explains why no guide can widen what the eye takes in "
@@ -560,7 +565,7 @@ LESSONS = [
         "concepts": [
             ("A session is one passage",
              "The pool holds 18 passages, rising from easy to hard, served in order "
-             "and never repeated. One passage behind the pacer and its six "
+             "and never repeated; a test takes the next standard one. One passage behind the pacer and its six "
              "questions is a session, and ten to fifteen minutes a day is the "
              "routine."),
             ("The target moves by a twentieth",
@@ -569,7 +574,7 @@ LESSONS = [
              "lower it by a twentieth: 288 becomes 273.6. Anything else keeps it "
              "where it is."),
             ("Tests are the readings that count",
-             "Every fifth session is a test: a pool passage at natural pace, with "
+             "Every fifth session is a test: a standard pool passage at natural pace, with "
              "no pacer. Paced readings are practice. Only tests and baselines go "
              "into the verdicts, because only they measure your own pace."),
         ],
@@ -588,9 +593,9 @@ LESSONS = [
                 "Ten to fifteen minutes a day: one pool passage, read with the "
                 "pacer at your hold target, then its questions. At most two timed "
                 "readings in a sitting.",
-                "Every fifth session, a test: tick the test box and read the next "
-                "pool passage at your natural pace, with no pacer. The lab says when "
-                "a test is due.",
+                "Every fifth session, a test: tick the test box, and Start serves the "
+                "next standard passage of the pool, to read at your natural pace with "
+                "no pacer. The lab says when a test is due.",
                 "Three holds in a row at a target, four or more right each time, "
                 "raise the target by about 5%, a twentieth. Two misses in a row "
                 "lower it by the same.",
@@ -613,18 +618,19 @@ LESSONS = [
                   "three at one target it says &ldquo;not yet&rdquo;. The "
                   "<strong>next target</strong> applies the rule to your last "
                   "readings at your latest target. The <strong>next test</strong> "
-                  "counts the practice sessions since your last test; four of them "
-                  "make the fifth a test. Paced practice readings from other lessons "
-                  "count as sessions too, so the three rungs of your ladder already "
-                  "stand in that count, and your first test may fall due sooner than "
-                  "the fifth session here."),
-            ("p", "One caution about those tests. The pool starts with eight easy "
-                  "passages, and your baselines were standard ones, so a test that "
-                  "falls on an easy passage is likely to come out faster for that "
-                  "reason alone. Read an early test above your range as the passage "
-                  "as much as you; the tests that compare fairly with your baselines "
-                  "are the ones on standard passages, from “The Engineer of the "
-                  "Pond” on, and the tests the later lessons log."),
+                  "counts the sessions you have read on this page since your last test "
+                  "reading of a standard passage; four of them make the fifth a test. "
+                  "Readings in other lessons, the three rungs of your ladder among "
+                  "them, are not sessions, and a scan, a skim or a test on an easy or "
+                  "hard passage does not restart the count; a test reading of a "
+                  "standard passage in a later lesson's warm-up does."),
+            ("p", "Those tests always fall on standard passages. The pool starts with "
+                  "eight easy passages, and your baselines were standard ones, so a "
+                  "test on an easy passage would come out faster for that reason "
+                  "alone. When the test box is ticked, Start skips ahead to the next "
+                  "unread standard passage, from “The Engineer of the Pond” on. Your "
+                  "log also records each passage's band, and the verdicts and the "
+                  "curve set only tests of standard passages against your baselines."),
             ("p", "The preset <strong>three-holds</strong> is a reader with three "
                   "paced readings at 288 that scored 5, 4 and 5 of six. All three "
                   "held, so the hold target is 288 and the next target is `288 × "
@@ -656,8 +662,8 @@ LESSONS = [
                   "Start button and paste it there. Your own text "
                   "has no questions, so it is logged as practice and its "
                   "comprehension is not scored, and it cannot be a test: it keeps the "
-                  "habit going, while the tests, which need a passage with questions, "
-                  "come from the pool while it lasts and afterwards from the readings "
+                  "habit going, while the tests, which need a standard passage with "
+                  "questions, come from the pool while its standard passages last and afterwards from the readings "
                   "the later lessons log as tests."),
             ("p", "From here on, every lesson in the Subject ends with this session. "
                   "The next lesson, Sprints Above Comfort, tries one of the "
@@ -751,7 +757,7 @@ LESSONS = [
             {"q": "A reader has done four practice sessions since their last test. "
                   "What should today's session be?",
              "a": ["Another paced session at the hold target",
-                   "A test: the next pool passage at natural pace, with no pacer",
+                   "A test: the next standard pool passage at natural pace, with no pacer",
                    "A ladder, to find the hold again",
                    "A reread of the last passage, to check the score"],
              "c": 1,

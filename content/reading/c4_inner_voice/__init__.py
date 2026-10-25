@@ -32,7 +32,7 @@ COURSE = {
         "glance = rate × 6 × 255 / 60,000",
         "one question ≈ 16.7 points",
     ],
-    "assumes_short": "Courses 1–3",
+    "assumes_short": "Measure Your Reading, Guided Practice, How the Eyes Read",
     "assumes_long": (
         "Measure Your Reading for the rate, the effective rate and the baseline "
         "range, Guided Practice for the pacer and the Daily Drill, and How the "

@@ -73,7 +73,7 @@ COURSE = {
         "warm-up serves the next one you have not logged. Rereading a passage measures your "
         "memory of it, not your reading.",
         "Treat the model as a model. The eye-movement budget and the speed check compute what "
-        "stated averages imply, and say so. Nothing in this course tracks your eyes; your "
+        "stated averages imply, and say so. Nothing here records where your eyes go; your "
         "drills measure time and answers, and the model says how that time could have been "
         "spent.",
         "Read the two comparisons for what they are. Looking Back and Fewer Needless "

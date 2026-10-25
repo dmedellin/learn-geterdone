@@ -32,7 +32,7 @@ COURSE = {
         "one unknown in every N = tokens / unknown",
         "words a year = minutes × rate × days",
     ],
-    "assumes_short": "Courses 1 to 5",
+    "assumes_short": "Measure Your Reading, Guided Practice, Skimming, Scanning and Previewing",
     "assumes_long": (
         "the scoring from Measure Your Reading, the Daily Drill from Guided Practice, "
         "and the gears of reading met in Skimming, Scanning and Previewing"

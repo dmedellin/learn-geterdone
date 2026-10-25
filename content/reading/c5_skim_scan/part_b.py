@@ -504,7 +504,9 @@ LESSONS = [
                   "section two and press Done; the lab times each. A box then asks "
                   "whether your attention left the text, and six questions follow, three "
                   "on each section. Change speed between the sections if the text asks "
-                  "you to: that is the exercise. The reading is logged as a test."),
+                  "you to: that is the exercise. The reading is logged as a test of a "
+                  "mixed passage, so it stays out of the medians set against your "
+                  "standard baselines."),
             ("p", "The panel gives a rate for each section, its words over its seconds, "
                   "and then the whole passage's rate and effective rate. The list under "
                   "the drill shows which questions you got right; the last three are on "

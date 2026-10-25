@@ -108,7 +108,10 @@ LESSONS = [
                   "prints its comprehension and effective rate, so you can see that the "
                   "rate was a reading and not a skim; and because it is logged as a test, "
                   "the verdict tile sets its rate against your baseline range, as it does "
-                  "for any test reading."),
+                  "for any test reading. Both stories are from the easy band, so expect "
+                  "that verdict to flatter you; your log records the band, and the "
+                  "medians that later lessons set against your baselines leave this "
+                  "test out."),
             ("p", "If you cannot read aloud where you are, press &ldquo;I can&rsquo;t "
                   "read aloud here&rdquo;. The lab writes Brysbaert's oral average, 183 "
                   "words in 60 seconds, into the aloud side, labels it as a published "

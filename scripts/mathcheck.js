@@ -20704,10 +20704,10 @@ console.log('reading: readkit formats, text rules and eight modes');
   const rcSrc = fs.readFileSync(RC_SOURCE, 'utf8'), rkSrc = fs.readFileSync(RK_SOURCE, 'utf8'), rbSrc = fs.readFileSync(RB_SOURCE, 'utf8');
   const ctx = { console: console };
   vm.createContext(ctx);
-  vm.runInContext(block('RATIONAL_JS') + ['RD_CORE_JS', 'RD_LIST_JS', 'RD_TEXT_JS'].map((n) => blockFrom(rcSrc, n, RC_SOURCE)).join('')
+  vm.runInContext(block('RATIONAL_JS') + ['RD_CORE_JS', 'RD_LIST_JS', 'RD_TEXT_JS', 'RD_LOG_JS'].map((n) => blockFrom(rcSrc, n, RC_SOURCE)).join('')
     + ['DR_BASE_JS', 'DR_SINGLE_JS', 'DR_PRACTICE_JS', 'DR_COMPARE_JS', 'DR_LADDER_JS', 'DR_REPEAT_JS', 'DR_SECTIONS_JS',
        'EYE_JS', 'FLASH_JS', 'SCAN_JS'].map((n) => blockFrom(rkSrc, n, RK_SOURCE)).join('')
-    + ['TRIAGE_JS', 'TEXT_JS', 'RECALL_JS', 'LOG_JS'].map((n) => blockFrom(rbSrc, n, RB_SOURCE)).join('')
+    + ['TRIAGE_JS', 'TEXT_JS', 'RECALL_JS', 'LOG_JS', 'LOG_FILL_JS'].map((n) => blockFrom(rbSrc, n, RB_SOURCE)).join('')
     + "function Q(t) { return Rparse(String(t)); }", ctx, { filename: 'readkit.py' });
   const rk = (expr) => {
     try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; }
@@ -20969,6 +20969,34 @@ console.log('reading: readkit formats, text rules and eight modes');
   eq(tile('drCompute', 'practice', prac('300/4/6', 3), PR, 'drTestDue') + '; ' + tile('drCompute', 'practice', prac('300/4/6', 4), PR, 'drTestDue')
      + '; ' + tile('drCompute', 'practice', prac('300/4/6', 0), PR, 'drTestDue'),
      'after 1 more practice session; due now: make the next reading a test; after 4 more practice sessions', 'drTestDueOf: four practice sessions');
+  /* Test medians on standard text only: the band each entry records (none: counts). */
+  const LOG = "[{kind: 'baseline', mode: 'drill', band: 'standard', words: 240, ms: 60000, correct: 6, total: 6},"
+    + " {kind: 'test', mode: 'drill', band: 'easy', words: 300, ms: 60000, correct: 6, total: 6},"
+    + " {kind: 'test', mode: 'warmup', band: 'hard', words: 150, ms: 60000, correct: 6, total: 6},"
+    + " {kind: 'test', mode: 'drill', band: 'mixed', words: 200, ms: 60000, correct: 6, total: 6},"
+    + " {kind: 'test', mode: 'drill', band: 'standard', words: 250, ms: 60000, correct: 3, total: 6},"
+    + " {kind: 'test', mode: 'drill', words: 260, ms: 60000, correct: 6, total: 6}]";
+  eq(rk("rdKindRates('test', false, " + LOG + ").map(Rtext).join()"), '250,260', 'rdKindRates: easy, hard and mixed tests left out; an unbanded entry counts');
+  eq(rk("rdKindRates('test', true, " + LOG + ").map(Rtext).join()"), '125,260', 'rdKindRates eff: effective rates of the standard tests');
+  eq(rk("rdKindRates('baseline', false, " + LOG + ").map(Rtext).join()"), '240', 'rdKindRates: a standard baseline counts');
+  eq(rk("var L = " + LOG + "; L.filter(lgCounted).length + ' ' + L.map(rdStandard).join()"), '3 true,false,false,false,true,true',
+     'lgCounted: history, noise and the log table count standard and unbanded readings only');
+  /* The Daily Drill's test count: sessions on its own page, reset by a standard test reading. */
+  const P = (view, mode) => "{kind: 'practice', mode: '" + (mode || 'drill') + "', view: '" + view + "', words: 300, ms: 60000, total: 6}";
+  const T = (mode, band, display) => "{kind: 'test', mode: '" + mode + "', band: '" + band + "', display: '" + (display || 'normal') + "', words: 300, ms: 60000, total: 6}";
+  eq(rk("drSinceTestOf([" + [P('practice'), P('ladder'), P('warmup', 'warmup'), P('practice')].join() + "])"), 2,
+     'drSinceTestOf: only practice on the practice page counts; ladder rungs and warm-ups do not');
+  eq(rk("drSinceTestOf([" + [P('practice'), P('practice'), "{kind: 'test', mode: 'scan', view: 'find', words: 0, ms: 9000}", T('drill', 'standard', 'gist'), P('practice')].join() + "])"), 3,
+     'drSinceTestOf: a scan or a gist skim logged as a test does not reset the count');
+  eq(rk("drSinceTestOf([" + [P('practice'), P('practice'), T('drill', 'easy'), P('practice')].join() + "]) + ' ' + drSinceTestOf([" + [P('practice'), P('practice'), T('warmup', 'standard'), P('practice')].join() + "])"),
+     '3 1', 'drSinceTestOf: a test on easy text does not reset; a standard test reading (here a warm-up) does');
+  const BANDS = "{Q01: 'easy', Q02: 'easy', Q09: 'standard', Q10: 'standard', Q26: 'hard'}";
+  eq(rk("[drPoolPick(['Q01', 'Q02', 'Q09', 'Q10', 'Q26'], " + BANDS + ", {}, false), drPoolPick(['Q01', 'Q02', 'Q09', 'Q10', 'Q26'], " + BANDS + ", {}, true),"
+     + " drPoolPick(['Q01', 'Q02', 'Q09', 'Q10', 'Q26'], " + BANDS + ", {Q09: true}, true), drPoolPick(['Q01', 'Q26'], " + BANDS + ", {}, true)].join()"),
+     'Q01,Q09,Q10,', 'drPoolPick: practice takes the next unread passage; a test the next unread standard one, or none');
+  eq(rk("drCompute('repeat', {words1: Q(300), seconds1: Q(75), correct1: Q(5), total1: Q(6), words2: Q(300), seconds2: Q(60), correct2: Q(5), total2: Q(6),"
+     + " words3: Q(340), seconds3: Q(60), correct3: Q(5), total3: Q(6), words4: Q(248), seconds4: Q(60), correct4: Q(5), total4: Q(6)}, {sides: {}}).status.indexOf('Only the second could be a change in the reader.') > 0"),
+     true, 'drCompute repeat: the transfer gain could be a change in the reader, not "is"');
   eq(tile('drCompute', 'single', "{words: Q(400), chars: Q(1), seconds: Q(100), correct: Q(0), total: Q(0), target: Q(250), chunk: Q(2)}", R1, 'drWordMsSeen'),
      '500 ms', 'drCompute rsvp: measured 100,000 ms × 2 / 400');
   eq(tile('flCompute', 'span', "{targets: ['ABCDE', 'FGHIJ'], typed: ['.B..E', 'F.H..']}", {}, 'flSpan') + '; '

@@ -59,7 +59,10 @@ LESSONS = [
                   "you would use if no one were timing you, answer its six questions, "
                   "then do the same with From Drifting Continents to Moving Plates. The "
                   "lab alternates which passage comes first, so follow the order it "
-                  "gives you."),
+                  "gives you. Both readings go into your log as tests, each with its "
+                  "passage's band, easy and hard; the medians that later lessons set "
+                  "against your baselines count only tests of standard passages, so "
+                  "these two stand beside your curve without bending it."),
             ("p", "Now put your two readings side by side and look at two things, not "
                   "one: the rates, and the scores. The passages are close in length, 395 "
                   "words and 391, and far apart in difficulty. By the formula the next "
@@ -741,7 +744,10 @@ LESSONS = [
             ("p", "Do the drill first. Read Packing for a Week Away and Performing a "
                   "Gram Stain, each once at your natural pace, and answer the six "
                   "questions after each. The lab alternates which comes first, so take "
-                  "them in the order it shows."),
+                  "them in the order it shows. The packing passage is logged as a test "
+                  "and the Gram stain as a condition: both are standard by the formula, "
+                  "but a reading slowed by an unfamiliar topic does not measure your "
+                  "usual pace, so it stays out of your test medians."),
             ("p", "By the counts of Measuring Difficulty, the two passages are as close "
                   "as two texts on different subjects get. Packing for a Week Away has "
                   "385 words in 16 sentences, a grade of about 9.4; Performing a Gram "
@@ -773,9 +779,10 @@ LESSONS = [
                   "baseball game, and measured what the students recalled and could "
                   "re-enact of it. Knowledge of baseball mattered more than reading "
                   "ability for what they recalled. They measured recall, not speed, and "
-                  "their readers were young; Rayner and colleagues' 2016 review counts "
-                  "background knowledge among the strongest influences on comprehension "
-                  "in readers generally."),
+                  "their readers were young. Rayner and colleagues' 2016 review of reading "
+                  "speed puts language skill, vocabulary above all, at the heart of "
+                  "reading speed; what a reader knows of the topic is the part of that "
+                  "knowledge this drill isolates."),
             ("p", "Two readings differ in more than topic. The passages are different "
                   "texts, with different steps and different questions, and whichever "
                   "you read second you read a little more practised or more tired. One "
@@ -798,7 +805,7 @@ LESSONS = [
             "view": "compare",
             "passages": [PASSAGES["P41"], PASSAGES["P42"]],
             "a": {"label": "Familiar topic", "kind": "test"},
-            "b": {"label": "Unfamiliar topic", "kind": "test"},
+            "b": {"label": "Unfamiliar topic", "kind": "condition"},
             "ratioOf": "err",
             "preset": "typical",
             "presets": [
@@ -895,8 +902,8 @@ LESSONS = [
             ("Believing speed is a skill independent of what you know",
              "Recht and Leslie found that junior-high readers' knowledge of baseball "
              "mattered more than their reading ability for what they recalled of a "
-             "baseball passage, and Rayner and colleagues' 2016 review counts background "
-             "knowledge among the strongest influences on comprehension. In the typical "
+             "baseball passage; they measured recall, not speed, in young readers, so "
+             "what it does to your pace is for your own readings to show. In the typical "
              "preset the same reader's effective rate is 240 on a familiar procedure and "
              "150 on an unfamiliar one at almost the same grade."),
             ("Trusting the grade to predict your reading",

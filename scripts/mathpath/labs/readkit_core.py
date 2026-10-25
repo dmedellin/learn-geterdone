@@ -325,13 +325,18 @@ RD_LOG_JS = r"""
   /* Readings the verdicts may use: timed readings of a passage (a drill or a
      warm-up), not a skim. rate = words x 60,000 / ms, exact; eff: x right / asked. */
   function rdIsReading(e) { return (e.mode === 'drill' || e.mode === 'warmup') && e.display !== 'gist' && e.words > 0 && e.ms > 0; }
+  /* Baselines and tests compare only on standard text: an entry logged with a
+     passage band counts only when the band is "standard"; one without a band
+     (a log from before bands were recorded, or your own pasted text) counts. */
+  function rdStdBand(b) { return !b || b === 'standard'; }
+  function rdStandard(e) { return rdStdBand(e.band); }
   function rdEntryRate(e, eff) {
     var r = R(BigInt(Math.round(e.words)) * 60000n, BigInt(Math.round(e.ms)));
     return eff ? Rmul(r, R(BigInt(e.correct), BigInt(e.total))) : r;
   }
-  /* The rates of every reading of one kind, in log order (eff: with questions, effective). */
+  /* The rates of every reading of one kind on standard text, in log order (eff: with questions, effective). */
   function rdKindRates(kind, eff, list) {
-    return (list || rdLogRead()).filter(function (e) { return e.kind === kind && rdIsReading(e) && (!eff || e.total > 0); })
+    return (list || rdLogRead()).filter(function (e) { return e.kind === kind && rdIsReading(e) && rdStandard(e) && (!eff || e.total > 0); })
       .map(function (e) { return rdEntryRate(e, eff); });
   }
   /* A delayed test that has fallen due is offered on EVERY readkit page: a
@@ -854,7 +859,7 @@ def build_lab(cfg, *, kit, prefix, view, fields, tiles, fn, js, opts, title, sub
     opts = {k: v for k, v in opts.items() if not k.startswith("_")}
     from .readkit_drill import RD_DRILL_JS, RD_FIND_JS, RD_RECALL_JS, RD_TIMED_JS
     # Idea units ship only where a free-recall drill ticks them.
-    keep = ("id", "title", "paragraphs", "questions") + (("ideas",) if any(sl["flow"] == "recall" for sl in slots.values()) else ())
+    keep = ("id", "title", "band", "paragraphs", "questions") + (("ideas",) if any(sl["flow"] == "recall" for sl in slots.values()) else ())
     script = RATIONAL_JS + RD_CORE_JS
     if any(s["kind"] in ("rec", "nums", "entries", "strings") for s in spec) or lists:
         script += RD_LIST_JS
