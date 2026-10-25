@@ -218,13 +218,13 @@ WATCH_EXERCISE = "\n".join([
 # body only (the lab takes records, not code).
 ACCESS_ROUTINE = "\n".join([
     "class CurrentRecord {",
-    "    private static Record current;",
+    "    private static InputRecord current;",
     "",
-    "    static Record get() {",
+    "    static InputRecord get() {",
     "        return current;",
     "    }",
     "",
-    "    static void set(Record next) {",
+    "    static void set(InputRecord next) {",
     "        current = next;",
     "    }",
     "}",
@@ -298,7 +298,7 @@ LESSONS = [
                   "techniques described in this chapter to avoid the problems caused by "
                   "unexpected initial values.&rdquo; That is the first of the Key Points with "
                   "which Chapter 10, General Issues in Using Variables, closes on page 258. This "
-                  "lesson reads the chapter's first three sections, pages 237 to 243; read them in "
+                  "lesson reads the chapter's first three sections, pages 237 to 244; read them in "
                   "your own copy first. The rest of the chapter, from Section 10.4 on scope, is the "
                   "next lesson."),
             ("p", "Section 10.1 begins with a self-test: a list of data-type terms to score "
@@ -369,11 +369,14 @@ LESSONS = [
                   "definitely assigned, on any path through the routine, and that check is "
                   "stronger than this lab's, because the lab reads lines in order and never "
                   "follows a branch. A C or C++ compiler accepts the same mistake, perhaps with a "
-                  "warning, and the program reads whatever was in memory. What Java's compiler "
+                  "warning; the behaviour is then undefined, and in practice the read usually gets "
+                  "whatever was in memory. What Java's compiler "
                   "does not question is a value set and thrown away, a variable set and never "
                   "used, or a field: `int count;` declared in a class rather than a "
                   "routine starts at 0 and is read without complaint. That is still an initial "
-                  "value nobody chose."),
+                  "value nobody chose. Paste such a class into the lab and it flags the read "
+                  "as used before set, which is the one case where the lab's reading is the "
+                  "stricter of the two."),
             ("h3", "Exercise"),
             ("code", lines(INITIALS_EXERCISE)),
             ("p", "This routine builds a person's initials. Read it top to bottom and list every "
@@ -456,12 +459,11 @@ LESSONS = [
         "quiz": [
             {"q": "In the exercise's `initials` routine, what does a top-to-bottom "
                   "reading report, and what does `javac` do with the routine?",
-             "a": ["Nothing; javac rejects it, because when the if is false line 6 reads result "
-                   "before anything sets it",
-                   "result used before set on line 6; javac rejects it",
-                   "Nothing; javac accepts it, because line 4 sets result",
+             "a": ["result used before set on line 6; javac rejects it",
+                   "Nothing; javac accepts it",
+                   "Nothing; javac rejects it",
                    "result set twice, on lines 4 and 6; javac accepts it"],
-             "c": 0,
+             "c": 2,
              "why": "Read in order, line 4 sets `result` before line 6 reads it, so "
                     "the lab reports no anomaly; and line 6 reads `result` before "
                     "setting it, so lines 4 and 6 are not two sets with no read between. But on "
@@ -479,25 +481,30 @@ LESSONS = [
                     "assigned. <code>set-twice</code> compiles: overwriting a value and leaving a "
                     "variable unused are legal Java, though the routine returns the first price "
                     "over the count, which is why the lab reports three anomalies there."},
-            {"q": "A local variable is set, then set again with no use between. Which of Section "
-                  "22.3's patterns is that?",
-             "a": ["Defined-defined", "Entered-used", "Defined-exited", "Used-defined"],
-             "c": 0,
+            {"q": "Reading top to bottom, `int n = 0;` is on line 2, `n = items.length;` "
+                  "is on line 4, and nothing between them reads `n`. Which of Section 22.3's "
+                  "patterns is that, and what does the lab list it under?",
+             "a": ["Entered-used; Used before set, n (line 4)",
+                   "Defined-exited; Set, never used, n (line 2)",
+                   "Used-defined; nothing, because line 4 sets n",
+                   "Defined-defined; Set twice, n (lines 2, 4)"],
+             "c": 3,
              "why": "Defined then defined again is the pattern McConnell calls wasteful and "
-                    "error-prone even if not wrong (p. 509). Entered-used is a read before any "
-                    "set; defined-exited is a set nothing reads; used-defined is a read followed "
-                    "by a set, which is suspicious only if nothing set the variable before the "
-                    "read."},
+                    "error-prone even if not wrong (p. 509), and the lab lists it under Set twice "
+                    "with both lines. Entered-used is a read before any set; defined-exited is a "
+                    "set nothing reads; used-defined is a read followed by a set, and line 4 "
+                    "reads nothing called `n` before it sets it."},
             {"q": "A class declares the field `int hits;` and a method reads it before "
                   "anything assigns it. What happens in Java?",
-             "a": ["It compiles, and the read gives 0",
-                   "The compiler rejects it, as it does a local",
+             "a": ["The compiler rejects it, as it does a local",
+                   "It compiles, and the read gives 0",
                    "It compiles, and the read gives whatever was in memory",
                    "It compiles, and the read throws an exception"],
-             "c": 0,
+             "c": 1,
              "why": "A field starts at its type's default, 0 for an `int`, and the "
                     "compiler's definite-assignment check applies to locals, not fields. Reading "
-                    "leftover memory is C's behaviour for an uninitialised local, not Java's for "
+                    "leftover memory is what C usually does with an uninitialised local, where the "
+                    "behaviour is undefined, and never Java's for "
                     "anything."},
         ],
         "mistakes": [
@@ -529,10 +536,10 @@ LESSONS = [
         ),
         "note": (
             "The lab reads the lines in order and never follows a branch or a loop; Java's "
-            "compiler checks every path, so for locals it is "
-            "stronger than the lab, and the exercise is a case only the compiler sees. The lab "
-            "also cannot see a value that has gone stale, a field's default, or a variable that "
-            "is set correctly and holds the wrong thing."
+            "compiler checks every path, so for locals it is stronger than the lab. The lab "
+            "also cannot see a value that has gone stale, or a variable that is set correctly "
+            "and holds the wrong thing; and a field it flags as read before set is one Java "
+            "silently starts at 0."
         ),
     },
     # ---------------------------------------------------------------- 02
@@ -540,6 +547,8 @@ LESSONS = [
     # p. 258 (Key Points), 24 words. Span and live time: section 10.4,
     # pp. 245-248.
     # F10, pp. 245-248 (span, live time, the book's 54 against 7).
+    # Also quoted: "window of vulnerability", p. 245 (3 words); "moonlighting as
+    # a boolean", p. 257 (4 words); lesson total 31.
     {
         "slug": "scope-span-and-live-time",
         "title": "Scope, Span and Live Time",
@@ -615,7 +624,9 @@ LESSONS = [
                   "than the reverse. He frames the disagreement fairly: programmers who make "
                   "variables global value convenience in writing, and those who keep them local "
                   "value being able to understand one routine at a time; his own conclusion is "
-                  "that a program is read more than it is written."),
+                  "that a program in which any routine can use any variable is harder to "
+                  "understand, debug and modify, so each variable should be visible to the "
+                  "smallest part of the program that needs it."),
             ("p", "The four shorter sections each add a point. Section 10.5, on persistence, "
                   "warns against assuming a variable lasts longer than it does, and compares it to "
                   "the milk in your refrigerator, which is supposed to keep for a week. Section "
@@ -633,7 +644,8 @@ LESSONS = [
             ("code", lines(DECLARED_AT_TOP)),
             ("p", "Count it for `heaviestKg`: declared on line 3, used on lines 13 and "
                   "18, so its spans are 9 and 4, and it is live for 18 &minus; 3 + 1 = 16 lines, "
-                  "nine of which come before it is first used. `scanned` is on lines 2, "
+                  "and the nine lines between its declaration and its first use have nothing to do "
+                  "with it. `scanned` is on lines 2, "
                   "9 and 11, spans 6 and 1, live time 10; `overLimit` on lines 4, 15 and "
                   "18, spans 10 and 2, live time 15. With the three variables in its "
                   "<em>Variables</em> box, the lab prints the average span over all six spans, "
@@ -704,9 +716,11 @@ LESSONS = [
              "For each variable, its last line minus its first line plus one. Note which is "
              "longest and how many of its lines come before the first real use."),
             ("Shorten a live time of your own",
-             "Paste a routine of your own into the lab with the Variables box empty, find the "
-             "variable with the longest live time, move its declaration down to just before its "
-             "first use, and note how far its live time falls."),
+             "Paste a routine of your own into the lab with the Variables box empty and find "
+             "the local variable with the longest live time (the table lists parameters and "
+             "loop variables too; a parameter's live time is the routine's). Move its "
+             "declaration down to just before its first use, paste again, and note how far its "
+             "live time fell."),
         ],
         "worked": {
             "title": "heaviestKg, declared at the top",
@@ -717,7 +731,7 @@ LESSONS = [
             "lines": [
                 "references: lines 3, 13, 18",
                 "spans: 13 - 3 - 1 is 9, and 18 - 13 - 1 is 4",
-                "average span: 13/2, about 6.5",
+                "average span: 13/2, which is 6.5",
                 "live time: 18 - 3 + 1 is 16",
                 "declared near use, on line 10: 18 - 10 + 1 is 9",
             ],
@@ -731,11 +745,11 @@ LESSONS = [
             {"q": "In the exercise's `reportSales`, what are the average span over "
                   "`total` and `count` and their live times, before and after "
                   "the declarations move to lines 6 and 7?",
-             "a": ["3.75 and live times 11 and 10 before; 1.75 and 7 and 6 after",
-                   "3.75 and live times 10 and 9 before; 1.75 and 6 and 5 after",
+             "a": ["3.75 and live times 10 and 9 before; 1.75 and 6 and 5 after",
+                   "3.75 and live times 11 and 10 before; 1.75 and 7 and 6 after",
                    "4.75 and live times 11 and 10 before; 2.75 and 7 and 6 after",
                    "3.75 and live times 11 and 10 before; 3.75 and 7 and 6 after"],
-             "c": 0,
+             "c": 1,
              "why": "Before, `total` is on lines 2, 9 and 12 (spans 6 and 2) and "
                     "`count` on 3, 10 and 12 (spans 6 and 1): 15/4 = 3.75, live times "
                     "12 &minus; 2 + 1 = 11 and 12 &minus; 3 + 1 = 10. After, `total` is "
@@ -745,9 +759,9 @@ LESSONS = [
                     "spans do change when a declaration moves."},
             {"q": "A variable is referenced only on line 1 and line 25. What are its span and "
                   "live time, as Section 10.4 counts them?",
-             "a": ["Span 23, live time 25", "Span 24, live time 24", "Span 23, live time 24",
-                   "Span 0, live time 25"],
-             "c": 0,
+             "a": ["Span 24, live time 24", "Span 23, live time 24", "Span 0, live time 25",
+                   "Span 23, live time 25"],
+             "c": 3,
              "why": "Twenty-three lines lie strictly between lines 1 and 25, and the live time "
                     "counts both ends: 25 &minus; 1 + 1 = 25. These are the book's own figures "
                     "(p. 246). A span of 0 would need a reference on every line between."},
@@ -763,11 +777,11 @@ LESSONS = [
                     "extension of the book's per-variable average; the live times average 41/3."},
             {"q": "Section 10.6 lists the times at which a variable can be bound to its value. "
                   "Which of these binds latest?",
-             "a": ["Reading the value each time a window is drawn",
-                   "A named constant",
+             "a": ["A named constant",
                    "A literal typed into the code",
+                   "Reading the value each time a window is drawn",
                    "Reading the value from a properties file when the program loads"],
-             "c": 0,
+             "c": 2,
              "why": "The section's order runs from coding time (a literal), through compile time "
                     "(a named constant) and load time (a file read at start-up), to object "
                     "creation and finally just in time, each time the value is used. Later "
@@ -935,7 +949,9 @@ LESSONS = [
                   "the routine's own name, as the lab does. Then rename the routine and every "
                   "short name for what it stands for, compute the mean again and say which names "
                   "are still under eight characters. Paste your version into the lab to check "
-                  "it."),
+                  "it, and write your names down before you open the quiz: it names one set, and "
+                  "yours need not match it to be right, so long as each says what the variable "
+                  "stands for."),
             ("p", "Names tell a reader what a value means; types decide what values it can hold. "
                   "The next lesson, &ldquo;Integers and Floating Point&rdquo;, reads the first "
                   "half of Chapter 12."),
@@ -1006,11 +1022,11 @@ LESSONS = [
                   "routine <code>simpleInterest(double principal, int months, double "
                   "annualRate)</code> with locals `monthlyInterest` and "
                   "`totalInterest`?",
-             "a": ["1, then 53/5 = 10.6, with only months under eight",
-                   "1, then 53/5 = 10.6, with no name under eight",
+             "a": ["1, then 53/5 = 10.6, with no name under eight",
                    "1, then 54/6 = 9, counting the loop index i",
-                   "1, then 67/6, about 11.17, counting the routine's name"],
-             "c": 0,
+                   "1, then 67/6, about 11.17, counting the routine's name",
+                   "1, then 53/5 = 10.6, with only months under eight"],
+             "c": 3,
              "why": "Before, the five counted names `p`, `n`, "
                     "`r`, `m` and `t` are one character each: "
                     "5/5 = 1. After, `principal` 9, `months` 6, "
@@ -1020,40 +1036,43 @@ LESSONS = [
                     "Counting `i` gives 54/6 = 9, and counting "
                     "`simpleInterest`, 14 characters, gives 67/6."},
             {"q": "What did the study the book reports on name length find?",
-             "a": ["Debugging effort was lowest when names averaged 10 to 16 characters, and "
+             "a": ["Every name should be at least 10 characters long",
+                   "Debugging effort was lowest when names averaged 10 to 16 characters, and "
                    "almost as low at 8 to 20",
-                   "Every name should be at least 10 characters long",
                    "The longer a program's names, the easier it was to debug",
                    "Debugging effort was lowest when names averaged 8 to 20 characters, and "
                    "almost as low at 10 to 16"],
-             "c": 0,
+             "c": 1,
              "why": "Gorla, Benander and Benander (1990), as the book reports them on page 262: "
                     "lowest at a 10 to 16 character average, almost as low at 8 to 20. It is an "
                     "average over a program, not a rule for each name, and it is a range, not a "
-                    "direction; the other two options turn it into one, and the last swaps the "
-                    "ranges."},
+                    "direction; a minimum of 10 for every name and &ldquo;the longer the "
+                    "easier&rdquo; turn it into one, and the answer with 8 to 20 lowest swaps "
+                    "the ranges."},
             {"q": "Under Section 11.1's convention for computed-value qualifiers, which set of "
                   "names is consistent?",
-             "a": ["revenueTotal, expenseTotal, revenueAverage",
-                   "totalRevenue, expenseTotal, revenueAverage",
+             "a": ["totalRevenue, expenseTotal, revenueAverage",
                    "totalRevenue, totalExpense, averageRevenue",
+                   "revenueTotal, expenseTotal, revenueAverage",
                    "revenueTotal, totalExpense, averageRevenue"],
-             "c": 0,
+             "c": 2,
              "why": "The section puts a qualifier such as `Total` or "
                     "`Average` at the end, so the part of the name that carries its "
-                    "meaning comes first. The third option is consistent, but with the opposite "
-                    "convention; the second and fourth mix the two."},
+                    "meaning comes first. The set with every qualifier first is consistent, but "
+                    "with the opposite convention; the other two mix the conventions."},
             {"q": "Section 11.2 discusses loop indexes. When does it advise a name longer than "
                   "`i`?",
              "a": ["When the loops are nested, or the index is used outside the loop",
-                   "Always: a single letter is never acceptable",
+                   "When the loop body calls another routine",
                    "Only when the loop runs more than ten times",
                    "Never: i, j and k are the established names"],
              "c": 0,
              "why": "The section accepts `i`, `j` and `k` for "
                     "simple loops and asks for descriptive names when a loop is nested or long, "
                     "or when the value is needed after the loop, as with a record count. How many "
-                    "times a loop runs is not its criterion."},
+                    "times a loop runs is not its criterion, and nor is what the loop calls; and "
+                    "the section does not ban the established names, it limits them to simple "
+                    "loops."},
         ],
         "mistakes": [
             ("Thinking that longer names are always better",
@@ -1084,8 +1103,8 @@ LESSONS = [
             "The lab measures length and cannot tell whether a name describes the problem: "
             "`someDataValue` passes it. On prefixes the book and later practice differ. "
             "Section 11.5 holds that terse standardized prefixes add precision, as with the "
-            "distinctions between first, last, limit and maximum, and can catch type mistakes a "
-            "compiler cannot. Many teams now drop type prefixes, because an editor shows a "
+            "distinctions between minimum, first, last and maximum, and can catch mixed-up "
+            "abstract types that a compiler may not check. Many teams now drop type prefixes, because an editor shows a "
             "variable's type and scope on demand and Java's own conventions use none, while "
             "others keep a few prefixes for role or scope. The lesson does not settle it."
         ),
@@ -1143,7 +1162,7 @@ LESSONS = [
                   "main problem is that two different paths to the same number don’t always lead "
                   "to the same number.&rdquo; That is from Section 12.3, on page 295 of Chapter "
                   "12, Fundamental Data Types. This lesson reads Sections 12.1 to 12.3, pages 291 "
-                  "to 297; read them in your own copy first. The rest of the chapter is the next "
+                  "to 296 and the top of 297; read them in your own copy first. The rest of the chapter is the next "
                   "lesson."),
             ("p", "Section 12.1 gives guidelines for numbers in general. Avoid magic numbers, "
                   "literals that appear in the middle of the code without explanation, because "
@@ -1208,7 +1227,7 @@ LESSONS = [
                   "does not, and the line prints <code>1471228928</code>. You can see it in the "
                   "lab by multiplying 31536000 by 1000 as an `int`. The fix is to "
                   "declare `msPerYear` as a `long` and write the last factor "
-                  "as <code>1000L</code>, so that the multiplication that overflows is done in "
+                  "as <code>1000L</code>, a `long` literal with an L after it, so that the multiplication that overflows is done in "
                   "`long`."),
             ("h3", "Exercise"),
             ("code", lines(OVERFLOW_EXERCISE)),
@@ -1306,27 +1325,33 @@ LESSONS = [
                     "Java neither throws on integer overflow nor stops at the limit. Declared "
                     "`long`, the total prints <code>3000000000</code>."},
             {"q": "Which of these `int` expressions overflows in Java?",
-             "a": ["46341 * 46341", "46340 * 46340", "65535 * 32768", "1000000 + 2000000000"],
-             "c": 0,
+             "a": ["46340 * 46340", "65535 * 32768", "46341 * 46341", "1000000 + 2000000000"],
+             "c": 2,
              "why": "46341² is 2,147,488,281, past 2,147,483,647. The others fit: 46340² is "
                     "2,147,395,600, 65535 × 32768 is 2,147,450,880, and the sum is "
                     "2,001,000,000."},
             {"q": "In a `double`, 0.1 is added ten times to 0.0 and the result is "
                   "compared with 1.0 using `==`. What happens?",
-             "a": ["The comparison is false; the sum prints as 0.9999999999999999",
-                   "The comparison is true",
+             "a": ["The comparison is true",
+                   "The comparison is false; the sum prints as 0.9999999999999999",
                    "The comparison is false; the sum prints as 1.0000000000000002",
                    "The comparison is false, because 1.0 cannot be stored exactly"],
-             "c": 0,
+             "c": 1,
              "why": "This is the book's example (pp. 295–296): the sum is "
                     "0.9999999999999999, so `==` is false. The error is in 0.1, "
                     "which has no exact binary form; 1.0 is stored exactly."},
-            {"q": "What does Java give for `7 / 2` when both are `int`?",
-             "a": ["3", "3.5", "4", "3.0"],
-             "c": 0,
-             "why": "Integer division drops the remainder, truncating toward zero: 3, an "
-                    "`int`. 3.5 needs a floating-point operand, 4 would be rounding, "
-                    "and 3.0 is a `double`."},
+            {"q": "After `int seconds = 365 * 24 * 60 * 60;` (31536000), the line "
+                  "`long ms = seconds * 1000;` runs. What does `ms` hold?",
+             "a": ["31536000000, because ms is a long",
+                   "Nothing: the line does not compile without a cast",
+                   "Nothing: the multiplication throws an ArithmeticException",
+                   "1471228928"],
+             "c": 3,
+             "why": "Both operands are `int`, so the multiplication is done in `int` and "
+                    "wraps to 1471228928 before the result is widened to `long`; declaring the "
+                    "target `long` comes too late. Widening an `int` to a `long` needs no cast, "
+                    "and Java does not throw on overflow. Writing <code>1000L</code>, a `long` literal, makes the "
+                    "multiplication itself a `long` one, and then `ms` holds 31536000000."},
         ],
         "mistakes": [
             ("Believing that a double holds 0.1",
@@ -1337,7 +1362,7 @@ LESSONS = [
              "`BigDecimal` is Java's decimal type."),
             ("Expecting Java to stop on integer overflow",
              "It does not. An `int` or `long` past its limit wraps to the "
-             "other end with no exception and no warning; only integer division by zero throws. "
+             "other end with no exception and no warning; only integer division or remainder by zero throws. "
              "Section 12.2's method is to think through each term's largest value before the "
              "code runs."),
             ("Expecting integer division to round",
@@ -1537,17 +1562,19 @@ LESSONS = [
         "quiz": [
             {"q": "How many magic numbers does the exercise's `watchWard` contain, "
                   "counting as the lab does, and how many are distinct?",
-             "a": ["3 magic numbers, 3 distinct: 38.5, 3 and 900",
-                   "2: 3 and 900, because 38.5 is not a whole number",
+             "a": ["2: 3 and 900, because 38.5 is not a whole number",
+                   "3 magic numbers, 3 distinct: 38.5, 3 and 900",
                    "3 magic numbers, 2 distinct, because 3 and 900 are both settings",
                    "None, because each literal is used once"],
-             "c": 0,
+             "c": 1,
              "why": "`38.5` on line 4, `3` on line 5 and `900` "
                     "on line 8: three literals, three values, three meanings, which might be "
                     "`FEVER_CELSIUS`, `URGENT_PRIORITY` and "
                     "`CHECK_INTERVAL_SECONDS`. A decimal literal is a magic number as "
                     "much as a whole one; distinct means distinct values; and a literal used once "
-                    "is still counted, as Section 12.7 asks."},
+                    "is still counted, as Section 12.7 asks. The `3` is a priority, which Section "
+                    "12.6 would rather make one value of an enumerated type, so that a 4 cannot "
+                    "be passed by mistake."},
             {"q": "Section 12.1 gives a rule of thumb for the literals that may appear in a "
                   "program's body. Which are they?",
              "a": ["0 and 1", "None at all", "0, 1 and 2", "Any literal used only once"],
@@ -1557,18 +1584,18 @@ LESSONS = [
                     "literal should be replaced with something more descriptive."},
             {"q": "The longest term changes from 360 months to 480. How many lines must change "
                   "in <code>magic</code>, and how many in <code>named</code>?",
-             "a": ["2 and 1", "1 and 1", "2 and 2", "3 and 1"],
-             "c": 0,
+             "a": ["1 and 1", "2 and 2", "3 and 1", "2 and 1"],
+             "c": 3,
              "why": "In <code>magic</code>, 360 is on lines 4 and 5; in <code>named</code> it is "
                     "only in the declaration of `MAX_TERM_MONTHS`. That single point of "
-                    "control is one of Section 12.7's two reasons for constants."},
+                    "control is one of Section 12.7's reasons for constants."},
             {"q": "Section 12.7 asks for a named constant even for the 12 in a loop over the "
                   "months of a year, which will never change. What reason does it give?",
-             "a": ["If the code leaves any doubt about its purpose, the name removes it",
-                   "The number of months may change",
+             "a": ["The number of months may change",
                    "A constant makes the loop run faster",
+                   "If the code leaves any doubt about its purpose, the name removes it",
                    "Java will not compile a loop bound written as a literal"],
-             "c": 0,
+             "c": 2,
              "why": "The section grants that the number of months is not going to change and "
                     "asks for the constant for readability: a reader should not have to bet that "
                     "12 means months (pp. 308–309). Constants cost nothing at run time, and a "
@@ -1576,8 +1603,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Thinking that a literal used only once is harmless",
-             "The chapter gives two reasons for constants, readability and a single point of "
-             "change, and asks for them even for literals you think are safe. In "
+             "The chapter's reasons for constants are readability and a single point of "
+             "change, and it asks for them even for literals you think are safe. In "
              "<code>magic</code>, `12` appearing twice with one meaning is the case "
              "the lab's list makes obvious; the single `0.0725` is not repeated, and "
              "it still does not say that it is an annual rate. On the lesson's illustration, "
@@ -1681,7 +1708,7 @@ LESSONS = [
                   "global another assumed was untouched, which the book calls a side effect; "
                   "aliasing, where a global passed as a parameter is changed under two names; "
                   "code that more than one thread runs; code that cannot be reused without its "
-                  "globals; initialisation order between files in C++; and above all the damage "
+                  "globals; initialisation order between files in C++; and, last, the damage "
                   "to modularity, because you can no longer understand one routine at a time."),
             ("p", "The section is fair to the other side. Some purists, it says, would forbid "
                   "global data, but a database and a configuration file are global data, and so "
@@ -1812,56 +1839,51 @@ LESSONS = [
         },
         "quiz_title": "Globals and access routines",
         "quiz": [
-            {"q": "For the exercise's five records, what are the counts, and what do access "
-                  "routines change?",
-             "a": ["2 globals, 3 routines, 3 of 3 pairs coupled; 5 direct touches, 2 with an "
-                   "access routine for each",
-                   "2 globals, 3 routines, 2 of 3 pairs coupled, because render and save only "
-                   "read config; 5 direct touches, 2 with access routines",
-                   "2 globals, 3 routines, 3 of 3 pairs coupled; 5 direct touches, and with "
-                   "access routines no pair is coupled",
-                   "2 globals, 3 routines, 3 of 3 pairs coupled; 5 direct touches, still 5 with "
-                   "access routines"],
-             "c": 0,
-             "why": "`load` writes `config`, which `render` and "
-                    "`save` read: two pairs. `render` writes "
-                    "`cache`, which `save` reads: the third pair, so all 3 "
-                    "pairs of the 3 routines are coupled. Five records touch a global directly; "
-                    "with an access routine for each global, 2 places do. The coupling stays at "
-                    "3, because the routines still share the data."},
-            {"q": "In the <code>globals</code> preset, which pair of routines is not coupled?",
-             "a": ["report and printTotals", "validate and report", "readInput and addLine",
-                   "reset and validate"],
-             "c": 0,
-             "why": "`report` reads `current` and `errors`; "
-                    "`printTotals` reads only `total`; they share nothing. "
-                    "`validate` writes `errors`, which `report` "
-                    "reads; `readInput` writes `current`, which "
-                    "`addLine` reads; `reset` and `validate` both "
-                    "write `errors`."},
+            {"q": "For the exercise's five records, how many globals, routines and coupled "
+                  "pairs of routines are there?",
+             "a": ["2 globals, 3 routines, 2 of 3 pairs coupled, because render and save only "
+                   "read config",
+                   "2 globals, 3 routines, 1 of 3 pairs coupled",
+                   "2 globals, 3 routines, 3 of 3 pairs coupled",
+                   "2 globals, 3 routines, 3 of 6 pairs coupled"],
+             "c": 2,
+             "why": "`load` writes `config`, which `render` and `save` read: two pairs. "
+                    "`render` writes `cache`, which `save` reads: the third pair, so all 3 "
+                    "pairs of the 3 routines are coupled. Three routines make 3 possible pairs, "
+                    "not 6."},
+            {"q": "In the same five records, how many places touch a global directly, before "
+                  "and after each global gets an access routine?",
+             "a": ["5, then 5", "5, then 0", "3, then 2", "5, then 2"],
+             "c": 3,
+             "why": "Each of the five records touches a global directly. With an access "
+                    "routine for each of the two globals, only those 2 routines do, and the "
+                    "coupled pairs stay at 3, because the routines still share the data. No "
+                    "access leaves the data untouched altogether, so 0 is not possible, and 3 "
+                    "counts routines, not places."},
             {"q": "Adding access routines in <code>access-routines</code> changes which of the "
                   "lab's counts?",
-             "a": ["Places touching a global fall from 10 to 3; coupled pairs stay at 9",
-                   "Both fall: coupled pairs to 3 and places to 3",
+             "a": ["Both fall: coupled pairs to 3 and places to 3",
+                   "Places touching a global fall from 10 to 3; coupled pairs stay at 9",
                    "Coupled pairs fall to 0; places stay at 10",
                    "Neither changes"],
-             "c": 0,
+             "c": 1,
              "why": "The six routines still read and write the same data through the access "
                     "routines, so the 9 coupled pairs remain. What moves is the representation: "
                     "each global is touched directly in one place, its owner. That centralised "
                     "control is the advantage Section 13.3 claims."},
-            {"q": "A table of tax rates is loaded once at start-up and only read afterwards by "
-                  "four routines. Counting coupling as the lab does, after start-up, how many "
-                  "pairs does it couple?",
-             "a": ["None, since no routine writes it",
+            {"q": "A table of tax rates is a `static final` array filled in its "
+                  "declaration, and four routines read it. Counting coupling as the lab does, "
+                  "how many pairs of routines does it couple?",
+             "a": ["None: no routine writes it",
                    "6, every pair of the four readers",
                    "4, one for each reader",
                    "3, each reader with the next"],
              "c": 0,
-             "why": "Coupling needs a writer, and once loaded the table has none: it behaves as a "
-                    "named constant, which Section 13.3 counts as global data but not a global "
-                    "variable (p. 338). Four readers make 6 pairs, but readers alone are not "
-                    "coupled."},
+             "why": "Coupling needs a writer, and a table filled in its declaration has none: "
+                    "it is a named constant, which Section 13.3 counts as global data but not a "
+                    "global variable (p. 338). Four readers make 6 pairs, but readers alone are "
+                    "not coupled. Had a routine loaded the table at start-up, that routine would "
+                    "be its writer and the lab would count 4 pairs, one with each reader."},
         ],
         "mistakes": [
             ("Thinking global data is fine as long as a routine only reads it",
