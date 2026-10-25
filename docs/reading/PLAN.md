@@ -249,7 +249,12 @@ only. §C says the kind of each reading.
 everywhere): a single reading above the baseline range happens by chance about
 one time in four (a fourth reading from the same reader is the highest of four
 one time in four); a change is evidence when the **median of the last three
-tests** is above the baseline range.
+tests** is above the baseline range. The median rule is not proof either: with
+nothing changed, three baselines and three tests from one reader put the median
+of the tests above the top baseline about one time in five, because that
+happens exactly when the two highest of the six readings are both tests, 3 of
+the 15 equally likely pairs (3/15 = 1/5). It is a rule of thumb that one lucky
+reading cannot meet, not a significance test.
 
 ---
 
@@ -281,15 +286,17 @@ other way has not refuted the study, and the study has not refuted them.
 
 Modules: `Rate and comprehension`, `Reading your numbers`.
 
-Gives every later drill its scoring and takes the reader's baselines: `P01`,
-`P02`, `P04` and `P05`, all at natural pace with questions, all logged
-`baseline`. Its `how_to` says: do every drill the first time you open the
+Gives every later drill its scoring and takes the reader's three baselines:
+`P01`, `P02` and `P04`, at natural pace with questions, logged `baseline`;
+`P05`, read the same way, is logged `test`, the first reading judged against
+them. (The kit builds every range from all the baselines the log holds, so a
+fourth baseline widens the range rather than being ignored.) Its `how_to` says: do every drill the first time you open the
 lesson, before reading the explanation; never practise on a passage you have
 already read; and its `not_covered` says a reader who finds reading effortful
 should see a specialist, not a drill.
 
 1. **words-per-minute** — Words per Minute — *Rate and comprehension* — 8 min — *drill first*
-   - **Drill:** a timed reading of `P01` at natural pace, six questions
+   - **Drill:** a timed reading of `P01` (491 words) at natural pace, six questions
      scored (the body does not discuss them until the next lesson);
      `baseline`.
    - **Do:** compute a reading rate from a word count and a time, in words and
@@ -298,8 +305,8 @@ should see a specialist, not a drill.
    - **Standard:** given words, characters and seconds, compute both rates
      to the nearest whole number and say which one Carver's figures use.
    - **Lab:** `drill/single`, display `normal`. Presets: `steady` (400 words,
-     2,640 characters with spaces, 96 s → 250 wpm, 275 standard wpm),
-     `slow` (400 words, 2,640 characters, 160 s → 150 wpm, 165 standard).
+     2,640 characters with spaces, 96 s, 5/6 → 250 wpm, 275 standard wpm),
+     `slow` (400 words, 2,640 characters, 160 s, 6/6 → 150 wpm, 165 standard).
      Pins `drWpm`, `drStdWpm`.
    - **Misconception:** "Most adults read about 300 words a minute, so I am
      slow." The best current estimate for silent reading of English
@@ -321,7 +328,8 @@ should see a specialist, not a drill.
    - **Lab:** `drill/compare`, `ratioOf: err`. Presets: `pushed-too-far` (A:
      400 words, 100 s, 6/6 → 240 wpm, effective 240; B: 400, 50 s, 2/6 → 480
      wpm, effective 160), `worth-it` (A as before; B 400, 75 s, 5/6 → 320 wpm,
-     effective ≈ 266.7). Pins `drWpmA`, `drWpmB`, `drErrA`, `drErrB`.
+     effective ≈ 266.7). Pins `drWpmA`, `drWpmB`, `drErrA`, `drErrB`,
+     `drErrDiff` (−80, ≈ +26.7), `drRatio` (2/3 ≈ 66.7%, 10/9 ≈ 111.1%).
    - **Misconception:** "The faster reading is the better reading." Effective
      rate (Jackson and McClelland's effective reading speed) makes the trade
      visible.
@@ -329,25 +337,28 @@ should see a specialist, not a drill.
    - **Sources:** Jackson and McClelland 1979; Rayner et al. 2016.
 
 3. **one-reading-is-one-measurement** — One Reading Is One Measurement — *Reading your numbers* — 12 min
-   - **Drill:** two more natural-pace readings with questions, `P04` then
-     `P05`, as the view's `warmup` list (`baseline`); then `log/noise` reads
-     all four baselines from the log.
+   - **Drill:** two more natural-pace readings with questions as the view's
+     `warmup` list: `P04` (`baseline`, the third) then `P05` (`test`); then
+     `log/noise` reads the baselines and tests from the log ("Use my
+     baselines").
    - **Do:** compute the range of the baseline rates and decide whether a
      later reading, and the median of three later tests, is above it.
-   - **Standard:** given four baselines and three later tests, compute the
-     range and the tests' median and say whether the change is evidence by the
-     Subject's rule.
+   - **Standard:** given three baselines and three later tests (the lesson's:
+     236, 249, 243; tests 251, 254, 247), compute the range and the tests'
+     median and say whether the change is evidence by the Subject's rule.
    - **Lab:** `log/noise` (effective rates). Presets: `tight` (baselines 238,
-     251, 245, 242 → range 238–251), `wide` (212, 268, 240, 231 → 212–268),
-     `one-high` (tight baselines; one later test 262 → "above the range once —
-     a fourth reading does this about one time in four"), `three-high` (tight
-     baselines; tests 262, 270, 258 → median 262, "above the range on the
-     median of three tests"). Pins `lgRange`, `lgTestMedian`, `lgVerdict`.
+     251, 245 → 238–251, `lgRange` 13 wpm wide; one test 247 → inside),
+     `wide` (212, 268, 240 → 56 wide; test 262 → inside), `one-high` (tight
+     baselines; one test 262 → "above the baseline range once — a fourth
+     reading does this about one time in four"), `three-high` (tight
+     baselines; tests 262, 270, 258 → median 262, "above the baseline range on
+     the median of the last three tests"). Pins `lgMean`, `lgRange`,
+     `lgTestMedian`, `lgVerdict`.
    - **Misconception:** "My rate on one test is my reading speed." The same
      reader on two passages of one band, minutes apart, can differ by tens of
      words per minute, and one high reading is expected by chance.
-   - **Worked:** baselines 212, 268, 240, 231 → range 212–268; a later 262 is
-     inside it.
+   - **Worked:** baselines 212, 268, 240 → range 212–268, 56 wide; a later
+     262 is inside it.
    - **Sources:** Carver 1990 (rate varies with passage).
 
 4. **typical-rates-and-reading-gears** — Typical Rates and Reading Gears — *Reading your numbers* — 8 min
@@ -361,9 +372,11 @@ should see a specialist, not a drill.
    - **Lab:** `log/gears`, inputs `stdwpm` and `wpm`. Gear table (standard
      words per minute, college students): scanning 600, skimming 450,
      rauding 300, learning 200, memorising 138. Presets: `average` (238 wpm,
-     262 standard → nearest rauding, |262 − 300| = 38 < 62), `slower`
-     (190 wpm, 209 standard → learning), `claim` (1,000 standard → "above
-     every gear"). Pins `lgNearest`, `lgVsAverage` (wpm / 238).
+     261.8 standard → nearest rauding, 300 − 261.8 = 38.2 < 61.8),
+     `short-words` (238 wpm, 214.2 standard → learning), `slower` (190 wpm,
+     209 standard → learning; 95/119 ≈ 79.8% of 238), `claim` (1,000 wpm,
+     1,100 standard → "above every gear"). Pins `lgNearest`, `lgVsAverage`
+     (wpm / 238).
    - **Misconception:** "There is one right speed, and faster is always
      better." Carver's gears are five processes with different goals. Carver
      also found that most readers seldom shift gear (his rauding rate is
@@ -381,11 +394,14 @@ should see a specialist, not a drill.
    - **Standard:** given a log of mixed kinds, pick the entries that count and
      state the verdict by the Subject's rule.
    - **Lab:** `log/history`. Example logs (shown when the reader's log is
-     empty, labelled "example"): `starting` (4 baselines only → "no tests
-     yet"), `six-weeks` (4 baselines 238–251, then tests 255, 262, 270, 266
-     among practice entries → median of last three 266, above), `speed-only`
-     (tests whose rate rises and comprehension falls: effective 240, 236, 244
-     → inside). Pins `lgSessions`, `lgRange`, `lgTestMedian`, `lgVerdict`.
+     empty, labelled "example"; entries are rate/right/asked, effective rates
+     given here): `starting` (3 baselines 238, 251, 245 only → "needs a
+     reading after the three baselines"), `six-weeks` (the same baselines,
+     median 245, then tests 255, 262, 270, 266 among eight practice entries →
+     median of last three 266, above), `speed-only` (tests read at 288, 354,
+     488 wpm with 5, 4, 3 right: effective 240, 236, 244 → median 240,
+     inside). Pins `lgSessions`, `lgBaseMedian`, `lgRecentMedian`,
+     `lgLatestErr`, `lgVerdict`.
    - **Misconception:** "Practice that feels faster is faster." Felt speed and
      measured effective rate diverge; only tests in the log say.
    - **Worked:** last three tests 262, 270, 266 → median 266 > 251.
@@ -408,12 +424,14 @@ Previewing and in Words, Knowledge and Difficulty.
      length, and compare effective rate with and without it.
    - **Standard:** given a target and words per line, compute ms per line;
      given two readings, say whether the difference exceeds one question.
-   - **Lab:** `drill/compare`, B `pacer`, `lineWords: 12`. Presets: `steadier`
-     (A 240 wpm 4/6 → 160; B 250 wpm 5/6 → ≈ 208.3), `no-difference` (A 240,
-     5/6; B 250, 5/6). Pins `drErrA`, `drErrB`, `drPacerLineMs` (12 × 60,000 /
-     250 = 2,880).
-   - **Misconception:** "A pacer works by forcing the eyes to move faster than
-     they can." It sets a steady pace and discourages drifting and needless
+   - **Lab:** `drill/compare`, B `pacer` at 250 (Use my baseline median
+     refills it), `lineWords: 12`. Presets: `steadier` (A 442 words in 110.5 s
+     → 240 wpm, 4/6 → 160; B 418 words in 100.32 s → 250 wpm, 5/6 → ≈ 208.3;
+     ≈ +48.3), `no-difference` (A 240, 5/6 → 200; B 250, 5/6 → ≈ 208.3;
+     ≈ +8.3). Pins `drErrA`, `drErrB`, `drErrDiff`, `drPacerLineMs` (12 ×
+     60,000 / 250 = 2,880).
+   - **Misconception:** "The pacer makes the eyes work faster than they
+     can." It sets a steady pace and discourages drifting and needless
      re-reading; it does not widen what a fixation takes in (How the Eyes Read
      shows why).
    - **Worked:** 12 × 60,000 / 250 = 2,880 ms per line.
@@ -427,11 +445,12 @@ Previewing and in Words, Knowledge and Difficulty.
      comprehension is at least 4/6.
    - **Standard:** given three targets and scores, name the hold target and
      the highest effective rate, and explain why they can differ.
-   - **Lab:** `drill/ladder`, `hold: 4/6`. Presets: `holds-at-120` (targets
-     240, 288, 360; scores 6/6, 4/6, 2/6 → hold 288; effective 240, 192, 120;
-     top effective at 240), `holds-at-150` (targets 240, 288, 360; scores 5/6,
-     5/6, 4/6 → hold 360; effective 200, 240, 240). Pins `drBestTarget`,
-     `drBestErr`, `drTopErr`.
+   - **Lab:** `drill/ladder`, `hold: 4/6`. Presets (450-word readings at
+     targets 240, 288, 360): `holds-at-288` (scores 6/6, 4/6, 2/6 → hold 288;
+     effective 240, 192, 120; top effective 240 at target 240),
+     `holds-at-360` (scores 5/6, 5/6, 4/6 → hold 360; effective 200, 240, 240;
+     top 240 at target 288, the tie going to the slower). Pins
+     `drBestTarget`, `drBestErr`, `drTopErr`.
    - **Misconception:** "Set the pacer as fast as you can follow it." Practise
      at the fastest setting at which you still understand; beyond it, effective
      rate falls.
@@ -454,15 +473,16 @@ Previewing and in Words, Knowledge and Difficulty.
      after two misses; at most two timed readings in a sitting; if attention
      left the text, shorten the session rather than slow the pacer. When the
      pool reaches hard texts, find the hold again: it will be lower.
-   - **Lab:** `drill/practice`, pool `Q01`–`Q18` and `Q26`–`Q28` (21 passages,
-     under the 67 KB ceiling; `Q19`–`Q25`, `Q29` and `Q30` are warm-ups
-     elsewhere, so the reader meets every pool passage once). Presets (log excerpts):
-     `three-holds` (pacer 288: 5/6, 4/6, 5/6 → next target ≈ 302.4), `two-misses`
-     (288: 3/6, 3/6 → ≈ 273.6), `test-due` (four practice sessions since the
-     last test → "today is a test"). Pins `drHold`, `drNextTarget`,
-     `drTestDue`.
-   - **Misconception:** "More practice is always better, so read as much as
-     possible at top speed." Short, regular sessions at a pace you still
+   - **Lab:** `drill/practice`, pool `Q01`–`Q15` and `Q26`–`Q28` (18 passages,
+     66.2 KB gzipped against the 67 KB ceiling; at 21 the page was 69.9 KB).
+     `Q16` is the warm-up of Reading Your Curve and `Q19`–`Q24`, `Q29` and
+     `Q30` are warm-ups elsewhere; `Q17`, `Q18` and `Q25` are unplaced.
+     Presets (log excerpts, 432 words in 90 s): `three-holds` (pacer 288: 5/6,
+     4/6, 5/6, three sessions since the last test → next target 302.4, test
+     after 1 more session), `two-misses` (288: 3/6, 3/6, two since → 273.6),
+     `test-due` (288: 4/6, 3/6, 5/6, 4/6, four since → "due now: make the
+     next reading a test"). Pins `drHold`, `drNextTarget`, `drTestDue`.
+   - **Misconception:** "Read as much as possible, as fast as possible." Short, regular sessions at a pace you still
      understand, with regular tests, are the routine; a session's length is
      limited by attention, not ambition.
    - **Worked:** 288 × 21/20 = 302.4.
@@ -471,17 +491,18 @@ Previewing and in Words, Knowledge and Difficulty.
 
 4. **sprints-above-comfort** — Sprints Above Comfort — *Pushing the pace* — 8 min
    - **Drill:** A: a one-minute sprint at twice the baseline rate on `P17`
-     with the pacer, no questions (`condition`); B: a natural-pace reading
-     with questions on `P18` (`test`). Order fixed (A first): the sprint is
-     the treatment.
+     with the pacer (`fromBase: 2`), no questions (`condition`); B: a
+     natural-pace reading with questions on `P18` (`test`). Order fixed (A
+     first): the sprint is the treatment.
    - **Do:** compute the rate of a reading after a sprint and judge it by the
      Subject's rule.
    - **Standard:** given a baseline range and a post-sprint reading, give the
      verdict and what further readings would be needed.
-   - **Lab:** `drill/compare`, `order: AB`. Presets: `after-sprint` (B 268 wpm,
-     5/6 → effective ≈ 223.3; baseline range 238–251 in rate → "above the
-     range once"), `no-effect` (B 247, 5/6 → inside). Pins `drWpmB`, `drErrB`,
-     `drVerdictB`.
+   - **Lab:** `drill/compare`, `order: AB`, `ratio: false`. Presets:
+     `after-sprint` (A 484 words in 60.5 s at target 480; B 469 words in 105 s
+     → 268 wpm, 5/6 → effective ≈ 223.3; baseline range 238–251 in rate →
+     "above the baseline range once"), `no-effect` (B 494 words in 120 s →
+     247, 5/6 → ≈ 205.8 → inside). Pins `drWpmB`, `drErrB`, `drVerdictB`.
    - **Misconception:** "After a sprint you read faster for good." Any
      after-effect is one reading; only the median of later tests says whether
      the base rate moved.
@@ -495,8 +516,10 @@ Previewing and in Words, Knowledge and Difficulty.
      which is evidence of a faster reader.
    - **Standard:** given four rates, compute both gains and name the one that
      measures the reader.
-   - **Lab:** `drill/repeat`. Presets: `practice-effect` (P23: 240, 300, 340;
-     P24: 248), `transfer` (P24: 275). Pins `drRepeatGain`, `drTransferGain`.
+   - **Lab:** `drill/repeat`. Presets: `practice-effect` (runs 1–3, 442 words
+     in 110.5, 88.4, 78 s: 240, 300, 340; run 4, 465 words in 112.5 s: 248),
+     `transfer` (run 4, 451 words in 98.4 s: 275, +35). Pins `drWpm4`,
+     `drRepeatGain`, `drTransferGain`.
    - **Misconception:** "The third reading shows my new speed." It shows you
      know the passage. Repeated reading is a fluency method from work with
      school-age readers, where it also improved new passages, less than the
@@ -538,17 +561,18 @@ Modules: `Fixations and saccades`, `The limits`.
 2. **the-perceptual-span** — The Perceptual Span — *Fixations and saccades* — 10 min
    - **Drill:** `flash/span`, partial report: a 15-letter random string
      flashed around a fixation mark for 150 ms (shorter than the 175–200 ms
-     it takes to start a saccade), then a mask, then two or three positions
-     cued; the reader picks those letters from buttons. Twenty trials.
-     Logged `other`.
+     it takes to start a saccade), then a mask, then three positions cued
+     (`cues: 3`); the reader picks those letters from buttons. Twenty trials
+     (`n: 20`). Logged `other`.
    - **Do:** compute letter-identification accuracy by distance from fixation
      and say how this differs from the perceptual span in reading.
    - **Standard:** given accuracy by position, name the farthest position each
      side with accuracy ≥ 1/2, and say why the reading span is asymmetric
      while this one is not.
-   - **Lab:** `flash/span`, `len: 15` (positions −7…+7). Presets: `typical`
-     (accuracy 10/10 at 0, 9/10 at ±1, 8/10 at ±2, 6/10 at ±3, 4/10 at ±4, 2/10
-     at ±5 and beyond, symmetric → span "left 3, right 3"), `strong`
+   - **Lab:** `flash/span`, `len: 15` (positions −7…+7). Presets, each ten
+     trials written out in full (`targets`, `typed`): `typical` (accuracy
+     10/10 at 0, 9/10 at ±1, 8/10 at ±2, 6/10 at ±3, 4/10 at ±4, 2/10 at ±5
+     and beyond, symmetric → span "left 3, right 3", edge 1/5), `strong`
      (6/10 at ±4 → "left 4, right 4"). Pins `flCentre`, `flEdge`, `flSpan`.
    - **Misconception:** "With training you can take in a whole line, or a page,
      in one glance." In reading, the perceptual span is about 3–4 letters left
@@ -565,16 +589,18 @@ Modules: `Fixations and saccades`, `The limits`.
      Rayner, Slattery and Bélanger 2010.
 
 3. **looking-back** — Looking Back — *Fixations and saccades* — 12 min
-   - **Drill:** `drill/compare` at the reader's hold target: A `P07` with the
-     `pacer` (`condition`); B `P08` with the `mask` display — lines above the
+   - **Drill:** `drill/compare` at the reader's hold target (both target
+     boxes; 300 until the reader sets them): A `P07` with the `pacer`
+     (`condition`); B `P08` with the `mask` display — lines above the
      highlight hidden as it passes (`condition`).
    - **Do:** compute what removing the text behind the eyes does to
      comprehension at a fixed rate, and say what regressions are for.
    - **Standard:** given two scores at one rate, compute both effective rates
      and say whether the difference exceeds one question.
-   - **Lab:** `drill/compare`. Presets: `masked-costs` (A 300 wpm 6/6 → 300; B
-     300 wpm 4/6 → 200), `no-cost` (A and B 5/6 → 250). Pins `drErrA`,
-     `drErrB`, `drErrDiff`.
+   - **Lab:** `drill/compare`. Presets: `masked-costs` (A 447 words in 89.4 s
+     → 300 wpm, 6/6 → 300; B 436 words in 87.2 s → 300 wpm, 4/6 → 200;
+     −100), `no-cost` (A and B 5/6 → 250). Pins `drErrA`, `drErrB`,
+     `drErrDiff`.
    - **Misconception:** "Regressions are a bad habit to eliminate." They are
      about 10–15% of saccades in skilled readers. When Schotter, Tran and
      Rayner made going back useless — each word turned to x's as the eyes left
@@ -587,17 +613,19 @@ Modules: `Fixations and saccades`, `The limits`.
 4. **fewer-needless-regressions** — Fewer Needless Regressions — *Fixations and saccades* — 12 min
    - **Drill:** `drill/compare`: A `P21` at natural pace without a pacer
      (`test`); B `P22` with the pacer at the hold target (`condition`); after
-     each, the attention tick and "how many times did you lose your place or
-     re-read for no reason?" (a count, logged in `extra`).
+     each, a count box, "Times my attention left the text" (`lapses: true`,
+     logged as `extra.lapses`).
    - **Do:** separate re-reading from lapses of attention from regressions that
      repair understanding, and compare a paced and an unpaced reading on
      effective rate and on self-reported lapses.
    - **Standard:** given two readings and their lapse counts, compute both
      effective rates and say which kind of regression a pacer can reduce.
-   - **Lab:** `drill/compare`, `extra: lapses`. Presets: `pacer-steadies` (A
-     240 wpm, 5/6, 4 lapses; B 264, 5/6, 1 lapse → effective 200 and 220),
-     `no-change` (A and B 250, 5/6, 2 lapses). Pins `drErrA`, `drErrB`,
-     `drLapsesA`, `drLapsesB`. The body works the eye-budget arithmetic of a
+   - **Lab:** `drill/compare`, `lapses: true`. Presets: `pacer-steadies` (A
+     484 words in 121 s → 240 wpm, 5/6, 4 lapses → 200; B 457 words in
+     103.864 s at target 264 → ≈ 264.0 wpm, 5/6, 1 lapse → ≈ 220.0),
+     `no-change` (A 484 words in 116.16 s, B 457 in 109.68 s, both 250 wpm,
+     5/6, 2 lapses → ≈ 208.3 each). Pins `drErrA`, `drErrB`, `drErrDiff`,
+     `drWpmB`, `drLapsesA`, `drLapsesB`. The body works the eye-budget arithmetic of a
      smaller regression share as its example (illustrative shares, labelled
      so); the lapse count is a self-report, not a measure of regressions.
    - **Misconception:** "Every look back is wasted time." The ones worth
@@ -617,10 +645,11 @@ Modules: `Fixations and saccades`, `The limits`.
    - **Standard:** given a claimed rate and the settings, compute characters
      per fixation and state the verdict with its settings.
    - **Lab:** `eye/required` (reg 0 in every preset). Presets: `double` (500
-     wpm, 225 + 30 ms, 6 → 12.75: "beyond what an average fixation identifies,
-     within the perceptual span, at these settings"), `thousand` (1,000 →
-     25.5: beyond the perceptual span), `twenty-five-thousand` (25,000 →
-     637.5). Pins `eyNeeded`, `eyVerdict`.
+     wpm, 225 + 30 ms, 6 → 12.75: "at these settings, beyond the
+     word-identification span but within the perceptual span"), `thousand`
+     (1,000 → 25.5: "at these settings, beyond the perceptual span"),
+     `twenty-five-thousand` (25,000 → 637.5, the same). Pins `eyNeeded`,
+     `eyVerdict`.
    - **Misconception:** "Reading at 1,000 words a minute with full
      comprehension is a matter of technique." At an average fixation it needs
      25 characters identified per glance. Skilled readers who reach 350–400
@@ -634,14 +663,16 @@ Modules: `Fixations and saccades`, `The limits`.
 6. **training-the-periphery** — Training the Periphery — *The limits* — 10 min
    - **Drill:** `flash/schulte`: three 5×5 tables, eyes on the centre, numbers
      found in order (`other`, logged with the table time); then `warmup`
-     `P11` (`test`). `log/history` draws table times beside test effective
-     rates by session, for the reader to look at over weeks.
+     `P11` (`test`). `log/history` has no Schulte series, so the reader
+     writes each table time in a log note beside the test's effective rate
+     and compares the two over weeks.
    - **Do:** compute a table time per cell and state what a faster table would
      and would not show about reading.
    - **Standard:** given table times and test rates over sessions, say whether
      they support transfer, and what else could explain both.
-   - **Lab:** `flash/schulte`. Presets: `first` (25 cells in 62 s → 2.48 s per
-     cell), `third` (25 in 41 s → 1.64). Pins `flTime`, `flPerCell`.
+   - **Lab:** `flash/schulte`. Presets: `first` (25 cells in 62 s, seed 12345
+     → 2.48 s per cell), `third` (25 in 41 s, seed 2718 → 1.64); no errors.
+     Pins `flTime`, `flPerCell`.
    - **Misconception:** "Getting faster at eye exercises makes reading faster."
      Practice improves the practised task; transfer to reading is the claim to
      test, and the evidence for it is weak (Rayner et al. 2016).
@@ -662,12 +693,14 @@ Modules: `The inner voice`, `Flashing words`.
    - **Standard:** given both rates, compute the ratio and state what it
      implies for the advice to eliminate the inner voice.
    - **Lab:** `drill/compare`, A `aloud`, `ratioOf: wpm`. Presets: `typical`
-     (A 183, B 238 → ≈ 1.3), `fast-silent` (A 180, B 320 → ≈ 1.8). Pins
-     `drWpmA`, `drWpmB`, `drRatio`.
+     (A the fallback's 183 words in 60 s; B 476 words in 120 s → 238 →
+     238/183 ≈ 130.1%), `fast-silent` (A 477 words in 159 s → 180; B 453
+     words in 84.9375 s → 320 → 16/9 ≈ 177.8%). The ratio prints as a
+     percentage. Pins `drWpmA`, `drWpmB`, `drRatio`.
    - **Misconception:** "The inner voice limits you to speaking speed, so it
      must go." Silent reading is already faster than oral reading on average;
      inner speech is not full articulation.
-   - **Worked:** 238 / 183 ≈ 1.3.
+   - **Worked:** 238 / 183 ≈ 1.3 (≈ 130.1%).
    - **Sources:** Brysbaert 2019; Rayner et al. 2016.
 
 2. **silencing-the-inner-voice** — Silencing the Inner Voice — *The inner voice* — 12 min
@@ -680,9 +713,10 @@ Modules: `The inner voice`, `Flashing words`.
    - **Standard:** given both readings, compute both effective rates and the
      difference, and say why a reading where the counting lapsed does not
      count.
-   - **Lab:** `drill/compare`. Presets: `typical` (A 245, 6/6 → 245; B 262, 4/6
-     → ≈ 174.7), `easy-text` (A 260, 6/6; B 266, 5/6 → ≈ 221.7). Pins
-     `drErrA`, `drErrB`, `drErrDiff`.
+   - **Lab:** `drill/compare`, B `suppress: true`. Presets: `typical` (A 392
+     words in 96 s → 245, 6/6 → 245; B 393 words in 90 s → 262, 4/6 →
+     ≈ 174.7; ≈ −70.3), `easy-text` (A 403 in 93 s → 260, 6/6; B 399 in 90 s
+     → 266, 5/6 → ≈ 221.7; ≈ −38.3). Pins `drErrA`, `drErrB`, `drErrDiff`.
    - **Misconception:** "Eliminating subvocalisation is the key to speed
      reading." In studies that suppressed inner speech, comprehension of
      difficult text fell while easy text held up (Hardyck and Petrinovich, by
@@ -700,9 +734,10 @@ Modules: `The inner voice`, `Flashing words`.
      comprehension with the reader's baselines.
    - **Standard:** given a rate, compute ms per word; explain why removing
      eye movements saves so little time.
-   - **Lab:** `drill/single`, `rsvp`. Presets: `at-baseline` (250 wpm → 240 ms
-     per word, 5/6), `at-500` (120 ms, 3/6), `at-600` (100 ms, the cap for a
-     drill; §D.0). Pins `drWordMs`, `drWpm`, `drErr`.
+   - **Lab:** `drill/single`, `rsvp`. Presets (`P29`'s 403 words):
+     `at-baseline` (96.72 s → 250 wpm, 240 ms per word, 5/6 → ≈ 208.3),
+     `at-500` (48.36 s, 120 ms, 3/6 → 250), `at-600` (40.3 s, 100 ms, the cap
+     for a drill, §D.0; 2/6 → 200). Pins `drWordMs`, `drWpm`, `drErr`.
    - **Misconception:** "Removing eye movements removes their time, so a
      flashed stream is free speed." Saccades are about a tenth of reading time
      (30 of 255 ms in the model). Single sentences can be understood in RSVP at
@@ -723,14 +758,16 @@ Modules: `The inner voice`, `Flashing words`.
      comprehension of grouped and ungrouped streams at one rate.
    - **Standard:** compute ms per phrase from its words and the rate; say what
      the comparison does and does not isolate.
-   - **Lab:** `drill/compare`, A `rsvp`, B `phrases`. Presets: `grouping-helps`
-     (A 250 wpm, 3/6 → 125; B 250, 5/6 → ≈ 208.3), `no-difference` (both
-     4/6). Pins `drErrA`, `drErrB`, `drPhraseMs` (mean ms per phrase for
-     `P20`).
+   - **Lab:** `drill/compare`, A `rsvp`, B `phrases`, both at 250. Presets:
+     `grouping-helps` (A 459 words in 110.16 s → 250 wpm, 3/6 → 125; B 438
+     words in 105.12 s → 250, 5/6 → ≈ 208.3), `no-difference` (both 4/6 →
+     ≈ 166.7). Pins `drErrA`, `drErrB`, `drErrDiff`, `drPhraseMs` (mean ms per
+     phrase for `P20`'s 127 phrases: 438 × 60,000 / (250 × 127) ≈ 827.7).
    - **Misconception:** "Phrase reading means seeing several words in one
      fixation." Chunking groups words by meaning; in normal reading the eyes
      still fixate most content words. What may help is the grouping.
-   - **Worked:** a 4-word phrase at 250 wpm: 4 × 60,000 / 250 = 960 ms.
+   - **Worked:** a 4-word phrase at 250 wpm: 4 × 60,000 / 250 = 960 ms; the
+     mean phrase of `P20` ≈ 827.7 ms.
    - **Sources:** Rayner et al. 2016.
 
 5. **rsvp-without-looking-back** — Flashing Words Without Looking Back — *Flashing words* — 12 min
@@ -741,8 +778,12 @@ Modules: `The inner voice`, `Flashing words`.
      garden-path question's result to regressions.
    - **Standard:** say what the garden-path question tests and why the stream
      cannot let you repair it.
-   - **Lab:** `drill/compare`. Presets: `stream-costs` (A 300, 6/6; B 300,
-     4/6), `even` (both 5/6). Pins `drErrA`, `drErrB`.
+   - **Lab:** `drill/compare`, both at 300. Presets: `stream-costs` (A 391
+     words in 78.2 s → 300, 6/6 → 300; B 403 words in 80.6 s → 300, 4/6 →
+     200; −100), `even` (both 5/6 → 250). Pins `drErrA`, `drErrB`,
+     `drErrDiff`. `P31`'s garden path ("The ferryman rowed across the river
+     waved a red flag …") carries its question (Q3) with no later cue that
+     gives the answer away.
    - **Misconception:** "RSVP is reading with the waste removed." The stream
      removes regressions too, and Schotter, Tran and Rayner found going back
      mattered for ordinary sentences, not only ambiguous ones; the garden path
@@ -751,19 +792,24 @@ Modules: `The inner voice`, `Flashing words`.
    - **Sources:** Schotter, Tran and Rayner 2014; Acklin and Papesh 2017.
 
 6. **testing-a-speed-claim** — Testing a Speed Claim — *Flashing words* — 10 min
-   - **Drill:** `warmup` `Q20` (`practice`); a felt reading of a claimed pace,
-     capped at 600 wpm in RSVP (beyond it the display is a flicker, and that
-     is itself the finding); then `eye/required` with the claim panel.
+   - **Drill:** `warmup` `Q20` (`practice`); then `eye/required` with the
+     claim panel. The kit cannot put a stream beside `eye/required`, so the
+     felt reading of a claimed pace is in the body: go back to One Word at a
+     Time, set 600 (the cap; beyond it the display is a flicker, and that is
+     itself the finding), and press Reset at the questions.
    - **Do:** test a claim with three computations — characters per fixation,
      effective rate at a plausible comprehension, and the time a book would
      take — and state what evidence would settle it.
    - **Standard:** given a claim, do the three computations and name the test
      that would settle it (a fresh passage, questions written by someone else,
      a control reader).
-   - **Lab:** `eye/required`, claim view. Presets: `triple-speed` (750 wpm →
-     19.125), `a-novel-an-hour` (90,000 words in 60 minutes → 1,500 wpm →
-     38.25), `whole-page` (350 words per 2-second glance → 10,500 wpm →
-     267.75). Pins `eyNeeded`, `eyVerdict`.
+   - **Lab:** `eye/required`, claim view, comprehension 1/2 in every preset.
+     Presets: `triple-speed` (750 words in 60 s → 750 wpm → 19.125, printed
+     ≈ 19.1; effective 375), `a-novel-an-hour` (90,000 words in 3,600 s →
+     1,500 wpm → 38.25; 750), `whole-page` (350 words in a 2-second glance →
+     10,500 wpm → 267.75; 5,250); every verdict "at these settings, beyond the
+     perceptual span". Pins `eyClaimWpm`, `eyNeeded`, `eyVerdict`,
+     `eyClaimErr`.
    - **Misconception:** "A claim with a testimonial is a measured claim." The
      Just, Carpenter and Masson comparison of trained speed readers, normal
      readers and skimmers is the model of a test; Carver (1985) is the other.
@@ -780,50 +826,58 @@ Modules: `The inner voice`, `Flashing words`.
 Modules: `Scanning and skimming`, `Reading strategically`.
 
 1. **scanning-for-a-target** — Scanning for a Target — *Scanning and skimming* — 8 min
-   - **Drill:** `scan/find` on `S01` (then `S02` on a second visit, first
+   - **Drill:** `scan/find` on `S01` (613 words; then `S02`, 590, on a second visit, first
      unread served): five targets, the reader selects the answering word by
      click or keyboard; timed per target (`other`). On a phone the scroll is
      inside the timing, and the panel says so.
    - **Do:** compute seconds per target and words passed over per second, and
      say why scanning is not reading.
    - **Standard:** given targets found and the time, compute both figures.
-   - **Lab:** `scan/find`. Presets: `quick` (600 words, 5 found, 40 s → 8 s
-     per target, 15 words per second), `slow` (600 words, 4 found, 1 wrong,
-     95 s). Pins `scFound`, `scPerTarget`, `scWordsPerSec`.
+   - **Lab:** `scan/find`. Presets (`S01`'s 613 words): `quick` (5 found, 40 s
+     → 8 s per target, ≈ 15.3 words a second), `slow` (4 found, 1 wrong, 95 s
+     → 23.75 s, ≈ 6.5). Pins `scFound`, `scPerTarget`, `scWordsPerSec`,
+     `scWrong`.
    - **Misconception:** "Scanning is fast reading." It is a search for a known
-     form — a number, a name — and not reading at all; its speed says nothing
-     about reading rate.
-   - **Worked:** 600 / 40 = 15 words per second, 900 a minute passed over.
+     form — a number, a name — and not reading for meaning; Carver counts it a
+     gear of its own, whose goal is finding. Its speed says nothing about
+     reading rate.
+   - **Worked:** 613 / 40 ≈ 15.3 words per second; 613 × 60 / 40 = 919.5 a
+     minute passed over.
    - **Sources:** Carver 1990.
 
 2. **skimming-for-gist** — Skimming for Gist — *Scanning and skimming* — 8 min — *drill first*
-   - **Drill:** `drill/single` with the `gist` display on `P32`: headings and
-     first sentences only, for a limit under a third of a full reading at the
-     reader's baseline; then four gist questions (`condition`).
+   - **Drill:** `drill/single` with the `gist` display on `P32` (594 words):
+     headings and first sentences only (141 words), for 40 s (`limit: 40`),
+     under a third of a full reading at 240 (148.5 s); then four gist
+     questions (`condition`).
    - **Do:** compute the share of the text a skim shows and gist questions
      right per minute.
    - **Standard:** given words shown, words in all and the time, compute the
      share and the gist rate; say when first sentences fail.
-   - **Lab:** `drill/single`, `gist`. Presets: `first-sentences` (112 of 560
-     words shown → 1/5; 3/4 gist in 40 s → 4.5 gist questions per minute),
-     `slower-skim` (112 shown, 4/4 in 80 s → 3). Pins `drShown`,
+   - **Lab:** `drill/single`, `gist`. Presets: `first-sentences` (141 of 594
+     words shown → 47/198 ≈ 23.7%; 3/4 gist in 40 s → 4.5 gist answers a
+     minute), `slower-skim` (4/4 in 80 s → 3). Pins `drShown`, `drComp`,
      `drGistPerMin`. No effective rate is printed for a skim.
    - **Misconception:** "First sentences always carry the point." Often in
      exposition written to a plan; the passage shows a paragraph where they do
      not. A skim is a bet on the text's structure.
-   - **Worked:** 112 / 560 = 1/5; 3 × 60 / 40 = 4.5.
+   - **Worked:** 141 / 594 = 47/198 ≈ 23.7%; 3 × 60 / 40 = 4.5.
    - **Sources:** Masson 1982; Duggan and Payne 2009.
 
 3. **what-skimming-costs** — What Skimming Costs — *Scanning and skimming* — 12 min
-   - **Drill:** `drill/compare`: A `P33` skimmed under a time limit
-     (`condition`); B `P34` read in full (`test`); each with six questions,
-     three gist and three detail.
+   - **Drill:** `drill/compare`: A `P33` (410 words) skimmed, the passage
+     disappearing at 40 s (normal display, `limit: 40`; `condition`); B `P34`
+     (387 words) read in full (`test`); each with six questions, three gist and
+     three detail.
    - **Do:** compute gist and detail comprehension separately and choose
      between a skim and a reading for a stated purpose.
    - **Standard:** given both scores by kind and a purpose, choose and justify.
-   - **Lab:** `drill/compare`, question kinds. Presets: `typical` (skim 2/3
-     gist, 1/3 detail; read 3/3, 3/3), `good-skimmer` (skim 3/3, 2/3). Pins
-     `drGistA`, `drDetailA`, `drGistB`, `drDetailB`.
+   - **Lab:** `drill/compare`, `kinds: true`. Presets: `typical` (skim 40 s →
+     615 wpm, 2/3 gist, 1/3 detail → effective 307.5; read 90 s → 258 wpm,
+     3/3, 3/3), `good-skimmer` (skim 3/3, 2/3 → 512.5). Pins `drGistA`,
+     `drDetailA`, `drGistB`, `drDetailB`, `drWpmA`, `drWpmB`, `drErrA`,
+     `drErrB`; the body says why the effective rate is the wrong basis for
+     the choice.
    - **Misconception:** "A skim is a fast read with a little less
      understanding." Gist suffers less than detail (Masson 1982); skimmers who
      choose where to look do better on the important points than readers
@@ -840,18 +894,21 @@ Modules: `Scanning and skimming`, `Reading strategically`.
      whether it paid for itself.
    - **Standard:** given times and scores, compute both effective rates with
      the preview counted.
-   - **Lab:** `drill/compare`, B `preview`, `limit: 30`. Presets: `pays` (A 480
-     words, 120 s, 4/6 → 160; B 480 words, 30 + 110 s, 6/6 → ≈ 205.7),
-     `does-not` (A 480, 120 s, 5/6 → 200; B 480, 30 + 115 s, 5/6 → ≈ 165.5).
-     Pins `drErrA`, `drErrB`.
+   - **Lab:** `drill/compare`, B `preview`, `limit: 30`. Presets: `pays` (A
+     `P35`'s 451 words in 110 s → 246 wpm, 4/6 → 164; B `P36`'s 433 words in
+     150 s with the preview counted → 173.2, 6/6 → 173.2; +9.2), `does-not`
+     (A 5/6 → 205; B 5/6 → ≈ 144.3; ≈ −60.7). Pins `drWpmA`, `drWpmB`,
+     `drErrA`, `drErrB`, `drErrDiff`.
    - **Misconception:** "A preview is free." It costs time; it pays when it
      raises comprehension or lets you skip a section.
-   - **Worked:** 480 × 60 / 140 ≈ 205.7 wpm, × 6/6.
+   - **Worked:** 433 × 60 / 150 = 173.2 wpm, × 6/6, against 246 × 4/6 = 164.
    - **Sources:** Robinson 1946; Adler and Van Doren 1972.
 
 5. **inspectional-reading** — Inspectional Reading — *Reading strategically* — 10 min
-   - **Drill:** `scan/inspect` on `B01` (front and back matter of an imaginary
-     book), five-minute limit, five structural targets (`other`).
+   - **Drill:** `scan/inspect` on `B01` (586 words of front and back matter
+     of an imaginary book), `limit: 300`, five structural targets from
+     `B01`'s own `targets`, each answered by clicking the word that answers
+     it (`other`).
    - **Do:** answer, from a timed inspection, what a book is about, how it is
      organised and where a topic is treated.
    - **Standard:** given a book's contents and index, answer five structural
@@ -874,30 +931,39 @@ Modules: `Scanning and skimming`, `Reading strategically`.
      fits and covers more value than reading in order.
    - **Lab:** `triage/plan` (read 250 wpm; skim 750 wpm covering 1/2 of a
      document's value; budget 45 minutes; eight documents totalling 15,000
-     words). Presets: `read-everything` (60 min — over), `skim-the-rest` (fits),
-     `skip-wrong` (fits, skips the most valuable). The author fixes the eight
-     rows and records them here. Pins `trMinutes`, `trCovered`, `trFits`.
+     words and 36 value points). The rows (words, value): neighbourhood
+     newsletter 1,800, 1; minutes of last month's meeting 1,500, 3;
+     landlord's lease proposal 3,000, 10; parking study 2,100, 3; staff survey
+     results 2,400, 6; history of the building 2,100, 1; facilities
+     manager's summary 1,200, 8; removal firm's quote 900, 4. Presets:
+     `read-everything` (60 min, 1 = 100%, over by 15), `skim-the-rest` (read
+     the lease, survey, summary and quote, skim the rest: 30 + 10 = 40 min,
+     8/9 ≈ 88.9%, 5 to spare), `skip-wrong` (read in the order they came until
+     time runs out, skipping the last three, the summary among them: 43.2 min,
+     23/36 ≈ 63.9%, 1.8 to spare). Pins `trMinutes`, `trCovered`, `trFits`.
    - **Misconception:** "The fastest way through a pile is to read faster."
      Choosing what not to read saves more time than any rate gain.
    - **Worked:** 15,000 / 250 = 60 minutes, over a 45-minute budget.
    - **Sources:** Duggan and Payne 2009.
 
 7. **shifting-gears** — Shifting Gears — *Reading strategically* — 12 min
-   - **Drill:** `drill/sections` on `P37` (an easy narrative section, then a
-     dense technical one), the instruction to change speed by section; time
-     per section; questions on both (`test`); the attention tick.
+   - **Drill:** `drill/sections` on `P37` (578 words: an easy narrative
+     section of 292, then a dense report of 286), the instruction to change
+     speed by section; time per section; six questions on the whole (`test`;
+     the kit has no per-section score); the attention tick.
    - **Do:** compute the rate for each section and say whether the reader
      shifted gear to match difficulty and purpose.
    - **Standard:** given section times and scores, compute both rates and say
      whether the shift was a choice or a collapse.
-   - **Lab:** `drill/sections`. Presets: `flexible` (300 words in 58 s ≈ 310.3;
-     300 in 95 s ≈ 189.5; 5/6), `rigid` (300 in 72 s = 250; 300 in 73 s ≈ 246.6;
-     dense questions 1/3). Pins `drRateS1`, `drRateS2`, `drErr`.
+   - **Lab:** `drill/sections`. Presets: `flexible` (292 in 60 s = 292; 286 in
+     104 s = 165; 5/6 → whole ≈ 211.5, effective ≈ 176.2), `rigid` (292 in
+     73 s = 240; 286 in 72 s ≈ 238.3; 4/6 → ≈ 159.4). Pins `drRateS1`,
+     `drRateS2`, `drWpm`, `drErr`.
    - **Misconception:** "A good reader holds one fast speed." Carver found
      most readers hold a nearly constant rate across ordinary texts and seldom
      shift gear; he recommended shifting deliberately, slowing for what must
      be learned and speeding up for what need only be skimmed.
-   - **Worked:** 300 × 60 / 58 ≈ 310.3; 300 × 60 / 95 ≈ 189.5.
+   - **Worked:** 292 × 60 / 60 = 292; 286 × 60 / 104 = 165.
    - **Sources:** Carver 1990, 1992.
 
 ### Course 6 — Words, Knowledge and Difficulty (`reading-words-knowledge-and-difficulty`, 5)
@@ -911,27 +977,31 @@ Modules: `Difficulty`, `Knowledge`.
      hard text and decide which a speed claim should be measured on.
    - **Standard:** given both readings, compute both ratios and say what a
      claim measured on easy text tells you about a hard one.
-   - **Lab:** `drill/compare`, `ratioOf: wpm`. Presets: `big-drop` (easy 290,
-     6/6; hard 170, 5/6 → rate ratio 17/29 ≈ 58.6%), `held-rate` (easy 260,
-     6/6; hard 248, 3/6 — rate held, comprehension fell). Pins `drWpmA`,
-     `drWpmB`, `drRatio`, `drErrB`.
+   - **Lab:** `drill/compare`, `ratioOf: wpm`. Presets: `big-drop` (easy 395
+     words in 79 s → 300, 6/6; hard 391 words in 138 s → 170, 5/6 → ≈ 141.7;
+     rate ratio 17/30 ≈ 56.7%), `held-rate` (easy 250 in 94.8 s, 6/6; hard
+     240 in 97.75 s, 3/6 → 120; ratio 24/25 = 96% — rate held, comprehension
+     fell). Pins `drWpmA`, `drWpmB`, `drRatio`, `drErrB`.
    - **Misconception:** "My reading speed is one number." Carver found readers
      keep a nearly constant rate across texts within their level and lose
      comprehension instead; on text well above it they drop into a slower
      gear, and the eye data show longer fixations and more regressions. Either
      way a rate means a rate on a kind of text.
-   - **Worked:** 170 / 290 = 17/29 ≈ 58.6%.
+   - **Worked:** 170 / 300 = 17/30 ≈ 56.7%.
    - **Sources:** Carver 1990; Rayner 1998.
 
 2. **measuring-difficulty** — Measuring Difficulty — *Difficulty* — 8 min
    - **Drill:** `warmup` `Q22` (`practice`); then `text/readability` on `P38`
-     and `P39` (just read) and a standard passage, counted by the kit.
+     and `P39` (just read) and `P01` (standard, read in Course 1), counted by
+     the kit.
    - **Do:** compute Flesch Reading Ease and Flesch–Kincaid grade from counts
      of words, sentences and syllables, and say what the formulas cannot see.
    - **Standard:** given counts, compute both scores by hand to one decimal.
-   - **Lab:** `text/readability`. Presets are the three passages (one per
-     band); pinned figures read from the page. Pins `txWords`, `txSentences`,
-     `txFre`, `txGrade`.
+   - **Lab:** `text/readability`. Presets: `octopus` (`P38`: 395 words, 21
+     sentences → FRE ≈ 79.8, grade ≈ 6.8), `church-clock` (`P01`: 491, 21 →
+     ≈ 70.2, ≈ 9.3), `continents` (`P39`: 391, 16 → ≈ 14.3, ≈ 17.3), `by-hand`
+     (100, 5, 140 → ≈ 68.1, 8.73). Pins `txWords`, `txSentences`, `txFre`,
+     `txGrade`.
    - **Misconception:** "A readability score measures how hard a text is to
      understand." It measures sentence length and syllables per word; short
      words about unfamiliar ideas score easy.
@@ -941,9 +1011,9 @@ Modules: `Difficulty`, `Knowledge`.
    - **Sources:** Flesch 1948; Kincaid et al. 1975.
 
 3. **unknown-words-and-coverage** — Unknown Words and Coverage — *Knowledge* — 12 min
-   - **Drill:** `text/coverage`: the reader reads `P40` (hard band, timed,
-     `test`), then selects the words they do not know; the lab computes
-     coverage.
+   - **Drill:** `text/coverage`: the reader reads `P40` (hard band, 380
+     words; untimed, logged `other`), selecting the words they do not know;
+     the lab computes coverage.
    - **Do:** compute lexical coverage and the density of unknown words, and
      compare with the published estimates.
    - **Standard:** given tokens and unknown tokens, compute coverage and "one
@@ -968,16 +1038,17 @@ Modules: `Difficulty`, `Knowledge`.
      with readability held close.
    - **Standard:** given both readings, compute both effective rates and the
      ratio, and say why readability did not predict it.
-   - **Lab:** `drill/compare`, `ratioOf: err`. Presets: `typical` (A 260, 6/6 →
-     260; B 225, 4/6 → 150 → ratio 15/26 ≈ 57.7%), `expert` (a reader who
-     knows B's field: A 260, 6/6; B 270, 6/6 → ≈ 103.8%). Pins `drErrA`,
-     `drErrB`, `drRatio`.
+   - **Lab:** `drill/compare`, `ratioOf: err`. Presets: `typical` (A 385 words
+     in 96.25 s → 240, 6/6 → 240; B 375 words in 100 s → 225, 4/6 → 150 →
+     ratio 5/8 = 62.5%), `expert` (a reader who knows B's field: A 240, 6/6;
+     B 375 in 90 s → 250, 6/6 → 25/24 ≈ 104.2%). Pins `drErrA`, `drErrB`,
+     `drRatio`.
    - **Misconception:** "Speed is a skill independent of what you know."
      Recht and Leslie found junior-high readers' knowledge of baseball
      mattered more than their reading ability for what they recalled of a
      baseball passage; background knowledge is among the strongest
      influences on comprehension.
-   - **Worked:** 150 / 260 = 15/26 ≈ 57.7%.
+   - **Worked:** 150 / 240 = 5/8 = 62.5%.
    - **Sources:** Recht and Leslie 1988; Rayner et al. 2016.
 
 5. **how-much-you-read** — How Much You Read — *Knowledge* — 8 min
@@ -989,8 +1060,9 @@ Modules: `Difficulty`, `Knowledge`.
      gain equal to a time gain.
    - **Lab:** `text/volume` (365 days, 90,000-word books). Presets:
      `twenty-minutes` (20 × 250 × 365 = 1,825,000 words ≈ 20.3 books),
-     `faster` (20 × 300 → 2,190,000), `longer` (30 × 250 → 2,737,500). Pins
-     `txWordsYear`, `txBooksYear`.
+     `faster` (20 × 300 → 2,190,000, ≈ 24.3), `longer` (30 × 250 → 2,737,500,
+     ≈ 30.4), `rate-to-match` (20 × 375 → 2,737,500). Pins `txWordsYear`,
+     `txBooksYear`.
    - **Misconception:** "The way to read more is to read faster." Ten more
      minutes a day at 250 adds as much as a rate gain from 250 to 375, which no
      technique reliably delivers; and reading volume is strongly associated
@@ -1011,13 +1083,13 @@ Modules: `Recall`, `Keeping it`.
      rate, and compare with multiple-choice comprehension.
    - **Standard:** given units recalled and the reading, compute both and say
      why recall is lower than recognition.
-   - **Lab:** `recall/free`. Presets: `typical` (12 units, 7 recalled; 400
-     words in 100 s → 240 × 7/12 = 140; questions 5/6), `strong` (10 of 12 →
-     200). Pins `reRecall`, `reRate`.
+   - **Lab:** `recall/free`, `questions: true`. Presets: `typical` (12 units, 7
+     recalled; 383 words in 95.75 s → 240 × 7/12 = 140; questions 5/6),
+     `strong` (10 of 12 → 200; 6/6). Pins `reRecall`, `reRate`, `reComp`.
    - **Misconception:** "Recognising the right answer is remembering."
      Multiple choice measures recognition; free recall is harder and closer to
      what you can use later.
-   - **Worked:** 240 × 7/12 = 140.
+   - **Worked:** 383 × 60 / 95.75 = 240; 240 × 7/12 = 140.
    - **Sources:** Roediger and Karpicke 2006 (free recall as the measure).
 
 2. **retrieval-beats-rereading** — Retrieval Beats Rereading — *Recall* — 15 min, then 5 min after two days
@@ -1031,11 +1103,13 @@ Modules: `Recall`, `Keeping it`.
      difference.
    - **Standard:** given delayed scores, compute both and explain why the
      immediate result favoured rereading.
-   - **Lab:** `recall/delayed`. Preset `published-shape` (Roediger and
-     Karpicke 2006, Experiment 1, rounded and labelled: restudy ≈ 81% at five
-     minutes, ≈ 54% at two days; test ≈ 75%, ≈ 68%) and `reader-example`
-     (delayed 2/6 reread, 4/6 retrieved, illustrative). Pins `reDelayedA`,
-     `reDelayedB`, `reDelayedDiff`.
+   - **Lab:** `recall/delayed`, `days: 2`. Presets: `reader-example` (shown
+     first; delayed 2/6 reread, 4/6 retrieved → ≈ +33.3 points; 7 of `P45`'s
+     11 idea units → 7/11 ≈ 63.6%; illustrative) and `published-shape`
+     (Roediger and Karpicke 2006, Experiment 1, rounded and labelled, as
+     scores out of 100: 54 restudy and 68 test at two days → +14 points;
+     recall 75/100; the five-minute 81% and 75% are in the body). Pins
+     `reDelayedA`, `reDelayedB`, `reDelayedDiff`, `reRecallB`.
    - **Misconception:** "Reading it again is the best way to remember it."
      Rereading wins on an immediate test and loses on a delayed one. Their test
      was free recall without feedback; the drill's delayed test is multiple
@@ -1052,7 +1126,8 @@ Modules: `Recall`, `Keeping it`.
      days and the minutes.
    - **Lab:** `recall/schedule`. Presets: `expanding` (first gap 1, × 2, 5
      reviews of 10 minutes → days 1, 3, 7, 15, 31; 50 minutes), `equal` (gap 6,
-     × 1 → 6, 12, 18, 24, 30), `massed` (gap 0 → all on day 0). Pins
+     × 1 → 6, 12, 18, 24, 30), `massed` (gap 1, × 0 → all five on day 1,
+     the same 50 minutes). Pins
      `reLastDay`, `reMinutes`, `reDays`.
    - **Misconception:** "Massed review works better, because it feels better."
      Review crammed into one sitting feels fluent and produces high scores
@@ -1064,14 +1139,16 @@ Modules: `Recall`, `Keeping it`.
      2007.
 
 4. **notes-in-your-own-words** — Notes in Your Own Words — *Keeping it* — 12 min
-   - **Drill:** `recall/free`, summary variant: `P46` timed (`test`), then a
-     three-sentence summary from memory, then idea units ticked.
+   - **Drill:** `recall/free`, summary variant: `P46` timed (377 words; logged
+     `other`, so a summary does not enter the recall row of the profile), then
+     a three-sentence summary from memory, then idea units ticked.
    - **Do:** compute the idea units a short summary covers and its words per
      unit, and say what a good summary leaves out.
    - **Standard:** given two summaries' lengths and units, compute and choose.
-   - **Lab:** `recall/free`, `summary: true`. Presets: `tight` (40 words, 6
-     units → ≈ 6.7 words per unit), `copied` (90 words, 4 units → 22.5). Pins
-     `reRecall`, `reWordsPerUnit`.
+   - **Lab:** `recall/free`, `summary: true`. Presets (10 idea units; 94.25 s
+     → 240 wpm): `tight` (40 words, 6 units → 3/5 = 60%, ≈ 6.7 words per
+     unit, 144 wpm recalled), `copied` (90 words, 4 units → 2/5 = 40%, 22.5,
+     96). Pins `reRecall`, `reWordsPerUnit`, `reRate`.
    - **Misconception:** "Highlighting is studying." Dunlosky and colleagues
      rated highlighting, rereading and summarisation all of low utility, and
      practice testing high; a summary written from memory is retrieval, which
@@ -1089,25 +1166,33 @@ Modules: `The plan`, `The test`.
    - **Do:** plan a week of practice under a time budget, with tests.
    - **Standard:** given a budget, produce a week that meets the routine's
      rules, and find the rule an unbalanced plan breaks.
-   - **Lab:** `log/plan`. Presets: `twenty-a-day` (5 × 20 + 2 × 30 = 160
-     minutes; tests 2 of 7 sessions), `weekend-only` (2 × 60), `all-sprints`
-     (7 × 15, no tests → "no test this week"). Pins `lgWeekMinutes`,
-     `lgTests`.
+   - **Lab:** `log/plan`, budget 120 minutes. Presets: `fifteen-a-day` (5 × 15
+     pacer practice + 2 × 15 test session = 105 minutes; test share 2/7
+     ≈ 28.6%; fits, 15 to spare), `weekend-only` (1 × 60 test + 1 × 60 long
+     practice = 120; 1/2 = 50%; fits, 0 to spare), `all-sprints` (7 × 15 =
+     105, "no test in the week"). Pins `lgWeekMinutes`, `lgTestShare`,
+     `lgFits`.
    - **Misconception:** "More drills means more progress." A week without a
      test reading has not measured anything, and sessions longer than
      attention lasts practise drifting.
-   - **Worked:** 5 × 20 + 2 × 30 = 160 minutes.
+   - **Worked:** 5 × 15 + 2 × 15 = 105 minutes; 30 / 105 = 2/7; 120 − 105 =
+     15 to spare.
    - **Sources:** Ericsson, Krampe and Tesch-Römer 1993.
 
 2. **reading-your-curve** — Reading Your Curve — *The plan* — 8 min
-   - **Drill:** `warmup` `Q25` (`test`); then `log/history` on the reader's log.
+   - **Drill:** `warmup` `Q16` (standard band, `test`: a hard-band warm-up
+     would drag the test median down); then `log/history` on the reader's
+     log.
    - **Do:** decide from a log whether effective rate has changed.
    - **Standard:** given a log, state the verdict by the Subject's rule and
      name the entries that do not count.
-   - **Lab:** `log/history`, trend view. Example logs: `real-gain` (baselines
-     238–251; tests 262, 270, 281 → median 270), `noise` (tests 244, 262, 239 →
-     244), `rate-only` (tests whose rate rose and comprehension fell:
-     effective 236, 240, 238). Pins `lgRange`, `lgTestMedian`, `lgVerdict`.
+   - **Lab:** `log/history`, trend view. Example logs (effective rates; every
+     one with baselines 238, 245, 251, median 245): `real-gain` (tests 262,
+     270, 281 → median 270, above; four practice entries drawn lighter),
+     `noise` (tests 244, 262, 239 → 244, inside), `rate-only` (tests read at
+     354, 360, 357 wpm with 4/6: effective 236, 240, 238 → 238, inside). Pins
+     `lgSessions`, `lgBaseMedian`, `lgRecentMedian`, `lgLatestErr`,
+     `lgVerdict`.
    - **Misconception:** "My best session is my new level." The best session is
      selected for being high; the median of the last three tests against the
      baseline range is the honest comparison.
@@ -1115,36 +1200,45 @@ Modules: `The plan`, `The test`.
    - **Sources:** —
 
 3. **plateaus-and-transfer** — Plateaus and Transfer — *The test* — 10 min
-   - **Drill:** `drill/single` on `P47` (a dense argument, a kind the reader
-     has not practised; `test`); the panel prints the reader's effective rate
-     on it beside the baseline range and the recent test median from the log.
+   - **Drill:** `drill/single` on `P47` (389 words, a dense argument, a kind
+     the reader has not practised; logged `other`, because a first reading of
+     a kind with no baseline would pull down the median of tests on standard
+     passages); `vsLog: true` prints the reader's effective rate on it beside
+     the baseline range and the recent test median from the log.
    - **Do:** compare a first reading of a new kind of text with the practised
      kind and say what a plateau in each would mean.
    - **Standard:** given the three figures, say whether the practice
      transferred and why one reading of a new kind has no baseline of its own.
-   - **Lab:** `drill/single` with the log comparison. Presets: `transfers`
-     (P47 effective 240 against baselines 238–251 and recent 270), `does-not`
-     (P47 effective 180). Pins `drErr`, `lgRange`, `lgTestMedian`.
+   - **Lab:** `drill/single` with the log comparison. Presets (range 238–251,
+     recent 270): `transfers` (97.25 s → 240 wpm, 6/6 → 240: inside, −30
+     against recent), `does-not` (77.8 s → 300 wpm, the practised rate, 4/6 →
+     200: below the range, −70). Pins `drWpm`, `drComp`, `drErr`, `drVsBase`,
+     `drVsRecent`.
    - **Misconception:** "A plateau means I have reached my limit." It often
      means the practice has stopped asking for more, or that the gains were
      specific to the practice material; a new kind of text tells which.
-   - **Worked:** 270 on practised text, 180 on the argument: the gain did not
-     carry.
+   - **Worked:** 270 on practised text, 200 on the argument (300 × 4/6): the
+     gain did not carry.
    - **Sources:** Ericsson, Krampe and Tesch-Römer 1993; Rayner et al. 2016.
 
 4. **the-full-battery** — The Full Battery — *The test* — 15 min, done fresh
-   - **Drill:** `log/profile` with `warmup` `P48` as a test with free recall
-     after the questions (`test`); the profile reads the latest skim
-     (Skimming for Gist and later), scan and recall entries from the log.
+   - **Drill:** `log/profile` with `warmup` `P48` as a test (`test`; a
+     warm-up cannot do free recall, so none follows); "Fill from my log" reads
+     the baseline median and the latest test, and the first and latest skim,
+     scan and free-recall entries, warm-ups included.
    - **Do:** compute a profile — effective rate (median of last three tests),
      gist rate, scan time per target, recall share — and compare each with the
      first measurement.
    - **Standard:** given two profiles, say which measures changed by the
      Subject's rule and which have too few readings to say.
-   - **Lab:** `log/profile`. Presets: `starting` (effective 244; gist 3 per
-     minute; scan 12 s per target; recall 5/12), `after-practice` (tests 262,
-     270, 266 → 266; gist 4.5; 8 s; 7/12). Pins `lgErrNow`, `lgErrThen`,
-     `lgVerdict`.
+   - **Lab:** `log/profile`. Presets: `after-practice` (effective then 245,
+     the baseline median; now 266, the latest test; range 238–251, no `tests`
+     list, so the tile judges 266 alone: "above the baseline range once" — the
+     body works the median of the last three, 262, 270, 266 → 266, as the
+     rule's evidence; gist 2/3 → 1; scan 12 s → 8 s; recall 5/12 → 7/12),
+     `rate-flat` (245 → 244, inside; gist 2/3 → 2/3; scan 12 s → 7 s; recall
+     flat). Pins `lgErrThen`, `lgErrNow`, `lgVerdict`, `lgGist`, `lgScan`,
+     `lgRecall`.
    - **Misconception:** "One number sums up a reader." A reader is a profile:
      rate on a kind of text, comprehension, the choice of when not to read
      everything, and what is kept.
@@ -1542,7 +1636,8 @@ second visit.
 
 **The practice pool** (`content/reading/passages/pool.py`, `Q01`–`Q30`): the
 Daily Drill's texts, served in order, never assigned to one lesson except the
-warm-ups `Q19`–`Q25`, `Q29` and `Q30` (§C); the Daily Drill page carries the other 21. Q01–Q08
+warm-ups `Q16`, `Q19`–`Q24`, `Q29` and `Q30` (§C); the Daily Drill page carries `Q01`–`Q15`
+and `Q26`–`Q28` (18, for page weight), and `Q17`, `Q18` and `Q25` are unplaced. Q01–Q08
 easy, Q09–Q22 standard rising, Q23–Q30 hard; 380–480 words; six questions;
 kinds mixed. After the pool, the reader practises on their own pasted text.
 
@@ -1837,3 +1932,17 @@ search on the doubtful claims). Resolution:
   correlational; the eye-budget model's understatement of a regression's
   cost; verdicts "at these settings"; every blank preset filled and every
   figure recomputed.
+
+### Reconciliation with the authored lessons, 2026-10-25
+
+- §C brought into agreement with the lessons as written (`content/reading/c*/part_*.py`)
+  and docs/reading/kit-report.md: preset instances and figures, passage word counts,
+  log kinds (Course 1 takes three baselines and logs `P05` as `test`; `P40`, `P46` and
+  `P47` log `other`), pins, and the reworded misconceptions; §B gains the median rule's
+  1-in-5 false-positive rate under pure noise (3/15, checked by enumeration).
+- Passages: the guessable or doubly-answerable questions P03 Q2, P05 Q1, P12 Q4, P13 Q6
+  and P14 Q6 rewritten; P31's later cues ("with his good hand", Klara "pulling the oars",
+  "out of breath") removed so its garden-path question depends on that sentence. No word
+  count or correct-answer index changed.
+- Reading Your Curve's test warm-up moved from the hard-band `Q25` to the standard-band
+  `Q16`.

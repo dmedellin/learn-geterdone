@@ -203,7 +203,7 @@ PASSAGES = {
                     "The lights of the island pier",
                     "The bell buoy off Carrick Point",
                     "The horn of a fishing boat",
-                    "The end of the eighteen minutes on her stopwatch",
+                    "A shout from the man in yellow oilskins",
                 ],
                 "c": 1,
                 "kind": "detail",
@@ -352,7 +352,7 @@ PASSAGES = {
             {
                 "q": "What problem did Fresnel’s design solve?",
                 "a": [
-                    "The metal mirrors behind oil lamps tarnished quickly",
+                    "Keepers had to light the lamps by hand every evening",
                     "Sailors could not tell one lighthouse from another at night",
                     "A lighthouse-sized solid lens would be too thick and heavy",
                     "Fog stopped the light from carrying beyond the shore",
@@ -959,7 +959,7 @@ PASSAGES = {
             {
                 "q": "Why was the Penny Black replaced?",
                 "a": [
-                    "The young queen disliked the portrait of herself that the first stamp carried",
+                    "Black cancelling marks could not be seen on its black background",
                     "The gum on the back failed to hold the stamp on in damp weather",
                     "The price of a letter rose and a new stamp had to be printed",
                     "Red cancellation marks were hard to see on it and could be cleaned off",
@@ -1060,12 +1060,12 @@ PASSAGES = {
                 "kind": "gist",
             },
             {
-                "q": "How long did the first mail take to reach Sacramento?",
+                "q": "How far did one rider carry the mail before handing it on?",
                 "a": [
-                    "About ten days",
-                    "About three days",
-                    "About three weeks",
-                    "About eighteen days",
+                    "Perhaps seventy-five to a hundred miles",
+                    "Ten to fifteen miles, from one station to the next",
+                    "About two hundred and fifty miles",
+                    "The whole way from Saint Joseph to Sacramento",
                 ],
                 "c": 0,
                 "kind": "detail",
@@ -1083,7 +1083,7 @@ PASSAGES = {
             "Suppose a boat is travelling uphill. The chamber starts empty, its water at the level of the lower canal. The lower gates are opened, the boat moves in, and the gates are closed behind it. Then the paddles in the upper gates are raised. Water from the higher canal pours into the chamber, and the boat rises with it, slowly and steadily, until the water inside is level with the canal above. Now there is no difference in pressure on either side of the upper gates, so they can be pushed open, and the boat moves out on the higher level. Going downhill is the same process in reverse.",
             "No pump is needed for any of this. Every lift is paid for with water that runs downhill from the highest stretch of the canal, and each time a lock is used, a chamberful of water passes from the upper level to the lower. That is why canal engineers worried constantly about supply, building reservoirs on high ground and feeder channels to keep the top level full.",
             "One clever detail is the shape of the gates. On many canals, each pair meets at an angle, forming a shallow V that points upstream, toward the higher water. The pressure of that water pushes the two gates against each other, sealing them more tightly the deeper the water becomes. A lock keeper does not need to bolt them shut; the canal holds them closed by itself. This is also why the gates cannot be opened until the levels on both sides are equal: before that, the weight of the water is far too great to move them.",
-            "Where a canal had to climb a steep slope, engineers built flights of locks, one immediately after another, so that boats could climb the hillside like a staircase.",
+            "Where a canal had to climb a steep slope, engineers built flights of locks, one immediately after another, so that boats could climb the hillside like a ladder.",
         ],
         "questions": [
             {
@@ -1144,9 +1144,9 @@ PASSAGES = {
             {
                 "q": "What does the passage compare a flight of locks to?",
                 "a": [
-                    "A ladder",
-                    "A row of terraces",
                     "A staircase",
+                    "A row of terraces",
+                    "A ladder",
                     "A chain",
                 ],
                 "c": 2,

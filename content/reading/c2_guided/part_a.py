@@ -8,8 +8,8 @@ ONE_Q = "One question is ≈ 16.7 points; a one-question difference is not a res
 # The Daily Drill's pool, served in order. PLAN §C 2.3 names Q01-Q18 and
 # Q26-Q28 (21 passages); with this lesson's text the page is 69.9 KB gzipped
 # at 21, against the library's 67 KB ceiling, and 66.2 KB at 18. So the page
-# carries Q01-Q15 and Q26-Q28: easy, then standard, then hard. Q16-Q18 are
-# left for the orchestrator to place (see the author's report).
+# carries Q01-Q15 and Q26-Q28: easy, then standard, then hard. Q16 is the
+# test warm-up of Reading Your Curve; Q17 and Q18 are unplaced.
 DAILY_POOL = [PASSAGES["Q%02d" % n] for n in list(range(1, 16)) + [26, 27, 28]]
 
 LESSONS = [

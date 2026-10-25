@@ -326,11 +326,11 @@ LESSONS = [
             "a curve can be: a change, a lucky day, and a faster page-turner."
         ),
         "body": [
-            ("p", "The warm-up above the lab is a test reading of a passage about cork, "
-                  "at natural pace, with six questions. Do it first, so that your own "
-                  "curve ends with today. The passage comes from the hard end of the "
-                  "practice pool, harder than the passages of your baselines; keep "
-                  "that in mind when you find it on the chart."),
+            ("p", "The warm-up above the lab is a test reading of a passage about "
+                  "rainbows, at natural pace, with six questions. Do it first, so that "
+                  "your own curve ends with today. The passage comes from the standard "
+                  "band of the practice pool, the band of your baselines, so it can "
+                  "stand beside them on the chart."),
             ("p", "The lab reads your log and keeps only the baseline and test "
                   "readings that had questions. It puts every baseline first and the "
                   "tests after them, sets the box for the number of baselines, and "
@@ -383,8 +383,8 @@ LESSONS = [
                   "passage reads lower for that reason alone, and the practice pool "
                   "grows harder toward its end. If your recent tests fall just as the "
                   "pool reaches its hard passages, read the fall as the passages until "
-                  "tests on standard ones say otherwise; today's warm-up was one of the "
-                  "hard ones."),
+                  "tests on standard ones say otherwise; today's warm-up was a "
+                  "standard one for that reason."),
             ("p", "When you have read your verdict, write it in the note box under the "
                   "lab with the date, so that the log carries what you concluded as "
                   "well as what you measured. The next lesson, Plateaus and Transfer, "
@@ -394,7 +394,7 @@ LESSONS = [
         "lab": ("readkit", {
             "mode": "log",
             "view": "history",
-            "warmup": _POOL["Q25"],
+            "warmup": _POOL["Q16"],
             "warmup_kind": "test",
             "preset": "real-gain",
             "presets": [
