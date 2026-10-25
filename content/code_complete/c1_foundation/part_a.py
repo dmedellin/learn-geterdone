@@ -16,8 +16,8 @@ from fractions import Fraction
 # convention supplies them. Written for the lesson; nothing in it is the
 # book's. Line numbers in the prose count every line from 1.
 SEND_WITH_DEFAULT = """\
-// Java has no default argument values. The team's convention: the
-// full version holds the logic, and each shorter one forwards to it.
+// Java has no default arguments.
+// Each shorter send forwards to the full one.
 static final int DEFAULT_RETRIES = 3;
 
 boolean send(Message message) {
@@ -48,7 +48,7 @@ LESSONS = [
     # ---------------------------------------------------------------- 01
     # McConnell Chapters 1-2, pp. 3-21: section 1.1 (p. 3; the list of
     # activities pp. 3-4, construction's tasks pp. 5-6, "coding" p. 5), 1.2
-    # (p. 6; the four reasons p. 7), 1.3 (p. 8); 2.1 (pp. 9-11), 2.2
+    # (p. 6; the five reasons p. 7), 1.3 (p. 8); 2.1 (pp. 9-11), 2.2
     # (pp. 11-12), 2.3 (pp. 13-20; writing p. 13, Brooks p. 14 and p. 16,
     # farming pp. 14-15, accretion pp. 15-16, building pp. 16-19, toolbox and
     # combining p. 20).
@@ -110,9 +110,9 @@ LESSONS = [
                   "central activity in software development; construction is the only "
                   "activity that’s guaranteed to happen on every project.&rdquo; It is the "
                   "first of the chapter's key points, and Chapter 1 is the argument for it. "
-                  "Read Chapters 1 and 2 in your own copy first, pages 3 to 21; they are the "
-                  "two shortest chapters in the book, and the lesson goes back through them a "
-                  "section at a time."),
+                  "Read Chapters 1 and 2 in your own copy first, pages 3 to 21; Chapter 1 is "
+                  "the shortest chapter in the book and Chapter 2 is not much longer, and the "
+                  "lesson goes back through them a section at a time."),
             ("p", "Chapter 1 asks a question that sounds too easy to need asking: what is "
                   "software construction? Section 1.1 (p. 3) answers by placing it among the "
                   "activities researchers had separated out of software development over the "
@@ -124,9 +124,10 @@ LESSONS = [
                   "(the design of classes and routines, where architecture is the design of "
                   "the system as a whole), construction planning, unit testing, integration "
                   "and integration testing. If you taught yourself to program, McConnell "
-                  "says, you probably filed all of it under programming, and the intuition is "
-                  "fairly accurate. What it lacks is perspective: the sight of construction "
-                  "among the activities around it."),
+                  "says, you probably grouped it all as programming, and the activity you "
+                  "thought of first is what the book calls construction: a fairly accurate "
+                  "intuition that lacks perspective, the sight of construction among the "
+                  "activities around it."),
             ("p", "The section then goes down a level, to the tasks construction involves: "
                   "checking that the groundwork has been laid, deciding how your code will be "
                   "tested, designing and writing classes and routines, naming variables and "
@@ -142,15 +143,19 @@ LESSONS = [
                   "creativity and judgement. The rest of the book is his evidence for that "
                   "sentence."),
             # F1, p. 7
-            ("p", "Section 1.2 (p. 6) gives four reasons to concentrate on construction. It "
+            ("p", "Section 1.2 (p. 6) gives five reasons to concentrate on construction. It "
                   "is a large part of the work: depending on the size of the project, the "
                   "book says, construction takes 30 to 80 percent of the total time, a range "
                   "that is its own synthesis and that Section 27.5 breaks down by project "
                   "size. It is central: requirements and architecture are done so that "
-                  "construction can be done well, and system testing checks that it was. Its "
+                  "construction can be done well, and system testing checks that it was. With "
+                  "a focus on construction, an individual programmer's productivity can "
+                  "improve enormously, a claim the book rests on Sackman, Erikson and Grant "
+                  "(1968) and the studies that followed them. Its "
                   "product, the source code, is often the only accurate description of the "
                   "software, because specifications go out of date and the code cannot. And "
-                  "it is the one activity sure to happen. Real projects skip requirements and "
+                  "it is the one activity sure to happen. Imperfect real projects often skip "
+                  "requirements and "
                   "design to start coding, and drop testing when they run out of time; no "
                   "project, however rushed, drops construction, so improving it improves "
                   "every project. Section 1.3 (p. 8) is a page on how to read the book, "
@@ -158,10 +163,7 @@ LESSONS = [
             ("p", "Chapter 2 moves from what construction is to how to think about it. "
                   "Section 2.1 (p. 9) argues that important ideas often come from analogies, "
                   "and that the analogy decides what you look at. Kekulé dreamed of a snake "
-                  "biting its tail and saw the benzene ring. The wave theory of light grew "
-                  "from comparing light with sound, and the same comparison sent physicists "
-                  "looking for an ether that was never found: a model stretched past the "
-                  "point where it held. An Aristotelian watching a swinging stone saw an "
+                  "biting its tail and saw the benzene ring. An Aristotelian watching a swinging stone saw an "
                   "object falling with difficulty, Galileo saw a pendulum, and they measured "
                   "different things. The history of science, McConnell concludes, is a "
                   "series of changes from worse metaphors to better ones rather than from "
@@ -210,8 +212,8 @@ LESSONS = [
                   "system that will run, a skeleton calling dummy classes, and then replace "
                   "the dummies with real code a piece at a time until the system works. Its "
                   "strength as a metaphor, he says, is that it does not overpromise."),
-            ("p", "The metaphor he finds most useful is building, because it fits accretion "
-                  "and says more. Planning, preparation and execution vary in kind and degree "
+            ("p", "Building, he says, is more useful than writing or growing, because it fits "
+                  "accretion and says more. Planning, preparation and execution vary in kind and degree "
                   "with what is built. A doghouse takes an afternoon, and if you forget the "
                   "door you fix it or start again; the same loose approach suits a thousand "
                   "lines of code. A house needs a problem definition, an architect, "
@@ -228,18 +230,18 @@ LESSONS = [
                   "<code>small-project</code> preset, illustrative hours for a project of "
                   "1,000 hours, the four construction activities are detailed design (120), "
                   "coding and debugging (320), unit testing (130) and integration (90), so "
-                  "the total tile reads 1,000 and the share tile 33/50 = 66%. The largest "
-                  "entry tile names coding and debugging at 8/25 = 32%: on this illustration "
-                  "construction is mostly coding and debugging, as the chapter says, and "
-                  "still more than half other work. The last tile counts the fewest "
+                  "the total tile reads 1,000 and the share tile 33/50, that is 66 percent. "
+                  "The largest entry tile names coding and debugging at 8/25, that is 32 "
+                  "percent: on this illustration coding and debugging is the largest part of "
+                  "construction, as the chapter says, and still less than half of it. The last tile counts the fewest "
                   "entries, taken largest first, whose hours reach four-fifths of the total: "
                   "six of the eight, so here the hours are spread across the activities, "
                   "not gathered in one or two."),
             ("p", "The <code>large-project</code> preset has the same activities on a project "
                   "of 12,000 hours, with more of them spent on requirements, architecture and "
                   "system testing. Construction comes to 6,200 hours, a share of "
-                  "31/60 ≈ 51.7%, and coding and debugging, still the largest entry, to "
-                  "9/40 = 22.5%; six of the eight entries again reach four-fifths. Both "
+                  "31/60, about 51.7 percent, and coding and debugging, still the largest "
+                  "entry, to 9/40, that is 22.5 percent; six of the eight entries again reach four-fifths. Both "
                   "shares sit inside the book's 30 to 80 percent only because the lesson "
                   "chose the hours so: they are illustrations, not measurements. What the "
                   "lab settles is the arithmetic. What it cannot settle is the marking. The "
@@ -253,7 +255,7 @@ LESSONS = [
                 "code review, 20 hours",
                 "unit testing, 40 hours",
                 "system testing, 50 hours",
-                "user documentation, 30 hours",
+                "user-interface design, 30 hours",
             ]),
             ("p", "A small project logged these seven activities. Mark each one construction "
                   "or not by Section 1.1's lists, then state construction's share of the "
@@ -353,7 +355,8 @@ LESSONS = [
              "why": "Construction is detailed design (30), coding (90), code review (20) and "
                     "unit testing (40): 180 of 300 hours, 3/5 or 60 percent. Code review is "
                     "construction because Section 1.1 lists reviewing teammates' code among "
-                    "its tasks; requirements, system testing and user documentation are not. "
+                    "its tasks; requirements, system testing and user-interface design are not, "
+                    "the last by name in Section 1.1's list of what construction excludes. "
                     "Counting coding alone gives 90, 30 percent, the view that construction is "
                     "only typing; leaving out code review gives 160; adding system testing "
                     "gives 230."},
@@ -368,14 +371,14 @@ LESSONS = [
                     "book uses the word."},
             {"q": "What does Section 2.3 say about the farming metaphor, plant a little and "
                   "grow a little?",
-             "a": ["It describes a good technique, doing a little at a time, with a poor "
-                   "image that suggests you have no direct control over the software",
-                   "It is the book's preferred picture of incremental development",
-                   "It is adequate for one person's work and small projects only",
-                   "It shows that incremental development is a mistake"],
+             "a": ["A good technique with a poor image",
+                   "The book's preferred picture of incremental development",
+                   "Adequate for one person's work and small projects only",
+                   "A sign that incremental development is a mistake"],
              "c": 0,
-             "why": "McConnell keeps the technique and rejects the image: the farming "
-                    "metaphor is hard to extend past doing a little at a time, and it implies "
+             "why": "McConnell keeps the technique, doing a little at a time, and rejects the "
+                    "image: the farming metaphor suggests you have no direct control over the "
+                    "software, and it is hard to extend past doing a little at a time, and it implies "
                     "a lack of control. His preferred image for incremental development is "
                     "accretion, the oyster's pearl. Adequate only for small work is what he "
                     "says of the writing metaphor, and he calls incremental development one "
@@ -397,8 +400,9 @@ LESSONS = [
              "start to finish, and thrown away and begun again if it comes out wrong. Section "
              "2.3 is aimed at exactly this picture, and finds it adequate only for one "
              "person's work or a small project: software is written by many people, changed "
-             "for years after release and rarely finished, and on a large system throwing "
-             "one away is the most expensive way to learn. The chapter's answer is the "
+             "for years after release and rarely finished, and on a large system McConnell "
+             "calls a plan to throw one away poor advice: better to get it right the first "
+             "time, or to take your chances while they are cheap. The chapter's answer is the "
              "building and accretion metaphors: plan in proportion to what is being built, "
              "and grow a running system a piece at a time. Brooks, whose line about throwing "
              "one away McConnell quotes against it, had moved to incremental development "
@@ -454,7 +458,7 @@ LESSONS = [
         "module": "Chapter 3 · Upstream Prerequisites",
         "one_line": "Find a defect near the phase it was made in: by the book's table a requirements defect found after release costs ten to a hundred times one found in requirements, and iteration lowers that cost without removing it.",
         "summary": (
-            "Chapter 3 argues that some of a project's success is decided before construction "
+            "Chapter 3 argues that much of a project's success is decided before construction "
             "begins, and that the goal of preparing is to reduce risk. It backs the argument "
             "with a table of what a defect costs to fix by the phase it was made in and the "
             "phase it was found in, and qualifies it by the kind of software and by iterative "
@@ -463,7 +467,7 @@ LESSONS = [
         ),
         "key": [
             "upstream, the goal is risk reduction",
-            "fix a defect near where it was made",
+            "fix defects near where they were made",
             "late cost: count times the table cell",
             "ratio: late cost / early cost",
             "upstream: 10 to 20 per cent of effort",
@@ -509,7 +513,7 @@ LESSONS = [
                   "specification was wrong; by the time a customer noticed, the wrong rule "
                   "was in the schema, three screens and a report. Chapter 3 is about that "
                   "kind of defect, and its carpenter's title, measure twice and cut once, is "
-                  "its argument in four words: some of a project's success or failure is "
+                  "its argument in four words: much of a project's success or failure is "
                   "settled before construction begins, and on a poor foundation the best "
                   "construction can do is limit the damage. Section 3.1 (p. 24) puts it as a "
                   "question of where a project puts its attention to quality. At the end, "
@@ -563,11 +567,13 @@ LESSONS = [
                   "defects are found nearer the time they were made, and it spreads the cost "
                   "over the project in small instalments instead of one bill at the end; it "
                   "does not remove it. In his illustrative tables the iterative project that "
-                  "attends to prerequisites is the cheapest of the four."),
-            ("p", "The section ends on a choice, not a rule. A more sequential approach suits "
-                  "stable requirements, a well-understood design, a team that knows the "
-                  "application area, low risk and a high cost of later change; a more "
-                  "iterative one suits the opposite of each. Most projects are neither wholly "
+                  "attends to prerequisites is the cheapest of the four, and an iterative "
+                  "project that skips them can cost more than a sequential one that does "
+                  "not."),
+            ("p", "The section ends on a choice, not a rule. A more sequential approach suits, "
+                  "among other things, stable requirements, a well-understood design and a "
+                  "high cost of later change; a more iterative one suits the opposite, and "
+                  "the rest of the book's criteria are in your copy. Most projects are neither wholly "
                   "one nor the other, the book says, and most find value in settling at least "
                   "the most critical requirements and architecture early. Given what "
                   "software is like, McConnell judges iterative approaches the more useful far "
@@ -585,11 +591,10 @@ LESSONS = [
                   "stable requirements, McConnell says, are a myth: customers understand what "
                   "they need better as the work goes on, and holding to the requirements as "
                   "first written amounts to refusing to respond to them. His advice for "
-                  "changes during construction is a list: check the requirements and back up "
-                  "if they are not good enough, make sure everyone knows what a change costs, "
-                  "set up a change-control procedure, use approaches that accommodate change, "
-                  "keep the business case in view, and, if nothing else works, consider "
-                  "cancelling the project."),
+                  "changes during construction is a list, which begins with checking the "
+                  "requirements and backing up if they are not good enough, making sure "
+                  "everyone knows what a change costs, and setting up a change-control "
+                  "procedure; the rest is in your copy."),
             # F30, p. 55
             ("p", "<em>Architecture</em>, the high-level design that holds the detailed design "
                   "together, decides the system's conceptual integrity, and Section 3.5's "
@@ -613,10 +618,10 @@ LESSONS = [
                   "the low ends and the high ends, and sets the total beside what the same "
                   "defects would have cost had each been found in the phase it was made, "
                   "where every cell is 1. On the <code>found-late</code> preset, 10 "
-                  "requirements defects found in system test cost 10 × 10 = 100, 5 "
+                  "requirements defects found in system test cost 10 × 10, that is 100; 5 "
                   "architecture defects found after release cost 5 × 25 to 5 × 100, that is "
-                  "125 to 500, and 20 construction defects found in system test cost "
-                  "20 × 10 = 200. The cost tile reads 425–800, in units of the cost of a fix "
+                  "125 to 500; and 20 construction defects found in system test cost "
+                  "20 × 10, that is 200. The cost tile reads 425–800, in units of the cost of a fix "
                   "in the phase of origin; the early-cost tile reads 35, one unit for each "
                   "defect; and the ratio tile divides the two, 85/7 ≈ 12.1× to "
                   "160/7 ≈ 22.9×."),
@@ -632,15 +637,21 @@ LESSONS = [
                   "the hard part of using the table at all."),
             ("h3", "Exercise"),
             ("ul", [
-                "Introduced in: requirements (<code>req</code>)",
-                "Found in: after release (<code>post</code>)",
-                "How many: 8",
+                "The specification says refunds are rounded half up; the customer's "
+                "contracts require rounding half to even. Found by an auditor a year after "
+                "release.",
+                "Tax is computed both in the order screen and in the invoice service, and "
+                "the two disagree on a boundary date. Found by a customer.",
+                "A loop that totals a basket skips its last line. Found by a customer.",
             ]),
-            ("p", "Eight defects in a released system turn out, on reading, to trace back to "
-                  "the requirements. Using Table 3-1's cells as this lesson gives them, find "
-                  "the total cost range in the table's units, the cost had each been caught "
-                  "in requirements, and the ratio between the two. Then enter the record "
-                  "<code>req, post, 8</code> in the lab to check your arithmetic."),
+            ("p", "Three defects in a released system. For each, decide the phase it was "
+                  "introduced in by Sections 3.3 to 3.5: a rule the specification got wrong "
+                  "is a requirements defect, a responsibility placed in two modules is an "
+                  "architecture defect, and a mistake inside a routine is a construction "
+                  "defect. Then price the three by Table 3-1 as this lesson gives it, against "
+                  "the 3 units they would have cost found where each was made, and state the "
+                  "ratio. When you have an answer, enter your three records in the lab to "
+                  "check the arithmetic; it cannot check the placing."),
             ("p", "The chapter is about what should be in place before construction. The next "
                   "lesson, “Key Construction Decisions”, reads Chapter 4 on what the "
                   "programmers themselves decide at its start: the language, the conventions "
@@ -724,21 +735,24 @@ LESSONS = [
         },
         "quiz_title": "Prerequisites and the cost of a late fix",
         "quiz": [
-            {"q": "In the lesson's exercise, eight requirements defects are found after "
-                  "release. By Table 3-1 as the lesson gives it, what do they cost, against "
-                  "the 8 units they would have cost if caught in requirements?",
-             "a": ["40 to 80 units, a ratio of 5× to 10×",
-                   "80 units, a ratio of 10×",
-                   "80 to 800 units, a ratio of 10× to 100×",
-                   "8 to 80 units, a ratio of 1× to 10×"],
-             "c": 2,
-             "why": "The cell for a requirements defect found after release is 10 to 100, so "
-                    "8 × 10 = 80 to 8 × 100 = 800 units, against 8 × 1 = 8 had each been "
-                    "caught in requirements: a ratio of 10× to 100×. 40 to 80 uses the "
-                    "construction cell (5 to 10) and 80 the system-test cell (10). The "
-                    "figures are the book's synthesis after Fagan 1976 and others (p. 29), "
-                    "and it notes on p. 39 that on smaller projects the post-release multiplier "
-                    "is closer to 5 to 10."},
+            {"q": "In the lesson's exercise, three defects are found after release: a "
+                  "rounding rule the specification got wrong, a tax calculation placed in two "
+                  "modules, and a loop that skips its last line. Placed by Sections 3.3 to "
+                  "3.5 and priced by Table 3-1 as the lesson gives it, what do they cost "
+                  "against the 3 units of finding each where it was made?",
+             "a": ["30 to 300 units, 10× to 100×",
+                   "45 to 225 units, 15× to 75×",
+                   "30 to 75 units, 10× to 25×",
+                   "45 to 150 units, 15× to 50×"],
+             "c": 1,
+             "why": "The rounding rule is a requirements defect, 10 to 100 after release; tax "
+                    "computed in two places is an architecture defect, a responsibility given "
+                    "to two modules, 25 to 100; the loop is a construction defect, 10 to 25. "
+                    "The sum is 45 to 225 units against 3, a ratio of 15× to 75×. 30 to 300 "
+                    "places all three in requirements, 30 to 75 all three in construction, "
+                    "and 45 to 150 places the rounding rule in construction. The cells are the "
+                    "book's synthesis after Fagan 1976 and others (p. 29), and p. 39 says that "
+                    "on smaller projects the post-release multiplier is closer to 5 to 10."},
             {"q": "By Table 3-1, a defect introduced in the architecture and found in system "
                   "test costs how many times as much to fix as one found while the "
                   "architecture is being written?",
@@ -748,21 +762,20 @@ LESSONS = [
                     "costs $1,000 to fix during architecture and $15,000 in system test. 10 is "
                     "the cell for one found in construction, 25 to 100 for one found after "
                     "release, and 3 is a requirements defect found in architecture."},
-            {"q": "What does Section 3.2 say about an iterative project that does little "
-                  "upstream work?",
-             "a": ["It needs no prerequisites, because each iteration finds its own defects",
-                   "It pays less for late defects, and pays in smaller instalments, but the "
-                   "cost is not removed",
-                   "It should specify all its requirements first, as a sequential project does",
-                   "It pays the after-release multiplier on every defect"],
+            {"q": "By Section 3.2, what does an iterative approach do to the cost of "
+                  "defects found late?",
+             "a": ["Removes it, because each iteration finds its own defects",
+                   "Lowers it and spreads it over the project, without removing it",
+                   "Leaves it unchanged, whatever the order of the work",
+                   "Raises it, because each iteration reworks what the last one built"],
              "c": 1,
-             "why": "Iteration finds defects nearer the time they were made and spreads the "
-                    "rework over the project, so it lowers and smooths the cost; the defects "
-                    "are still found late in each iteration, so the cost is not removed. "
-                    "McConnell calls the view that iterative projects need no prerequisites "
-                    "misinformed, and he does not ask them to specify everything first: most "
-                    "projects, he says, should settle at least the most critical requirements "
-                    "and architecture early."},
+             "why": "Iteration finds defects nearer the time they were made, so each costs "
+                    "less by Table 3-1, and absorbs the rework piecemeal instead of at the "
+                    "end; the defects are still found after the work that made them, so the "
+                    "cost is lowered, not removed. The chapter calls the view that iterative "
+                    "projects need no prerequisites misinformed, and adds that an iterative "
+                    "project which ignores them can cost more than a sequential one that "
+                    "attends to them."},
             {"q": "What share of its effort and schedule does Section 3.6 say a well-run "
                   "project spends on requirements, architecture and up-front planning?",
              "a": ["About 10 to 20 percent of effort and 20 to 30 percent of schedule",
@@ -783,7 +796,7 @@ LESSONS = [
              "kinds of project. The table is an argument for finding defects close to where "
              "they were made, and an iterative project does that by doing a little of each "
              "activity at a time; McConnell says iterative approaches are the more useful far "
-             "more often, and asks only that the most critical requirements and "
+             "more often, and asks that at least the most critical requirements and "
              "architecture be settled early. On the lesson's illustration, catching the same "
              "35 defects where each was made costs 35 units against 425 to 800, and that can "
              "happen in any order of work that finds defects early."),
@@ -801,9 +814,10 @@ LESSONS = [
              "needed a calculator and four quarterly figures, not a program."),
         ],
         "standard": (
-            "Finish when you can price a set of defects by the table and state the ratio.",
-            "Given defects by the phase each was introduced in and the phase it was found "
-            "in, and Table 3-1's cells, compute the total cost range and its ratio to the "
+            "Finish when you can place defects by phase and price them by the table.",
+            "Given short descriptions of defects and the phase each was found in, place each "
+            "by the chapter's sections, then compute the total cost range by Table 3-1's "
+            "cells and its ratio to the "
             "cost of finding each defect where it was made, without the lab."
         ),
         "note": (
@@ -845,10 +859,10 @@ LESSONS = [
             "supply in Java, by convention, a facility the language lacks."
         ),
         "key": [
-            "program into a language, not in it",
+            "program into the language, not in it",
             "ratio: C statements per statement",
             "statements: C size / ratio",
-            "a ratio counts statements, not hours",
+            "ratios count statements, not hours",
             "set conventions before the code",
             "know where you are on the wave",
         ],
@@ -860,7 +874,7 @@ LESSONS = [
         "concepts": [
             ("A statement ratio",
              "The book's Table 4-1 gives, for each of several languages, how many statements "
-             "of C one statement of that language is worth on average: 2.5 for Java, 6 for "
+             "of C one statement of that language is typically worth: 2.5 for Java, 6 for "
              "Python. A size in C divided by the ratio is the size of the same work in that "
              "language. It counts statements and nothing else."),
             ("A convention",
@@ -876,7 +890,7 @@ LESSONS = [
         ],
         "read_title": "The key point first, then the chapter's four decisions",
         "read_intro": (
-            "The quotation is the last of the chapter's key points. The lesson takes the four "
+            "The quotation is one of the chapter's key points. The lesson takes the four "
             "sections in order, writes one convention in Java, and converts a size by the "
             "chapter's table."
         ),
@@ -884,8 +898,8 @@ LESSONS = [
             ("p", "<strong>Chapter 4, p. 70.</strong> &ldquo;Ask yourself whether the "
                   "programming practices you’re using are a response to the programming "
                   "language you’re using or controlled by it. Remember to program into the "
-                  "language, rather than programming in it.&rdquo; It is the last of the "
-                  "chapter's key points, and the idea the chapter calls critical to "
+                  "language, rather than programming in it.&rdquo; It is the fourth of the "
+                  "chapter's five key points, and the idea the chapter calls critical to "
                   "understanding the whole book. Chapter 4 is short, pages 61 to 70; read it "
                   "in your own copy first."),
             ("p", "Chapter 3 was about preparations a programmer may have had no say in. "
@@ -903,12 +917,12 @@ LESSONS = [
                   "know: the Cocomo II estimation model's data, as the book gives it after "
                   "Boehm and others (2000), puts programmers with three or more years in a "
                   "language about 30 percent ahead of equally experienced programmers new to "
-                  "it. And higher-level languages say more per line. Table 4-1 (p. 62), after "
-                  "Jones 1998, Boehm 2000 and Prechelt 2000, gives the number of statements "
-                  "of C that one statement of a language does the work of: 2.5 for C++ and "
-                  "Java, 2 for Fortran 95, 4.5 for Visual Basic, and 6 for Perl, Python and "
-                  "Smalltalk. The ratios are averages over the programs those authors "
-                  "studied, not constants of the languages."),
+                  "it. And higher-level languages say more per line. Table 4-1 (p. 62) gives "
+                  "typical ratios, which the book adapts from Jones 1998, Boehm 2000 and "
+                  "Prechelt 2000: the number of statements of C that one statement of a "
+                  "language does the work of, 2.5 for Java, 4.5 for Visual Basic and 6 for "
+                  "Python among them, and the others in your copy. They are typical ratios, "
+                  "not constants of the languages."),
             ("p", "The section's second argument is about thought rather than output. It "
                   "borrows the Sapir-Whorf hypothesis, that the words a language offers shape "
                   "the thoughts its speakers can form, and suggests that programmers may be "
@@ -982,7 +996,7 @@ LESSONS = [
                   "10,000 statements of C at Java's 2.5 come to 4,000 statements of Java. On "
                   "<code>python</code>, at 6, they come to 5000/3 ≈ 1,666.67, and on "
                   "<code>visual-basic</code>, at 4.5, to 20000/9 ≈ 2,222.22; a fraction of a "
-                  "statement is the average showing through, not a statement anyone writes. "
+                  "statement is the typical ratio showing through, not a statement anyone writes. "
                   "The book never turns the ratio into a schedule, and neither does the lab: "
                   "it measures statements, not the time the work takes, not the defects in "
                   "it, and not the gain the book reports from years of experience in a "
@@ -998,7 +1012,8 @@ LESSONS = [
                   "facility: a few lines of Java and a sentence on how they are used for the "
                   "first two, and a sentence for the third. Each answer should be something a "
                   "team can agree on and a reviewer can check. The lab has nothing to say "
-                  "about this exercise; the first question of the quiz does."),
+                  "about this exercise; write your three conventions down before you reach "
+                  "the quiz, whose first item checks the first of them."),
             ("p", "That ends the book's first Part. The next course, Creating High-Quality "
                   "Code, opens Part II with “Design Challenges and Complexity”, and with the "
                   "idea the rest of the book is organised around: that managing complexity is "
@@ -1027,8 +1042,8 @@ LESSONS = [
             "panel_intro": (
                 "Give a size in statements of C and a ratio from Table 4-1: the lab divides, "
                 "giving the statements of the other language that do the same work. Figures: "
-                "Table 4-1, the book's, after Jones 1998, Boehm 2000 and Prechelt 2000, an "
-                "average over the programs they measured; the size is the lesson's."
+                "Table 4-1's typical ratios, which the book adapts from Jones 1998, Boehm "
+                "2000 and Prechelt 2000; the size is the lesson's."
             ),
         }),
         "steps_title": "Converting a size, and supplying what a language lacks",
@@ -1039,7 +1054,7 @@ LESSONS = [
              "statements does the work of."),
             ("Divide",
              "Divide the size in statements of C by the ratio. A fraction in the result is "
-             "the average showing through; keep it, and do not round it into a promise."),
+             "the typical ratio showing through; keep it, and do not round it into a promise."),
             ("Say what the figure leaves out",
              "State that the result counts statements: not hours, not defects, and not the "
              "team's experience in the language, which Section 4.1 treats as a separate "
@@ -1156,8 +1171,9 @@ LESSONS = [
             "lacks, write the convention that supplies it, without the lab."
         ),
         "note": (
-            "The lab divides one number by another. The ratios are the book's averages over "
-            "the programs Jones, Boehm and Prechelt measured, and the size in the presets is "
+            "The lab divides one number by another. The ratios are the typical ratios the book "
+            "adapts from Jones 1998, Boehm 2000 and Prechelt 2000, not constants of the "
+            "languages, and the size in the presets is "
             "the lesson's. Nothing in the lab can tell whether a convention is kept; that is "
             "done by people reading code, which is why the chapter puts conventions among "
             "the decisions taken before construction rather than among the things a tool "

@@ -36,10 +36,10 @@ COURSE = {
         "construction: the activity sure to happen",
         "metaphors: heuristics, not algorithms",
         "share: construction hours / all hours",
-        "fix a defect near where it was made",
+        "fix defects near where they were made",
         "late cost: count times the table cell",
-        "program into a language, not in it",
-        "a count is a reason to look",
+        "program into the language, not in it",
+        "counts say where to look",
     ],
     "assumes_short": "Nothing",
     "assumes_long": (
@@ -88,7 +88,7 @@ COURSE = {
         "a computation. From the next course on, many labs read Java.",
         "Treat the book's figures as other people's averages. Construction's share of a "
         "project, the cost of a late fix and the statement ratios are syntheses of studies "
-        "from the 1970s to 2003, collected by Jones, Boehm and others. Each lesson says "
+        "from the 1970s to 2004, collected by Jones, Boehm and others. Each lesson says "
         "whose figure it is the first time it uses one, and your own records can test it; "
         "the lab cannot.",
         "Keep a project of your own in mind. Every lesson ends by sending you to your own "

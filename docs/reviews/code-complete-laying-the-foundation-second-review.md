@@ -215,3 +215,40 @@ No pedagogy assessment exists yet for this course
 (`docs/pedagogy/code-complete-laying-the-foundation.md` is absent), so there is
 nothing to compare. Whoever writes it should note findings 1 and 2, which sit in
 the lessons' framing sentences a pedagogy read is likely to praise.
+
+## Author's response
+
+Both reviews (this one and `code-complete-laying-the-foundation-pedagogy-review.md`)
+were applied in `content/code_complete/c1_foundation/`, with the §C entries for the
+course updated in the same change. Preview afterwards: OK, 3 pages pinned, 0 failing.
+
+**Applied from this review:** 1 (the fourth of five key points; `read_intro` "one of");
+2 (five reasons, the productivity reason named with Sackman, Erikson and Grant 1968 and
+no figure; comment corrected); 3; 4 ("at least"); 5 ("typical ratios, which the book
+adapts from…", in body, panel intro and note, and the concept and step wording); 6 (three
+ratios, "the others in your copy"); 7 ("that is 100", "that is 200"); 8 and 9 (§C now
+records the other quotations and the snippet); 10; 11 (all three softened); 12 ("much
+of", body and summary); 13 (three points of each list and "the rest in your copy");
+14 (the comment lines are now one sentence each, per the pedagogy review's S4, so line
+numbers hold); 15 ("to 2004").
+
+**Applied from the pedagogy review:** M1, M2, M3, S1–S5, C1 (the ether sentence cut),
+C2. Two deviations in M1: the first described defect was reworded ("the specification
+says refunds are rounded half up; the customer's contracts require half to even") so
+that its phase cannot be read as construction; and the reviewer's fourth option,
+"45 to 125 … places the tax defect in construction", does not add up (that placing gives
+30 to 150), so the fourth option is "45 to 150 units, 15× to 50×", which places the
+rounding rule in construction. Answer 45 to 225 against 3, 15× to 75×, checked in the
+lab with `req, post, 1; arch, post, 1; cons, post, 1`. In S2 the exercise's seventh
+activity is now user-interface design; the answer is unchanged (3/5 = 60%, checked).
+
+**Declined, with reasons:**
+- Pedagogy C3 (the kit's mode titles above the panel; the clipped table header on a
+  phone) and C4 ("p." and "pp." spoken as written): kit and read-out matters, outside
+  the course files. Passed to the orchestrator.
+- Pedagogy C5: agreed, not a change. `speechcheck.py` cannot see the Subject until it
+  is wired; the read-out was checked by `say_code` on every run and the rendered
+  `data-say`, and the author's report says so.
+- Pedagogy M3's dialect bug (a lone "a" read as the letter) is being fixed in
+  `speech.py` by the renderer engineer; the key lines were reworded anyway, since the
+  new wording is no worse on the page.
