@@ -56,11 +56,17 @@ and the one that wired these two:
   `tests/test_generation4.py`, `tests/test_generation5_catalog.py`,
   `tests/browser_acceptance.js`, `tests/browser_contrast.js`,
   `tests/browser_interactions.js`;
-- `site/index.html`, which is hand-authored and needs a subject card and one
-  entry per course in its inline search array — that array builds TEXT NODES, so
-  an HTML entity written into it reaches the reader as its own characters;
-- `site/progress/index.html` and `site/oauth2/spa/callback/index.html`, which
-  embed the library inventory: re-run `scripts/build_auth_pages.py`;
+- `scripts/catalog.py`: ONE entry, in its group, at the place a reader should
+  meet the Subject. The home page's Subject cards and course search are written
+  from it by `scripts/build_index.py`, and the progress and sign-in pages take
+  their order from it through `scripts/build_auth_pages.py`; re-run both. Never
+  edit the region between the BEGIN/END markers in `site/index.html` or the
+  `var COURSES` array by hand: `test_course_ui.TestLibraryCatalog` fails a stale
+  index. Group notes and card text are home-page copy and obey its copy rules;
+- new course slugs carry the Subject's short name as a prefix (`capital-`,
+  `perception-`, `reading-`) so that a generic title cannot collide in the flat
+  course namespace. The older Subjects predate the rule and are NOT renamed:
+  a published URL is never moved;
 - `content/spoken/<package>.py`, ONE file named for the Subject's package:
   `speechcheck.py` loads exactly that name, so per-course spoken files are
   invisible to it (render.py merges every file in the directory, so they still

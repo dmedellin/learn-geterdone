@@ -63,11 +63,13 @@ def library_inventory():
     precisely because a course home links to it. That is the same "no second
     copy" rule the generated paths get for free.
 
-    Order matches the site index: Trading, then the two mathematics paths.
+    Order is the catalog's (scripts/catalog.py), the same order the site index
+    shows its Subject cards and its course search in.
     """
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
     import build_paths
     import add_progress_marks
+    import catalog
 
     trading = {
         "slug": "trading",
@@ -82,7 +84,7 @@ def library_inventory():
             for number, course in enumerate(add_progress_marks.trading_inventory(), start=1)
         ],
     }
-    return [trading] + [
+    subjects = [trading] + [
         {
             "slug": path["slug"],
             "title": path["title"],
@@ -98,6 +100,7 @@ def library_inventory():
         }
         for path in build_paths.GENERATED_PATHS
     ]
+    return sorted(subjects, key=lambda subject: catalog.order_of(subject["slug"]))
 
 
 def page(*, title, description, canonical_path, up, body, script, extra_css=""):

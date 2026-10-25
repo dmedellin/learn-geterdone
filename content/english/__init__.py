@@ -52,7 +52,7 @@ for _index, _course in enumerate(COURSES, start=1):
 PATH = {
     "slug": "english",
     "title": "English",
-    "level": "Foundational",
+    "level": "Beginner",
     "level_note": "no earlier course on this site is assumed; the number work never goes past counting",
     "tagline": (
         "Every rule you have been given about English, with the one thing no "

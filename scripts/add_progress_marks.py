@@ -645,8 +645,9 @@ def course_navigation(courses, index, up="../"):
     for offset, direction in ((-1, "prev"), (1, "next")):
         if 0 <= index + offset < len(courses):
             target = courses[index + offset]
-            links.append('<a class="path-move %s" href="%s%s/" rel="%s"><span>Related course</span><strong>%s</strong></a>'
-                         % (direction, up, target["slug"], direction, esc(target["title"])))
+            label = "Builds on" if direction == "prev" else "Leads to"
+            links.append('<a class="path-move %s" href="%s%s/" rel="%s"><span>%s</span><strong>%s</strong></a>'
+                         % (direction, up, target["slug"], direction, label, esc(target["title"])))
     if index == len(courses) - 1:
         links.append('<a class="path-move next" href="%spaths/trading/"><strong>All Trading courses</strong></a>' % up)
     return '<nav class="path-nav" data-ui="course-navigation" aria-label="Course navigation">%s</nav>' % ''.join(links)

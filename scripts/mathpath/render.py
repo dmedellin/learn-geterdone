@@ -389,19 +389,22 @@ def course_home(*, course, index, courses, path):
         for i, (t, body) in enumerate(course["outcomes"])
     )
 
+    # The pager is labelled by dependency, which is what the Subject's course
+    # order means: "Builds on" the course this one assumes, "Leads to" the one
+    # that assumes it. Both once read "Related course", which hid the direction.
     nav = []
     if index > 0:
         before = courses[index - 1]
         nav.append(
             '        <a class="path-move prev" href="../%s/" rel="prev">'
-            "<span>Related course</span><strong>%s</strong></a>"
+            "<span>Builds on</span><strong>%s</strong></a>"
             % (before["slug"], esc(before["title"]))
         )
     if index < total_courses - 1:
         after = courses[index + 1]
         nav.append(
             '        <a class="path-move next" href="../%s/" rel="next">'
-            "<span>Related course</span><strong>%s</strong></a>"
+            "<span>Leads to</span><strong>%s</strong></a>"
             % (after["slug"], esc(after["title"]))
         )
     else:
@@ -502,7 +505,7 @@ def path_page(path):
         '<a class="spine-item" href="../../%s/" data-course="%s" data-lessons="%d">'
         '<div class="spine-body"><strong>%s</strong><p>%s</p>'
         '<div class="spine-meta"><span>%d lessons</span><span>%s</span>'
-        '<span class="spine-progress"></span></div></div></a>'
+        '<span class="spine-progress" hidden></span></div></div></a>'
         % (c["slug"], c["slug"], len(c["lessons"]), esc(c["title"]),
            inline(c["blurb"]), len(c["lessons"]), esc(c["level"])) for c in courses)
     return chrome.name_horizontal_scrollers("".join([
@@ -535,7 +538,10 @@ def path_page(path):
         '<section class="section prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
         % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
         '<section class="section" id="courses" data-ui="course-list">'
-        '<div class="section-head"><div><h2>Courses</h2></div><p>%s</p></div>'
+        # The sequence note sits UNDER the heading. As the section-head's second
+        # column it floated beside "Courses" and, being long on most Subjects,
+        # ended up above it on the right with the heading pushed to the bottom.
+        '<div class="section-head"><div><h2>Courses</h2><p>%s</p></div></div>'
         '<div class="spine">%s</div></section>\n' % (inline(path["sequence_intro"]), cards),
         '<section class="section prose" id="background" data-ui="background">'
         '<h2>Recommended background</h2>%s</section>\n'

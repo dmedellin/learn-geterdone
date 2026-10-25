@@ -17,7 +17,8 @@ places that must agree, and the suite will tell you which one you missed:
 2. `scripts/smoke.py`
 3. `acceptance.checks` in `release/contract.json` (+ `.example.json`, `.schema.json`)
 4. the "Published URL space is complete" step in `.github/workflows/ci.yml`
-5. the publish guards in `.github/workflows/pages.yml` and `Containerfile.release`
+5. the publish guard in `Containerfile.release` (`.github/workflows/pages.yml`
+   was the other half of this item until it was removed)
 
 Retired URLs must never be re-added: the seven flat lesson URLs, the whole
 `/market-structure-lab/` prefix, and `/systems-matrices-and-sequences/`.

@@ -109,6 +109,7 @@ PATH_JS = """
       var out = item.querySelector('.spine-progress');
       if (!out || !total) return;
       out.textContent = n ? n + ' of ' + total + ' lessons marked complete' : '';
+      out.hidden = !n;  // an empty chip drew as a blank pill on every card
       item.classList.toggle('is-started', n > 0);
       item.classList.toggle('is-complete', n >= total);
     });

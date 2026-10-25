@@ -9,8 +9,33 @@ architecture and maintainability pass (Opus). Neither edited anything. Their
 findings were merged, the overlaps collapsed, and the load-bearing claims
 re-checked against the tree. Line numbers are from `3f5f387`.
 
-Nothing here is scheduled. Each item says what it touches so it can be picked up
-on its own.
+## Status (2026-10-25)
+
+The same PR that added this backlog implemented most of it:
+
+| done | what shipped |
+|---|---|
+| B-1, B-2, B-3, B-12, B-22 | The home page shows five groups in dependency order. Each card has one sentence, a "courses · lessons · level" line, and a "Read along" eyebrow where one applies; no card repeats "SUBJECT". Capital and Phenomenology show their short titles. Cards are now `h4` under group `h3`s. |
+| B-6 | The two Trading notices sit inside the Markets group, beside the Trading card, with their text unchanged. |
+| B-8, B-9 | `scripts/catalog.py` holds the groups, order and card text. `library_inventory()` follows it, so Progress and the sign-in inventory match the home page. `tests/test_course_ui.py::TestLibraryCatalog` fails on a Subject missing from the catalog, a stale index, a `builds_on` that points forward, or a card order that differs. |
+| B-11 | `scripts/build_index.py` writes the Subjects region and `var COURSES` from the catalog and content. Search descriptions are each course's `summary`, its blurb when the summary says "the path", and `catalog.SEARCH_DESCRIPTIONS` for the three courses where both do. |
+| B-13 (home half) | Cards link the Subjects they build on: Differential Equations → Algebra; Algorithms → Discrete Mathematics; System Design and Operations Research → both. |
+| B-4, B-7 | The Subject page "Courses" note sits under its heading. The empty progress chip is `hidden` until a lesson is marked. |
+| B-16 | The course pager says "Builds on" and "Leads to" instead of "Related course" twice: in `render.py` for generated courses and in `add_progress_marks.py` for Trading. |
+| B-23 | English's level is "Beginner"; every Subject now uses one scale. |
+| B-10, B-14, B-26 | The `site-architect` agent no longer names the removed `pages.yml`. The AGENTS.md §0 wiring list says "one catalog entry, then build_index and build_auth_pages", and records the course-slug prefix rule for new Subjects. |
+
+Changed from the plan: **B-5 is not done.** The library page contract in
+`tests/test_course_ui.py` pins the region order hero → Subjects → search, so
+search stays below the Subjects. The groups, jump links and shorter cards make
+that list far shorter than before.
+
+Still open: B-13 on Subject pages (Assumes as links, "Used by"), B-15, B-17,
+B-18 and B-19 (both need Trading levels), B-20, B-21, B-24, B-25. B-24
+rewrites the footer of roughly 1,100 pages and their pinned copy for one word;
+it is the least worth its cost.
+
+Each item below says what it touches, so it can be picked up on its own.
 
 ## Why the home page has no order
 
