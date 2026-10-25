@@ -1552,9 +1552,95 @@ PHEN_COURSES = (
 PHEN_PATH_COURSE_COUNT = 7
 PHEN_UPCOMING_COURSES = ()
 
+# The Reading Faster path: eight courses, all published. Generated from
+# content/reading/ so these cannot disagree with what is built.
+READ_PATH_PAGE = "/paths/reading-faster/"
+
+READ_COURSE_1_HOME = "/reading-measure-your-reading/"
+READ_COURSE_1_LESSONS = (
+    "words-per-minute",
+    "comprehension-and-effective-rate",
+    "one-reading-is-one-measurement",
+    "typical-rates-and-reading-gears",
+    "keeping-a-practice-log",
+)
+READ_COURSE_2_HOME = "/reading-guided-practice/"
+READ_COURSE_2_LESSONS = (
+    "reading-with-a-pacer",
+    "choosing-a-target-pace",
+    "the-daily-drill",
+    "sprints-above-comfort",
+    "repeated-reading-and-transfer",
+)
+READ_COURSE_3_HOME = "/reading-how-the-eyes-read/"
+READ_COURSE_3_LESSONS = (
+    "fixations-and-saccades",
+    "the-perceptual-span",
+    "looking-back",
+    "fewer-needless-regressions",
+    "the-speed-ceiling",
+    "training-the-periphery",
+)
+READ_COURSE_4_HOME = "/reading-inner-voice-and-flashing-words/"
+READ_COURSE_4_LESSONS = (
+    "the-inner-voice",
+    "silencing-the-inner-voice",
+    "one-word-at-a-time",
+    "reading-in-phrases",
+    "rsvp-without-looking-back",
+    "testing-a-speed-claim",
+)
+READ_COURSE_5_HOME = "/reading-skim-scan-and-preview/"
+READ_COURSE_5_LESSONS = (
+    "scanning-for-a-target",
+    "skimming-for-gist",
+    "what-skimming-costs",
+    "previewing-before-reading",
+    "inspectional-reading",
+    "triaging-a-reading-list",
+    "shifting-gears",
+)
+READ_COURSE_6_HOME = "/reading-words-knowledge-and-difficulty/"
+READ_COURSE_6_LESSONS = (
+    "your-rate-on-hard-text",
+    "measuring-difficulty",
+    "unknown-words-and-coverage",
+    "what-you-already-know",
+    "how-much-you-read",
+)
+READ_COURSE_7_HOME = "/reading-remembering-what-you-read/"
+READ_COURSE_7_LESSONS = (
+    "free-recall",
+    "retrieval-beats-rereading",
+    "spacing-your-reviews",
+    "notes-in-your-own-words",
+)
+READ_COURSE_8_HOME = "/reading-your-training-plan/"
+READ_COURSE_8_LESSONS = (
+    "a-practice-week",
+    "reading-your-curve",
+    "plateaus-and-transfer",
+    "the-full-battery",
+)
+
+READ_COURSES = (
+    ("Measure Your Reading", READ_COURSE_1_HOME, READ_COURSE_1_LESSONS),
+    ("Guided Practice", READ_COURSE_2_HOME, READ_COURSE_2_LESSONS),
+    ("How the Eyes Read", READ_COURSE_3_HOME, READ_COURSE_3_LESSONS),
+    ("The Inner Voice and Flashing Words", READ_COURSE_4_HOME, READ_COURSE_4_LESSONS),
+    ("Skimming, Scanning and Previewing", READ_COURSE_5_HOME, READ_COURSE_5_LESSONS),
+    ("Words, Knowledge and Difficulty", READ_COURSE_6_HOME, READ_COURSE_6_LESSONS),
+    ("Remembering What You Read", READ_COURSE_7_HOME, READ_COURSE_7_LESSONS),
+    ("Your Training Plan", READ_COURSE_8_HOME, READ_COURSE_8_LESSONS),
+)
+
+READ_PATH_COURSE_COUNT = 8
+READ_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
-               + DE_COURSES + CAP_COURSES + PHEN_COURSES)
+               + DE_COURSES + CAP_COURSES + PHEN_COURSES
+               + READ_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1675,7 +1761,7 @@ def source_of(url):
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
-                       CAP_PATH_PAGE, PHEN_PATH_PAGE)
+                       CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1702,6 +1788,8 @@ PATHS = (
      CAP_UPCOMING_COURSES),
     ("Phenomenology", PHEN_PATH_PAGE, PHEN_COURSES, PHEN_PATH_COURSE_COUNT,
      PHEN_UPCOMING_COURSES),
+    ("Reading Faster", READ_PATH_PAGE, READ_COURSES, READ_PATH_COURSE_COUNT,
+     READ_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -1908,6 +1996,12 @@ CAP_DISCLAIMER_RE = re.compile(
 # Stopping short of the em dash, for OR's reason.
 PHEN_DISCLAIMER_RE = re.compile(
     r"(?i)what perception gives is not a figure")
+# Reading Faster promises that every figure is computed from what the reader
+# did in a drill or from what a lesson states, and warns that a rate measured
+# on one passage on one day is one measurement, not the reader's speed --
+# which only a log can answer. Stopping short of the em dash, for OR's reason.
+READ_DISCLAIMER_RE = re.compile(
+    r"(?i)one measurement, not your reading speed")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -1930,6 +2024,8 @@ PATH_MATERIAL_DISCLAIMER = {
                     CAP_DISCLAIMER_RE),
     PHEN_PATH_PAGE: ("the perception-is-not-a-figure disclaimer",
                      PHEN_DISCLAIMER_RE),
+    READ_PATH_PAGE: ("the one-reading-is-one-measurement disclaimer",
+                     READ_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2264,10 +2360,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(PHEN_COURSES)
             + sum(len(slugs) for _t, _h, slugs in PHEN_COURSES)
         )
+        read_tree = (
+            1  # the Reading Faster path page
+            + len(READ_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in READ_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
-                       + cap_tree + phen_tree)  # 1 for the index
+                       + cap_tree + phen_tree + read_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2335,9 +2436,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 52 pages, got %d" % phen_tree,
         )
         self.assertEqual(
-            1175,
+            51,
+            read_tree,
+            "the Reading Faster path is 1 + 8 + 5 + 5 + 6 + 6 + 7 + 5 + 4 + 4 "
+            "= 51 pages, got %d" % read_tree,
+        )
+        self.assertEqual(
+            1226,
             course_tree,
-            "the site index plus all eleven path trees is 1175 pages, got %d" % course_tree,
+            "the site index plus all twelve path trees is 1226 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2348,9 +2455,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1179,
+            1230,
             expected,
-            "1175 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1179, "
+            "1226 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1230, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2567,6 +2674,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "differential_equations": getattr(smoke, "DE_COURSES", ()),
             "capital": getattr(smoke, "CAP_COURSES", ()),
             "phenomenology": getattr(smoke, "PHEN_COURSES", ()),
+            "reading": getattr(smoke, "READ_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -2979,9 +3087,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1163,
+            1213,
             len(course_pages),
-            "one hundred and five course homes and 1058 lessons carry a material "
+            "one hundred and thirteen course homes and 1100 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -3972,7 +4080,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(105, checked, "every published course must be checked")
+        self.assertEqual(113, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4272,6 +4380,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
             from capital import PATH as CAPITAL
             from phenomenology import PATH as PHENOMENOLOGY
+            from reading import PATH as READING
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4284,6 +4393,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
              DIFFERENTIAL_EQUATIONS),
             ("capital", CAP_COURSES, CAP_PATH_PAGE, CAPITAL),
             ("phenomenology", PHEN_COURSES, PHEN_PATH_PAGE, PHENOMENOLOGY),
+            ("reading faster", READ_COURSES, READ_PATH_PAGE, READING),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4418,11 +4528,12 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
             from capital import PATH as CAPITAL
             from phenomenology import PATH as PHENOMENOLOGY
+            from reading import PATH as READING
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL, PHENOMENOLOGY):
+                     CAPITAL, PHENOMENOLOGY, READING):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4574,12 +4685,13 @@ class TestEveryLabBuilds(unittest.TestCase):
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
             from capital import PATH as CAPITAL
             from phenomenology import PATH as PHENOMENOLOGY
+            from reading import PATH as READING
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL, PHENOMENOLOGY):
+                     CAPITAL, PHENOMENOLOGY, READING):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

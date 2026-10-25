@@ -3,7 +3,7 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
-## 0. Nothing is inert any more: all eleven Subjects publish
+## 0. Nothing is inert any more: all twelve Subjects publish
 
 `content/system_design/`, `content/algorithms/` and `content/operations_research/`
 were in the tree for months publishing nothing. All three are now in
@@ -19,15 +19,17 @@ were in the tree for months publishing nothing. All three are now in
 | Differential Equations | **published** — 10 courses, 92 lessons, 103 pages, wired 2026-10-10 (890 pages became 993) |
 | Capital | **published** — 14 courses, 119 lessons, 134 pages, wired 2026-10-24 (993 pages became 1,127) |
 | Phenomenology | **published** — 7 courses, 44 lessons, 52 pages, wired 2026-10-24 (1,127 pages became 1,179) |
+| Reading Faster | **published** — 8 courses, 42 lessons, 51 pages, wired 2026-10-25 (1,179 pages became 1,230); its package is `content/reading/`, its path slug `reading-faster` |
 
-152 lab modes are registered (Differential Equations added 22, Capital 17,
-Phenomenology 15) and all twenty-two kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
-pages: `node scripts/labcheck.js --generated` executes 1,047 generated pages, 518
+160 lab modes are registered (Differential Equations added 22, Capital 17,
+Phenomenology 15, Reading Faster 8) and all twenty-three kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
+pages: `node scripts/labcheck.js --generated` executes 1,098 generated pages, 560
 of them with pinned figures, and compares every pinned tile string against what
 the page prints. Philosophy's two kits, `argkit` and `choicekit`, account for 98
 of those pages, English's `english` kit for 41, Differential Equations' `calckit`
-and `dekit` for 92, Capital's `capkit` for 119, and Phenomenology's `phenkit` for
-42 (its other two lessons reuse `argkit`'s validity mode). `de_core`, the exact engine under `calckit` and `dekit`, is exercised
+and `dekit` for 92, Capital's `capkit` for 119, Phenomenology's `phenkit` for
+42 (its other two lessons reuse `argkit`'s validity mode), and Reading Faster's
+`readkit` for all 42 of its lessons. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
 directly by `scripts/mathcheck.js`, one case per function, each seen to fail
 when its function was broken on purpose.
 Before the last two Subjects were wired it said "0 with pinned figures" — those
@@ -64,9 +66,15 @@ and the one that wired these two:
   invisible to it (render.py merges every file in the directory, so they still
   reach the pages and hide the gap). Two files giving one run two readings is a
   `test_speech` failure;
+- `build_paths.PACKAGE_OF_SLUG`, when the path slug is not the package name
+  with `-` for `_` (Reading Faster: `reading-faster` from `content/reading/`).
+  The content-preservation inventory and `speechcheck.py` find a path's source
+  through `build_paths.package_of`; a rewritten slug that names no directory
+  finds no modules and fails nothing;
 - the shape checks `TestGeneratedPathIsCurrent`, `TestLessonDataMatchesTheRenderer`
   and `TestEveryLabBuilds`, whose import lists name Discrete Mathematics,
-  Algebra, Philosophy, English, Differential Equations, Capital and Phenomenology. Philosophy was added
+  Algebra, Philosophy, English, Differential Equations, Capital, Phenomenology and
+  Reading Faster. Philosophy was added
   on wiring and the escaped-field check immediately found thirteen mistake
   titles showing `&ldquo;` literally; System Design, Algorithms and Operations
   Research are still not in those lists;
@@ -95,8 +103,9 @@ Five things that have each cost a day:
    `release/contract.schema.json` and by a test. `algebra-course6-lesson-`
    `quadratic-equations-and-the-zero-product-property` is exactly 72. The check
    id prefixes are short for that reason: `math`, `algebra`, `sysdesign`,
-   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`. Differential Equations'
-   longest is 64, Capital's 66, Phenomenology's 62.
+   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`. Differential
+   Equations' longest is 64, Capital's 66, Phenomenology's 62, Reading
+   Faster's 52.
 
 `tests/test_site_invariants.py` checks a Subject's tagline and description
 against its own course and lesson counts. Those sentences are written when a
@@ -121,23 +130,23 @@ and that is written down rather than engineered around.
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
 
 The site is a subject-agnostic LIBRARY OF PATHS. A path is an ordered sequence of
-courses on one subject. There are eleven: **Trading** (8 courses, 118 lessons,
+courses on one subject. There are twelve: **Trading** (8 courses, 118 lessons,
 hand-authored and normalized at intake), **Discrete Mathematics** (8 courses, 106
 lessons), **Algebra** (9 courses, 112 lessons), **System Design** (10 courses,
 114 lessons), **Algorithms** (9 courses, 112 lessons), **Operations Research**
 (10 courses, 92 lessons), **Philosophy** (10 courses, 108 lessons), **English**
 (10 courses, 41 lessons), **Differential Equations** (10 courses, 92 lessons),
-**Capital** (14 courses, 119 lessons) and **Phenomenology** (7 courses, 44
-lessons) — the last ten GENERATED from `content/<subject>/`. 105 courses and
-1,058 lessons in all. The
+**Capital** (14 courses, 119 lessons), **Phenomenology** (7 courses, 44
+lessons) and **Reading Faster** (8 courses, 42 lessons) — the last eleven
+GENERATED from `content/<subject>/`. 113 courses and 1,100 lessons in all. The
 published URL space:
 
 | URL | Served from |
 | --- | --- |
 | `learn.geterdone.io/` | `site/index.html` — the site index: the paths, plus course search |
-| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology` |
-| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 105 course homes |
-| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,058 lessons |
+| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster` |
+| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 113 course homes |
+| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,100 lessons |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -148,7 +157,7 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 1,179-page map (plus eight published JSON assets) is in
+The full 1,230-page map (plus eight published JSON assets) is in
 [README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json` (and in
@@ -195,7 +204,7 @@ The apex `geterdone.io` is a **separate, live GitHub Pages site that this reposi
 does not control**. Do not deploy to it, reconfigure it, or write anything that
 implies we own its records. Linking to it is fine; changing it is out of scope.
 
-## 1a. One path is authored, ten are generated
+## 1a. One path is authored, eleven are generated
 
 The paths are built in opposite directions and must be edited differently.
 
@@ -204,14 +213,14 @@ the library's conventions by `scripts/intake_course.py`. Its pages are the sourc
 of truth. Edit them directly.
 
 **Discrete Mathematics**, **Algebra**, **System Design**, **Algorithms**,
-**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital** and **Phenomenology** are generated. `content/<subject>/` holds each of them as
+**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology** and **Reading Faster** are generated. `content/<subject>/` holds each of them as
 data — one Python module per course, with the lessons as dicts — and
-`scripts/build_paths.py` renders all 1,047 of their pages from `scripts/mathpath/`
+`scripts/build_paths.py` renders all 1,098 of their pages from `scripts/mathpath/`
 (one stylesheet, one chrome renderer, one lab kit per subject area). **Never
 edit a page under one of those course slugs by hand**: the next build reverts it,
 so the change appears to work and then vanishes.
 
-    python3 scripts/build_paths.py                     # rebuild all ten
+    python3 scripts/build_paths.py                     # rebuild all eleven
     python3 scripts/build_paths.py --check             # fail if any page is stale
     node scripts/mathcheck.js                          # check the arithmetic itself
     node scripts/labcheck.js --generated               # execute every lab
@@ -326,6 +335,14 @@ range, so they have no row of their own. The heaviest course is What
 Phenomenology Is (36 KB median gzipped); the heaviest page is Sensing and
 Space's `the-body-and-perception` at 38.1 KB; the lightest course is Sensing and
 Space at 34.7 KB median. The ceiling below is unchanged.
+
+Re-measured 2026-10-25 when Reading Faster was wired, with its lessons still
+being edited. Its 42 lessons are 145 KB / 213 KB raw and 39 KB / 63 KB gzipped
+(median / max). The drill pages carry their passages and the log, so the
+heaviest is Guided Practice's `the-daily-drill` at 63.0 KB, under the ceiling
+but in Algebra course 9's range; the heaviest course is Guided Practice (41 KB
+median gzipped) and the lightest How the Eyes Read (37 KB). The ceiling below
+is unchanged.
 
 Re-derive them rather than trusting them; they go stale every time a lab grows:
 

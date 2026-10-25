@@ -17,6 +17,7 @@ const PAGES = [
   ['generated', '/differential-equations-and-eulers-method/eulers-method/'],
   ['generated', '/capital-money-into-surplus-value/the-rate-of-surplus-value/'],
   ['generated', '/perception-classical-prejudices/association-and-the-projection-of-memories/'],
+  ['generated', '/reading-measure-your-reading/comprehension-and-effective-rate/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];

@@ -1,0 +1,2587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Measuring Difficulty | Lesson | Words, Knowledge and Difficulty | Reading Faster | Learn · geterdone.io</title>
+  <meta name="description" content="A readability formula turns three counts into a score: words, sentences and syllables. Compute Flesch Reading Ease and the Flesch–Kincaid grade for the passages you have read, by the kit&#x27;s counting rule, and see what the formulas measure and what they cannot see." />
+  <link rel="canonical" href="https://learn.geterdone.io/reading-words-knowledge-and-difficulty/measuring-difficulty/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Measuring Difficulty | Lesson | Words, Knowledge and Difficulty | Reading Faster | Learn · geterdone.io" />
+  <meta property="og:description" content="A readability formula turns three counts into a score: words, sentences and syllables. Compute Flesch Reading Ease and the Flesch–Kincaid grade for the passages you have read, by the kit&#x27;s counting rule, and see what the formulas measure and what they cannot see." />
+  <meta property="og:url" content="https://learn.geterdone.io/reading-words-knowledge-and-difficulty/measuring-difficulty/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Measuring Difficulty | Lesson | Words, Knowledge and Difficulty | Reading Faster | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A readability formula turns three counts into a score: words, sentences and syllables. Compute Flesch Reading Ease and the Flesch–Kincaid grade for the passages you have read, by the kit&#x27;s counting rule, and see what the formulas measure and what they cannot see." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/reading-words-knowledge-and-difficulty/measuring-difficulty/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    /* The hero's right column carries a monospace key block, and the block is
+       authored to a fixed 46 characters because it is `white-space: pre-wrap`
+       -- a line that does not fit is not reflowed, it is broken.
+       The column holds 46 only while the shell is at its full 1160px, which
+       takes a 1192px viewport. Below that it shrinks fast: 41 characters at
+       1100, 37 at 1024, 31 at 900, and 22 at 721 -- one pixel above the old
+       720px collapse, where the same block jumps back to 63. Every width in
+       that range was WORSE than stacking, so the hero now stacks below the
+       width its own content was written for. Measured in Chrome, not derived.
+       This subsumes the supplemental-only collapse that used to sit at 920. */
+    @media (max-width: 1191px) {
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/reading-faster/">Reading Faster</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Words, Knowledge and Difficulty</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Measuring Difficulty</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The readability by formula is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Words, Knowledge and Difficulty &middot; Difficulty</span>
+        <h1>Measuring Difficulty</h1>
+        <p>A readability formula turns three counts into a score: words, sentences and syllables. Compute Flesch Reading Ease and the Flesch–Kincaid grade for the passages you have read, by the kit's counting rule, and see what the formulas measure and what they cannot see.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" data-say="W over S equals words per sentence. Y over W equals syllables per word. ease equals 206.835 minus 1.015 times W over S minus 84.6 times Y over W. grade equals 0.39 times W over S plus 11.8 times Y over W minus 15.59. higher ease, easier, higher grade, harder" tabindex="0" role="region" aria-label="Mathematical notation">W/S = words per sentence
+Y/W = syllables per word
+ease = 206.835 − 1.015 × W/S − 84.6 × Y/W
+grade = 0.39 × W/S + 11.8 × Y/W − 15.59
+higher ease, easier; higher grade, harder</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two formulas from three counts</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>You have felt the difference between an easy and a hard passage. A readability formula puts a number on part of that difference, and only part.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Two counts stand in for difficulty</h3><p>Both formulas use the average sentence length in words and the average word length in syllables. Long sentences and long words make a text score harder; nothing else enters.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Two scales, one pair of inputs</h3><p>Flesch Reading Ease runs downward with difficulty: the higher the score, the easier the text. The Flesch–Kincaid grade runs upward and is read as a school grade. The same two averages drive both, so they almost always agree on which of two texts is harder.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A count, not a judgement</h3><p>The formulas cannot see whether the ideas are familiar, whether one sentence depends on the last, or whether the words are common. Short words about unfamiliar ideas score easy.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Counting a text</h2></div><p>Start with the warm-up reading at the top of the lab; then count the passages you have already read.</p></div>
+      <article class="card card-pad prose"><p>Begin with the warm-up at the top of the lab, Endgame at the Rosedal, at your usual pace. It is a practice reading from the Subject's passage pool, logged as practice, and it keeps every lesson in this Subject a lesson with a timed reading in it.</p><div class="defbox"><span class="label">Definition &middot; Flesch Reading Ease and the Flesch–Kincaid grade</span><p>With W words, S sentences and Y syllables, Rudolf Flesch's 1948 <strong>Reading Ease</strong> is 206.835, less 1.015 times the words per sentence, less 84.6 times the syllables per word; the <strong>Flesch–Kincaid grade</strong>, derived by Kincaid and colleagues in 1975 for Navy enlisted personnel, is 0.39 times the words per sentence, plus 11.8 times the syllables per word, less 15.59. The key lines above give both in symbols.</p></div><p>The counts need rules, and the lab states its own. A word is a whitespace-separated token with a letter or a digit in it. A sentence ends at a full stop, a question mark or an exclamation mark followed by a space. Syllables are counted by a rule: the groups of vowels in a word, with y as a vowel, less one for a silent e at the end, and at least one a word. The rule miscounts some words, so every syllable figure is an approximation, and another program's counts will differ a little.</p><p>Work the example by hand first. A text of 100 words in 5 sentences with 140 syllables has 20 words a sentence and 1.4 syllables a word. The preset <strong>by-hand</strong> carries those counts.</p><div class="mathblock" data-say="W over S equals 100 over 5 equals 20, Y over W equals 140 over 100 equals 1.4. ease, equals 206.835 minus 1.015 times 20 minus 84.6 times 1.4. equals 206.835 minus 20.3 minus 118.44 equals 68.095. grade equals 0.39 times 20 plus 11.8 times 1.4 minus 15.59. equals 7.8 plus 16.52 minus 15.59 equals 8.73" tabindex="0" role="region" aria-label="Mathematical notation">W/S = 100 / 5 = 20      Y/W = 140 / 100 = 1.4
+ease  = 206.835 − 1.015 × 20 − 84.6 × 1.4
+      = 206.835 − 20.3 − 118.44 = 68.095
+grade = 0.39 × 20 + 11.8 × 1.4 − 15.59
+      = 7.8 + 16.52 − 15.59 = 8.73</div><p>Now the passages. The preset <strong>octopus</strong> counts The Octopus: 395 words, 21 sentences and 504 syllables, so about 18.8 words a sentence and 1.28 syllables a word, for a reading ease of about 79.8 and a grade of about 6.8. The preset <strong>continents</strong> counts From Drifting Continents to Moving Plates: 391 words, 16 sentences, 775 syllables, about 24.4 words a sentence and 1.98 syllables a word, for an ease of about 14.3 and a grade of about 17.3. Between them is the preset <strong>church-clock</strong>, The Church Clock at Wexley, the first passage you timed in Measure Your Reading: 491 words, 21 sentences, an ease of about 70.2 and a grade of about 9.3.</p><p>Look at where the difference comes from. The sentences of the hard passage are only about a third longer than the easy one's, but its words carry more than half as many syllables again, and syllables a word are multiplied by 84.6. Most of the gap between 79.8 and 14.3 is word length.</p><p>The passages you read for time in this Subject were sorted into bands by exactly these counts: easy at grades 5 to 7, standard at 8 to 11, hard at 13 and above. That is the honest use of a formula: to sort many texts quickly by how long their sentences and words are.</p><p>The formulas cannot see anything else. They do not know whether a word is common or rare, so a short technical word counts as easy. They do not know whether you know the subject, and they cannot tell a passage of separate facts from one in which every sentence depends on the one before. A sentence of short words about an idea you have never met can score as easy as a nursery rhyme, and What You Already Know puts two passages of nearly the same grade side by side to measure exactly that.</p><p>The lab also counts your own text: open Count a text of your own, paste a few paragraphs of something you are reading this week, and compare its grade with the three passages.</p><p>The next lesson, Unknown Words and Coverage, measures one of the things the formulas miss: the words in a text that you do not know.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Readability by formula</h2></div><p>counted by a stated rule</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Readability by formula</strong><span>counted by a stated rule</span></div>
+      </div>
+      <div class="status-banner" id="rdDue" style="display:none;margin-top:12px;"></div>
+      <div class="card card-pad" id="rdBoxW" style="margin-top:12px;">
+        <h4 style="margin:0 0 4px;">Warm-up reading: Endgame at the Rosedal</h4>
+        <p class="small-copy" id="rdMsgW" style="margin:0 0 8px;" aria-live="polite">A warm-up: a timed reading at your usual pace, then its questions. It is logged as practice and fills none of the boxes below.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;"><button class="btn small primary" type="button" id="rdStartW">Start</button> <button class="btn small" type="button" id="rdDoneW" style="display:none">Done</button>  <button class="btn small" type="button" id="rdResetW">Reset</button></div>
+        <div id="rdTextW" class="prose" style="display:none;margin-top:12px;overflow-wrap:anywhere;"></div>
+        <div id="rdWorkW" style="display:none;margin-top:12px;"></div>
+        <div id="rdOutW" class="small-copy" style="margin-top:8px;"></div>
+      </div>
+      <div id="txPassage" class="prose card card-pad" style="margin-top:12px;max-height:22rem;overflow-y:auto;"></div>
+      <details style="margin-top:12px;"><summary class="small-copy">Count a text of your own</summary>
+        <textarea id="txOwn" rows="6" style="width:100%;box-sizing:border-box;" aria-label="Text to count"></textarea>
+        <button class="btn small" type="button" id="txCount">Count my text</button></details>
+      <div id="txExtra" style="margin-top:12px;"></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="txTable"></table></div>
+      <div class="status-banner" id="txStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Three counts and two formulas</h3>
+          <p>A count over a text: words, sentences and syllables by the kit's stated rule (vowel groups, less a final silent e, at least one a word), which is an approximation; then Flesch's Reading Ease and the Flesch–Kincaid grade.</p>
+        <div class="field">
+          <label for="txPreset">Worked example</label>
+          <select id="txPreset"><option value="octopus" selected>The Octopus (easy)</option><option value="church-clock">The Church Clock at Wexley (standard)</option><option value="continents">From Drifting Continents to Moving Plates (hard)</option><option value="by-hand">by hand: 100 words, 5 sentences, 140 syllables</option></select>
+        </div>
+        <div class="field">
+          <label for="txInWords">Words (body paragraphs)</label>
+          <input id="txInWords" type="text" value="395" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="txInSentences">Sentences</label>
+          <input id="txInSentences" type="text" value="21" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="txInSyllables">Syllables, by the rule</label>
+          <input id="txInSyllables" type="text" value="504" inputmode="text" autocomplete="off">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Words</span><strong id="txWords">&mdash;</strong></div>
+          <div class="kpi"><span>Sentences</span><strong id="txSentences">&mdash;</strong></div>
+          <div class="kpi"><span>Syllables</span><strong id="txSyllables">&mdash;</strong></div>
+          <div class="kpi"><span>Flesch Reading Ease</span><strong id="txFre">&mdash;</strong></div>
+          <div class="kpi"><span>Flesch–Kincaid grade</span><strong id="txGrade">&mdash;</strong></div>
+        </div>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring a text yourself</h2></div><p>Four steps for any text you want to place, then the day's practice.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the three things</h3><p>Words, sentences and syllables, by one rule kept the same for every text. Paste the text into the lab's counter, or count a 100-word sample by hand.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the two averages</h3><p>Words per sentence and syllables per word. Write them down: they are the whole of what the formulas know about the text.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both scores</h3><p>Reading Ease is 206.835, less 1.015 times the words per sentence, less 84.6 times the syllables per word; the grade is 0.39 times the words per sentence, plus 11.8 times the syllables per word, less 15.59. Keep one decimal.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what the score leaves out</h3><p>Before you trust the number, ask whether the words are common, whether you know the topic, and whether each sentence leans on the last. The formula has seen none of that.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Open The Daily Drill and do today's session as its routine says. When the pool reaches its hard passages, find your hold target again: it will probably be lower, and that is this course's subject measured on your own practice.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Counting difficulty</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>A hundred words by hand</h3><p>A text of 100 words, 5 sentences and 140 syllables.</p><div class="mathblock" data-say="words a sentence, equals 100 over 5, equals 20. syllables a word, equals 140 over 100 equals 1.4. ease, equals 206.835 minus 20.3 minus 118.44 equals 68.095. grade equals 7.8 plus 16.52 minus 15.59, equals 8.73" tabindex="0" role="region" aria-label="Mathematical notation">words a sentence   = 100 / 5   = 20
+syllables a word   = 140 / 100 = 1.4
+ease  = 206.835 − 20.3 − 118.44 = 68.095
+grade = 7.8 + 16.52 − 15.59     = 8.73</div><p>The lab prints the ease as about 68.1 and the grade as 8.73, exact. A grade of 8.73 sits in this Subject's standard band.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a readability score for how hard a text is to understand</strong><span>The score measures sentence length and syllables a word, nothing more. Short words about unfamiliar ideas score easy, and a passage in which every sentence depends on the last scores the same as a list of separate facts with the same counts. The score is a count; whether you understand the text is a measurement only a reading can make.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the two scales the same way round</strong><span>Reading Ease falls as difficulty rises; the grade rises. The octopus passage has an ease of about 79.8 and a grade of about 6.8, the continents passage about 14.3 and 17.3. A high ease is an easy text and a high grade a hard one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trusting the second decimal</strong><span>Syllables are counted by a rule that gets some words wrong, and different programs count sentences differently. A grade of 9.3 against 9.4 is no difference at all; use the formulas to sort texts into broad bands.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a text by hand and say what the score misses.</strong><p>Given counts of words, sentences and syllables, compute Flesch Reading Ease and the Flesch–Kincaid grade by hand to one decimal, and name two things that make a text hard which neither formula can see.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every syllable figure here comes from a counting rule, an approximation, and another program will give slightly different scores for the same text. The formulas were fitted to readers and texts of their time; they sort texts by sentence and word length, and that is all they can be asked to do.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../your-rate-on-hard-text/" rel="prev"><span>Lesson</span><strong>Your Rate on Hard Text</strong></a>
+      <a class="lesson-link next" href="../unknown-words-and-coverage/" rel="next"><span>Lesson</span><strong>Unknown Words and Coverage</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="reading-words-knowledge-and-difficulty/measuring-difficulty" data-lesson-title="Measuring Difficulty" data-course-title="Words, Knowledge and Difficulty">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Words, Knowledge and Difficulty.</strong> Every figure in this course is computed in your browser from a drill you did or from the counts a lesson states. A readability score is a count of sentence and word lengths, a coverage figure is a count of the words you marked, and a year of reading is a product of three numbers. None of them says how hard a text is for you; your two readings say that, for one day.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from what you did in a drill or from the quantities a lesson states, and a rate measured on one passage on one day is one measurement, not your reading speed &mdash; whether a technique helps you is a question your log can answer and a single drill cannot.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A text has 200 words, 10 sentences and 300 syllables. What is its Flesch\u2013Kincaid grade?", "a": ["9.91", "8.73", "11.21", "7.80"], "c": 0, "why": "Words a sentence = 20, syllables a word = 1.5. Grade <span data-say=\"equals 0.39 times 20 plus 11.8 times 1.5 minus 15.59 equals 7.8 plus 17.7 minus 15.59 equals 9.91\">= 0.39 \u00d7 20 + 11.8 \u00d7 1.5 \u2212 15.59 = 7.8 + 17.7 \u2212 15.59 = 9.91<\/span>. The answer 8.73 is the grade for 1.4 syllables a word, and 7.80 is the sentence term alone."}, {"q": "Two texts have the same sentence length. Text A averages 1.3 syllables a word and text B 1.6. By how much does B's Reading Ease fall below A's?", "a": ["About 0.3 points", "About 25.4 points", "About 3.5 points", "It cannot be said without the sentence length"], "c": 1, "why": "With sentence length the same, only the last term changes: <span data-say=\"84.6 times\">84.6 \u00d7<\/span> (1.6 \u2212 1.3) <span data-say=\"equals 84.6 times 0.3 equals 25.38\">= 84.6 \u00d7 0.3 = 25.38<\/span>. The sentence term cancels, so its value is not needed."}, {"q": "A passage of short, common words explains an idea from a field you have never studied, and its grade comes out at 6. What does the grade tell you?", "a": ["That you will read it as easily as other grade-6 text", "That its sentences and words are short; nothing about how familiar its ideas are", "That the syllable rule failed on it", "That it was written for children"], "c": 1, "why": "The formulas see only sentence length and syllables a word. Whether the ideas are familiar is invisible to them, which is the lesson's point and the subject of What You Already Know."}];
+
+  (function () {
+
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  var RD_DASH = '—', RD_MINUS = '−';
+  function rdEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function rdClean(t) { return String(t === null || t === undefined ? '' : t).replace(/−/g, '-').trim(); }
+  function rdGroup(digits) { return digits.length < 4 ? digits : digits.replace(/\B(?=(\d{3})+$)/g, ','); }
+  function rdFixed(r, places) {
+    var num = r.n < 0n ? -r.n : r.n, scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / r.d + 1n) / 2n, s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var whole = rdGroup(s.slice(0, s.length - places));
+    return places ? whole + '.' + s.slice(s.length - places) : whole;
+  }
+  function rdFig(r) {
+    var neg = Rsign(r) < 0, a = Rabs(r), s, approx = false;
+    if (Rint(a)) s = rdGroup(String(a.n));
+    else if (Rint(Rmul(a, R(100n)))) s = rdFixed(a, 2).replace(/0$/, '');
+    else { approx = true; s = rdFixed(a, 1); }
+    return (approx ? '≈ ' : '') + (neg ? RD_MINUS : '') + s;
+  }
+  function rdUnit(r, unit) { return rdFig(r) + (unit ? ' ' + unit : ''); }
+  function rdSigned(r, unit) {
+    var t = rdUnit(r, unit);
+    if (Rsign(r) <= 0) return t;
+    return t.indexOf('≈ ') === 0 ? '≈ +' + t.slice(2) : '+' + t;
+  }
+  function rdShare(r) {
+    var p = Rmul(r, R(100n)), pct = rdFig(p), exact = pct.indexOf('≈') !== 0;
+    var a = Rabs(r), short = String(a.n).length <= 4 && String(a.d).length <= 4;
+    if (!short) return pct + '%';
+    return (Rsign(r) < 0 ? RD_MINUS : '') + Rtext(a) + (exact ? ' = ' : ' ') + pct + '%';
+  }
+  function rdSum(v) { var s = R0; v.forEach(function (x) { s = Radd(s, x); }); return s; }
+  function rdMedian(v) {
+    var s = v.slice().sort(Rcmp), m = s.length >> 1;
+    return s.length % 2 ? s[m] : Rdiv(Radd(s[m - 1], s[m]), R(2n));
+  }
+  function rdRate(words, seconds) { return Rdiv(Rmul(words, R(60n)), seconds); }
+  function rdDec(r) { return rdFixed(r, 2).replace(/,/g, '').replace(/\.?0+$/, ''); }
+  function rdWhole(r) { return rdFixed(r, 0).replace(/,/g, ''); }
+  var RD_NW = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  var RD_ORD = ['', '', '', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth'];
+  function rdOnce(n) {
+    var m = n + 1;
+    return 'above the baseline range once — ' + (m < 13 ? 'a ' + RD_ORD[m] + ' reading does this about one time in ' + RD_NW[m]
+      : 'a reading after ' + n + ' baselines does this about one time in ' + m);
+  }
+  function rdNeedBase(n) { var k = 3 - n; return 'needs ' + RD_NW[k] + ' more baseline reading' + (k === 1 ? '' : 's'); }
+
+  function rdNum(text, what) {
+    var s = rdClean(text), r = s === '' ? null : Rparse(s);
+    if (r === null) throw new Error(what + ' should be a number such as 3, 1/2 or 0.25, and "' + s + '" is not one');
+    return r;
+  }
+  var RD_BAD_NAME = /[,;<>&"=\/]/;
+  function rdScalar(kind, text, what, words) {
+    var s = rdClean(text), r;
+    if (kind === 'label' || kind === 'name') {
+      if (kind === 'name' && s === '') throw new Error(what + ' is missing');
+      if (RD_BAD_NAME.test(s)) throw new Error(what + ' "' + s + '" may not contain , ; / = < > & or quotes');
+      return s;
+    }
+    if (kind === 'word') {
+      if (words.indexOf(s) < 0) throw new Error(what + ' should be one of ' + words.join(', ') + ', not "' + s + '"');
+      return s;
+    }
+    if (kind === 'opt' && s === '') return null;
+    r = rdNum(s, what);
+    if (kind === 'pos' && Rsign(r) <= 0) throw new Error(what + ' must be more than 0, and it is ' + rdFig(r));
+    if ((kind === 'nn' || kind === 'opt') && Rsign(r) < 0) throw new Error(what + ' cannot be negative, and it is ' + rdFig(r));
+    if (kind === 'share' && (Rsign(r) < 0 || Rcmp(r, R1) > 0)) throw new Error(what + ' is a share from 0 to 1, and it is ' + rdFig(r));
+    if (kind === 'count' && (!Rint(r) || Rsign(r) <= 0)) throw new Error(what + ' must be a whole number of at least 1, not ' + rdFig(r));
+    if (kind === 'nncount' && (!Rint(r) || Rsign(r) < 0)) throw new Error(what + ' must be a whole number, 0 or more, not ' + rdFig(r));
+    return r;
+  }
+  function rdField(f, text) {
+    if (f.kind === 'rec') return rdRecords(text, f);
+    if (f.kind === 'nums') return rdNumbers(text, f);
+    if (f.kind === 'entries') return rdEntries(text, f);
+    if (f.kind === 'strings') return rdStrings(text, f);
+    return rdScalar(f.kind, text, f.what, f.words);
+  }
+  function rdRead(spec, raw) {
+    var out = {};
+    spec.forEach(function (f) { out[f.key] = rdField(f, raw[f.key]); });
+    return out;
+  }
+  function rdSet(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
+  function rdRefuse(statusEl, ids, why) {
+    ids.forEach(function (id) { rdSet(id, RD_DASH); });
+    statusEl.innerHTML = '<span class="tone-red">' + rdEsc(String(why).replace(/\.$/, '')) + '.</span>';
+  }
+  function rdTable(caption, head, rows) {
+    var h = '<caption>' + rdEsc(caption) + '</caption><thead><tr>'
+      + head.map(function (x) { return '<th>' + rdEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    rows.forEach(function (row) { h += '<tr>' + row.map(function (c) { return '<td>' + rdEsc(c) + '</td>'; }).join('') + '</tr>'; });
+    return h + '</tbody>';
+  }
+
+  function rdHeading(p) { return /^## /.test(p); }
+  function rdPlain(p) { return String(p).replace(/^## /, '').replace(/\|/g, ' ').replace(/\s+/g, ' ').trim(); }
+  function rdTokens(p) { var s = rdPlain(p); return s === '' ? [] : s.split(' '); }
+  function rdIsWord(t) { return /[A-Za-z0-9À-ɏ]/.test(t); }
+  function rdWordCount(p) { return rdTokens(p).filter(rdIsWord).length; }
+  function rdSentenceCount(p) { return (rdPlain(p).match(/[.!?]+["'”’)\]]*(?=\s|$)/g) || []).length; }
+  function rdSyllables(word) {
+    var w = String(word).toLowerCase().replace(/[^a-z]/g, '');
+    if (w === '') return 1;
+    var n = (w.match(/[aeiouy]+/g) || []).length;
+    if (/e$/.test(w) && !/le$/.test(w)) n -= 1;
+    return n < 1 ? 1 : n;
+  }
+  function rdPassageWords(P) { var n = 0; P.paragraphs.forEach(function (p) { n += rdWordCount(p); }); return n; }
+  function rdPassageChars(P) { return Array.from(P.paragraphs.map(rdPlain).join(' ')).length; }
+  function rdCounts(P) {
+    var words = 0, sentences = 0, syllables = 0;
+    P.paragraphs.forEach(function (p) {
+      if (rdHeading(p)) return;
+      var w = rdTokens(p).filter(rdIsWord);
+      words += w.length; sentences += rdSentenceCount(p);
+      w.forEach(function (t) { syllables += rdSyllables(t); });
+    });
+    return { words: words, sentences: sentences, syllables: syllables };
+  }
+  function rdFirstSentence(p) {
+    var s = rdPlain(p), m = /[.!?]+["'”’)\]]*(?=\s|$)/.exec(s);
+    return m ? s.slice(0, m.index + m[0].length) : s;
+  }
+  function rdGistParas(P) {
+    return P.paragraphs.map(function (p) { return rdHeading(p) ? p : rdFirstSentence(p); });
+  }
+  function rdPreviewParas(P) {
+    var body = [], out = [];
+    P.paragraphs.forEach(function (p, i) { if (!rdHeading(p)) body.push(i); });
+    P.paragraphs.forEach(function (p, i) {
+      if (rdHeading(p) || i === body[0] || i === body[body.length - 1]) out.push(p);
+    });
+    return out;
+  }
+  function rdPhrases(P) {
+    var out = [];
+    P.paragraphs.forEach(function (p) {
+      String(p).replace(/^## /, '').split('|').forEach(function (ph) {
+        var t = ph.replace(/\s+/g, ' ').trim();
+        if (t !== '' && rdWordCount(t) > 0) out.push(t);
+      });
+    });
+    return out;
+  }
+  function rdWordsIn(paras) { var n = 0; paras.forEach(function (p) { n += rdWordCount(p); }); return n; }
+
+  var RD_LOG_KEY = 'learn-reading-log', rdLogWarned = false;
+  function rdLogRead() {
+    try {
+      var raw = window.localStorage.getItem(RD_LOG_KEY), v = raw ? JSON.parse(raw) : [];
+      return Array.isArray(v) ? v.filter(function (e) { return e && typeof e === 'object'; }) : [];
+    } catch (err) { return []; }
+  }
+  function rdLogWrite(list) {
+    try { window.localStorage.setItem(RD_LOG_KEY, JSON.stringify(list)); return true; } catch (err) { return false; }
+  }
+  function rdLogAppend(entry, noticeEl) {
+    var list = rdLogRead();
+    entry.v = 1;
+    entry.at = new Date().toISOString();
+    if (!entry.lesson) entry.lesson = LESSON || String((window.location && window.location.pathname) || '').split('/').filter(Boolean).pop() || '';
+    list.push(entry);
+    if (rdLogWrite(list)) return true;
+    if (!rdLogWarned && noticeEl) {
+      rdLogWarned = true;
+      noticeEl.textContent = 'This browser is not keeping data for this page, so your results will not be kept. Every drill still runs.';
+    }
+    return false;
+  }
+  function rdIsReading(e) { return (e.mode === 'drill' || e.mode === 'warmup') && e.display !== 'gist' && e.words > 0 && e.ms > 0; }
+  function rdStdBand(b) { return !b || b === 'standard'; }
+  function rdStandard(e) { return rdStdBand(e.band); }
+  function rdEntryRate(e, eff) {
+    var r = R(BigInt(Math.round(e.words)) * 60000n, BigInt(Math.round(e.ms)));
+    return eff ? Rmul(r, R(BigInt(e.correct), BigInt(e.total))) : r;
+  }
+  function rdKindRates(kind, eff, list) {
+    return (list || rdLogRead()).filter(function (e) { return e.kind === kind && rdIsReading(e) && rdStandard(e) && (!eff || e.total > 0); })
+      .map(function (e) { return rdEntryRate(e, eff); });
+  }
+  function rdDueEntries(list) {
+    var now = Date.now();
+    return list.filter(function (e) {
+      return e.due && Date.parse(e.due) <= now && !list.some(function (x) {
+        return x.view === 'delayed-test' && x.lesson === e.lesson && x.at > e.at;
+      });
+    });
+  }
+  function rdDueBanner() {
+    var el = document.getElementById('rdDue');
+    if (!el) return;
+    var here = String((window.location && window.location.pathname) || ''), seen = {}, links = [];
+    rdDueEntries(rdLogRead()).forEach(function (e) {
+      var u = String(e.url || '');
+      if (!/^\/[a-z0-9\-\/]*$/.test(u) || u === here || seen[u]) return;
+      seen[u] = true;
+      links.push('<a href="' + rdEsc(u) + '">' + (e.title ? 'the test on “' + rdEsc(e.title) + '”' : rdEsc(e.lesson || u)) + '</a>');
+    });
+    if (links.length) {
+      el.innerHTML = 'A delayed test is due: open ' + links.join(', ') + ' to take it.';
+      el.style.display = '';
+    }
+    return links.length;
+  }
+
+  function txFormulas(w, s, y) {
+    var ws = Rdiv(w, s), yw = Rdiv(y, w);
+    return { fre: Rsub(Rsub(Rparse('206.835'), Rmul(Rparse('1.015'), ws)), Rmul(Rparse('84.6'), yw)),
+             grade: Rsub(Radd(Rmul(Rparse('0.39'), ws), Rmul(Rparse('11.8'), yw)), Rparse('15.59')) };
+  }
+  function txCompute(view, inst) {
+    var t = {};
+    if (view === 'readability') {
+      var f = txFormulas(inst.words, inst.sentences, inst.syllables);
+      t.txWords = rdFig(inst.words); t.txSentences = rdFig(inst.sentences);
+      t.txSyllables = rdFig(inst.syllables) + ' (by the rule)';
+      t.txFre = rdFig(f.fre); t.txGrade = rdFig(f.grade);
+      return { tiles: t, status: '206.835 − 1.015 × ' + rdFig(Rdiv(inst.words, inst.sentences)) + ' − 84.6 × '
+        + rdFig(Rdiv(inst.syllables, inst.words)) + ' = ' + t.txFre + ' reading ease; grade ' + t.txGrade
+        + '. Syllables are counted by a rule, an approximation; the formulas see sentence and word length, not ideas.' };
+    }
+    if (view === 'coverage') {
+      if (Rcmp(inst.unknown, inst.tokens) > 0) return { refuse: 'More unknown words than words in the text' };
+      if (inst.total !== undefined && Rcmp(inst.correct, inst.total) > 0) return { refuse: 'More questions right than asked' };
+      t.txCoverage = rdShare(Rdiv(Rsub(inst.tokens, inst.unknown), inst.tokens));
+      t.txOneIn = Rzero(inst.unknown) ? 'no unknown words' : 'one unknown in every ' + rdFig(Rdiv(inst.tokens, inst.unknown)) + ' tokens';
+      if (inst.seconds !== undefined) t.txWpm = rdUnit(rdRate(inst.tokens, inst.seconds), 'wpm');
+      if (inst.total !== undefined) t.txComp = Rzero(inst.total) ? 'no questions' : rdShare(Rdiv(inst.correct, inst.total));
+      return { tiles: t, status: rdFig(inst.unknown) + ' unknown of ' + rdFig(inst.tokens) + ' words: coverage ' + t.txCoverage
+        + ', one unknown word every ' + (Rzero(inst.unknown) ? '(none)' : rdFig(Rdiv(inst.tokens, inst.unknown))) + ' words. Hu and Nation put unassisted reading near 98%.'
+        + (t.txWpm ? ' Read while marking at ' + t.txWpm + (t.txComp ? ', comprehension ' + t.txComp : '') + '.' : t.txComp ? ' Comprehension ' + t.txComp + '.' : '') };
+    }
+    var w = Rmul(Rmul(inst.minutes, inst.wpm), inst.days);
+    t.txWordsYear = rdUnit(w, 'words');
+    t.txBooksYear = rdUnit(Rdiv(w, inst.bookWords), 'books');
+    return { tiles: t, status: rdFig(inst.minutes) + ' min × ' + rdFig(inst.wpm) + ' wpm × ' + rdFig(inst.days) + ' days = ' + t.txWordsYear
+      + ', or ' + t.txBooksYear + ' of ' + rdFig(inst.bookWords) + ' words.' };
+  }
+  var PRESETS = {"octopus": {"words": "395", "sentences": "21", "syllables": "504", "__passage": "P38"}, "church-clock": {"words": "491", "sentences": "21", "syllables": "655", "__passage": "P01"}, "continents": {"words": "391", "sentences": "16", "syllables": "775", "__passage": "P39"}, "by-hand": {"words": "100", "sentences": "5", "syllables": "140"}};
+  var SPEC = [{"key": "words", "what": "Words (body paragraphs)", "kind": "count", "id": "txInWords"}, {"key": "sentences", "what": "Sentences", "kind": "count", "id": "txInSentences"}, {"key": "syllables", "what": "Syllables, by the rule", "kind": "count", "id": "txInSyllables"}];
+  var TILES = ["txWords", "txSentences", "txSyllables", "txFre", "txGrade"];
+  var VIEW = "readability";
+  var OPTS = {};
+  var LESSON = "";
+  var PASSAGES = {"P38": {"id": "P38", "title": "The Octopus", "band": "easy", "paragraphs": ["An octopus has eight arms and no bones. Its body is so soft that it can pour itself through a gap not much wider than one of its eyes. The only hard part it has is its beak, which sits in the middle of the ring of arms and looks a little like the beak of a parrot. If the beak can fit through a hole, the rest of the octopus can follow.", "Each arm is lined with rows of suckers, and the suckers do much more than grip. They can also taste and feel. An octopus feeling its way into a crack in a rock can tell what is hiding there before it sees it. The arms can even carry on with a task, such as pulling apart a shell, while the animal pays attention to something else.", "The inside of an octopus is just as strange as the outside. It has three hearts. Two of them push blood through the gills, where it picks up oxygen from the water, and the third pumps it around the rest of the body. Its blood is blue rather than red, because the substance that carries oxygen in it is built around copper instead of iron.", "The skin of an octopus is full of tiny sacs of colour, each one ringed by muscles that can stretch it open or squeeze it shut. By working thousands of them at once, the animal can change its colour and pattern in less than a second. Many kinds can also raise small bumps and ridges on the skin, so that an octopus sitting on a rock can match not only its colour but its roughness. When hiding fails, it can squirt a dark cloud of ink into the water and shoot away while the ink hangs behind it. One kind that lives in warm seas even carries empty coconut shells around with it and hides inside them.", "For all these gifts, most octopuses have short lives. Many kinds live for only a year or two. A female lays her eggs in a den, often hanging them in long strings from the roof, and then stays with them for weeks or months, blowing fresh water over them and keeping them clean. In most kinds she does not leave even to eat, and she dies soon after the young hatch and drift away."], "questions": [{"q": "According to the passage, what decides whether an octopus can squeeze through a hole?", "a": ["Whether its beak can fit through", "Whether its arms can reach through first", "Whether its eyes can fit through", "Whether the hole is wider than its body"], "c": 0, "kind": "detail"}, {"q": "What can the suckers of an octopus do besides grip?", "a": ["Make ink", "Change colour", "Taste and feel", "Breathe in water"], "c": 2, "kind": "detail"}, {"q": "What do two of the octopus\u2019s three hearts do?", "a": ["Pump blood to the skin to change its colour", "Pump blood to the arms only", "Push blood through the gills", "Pump ink into the ink sac"], "c": 2, "kind": "detail"}, {"q": "What is the main point of the paragraph about the skin?", "a": ["Octopuses are always the same colour as the rocks they live on", "The skin of an octopus is too thin to protect it", "Octopuses use their colours mainly to attract mates", "Octopuses can quickly change colour and texture to hide, and use ink when hiding fails"], "c": 3, "kind": "gist"}, {"q": "What does the last paragraph say about a female octopus?", "a": ["She guards her eggs, often without eating, and dies soon after they hatch", "She carries her eggs in her arms while she hunts", "She leaves her eggs once they are laid", "She lays her eggs in the open water"], "c": 0, "kind": "gist"}, {"q": "What is the passage mainly about?", "a": ["The unusual body and life of the octopus", "How octopuses hunt for crabs and shells", "Why octopuses are kept in aquariums", "How octopuses differ from squid"], "c": 0, "kind": "gist"}]}, "P01": {"id": "P01", "title": "The Church Clock at Wexley", "band": "standard", "paragraphs": ["The clock in the tower of Saint Anne\u2019s had stopped at ten minutes past four, and by breakfast the whole village of Wexley knew it. Farmers glanced up from the lane and frowned, the baker\u2019s boy was late with the bread, and the vicar, who had a wedding to conduct at noon, walked straight to the workshop of Tobias Reed, the only clockmaker within twenty miles.", "Tobias was in bed with a fever, wrapped in two blankets and furious about it, and the only help he could offer was his apprentice, Hannah Price, who was sixteen years old and had spent three winters sweeping his floor and filing his brass. She had cleaned the tower clock with him twice, holding the lamp while he worked, but she had never touched it alone. The vicar looked at her doubtfully; Tobias looked at the ceiling for a long moment and then told her which tools to take.", "The tower stairs were narrow and smelled of damp stone. At the top, the clock sat in its iron frame like a sleeping animal, its great wheels still, its pendulum hanging straight down in the shaft below. Hannah did what Tobias always did first: she looked carefully before she touched anything. The driving weight still hung halfway up its cable, so the clock had not simply run down. The pendulum was not broken, yet when she pushed it gently, it swung twice and stopped again, as if something were holding the works back.", "She moved her lamp slowly along the train of wheels until she saw it. A twig, long and crooked and grey with lichen, had dropped from the jackdaws\u2019 nest in the louvres above and wedged itself between two teeth of the escape wheel. The clock had been straining all night against a stick no thicker than a pencil.", "Hannah drew the twig out with a pair of long pliers, wiped the teeth with an oily rag, and set the pendulum swinging. This time it kept going, and the steady tick filled the little room. The hands, of course, were still wrong, and she had no way of knowing the exact time up there, so she climbed down, ran to the railway station, and asked the stationmaster, whose clock was corrected every morning by telegraph from London. Then she climbed the tower again, counting the minutes on her own watch, and moved the hands forward to match.", "When the bell rang out at noon, the bride was standing on the church steps, and people in the lane looked up and nodded as though the clock had never stopped. Hannah went back to the workshop and told Tobias about the twig. He listened, coughed, and said that next week she would come up with him to fix a wire screen under the nest. It was, she realised later, the first time he had asked for her help with a job he had never done himself."], "questions": [{"q": "What is the story mainly about?", "a": ["A clockmaker who teaches his apprentice how to build a tower clock", "A vicar who has to postpone a wedding because the church clock has failed", "An apprentice who repairs a stopped clock on her own for the first time", "A stationmaster who keeps a whole village on time by telegraph"], "c": 2, "kind": "gist"}, {"q": "What had stopped the clock?", "a": ["A twig from a jackdaws\u2019 nest wedged in the escape wheel", "The driving weight had run all the way down its cable", "The pendulum had broken loose in the shaft below", "Old oil on the wheels had thickened in the cold"], "c": 0, "kind": "detail"}, {"q": "How did Hannah find out the correct time to set the hands?", "a": ["She compared the tower clock with the vicar\u2019s pocket watch", "She waited in the tower until the noon train passed below", "She checked the clock in Tobias\u2019s workshop on her way back to the church", "She asked the stationmaster, whose clock was corrected by telegraph"], "c": 3, "kind": "detail"}, {"q": "What does the ending suggest about how Tobias now sees Hannah?", "a": ["He thinks she should have waited until he was well", "He is ready to treat her as a partner in new work", "He believes the repair was mostly a matter of luck", "He plans to send her to the stationmaster to learn timekeeping"], "c": 1, "kind": "gist"}, {"q": "Why was the stopped clock urgent that particular morning?", "a": ["It was market day and the farmers needed the time", "The bishop was expected at the church before noon", "The railway timetable depended on the church bell", "The vicar had a wedding to conduct at noon"], "c": 3, "kind": "detail"}, {"q": "Why does the story point out that Hannah looked carefully before touching anything?", "a": ["It shows her using her master\u2019s method, which found the real cause", "It shows that she was afraid of damaging the clock\u2019s machinery", "It explains why she forgot to bring the right tools up the tower with her", "It shows that the vicar had told her not to touch the works"], "c": 0, "kind": "gist"}]}, "P39": {"id": "P39", "title": "From Drifting Continents to Moving Plates", "band": "hard", "paragraphs": ["In 1912 the German meteorologist Alfred Wegener proposed that the continents had not always occupied their present positions but had once formed a single landmass, which subsequently fragmented and whose pieces gradually migrated apart. His argument assembled several independent lines of evidence. The first was the conspicuous correspondence between the coastlines of South America and Africa; the second, the distribution of identical fossil species, including a small freshwater reptile, on continents now separated by thousands of kilometres of ocean; the third, geological formations that terminated abruptly at one coastline and resumed on another; and the fourth, deposits left by ancient glaciers in regions that are presently tropical.", "Despite this accumulation of circumstantial evidence, most geologists rejected the hypothesis for several decades, principally because Wegener could identify no plausible mechanism capable of propelling continents through the apparently rigid rock of the ocean floor. His suggestion that the continents ploughed through the oceanic crust was demonstrably inadequate. The persuasiveness of the observations could not compensate for the implausibility of the explanation.", "The decisive evidence emerged after the Second World War from systematic investigation of the ocean floor itself. Mapping revealed an enormous system of submarine mountain ridges extending through every ocean basin. Magnetic surveys conducted across these ridges then disclosed a remarkable pattern: parallel stripes of rock magnetised alternately in the direction of the present magnetic field and in the opposite direction, arranged symmetrically on either side of each ridge. Geophysicists interpreted the pattern by combining two propositions. The first was that new crust is continuously generated at the ridges and spreads outward; the second, that the polarity of the magnetic field periodically reverses. Each stripe therefore preserves the orientation prevailing when its rock solidified.", "Subsequent drilling confirmed that oceanic crust is youngest at the ridges and progressively older with distance from them. Nowhere is it older than approximately two hundred million years, a small fraction of the age of the continents. Since the planet is not expanding, crust created at the ridges must be consumed elsewhere, and the consuming boundaries were identified with the deep oceanic trenches, where one plate descends beneath another into the mantle.", "The resulting theory of plate tectonics, consolidated during the late 1960s, explained not only Wegener\u2019s observations but also the concentration of earthquakes and volcanoes along narrow belts, which correspond precisely to the margins of the plates."], "questions": [{"q": "Why did most geologists reject Wegener\u2019s hypothesis for decades?", "a": ["His fossil evidence was shown to be mistaken", "His maps of the ocean floor were shown to be inaccurate", "The coastlines of South America and Africa do not match", "He could identify no plausible mechanism for moving the continents"], "c": 3, "kind": "gist"}, {"q": "Which of these was NOT among Wegener\u2019s lines of evidence, as the passage lists them?", "a": ["Magnetic stripes on the ocean floor", "Matching fossils on separated continents", "Glacial deposits in regions now tropical", "Rock formations ending at one coast and resuming on another"], "c": 0, "kind": "detail"}, {"q": "What two ideas together explained the magnetic stripes beside the ridges?", "a": ["Continents plough through oceanic crust, and the field weakens over time", "New crust forms at the ridges and spreads outward, and the magnetic field periodically reverses", "The planet is expanding, and the ridges are cooling", "Glaciers deposit magnetised rock, and trenches erase it"], "c": 1, "kind": "gist"}, {"q": "According to the passage, how old is the oldest oceanic crust?", "a": ["About as old as the continents", "About two hundred million years", "About two thousand million years", "Less than ten million years"], "c": 1, "kind": "detail"}, {"q": "Where, according to the passage, is old crust consumed?", "a": ["At deep oceanic trenches, where one plate descends beneath another", "At the mid-ocean ridges", "Along the coastlines of the continents", "Beneath the oldest parts of the continents"], "c": 0, "kind": "detail"}, {"q": "What did plate tectonics explain besides Wegener\u2019s observations?", "a": ["Why earthquakes and volcanoes occur along narrow belts at plate margins", "Why the climate of the tropics has changed", "Why fossil reptiles lived in fresh water", "Why the magnetic field is weakening today"], "c": 0, "kind": "gist"}]}, "Q22": {"id": "Q22", "title": "Endgame at the Rosedal", "band": "standard", "paragraphs": ["Under the plane trees at the edge of the rose garden in Palermo Park there were six stone tables with chessboards cut into their tops, and on Saturday afternoons in the autumn of 1987 every one of them was taken. Don Aurelio Sanz had played at the third table from the fountain for longer than anyone could remember; he was seventy-four, wore a grey hat in all weathers, and almost never lost.", "The boy who sat down opposite him that Saturday was perhaps thirteen. He had been watching for weeks, standing behind the old men with his hands in his pockets, and he played the opening quickly and well, too well for someone who had only watched, so that Don Aurelio raised his eyebrows and slowed down.", "By the middle of the game a small crowd had gathered and the boy was a pawn ahead, while the old man was building up pressure along one file, patiently, piece by piece, the way he had done to better players than this for fifty years. Twice the boy found the only move that held, but the third time he did not, and Don Aurelio won back the pawn and reached an ending with a rook each and an extra pawn for himself, the kind of ending he had won a thousand times.", "The boy stared at the board for a long time. Then, instead of resigning, he began to walk his king forward, step by step, into the middle of the board, where it seemed to have no business being, and each time Don Aurelio pushed his extra pawn the king came a little closer. The old man frowned and checked the king twice to drive it back, only to find that each check helped it forward, until suddenly his own pawn was blocked, his rook was tied to guarding it, and neither side could make any progress at all.", "Don Aurelio sat back and looked at the position for a full minute without touching anything, and then he reached across and stopped the clock. \u201cA draw,\u201d he said. \u201cYou knew that defence before you sat down.\u201d", "The boy admitted that he had found it in a library book the week before and had not expected to need it.", "The old man laughed, took off his grey hat and set the pieces back up while the crowd waited. \u201cAgain,\u201d said Don Aurelio, \u201cbut this time I play white, and you tell me the name of the book.\u201d"], "questions": [{"q": "How did the game end?", "a": ["A win for the boy after the old man\u2019s mistake", "A win for Don Aurelio after the boy\u2019s third slip", "A draw, after the boy found a defence", "Unfinished, because the crowd interrupted them"], "c": 2, "kind": "gist"}, {"q": "What did Don Aurelio wear in all weathers?", "a": ["A dark coat", "A red scarf", "A pair of gloves", "A grey hat"], "c": 3, "kind": "detail"}, {"q": "What did the boy do in the ending that surprised Don Aurelio?", "a": ["He walked his king forward into the middle", "He resigned at once instead of playing the ending", "He gave up his rook to stop the extra pawn", "He offered a draw before the ending began"], "c": 0, "kind": "gist"}, {"q": "Where had the boy learned the defence?", "a": ["From watching Don Aurelio\u2019s Saturday games", "From a library book the week before", "From his grandfather, who also played there", "From another old player at the stone tables"], "c": 1, "kind": "detail"}, {"q": "Which table did Don Aurelio play at?", "a": ["The first by the roses", "The last under the plane trees", "The third from the fountain", "The one nearest the gate"], "c": 2, "kind": "detail"}, {"q": "What does Don Aurelio\u2019s response at the end show?", "a": ["He is angry and wants revenge for the lost game", "He suspects the boy of cheating with outside help", "He is tired and wants to stop playing for the day", "He respects the boy and wants to keep playing him"], "c": 3, "kind": "gist"}]}};
+  var SLOTS = {"W": {"passage": "Q22", "intro": "A warm-up: a timed reading at your usual pace, then its questions. It is logged as practice and fills none of the boxes below.", "kind": "practice", "mode": "warmup", "view": "warmup", "display": "normal", "questions": true, "qkinds": "all", "flow": "read", "write": {}, "target": null, "targetKey": null, "chunk": 1, "limit": null, "split": null, "targets": null, "suppress": false, "days": null, "summary": false, "pool": ["Q22"], "tick": null, "published": null, "order": null, "say": null}};
+
+  var RD_ST = {};
+  var RD_TIMED = { pacer: 1, mask: 1, rsvp: 1, phrases: 1 };
+  function rdE(name, k) { return document.getElementById(name + k); }
+  function rdShow(el, on) { if (el) el.style.display = on ? '' : 'none'; }
+  function rdMsg(k, text) { var m = rdE('rdMsg', k); if (m) m.textContent = text; }
+  function rdMsText(ms) {
+    ms = Math.max(1, Math.round(ms));
+    var w = Math.floor(ms / 1000), f = ms % 1000;
+    return f ? w + '.' + String(f + 1000).slice(1).replace(/0+$/, '') : String(w);
+  }
+  function rdSpecId(key) { for (var i = 0; i < SPEC.length; i++) if (SPEC[i].key === key) return SPEC[i].id; return null; }
+  function rdTokHtml(paras, clickable) {
+    var n = 0;
+    return paras.map(function (p) {
+      var head = rdHeading(p), toks = rdTokens(p).map(function (t) {
+        var w = rdIsWord(t);
+        return '<span class="rdw" data-i="' + (n++) + '"' + (w ? ' data-w="1"' : '')
+          + (clickable && w ? ' tabindex="0" role="button"' : '') + '>' + rdEsc(t) + '</span>';
+      }).join(' ');
+      return head ? '<h4 style="margin:10px 0 4px;">' + toks + '</h4>' : '<p>' + toks + '</p>';
+    }).join('');
+  }
+  function rdClearTimers(st) { (st.timers || []).forEach(function (t) { clearTimeout(t); }); st.timers = []; }
+  function rdLater(st, fn, ms) { st.timers.push(setTimeout(fn, Math.max(0, ms))); }
+  function rdPassageOf(k) { var S = SLOTS[k], st = RD_ST[k]; return st.passage || (S.passage ? PASSAGES[S.passage] : null); }
+  function rdTargetOf(k) {
+    var S = SLOTS[k], text = S.targetKey ? field(rdSpecId(S.targetKey)).value : S.target, r = Rparse(rdClean(text));
+    return r && Rsign(r) > 0 ? Number(r.n) / Number(r.d) : null;
+  }
+  function rdButtons(k, start, done, next) {
+    rdShow(rdE('rdStart', k), start); rdShow(rdE('rdDone', k), done); rdShow(rdE('rdNext', k), next);
+  }
+  function rdHideText(k) { var t = rdE('rdText', k); t.innerHTML = ''; rdShow(t, false); }
+  function rdResetSlot(k, keepOut) {
+    var st = RD_ST[k];
+    rdClearTimers(st);
+    RD_ST[k] = { phase: 'idle', timers: [], ms: 0 };
+    rdHideText(k);
+    var w = rdE('rdWork', k); w.innerHTML = ''; rdShow(w, false);
+    if (!keepOut) rdE('rdOut', k).innerHTML = '';
+    var s = rdE('rdStart', k); s.textContent = 'Start';
+    rdE('rdDone', k).textContent = 'Done';
+    rdButtons(k, true, false, false);
+    rdMsg(k, SLOTS[k].intro);
+  }
+
+  function rdFirstUnlogged(ids) {
+    var used = {};
+    rdLogRead().forEach(function (e) { used[e.passage] = true; });
+    for (var i = 0; i < ids.length; i++) if (!used[ids[i]]) return ids[i];
+    return null;
+  }
+  var RD_STREAM_CAP = 600;
+  function rdStart(k) {
+    var S = SLOTS[k], st = RD_ST[k];
+    if (st.phase === 'reread1') { rdBeginRead(k); return; }
+    rdResetSlot(k, false);
+    st = RD_ST[k];
+    st.display = S.display; st.kind = S.kind;
+    if (S.flow === 'practice' && !rdPracticeSetup(k)) return;
+    if (S.pool && S.flow !== 'practice') {
+      var id = rdFirstUnlogged(S.pool);
+      if (!id) { rdMsg(k, 'Every passage offered here is already in your log; reading one again would measure your memory of it.'); return; }
+      st.passage = PASSAGES[id];
+      if (S.kinds && S.kinds[id]) st.kind = S.kinds[id];
+    }
+    var P = rdPassageOf(k);
+    if (!P) { rdMsg(k, 'There is no passage to read.'); return; }
+    if (RD_TIMED[st.display]) {
+      st.target = rdTargetOf(k);
+      if (!st.target) { rdMsg(k, 'Type a target rate in words per minute (more than 0) first.'); return; }
+      if ((st.display === 'rsvp' || st.display === 'phrases') && st.target > RD_STREAM_CAP) {
+        rdMsg(k, 'This display runs at ' + RD_STREAM_CAP + ' wpm or less: beyond that it is a flicker, not reading. Set a lower target.');
+        return;
+      }
+    }
+    rdBeginRead(k);
+  }
+  function rdBeginRead(k) {
+    var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k), text = rdE('rdText', k), d = st.display;
+    rdShow(text, true);
+    rdButtons(k, false, true, S.flow === 'sections' || S.flow === 'find');
+    if (S.flow === 'find') { rdFindBegin(k); return; }
+    if (S.flow === 'coverage') {
+      text.innerHTML = rdTokHtml(P.paragraphs, true); st.phase = 'mark'; st.t0 = performance.now();
+      rdE('rdDone', k).textContent = 'Count my marks';
+      rdMsg(k, 'Click (or Tab to and press Enter on) every word you do not know; click again to unmark. Then press Count my marks.');
+      return;
+    }
+    var again = st.phase === 'reread1';
+    st.phase = again ? 'reread2' : 'reading';
+    var paras = P.paragraphs;
+    if (S.flow === 'sections') paras = P.paragraphs.slice(0, S.split);
+    if (d === 'gist') paras = rdGistParas(P);
+    if (d === 'preview') paras = rdPreviewParas(P);
+    st.t0 = performance.now();
+    if (d === 'rsvp' || d === 'phrases') { rdStream(k, P); return; }
+    text.innerHTML = rdTokHtml(paras, false);
+    var say = { normal: 'Read at your usual pace and press Done when you finish.',
+                aloud: 'Read the passage ALOUD at a natural pace and press Done when you finish speaking.',
+                pacer: 'Keep your eyes on the highlighted line as it moves.',
+                mask: 'Keep up with the highlighted line; the lines above it disappear.',
+                gist: 'Skim: only headings and first sentences are shown, and they disappear after ' + S.limit + ' s.',
+                preview: 'Preview: headings, the first and the last paragraph, for ' + S.limit + ' s; then the whole passage. The clock runs through both.' };
+    var m = say[d] || say.normal;
+    if (d === 'normal' && S.limit && S.flow !== 'inspect') m = 'The passage disappears after ' + S.limit + ' s; press Done if you finish first.';
+    if (S.say) m = S.say + ' Press Done when you finish.';
+    rdMsg(k, again ? 'Read it again, then press Done.' : (S.flow === 'sections' ? 'Section 1 of 2. Press Next section when you reach its end. ' : '') + m);
+    if (d === 'pacer' || d === 'mask') rdPacer(k);
+    if (d === 'gist' || (S.limit && S.flow === 'inspect')) rdLater(st, function () { rdFinish(k); }, S.limit * 1000);
+    if (d === 'preview') rdLater(st, function () {
+      if (st.phase !== 'reading') return;
+      text.innerHTML = rdTokHtml(P.paragraphs, false);
+      rdMsg(k, 'Now the whole passage. Press Done when you finish.');
+    }, S.limit * 1000);
+    if (S.limit && (d === 'pacer' || d === 'mask' || d === 'normal') && S.flow !== 'inspect') rdLater(st, function () { rdFinish(k); }, S.limit * 1000);
+  }
+  function rdNextSection(k) {
+    var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k);
+    if (S.flow === 'find') { rdFindStep(k, false); return; }
+    if (st.phase !== 'reading' || st.split !== undefined) return;
+    st.split = Math.round(performance.now() - st.t0);
+    rdE('rdText', k).innerHTML = rdTokHtml(P.paragraphs.slice(S.split), false);
+    rdShow(rdE('rdNext', k), false);
+    rdMsg(k, 'Section 2 of 2. Press Done when you finish.');
+  }
+  function rdFinish(k) {
+    var S = SLOTS[k], st = RD_ST[k];
+    if (st.phase === 'mark') { rdCoverageScore(k); return; }
+    if (st.phase !== 'reading' && st.phase !== 'reread2') return;
+    if (S.flow === 'sections' && st.split === undefined) { rdMsg(k, 'Press Next section first, at the end of section 1.'); return; }
+    rdClearTimers(st);
+    st.ms += Math.max(1, Math.round(performance.now() - st.t0));
+    rdHideText(k);
+    rdButtons(k, false, false, false);
+    if (S.flow === 'reread') {
+      if (st.phase === 'reading') {
+        st.phase = 'reread1';
+        var s = rdE('rdStart', k); s.textContent = 'Read it again'; rdShow(s, true);
+        rdMsg(k, 'Now read the same passage a second time. Press Read it again when you are ready.');
+        return;
+      }
+      st.phase = 'done'; rdLogReread(k); return;
+    }
+    st.phase = 'after';
+    if (S.tick) { rdTickAsk(k); return; }
+    rdAfterReading(k);
+  }
+  function rdTickAsk(k) {
+    var S = SLOTS[k], w = rdE('rdWork', k), st = RD_ST[k];
+    rdShow(w, true);
+    w.innerHTML = '<label class="small-copy">' + (S.tick.count ? rdEsc(S.tick.label) + ': <input type="number" min="0" step="1" value="0" style="width:5rem;">'
+      : '<input type="checkbox"> ' + rdEsc(S.tick.label)) + '</label> <button class="btn small" type="button">Continue</button>';
+    w.getElementsByTagName('button')[0].addEventListener('click', function () {
+      var box = w.getElementsByTagName('input')[0];
+      st.tick = S.tick.count ? Math.max(0, Math.floor(+box.value) || 0) : !!box.checked;
+      rdAfterReading(k);
+    });
+  }
+  function rdAfterReading(k) {
+    var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k);
+    if (S.flow === 'recall') { rdRecallWrite(k); return; }
+    var qs = S.questions && P.questions ? P.questions.filter(function (q) { return S.qkinds !== 'gist' || q.kind === 'gist'; }) : [];
+    st.qs = qs;
+    if (!qs.length) { rdScore(k, []); return; }
+    rdMsg(k, 'The passage is hidden. Answer each question; there is no going back.');
+    rdAsk(rdE('rdWork', k), qs, function (answers) {
+      var w = rdE('rdWork', k);
+      w.innerHTML = '<button class="btn small primary" type="button">Score</button>';
+      w.firstChild.addEventListener('click', function () { rdScore(k, answers); });
+      rdMsg(k, 'All answered. Press Score.');
+    });
+  }
+  function rdAsk(work, qs, done) {
+    var answers = [];
+    rdShow(work, true);
+    function ask(n) {
+      if (n >= qs.length) { done(answers); return; }
+      var q = qs[n];
+      work.innerHTML = '<p class="small-copy" style="margin:0 0 6px;">Question ' + (n + 1) + ' of ' + qs.length + '</p><p><strong>'
+        + rdEsc(q.q) + '</strong></p><div class="choice-grid">' + q.a.map(function (a, i) {
+          return '<button class="choice" type="button" data-a="' + i + '">' + rdEsc(a) + '</button>';
+        }).join('') + '</div>';
+      var bs = work.getElementsByTagName('button');
+      for (var i = 0; i < bs.length; i++) bs[i].addEventListener('click', function (e) {
+        answers.push(+e.currentTarget.getAttribute('data-a')); ask(n + 1);
+      });
+      if (bs[0]) bs[0].focus();
+    }
+    ask(0);
+  }
+  function rdTally(qs, answers) {
+    var t = { correct: 0, total: qs.length, gist: 0, gistTotal: 0, detail: 0, detailTotal: 0 };
+    qs.forEach(function (q, i) {
+      var ok = answers[i] === q.c;
+      if (ok) t.correct += 1;
+      t[q.kind + 'Total'] += 1;
+      if (ok) t[q.kind] += 1;
+    });
+    return t;
+  }
+  function rdReview(qs, answers) {
+    if (!qs.length) return '';
+    return '<ol class="small-copy">' + qs.map(function (q, i) {
+      var ok = answers[i] === q.c;
+      return '<li><strong>' + (ok ? 'Right' : 'Wrong') + '.</strong> ' + rdEsc(q.q) + ' Your answer: ' + rdEsc(q.a[answers[i]])
+        + (ok ? '' : '; the passage says: ' + rdEsc(q.a[q.c])) + '</li>';
+    }).join('') + '</ol>';
+  }
+  function rdScore(k, answers) {
+    var S = SLOTS[k], st = RD_ST[k], P = rdPassageOf(k), t = rdTally(st.qs || [], answers);
+    var words = rdPassageWords(P), sec = rdMsText(st.ms), vals = {};
+    var got = { words: words, chars: rdPassageChars(P), seconds: sec, correct: t.correct, total: t.total,
+                gist: t.gist, gistTotal: t.gistTotal, detail: t.detail, detailTotal: t.detailTotal,
+                found: t.correct, targets: t.total, phrases: rdPhrases(P).length };
+    if (st.display === 'gist') got.shown = rdWordsIn(rdGistParas(P));
+    if (S.tick && S.tick.count) got.lapses = st.tick;
+    if (S.flow === 'sections') {
+      got.words1 = rdWordsIn(P.paragraphs.slice(0, S.split)); got.words2 = rdWordsIn(P.paragraphs.slice(S.split));
+      got.seconds1 = rdMsText(st.split); got.seconds2 = rdMsText(st.ms - st.split);
+    }
+    Object.keys(S.write || {}).forEach(function (g) { if (got[g] !== undefined) vals[S.write[g]] = got[g]; });
+    if (Object.keys(vals).length) rdWrite(vals);
+    var rate = rdRate(R(BigInt(words)), Rparse(sec));
+    var line = (st.display === 'gist' ? 'Skimmed for ' + rdUnit(Rparse(sec), 's') : rdFig(R(BigInt(words))) + ' words in ' + rdUnit(Rparse(sec), 's') + ': ' + rdUnit(rate, 'wpm'))
+      + (t.total ? ', ' + t.correct + ' of ' + t.total + ' right' : ', no questions') + '.'
+      + (S.tick && st.tick !== undefined ? ' (' + S.tick.label + ': ' + (S.tick.count ? st.tick : st.tick ? 'yes' : 'no') + '.)' : '');
+    rdE('rdOut', k).innerHTML = rdEsc(line) + rdReview(st.qs || [], answers);
+    rdLogAppend({ mode: S.mode, view: S.view, side: k, passage: P.id || 'pasted', band: P.band, display: st.display, words: words, chars: got.chars,
+                  ms: st.ms, correct: t.correct, total: t.total, kind: st.kind,
+                  extra: { gist: t.gist, gistTotal: t.gistTotal, detail: t.detail, detailTotal: t.detailTotal,
+                           target: st.target || null, split: st.split === undefined ? null : st.split, order: S.order || null,
+                           kept: S.tick && S.tick.key === 'kept' ? !!st.tick : null,
+                           lapse: S.tick && S.tick.key === 'lapse' ? !!st.tick : null,
+                           lapses: S.tick && S.tick.count ? st.tick : null } }, rdE('rdMsg', k));
+    var w = rdE('rdWork', k); w.innerHTML = ''; rdShow(w, false);
+    st.phase = 'idle';
+    var s = rdE('rdStart', k); s.textContent = 'Start again'; rdShow(s, true);
+    rdMsg(k, 'Scored and logged. Reading the same passage again measures your memory of it, not your reading.');
+    if (typeof rdAfterScore === 'function') rdAfterScore(k);
+  }
+  function rdDrillInit() {
+    Object.keys(SLOTS).forEach(function (k) {
+      RD_ST[k] = { phase: 'idle', timers: [], ms: 0 };
+      var S = SLOTS[k];
+      rdE('rdStart', k).addEventListener('click', function () { rdStart(k); });
+      rdE('rdDone', k).addEventListener('click', function () { rdFinish(k); });
+      rdE('rdReset', k).addEventListener('click', function () { rdResetSlot(k, false); rdMsg(k, 'Reset: nothing was logged. ' + S.intro); });
+      var nx = rdE('rdNext', k);
+      if (nx) nx.addEventListener('click', function () { rdNextSection(k); });
+      if (rdE('rdAlt', k) && typeof rdAloudInit === 'function') rdAloudInit(k);
+      if ((S.flow === 'find' || S.flow === 'coverage') && typeof rdFindInit === 'function') rdFindInit(k);
+    });
+  }
+
+  var presetS = document.getElementById('txPreset');
+  var statusEl = document.getElementById('txStatus');
+  var tableEl = document.getElementById('txTable');
+  var extraEl = document.getElementById('txExtra');
+  function field(id) { return document.getElementById(id); }
+  function rdClear() { tableEl.innerHTML = ''; if (extraEl) extraEl.innerHTML = ''; }
+  function redraw() {
+    var raw = {}, inst;
+    SPEC.forEach(function (f) { raw[f.key] = field(f.id).value; });
+    try { inst = rdRead(SPEC, raw); } catch (err) { rdClear(); rdRefuse(statusEl, TILES, err.message); return; }
+    var out = txCompute(VIEW, inst, OPTS);
+    if (out.refuse) { rdClear(); rdRefuse(statusEl, TILES, out.refuse); return; }
+    TILES.forEach(function (id) { rdSet(id, out.tiles[id] === undefined ? RD_DASH : out.tiles[id]); });
+    tableEl.innerHTML = out.table ? rdTable(out.table.caption, out.table.head, out.table.rows) : '';
+    if (extraEl) extraEl.innerHTML = (out.svg || '') + (out.html || '');
+    statusEl.innerHTML = rdEsc(out.status);
+  }
+  function rdWrite(values) {
+    SPEC.forEach(function (f) { if (values[f.key] !== undefined) field(f.id).value = String(values[f.key]); });
+    redraw();
+  }
+  presetS.addEventListener('change', function () {
+    var inst = PRESETS[presetS.value];
+    if (!inst) return;
+    if (typeof rdFill === 'function') inst = rdFill(inst);
+    rdWrite(inst);
+  });
+  SPEC.forEach(function (f) { field(f.id).addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  if (rdDueBanner()) { var rdWarmBox = document.getElementById('rdBoxW'); if (rdWarmBox) rdWarmBox.style.display = 'none'; }
+  rdDrillInit();
+
+  function rdFill(inst) {
+    var id = inst.__passage;
+    var view = document.getElementById('txPassage');
+    if (!id || !PASSAGES[id]) { if (view) view.innerHTML = ''; return inst; }
+    var c = rdCounts(PASSAGES[id]);
+    if (view) view.innerHTML = '<h4>' + rdEsc(PASSAGES[id].title) + '</h4>' + PASSAGES[id].paragraphs.map(function (p) {
+      return rdHeading(p) ? '<h4>' + rdEsc(rdPlain(p)) + '</h4>' : '<p>' + rdEsc(rdPlain(p)) + '</p>';
+    }).join('');
+    return { words: c.words, sentences: c.sentences, syllables: c.syllables };
+  }
+  (function () {
+    var b = document.getElementById('txCount');
+    var first = PRESETS[presetS.value];
+    if (first && first.__passage) rdWrite(rdFill(first));
+    b.addEventListener('click', function () {
+      var text = rdClean(document.getElementById('txOwn').value);
+      if (text === '') return;
+      var c = rdCounts({ paragraphs: text.split(/\n\s*\n/) });
+      if (!c.words || !c.sentences) { statusEl.textContent = 'That text has no complete sentence to count.'; return; }
+      document.getElementById('txPassage').innerHTML = '';
+      rdWrite(c);
+    });
+  })();
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "reading-words-knowledge-and-difficulty/measuring-difficulty";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+  </script>
+</body>
+</html>
