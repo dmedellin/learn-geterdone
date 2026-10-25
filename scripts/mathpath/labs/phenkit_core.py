@@ -335,7 +335,7 @@ PH_CORE_JS = r"""
       + '" stroke="' + stroke + '" stroke-width="2"' + (extra || '') + '></line>';
   }
   function phText(x, y, text, anchor) {
-    return '<text x="' + phPx(x) + '" y="' + phPx(y) + '" fill="var(--text)" font-size="13"'
+    return '<text x="' + phPx(x) + '" y="' + phPx(y) + '" fill="var(--text)" font-size="20"'
       + (anchor ? ' text-anchor="' + anchor + '"' : '') + '>' + phEsc(text) + '</text>';
   }
 """

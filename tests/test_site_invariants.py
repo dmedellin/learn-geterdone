@@ -1469,9 +1469,92 @@ CAP_COURSES = (
 CAP_PATH_COURSE_COUNT = 14
 CAP_UPCOMING_COURSES = ()
 
+# The Phenomenology path: seven courses, all published. Generated from
+# content/phenomenology/ so these cannot disagree with what is built.
+PHEN_PATH_PAGE = "/paths/phenomenology/"
+
+PHEN_COURSE_1_HOME = "/perception-what-phenomenology-is/"
+PHEN_COURSE_1_LESSONS = (
+    "description-not-explanation",
+    "the-reduction-and-its-limit",
+    "essences-and-existence",
+    "intentionality-and-rationality",
+)
+PHEN_COURSE_2_HOME = "/perception-classical-prejudices/"
+PHEN_COURSE_2_LESSONS = (
+    "the-idea-of-pure-sensation",
+    "the-constancy-hypothesis",
+    "association-and-the-projection-of-memories",
+    "attention-and-judgment",
+    "the-phenomenal-field",
+)
+PHEN_COURSE_3_HOME = "/perception-the-lived-body/"
+PHEN_COURSE_3_LESSONS = (
+    "experience-and-objective-thought",
+    "the-phantom-limb",
+    "the-habitual-body",
+    "the-permanence-of-ones-own-body",
+    "the-body-schema",
+    "schneider-concrete-and-abstract-movement",
+    "the-intentional-arc",
+    "habit-and-the-blind-mans-cane",
+)
+PHEN_COURSE_4_HOME = "/perception-the-expressive-body/"
+PHEN_COURSE_4_LESSONS = (
+    "the-body-as-a-work-of-art",
+    "the-body-as-a-sexed-being",
+    "speech-as-gesture",
+    "the-spoken-word-and-thought",
+)
+PHEN_COURSE_5_HOME = "/perception-sensing-and-space/"
+PHEN_COURSE_5_LESSONS = (
+    "the-body-and-perception",
+    "the-motor-physiognomy-of-colours",
+    "the-anonymous-subject-of-sensing",
+    "the-unity-of-the-senses",
+    "up-and-down",
+    "depth",
+    "movement",
+    "lived-space",
+)
+PHEN_COURSE_6_HOME = "/perception-things-world-and-others/"
+PHEN_COURSE_6_LESSONS = (
+    "size-and-shape-constancy",
+    "colour-and-lighting",
+    "the-thing-and-the-real",
+    "the-natural-world",
+    "hallucination",
+    "the-cultural-world-and-others",
+    "the-truth-of-solipsism",
+)
+PHEN_COURSE_7_HOME = "/perception-cogito-time-and-freedom/"
+PHEN_COURSE_7_LESSONS = (
+    "the-cogito-and-the-certainty-of-seeing",
+    "the-triangle",
+    "the-tacit-cogito",
+    "time-is-not-in-things",
+    "the-field-of-presence",
+    "time-as-subject",
+    "the-rock-and-the-project",
+    "freedom-in-situation",
+)
+
+PHEN_COURSES = (
+    ("What Phenomenology Is", PHEN_COURSE_1_HOME, PHEN_COURSE_1_LESSONS),
+    ("Classical Prejudices", PHEN_COURSE_2_HOME, PHEN_COURSE_2_LESSONS),
+    ("The Lived Body", PHEN_COURSE_3_HOME, PHEN_COURSE_3_LESSONS),
+    ("The Expressive Body", PHEN_COURSE_4_HOME, PHEN_COURSE_4_LESSONS),
+    ("Sensing and Space", PHEN_COURSE_5_HOME, PHEN_COURSE_5_LESSONS),
+    ("Things, the World and Others", PHEN_COURSE_6_HOME, PHEN_COURSE_6_LESSONS),
+    ("The Cogito, Time and Freedom", PHEN_COURSE_7_HOME, PHEN_COURSE_7_LESSONS),
+)
+
+PHEN_PATH_COURSE_COUNT = 7
+PHEN_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
-               + DE_COURSES + CAP_COURSES)
+               + DE_COURSES + CAP_COURSES + PHEN_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1592,7 +1675,7 @@ def source_of(url):
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
-                       CAP_PATH_PAGE)
+                       CAP_PATH_PAGE, PHEN_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1617,6 +1700,8 @@ PATHS = (
      DE_UPCOMING_COURSES),
     ("Capital", CAP_PATH_PAGE, CAP_COURSES, CAP_PATH_COURSE_COUNT,
      CAP_UPCOMING_COURSES),
+    ("Phenomenology", PHEN_PATH_PAGE, PHEN_COURSES, PHEN_PATH_COURSE_COUNT,
+     PHEN_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -1817,6 +1902,12 @@ DE_DISCLAIMER_RE = re.compile(
 # argues and no lab settles. Stopping short of the em dash, for OR's reason.
 CAP_DISCLAIMER_RE = re.compile(
     r"(?i)only as good as the definitions")
+# Phenomenology promises that every figure is what a stated model of perception
+# predicts, or a count over a lesson's cases, and warns that what perception
+# gives is not a figure -- the claim the book argues and no lab settles.
+# Stopping short of the em dash, for OR's reason.
+PHEN_DISCLAIMER_RE = re.compile(
+    r"(?i)what perception gives is not a figure")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -1837,6 +1928,8 @@ PATH_MATERIAL_DISCLAIMER = {
                    DE_DISCLAIMER_RE),
     CAP_PATH_PAGE: ("the only-as-good-as-the-definitions disclaimer",
                     CAP_DISCLAIMER_RE),
+    PHEN_PATH_PAGE: ("the perception-is-not-a-figure disclaimer",
+                     PHEN_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2166,10 +2259,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(CAP_COURSES)
             + sum(len(slugs) for _t, _h, slugs in CAP_COURSES)
         )
+        phen_tree = (
+            1  # the Phenomenology path page
+            + len(PHEN_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in PHEN_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
-                       + cap_tree)  # 1 for the index
+                       + cap_tree + phen_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2231,9 +2329,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 134 pages, got %d" % cap_tree,
         )
         self.assertEqual(
-            1123,
+            52,
+            phen_tree,
+            "the Phenomenology path is 1 + 7 + 4 + 5 + 8 + 4 + 8 + 7 + 8 "
+            "= 52 pages, got %d" % phen_tree,
+        )
+        self.assertEqual(
+            1175,
             course_tree,
-            "the site index plus all ten path trees is 1123 pages, got %d" % course_tree,
+            "the site index plus all eleven path trees is 1175 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2244,9 +2348,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1127,
+            1179,
             expected,
-            "1123 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1127, "
+            "1175 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1179, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2462,6 +2566,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "english": getattr(smoke, "ENG_COURSES", ()),
             "differential_equations": getattr(smoke, "DE_COURSES", ()),
             "capital": getattr(smoke, "CAP_COURSES", ()),
+            "phenomenology": getattr(smoke, "PHEN_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -2874,9 +2979,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1112,
+            1163,
             len(course_pages),
-            "ninety-eight course homes and 1014 lessons carry a material "
+            "one hundred and five course homes and 1058 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -3867,7 +3972,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(98, checked, "every published course must be checked")
+        self.assertEqual(105, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4166,6 +4271,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from english import PATH as ENGLISH
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
             from capital import PATH as CAPITAL
+            from phenomenology import PATH as PHENOMENOLOGY
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4177,6 +4283,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("differential equations", DE_COURSES, DE_PATH_PAGE,
              DIFFERENTIAL_EQUATIONS),
             ("capital", CAP_COURSES, CAP_PATH_PAGE, CAPITAL),
+            ("phenomenology", PHEN_COURSES, PHEN_PATH_PAGE, PHENOMENOLOGY),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4310,11 +4417,12 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from english import PATH as ENGLISH
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
             from capital import PATH as CAPITAL
+            from phenomenology import PATH as PHENOMENOLOGY
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL):
+                     CAPITAL, PHENOMENOLOGY):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4465,12 +4573,13 @@ class TestEveryLabBuilds(unittest.TestCase):
             from english import PATH as ENGLISH
             from differential_equations import PATH as DIFFERENTIAL_EQUATIONS
             from capital import PATH as CAPITAL
+            from phenomenology import PATH as PHENOMENOLOGY
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL):
+                     CAPITAL, PHENOMENOLOGY):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

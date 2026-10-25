@@ -353,9 +353,11 @@ class TestReaderScript(unittest.TestCase):
         self.assertNotIn('"', READOUT_JS)
 
 
-def _sound_islands(path):
-    """Every sound or stress-mark island in a Subject's prose (speech.islands)."""
-    from mathpath.speech import _IPA, _STRESS, islands
+def _prose_islands(path):
+    """Every math island in a Subject's prose: the runs written without
+    backticks that render._prose gives a spoken form (speech.islands), read
+    from the same strings and split on tags the same way."""
+    from mathpath.speech import islands
     tag, span = re.compile(r"(<[^>]+>)"), re.compile(r"`[^`]*`")
 
     def strings(node):
@@ -375,10 +377,15 @@ def _sound_islands(path):
         for piece in tag.split(span.sub(" ", text)):
             if not piece.startswith("<"):
                 for start, end in islands(piece):
-                    island = piece[start:end]
-                    if _IPA.search(island) or _STRESS.match(island):
-                        found.add(island)
+                    found.add(piece[start:end])
     return found
+
+
+def _sound_islands(path):
+    """Every sound or stress-mark island in a Subject's prose (speech.islands)."""
+    from mathpath.speech import _IPA, _STRESS
+    return {island for island in _prose_islands(path)
+            if _IPA.search(island) or _STRESS.match(island)}
 
 
 class TestCoverage(unittest.TestCase):
@@ -412,9 +419,11 @@ class TestCoverage(unittest.TestCase):
 
     def test_no_spoken_form_for_math_that_is_gone(self):
         """A spoken form keyed to a run the content no longer has is dead data,
-        and the next edit to that line silently loses its reading."""
+        and the next edit to that line silently loses its reading. A prose
+        island counts as present: render._prose speaks it with its spoken
+        form (Phenomenology's `ho_se` and `_a_e` are read that way)."""
         for path, overrides in self.subjects:
-            present = {run for run, _, _ in self.runs(path)} | _sound_islands(path)
+            present = {run for run, _, _ in self.runs(path)} | _prose_islands(path)
             with self.subTest(path=path["slug"]):
                 self.assertEqual(sorted(set(overrides) - present), [])
 
