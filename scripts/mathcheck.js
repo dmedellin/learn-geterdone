@@ -21976,6 +21976,8 @@ console.log('introduction to algorithms: itakit family A, eight modes');
      'n = 10: from there on A (n^3) is always faster | 16,384/15,625 ≈ 1.05 s', 'growth/race: 2^n > n³ from n = 10 (2^9 = 512 < 729)');
   eq(gr('race', { fnA: 'n', costA: '3', speedA: '100', fnB: 'n', costB: '2', speedB: '100', n: '64' }, 'griCross'),
      'never: the same order of growth, so A always takes 3/2 ≈ 1.5× B\'s time', 'growth/race: equal orders never cross');
+  eq(gr('race', { fnA: 'n', costA: '1', speedA: '100', fnB: 'n', costB: '41', speedB: '100', n: '64' }, 'griCross'),
+     'never: the same order of growth, so B always takes 41× A\'s time', 'growth/race: a ratio under 1 is stated from the slower program, never as 0.0×');
   eq(gr('race', { fnA: 'n^2', costA: '1', speedA: '1', fnB: 'n', costB: '8', speedB: '1', n: '8' }, 'griCross griFaster'),
      'n = 9: from there on B (n) is always faster | neither: the same time', 'growth/race: n² = 8n exactly at n = 8, so B wins for good from 9');
   eq(gr('race', { fnA: 'n^2', costA: '1', speedA: '1', fnB: 'n', costB: '100', speedB: '1', n: '100' }, 'griCross'),
@@ -22074,6 +22076,8 @@ console.log('introduction to algorithms: itakit family A, eight modes');
   eq(ft('multiply', { a: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1', b: '1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1' }, 'ftiN ftiFft ftiAgree'),
      '32 (product degree 30) | ' + Array.from({ length: 31 }, (_, i) => (i < 16 ? (i % 2 ? '0' : '1') : (i % 2 ? '0' : '−1'))).join(', ') + ' | yes', 'fft: two length-16 polynomials, rounded and checked against the schoolbook product');
   eq(ft('multiply', { a: '999999 -1000000 777777', b: '-1000000 1 999999 123456' }, 'ftiAgree'), 'yes', 'fft: coefficients near 10^6 still round to the exact product');
+  eq(ft('multiply', { a: '1000000 -1', b: '-1000000 2' }, 'ftiSchool ftiFft ftiAgree'),
+     '−1000000000000, 3000000, −2 | −1000000000000, 3000000, −2 | yes', 'fft: coefficient lists carry no thousands commas, so every comma separates two coefficients');
 }
 // ---- end itakit family A ----
 

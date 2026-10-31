@@ -1520,8 +1520,10 @@ BTREE = {
                      "above it), then B-TREE-INSERT-NONFULL walks down: at a leaf it inserts the key and writes the leaf "
                      "(1 write); at an inner node it reads the child it will descend to (1 read; the root is never read, "
                      "it stays in memory) and, when that child is full, splits it before descending, which writes the "
-                     "two halves and the parent (3 writes). After a split the walk takes the new right half without "
-                     "reading it. Height counts the edges from the root to a leaf, so a lone root has height 0. The "
+                     "two halves and the parent (3 writes). After a split below the root the walk takes the new right "
+                     "half without reading it. Right after a root split, B-TREE-INSERT-NONFULL starts at the "
+                     "new root and reads the child it descends to, so one DISK-READ is counted on the half the walk "
+                     "enters, as the book's procedure calls it, though that half was just written. Height counts the edges from the root to a leaf, so a lone root has height 0. The "
                      "bound is printed to two places, rounded half up by exact integer comparison.",
             "js": BTI_VIEW_JS["insert"],
         },

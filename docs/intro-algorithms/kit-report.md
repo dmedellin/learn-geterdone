@@ -9,7 +9,7 @@ string in family A's section was read off a rendered page with
 `node scripts/labcheck.js --observe`; none was copied from the code. The
 "Deviations" section says where family A differs from §D and why.
 
-## Files (nothing committed)
+## Files
 
 - `scripts/mathpath/labs/itakit.py`: the entry point `itakit_lab(cfg)`,
   `mode_lab(cfg, mode, spec)` (shared with family B), `ITA_CORE_JS` (shipped
@@ -24,8 +24,8 @@ string in family A's section was read off a rendered page with
 - `scripts/mathpath/labs/__init__.py`: one import (`itakit,`) and one registry
   line (`"itakit": itakit.itakit_lab,`).
 - `scripts/build_paths.py`: `"itakit"` added to `KITS_WITH_EXPECTATIONS`
-  (no published page uses the kit yet, so `--check` is unchanged). From now on
-  every itakit preset menu must pin at least one tile on every option.
+  (the Subject's 61 lessons are its published pages). Every itakit preset
+  menu must pin at least one tile on every option.
 - `scripts/mathcheck.js`: the block `// ---- itakit (Introduction to
   Algorithms), family A ----` … `// ---- end itakit family A ----`, before
   THE VERDICT: 49 assertions, one vm context per mode.
@@ -108,7 +108,8 @@ containing lg n, which prints rounded while every comparison involving lg n
 integers (`itaLgCmp`); (2) the exponent in `rciCritical` when log_b a is
 irrational (`n^(log_2 7) ≈ n^2.807`), while the case is decided on integers;
 (3) fft, which works in doubles, rounds, and compares with the exact
-schoolbook product (`ftiAgree`). Never pin `ftiError`: its value is a
+schoolbook product (`ftiAgree`); its rounding distance is not below 10^−9
+for large coefficients (see "fft" below). Never pin `ftiError`: its value is a
 floating-point residue and may differ between browsers.
 
 **Refusals.** Beyond the field rules above, each view's Python `check`
@@ -326,7 +327,9 @@ cost grows more slowly is strictly faster at every larger n (n = 1 to 64 one
 by one, then bisection up to 10^15, or 4,096 when either costs `2^n`; past
 the cap: `beyond n = 1,000,000,000,000,000, where the search stops`). Equal
 orders never cross: `never: the same order of growth, so A always takes 3/2
-≈ 1.5× B's time`. An exact tie is not "faster": n² against 8n crosses at
+≈ 1.5× B's time`; the ratio is always stated from the slower program, so it
+is never under 1 (A's constant 1 and B's 41 on one machine: `never: the
+same order of growth, so B always takes 41× A's time`). An exact tie is not "faster": n² against 8n crosses at
 `n = 9: …` and `griFaster` at n = 8 is `neither: the same time`. Other
 observed: n³ against 2^n on one machine at 10^6 a second, n = 20:
 `griCross` `n = 10: from there on A (n^3) is always faster`, `griTimeA`
@@ -425,9 +428,19 @@ singular: column 2 has no nonzero pivot on or below the diagonal").
 
 **fft.** Coefficients are listed constant term first. n is the least power
 of 2 at least the product's length; butterflies are 3 × (n/2) lg n (two
-forward transforms and one inverse) plus n pointwise products. `ftiError`
-is `below 10^−9` for every input the kit accepts that was tried, but do not
-pin it. Refuses nothing beyond the fields (1–16 whole numbers from
+forward transforms and one inverse) plus n pointwise products. `ftiSchool`
+and `ftiFft` print their coefficients without thousands separators, so every
+comma separates two coefficients: `−1000000000000, 3000000, −2`. `ftiError`
+is `below 10^−9` only for small coefficients; it grows with their size, and
+near a million it is not: the `large` preset (`1000000 −999999 1000000` times
+`999999 1000000 −1000000`) prints about `1.8 × 10^−4`, and sixteen
+coefficients of 1,000,000 squared about `3.9 × 10^−3`. Every input the kit
+accepts stays far under the 1/2 at which rounding could land on the wrong
+integer (20,000 random inputs at the limits: largest distance 1.2 × 10^−3,
+none wrong). `ftiAgree` does not rely on that margin: it compares every
+rounded coefficient, padding included, with the exact BigInt schoolbook
+product, so it reads `yes` only when the FFT's answer is exactly right. Do
+not pin `ftiError`. Refuses nothing beyond the fields (1–16 whole numbers from
 −1,000,000 to 1,000,000).
 
 ### A sample preset (sorting/merge)
@@ -694,10 +707,14 @@ leaf, so a lone node has height 1); `rbiBound` Lemma 13.1 bound.
   `log_2 8 = 3`); `btiLevels` The tree by level, root first `[4] / [2] [6 8]
   / [1] [3] [5] [7] [9 10]`. Counting is B-TREE-INSERT's: 1 write when the
   key goes into a leaf; 1 read for each child the walk descends to (never the
-  root, which stays in memory, and never the new right half after a split,
-  which was just written); 3 writes for each split (both halves and the
-  parent); a full root is split first under a new root. B-TREE-CREATE's one
-  write is not in the totals. Table: per key, splits, reads, writes, height.
+  root, which stays in memory, and never the new right half after a split
+  below the root, which was just written); 3 writes for each split (both halves and the
+  parent); a full root is split first under a new root. Right after a root
+  split, B-TREE-INSERT calls B-TREE-INSERT-NONFULL on the new root, which
+  reads the child it descends to: one DISK-READ is counted on the half the
+  walk enters, though that half was just written, because the book's
+  procedure calls DISK-READ there. B-TREE-CREATE's one write is not in the
+  totals. Table: per key, splits, reads, writes, height.
   Refused: a key twice.
 
 ### fibheap (`fhi`)

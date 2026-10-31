@@ -196,8 +196,11 @@ GRI_VIEW_JS["race"] = r"""
       rows.push([eaInt(k), griShow(a) + ' s', griShow(b) + ' s', d < 0 ? 'A' : (d > 0 ? 'B' : 'neither')]);
     });
     if (GRI_RANK[A.fn] === GRI_RANK[B.fn]) {
-      var q = Rdiv(A.k, B.k);
-      cross = 'never: the same order of growth, so A always takes ' + eaTimes(q) + ' B\'s time';
+      var q = Rdiv(A.k, B.k), qa = Rcmp(q, R1) >= 0;
+      /* State the ratio from the slower program, so it is never a figure under 1
+         that rounds to 0.0×. */
+      cross = 'never: the same order of growth, so ' + (qa ? 'A' : 'B') + ' always takes '
+        + eaTimes(qa ? q : Rdiv(R1, q)) + ' ' + (qa ? 'B' : 'A') + '\'s time';
     } else {
       var S = GRI_RANK[A.fn] < GRI_RANK[B.fn] ? A : B, F = S === A ? B : A;
       var cap = (A.fn === '2^n' || B.fn === '2^n') ? 4096n : 1000000000000000n;
@@ -1005,7 +1008,9 @@ LUI_VIEW_JS["decompose"] = r"""
       tiles: tiles,
       status: 'PA = LU with L unit lower-triangular and U upper-triangular; π lists, for each row of PA, the row of A it came from. '
         + 'Every entry is an exact fraction, so nothing is lost to rounding: a pivot is chosen by size, as the book does for numerical stability, '
-        + 'though here it changes no figure\'s accuracy. det A = ' + (sign < 0 ? '−' : '+') + 'the product of the pivots.',
+        + 'though here it changes no figure\'s accuracy. det A is the product of the pivots' + (sign < 0
+          ? ', negated: the permutation is odd (an odd number of row swaps).'
+          : ', unchanged: the permutation is even (an even number of row swaps).'),
       table: { caption: 'Elimination, column by column', head: ['column', 'pivot from', 'pivot', 'multipliers below it'], rows: steps }
     };
   };
@@ -1068,6 +1073,11 @@ FTI_VIEW_JS["multiply"] = r"""
     if (invert) for (i = 0; i < n; i += 1) { re[i] /= n; im[i] /= n; }
     return bf;
   }
+  /* A coefficient list: no thousands grouping, so the only commas are the
+     ones between coefficients (1000000, −1999999, 3). */
+  function ftiList(a) {
+    return a.map(function (c) { return (c < 0n ? EA_MINUS : '') + String(c < 0n ? -c : c); }).join(', ');
+  }
   FTI_VIEW.multiply = function (inst) {
     var a = inst.a.map(function (r) { return r.n; }), b = inst.b.map(function (r) { return r.n; });
     var deg = a.length + b.length - 1, n = 1, i, j;
@@ -1098,8 +1108,8 @@ FTI_VIEW_JS["multiply"] = r"""
     return {
       tiles: {
         ftiN: eaInt(n) + ' (product degree ' + (deg - 1) + ')',
-        ftiSchool: itaList(school), ftiSchoolMults: eaInt(a.length * b.length) + ' (' + a.length + ' × ' + b.length + ')',
-        ftiFft: itaList(rounded.slice(0, deg)),
+        ftiSchool: ftiList(school), ftiSchoolMults: eaInt(a.length * b.length) + ' (' + a.length + ' × ' + b.length + ')',
+        ftiFft: ftiList(rounded.slice(0, deg)),
         ftiButterflies: eaInt(bf) + ' (3 transforms × (n/2) lg n = 3 × ' + eaInt(n / 2 * lg) + '), and ' + eaInt(n) + ' pointwise products',
         ftiAgree: agree ? 'yes' : 'no',
         ftiError: err < 1e-9 ? 'below 10^−9' : err.toExponential(1).replace('e', ' × 10^').replace('-', EA_MINUS)
@@ -1352,7 +1362,8 @@ FFT = {
                      "to n, the least power of 2 at least the product's length, evaluates each at the n complex nth "
                      "roots of unity, multiplies pointwise and interpolates by the inverse FFT. It works in floating "
                      "point (doubles): the result is rounded to the nearest integer, and compared with the schoolbook "
-                     "product. The distance tile is rounded and can differ between browsers in its last digit.",
+                     "product. Coefficient lists print without thousands separators, so every comma separates two "
+                     "coefficients. The distance tile is rounded and can differ between browsers in its last digit.",
             "js": FTI_VIEW_JS["multiply"],
         },
     },
