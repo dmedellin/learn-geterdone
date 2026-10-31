@@ -19,6 +19,7 @@ const PAGES = [
   ['generated', '/perception-classical-prejudices/association-and-the-projection-of-memories/'],
   ['generated', '/reading-measure-your-reading/comprehension-and-effective-rate/'],
   ['generated', '/code-complete-statements/boolean-expressions/'],
+  ['generated', '/enterprise-patterns-domain-logic/transaction-script/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];

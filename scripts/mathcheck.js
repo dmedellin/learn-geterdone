@@ -21215,6 +21215,23 @@ console.log('code complete: cckit, eight modes');
      '3 | 0–3', 'code/complexity: a band includes its top');
   eq(C('complexity', 'void f() {\n    if (a) {\n    } else {\n    }\n}', 'coDepth coDeepest', '{}', { bands: [5, 10] }), '0 | line 2',
      'code/complexity: a line\'s depth is taken after the braces that open it');
+  /* section H.1 of the Enterprise Patterns plan: cfg book "other" names Code Complete where the default says "the book" */
+  const coOther = mk(ckBlock('core', 'CC_LEX_JS') + ckBlock('a', 'CO_JS') + ckBlock('a', 'CO_DECIDE_JS')
+    + views('a', 'CO_VIEW_JS', ['complexity']) + ckBlock('a', 'CO_BOOK_OTHER_JS'));
+  const TERN = 'int f(int a) {\n    if (a > 0) { a = 1; }\n    return a > 1 ? a : -a;\n}';
+  const cxStatus = (ctx) => ctx("coCompute('complexity', {code: ccSplitLines(" + JSON.stringify(TERN) + ")}, {bands: [5, 10]}).status");
+  const other = cxStatus(coOther), plain = cxStatus(co);
+  eq([other.indexOf('McConnell\'s guidance in Code Complete on what') >= 0, other.indexOf('McConnell prints his bands as 0–5') >= 0,
+      other.indexOf('the kit\'s choice, not McConnell\'s.') >= 0, /book/.test(other)].join(), 'true,true,true,false',
+     'code/complexity: book "other" names McConnell and Code Complete, and never says "the book"');
+  eq([plain.indexOf('McConnell\'s guidance on what') >= 0, plain.indexOf('The book prints its bands') >= 0,
+      plain.indexOf('the kit\'s choice, not the book\'s.') >= 0].join(), 'true,true,true',
+     'code/complexity: the default banner is unchanged');
+  eq(other.replace('McConnell\'s guidance in Code Complete on what', 'McConnell\'s guidance on what').replace('McConnell prints his bands', 'The book prints its bands')
+       .replace('the kit\'s choice, not McConnell\'s.', 'the kit\'s choice, not the book\'s.'), plain,
+     'code/complexity: book "other" changes those three phrases and nothing else');
+  eq(coOther("T(coCompute('complexity', {code: ccSplitLines(" + JSON.stringify(TERN) + ")}, {bands: [5, 10]}), '" + CX + "')"),
+     C('complexity', TERN, CX, '{}', { bands: [5, 10] }), 'code/complexity: book "other" changes no tile');
   eq(C('size', 'int f() {\n}\n}', 'coLines'), 'REFUSED Line 3 closes a brace that no earlier line opened', 'code: an unbalanced brace');
   starts(C('size', 'String s = "abc;', 'coLines'), 'REFUSED Line 1 has a string literal that does not clo', 'code: an unclosed string');
   starts(C('size', 'int x = a # b;', 'coLines'), 'REFUSED Line 1 has "#", whi', 'code: a character outside the subset');
@@ -21447,6 +21464,432 @@ console.log('code complete: cckit, eight modes');
   }
 }
 // ---- end cckit ----
+
+// ---- eakit (Enterprise Patterns) ----
+// ==========================================================================
+// Patterns of Enterprise Application Architecture, Read Along: eakit.py,
+// eakit_b.py and eakit_core.py
+// ==========================================================================
+//
+// RATIONAL_JS and EA_CORE_JS, then one vm context per mode holding that mode's
+// base block and every one of its view blocks (a page ships one view; together
+// here they show the views do not collide). Each mode's pure
+// <xx>Compute(view, inst, opts) is called on inputs read by the kit's own
+// parser (eaRead) and compared on the exact tile string a reader sees. The
+// figures are docs/enterprise-patterns/PLAN.md section C's, as the reference
+// model earef.py prints them; the edge cases are D.1's rules in D.0's format,
+// each confirmed on a rendered page. Every mode's block was seen to FAIL when
+// a line it tests was broken on purpose (docs/enterprise-patterns/kit-report.md).
+console.log('enterprise patterns: eakit, eight modes');
+{
+  const vm = require('vm');
+  const eaFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const eaSrc = { core: fs.readFileSync(eaFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(eaFile('eakit.py'), 'utf8'),
+    b: fs.readFileSync(eaFile('eakit_b.py'), 'utf8') };
+  const eaBlock = (src, name) => blockFrom(eaSrc[src], name.replace(/[[\]]/g, '\\$&'), 'eakit (' + src + ')');
+  const eaViews = (src, dict, list) => list.map((v) => eaBlock(src, dict + '["' + v + '"]')).join('');
+  /* Field specs as the kit's views declare them (eakit.py VIEWS), so eaRead
+     parses what a reader types before the view sees it. */
+  const SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function N(gt, lo) { var f = { kind: 'num', max: LIM }; if (gt !== null) f.gt = String(gt); if (lo !== undefined) f.min = String(lo); return f; }
+    var NM = { kind: 'name' }, PA = { kind: 'parent' }, YN = { kind: 'word', words: ['yes', 'no'] };
+    function WD(list) { return { kind: 'word', words: list.split(' ') }; }
+    function REC(sub, unique) { return { kind: 'rec', lo: 1, hi: 60, unique: !!unique, sub: sub }; }
+    function PAIRS(shape) { return { kind: 'pairs', hi: 60, shape: shape }; }
+    var SPEC_OF = {
+      'perf/load': { points: REC([['system', NM], ['users', W(1)], ['ms', N(0)]]), users: W(1) },
+      'perf/scale': { points: REC([['system', NM], ['servers', W(1, 10000)], ['tps', N(null, 0)]]), need: N(0), at: W(1, 10000) },
+      'remote/boundary': { calls: REC([['caller', NM], ['callee', NM], ['count', W(0)]]), nodes: PAIRS('class=node'), remoteUs: N(0), localUs: N(0) },
+      'remote/calls': { ops: REC([['operation', NM], ['fine', W(1)]], true), latencyMs: N(0), workMs: N(null, 0) },
+      'remote/payload': { fields: REC([['field', NM], ['bytes', W(0)], ['needed', YN]], true), latencyMs: N(0), bytesPerMs: N(0), factor: N(0) },
+      'load/instances': { tables: REC([['table', NM], ['rows', W(0)]], true) },
+      'load/finds': { wanted: W(1), broad: W(1), batch: W(1), latencyMs: N(0), rowMs: N(null, 0) },
+      'load/identity': { finds: REC([['class', NM], ['id', NM]]) },
+      'load/graph': { parents: REC([['parent', NM], ['children', W(0)], ['used', YN]], true), batch: W(1) },
+      'load/tree': { nodes: REC([['node', NM], ['parent', PA]], true) },
+      'uow/commit': { script: REC([['op', WD('load new change delete')], ['object', NM]]) },
+      'uow/order': { keys: REC([['child', NM], ['parent', NM]]), as: { kind: 'list', lo: 0, hi: 60, things: 'tables', each: NM } },
+      'inherit/tables': { classes: REC([['class', NM], ['parent', PA], ['fields', W(0, 1000)], ['concrete', YN]], true), load: NM, find: NM, alter: NM },
+      'lock/reads': { items: REC([['item', NM], ['before', W(0)], ['after', W(0)], ['read', WD('before after')], ['change', WD('insert update')]], true) },
+      'lock/timeline': { events: REC([['minute', W(0)], ['session', NM], ['action', WD('read edit commit')], ['record', PA]]),
+        scheme: WD('none optimistic pessimistic'), groups: PAIRS('record=group'), checkReads: WD('no yes') },
+      'session/objects': { users: W(1), serviceMs: N(0), thinkMs: N(0) },
+      'session/state': { users: W(1), stateBytes: W(1), requests: W(1), idBytes: W(0) },
+      'money/allocate': { amount: W(0), ratios: { kind: 'list', lo: 2, hi: 20, things: 'ratios', each: W(0, 1000000) }, rule: WD('nearest down up last allocator') }
+    };
+    var DEFAULTS = { nodes: '', as: '', groups: '', checkReads: 'no' };
+    /* Read the raw texts as the page does, then compute; T joins the tiles. */
+    function RUN(mode, view, raw, opts) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = eaRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, opts || {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+  `;
+  const eaMk = (code, mode, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + eaBlock('core', 'EA_CORE_JS') + code + SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ', MODE = ' + JSON.stringify(mode || '') + ';', ctx, { filename: 'eakit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const eaCall = (run, mode, defaults) => (view, raw, ids, opts) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', '
+      + JSON.stringify(Object.assign({}, defaults || {}, opts || {})) + '), ' + JSON.stringify(ids) + ')');
+  const eaStarts = (got, want, label) => eq(String(got).slice(0, want.length), want, label);
+
+  /* --- eakit_core: printing (D.0) ------------------------------------------ */
+  const ec = eaMk('');
+  const EQ = (t) => "Rparse('" + t + "')";
+  eq(ec("eaInt(2692537n) + ' ' + eaInt(-1n) + ' ' + eaInt(0)"), '2,692,537 −1 0', 'eaInt: grouped, U+2212');
+  eq(ec("[eaNum(Rparse('7/2')), eaNum(Rparse('28/3')), eaNum(Rparse('-29/15')), eaNum(Rparse('4000'))].join('; ')"),
+     '7/2 = 3.50; 28/3 ≈ 9.33; −29/15 ≈ −1.93; 4,000', 'eaNum: "=" only when the two places are exact');
+  eq(ec("eaNum(Rparse('51033/500')) + '; ' + eaNum(Rparse('3171/2')) + '; ' + eaNum(Rparse('5000000000000/1000003'))"),
+     '51,033/500 ≈ 102.07; 3,171/2 = 1,585.50; 5,000,000,000,000/1,000,003 ≈ 4,999,985.00', 'eaNum: both parts of the fraction grouped (section C)');
+  eq(ec("eaNum(Rparse('23/8')) + '; ' + eaNum(Rparse('-23/8')) + '; ' + eaNum(Rparse('1/300'))"), '23/8 ≈ 2.88; −23/8 ≈ −2.88; 1/300 ≈ 0.00',
+     'eaNum: half away from zero on the exact value');
+  eq(ec("eaNum(R(10n ** 40n, 3n)) + '; ' + eaNum(R(-1n, 10n ** 40n))"), '≈ 3.33 × 10^39; ≈ −1.00 × 10^−40', 'eaNum: past 30 digits');
+  eq(ec("[eaPct(" + EQ('9/10') + "), eaPct(" + EQ('2/3') + "), eaPct(R1), eaPct(R0), eaPct(" + EQ('1000/1003') + "), eaPct(" + EQ('94000/94027') + "), eaPct(" + EQ('1/8') + ")].join('; ')"),
+     '9/10 = 90%; 2/3 ≈ 66.7%; 1 = 100%; 0 = 0%; 1,000/1,003 ≈ 99.7%; 94,000/94,027 ≈ 100.0%; 1/8 = 12.5%', 'eaPct');
+  eq(ec("[eaTimes(R(10n)), eaTimes(" + EQ('125/37') + "), eaTimes(" + EQ('11/5') + "), eaTimes(" + EQ('94027/74') + "), eaTimes(R1)].join('; ')"),
+     '10×; 125/37 ≈ 3.4×; 11/5 ≈ 2.2×; 94,027/74 ≈ 1,270.6×; 1×', 'eaTimes: whole, else one place and always "≈" (D.0)');
+  eq(ec("eaSigned(1n) + ' ' + eaSigned(-1n) + ' ' + eaSigned(0n) + ' ' + eaCount([]) + ' / ' + eaCount(['david', 'martin'])"),
+     '+1 −1 0 0: none / 2: david, martin', 'eaSigned, eaCount');
+  eq(ec("[eaFloor(" + EQ('7/2') + "), eaFloor(" + EQ('-7/2') + "), eaCeil(" + EQ('7/2') + "), eaCeil(" + EQ('-7/2') + "), eaFloor(R(4n)), eaCeil(R(-4n))].join(' ')"),
+     '3 -4 4 -3 4 -4', 'eaFloor, eaCeil: toward minus and plus infinity');
+
+  /* --- eakit_core: reading (D.0) -------------------------------------------- */
+  const RD = (f, text) => ec("(function () { try { var v = eaRead([Object.assign({ key: 'x', what: 'X' }, " + f + ")], { x: " + JSON.stringify(text) + " }).x;"
+    + " return typeof v === 'object' && v.n !== undefined ? 'R ' + Rtext(v) : JSON.stringify(v, function (k, x) { return typeof x === 'bigint' ? String(x) : x; }); } catch (e) { return 'THREW ' + e.message; } })()");
+  const WH = "{ kind: 'whole', min: '1', max: '10000000' }", NU = "{ kind: 'num', gt: '0', max: '10000000' }";
+  eq(RD(NU, '0.1'), 'R 1/10', 'num: a decimal is read exactly');
+  eq(RD(NU, '.5') + ' ' + RD("{ kind: 'num', min: '0', max: '10' }", '-0') , 'R 1/2 R 0', 'num: a leading point; minus zero is zero');
+  eq(RD(NU, '1/2'), 'THREW X should be a number such as 3 or 0.25 (no fractions or exponents), and "1/2" is not one', 'num: a fraction is refused');
+  eq(RD(NU, '1e3'), 'THREW X should be a number such as 3 or 0.25 (no fractions or exponents), and "1e3" is not one', 'num: an exponent is refused');
+  eq(RD(NU, '+5'), 'THREW X should be a number such as 3 or 0.25 (no fractions or exponents), and "+5" is not one', 'num: a plus sign is refused');
+  eq(RD(NU, '0.1234567'), 'THREW X has more than 6 decimal places', 'num: at most 6 places');
+  eq(RD(NU, '0'), 'THREW X must be more than 0, and it is 0', 'num: a divisor must be positive');
+  eq(RD(NU, '-1'), 'THREW X must be more than 0, and it is −1', 'num: a negative divisor names the field');
+  eq(RD("{ kind: 'num', min: '0', max: '10000000' }", '-0.5'), 'THREW X cannot be less than 0, and it is −0.5', 'num: at least 0');
+  eq(RD(NU, '10000000.5'), 'THREW X is at most 10,000,000, and it is 10000000.5', 'num: at most 10,000,000');
+  eq(RD(WH, '0'), 'THREW X is a whole number from 1 to 10,000,000, and it is 0', 'whole: the range is named');
+  eq(RD(WH, '2.5'), 'THREW X should be a whole number, and "2.5" is not one', 'whole: a decimal is refused');
+  eq(RD(WH, ' 12 '), 'R 12', 'whole: space round it is ignored');
+  eq(RD(WH, '−3'), 'THREW X is a whole number from 1 to 10,000,000, and it is −3', 'whole: U+2212 reads as a minus');
+  eq(RD("{ kind: 'name' }", '-'), 'THREW X cannot be "-", which marks none', 'name: "-" marks none');
+  eq(RD("{ kind: 'parent' }", '-'), '"-"', 'parent: "-" is the root');
+  eq(RD("{ kind: 'name' }", 'A>B'), 'THREW X "A>B" should be letters, digits, dots, hyphens or underscores', 'name: markup refused');
+  eq(RD("{ kind: 'word', words: ['yes', 'no'] }", 'maybe'), 'THREW X should be one of yes, no, not "maybe"', 'word: the list is named');
+  const RS = "{ kind: 'rec', lo: 1, hi: 60, unique: true, sub: [['a', { kind: 'name' }], ['b', " + WH + "], ['c', { kind: 'name' }]] }";
+  eq(RD(RS, 'x, 1, y; z, 2'), 'THREW X: record 2 has 2 fields; this list needs 3 (a, b, c)', 'records: the wrong field count names the record (D.0)');
+  eq(RD(RS, 'x, 1, y, z'), 'THREW X: record 1 has 4 fields; this list needs 3 (a, b, c)', 'records: too many fields is refused too');
+  eq(RD(RS, 'x, 1, y; x, 2, z'), 'THREW X names "x" twice', 'records: unique');
+  eq(RD(RS, 'x, 0, y'), 'THREW X, record 1: b is a whole number from 1 to 10,000,000, and it is 0', 'records: a bad field names record and field');
+  eq(RD(RS, 'x, 1, y;'), '[{"a":"x","b":{"n":"1","d":"1"},"c":"y"}]', 'records: a trailing semicolon is ignored');
+  eq(RD(RS, ''), 'THREW X is empty', 'records: empty');
+  eq(RD(RS, Array(61).fill('a, 1, b').map((r, i) => r.replace('a', 'a' + i)).join('; ')), 'THREW X: this lab takes at most 60 records, and there are 61', 'records: at most 60');
+  const PR = "{ kind: 'pairs', hi: 60, shape: 'class=node' }";
+  eq(RD(PR, ''), '[]', 'pairs: empty is none');
+  eq(RD(PR, 'a=b; c = d;'), '[{"a":"a","b":"b"},{"a":"c","b":"d"}]', 'pairs: read');
+  eq(RD(PR, 'a=b; a=c'), 'THREW X names "a" twice', 'pairs: a name twice');
+  eq(RD(PR, 'banana'), 'THREW X: "banana" should be class=node, two names joined by =', 'pairs: not a pair');
+  eq(RD("{ kind: 'list', lo: 2, hi: 20, things: 'ratios', each: { kind: 'whole', min: '0', max: '1000000' } }", '70'),
+     'THREW X: this lab needs at least 2 ratios, and there is 1', 'list: too few');
+  eq(RD("{ kind: 'list', lo: 0, hi: 60, things: 'tables', each: { kind: 'name' } }", 'a b a'), 'THREW X names "a" twice', 'list: a name twice');
+
+  /* --- the eight modes: one context each, every view block in it ------------ */
+  const PZ = eaCall(eaMk(eaBlock('a', 'PZ_JS') + eaViews('a', 'PZ_VIEW_JS', ['load', 'scale']), 'perf', 'pzCompute'), 'perf', { unit: 'server' });
+  const RR = eaCall(eaMk(eaBlock('a', 'RR_JS') + eaViews('a', 'RR_VIEW_JS', ['boundary', 'calls', 'payload']), 'remote', 'rrCompute'), 'remote');
+  const LD = eaCall(eaMk(eaBlock('a', 'LD_JS') + eaViews('a', 'LD_VIEW_JS', ['instances', 'finds', 'identity', 'graph', 'tree']), 'load', 'ldCompute'), 'load');
+  const UW = eaCall(eaMk(eaBlock('a', 'UW_JS') + eaViews('a', 'UW_VIEW_JS', ['commit', 'order']), 'uow', 'uwCompute'), 'uow');
+  const IH = eaCall(eaMk(eaBlock('b', 'IH_JS') + eaViews('b', 'IH_VIEW_JS', ['tables']), 'inherit', 'ihCompute'), 'inherit');
+  const olRun = eaMk(eaBlock('b', 'OL_JS') + eaViews('b', 'OL_VIEW_JS', ['reads', 'timeline']), 'lock', 'olCompute');
+  const OL = eaCall(olRun, 'lock');
+  const OLS = (view, raw) => olRun('RUN("lock", ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', {}).status');
+  const SN = eaCall(eaMk(eaBlock('b', 'SN_JS') + eaViews('b', 'SN_VIEW_JS', ['objects', 'state']), 'session', 'snCompute'), 'session');
+  const MN = eaCall(eaMk(eaBlock('b', 'MN_JS') + eaViews('b', 'MN_VIEW_JS', ['allocate']), 'money', 'mnCompute'), 'money');
+
+  /* --- every section C preset, every tile (earef.py's figures), then the
+         edge cases, each confirmed on a rendered page ------------------------ */
+  eq(PZ("load", {"points": "a, 10, 500; a, 20, 500; b, 10, 200; b, 20, 2000", "users": "15"}, "pzPerUser pzRatio pzAt"), "a 0 ms a user; b 180 ms a user | a 1×; b 10× | a 500 ms; b 1,100 ms", "perf/load: 1.2 system-a-and-b");
+  eq(PZ("load", {"points": "a, 10, 500; a, 20, 500; b, 10, 200; b, 20, 2000", "users": "10"}, "pzPerUser pzRatio pzAt"), "a 0 ms a user; b 180 ms a user | a 1×; b 10× | a 500 ms; b 200 ms", "perf/load: 1.2 at-ten-users");
+  eq(PZ("load", {"points": "north, 5, 400; north, 25, 1400; south, 5, 900; south, 25, 1000", "users": "20"}, "pzPerUser pzRatio pzAt"), "north 50 ms a user; south 5 ms a user | north 7/2 ≈ 3.5×; south 10/9 ≈ 1.1× | north 1,150 ms; south 975 ms", "perf/load: 1.2 exercise");
+  eq(PZ("scale", {"points": "swordfish, 1, 20; swordfish, 2, 35; camel, 1, 40; camel, 2, 50", "need": "40", "at": "5"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "server"}), "swordfish 20 a server; camel 40 a server | swordfish 15; camel 10 | 5 servers (both 80) | swordfish 3; camel 1 | swordfish 80; camel 80", "perf/scale: 1.3 swordfish-and-camel");
+  eq(PZ("scale", {"points": "swordfish, 1, 20; swordfish, 2, 35; camel, 1, 40; camel, 2, 50", "need": "120", "at": "10"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "server"}), "swordfish 20 a server; camel 40 a server | swordfish 15; camel 10 | 5 servers (both 80) | swordfish 8; camel 9 | swordfish 155; camel 130", "perf/scale: 1.3 need-120");
+  eq(PZ("scale", {"points": "heron, 1, 30; heron, 3, 54; stork, 1, 45; stork, 3, 57", "need": "60", "at": "6"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "server"}), "heron 30 a server; stork 45 a server | heron 12; stork 6 | 4 servers (heron 66, stork 63) | heron 4; stork 4 | heron 90; stork 75", "perf/scale: 1.3 exercise");
+  eq(LD("instances", {"tables": "customer, 200; orders, 1500; product, 120; line, 6000"}, "ldTables ldRows ldRowObjects ldTableObjects ldLargest"), "4 | 7,820 | 7,820 | 4 | line 6,000", "load/instances: 2.3 small-shop");
+  eq(LD("instances", {"tables": "reading, 250000; meter, 400"}, "ldTables ldRows ldRowObjects ldTableObjects ldLargest"), "2 | 250,400 | 250,400 | 2 | reading 250,000", "load/instances: 2.3 one-big-table");
+  eq(LD("instances", {"tables": "patient, 900; visit, 5400; doctor, 30; ward, 12"}, "ldTables ldRows ldRowObjects ldTableObjects ldLargest"), "4 | 6,342 | 6,342 | 4 | visit 5,400", "load/instances: 2.3 exercise");
+  eq(MN("allocate", {"amount": "5", "ratios": "70 30", "rule": "nearest"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "4, 2 | 6 | +1 | 7/2 = 3.50, 3/2 = 1.50 | 1/2 = 0.50", "money/allocate: 2.6 nearest");
+  eq(MN("allocate", {"amount": "5", "ratios": "70 30", "rule": "down"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "3, 1 | 4 | −1 | 7/2 = 3.50, 3/2 = 1.50 | 1/2 = 0.50", "money/allocate: 2.6 round-down");
+  eq(MN("allocate", {"amount": "5", "ratios": "70 30", "rule": "last"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "4, 1 | 5 | 0 | 7/2 = 3.50, 3/2 = 1.50 | 1/2 = 0.50", "money/allocate: 2.6 rest-to-last");
+  eq(MN("allocate", {"amount": "5", "ratios": "70 30", "rule": "allocator"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "4, 1 | 5 | 0 | 7/2 = 3.50, 3/2 = 1.50 | 1/2 = 0.50", "money/allocate: 2.6 allocator");
+  eq(MN("allocate", {"amount": "100", "ratios": "1 1 1", "rule": "nearest"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "33, 33, 33 | 99 | −1 | 100/3 ≈ 33.33, 100/3 ≈ 33.33, 100/3 ≈ 33.33 | 1/3 ≈ 0.33", "money/allocate: 2.6 three-ways");
+  eq(MN("allocate", {"amount": "100", "ratios": "1 1 1", "rule": "allocator"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "34, 33, 33 | 100 | 0 | 100/3 ≈ 33.33, 100/3 ≈ 33.33, 100/3 ≈ 33.33 | 2/3 ≈ 0.67", "money/allocate: 2.6 three-ways-allocated");
+  eq(MN("allocate", {"amount": "100", "ratios": "1 1 1 1 1 1 1", "rule": "last"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "14, 14, 14, 14, 14, 14, 16 | 100 | 0 | 100/7 ≈ 14.29, 100/7 ≈ 14.29, 100/7 ≈ 14.29, 100/7 ≈ 14.29, 100/7 ≈ 14.29, 100/7 ≈ 14.29, 100/7 ≈ 14.29 | 12/7 ≈ 1.71", "money/allocate: 2.6 pennies-to-last");
+  eq(MN("allocate", {"amount": "100", "ratios": "1 1 1 1 1 1", "rule": "nearest"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "17, 17, 17, 17, 17, 17 | 102 | +2 | 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67 | 1/3 ≈ 0.33", "money/allocate: 2.6 exercise-nearest");
+  eq(MN("allocate", {"amount": "100", "ratios": "1 1 1 1 1 1", "rule": "allocator"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "17, 17, 17, 17, 16, 16 | 100 | 0 | 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67, 50/3 ≈ 16.67 | 2/3 ≈ 0.67", "money/allocate: 2.6 exercise-allocator");
+  eq(LD("finds", {"wanted": "50", "broad": "200", "batch": "10", "latencyMs": "5", "rowMs": "0.1"}, "ldKeyedStatements ldKeyedMs ldBroadRows ldBroadMs ldBatchStatements ldBatchMs ldUnneeded"), "50 | 255 | 200 | 25 | 5 | 30 | 150", "load/finds: 3.2 fifty-or-one");
+  eq(LD("finds", {"wanted": "50", "broad": "200", "batch": "10", "latencyMs": "0.2", "rowMs": "0.1"}, "ldKeyedStatements ldKeyedMs ldBroadRows ldBroadMs ldBatchStatements ldBatchMs ldUnneeded"), "50 | 15 | 200 | 101/5 = 20.20 | 5 | 6 | 150", "load/finds: 3.2 local-database");
+  eq(LD("finds", {"wanted": "30", "broad": "600", "batch": "15", "latencyMs": "4", "rowMs": "0.05"}, "ldKeyedStatements ldKeyedMs ldBroadRows ldBroadMs ldBatchStatements ldBatchMs ldUnneeded"), "30 | 243/2 = 121.50 | 600 | 34 | 2 | 19/2 = 9.50 | 570", "load/finds: 3.2 exercise");
+  eq(RR("calls", {"ops": "insert-order, 1; insert-lines, 12; update-stock, 12", "latencyMs": "2", "workMs": "0.5"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "25 | 3 | 125/2 = 62.50 | 37/2 = 18.50 | 4/5 = 80% | 125/37 ≈ 3.4×", "remote/calls: 3.6 save-an-order");
+  eq(RR("calls", {"ops": "insert-order, 1; insert-lines, 12; update-stock, 12", "latencyMs": "0.1", "workMs": "0.5"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "25 | 3 | 15 | 64/5 = 12.80 | 1/6 ≈ 16.7% | 75/64 ≈ 1.2×", "remote/calls: 3.6 same-machine");
+  eq(RR("calls", {"ops": "insert-invoice, 1; insert-items, 40", "latencyMs": "3", "workMs": "0.2"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "41 | 2 | 656/5 = 131.20 | 71/5 = 14.20 | 15/16 ≈ 93.8% | 656/71 ≈ 9.2×", "remote/calls: 3.6 exercise");
+  eq(UW("commit", {"script": "load, order7; change, order7; new, line1; new, line2; change, order7; delete, line2; load, customer3; change, line1"}, "uwImmediate uwCommit uwSaved uwWrites uwClean"), "6 | 2 | 4 (2/3 ≈ 66.7%) | INSERT line1; UPDATE order7 | 1: customer3", "uow/commit: 4.1 edit-an-order");
+  eq(UW("commit", {"script": "load, a1; load, a2; change, a1; delete, a2; change, a1"}, "uwImmediate uwCommit uwSaved uwWrites uwClean"), "3 | 2 | 1 (1/3 ≈ 33.3%) | UPDATE a1; DELETE a2 | 0: none", "uow/commit: 4.1 delete-loaded");
+  eq(UW("commit", {"script": "load, invoice4; new, payment1; change, invoice4; change, invoice4; load, account2; change, account2; new, note1; delete, note1; change, payment1"}, "uwImmediate uwCommit uwSaved uwWrites uwClean"), "7 | 3 | 4 (4/7 ≈ 57.1%) | INSERT payment1; UPDATE invoice4; UPDATE account2 | 0: none", "uow/commit: 4.1 exercise");
+  eq(LD("identity", {"finds": "customer, 7; order, 31; customer, 7; order, 32; customer, 7; product, 5; product, 5"}, "ldFinds ldDistinct ldDuplicates ldShared"), "7 | 4 | 3 | customer 7 ×3, product 5 ×2", "load/identity: 4.2 one-session");
+  eq(LD("identity", {"finds": "customer, 7; order, 31; product, 5"}, "ldFinds ldDistinct ldDuplicates ldShared"), "3 | 3 | 0 | none", "load/identity: 4.2 no-repeats");
+  eq(LD("identity", {"finds": "room, 12; guest, 3; room, 14; guest, 3; room, 12; guest, 9; guest, 3"}, "ldFinds ldDistinct ldDuplicates ldShared"), "7 | 4 | 3 | room 12 ×2, guest 3 ×3", "load/identity: 4.2 exercise");
+  eq(LD("graph", {"parents": "o1, 3, yes; o2, 0, no; o3, 5, yes; o4, 2, no; o5, 4, yes", "batch": "2"}, "ldLazy ldBatched ldTwoQueries ldJoin"), "4 statements, 17 rows | 3 statements, 17 rows | 2 statements, 19 rows | 1 statement, 15 rows", "load/graph: 4.3 orders-and-lines");
+  eq(LD("graph", {"parents": "o1, 3, yes; o2, 0, yes; o3, 5, yes; o4, 2, yes; o5, 4, yes", "batch": "2"}, "ldLazy ldBatched ldTwoQueries ldJoin"), "6 statements, 19 rows | 4 statements, 19 rows | 2 statements, 19 rows | 1 statement, 15 rows", "load/graph: 4.3 every-order-used");
+  eq(LD("graph", {"parents": "a, 10, yes; b, 0, no; c, 2, no; d, 6, yes; e, 1, no; f, 3, yes", "batch": "3"}, "ldLazy ldBatched ldTwoQueries ldJoin"), "4 statements, 25 rows | 2 statements, 25 rows | 2 statements, 28 rows | 1 statement, 23 rows", "load/graph: 4.3 exercise");
+  eq(UW("order", {"keys": "orders, customer; line, orders; line, product; payment, orders", "as": "line orders customer product payment"}, "uwInsertOrder uwDeleteOrder uwBroken"), "customer, orders, payment, product, line | line, product, payment, orders, customer | 3: orders before customer, line before orders, line before product", "uow/order: 4.4 order-schema");
+  eq(UW("order", {"keys": "orders, customer; line, orders; line, product; payment, orders"}, "uwInsertOrder uwDeleteOrder"), "customer, orders, payment, product, line | line, product, payment, orders, customer", "uow/order: 4.4 schema-only");
+  eq(UW("order", {"keys": "booking, guest; booking, room; room, hotel; charge, booking", "as": "hotel guest booking room charge"}, "uwInsertOrder uwDeleteOrder uwBroken"), "guest, hotel, room, booking, charge | charge, booking, room, hotel, guest | 1: booking before room", "uow/order: 4.4 exercise");
+  eq(LD("tree", {"nodes": "company, -; sales, company; north, sales; south, sales; it, company; support, it; desk, support; field, support"}, "ldNodes ldDepth ldPerNode ldPerLevel ldLob"), "8 | 4 | 9 | 5 | 1", "load/tree: 4.5 departments");
+  eq(LD("tree", {"nodes": "company, -; sales, company; it, company; legal, company"}, "ldNodes ldDepth ldPerNode ldPerLevel ldLob"), "4 | 2 | 5 | 3 | 1", "load/tree: 4.5 flat");
+  eq(LD("tree", {"nodes": "root, -; a, root; b, a; c, b; d, c; e, root"}, "ldNodes ldDepth ldPerNode ldPerLevel ldLob"), "6 | 5 | 7 | 6 | 1", "load/tree: 4.5 exercise");
+  eq(IH("tables", {"classes": "person, -, 3, no; employee, person, 2, yes; manager, employee, 2, yes; contractor, person, 2, yes", "load": "manager", "find": "person", "alter": "person"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 4, 3 | 11, 13, 20 | 2 | 1, 3, 1 | 1, 4, 3 | 1, 1, 3", "inherit/tables: 4.6 staff");
+  eq(IH("tables", {"classes": "person, -, 3, no; employee, person, 2, yes; manager, employee, 2, yes; contractor, person, 2, yes", "load": "employee", "find": "employee", "alter": "manager"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 4, 3 | 11, 13, 20 | 4 | 1, 2, 1 | 1, 3, 2 | 1, 1, 1", "inherit/tables: 4.6 load-an-employee");
+  eq(IH("tables", {"classes": "vehicle, -, 4, no; car, vehicle, 2, yes; van, vehicle, 3, yes; truck, vehicle, 5, yes", "load": "van", "find": "vehicle", "alter": "vehicle"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 4, 3 | 16, 18, 25 | 7 | 1, 2, 1 | 1, 4, 3 | 1, 1, 3", "inherit/tables: 4.6 exercise");
+  eq(IH("tables", {"classes": "person, -, 3, no; employee, person, 2, yes; manager, employee, 2, yes; contractor, person, 2, yes", "load": "manager", "find": "person", "alter": "person"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 4, 3 | 11, 13, 20 | 2 | 1, 3, 1 | 1, 4, 3 | 1, 1, 3", "inherit/tables: 4.7 staff-find-person");
+  eq(IH("tables", {"classes": "person, -, 3, no; employee, person, 2, yes; manager, employee, 2, yes; contractor, person, 2, yes", "load": "contractor", "find": "employee", "alter": "employee"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 4, 3 | 11, 13, 20 | 4 | 1, 2, 1 | 1, 3, 2 | 1, 1, 2", "inherit/tables: 4.7 staff-find-employee");
+  eq(IH("tables", {"classes": "account, -, 3, no; saving, account, 2, yes; isa, saving, 1, yes; current, account, 2, yes", "load": "isa", "find": "saving", "alter": "account"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 4, 3 | 10, 12, 19 | 2 | 1, 3, 1 | 1, 3, 2 | 1, 1, 3", "inherit/tables: 4.7 exercise");
+  eq(OL("reads", {"items": "locking, 7, 9, before, insert; multiphase, 5, 8, after, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "15 | 12 | 17 | no: 15 is neither 12 nor 17 | repeatable read allows it (a phantom); serializable prevents it", "lock/reads: 6.1 martin-and-david");
+  eq(OL("reads", {"items": "locking, 7, 9, after, insert; multiphase, 5, 8, after, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "17 | 12 | 17 | yes: the state after the commit | none needed: no read straddles the commit", "lock/reads: 6.1 both-after");
+  eq(OL("reads", {"items": "locking, 7, 9, before, insert; multiphase, 5, 8, before, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "12 | 12 | 17 | yes: the state before the commit | none needed: no read straddles the commit", "lock/reads: 6.1 both-before");
+  eq(OL("reads", {"items": "cash, 400, 300, after, update; savings, 600, 700, before, update"}, "olSeen olBefore olAfter olConsistent olLevel"), "900 | 1,000 | 1,000 | no: 900 is not 1,000, before or after | read committed allows it (an unrepeatable read); repeatable read prevents it", "lock/reads: 6.1 exercise");
+  eq(OL("timeline", {"events": "0, martin, read, design; 1, david, read, design; 5, david, edit, design; 6, martin, edit, design; 8, david, commit, -; 10, martin, commit, -", "scheme": "none"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: david, martin | 0: none | 0: none | 1 | 0 | —", "lock/timeline: 6.2 no-control");
+  eq(OL("timeline", {"events": "0, martin, read, design; 1, david, read, design; 5, david, edit, design; 6, martin, edit, design; 8, david, commit, -; 10, martin, commit, -", "scheme": "optimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: david | 1: martin | 0: none | 0 | 10 | —", "lock/timeline: 6.2 optimistic");
+  eq(OL("timeline", {"events": "0, martin, read, design; 1, david, read, design; 5, david, edit, design; 6, martin, edit, design; 8, david, commit, -; 10, martin, commit, -", "scheme": "pessimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: martin | 0: none | 1: david | 0 | 0 | 1", "lock/timeline: 6.2 pessimistic");
+  eq(OL("timeline", {"events": "0, ann, read, plan; 2, bo, read, plan; 3, ann, edit, plan; 4, bo, edit, plan; 9, bo, commit, -; 12, ann, commit, -", "scheme": "optimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: bo | 1: ann | 0: none | 0 | 12 | —", "lock/timeline: 6.2 exercise");
+  eq(OL("timeline", {"events": "0, ann, read, plan; 2, bo, read, plan; 3, ann, edit, plan; 4, bo, edit, plan; 9, bo, commit, -; 12, ann, commit, -", "scheme": "pessimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: ann | 0: none | 1: bo | 0 | 0 | 1", "lock/timeline: 6.2 exercise-pessimistic");
+  eq(OL("reads", {"items": "january, 400, 400, before, update; february, 300, 350, before, update; march, 0, 120, after, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "820 | 700 | 870 | no: 820 is neither 700 nor 870 | read committed allows it (an unrepeatable read); repeatable read prevents it", "lock/reads: 6.3 quarter-totals");
+  eq(OL("reads", {"items": "january, 400, 400, before, update; march, 0, 120, after, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "520 | 400 | 520 | yes: the state after the commit | none needed: no read straddles the commit", "lock/reads: 6.3 only-a-new-row");
+  eq(OL("reads", {"items": "north, 12, 12, before, update; south, 8, 11, before, insert; east, 5, 7, after, update"}, "olSeen olBefore olAfter olConsistent olLevel"), "27 | 25 | 30 | no: 27 is neither 25 nor 30 | repeatable read allows it (a phantom); serializable prevents it", "lock/reads: 6.3 exercise");
+  eq(OL("timeline", {"events": "0, kim, read, invoice; 1, lee, read, invoice; 2, lee, edit, invoice; 3, lee, commit, -; 4, kim, edit, invoice; 20, kim, commit, -", "scheme": "optimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: lee | 1: kim | 0: none | 0 | 20 | —", "lock/timeline: 6.4 two-clerks");
+  eq(OL("timeline", {"events": "0, kim, read, rate; 0, kim, edit, invoice; 1, lee, edit, rate; 2, lee, commit, -; 6, kim, commit, -", "scheme": "optimistic", "checkReads": "no"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: lee, kim | 0: none | 0: none | 0 | 0 | —", "lock/timeline: 6.4 inconsistent-read");
+  eq(OL("timeline", {"events": "0, kim, read, rate; 0, kim, edit, invoice; 1, lee, edit, rate; 2, lee, commit, -; 6, kim, commit, -", "scheme": "optimistic", "checkReads": "yes"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: lee | 1: kim | 0: none | 0 | 6 | —", "lock/timeline: 6.4 check-the-read");
+  eq(OL("timeline", {"events": "0, ana, read, policy; 1, ben, read, policy; 2, ana, edit, policy; 5, ana, commit, -; 6, ben, edit, policy; 30, ben, commit, -; 31, cy, read, policy; 32, cy, edit, policy; 40, cy, commit, -", "scheme": "optimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: ana, cy | 1: ben | 0: none | 0 | 29 | —", "lock/timeline: 6.4 exercise");
+  eq(OL("timeline", {"events": "0, kim, edit, line1; 1, lee, edit, line2; 4, kim, commit, -; 5, lee, commit, -", "scheme": "pessimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: kim, lee | 0: none | 0: none | 0 | 0 | 2", "lock/timeline: 6.5 line-locks");
+  eq(OL("timeline", {"events": "0, kim, edit, line1; 1, lee, edit, line2; 4, kim, commit, -; 5, lee, commit, -", "scheme": "pessimistic", "groups": "line1=order9; line2=order9"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: kim | 0: none | 1: lee | 0 | 0 | 1", "lock/timeline: 6.5 order-lock");
+  eq(OL("timeline", {"events": "0, kim, edit, line1; 1, lee, edit, line2; 4, kim, commit, -; 5, lee, commit, -", "scheme": "optimistic", "groups": "line1=order9; line2=order9"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: kim | 1: lee | 0: none | 0 | 4 | —", "lock/timeline: 6.5 optimistic-groups");
+  eq(OL("timeline", {"events": "0, ann, edit, room1; 1, bo, edit, room2; 2, cy, edit, room3; 3, ann, commit, -; 7, bo, commit, -; 8, cy, commit, -", "scheme": "pessimistic", "groups": "room1=floor1; room2=floor1; room3=floor2"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: ann, cy | 0: none | 1: bo | 0 | 0 | 2", "lock/timeline: 6.5 exercise");
+  eq(SN("objects", {"users": "100", "serviceMs": "1000", "thinkMs": "10000"}, "snStateful snStateless snIdle snPerObject"), "100 | 10 | 9/10 = 90% | 10", "session/objects: 6.6 hundred-users");
+  eq(SN("objects", {"users": "100", "serviceMs": "1000", "thinkMs": "2000"}, "snStateful snStateless snIdle snPerObject"), "100 | 50 | 1/2 = 50% | 2", "session/objects: 6.6 busier");
+  eq(SN("objects", {"users": "250", "serviceMs": "400", "thinkMs": "20000"}, "snStateful snStateless snIdle snPerObject"), "250 | 5 | 49/50 = 98% | 50", "session/objects: 6.6 exercise");
+  eq(SN("state", {"users": "100", "stateBytes": "1000000", "requests": "20", "idBytes": "32"}, "snWire snSessionWire snIdOnly snMemory snDatabase"), "2,000,000 | 40,000,000 | 32 | 100,000,000 | 2,000,000", "session/state: 6.7 a-megabyte");
+  eq(SN("state", {"users": "100", "stateBytes": "2000", "requests": "20", "idBytes": "32"}, "snWire snSessionWire snIdOnly snMemory snDatabase"), "4,000 | 80,000 | 32 | 200,000 | 4,000", "session/state: 6.7 a-small-cart");
+  eq(SN("state", {"users": "5000", "stateBytes": "40000", "requests": "12", "idBytes": "32"}, "snWire snSessionWire snIdOnly snMemory snDatabase"), "80,000 | 960,000 | 32 | 200,000,000 | 80,000", "session/state: 6.7 exercise");
+  eq(RR("boundary", {"calls": "screen, order, 20; order, customer, 10; order, product, 30; order, pricing, 15", "nodes": "order=orders; customer=customers; product=catalog; pricing=pricing", "remoteUs": "1000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "75 | 75 | 75,000 | 1 = 100% | 75 | 1,000×", "remote/boundary: 7.1 by-class");
+  eq(RR("boundary", {"calls": "screen, order, 20; order, customer, 10; order, product, 30; order, pricing, 15", "nodes": "", "remoteUs": "1000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "75 | 0 | 75 | 0 = 0% | 75 | 1×", "remote/boundary: 7.1 one-process");
+  eq(RR("boundary", {"calls": "web, cart, 12; cart, stock, 8; cart, tax, 8; tax, rates, 16", "nodes": "web=front; tax=back; rates=back", "remoteUs": "800", "localUs": "2"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "44 | 20 | 16,048 | 1,000/1,003 ≈ 99.7% | 88 | 2,006/11 ≈ 182.4×", "remote/boundary: 7.1 exercise");
+  eq(RR("calls", {"ops": "moveHouse, 5; showCustomer, 6", "latencyMs": "20", "workMs": "0.5"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "11 | 2 | 451/2 = 225.50 | 91/2 = 45.50 | 40/41 ≈ 97.6% | 451/91 ≈ 5.0×", "remote/calls: 7.2 move-house");
+  eq(RR("calls", {"ops": "moveHouse, 5; showCustomer, 6", "latencyMs": "1", "workMs": "0.5"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "11 | 2 | 33/2 = 16.50 | 15/2 = 7.50 | 2/3 ≈ 66.7% | 11/5 ≈ 2.2×", "remote/calls: 7.2 on-a-fast-network");
+  eq(RR("calls", {"ops": "bookTrip, 8; cancelTrip, 3; showTrip, 9", "latencyMs": "15", "workMs": "1"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "20 | 3 | 320 | 65 | 15/16 ≈ 93.8% | 64/13 ≈ 4.9×", "remote/calls: 7.2 exercise");
+  eq(RR("payload", {"fields": "id, 8, yes; customerName, 40, yes; status, 10, yes; totalCents, 8, yes; lines, 2000, yes; notes, 4000, no", "latencyMs": "20", "bytesPerMs": "1000", "factor": "1"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "5 | 51,033/500 ≈ 102.07 | 6,066 | 13,033/500 ≈ 26.07 | 4,000 | 80,000", "remote/payload: 7.3 order-screen");
+  eq(RR("payload", {"fields": "id, 8, yes; customerName, 40, yes; status, 10, yes; totalCents, 8, yes; lines, 2000, yes; notes, 4000, no", "latencyMs": "20", "bytesPerMs": "1000", "factor": "3"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "5 | 53,099/500 ≈ 106.20 | 18,198 | 19,099/500 ≈ 38.20 | 12,000 | 80,000", "remote/payload: 7.3 as-xml");
+  eq(RR("payload", {"fields": "name, 30, yes; email, 40, yes; photo, 60000, no; history, 9000, no", "latencyMs": "10", "bytesPerMs": "2000", "factor": "1"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "2 | 4,007/200 ≈ 20.04 | 69,070 | 8,907/200 ≈ 44.54 | 69,000 | 20,000", "remote/payload: 7.3 exercise");
+  eq(RR("payload", {"fields": "name, 30, yes; email, 40, yes", "latencyMs": "10", "bytesPerMs": "2000", "factor": "1"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "2 | 4,007/200 ≈ 20.04 | 70 | 2,007/200 ≈ 10.04 | 0 | 20,000", "remote/payload: 7.3 exercise-shaped");
+  eq(RR("boundary", {"calls": "browser, page, 1; page, service, 2; service, domain, 40; domain, mapper, 25; mapper, database, 6", "nodes": "browser=client; database=db", "remoteUs": "2000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "74 | 7 | 14,067 | 14,000/14,067 ≈ 99.5% | 74 | 14,067/74 ≈ 190.1×", "remote/boundary: 7.4 web-and-database");
+  eq(RR("boundary", {"calls": "browser, page, 1; page, service, 2; service, domain, 40; domain, mapper, 25; mapper, database, 6", "nodes": "browser=client; service=app; domain=app; mapper=app; database=db", "remoteUs": "2000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "74 | 9 | 18,065 | 3,600/3,613 ≈ 99.6% | 74 | 18,065/74 ≈ 244.1×", "remote/boundary: 7.4 service-split-off");
+  eq(RR("boundary", {"calls": "browser, page, 1; page, service, 2; service, domain, 40; domain, mapper, 25; mapper, database, 6", "nodes": "browser=client; domain=app; mapper=app; database=db", "remoteUs": "2000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "74 | 47 | 94,027 | 94,000/94,027 ≈ 100.0% | 74 | 94,027/74 ≈ 1,270.6×", "remote/boundary: 7.4 domain-split-off");
+  eq(RR("boundary", {"calls": "app, facade, 3; facade, domain, 30; domain, mapper, 20; mapper, db, 4", "nodes": "app=phone", "remoteUs": "50000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "57 | 3 | 150,054 | 25,000/25,009 ≈ 100.0% | 57 | 50,018/19 ≈ 2,632.5×", "remote/boundary: 7.4 exercise");
+  eq(PZ("load", {"points": "a, 10, 500; b, 10, 200; b, 20, 2000", "users": "10"}, "pzPerUser pzRatio pzAt"), "a —; b 180 ms a user | a —; b 10× | a 500 ms; b 200 ms", "perf/load: edge one-point");
+  eq(PZ("load", {"points": "a, 10, 500; a, 20, 500; b, 10, 200; b, 20, 2000", "users": "25"}, "pzPerUser pzRatio pzAt"), "a 0 ms a user; b 180 ms a user | a 1×; b 10× | a outside its measured loads; b outside its measured loads", "perf/load: edge outside");
+  eq(PZ("load", {"points": "a, 10, 100; a, 40, 340; a, 20, 300", "users": "30"}, "pzPerUser pzRatio pzAt"), "a 8 ms a user | a 17/5 ≈ 3.4× | a 320 ms", "perf/load: edge three-points");
+  eq(PZ("load", {"points": "a, 10, 500; a, 20, 400", "users": "12"}, "pzPerUser pzRatio pzAt"), "a −10 ms a user | a 4/5 ≈ 0.8× | a 480 ms", "perf/load: edge falling");
+  eq(PZ("load", {"points": "a, 10, 100; a, 13, 200", "users": "11"}, "pzPerUser pzRatio pzAt"), "a 100/3 ≈ 33.33 ms a user | a 2× | a 400/3 ≈ 133.33 ms", "perf/load: edge thirds");
+  eq(PZ("load", {"points": "a, 1, 0.5; a, 3, 2.25", "users": "2"}, "pzPerUser pzRatio pzAt"), "a 7/8 ≈ 0.88 ms a user | a 9/2 ≈ 4.5× | a 11/8 ≈ 1.38 ms", "perf/load: edge decimals");
+  eq(PZ("scale", {"points": "a, 1, 10; a, 2, 20; b, 1, 15; b, 2, 25; c, 1, 5; c, 2, 40", "need": "30", "at": "3"}, "pzEfficiency pzMarginal pzNeed pzAt pzCrossover", {"unit": "node"}), "a 10 a node; b 15 a node; c 5 a node | a 10; b 10; c 35 | a 3; b 3; c 2 | a 30; b 35; c 75 | —: the crossover compares two systems", "perf/scale: edge three-systems");
+  eq(PZ("scale", {"points": "a, 1, 20; b, 1, 30; b, 2, 50", "need": "25", "at": "5"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 20 a node; b 30 a node | a —; b 20 | —: each system needs two measurements | a not measured: one measurement gives no rate; b 1 | a —; b 110", "perf/scale: edge one-measurement");
+  eq(PZ("scale", {"points": "a, 1, 50; a, 2, 40; b, 1, 10; b, 2, 20", "need": "60", "at": "7"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 50 a node; b 10 a node | a −10; b 10 | 3 nodes (both 30) | a never at this rate; b 6 | a −10; b 70", "perf/scale: edge never");
+  eq(PZ("scale", {"points": "a, 1, 1; a, 2, 2; b, 1, 1; b, 2, 3", "need": "20001", "at": "10000"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 1 a node; b 1 a node | a 1; b 2 | 1 node (both 1) | a more than 10,000; b more than 10,000 | a 10,000; b 19,999", "perf/scale: edge past-the-search");
+  eq(PZ("scale", {"points": "a, 1, 10; a, 2, 20; b, 1, 20; b, 2, 30", "need": "15", "at": "2"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 10 a node; b 20 a node | a 10; b 10 | none | a 2; b 1 | a 20; b 30", "perf/scale: edge parallel");
+  eq(PZ("scale", {"points": "a, 1, 10; a, 2, 20; b, 1, 10; b, 2, 30", "need": "15", "at": "2"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 10 a node; b 10 a node | a 10; b 20 | 1 node (both 10) | a 2; b 2 | a 20; b 30", "perf/scale: edge equal-at-one");
+  eq(PZ("scale", {"points": "a, 1, 10; a, 5, 50; a, 3, 100; b, 1, 30; b, 2, 40", "need": "60", "at": "4"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 10 a node; b 30 a node | a 10; b 10 | 3 nodes (a 100, b 50) | a 3; b 4 | a 40; b 60", "perf/scale: edge measured-middle");
+  eq(PZ("scale", {"points": "a, 1, 30; a, 4, 30; b, 1, 10; b, 3, 40", "need": "30", "at": "2"}, "pzEfficiency pzMarginal pzCrossover pzNeed pzAt", {"unit": "node"}), "a 30 a node; b 10 a node | a 0; b 15 | 3 nodes (a 30, b 40) | a 1; b 3 | a 30; b 25", "perf/scale: edge flat");
+  eq(PZ("scale", {"points": "a, 2, 0.5; a, 4, 1.5", "need": "1.25", "at": "3"}, "pzEfficiency pzMarginal pzNeed pzAt pzCrossover", {"unit": "node"}), "a 1/4 = 0.25 a node | a 1/2 = 0.50 | a 4 | a 1 | —: the crossover compares two systems", "perf/scale: edge halves");
+  eq(RR("boundary", {"calls": "a, b, 0", "nodes": "a=x", "remoteUs": "1000", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "0 | 0 | 0 | — | 0 | —", "remote/boundary: edge no-calls");
+  eq(RR("boundary", {"calls": "a, b, 3; b, c, 4", "nodes": "c=far", "remoteUs": "2.5", "localUs": "0.5"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "7 | 4 | 23/2 = 11.50 | 20/23 ≈ 87.0% | 7/2 = 3.50 | 23/7 ≈ 3.3×", "remote/boundary: edge decimal-times");
+  eq(RR("boundary", {"calls": "a, a, 5; a, b, 1", "nodes": "b=far", "remoteUs": "100", "localUs": "1"}, "rrCalls rrRemote rrTime rrShare rrOneNode rrRatio"), "6 | 1 | 105 | 20/21 ≈ 95.2% | 6 | 35/2 ≈ 17.5×", "remote/boundary: edge self-call");
+  eq(RR("calls", {"ops": "x, 4", "latencyMs": "1", "workMs": "0"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "4 | 1 | 4 | 1 | 1 = 100% | 4×", "remote/calls: edge no-work");
+  eq(RR("calls", {"ops": "x, 1; y, 1", "latencyMs": "3", "workMs": "1"}, "rrFineTrips rrCoarseTrips rrFineMs rrCoarseMs rrLatencyShare rrSpeedup"), "2 | 2 | 8 | 8 | 3/4 = 75% | 1×", "remote/calls: edge one-to-one");
+  eq(RR("payload", {"fields": "a, 10, no; b, 20, no", "latencyMs": "5", "bytesPerMs": "10", "factor": "1"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "0 | 0 | 30 | 8 | 30 | 0", "remote/payload: edge nothing-needed");
+  eq(RR("payload", {"fields": "a, 10, yes; b, 20, no", "latencyMs": "5", "bytesPerMs": "10", "factor": "1.5"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "1 | 13/2 = 6.50 | 45 | 19/2 = 9.50 | 30 | 0", "remote/payload: edge one-needed");
+  eq(RR("payload", {"fields": "a, 0, yes; b, 0, yes", "latencyMs": "0.5", "bytesPerMs": "3", "factor": "2"}, "rrGetterCalls rrGetterMs rrDtoBytes rrDtoMs rrExtraBytes rrSpare"), "2 | 1 | 0 | 1/2 = 0.50 | 0 | 3/2 = 1.50", "remote/payload: edge zero-bytes");
+  eq(LD("instances", {"tables": "a, 0; b, 0; c, 1"}, "ldTables ldRows ldRowObjects ldTableObjects ldLargest"), "3 | 1 | 1 | 3 | c 1", "load/instances: edge empty-tables");
+  eq(LD("finds", {"wanted": "7", "broad": "7", "batch": "100", "latencyMs": "1", "rowMs": "0"}, "ldKeyedStatements ldKeyedMs ldBroadRows ldBroadMs ldBatchStatements ldBatchMs ldUnneeded"), "7 | 7 | 7 | 1 | 1 | 1 | 0", "load/finds: edge one-batch");
+  eq(LD("finds", {"wanted": "20", "broad": "21", "batch": "5", "latencyMs": "0.25", "rowMs": "0.125"}, "ldKeyedStatements ldKeyedMs ldBroadRows ldBroadMs ldBatchStatements ldBatchMs ldUnneeded"), "20 | 15/2 = 7.50 | 21 | 23/8 ≈ 2.88 | 4 | 7/2 = 3.50 | 1", "load/finds: edge exact-batches");
+  eq(LD("identity", {"finds": "a, 1; b, 1; a, 1; a, 1"}, "ldFinds ldDistinct ldDuplicates ldShared"), "4 | 2 | 2 | a 1 ×3", "load/identity: edge same-id-two-classes");
+  eq(LD("graph", {"parents": "a, 3, no; b, 0, no", "batch": "4"}, "ldLazy ldBatched ldTwoQueries ldJoin"), "1 statement, 2 rows | 1 statement, 2 rows | 2 statements, 5 rows | 1 statement, 4 rows", "load/graph: edge none-used");
+  eq(LD("graph", {"parents": "a, 1, yes", "batch": "1"}, "ldLazy ldBatched ldTwoQueries ldJoin"), "2 statements, 2 rows | 2 statements, 2 rows | 2 statements, 2 rows | 1 statement, 1 row", "load/graph: edge one-each");
+  eq(LD("graph", {"parents": "a, 0, yes; b, 0, yes; c, 0, no", "batch": "2"}, "ldLazy ldBatched ldTwoQueries ldJoin"), "3 statements, 3 rows | 2 statements, 3 rows | 2 statements, 3 rows | 1 statement, 3 rows", "load/graph: edge no-children");
+  eq(LD("tree", {"nodes": "r, -"}, "ldNodes ldDepth ldPerNode ldPerLevel ldLob"), "1 | 1 | 2 | 2 | 1", "load/tree: edge root-only");
+  eq(LD("tree", {"nodes": "c, b; b, a; a, -; d, a"}, "ldNodes ldDepth ldPerNode ldPerLevel ldLob"), "4 | 3 | 5 | 4 | 1", "load/tree: edge listed-out-of-order");
+  eq(UW("commit", {"script": "load, a; load, b; load, a"}, "uwImmediate uwCommit uwSaved uwWrites uwClean"), "0 | 0 | 0 (—) | none | 2: a, b", "uow/commit: edge only-loads");
+  eq(UW("commit", {"script": "new, a; change, a; delete, a"}, "uwImmediate uwCommit uwSaved uwWrites uwClean"), "3 | 0 | 3 (1 = 100%) | none | 0: none", "uow/commit: edge made-and-dropped");
+  eq(UW("commit", {"script": "load, c; new, n; load, d; change, d; delete, c; change, n; load, e"}, "uwImmediate uwCommit uwSaved uwWrites uwClean"), "4 | 3 | 1 (1/4 = 25%) | INSERT n; UPDATE d; DELETE c | 1: e", "uow/commit: edge everything");
+  eq(UW("order", {"keys": "c, b; b, a", "as": "a b c"}, "uwInsertOrder uwDeleteOrder uwBroken"), "a, b, c | c, b, a | 0: none", "uow/order: edge chain");
+  eq(UW("order", {"keys": "c, b; b, a", "as": "c b a"}, "uwInsertOrder uwDeleteOrder uwBroken"), "a, b, c | c, b, a | 2: c before b, b before a", "uow/order: edge reversed");
+  eq(UW("order", {"keys": "d, b; d, c; b, a; c, a", "as": "a c b d"}, "uwInsertOrder uwDeleteOrder uwBroken"), "a, b, c, d | d, c, b, a | 0: none", "uow/order: edge diamond");
+  eq(IH("tables", {"classes": "a, -, 1, yes; b, a, 2, yes; c, b, 3, yes; d, a, 0, no; e, d, 4, yes", "load": "a", "find": "d", "alter": "b"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 5, 4 | 12, 15, 19 | 9 | 1, 1, 1 | 1, 3, 1 | 1, 1, 2", "inherit/tables: edge root-concrete");
+  eq(IH("tables", {"classes": "a, -, 3, yes", "load": "a", "find": "a", "alter": "a"}, "ihTables ihColumns ihEmpty ihLoad ihFind ihAlter"), "1, 1, 1 | 5, 4, 4 | 0 | 1, 1, 1 | 1, 1, 1 | 1, 1, 1", "inherit/tables: edge one-class");
+  eq(OL("reads", {"items": "x, 10, 12, before, update; y, 5, 3, after, update; z, 1, 3, after, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "16 | 16 | 18 | no, though 16 equals the total before the commit | read committed allows it (an unrepeatable read); repeatable read prevents it", "lock/reads: edge coincidence-after");
+  eq(OL("reads", {"items": "x, 10, 12, before, update; y, 5, 3, after, update"}, "olSeen olBefore olAfter olConsistent olLevel"), "13 | 15 | 15 | no: 13 is not 15, before or after | read committed allows it (an unrepeatable read); repeatable read prevents it", "lock/reads: edge coincidence-before");
+  eq(OL("reads", {"items": "x, 5, 5, before, update; y, 6, 6, after, insert"}, "olSeen olBefore olAfter olConsistent olLevel"), "11 | 11 | 11 | yes: the state after the commit | none needed: no read straddles the commit", "lock/reads: edge unchanged-only");
+  eq(OL("reads", {"items": "x, 1, 2, before, insert; y, 1, 2, before, update; z, 1, 2, after, update"}, "olSeen olBefore olAfter olConsistent olLevel"), "4 | 3 | 6 | no: 4 is neither 3 nor 6 | read committed allows it (an unrepeatable read); repeatable read prevents it", "lock/reads: edge mixed-stale");
+  eq(OL("timeline", {"events": "0, a, edit, r; 1, b, read, r; 2, a, commit, -", "scheme": "pessimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: a | 0: none | 0: none | 0 | 0 | 1", "lock/timeline: edge open-session");
+  eq(OL("timeline", {"events": "0, a, read, r; 0, b, read, r; 0, c, read, r; 1, a, edit, r; 2, b, edit, r; 3, c, edit, r; 4, a, commit, -; 5, b, commit, -; 6, c, commit, -", "scheme": "none"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "3: a, b, c | 0: none | 0: none | 2 | 0 | —", "lock/timeline: edge three-lost");
+  eq(OL("timeline", {"events": "0, a, read, r; 1, b, edit, r; 2, b, commit, -; 3, a, commit, -", "scheme": "pessimistic", "checkReads": "yes"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: b, a | 0: none | 0: none | 0 | 0 | 1", "lock/timeline: edge check-reads-pessimistic");
+  eq(OL("timeline", {"events": "0, a, read, r; 1, b, edit, r; 2, b, commit, -; 3, a, commit, -", "scheme": "optimistic", "checkReads": "yes"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: b | 1: a | 0: none | 0 | 3 | —", "lock/timeline: edge check-reads-optimistic");
+  eq(OL("timeline", {"events": "0, a, edit, r; 1, a, commit, -; 2, b, edit, r; 2, b, edit, s; 3, b, commit, -", "scheme": "pessimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "2: a, b | 0: none | 0: none | 0 | 0 | 2", "lock/timeline: edge relock-after-commit");
+  eq(OL("timeline", {"events": "5, a, read, r; 5, a, edit, r; 5, a, commit, -", "scheme": "optimistic"}, "olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks"), "1: a | 0: none | 0: none | 0 | 0 | —", "lock/timeline: edge same-minute");
+  eq(SN("objects", {"users": "3", "serviceMs": "250", "thinkMs": "250"}, "snStateful snStateless snIdle snPerObject"), "3 | 3 | 0 = 0% | 1", "session/objects: edge always-busy");
+  eq(SN("objects", {"users": "7", "serviceMs": "0.3", "thinkMs": "1.1"}, "snStateful snStateless snIdle snPerObject"), "7 | 21/11 ≈ 1.91 | 8/11 ≈ 72.7% | 11/3 ≈ 3.67", "session/objects: edge decimals");
+  eq(SN("state", {"users": "1", "stateBytes": "1", "requests": "1", "idBytes": "0"}, "snWire snSessionWire snIdOnly snMemory snDatabase"), "2 | 2 | 0 | 1 | 2", "session/state: edge no-id");
+  eq(SN("state", {"users": "10000000", "stateBytes": "10000000", "requests": "10000000", "idBytes": "10000000"}, "snWire snSessionWire snIdOnly snMemory snDatabase"), "20,000,000 | 200,000,000,000,000 | 10,000,000 | 100,000,000,000,000 | 20,000,000", "session/state: edge largest");
+  eq(MN("allocate", {"amount": "2", "ratios": "1 1 1 1", "rule": "last"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "1, 1, 1, −1 | 2 | 0 | 1/2 = 0.50, 1/2 = 0.50, 1/2 = 0.50, 1/2 = 0.50 | 3/2 = 1.50", "money/allocate: edge last-negative");
+  eq(MN("allocate", {"amount": "10", "ratios": "1 2", "rule": "up"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "4, 7 | 11 | +1 | 10/3 ≈ 3.33, 20/3 ≈ 6.67 | 2/3 ≈ 0.67", "money/allocate: edge up");
+  eq(MN("allocate", {"amount": "7", "ratios": "0 1 1", "rule": "allocator"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "1, 3, 3 | 7 | 0 | 0, 7/2 = 3.50, 7/2 = 3.50 | 1", "money/allocate: edge a-zero-ratio");
+  eq(MN("allocate", {"amount": "0", "ratios": "3 4", "rule": "nearest"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "0, 0 | 0 | 0 | 0, 0 | 0", "money/allocate: edge nothing");
+  eq(MN("allocate", {"amount": "10000000", "ratios": "1000000 999999 7", "rule": "nearest"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "4,999,985, 4,999,980, 35 | 10,000,000 | 0 | 5,000,000,000,000/1,000,003 ≈ 4,999,985.00, 4,999,995,000,000/1,000,003 ≈ 4,999,980.00, 35,000,000/1,000,003 ≈ 35.00 | 105/1,000,003 ≈ 0.00", "money/allocate: edge big");
+  eq(MN("allocate", {"amount": "3", "ratios": "1 1", "rule": "nearest"}, "mnShares mnTotal mnDiff mnExact mnFurthest"), "2, 2 | 4 | +1 | 3/2 = 1.50, 3/2 = 1.50 | 1/2 = 0.50", "money/allocate: edge halves-up");
+
+  /* --- what the views refuse (D.1, D.3), and what they print instead of a
+         figure (zero denominators, outside the data) ------------------------- */
+  const SC = 'swordfish, 1, 20; swordfish, 2, 35; camel, 1, 40; camel, 2, 50';
+  eq(PZ('load', { points: 'a, 10, 1; a, 10, 2', users: '10' }, 'pzAt'), 'REFUSED System a is measured at 10 users twice', 'perf/load: a load measured twice');
+  eq(PZ('load', { points: 'a, 10, 0; a, 20, 5', users: '10' }, 'pzAt'), 'REFUSED points, record 1: ms must be more than 0, and it is 0', 'perf/load: a response time is a divisor');
+  eq(PZ('scale', { points: 'a, 1, 5; a, 1, 6', need: '1', at: '1' }, 'pzAt'), 'REFUSED System a is measured at 1 servers twice', 'perf/scale: a server count measured twice');
+  eq(PZ('scale', { points: SC, need: '0', at: '5' }, 'pzAt'), 'REFUSED need must be more than 0, and it is 0', 'perf/scale: need must be positive');
+  eq(PZ('scale', { points: SC, need: '40', at: '10001' }, 'pzAt'), 'REFUSED at is a whole number from 1 to 10,000, and it is 10,001', 'perf/scale: at most 10,000 servers');
+  eq(PZ('scale', { points: SC, need: '40', at: '5' }, 'pzCrossover', { unit: 'node' }), '5 nodes (both 80)', 'perf/scale: the unit names the crossover');
+  eq(PZ('scale', { points: 'a, 1, 10; a, 5, 50; a, 3, 20', need: '30', at: '3' }, 'pzNeed pzAt'), 'a 4 | a 20',
+     'perf/scale: where the line reaches the need at a count whose measurement falls short, the next count on the line');
+  eq(RR('boundary', { calls: 'a, b, 2; b, c, 3', nodes: 'a=main', remoteUs: '10', localUs: '1' }, 'rrRemote rrTime'), '0 | 5',
+     'remote/boundary: a class put on main by name is on the same node as one not listed');
+  eq(LD('instances', { tables: 'a, 5; b, 5; c, 4' }, 'ldLargest'), 'a 5', 'load/instances: a tie goes to the first table listed');
+  eq(OL('reads', { items: 'x, 1, 2, before, update; y, 2, 1, before, update; z, 0, 5, after, insert' }, 'olSeen olBefore olAfter olConsistent'),
+     '8 | 3 | 8 | no, though 8 equals the total after the commit', 'lock/reads: a sum that matches the state after by coincidence');
+  eq(RR('boundary', { calls: 'a, b, 1', nodes: 'c=x', remoteUs: '1', localUs: '1' }, 'rrCalls'), 'REFUSED Nodes names c, which no call has', 'remote/boundary: a node for a class no call has');
+  eq(RR('boundary', { calls: 'a, b, 1', remoteUs: '0', localUs: '1' }, 'rrCalls'), 'REFUSED remoteUs must be more than 0, and it is 0', 'remote/boundary: a time is positive');
+  eq(RR('calls', { ops: 'a, 1; a, 2', latencyMs: '1', workMs: '0' }, 'rrFineTrips'), 'REFUSED ops names "a" twice', 'remote/calls: an operation twice');
+  eq(RR('calls', { ops: 'a, 0', latencyMs: '1', workMs: '0' }, 'rrFineTrips'), 'REFUSED ops, record 1: fine is a whole number from 1 to 10,000,000, and it is 0', 'remote/calls: a coarse call replaces at least one');
+  eq(RR('payload', { fields: 'a, 1, maybe', latencyMs: '1', bytesPerMs: '1', factor: '1' }, 'rrDtoBytes'), 'REFUSED fields, record 1: needed should be one of yes, no, not "maybe"', 'remote/payload: yes or no');
+  eq(RR('payload', { fields: 'a, 1, yes', latencyMs: '1', bytesPerMs: '0', factor: '1' }, 'rrDtoBytes'), 'REFUSED bytesPerMs must be more than 0, and it is 0', 'remote/payload: a bandwidth is a divisor');
+  eq(LD('finds', { wanted: '50', broad: '49', batch: '10', latencyMs: '5', rowMs: '0.1' }, 'ldUnneeded'),
+     'REFUSED The broad query returns at least the rows you want: broad is 49 and wanted is 50', 'load/finds: broad below wanted');
+  eq(LD('instances', { tables: 'a, 1; a, 2' }, 'ldRows'), 'REFUSED tables names "a" twice', 'load/instances: a table twice');
+  eq(LD('tree', { nodes: 'a, -; b, -' }, 'ldDepth'), 'REFUSED The tree has 2 roots (a, b); this lab takes exactly one', 'load/tree: two roots');
+  eq(LD('tree', { nodes: 'a, b; b, a' }, 'ldDepth'), 'REFUSED The tree has no root: give one node the parent -', 'load/tree: no root');
+  eq(LD('tree', { nodes: 'a, -; b, c' }, 'ldDepth'), "REFUSED b's parent c is not a node", 'load/tree: an unknown parent');
+  eq(LD('tree', { nodes: 'r, -; a, b; b, c; c, a' }, 'ldDepth'), 'REFUSED The parents form a cycle: a → b → c → a', 'load/tree: a cycle');
+  eq(UW('commit', { script: 'change, a' }, 'uwCommit'), 'REFUSED Script, record 1: change of a, which the script has neither loaded nor created', 'uow/commit: change of nothing');
+  eq(UW('commit', { script: 'load, a; delete, b' }, 'uwCommit'), 'REFUSED Script, record 2: delete of b, which the script has neither loaded nor created', 'uow/commit: delete of nothing');
+  eq(UW('commit', { script: 'new, a; load, a' }, 'uwCommit'), 'REFUSED Script, record 2: load of a, which the script created', 'uow/commit: load of a new object');
+  eq(UW('commit', { script: 'load, a; new, a' }, 'uwCommit'), 'REFUSED Script, record 2: new a, which the script has already loaded or created', 'uow/commit: new of an existing object');
+  eq(UW('commit', { script: 'load, a; delete, a; change, a' }, 'uwCommit'), 'REFUSED Script, record 3: change of a after its delete', 'uow/commit: anything after a delete');
+  eq(UW('commit', { script: 'load, a; delete, a; load, a' }, 'uwCommit'), 'REFUSED Script, record 3: load of a after its delete', 'uow/commit: a load after a delete too');
+  eq(UW('commit', { script: 'load, a; jump, a' }, 'uwCommit'), 'REFUSED script, record 2: op should be one of load, new, change, delete, not "jump"', 'uow/commit: a word off the list');
+  eq(UW('order', { keys: 'a, b; b, b' }, 'uwInsertOrder'),
+     'REFUSED Keys, record 2: b refers to itself; a table that refers to itself needs its rows ordered, which this lab does not do', 'uow/order: a self-reference');
+  eq(UW('order', { keys: 'a, b; b, c; c, a; d, a' }, 'uwInsertOrder'), 'REFUSED The keys form a cycle: a → b → c → a; no order puts every parent first', 'uow/order: a cycle');
+  eq(UW('order', { keys: 'a, b; a, b' }, 'uwInsertOrder'), 'REFUSED Keys lists a, b twice', 'uow/order: a key twice');
+  eq(UW('order', { keys: 'a, b', as: 'b' }, 'uwBroken'), 'REFUSED The order given misses a; it names every table in the keys once', 'uow/order: an order that misses a table');
+  eq(UW('order', { keys: 'a, b', as: 'b a c' }, 'uwBroken'), 'REFUSED The order given names c, which no key has', 'uow/order: an order with a stranger');
+  eq(UW('order', { keys: 'a, b', as: 'b a b' }, 'uwBroken'), 'REFUSED as names "b" twice', 'uow/order: an order that names a table twice');
+  eq(UW('order', { keys: 'a, b' }, 'uwInsertOrder uwDeleteOrder uwBroken'), 'b, a | a, b | —', 'uow/order: no order given');
+  const STAFF = 'person, -, 3, no; employee, person, 2, yes; manager, employee, 2, yes; contractor, person, 2, yes';
+  eq(IH('tables', { classes: STAFF, load: 'person', find: 'person', alter: 'person' }, 'ihLoad'),
+     'REFUSED The class to load, person, is not concrete: only a concrete class has objects to load', 'inherit/tables: load an abstract class');
+  eq(IH('tables', { classes: STAFF, load: 'manager', find: 'clerk', alter: 'person' }, 'ihFind'), 'REFUSED The class to find, clerk, is not one of the classes', 'inherit/tables: find an unknown class');
+  eq(IH('tables', { classes: 'a, -, 1, yes; b, -, 1, yes', load: 'a', find: 'a', alter: 'a' }, 'ihTables'), 'REFUSED The hierarchy has 2 roots (a, b); this lab takes exactly one', 'inherit/tables: two roots');
+  eq(IH('tables', { classes: 'a, -, 1, yes; b, c, 1, yes; c, b, 1, yes', load: 'a', find: 'a', alter: 'a' }, 'ihTables'), 'REFUSED The parents form a cycle: b → c → b', 'inherit/tables: a cycle');
+  eq(IH('tables', { classes: 'a, -, 1001, yes', load: 'a', find: 'a', alter: 'a' }, 'ihTables'), 'REFUSED classes, record 1: fields is a whole number from 0 to 1,000, and it is 1,001', 'inherit/tables: at most 1,000 fields');
+  eq(SN('objects', { users: '10', serviceMs: '5', thinkMs: '4' }, 'snIdle'),
+     'REFUSED The time between requests must be at least the service time: it is 4 ms against 5 ms', 'session/objects: think below service');
+  eq(SN('state', { users: '1', stateBytes: '0', requests: '1', idBytes: '0' }, 'snWire'), 'REFUSED stateBytes is a whole number from 1 to 10,000,000, and it is 0', 'session/state: a state of 0 bytes');
+  eq(MN('allocate', { amount: '5', ratios: '0 0', rule: 'nearest' }, 'mnShares'), 'REFUSED At least one ratio must be more than 0', 'money/allocate: every ratio 0');
+  eq(MN('allocate', { amount: '5', ratios: '1 1000001', rule: 'nearest' }, 'mnShares'), 'REFUSED ratios, entry 2 is a whole number from 0 to 1,000,000, and it is 1,000,001', 'money/allocate: a ratio past 10^6');
+  eq(MN('allocate', { amount: '5', ratios: Array(21).fill('1').join(' '), rule: 'nearest' }, 'mnShares'), 'REFUSED ratios: this lab takes at most 20 ratios, and there are 21', 'money/allocate: at most 20 ratios');
+  eq(MN('allocate', { amount: '5', ratios: '1 1', rule: 'banker' }, 'mnShares'), 'REFUSED rule should be one of nearest, down, up, last, allocator, not "banker"', 'money/allocate: a rule off the list');
+  const TL = (events, scheme, more) => Object.assign({ events: events, scheme: scheme }, more || {});
+  const OLT = 'olCommitted olConflicts olRefused olLostUpdates olRedo olPeakLocks';
+  eq(OL('timeline', TL('2, a, read, r; 1, b, read, r', 'none'), 'olCommitted'),
+     'REFUSED Events, record 2: minute 1 comes before minute 2 of the record before it; the minutes must not decrease', 'lock/timeline: minutes go back');
+  eq(OL('timeline', TL('0, a, commit, r', 'none'), 'olCommitted'), 'REFUSED Events, record 1: a commit names no record; write - for it', 'lock/timeline: a commit with a record');
+  eq(OL('timeline', TL('0, a, edit, -', 'none'), 'olCommitted'), 'REFUSED Events, record 1: a edit needs a record, not -', 'lock/timeline: an edit with no record');
+  eq(OL('timeline', TL('0, a, edit, r; 1, a, commit, -; 2, a, read, r', 'none'), 'olCommitted'), 'REFUSED Events, record 3: a acts after it committed', 'lock/timeline: a session after its commit');
+  eq(OL('timeline', TL('0, a, edit, r', 'none', { groups: 's=g' }), 'olCommitted'), 'REFUSED Groups names s, which no event reads or edits', 'lock/timeline: a group for no record');
+  eq(OL('timeline', TL('0, a, edit, r; 1, b, edit, r; 2, b, commit, -; 3, a, commit, -; 4, a, read, r', 'optimistic'), OLT),
+     '1: b | 1: a | 0: none | 0 | 3 | —', 'lock/timeline: a conflicted session\'s later events are skipped, not refused');
+  eq(/skipped: a at minute 4\.$/.test(OLS('timeline', TL('0, a, edit, r; 1, b, edit, r; 2, b, commit, -; 3, a, commit, -; 4, a, read, r', 'optimistic'))), true,
+     'lock/timeline: a skipped event is named by its session and minute');
+  eq(OL('timeline', TL('0, a, edit, r', 'optimistic'), 'olCommitted'), '0: none', 'lock/timeline: a session that never commits');
+  eq(OL('timeline', TL('0, a, read, x; 1, b, edit, x; 2, b, commit, -; 3, a, edit, x; 4, a, commit, -', 'pessimistic'), OLT),
+     '1: a | 0: none | 1: b | 0 | 0 | 1', 'lock/timeline: pessimistic locks at the first read of a record the session edits (book p. 384), so no update is lost');
+  eq(OL('timeline', TL('0, a, read, x; 1, b, edit, x; 2, b, commit, -; 3, a, read, x; 4, a, commit, -', 'pessimistic'), OLT),
+     '2: b, a | 0: none | 0: none | 0 | 0 | 1', 'lock/timeline: a read of a record the session never edits takes no lock');
+  eq(OL('timeline', TL('0, a, read, x; 1, b, edit, x; 2, b, commit, -; 3, a, edit, x; 4, a, commit, -', 'none'), OLT),
+     '2: b, a | 0: none | 0: none | 1 | 0 | —', 'lock/timeline: with no control the same timeline loses an update');
+
+  /* --- EA_WIRE_JS on a fake DOM: presets fill the boxes; a hostile value is red ---- */
+  {
+    const els = new Map();
+    const byId = (id) => {
+      if (!els.has(id)) {
+        const el = { id: id, value: '', l: {}, _t: '', _h: '' };
+        Object.defineProperty(el, 'textContent', { get() { return this._t; }, set(v) { this._t = String(v); this._h = String(v); } });
+        Object.defineProperty(el, 'innerHTML', { get() { return this._h; }, set(v) { this._h = String(v); this._t = String(v).replace(/<[^>]*>/g, ''); } });
+        el.addEventListener = (t, f) => { (el.l[t] = el.l[t] || []).push(f); };
+        el.fire = (t) => (el.l[t] || []).forEach((f) => f({ target: el }));
+        els.set(id, el);
+      }
+      return els.get(id);
+    };
+    const wctx = { console: console, document: { getElementById: byId }, window: {} };
+    vm.createContext(wctx);
+    const lit = (name, value) => 'var ' + name + ' = ' + JSON.stringify(value) + ';\n';
+    const spec = [{ key: 'amount', id: 'mnInAmount', kind: 'whole', min: '0', max: '10000000', what: 'Amount', control: 'text' },
+      { key: 'ratios', id: 'mnInRatios', kind: 'list', lo: 2, hi: 20, things: 'ratios', each: { kind: 'whole', min: '0', max: '1000000' }, what: 'Ratios', control: 'text' },
+      { key: 'rule', id: 'mnInRule', kind: 'word', words: ['nearest', 'down', 'up', 'last', 'allocator'], what: 'Rule', control: 'select' }];
+    const presets = { a: { amount: '5', ratios: '70 30', rule: 'nearest' }, b: { amount: '100', ratios: '1 1 1', rule: 'allocator' } };
+    byId('mnPreset').value = 'a';
+    vm.runInContext(block('RATIONAL_JS') + eaBlock('core', 'EA_CORE_JS') + eaBlock('b', 'MN_JS') + eaBlock('b', 'MN_VIEW_JS["allocate"]')
+      + lit('PRESETS', presets) + lit('SPEC', spec) + lit('TILES', ['mnShares', 'mnDiff']) + lit('FIXED', {}) + lit('VIEW', 'allocate')
+      + eaBlock('core', 'EA_WIRE_JS').replace(/%P%/g, 'mn').replace(/%FN%/g, 'mnCompute'), wctx, { filename: 'eakit_core.py' });
+    eq(byId('mnInRatios').value + ' / ' + byId('mnShares').textContent + ' ' + byId('mnDiff').textContent, '70 30 / 4, 2 +1',
+       'EA_WIRE_JS: the preset fills the boxes at load, and the tiles follow');
+    byId('mnPreset').value = 'b'; byId('mnPreset').fire('change');
+    eq(byId('mnInRule').value + ' / ' + byId('mnShares').textContent + ' ' + byId('mnDiff').textContent, 'allocator / 34, 33, 33 0',
+       'EA_WIRE_JS: a preset change rewrites the boxes and the select, and redraws');
+    byId('mnInRule').value = 'down'; byId('mnInRule').fire('change');
+    eq(byId('mnShares').textContent, '33, 33, 33', 'EA_WIRE_JS: a select redraws on change');
+    byId('mnInAmount').value = '1/0'; byId('mnInAmount').fire('input');
+    eq(/tone-red/.test(byId('mnStatus').innerHTML) + ' ' + byId('mnShares').textContent + byId('mnDiff').textContent + ' ' + byId('mnTable').innerHTML, 'true —— ',
+       'EA_WIRE_JS: a refusal reddens the banner and blanks the tiles and the table');
+    eq(byId('mnStatus').innerHTML, '<span class="tone-red">Amount should be a whole number, and &quot;1/0&quot; is not one.</span>',
+       'EA_WIRE_JS: the banner is one escaped sentence');
+    byId('mnInAmount').value = '7'; byId('mnInAmount').fire('input');
+    eq(/<caption[^>]*>Each share<\/caption>/.test(byId('mnTable').innerHTML) + ' ' + byId('mnShares').textContent, 'true 2, 2, 2', 'EA_WIRE_JS: a good value redraws the table');
+    eq(/<tr><td>/.test(byId('mnTable').innerHTML), true, 'EA_WIRE_JS: a table that fits its box keeps its columns');
+    byId('mnTableBox').clientWidth = 300; byId('mnTable').offsetWidth = 500;
+    byId('mnInAmount').value = '8'; byId('mnInAmount').fire('input');
+    eq(/<tr><td style="text-align:left;white-space:normal;overflow-wrap:anywhere;">/.test(byId('mnTable').innerHTML)
+       + ' ' + (byId('mnTable').innerHTML.match(/<tr><td/g) || []).length, 'true 3',
+       'EA_WIRE_JS: a table wider than its box is painted compact, one wrapping cell a row');
+    eq(/<caption style="white-space:normal;">Each share<\/caption>/.test(byId('mnTable').innerHTML), true, 'EA_WIRE_JS: the caption wraps');
+  }
+}
+// ---- end eakit ----
 
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,

@@ -38,7 +38,8 @@ GROUPS = (
         "title": "Computing and decisions",
         "note": "Algorithms, System Design and Operations Research build on "
                 "Discrete Mathematics, the last two on Algebra as well; Code "
-                "Complete assumes only that you can read a short routine.",
+                "Complete and Enterprise Application Patterns assume only that "
+                "you can read a short routine.",
     },
     {
         "key": "philosophy",
@@ -120,6 +121,15 @@ SUBJECTS = (
         "card": "Steve McConnell&rsquo;s <em>Code Complete</em>, chapter by "
                 "chapter, with each chapter&rsquo;s guidance measured on short "
                 "pieces of code.",
+    },
+    {
+        "slug": "enterprise-patterns",
+        "group": "computing",
+        "short_title": "Enterprise Application Patterns",
+        "kind": "Read along",
+        "card": "Martin Fowler&rsquo;s <em>Patterns of Enterprise Application "
+                "Architecture</em>, narrative by narrative, with each "
+                "pattern&rsquo;s trade-off counted on a stated situation.",
     },
     {
         "slug": "philosophy",

@@ -3,7 +3,7 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
-## 0. Nothing is inert any more: all thirteen Subjects publish
+## 0. Nothing is inert any more: all fourteen Subjects publish
 
 `content/system_design/`, `content/algorithms/` and `content/operations_research/`
 were in the tree for months publishing nothing. All three are now in
@@ -21,16 +21,19 @@ were in the tree for months publishing nothing. All three are now in
 | Phenomenology | **published** — 7 courses, 44 lessons, 52 pages, wired 2026-10-24 (1,127 pages became 1,179) |
 | Reading Faster | **published** — 8 courses, 42 lessons, 51 pages, wired 2026-10-25 (1,179 pages became 1,230); its package is `content/reading/`, its path slug `reading-faster` |
 | Code Complete | **published** — 7 courses, 41 lessons, 49 pages, wired 2026-10-25 (1,230 pages became 1,279); its package is `content/code_complete/`, its path slug `code-complete`, its kit `cckit` |
+| Enterprise Application Patterns | **published** — 7 courses, 44 lessons, 52 pages, wired 2026-10-31 (1,279 pages became 1,331); its package is `content/enterprise_patterns/`, its path slug `enterprise-patterns`, its kit `eakit` (with `cckit`'s modes) |
 
-168 lab modes are registered (Differential Equations added 22, Capital 17,
-Phenomenology 15, Reading Faster 8, Code Complete 8) and all twenty-four kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
-pages: `node scripts/labcheck.js --generated` executes 1,147 generated pages, 601
+176 lab modes are registered (Differential Equations added 22, Capital 17,
+Phenomenology 15, Reading Faster 8, Code Complete 8, Enterprise Application
+Patterns 8) and all twenty-five kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
+pages: `node scripts/labcheck.js --generated` executes 1,199 generated pages, 645
 of them with pinned figures, and compares every pinned tile string against what
 the page prints. Philosophy's two kits, `argkit` and `choicekit`, account for 98
 of those pages, English's `english` kit for 41, Differential Equations' `calckit`
 and `dekit` for 92, Capital's `capkit` for 119, Phenomenology's `phenkit` for
 42 (its other two lessons reuse `argkit`'s validity mode), Reading Faster's
-`readkit` for all 42 of its lessons, and Code Complete's `cckit` for all 41 of its. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
+`readkit` for all 42 of its lessons, and Code Complete's `cckit` for all 41 of its and for 20 of
+Enterprise Application Patterns' 44, whose other 24 use `eakit`. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
 directly by `scripts/mathcheck.js`, one case per function, each seen to fail
 when its function was broken on purpose.
 Before the last two Subjects were wired it said "0 with pinned figures" — those
@@ -65,7 +68,7 @@ and the one that wired these two:
   `var COURSES` array by hand: `test_course_ui.TestLibraryCatalog` fails a stale
   index. Group notes and card text are home-page copy and obey its copy rules;
 - new course slugs carry the Subject's short name as a prefix (`capital-`,
-  `perception-`, `reading-`, `code-complete-`) so that a generic title cannot collide in the flat
+  `perception-`, `reading-`, `code-complete-`, `enterprise-patterns-`) so that a generic title cannot collide in the flat
   course namespace. The older Subjects predate the rule and are NOT renamed:
   a published URL is never moved;
 - `content/spoken/<package>.py`, ONE file named for the Subject's package:
@@ -81,7 +84,7 @@ and the one that wired these two:
 - the shape checks `TestGeneratedPathIsCurrent`, `TestLessonDataMatchesTheRenderer`
   and `TestEveryLabBuilds`, whose import lists name Discrete Mathematics,
   Algebra, Philosophy, English, Differential Equations, Capital, Phenomenology,
-  Reading Faster and Code Complete. Philosophy was added
+  Reading Faster, Code Complete and Enterprise Application Patterns. Philosophy was added
   on wiring and the escaped-field check immediately found thirteen mistake
   titles showing `&ldquo;` literally; System Design, Algorithms and Operations
   Research are still not in those lists;
@@ -110,9 +113,9 @@ Five things that have each cost a day:
    `release/contract.schema.json` and by a test. `algebra-course6-lesson-`
    `quadratic-equations-and-the-zero-product-property` is exactly 72. The check
    id prefixes are short for that reason: `math`, `algebra`, `sysdesign`,
-   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`, `cc`. Differential
+   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`, `cc`, `eaa`. Differential
    Equations' longest is 64, Capital's 66, Phenomenology's 62, Reading
-   Faster's 52, Code Complete's 58.
+   Faster's 52, Code Complete's 58, Enterprise Application Patterns' 58.
 
 `tests/test_site_invariants.py` checks a Subject's tagline and description
 against its own course and lesson counts. Those sentences are written when a
@@ -137,24 +140,25 @@ and that is written down rather than engineered around.
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
 
 The site is a subject-agnostic LIBRARY OF PATHS. A path is an ordered sequence of
-courses on one subject. There are thirteen: **Trading** (8 courses, 118 lessons,
+courses on one subject. There are fourteen: **Trading** (8 courses, 118 lessons,
 hand-authored and normalized at intake), **Discrete Mathematics** (8 courses, 106
 lessons), **Algebra** (9 courses, 112 lessons), **System Design** (10 courses,
 114 lessons), **Algorithms** (9 courses, 112 lessons), **Operations Research**
 (10 courses, 92 lessons), **Philosophy** (10 courses, 108 lessons), **English**
 (10 courses, 41 lessons), **Differential Equations** (10 courses, 92 lessons),
 **Capital** (14 courses, 119 lessons), **Phenomenology** (7 courses, 44
-lessons), **Reading Faster** (8 courses, 42 lessons) and **Code Complete, Read
-Along** (7 courses, 41 lessons) — the last twelve GENERATED from
-`content/<subject>/`. 120 courses and 1,141 lessons in all. The
+lessons), **Reading Faster** (8 courses, 42 lessons), **Code Complete, Read
+Along** (7 courses, 41 lessons) and **Patterns of Enterprise Application
+Architecture, Read Along** (7 courses, 44 lessons) — the last thirteen GENERATED
+from `content/<subject>/`. 127 courses and 1,185 lessons in all. The
 published URL space:
 
 | URL | Served from |
 | --- | --- |
 | `learn.geterdone.io/` | `site/index.html` — the site index: the paths, plus course search |
-| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete` |
-| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 120 course homes |
-| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,141 lessons |
+| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete`, `enterprise-patterns` |
+| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 127 course homes |
+| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,185 lessons |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -165,7 +169,7 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 1,279-page map (plus eight published JSON assets) is in
+The full 1,331-page map (plus eight published JSON assets) is in
 [README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json` (and in
@@ -212,7 +216,7 @@ The apex `geterdone.io` is a **separate, live GitHub Pages site that this reposi
 does not control**. Do not deploy to it, reconfigure it, or write anything that
 implies we own its records. Linking to it is fine; changing it is out of scope.
 
-## 1a. One path is authored, twelve are generated
+## 1a. One path is authored, thirteen are generated
 
 The paths are built in opposite directions and must be edited differently.
 
@@ -221,14 +225,14 @@ the library's conventions by `scripts/intake_course.py`. Its pages are the sourc
 of truth. Edit them directly.
 
 **Discrete Mathematics**, **Algebra**, **System Design**, **Algorithms**,
-**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology**, **Reading Faster** and **Code Complete** are generated. `content/<subject>/` holds each of them as
+**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology**, **Reading Faster**, **Code Complete** and **Enterprise Application Patterns** are generated. `content/<subject>/` holds each of them as
 data — one Python module per course, with the lessons as dicts — and
-`scripts/build_paths.py` renders all 1,147 of their pages from `scripts/mathpath/`
+`scripts/build_paths.py` renders all 1,199 of their pages from `scripts/mathpath/`
 (one stylesheet, one chrome renderer, one lab kit per subject area). **Never
 edit a page under one of those course slugs by hand**: the next build reverts it,
 so the change appears to work and then vanishes.
 
-    python3 scripts/build_paths.py                     # rebuild all twelve
+    python3 scripts/build_paths.py                     # rebuild all thirteen
     python3 scripts/build_paths.py --check             # fail if any page is stale
     node scripts/mathcheck.js                          # check the arithmetic itself
     node scripts/labcheck.js --generated               # execute every lab
@@ -359,6 +363,16 @@ a `cckit` page ships the tokenizer only in the `code` mode and only its own
 view's block. The heaviest course is Software Craftsmanship (38 KB median
 gzipped); the heaviest page is its `layout-and-style` at 38.9 KB; the lightest
 course is System Considerations at 31.6 KB. The ceiling below is unchanged.
+
+Re-measured 2026-10-31 when Enterprise Application Patterns was wired, after
+the per-course reviews and revisions. Its 44 lessons are 123 KB / 143 KB raw
+and 32 KB / 38 KB gzipped (median / max), in Code Complete's range, so they
+have no row of their own: 20 of them are `cckit` pages and the other 24 are
+`eakit` pages, each shipping the shared core and only its own mode's block.
+The heaviest course is Web Presentation (37.2 KB median gzipped); the
+heaviest page is Organizing Domain Logic's `domain-model` at 38.0 KB; the
+lightest course is Objects and Tables at 31.8 KB. The ceiling below is
+unchanged.
 
 Re-derive them rather than trusting them; they go stale every time a lab grows:
 

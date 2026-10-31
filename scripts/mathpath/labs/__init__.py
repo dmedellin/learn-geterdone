@@ -14,6 +14,7 @@ from . import (
     phenkit,
     readkit,
     cckit,
+    eakit,
     argkit,
     choicekit,
     algebra_equations,
@@ -173,6 +174,7 @@ REGISTRY = {
     "phenkit": phenkit.phenkit_lab,
     "readkit": readkit.readkit_lab,
     "cckit": cckit.cckit_lab,
+    "eakit": eakit.eakit_lab,
 }
 
 

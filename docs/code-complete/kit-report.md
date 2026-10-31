@@ -20,7 +20,7 @@ section says which one is right.
   - Any other mode is dispatched to `cckit_b.mode_lab` through a lazy import.
 - `scripts/mathpath/labs/cckit_b.py` (73 KB): the seven other modes. Each has a base block (`DG_JS`, `CD_JS`, `SE_JS`, `LP_JS`, `DF_JS`, `PF_JS`, `PJ_JS`) and one block per view (`DG_VIEW_JS[view]`, …).
 - `scripts/mathpath/labs/__init__.py`: one import (`cckit,`) and one registry line (`"cckit": cckit.cckit_lab,`). cckit is **not** in `KITS_WITH_EXPECTATIONS`; wiring adds it.
-- `scripts/mathcheck.js`: one block, `// ---- cckit (Code Complete) ----` … `// ---- end cckit ----`, just before THE VERDICT. It holds 187 assertions in one vm context per mode, plus a CC_WIRE_JS run on a fake DOM.
+- `scripts/mathcheck.js`: one block, `// ---- cckit (Code Complete) ----` … `// ---- end cckit ----`, just before THE VERDICT. It holds 191 assertions (187, plus 4 for the `book` key) in one vm context per mode, plus a CC_WIRE_JS run on a fake DOM.
 
 There is no `content/code_complete/`: no tooling needed a stub. Nothing in the renderer was edited, and the kit needs nothing more from it (see "What the kit needs from the renderer").
 
@@ -34,6 +34,7 @@ There is no `content/code_complete/`: no tooling needed a stub. Nothing in the r
   - `min_run` (dupes, 2–10, default 2);
   - `min` (names, 1–40, default 8);
   - `bands` (complexity, two whole numbers 0 < a < b, default `[5, 10]`);
+  - `book` (complexity, `"code-complete"`, the default, or `"other"`; added for the Enterprise Patterns path, its PLAN §H.1). With `"other"`, `CO_BOOK_OTHER_JS` ships after the complexity block and rewrites three phrases of the banner: "McConnell's guidance on what" becomes "McConnell's guidance in Code Complete on what", "The book prints its bands" becomes "McConnell prints his bands", and the `?:` note's "not the book's" becomes "not McConnell's". No tile changes. With the default nothing ships and every page is byte-identical to before. Any other value raises. The basis view's `?:` note still says "the book's", since no lesson outside Code Complete uses basis;
   - `indent` (layout, 1–8, default 4);
   - `table` (defects/cost, required);
   - `target` (profile, a share above 0 and at most 1, default 4/5);
@@ -190,7 +191,7 @@ Every view has one field, `code` (the Java listing, —), drawn as the numbered 
   - coMagic, Magic numbers, `5`;
   - coDistinct, Distinct, `3`;
   - coMagicList, Each, with its lines, `0.0725 (line 2), 12 (lines 2, 3), 360 (lines 4, 5)`.
-- **complexity.** cfg `bands`. Tiles:
+- **complexity.** cfg `bands` and `book`. Tiles:
   - coDecisions, Decision points, `9`;
   - coBreakdown, Breakdown, `1 + if 5 + for 1 + && 1 + || 1`;
   - coBand, Band, `6–10` (the bands print `0–5`, `6–10`, `10+`);
@@ -410,7 +411,7 @@ Nothing beyond what is already there:
   - `refusals.py`: 27 of 27 build refusals raise.
   - `dbl.js` compared nuShort with JavaScript's shortest round-trip digits on 30,000 random normal doubles. Every one read back exactly, had the same digits, and switched to the `E` form at the right thresholds.
   - `perf.js`: the worst arith runs (1,000 steps) take 4–31 ms.
-- **mathcheck.** `node scripts/mathcheck.js` passes in full, with 187 cckit assertions, every view at least once, and §C's figures as the cases.
+- **mathcheck.** `node scripts/mathcheck.js` passes in full, with 191 cckit assertions (4 of them for the `book` key, seen to fail when its rewrite was broken), every view at least once, and §C's figures as the cases.
 - **Mutation testing.** `mutate.py` broke 133 lines, one at a time, in a scratch copy of the kit, covering every Compute function, the printing, the parser, the tokenizer and the wiring. The cckit block was run against each.
   - 119 were killed on the first pass. I added cases for 12 survivors: block comments, a final public field, a field initialised by a call, a name set first in a block, a code line with a comment, a name at the minimum, a band's top, a line's depth after its leading braces, the cycle's message, a loop that never starts with a negative step, a table with a baseline other than 1, and a share that reaches the target exactly. All 12 were then killed.
   - Two survivors were equivalent:

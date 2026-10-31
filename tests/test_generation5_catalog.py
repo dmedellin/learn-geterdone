@@ -33,9 +33,9 @@ def ordinal(text):
 class TestCatalogDestinations(unittest.TestCase):
     def test_every_lesson_destination_is_literal(self):
         courses,lessons,links=catalog_inventory(ui.SITE)
-        self.assertEqual(120,len(courses))
-        self.assertEqual(1141,len(lessons))
-        self.assertEqual(1156,len(links))
+        self.assertEqual(127,len(courses))
+        self.assertEqual(1185,len(lessons))
+        self.assertEqual(1200,len(links))
         self.assertEqual(lessons,{a['target'] for a in links})
         self.assertEqual(set(courses),{a['course'] for a in links})
         bad=[a for a in links if ordinal(a['text'])]
