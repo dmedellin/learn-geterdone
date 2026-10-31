@@ -417,7 +417,7 @@ UW_VIEW_JS["commit"] = r"""
       status: 'Every new, change and delete is one write when each is written at once; at commit an object is written once, '
         + 'and an object created and deleted in the script is not written at all. '
         + (imm ? '' : 'Nothing is written either way, so there is no share saved. ')
-        + 'Writes in this order can still break a foreign key; the order view is lesson 4.4\'s.',
+        + 'Writes in this order can still break a foreign key; the order view is in Identity Field and Foreign Keys.',
       table: { caption: 'Each step of the script', head: ['step', 'op', 'object', 'written at once'], rows: rows }
     };
   };

@@ -190,7 +190,7 @@ LESSONS = [
                   "handles every read, keeps a copy of each object, and compares at commit, "
                   "which costs time at commit but lets it update only the fields that "
                   "changed. The pattern also gives the commit a place to order the writes "
-                  "for the database's keys, which is lesson 4.4's subject, and to send them "
+                  "for the database's keys, which is the subject of Identity Field and Foreign Keys, and to send them "
                   "as one batch. The pattern's worked example, with object registration, is "
                   "David Rice's, and is better read in the book."),
             ("p", "Its When to Use It sets out the alternatives. The simplest is to save each "
@@ -244,7 +244,7 @@ LESSONS = [
                   "and give the writes saved as a share. Then type the script into the lab to "
                   "check."),
             ("p", "A Unit of Work writes each row once; putting those writes in an order the "
-                  "keys allow is lesson 4.4's. The next lesson, Identity Map, takes the other "
+                  "keys allow is for Identity Field and Foreign Keys. The next lesson, Identity Map, takes the other "
                   "half of the behavioral problem: loading the same row twice."),
         ],
         "lab": ("eakit", {
@@ -396,7 +396,7 @@ LESSONS = [
              "set by the kind of write or by when the object was first marked, not by the "
              "database's keys. A line written before its order can break a foreign key. "
              "Chapter 11 makes the Unit of Work the obvious home for that ordering, and "
-             "lesson 4.4 counts how."),
+             "Identity Field and Foreign Keys counts how."),
         ],
         "standard": (
             "Finish when you can list a commit's statements from a script by hand.",
@@ -673,7 +673,7 @@ LESSONS = [
             "The lab counts finds by key in one session. It cannot show the failure the map "
             "exists to prevent, two copies changed differently, because it runs nothing; nor "
             "does it count the queries for many rows that the map cannot answer, or what "
-            "happens between sessions, which the offline locks of Course 6 take up."
+            "happens between sessions, which the offline locks of Concurrency and Session State take up."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -1046,7 +1046,7 @@ LESSONS = [
                   "order row knows nothing of its lines. Fowler's answer to the first problem "
                   "is to keep each object's key in the object, and to translate between "
                   "references and keys on every load and save, with the Identity Map of "
-                  "lesson 4.2 as the lookup table."),
+                  "Identity Map as the lookup table."),
             ("p", "Identity Field is that key in the object, and it is a tool with choices. "
                   "Fowler's first concern is meaningful against meaningless keys. A "
                   "meaningful one, such as a national identity number, should be unique and "

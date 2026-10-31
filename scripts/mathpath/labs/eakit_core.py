@@ -18,7 +18,7 @@ JavaScript:
     eaSigned(n)         "+1", "−1", "0"
     eaNames, eaCount    "a, b" / "none";  "2: david, martin" / "0: none"
     eaRead(spec, raw)   parse every input of a view; THROWS a sentence
-    eaTableHtml(t)      the table under the tiles
+    eaTableHtml(t, c)   the table under the tiles (c: compact, one cell a row)
   EA_WIRE_JS   the page wiring (preset menu, inputs, redraw)
 
 Python:
@@ -220,9 +220,22 @@ EA_CORE_JS = r"""
   }
 
   /* head: header texts; rows: rows of cells, each text. */
-  function eaTableHtml(t) {
-    var h = '<caption>' + eaEsc(t.caption) + '</caption><thead><tr>'
-      + t.head.map(function (x) { return '<th scope="col">' + eaEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
+  /* The table as rows and columns; compact, one wrapping cell a row of
+     "head value" pairs, for a container too narrow for the columns. */
+  function eaTableHtml(t, compact) {
+    var h = '<caption style="white-space:normal;">' + eaEsc(t.caption) + '</caption><thead><tr>';
+    if (compact) {
+      h += '<th scope="col" style="text-align:left;white-space:normal;">' + t.head.map(eaEsc).join(' · ') + '</th></tr></thead><tbody>';
+      t.rows.forEach(function (row) {
+        var parts = [];
+        row.forEach(function (cell, k) {
+          if (cell !== '') parts.push('<span style="color:var(--muted);">' + eaEsc(t.head[k]) + '</span> ' + eaEsc(cell));
+        });
+        h += '<tr><td style="text-align:left;white-space:normal;overflow-wrap:anywhere;">' + parts.join(' · ') + '</td></tr>';
+      });
+      return h + '</tbody>';
+    }
+    h += t.head.map(function (x) { return '<th scope="col">' + eaEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
     t.rows.forEach(function (row) {
       h += '<tr>' + row.map(function (cell) { return '<td>' + eaEsc(cell) + '</td>'; }).join('') + '</tr>';
     });
@@ -235,6 +248,7 @@ EA_WIRE_JS = r"""
   var eaPresetS = eaEl('%P%Preset'), eaStatusEl = eaEl('%P%Status'), eaTableEl = eaEl('%P%Table');
   function eaRed(why) {
     TILES.forEach(function (id) { eaEl(id).textContent = EA_DASH; });
+    eaLastTable = null;
     eaTableEl.innerHTML = '';
     eaStatusEl.innerHTML = '<span class="tone-red">' + eaEsc(String(why).replace(/\.$/, '')) + '.</span>';
   }
@@ -245,9 +259,20 @@ EA_WIRE_JS = r"""
     out = %FN%(VIEW, inst, FIXED);
     if (out.refuse) { eaRed(out.refuse); return; }
     TILES.forEach(function (id) { eaEl(id).textContent = out.tiles[id] === undefined ? EA_DASH : out.tiles[id]; });
-    eaTableEl.innerHTML = out.table ? eaTableHtml(out.table) : '';
+    eaPaint(out.table || null);
     eaStatusEl.textContent = out.status;
   }
+  /* Paint the table; when its columns are wider than the box holding it,
+     paint it compact instead, so the page never scrolls sideways. */
+  var eaLastTable = null;
+  function eaPaint(t) {
+    eaLastTable = t;
+    if (!t) { eaTableEl.innerHTML = ''; return; }
+    eaTableEl.innerHTML = eaTableHtml(t, false);
+    var box = eaEl('%P%TableBox');
+    if (box && box.clientWidth > 0 && Math.max(eaTableEl.offsetWidth || 0, box.scrollWidth || 0) > box.clientWidth) eaTableEl.innerHTML = eaTableHtml(t, true);
+  }
+  if (window.addEventListener) window.addEventListener('resize', function () { if (eaLastTable) eaPaint(eaLastTable); });
   function eaFill(id) {
     var inst = PRESETS[id];
     if (!inst) return false;
@@ -570,8 +595,8 @@ def markup_html(prefix, name, subtitle, rules):
             '        <div class="lab-title"><strong>%s</strong><span>%s</span></div>\n'
             "      </div>\n" % (esc(name), esc(subtitle))
             + '      <div class="status-banner" id="%sStatus" style="margin-top:12px;" aria-live="polite"></div>\n' % prefix
-            + '      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="%sTable"></table></div>\n'
-            % prefix
+            + '      <div class="table-wrap" id="%sTableBox" style="margin-top:12px;"><table class="tt" id="%sTable"></table></div>\n'
+            % (prefix, prefix)
             + '      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> %s</p>\n'
             % esc(rules))
 

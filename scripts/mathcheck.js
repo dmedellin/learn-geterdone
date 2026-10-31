@@ -21609,7 +21609,9 @@ console.log('enterprise patterns: eakit, eight modes');
   const LD = eaCall(eaMk(eaBlock('a', 'LD_JS') + eaViews('a', 'LD_VIEW_JS', ['instances', 'finds', 'identity', 'graph', 'tree']), 'load', 'ldCompute'), 'load');
   const UW = eaCall(eaMk(eaBlock('a', 'UW_JS') + eaViews('a', 'UW_VIEW_JS', ['commit', 'order']), 'uow', 'uwCompute'), 'uow');
   const IH = eaCall(eaMk(eaBlock('b', 'IH_JS') + eaViews('b', 'IH_VIEW_JS', ['tables']), 'inherit', 'ihCompute'), 'inherit');
-  const OL = eaCall(eaMk(eaBlock('b', 'OL_JS') + eaViews('b', 'OL_VIEW_JS', ['reads', 'timeline']), 'lock', 'olCompute'), 'lock');
+  const olRun = eaMk(eaBlock('b', 'OL_JS') + eaViews('b', 'OL_VIEW_JS', ['reads', 'timeline']), 'lock', 'olCompute');
+  const OL = eaCall(olRun, 'lock');
+  const OLS = (view, raw) => olRun('RUN("lock", ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', {}).status');
   const SN = eaCall(eaMk(eaBlock('b', 'SN_JS') + eaViews('b', 'SN_VIEW_JS', ['objects', 'state']), 'session', 'snCompute'), 'session');
   const MN = eaCall(eaMk(eaBlock('b', 'MN_JS') + eaViews('b', 'MN_VIEW_JS', ['allocate']), 'money', 'mnCompute'), 'money');
 
@@ -21829,6 +21831,8 @@ console.log('enterprise patterns: eakit, eight modes');
   eq(OL('timeline', TL('0, a, edit, r', 'none', { groups: 's=g' }), 'olCommitted'), 'REFUSED Groups names s, which no event reads or edits', 'lock/timeline: a group for no record');
   eq(OL('timeline', TL('0, a, edit, r; 1, b, edit, r; 2, b, commit, -; 3, a, commit, -; 4, a, read, r', 'optimistic'), OLT),
      '1: b | 1: a | 0: none | 0 | 3 | —', 'lock/timeline: a conflicted session\'s later events are skipped, not refused');
+  eq(/skipped: a at minute 4\.$/.test(OLS('timeline', TL('0, a, edit, r; 1, b, edit, r; 2, b, commit, -; 3, a, commit, -; 4, a, read, r', 'optimistic'))), true,
+     'lock/timeline: a skipped event is named by its session and minute');
   eq(OL('timeline', TL('0, a, edit, r', 'optimistic'), 'olCommitted'), '0: none', 'lock/timeline: a session that never commits');
   eq(OL('timeline', TL('0, a, read, x; 1, b, edit, x; 2, b, commit, -; 3, a, edit, x; 4, a, commit, -', 'pessimistic'), OLT),
      '1: a | 0: none | 1: b | 0 | 0 | 1', 'lock/timeline: pessimistic locks at the first read of a record the session edits (book p. 384), so no update is lost');
@@ -21875,7 +21879,14 @@ console.log('enterprise patterns: eakit, eight modes');
     eq(byId('mnStatus').innerHTML, '<span class="tone-red">Amount should be a whole number, and &quot;1/0&quot; is not one.</span>',
        'EA_WIRE_JS: the banner is one escaped sentence');
     byId('mnInAmount').value = '7'; byId('mnInAmount').fire('input');
-    eq(/<caption>Each share<\/caption>/.test(byId('mnTable').innerHTML) + ' ' + byId('mnShares').textContent, 'true 2, 2, 2', 'EA_WIRE_JS: a good value redraws the table');
+    eq(/<caption[^>]*>Each share<\/caption>/.test(byId('mnTable').innerHTML) + ' ' + byId('mnShares').textContent, 'true 2, 2, 2', 'EA_WIRE_JS: a good value redraws the table');
+    eq(/<tr><td>/.test(byId('mnTable').innerHTML), true, 'EA_WIRE_JS: a table that fits its box keeps its columns');
+    byId('mnTableBox').clientWidth = 300; byId('mnTable').offsetWidth = 500;
+    byId('mnInAmount').value = '8'; byId('mnInAmount').fire('input');
+    eq(/<tr><td style="text-align:left;white-space:normal;overflow-wrap:anywhere;">/.test(byId('mnTable').innerHTML)
+       + ' ' + (byId('mnTable').innerHTML.match(/<tr><td/g) || []).length, 'true 3',
+       'EA_WIRE_JS: a table wider than its box is painted compact, one wrapping cell a row');
+    eq(/<caption style="white-space:normal;">Each share<\/caption>/.test(byId('mnTable').innerHTML), true, 'EA_WIRE_JS: the caption wraps');
   }
 }
 // ---- end eakit ----

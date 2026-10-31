@@ -142,7 +142,7 @@ OL_VIEW_JS["timeline"] = r"""
     inst.events.forEach(function (e, i) {
       var s = e.session, m = e.minute.n, a = e.action, g = a === 'commit' ? '' : G(e.record), what;
       var row = function (w) { rows.push([eaInt(m), s, a, e.record, a === 'commit' ? '' : g, w]); };
-      if (failed[s]) { skipped.push(i + 1); row('skipped'); return; }
+      if (failed[s]) { skipped.push(s + ' at minute ' + eaInt(m)); row('skipped'); return; }
       if (ended[s]) eaRefuse('Events, record ' + (i + 1) + ': ' + s + ' acts after it committed');
       if (!own(start, s)) { start[s] = m; seenv[s] = {}; edits[s] = []; reads[s] = []; sessions.push(s); }
       if (a !== 'commit') {
@@ -188,7 +188,7 @@ OL_VIEW_JS["timeline"] = r"""
       tiles: { olCommitted: eaCount(committed), olConflicts: eaCount(conflicts), olRefused: eaCount(refused),
         olLostUpdates: eaInt(lost), olRedo: eaInt(redo), olPeakLocks: scheme === 'pessimistic' ? eaInt(peak) : EA_DASH },
       status: rule + ' The minutes are the lesson\'s.'
-        + (skipped.length ? ' A refused or conflicted session\'s later events are skipped: ' + (skipped.length === 1 ? 'event ' : 'events ') + eaNames(skipped.map(String)) + '.' : '')
+        + (skipped.length ? ' A refused or conflicted session\'s later events are skipped: ' + eaNames(skipped) + '.' : '')
         + (open.length ? ' ' + eaNames(open) + (open.length === 1 ? ' neither commits nor fails' : ' neither commit nor fail') + ' in this timeline.' : '')
         + (checkReads && scheme !== 'optimistic' ? ' Checking reads applies only to the optimistic scheme, so it changes nothing here.' : ''),
       table: { caption: 'Each event, and what the scheme does with it', head: ['minute', 'session', 'action', 'record', 'group', 'what happens'], rows: rows }

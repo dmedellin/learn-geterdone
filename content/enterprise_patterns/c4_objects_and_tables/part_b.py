@@ -214,7 +214,7 @@ LESSONS = [
                   "Chapter 12. Read them in your own copy first."),
             ("p", "The chapter's question is which objects deserve a table. Its first answer "
                   "is about small values. A date range or an amount of money is a Value "
-                  "Object, Course 2's pattern: it has no identity, only a value, so nobody "
+                  "Object, a pattern from Organizing Domain Logic: it has no identity, only a value, so nobody "
                   "needs to find it by key, and Chapter 12's Embedded Value thinks a table "
                   "of nothing but amounts absurd. Its fields go into the owner's "
                   "row instead, and the owner loads and saves them. Because a value has no "

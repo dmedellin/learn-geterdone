@@ -223,7 +223,7 @@ LESSONS = [
                   "again. The snippet leaves the system transaction around it, closing the statement and "
                   "moving its own copy of the version on after a save, to its caller."),
             ("code", _lines(OPTIMISTIC_SAVE)),
-            ("p", "The lab is the timeline of lesson 2 with the scheme set to optimistic. In "
+            ("p", "The lab is the timeline of Optimistic and Pessimistic Control with the scheme set to optimistic. In "
                   "<code>two-clerks</code> Kim reads the invoice at minute 0, at version 0. Lee "
                   "reads it at 1, edits at 2 and commits at 3, moving it to version 1. Kim edits "
                   "at 4 and saves at 20, and her update matches no row. The lab prints "

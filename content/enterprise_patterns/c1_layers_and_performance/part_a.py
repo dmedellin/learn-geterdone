@@ -316,7 +316,7 @@ LESSONS = [
                   "and no threshold, so the band is another author's guidance, not this "
                   "book's. The deepest nesting is 2, first reached at line 12, the statement "
                   "inside the `if` on line 11, which is inside the `if` on line 10. The preset "
-                  "<code>due-day-plain</code> is the same routine with every agreement taken "
+                  "<code>due-day-plain</code>, below, is the same routine with every agreement taken "
                   "out: 1 decision point, breakdown 1, band 0–5, nesting 0, line 3. The eight "
                   "points between the two listings are the agreements, and none of them could "
                   "have been derived from the plain rule. The four agreements cost eight points "
@@ -325,6 +325,7 @@ LESSONS = [
                   "the `||`), and the cap two (an `if` and an `&&`). That is what the count shows: not "
                   "that the routine is badly written, but how much of it a reader has to learn "
                   "case by case."),
+            ("code", _lines(DUE_DAY_PLAIN)),
             ("h3", "Exercise"),
             ("code", _lines(LATE_FEE)),
             ("p", "Count the decision points in this late fee by the same rule, writing the "
@@ -1420,7 +1421,7 @@ LESSONS = [
                   "Java's `interface` is the obvious choice, though an abstract class can carry "
                   "optional common behaviour. Who creates the implementation, since the "
                   "client may not know its class? A factory, itself behind a Separated "
-                  "Interface and bound by Plugin, a pattern Course 7 reads; or, more simply, a "
+                  "Interface and bound by Plugin, a pattern Distribution and Putting It Together reads; or, more simply, a "
                   "package that knows both and wires them together when the application "
                   "starts."),
             ("p", "When to Use It gives the occasions: a framework that must call application "

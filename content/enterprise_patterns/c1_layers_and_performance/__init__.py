@@ -103,7 +103,7 @@ COURSE = {
         "Disconnected operation and the synchronising of a client's data, which Fowler "
         "himself puts outside the book's scope in Choosing Where to Run Your Layers.",
         "Other layering schemes. Chapter 8 compares Fowler's three layers with those of "
-        "other authors, and Course 7 reads it once every pattern the schemes name has been "
+        "other authors, and Distribution and Putting It Together reads it once every pattern the schemes name has been "
         "met.",
         "What has changed since 2002 in where presentation runs. One lesson, Layering, "
         "sets the chapter beside presentation built in the browser; the rest read the book "

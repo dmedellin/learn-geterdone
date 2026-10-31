@@ -1717,10 +1717,94 @@ CC_COURSES = (
 CC_PATH_COURSE_COUNT = 7
 CC_UPCOMING_COURSES = ()
 
+# The Enterprise Application Patterns path: seven courses, all published.
+# Generated from content/enterprise_patterns/ so these cannot disagree with
+# what is built.
+EAA_PATH_PAGE = "/paths/enterprise-patterns/"
+
+EAA_COURSE_1_HOME = "/enterprise-patterns-layers-and-performance/"
+EAA_COURSE_1_LESSONS = (
+    "enterprise-applications",
+    "performance-terms",
+    "capacity-and-scalability",
+    "layering",
+    "layer-supertype-and-separated-interface",
+)
+EAA_COURSE_2_HOME = "/enterprise-patterns-domain-logic/"
+EAA_COURSE_2_LESSONS = (
+    "transaction-script",
+    "domain-model",
+    "table-module-and-making-a-choice",
+    "service-layer",
+    "value-object",
+    "money",
+    "special-case",
+)
+EAA_COURSE_3_HOME = "/enterprise-patterns-data-source/"
+EAA_COURSE_3_LESSONS = (
+    "gateways",
+    "row-data-gateway-and-finders",
+    "active-record",
+    "data-mapper",
+    "building-the-mapping",
+    "database-connections",
+)
+EAA_COURSE_4_HOME = "/enterprise-patterns-objects-and-tables/"
+EAA_COURSE_4_LESSONS = (
+    "unit-of-work",
+    "identity-map",
+    "lazy-load",
+    "identity-field-and-foreign-keys",
+    "embedded-value-and-serialized-lob",
+    "single-table-inheritance",
+    "class-and-concrete-table-inheritance",
+    "metadata-query-object-repository",
+)
+EAA_COURSE_5_HOME = "/enterprise-patterns-web-presentation/"
+EAA_COURSE_5_LESSONS = (
+    "model-view-controller",
+    "page-controller",
+    "front-controller",
+    "template-and-transform-view",
+    "two-step-view",
+    "application-controller",
+)
+EAA_COURSE_6_HOME = "/enterprise-patterns-concurrency-and-session-state/"
+EAA_COURSE_6_LESSONS = (
+    "concurrency-problems",
+    "optimistic-and-pessimistic-control",
+    "transactions-and-isolation",
+    "optimistic-offline-lock",
+    "pessimistic-and-coarse-grained-locks",
+    "the-value-of-statelessness",
+    "session-state",
+)
+EAA_COURSE_7_HOME = "/enterprise-patterns-distribution/"
+EAA_COURSE_7_LESSONS = (
+    "distribution-strategies",
+    "remote-facade",
+    "data-transfer-object",
+    "putting-it-all-together",
+    "plugin-and-service-stub",
+)
+
+EAA_COURSES = (
+    ("Layers and Performance", EAA_COURSE_1_HOME, EAA_COURSE_1_LESSONS),
+    ("Organizing Domain Logic", EAA_COURSE_2_HOME, EAA_COURSE_2_LESSONS),
+    ("Talking to the Database", EAA_COURSE_3_HOME, EAA_COURSE_3_LESSONS),
+    ("Objects and Tables", EAA_COURSE_4_HOME, EAA_COURSE_4_LESSONS),
+    ("Web Presentation", EAA_COURSE_5_HOME, EAA_COURSE_5_LESSONS),
+    ("Concurrency and Session State", EAA_COURSE_6_HOME, EAA_COURSE_6_LESSONS),
+    ("Distribution and Putting It Together", EAA_COURSE_7_HOME, EAA_COURSE_7_LESSONS),
+)
+
+EAA_PATH_COURSE_COUNT = 7
+EAA_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
-               + READ_COURSES + CC_COURSES)
+               + READ_COURSES + CC_COURSES + EAA_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1842,7 +1926,7 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
-                       CC_PATH_PAGE)
+                       CC_PATH_PAGE, EAA_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1873,6 +1957,8 @@ PATHS = (
      READ_UPCOMING_COURSES),
     ("Code Complete, Read Along", CC_PATH_PAGE, CC_COURSES, CC_PATH_COURSE_COUNT,
      CC_UPCOMING_COURSES),
+    ("Patterns of Enterprise Application Architecture, Read Along", EAA_PATH_PAGE,
+     EAA_COURSES, EAA_PATH_COURSE_COUNT, EAA_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2091,6 +2177,12 @@ READ_DISCLAIMER_RE = re.compile(
 # reason.
 CC_DISCLAIMER_RE = re.compile(
     r"(?i)a reason to look at it, not a verdict")
+# Enterprise Application Patterns promises that every figure is computed from
+# the situation a lesson states, and warns that a count models that situation
+# and is not a measurement of the reader's system -- Fowler's own rule.
+# Stopping short of the em dash, for OR's reason.
+EAA_DISCLAIMER_RE = re.compile(
+    r"(?i)not a measurement of your system")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2117,6 +2209,8 @@ PATH_MATERIAL_DISCLAIMER = {
                      READ_DISCLAIMER_RE),
     CC_PATH_PAGE: ("the a-count-is-not-a-verdict disclaimer",
                    CC_DISCLAIMER_RE),
+    EAA_PATH_PAGE: ("the not-a-measurement-of-your-system disclaimer",
+                    EAA_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2461,11 +2555,16 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(CC_COURSES)
             + sum(len(slugs) for _t, _h, slugs in CC_COURSES)
         )
+        eaa_tree = (
+            1  # the Enterprise Application Patterns path page
+            + len(EAA_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in EAA_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
-                       + cc_tree)  # 1 for the index
+                       + cc_tree + eaa_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2545,9 +2644,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 49 pages, got %d" % cc_tree,
         )
         self.assertEqual(
-            1275,
+            52,
+            eaa_tree,
+            "the Enterprise Application Patterns path is 1 + 7 + 5 + 7 + 6 + 8 + 6 + 7 + 5 "
+            "= 52 pages, got %d" % eaa_tree,
+        )
+        self.assertEqual(
+            1327,
             course_tree,
-            "the site index plus all thirteen path trees is 1275 pages, got %d" % course_tree,
+            "the site index plus all fourteen path trees is 1327 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2558,9 +2663,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1279,
+            1331,
             expected,
-            "1275 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1279, "
+            "1327 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1331, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2779,6 +2884,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "phenomenology": getattr(smoke, "PHEN_COURSES", ()),
             "reading": getattr(smoke, "READ_COURSES", ()),
             "code_complete": getattr(smoke, "CC_COURSES", ()),
+            "enterprise_patterns": getattr(smoke, "EAA_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3191,9 +3297,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1261,
+            1312,
             len(course_pages),
-            "one hundred and twenty course homes and 1141 lessons carry a material "
+            "one hundred and twenty-seven course homes and 1185 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4180,11 +4286,13 @@ class TestCourseContext(SiteFixture):
                     self.assertIsNotNone(breadcrumb, home + " lacks its breadcrumb")
                     copy = visible_text(breadcrumb.group(1))
                     self.assertIn("Learn library", copy)
-                    self.assertIn(subject.title(), copy)
+                    # the name as PATHS writes it: str.title() would turn
+                    # "Patterns of Enterprise..." into "Patterns Of ..."
+                    self.assertIn(subject, copy)
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(120, checked, "every published course must be checked")
+        self.assertEqual(127, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4486,6 +4594,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from phenomenology import PATH as PHENOMENOLOGY
             from reading import PATH as READING
             from code_complete import PATH as CODE_COMPLETE
+            from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4500,6 +4609,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("phenomenology", PHEN_COURSES, PHEN_PATH_PAGE, PHENOMENOLOGY),
             ("reading faster", READ_COURSES, READ_PATH_PAGE, READING),
             ("code complete", CC_COURSES, CC_PATH_PAGE, CODE_COMPLETE),
+            ("enterprise patterns", EAA_COURSES, EAA_PATH_PAGE, ENTERPRISE_PATTERNS),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4636,11 +4746,13 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from phenomenology import PATH as PHENOMENOLOGY
             from reading import PATH as READING
             from code_complete import PATH as CODE_COMPLETE
+            from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE):
+                     CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
+                     ENTERPRISE_PATTERNS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4827,12 +4939,14 @@ class TestEveryLabBuilds(unittest.TestCase):
             from phenomenology import PATH as PHENOMENOLOGY
             from reading import PATH as READING
             from code_complete import PATH as CODE_COMPLETE
+            from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
-                     CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE):
+                     CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
+                     ENTERPRISE_PATTERNS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]
@@ -6215,3 +6329,48 @@ class TestCodeCompleteContent(unittest.TestCase):
         without = dict(cfg, source="Table 3-1, p. 29")
         del without["panel_intro"]
         self.assertIn("Figures: Table 3-1, p. 29.", cckit.cckit_lab(without).panel_intro)
+
+
+class TestEnterprisePatternsContent(unittest.TestCase):
+    """Code Complete's snippet rule, on the Enterprise Application Patterns
+    Subject (docs/enterprise-patterns/PLAN.md section H.3): for every cckit lab
+    of mode `code` on this path, each preset's code is a `code` block on the
+    same lesson or a named *_EXERCISE constant of the course's package, so the
+    listing the reader reads and the listing the lab counts cannot drift.
+    """
+
+    snippet_errors = TestCodeCompleteContent.__dict__["snippet_errors"]
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        sys.path.insert(0, str(REPO_ROOT / "content"))
+        try:
+            import importlib
+            import pkgutil
+            import enterprise_patterns
+            from mathpath import render
+        except ImportError as exc:  # pragma: no cover
+            raise unittest.SkipTest("cannot import the Enterprise Application Patterns package: %s" % exc)
+        cls.render = render
+        cls.path = enterprise_patterns.PATH
+        cls.exercises = {}
+        for info in pkgutil.iter_modules(enterprise_patterns.__path__):
+            package = importlib.import_module("enterprise_patterns." + info.name)
+            course = getattr(package, "COURSE", None)
+            if course is None:
+                continue
+            found = {}
+            modules = [package] + [importlib.import_module("enterprise_patterns.%s.%s" % (info.name, sub.name))
+                                   for sub in pkgutil.iter_modules(package.__path__)]
+            for module in modules:
+                for name, value in vars(module).items():
+                    if name.endswith("_EXERCISE") and isinstance(value, str):
+                        found[name] = value
+            cls.exercises[course["slug"]] = found
+
+    def test_enterprise_patterns_presets_use_the_lessons_snippets(self):
+        errors, checked = self.snippet_errors(self.path, self.exercises)
+        # 29 presets across 14 code labs when wired; an empty sweep must fail.
+        self.assertGreater(checked, 25, "found only %d code-lab presets to check" % checked)
+        self.assertEqual([], errors, "\n".join(errors))

@@ -2057,6 +2057,97 @@ CC_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Enterprise Application Patterns, same shape.
+EAA_PATH_PAGE_PATH = "/paths/enterprise-patterns/"
+EAA_MATERIAL_MARKER = "not a measurement of your system"
+EAA_COURSES = (
+    ("enterprise-patterns-layers-and-performance", "Layers and Performance", (
+        "enterprise-applications",
+        "performance-terms",
+        "capacity-and-scalability",
+        "layering",
+        "layer-supertype-and-separated-interface",
+    )),
+    ("enterprise-patterns-domain-logic", "Organizing Domain Logic", (
+        "transaction-script",
+        "domain-model",
+        "table-module-and-making-a-choice",
+        "service-layer",
+        "value-object",
+        "money",
+        "special-case",
+    )),
+    ("enterprise-patterns-data-source", "Talking to the Database", (
+        "gateways",
+        "row-data-gateway-and-finders",
+        "active-record",
+        "data-mapper",
+        "building-the-mapping",
+        "database-connections",
+    )),
+    ("enterprise-patterns-objects-and-tables", "Objects and Tables", (
+        "unit-of-work",
+        "identity-map",
+        "lazy-load",
+        "identity-field-and-foreign-keys",
+        "embedded-value-and-serialized-lob",
+        "single-table-inheritance",
+        "class-and-concrete-table-inheritance",
+        "metadata-query-object-repository",
+    )),
+    ("enterprise-patterns-web-presentation", "Web Presentation", (
+        "model-view-controller",
+        "page-controller",
+        "front-controller",
+        "template-and-transform-view",
+        "two-step-view",
+        "application-controller",
+    )),
+    ("enterprise-patterns-concurrency-and-session-state", "Concurrency and Session State", (
+        "concurrency-problems",
+        "optimistic-and-pessimistic-control",
+        "transactions-and-isolation",
+        "optimistic-offline-lock",
+        "pessimistic-and-coarse-grained-locks",
+        "the-value-of-statelessness",
+        "session-state",
+    )),
+    ("enterprise-patterns-distribution", "Distribution and Putting It Together", (
+        "distribution-strategies",
+        "remote-facade",
+        "data-transfer-object",
+        "putting-it-all-together",
+        "plugin-and-service-stub",
+    )),
+)
+
+EAA_PATH_PAGE_MARKERS = (
+    canonical_marker(EAA_PATH_PAGE_PATH),
+    html.escape(EAA_COURSES[0][1]),
+    html.escape(EAA_COURSES[-1][1]),
+    'href="../../%s/"' % EAA_COURSES[-1][0],
+)
+
+EAA_COURSE_HOMES = tuple(
+    (
+        "eaa-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, EAA_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(EAA_COURSES, start=1)
+)
+
+EAA_COURSE_LESSONS = tuple(
+    (
+        "eaa-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), EAA_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(EAA_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2157,6 +2248,7 @@ def path_page_targets(args):
         ("phen-path", PHEN_PATH_PAGE_PATH, PHEN_PATH_PAGE_MARKERS),
         ("read-path", READ_PATH_PAGE_PATH, READ_PATH_PAGE_MARKERS),
         ("cc-path", CC_PATH_PAGE_PATH, CC_PATH_PAGE_MARKERS),
+        ("eaa-path", EAA_PATH_PAGE_PATH, EAA_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2184,7 +2276,8 @@ def course_home_targets(args):
                                     + CAP_COURSE_HOMES
                                     + PHEN_COURSE_HOMES
                                     + READ_COURSE_HOMES
-                                    + CC_COURSE_HOMES):
+                                    + CC_COURSE_HOMES
+                                    + EAA_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2227,6 +2320,7 @@ def lesson_targets(args):
         + PHEN_COURSE_LESSONS
         + READ_COURSE_LESSONS
         + CC_COURSE_LESSONS
+        + EAA_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

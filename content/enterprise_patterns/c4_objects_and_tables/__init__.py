@@ -107,7 +107,7 @@ COURSE = {
         "The book's long mapping examples. Each pattern in Chapters 11 to 13 has worked "
         "examples in Java or C#, some of them several pages long; the lessons point to them "
         "by pattern and do not rework them.",
-        "Association Table Mapping and Dependent Mapping beyond a paragraph each. Lesson 4.4 "
+        "Association Table Mapping and Dependent Mapping beyond a paragraph each. Identity Field and Foreign Keys "
         "names what each is for and leaves its mechanics to the book.",
         "The full range of Identity Field's key schemes and Lazy Load's four forms. The "
         "lessons name the choices and show one of each in code.",

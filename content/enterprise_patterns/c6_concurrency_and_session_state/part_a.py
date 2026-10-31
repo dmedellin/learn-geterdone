@@ -213,7 +213,7 @@ LESSONS = [
                   "then 9, read before David's commit; multiphase 5 then 8, read after. The lab "
                   "prints a total of 15, 12 before and 17 after, and &ldquo;no: 15 is neither 12 "
                   "nor 17&rdquo;. The change column says insert, because David added classes; "
-                  "the isolation tile it feeds is lesson 3's."),
+                  "the isolation tile it feeds belongs to Transactions and Isolation."),
             ("p", "Now move the reads. In <code>both-after</code> Martin reads both packages "
                   "after the commit: 17, &ldquo;yes: the state after the commit&rdquo;. In "
                   "<code>both-before</code> he reads both before it: 12, &ldquo;yes: the state "
