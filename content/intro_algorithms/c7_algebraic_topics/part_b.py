@@ -116,8 +116,8 @@ LESSONS = [
             ("p", "Lamé's bound for this pair: 851 lies between `F₁₅ = 610` and `F₁₆ = 987`, so "
                   "with `k + 1 = 16` the theorem promises fewer than 15 calls; there are 4. The "
                   "bound is about the worst pair of that size, and the worst pairs are "
-                  "consecutive Fibonacci numbers: `(89, 55)` takes 9 divisions, every quotient 1, "
-                  "the most for any b below 89."),
+                  "consecutive Fibonacci numbers: `(89, 55)` takes 9 divisions, every quotient 1 "
+                  "until the last, the most for any b below 89."),
             ("p", "Section 31.3 supplies the algebra: the integers modulo n under addition form "
                   "a group, and the remainders coprime to n form a group `Zₙ*` under "
                   "multiplication, with `φ(n)` elements, Euler's phi function. Section 31.4 "
@@ -158,7 +158,12 @@ LESSONS = [
                   "m = 35 lists the seven solutions of the example, each checked. The Chinese "
                   "remainder mode on remainders 4 and 6 with moduli 7 and 9 gives 60 modulo 63. The "
                   "exponentiation mode on 5, 117 and 391 gives 201 in 6 squarings and 5 "
-                  "multiplications, against 116 multiplications done one at a time."),
+                  "multiplications, against 116 multiplications done one at a time. It counts "
+                  "differently from MODULAR-EXPONENTIATION: it reads the bits of 117, binary "
+                  "1110101, from the least significant end and skips the square it would never "
+                  "use, while the book's procedure reads from the most significant end and "
+                  "squares once for each of the 7 bits, the first time squaring 1. Both multiply "
+                  "once for each 1 bit, 5 times here."),
             ("h3", "Exercise"),
             ("p", "Run EXTENDED-EUCLID by hand on `(377, 233)`, two consecutive Fibonacci "
                   "numbers, count the recursive calls, and compare with Lamé's bound. Then solve "
@@ -249,8 +254,8 @@ LESSONS = [
              "a": ["`x = 3, y = −4`", "`x = −4, y = 3`", "`x = 23, y = −31`", "`x = 1, y = 1`"],
              "c": 0,
              "why": "`1147·3 − 851·4 = 3441 − 3404 = 37`. Swapping gives `−4588 + 2553 = −2035`. "
-                    "`x = 23, y = −31` comes from the zero row: `1147·23 − 851·31 = 26381 − 26381 "
-                    "= 0`, a combination of value 0, not 37. `1147 + 851 = 1998`, which is "
+                    "`x = 23, y = −31` is the zero row's pair with its signs flipped: "
+                    "`1147·23 − 851·31 = 26381 − 26381 = 0`, a combination of value 0, not 37. `1147 + 851 = 1998`, which is "
                     "`54·37`, a multiple of the gcd but not the gcd."},
         ],
         "mistakes": [
@@ -266,8 +271,8 @@ LESSONS = [
              "seven, and the lab's congruence mode lists them; dividing through by d leaves one "
              "solution modulo n/d, which lifts to d of them."),
             ("Computing the power first and reducing at the end",
-             "`5^117` has 82 digits, and `7^560` has 474, though each fits below the modulus "
-             "after reduction. Reducing after every squaring and multiplication keeps every "
+             "`5^117` has 82 digits, and `2^1000` has 302, though each fits below a small "
+             "modulus after reduction. Reducing after every squaring and multiplication keeps every "
              "intermediate below n², and repeated squaring needs only about 2·lg b "
              "multiplications instead of b − 1."),
         ],
@@ -281,7 +286,8 @@ LESSONS = [
         "note": (
             "The lab runs each algorithm exactly with integers of any size and prints its "
             "trace; its exponentiation mode reads the bits of b from the least significant "
-            "end, so its counts differ by one from MODULAR-EXPONENTIATION's. Lamé's theorem "
+            "end and makes one squaring fewer than MODULAR-EXPONENTIATION, which squares "
+            "once per bit; the multiplications agree. Lamé's theorem "
             "and the O(β) bounds are the book's proofs; the counts are facts about the "
             "numbers typed."
         ),
@@ -404,19 +410,23 @@ LESSONS = [
                      "if n is prime it always answers prime.")),
             ("p", "The authors add two remarks. The bound is about the test's coin flips, not "
                   "about how likely a given n is to be prime, and Bayes's theorem shows that for "
-                  "a random 1024-bit number a few trials are needed just to outweigh the prior "
-                  "odds against primality; they suggest s = 50 for almost any use. And the true "
-                  "count is better than the theorem: an improved argument shows at most "
-                  "`(n − 1)/4` bases are non-witnesses, and for a random odd composite far fewer "
-                  "are."),
+                  "a random 1024-bit number about nine trials are needed just to outweigh the "
+                  "prior odds against primality; they suggest s = 50 for almost any use. And "
+                  "the true count is better than the theorem: an improved argument shows that "
+                  "at most `(n − 1)/4` bases are non-witnesses, some n have exactly that many, "
+                  "and for a random odd composite far fewer are expected."),
             ("p", "Now the lab, the one the Algorithms Subject's lesson Witnesses, Liars, and "
                   "One-Sided Error uses. Its slider n runs over odd numbers up to 2,047, and for "
                   "each it tests every base from 2 to n − 2, so the counts are exact. It traces "
-                  "the chain `a^u, a^(2u), …` for one chosen base, counts witnesses and non-witnesses, "
-                  "counts Fermat's witnesses beside them, and gives the exact chance that t "
-                  "random bases all fail to testify, against the bound `(1/4)ᵗ` from the improved "
-                  "argument. The bases 1 and n − 1, which never testify, are left out of its "
-                  "count."),
+                  "the chain for one chosen base, counts witnesses and non-witnesses, counts "
+                  "Fermat's witnesses beside them, and gives the exact chance that a chosen "
+                  "number of random bases all fail to testify. It differs from the book in three "
+                  "ways. Its letters are swapped: it writes `n − 1 = d·2ˢ` with d odd, where the "
+                  "book writes `2ᵗ·u`, and it calls the number of bases t, where the book calls "
+                  "it s. Its bound is `(1/4)` to the number of bases, from the improved "
+                  "argument, not Theorem 31.39's `2^(−s)`, and a tile checks that at least three "
+                  "quarters of the bases are witnesses, not Theorem 31.38's half. And it leaves out the bases 1 "
+                  "and n − 1, which never testify, where the book draws from 1 to n − 1."),
             ("p", "The lesson's number is preset psp2047, `2047 = 23 · 89`. Here "
                   "`n − 1 = 2·1023`, so `t = 1`, and `2¹¹ = 2048 ≡ 1`, so `2¹⁰²³ = (2¹¹)⁹³ ≡ 1`: "
                   "base 2 yields no testimony, and a test that tried only base 2 would call 2047 "
@@ -549,7 +559,7 @@ LESSONS = [
         ),
         "note": (
             "The lab counts witnesses exactly for odd n up to 2,047 over the bases 2 to n − 2 "
-            "and prints the improved `(1/4)ᵗ` bound beside the exact error; it does not run RSA, "
+            "and prints the improved bound, a quarter to the number of bases, beside the exact error; it does not run RSA, "
             "which the example and the worked check carry by hand. Theorem 31.38's bound holds "
             "for every odd composite; the counts are facts about the number on the slider."
         ),

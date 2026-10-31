@@ -67,8 +67,8 @@ LESSONS = [
             ("Greedy scheduler",
              "A scheduler that never leaves a processor idle when a strand is ready. At each "
              "step it runs P ready strands if there are that many, and all of them otherwise. "
-             "It needs no knowledge of the future, and Theorem 27.1 shows it never takes more "
-             "than twice as long as the best possible schedule."),
+             "It needs no knowledge of the future, and it never takes more "
+             "than twice as long as the best possible schedule (Corollary 27.2)."),
         ],
         "read_title": "The chapter's argument first, then the count",
         "read_intro": (
@@ -132,9 +132,11 @@ LESSONS = [
                   "busy."),
             ("example", ("Seven strands by hand",
                          "A program starts with `init` (cost 2), then spawns `load` (6) and "
-                         "continues with `parse` (3), which spawns `index` (4) and continues "
-                         "with `check` (2). A sync joins `index` and `check` into `merge` (1), "
-                         "and a final sync joins `merge` and `load` into `done` (1). The work is "
+                         "calls a helper that runs `parse` (3), spawns `index` (4), runs "
+                         "`check` (2) and syncs into `merge` (1). Back in the caller, a final "
+                         "sync joins the helper's return and `load` into `done` (1); the helper "
+                         "is needed because a sync waits for every child its own procedure has "
+                         "spawned. The work is "
                          "`2 + 6 + 3 + 4 + 2 + 1 + 1 = 19`. The paths are init, load, done at "
                          "`2 + 6 + 1 = 9` and init, parse, index, merge, done at "
                          "`2 + 3 + 4 + 1 + 1 = 11`, so the span is 11 and the parallelism "
@@ -263,7 +265,8 @@ LESSONS = [
             "intro": [
                 "Use the lab's counting: a call on n ≥ 2 is three unit strands, the one before the "
                 "spawn, the one that makes the second call, and the one after the sync; a call "
-                "on 0 or 1 is one strand.",
+                "on 0 or 1 is one strand. This is the counting of the book's Figure 27.2, so "
+                "at n = 4 you can check the table against the totals the book gives there.",
             ],
             "lines": [
                 "work: W(n) = W(n − 1) + W(n − 2) + 3",
@@ -478,8 +481,8 @@ LESSONS = [
                   "`4, 1, 3; 0, 11/4, 5/4; 0, 0, 31/11`, determinant 31 and `x = 2, −1, 1`, "
                   "checked exactly. Preset zero is the example above: `π = 2, 1` and "
                   "`x = 1, 2`. Preset four is a 4 × 4 system whose solution is all ones; "
-                  "its third pivot is `−2/3`, negative, because the rule compares absolute "
-                  "values."),
+                  "its third pivot is `−2/3`, chosen over `−1/3` because the rule compares "
+                  "absolute values."),
             ("p", "The determinant tile uses a fact the decomposition gives for free: "
                   "`det A` is the product of the pivots, with its sign changed once for each "
                   "row exchange. For preset three, `4 · 11/4 · 31/11 = 31`, and π is a cycle "
@@ -731,11 +734,12 @@ LESSONS = [
                   "multiplied by −1. Each repair gives an equivalent program, one with the same "
                   "optimal value and solutions that translate back."),
             ("example", ("Four repairs on one program",
-                         "Minimize `2x₁ − x₂` subject to `x₁ + x₂ = 5`, `x₁ − 3x₂ ≥ −4`, "
-                         "`x₁ ≥ 0`, with x₂ free. Negate the objective: maximize `−2x₁ + x₂`. "
-                         "Replace x₂ by `x₂′ − x₂″` with both nonnegative. Split the equality into "
-                         "`x₁ + x₂′ − x₂″ ≤ 5` and `−x₁ − x₂′ + x₂″ ≤ −5`. Multiply the other "
-                         "constraint by −1: `−x₁ + 3x₂′ − 3x₂″ ≤ 4`. The result is in standard "
+                         "Minimize `3x₁ − 2x₂` subject to `x₁ − x₂ ≥ 1`, `2x₁ + x₂ = 8`, "
+                         "`x₂ ≥ 0`, with x₁ free. Negate the objective: maximize `−3x₁ + 2x₂`. "
+                         "Replace x₁ by `x₁′ − x₁″` with both nonnegative, so the objective "
+                         "becomes `−3x₁′ + 3x₁″ + 2x₂`. Multiply the first constraint by −1: "
+                         "`−x₁′ + x₁″ + x₂ ≤ −1`. Split the equality into "
+                         "`2x₁′ − 2x₁″ + x₂ ≤ 8` and `−2x₁′ + 2x₁″ − x₂ ≤ −8`. The result is in standard "
                          "form, with three variables and three constraints.")),
             ("p", "Slack form comes next. For each constraint `aᵢ·x ≤ bᵢ` define a slack "
                   "variable `sᵢ = bᵢ − aᵢ·x`, required to be nonnegative, so that the inequality "
@@ -796,7 +800,11 @@ LESSONS = [
                   "pivot exchanges one. Its entering rule takes the largest positive "
                   "coefficient, one of the choices SIMPLEX allows. Set the objective "
                   "coefficients to 5 and 1 and the walk changes to `(0, 0)`, `(4, 0)`, `(4, 3)`, "
-                  "ending at 23."),
+                  "ending at 23. The menu's second example is a look at degeneracy: its label "
+                  "promises five corners, but the page lists four, because all three of its "
+                  "constraint lines pass through `(3, 4)`, which the table marks degenerate. "
+                  "Two constraints already fix that point, so its basic solution has a basic "
+                  "variable at 0."),
             ("p", "The lab prints its bases in tableau language, a grid of coefficients in "
                   "which the objective row holds the negated coefficients, so an improving "
                   "column shows a negative entry there. That is the same information as the "
@@ -1066,7 +1074,8 @@ LESSONS = [
                      "attains an optimum of finite value; and SIMPLEX, "
                      "with INITIALIZE-SIMPLEX, returns the right one of the three answers.")),
             ("p", "The Operations Research Subject starts the method differently, with one "
-                  "artificial variable per row whose sum it minimizes in a first phase. The two "
+                  "artificial variable for each greater-than or equality row, where the origin "
+                  "supplies no starting column, and minimizes their sum in a first phase. The two "
                   "routes decide the same question in the same way: an auxiliary program that "
                   "is always feasible, whose optimum is the ideal value exactly when the "
                   "original program is feasible."),
@@ -1212,8 +1221,8 @@ LESSONS = [
         "note": (
             "The lab runs only its built-in programs; the workshop matches the last lesson's "
             "program, and the lesson's L_aux example is worked by hand because the Phase I "
-            "mode of the simplex kit uses one artificial per row rather than the book's single "
-            "x₀. A closed chain certifies one pair of points; weak duality and Theorem 29.10 "
+            "mode of the simplex kit uses one artificial for each greater-than or equality row "
+            "rather than the book's single x₀ shared by every row. A closed chain certifies one pair of points; weak duality and Theorem 29.10 "
             "are proved for every program."
         ),
     },
