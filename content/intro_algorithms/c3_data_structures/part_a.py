@@ -231,8 +231,8 @@ LESSONS = [
              "a": ["Array 31, list 9", "Array 27, list 9", "Array 31, list 14",
                    "Array 4, list 31"],
              "c": 0,
-             "why": "The array shifts every element on a front insertion: 9, 10 and 11 at sizes "
-                    "8, 9 and 10, then the index costs 1, for 31. The list splices each insertion "
+             "why": "A front insertion on the array shifts every element and then writes the new "
+                    "one: 9, 10 and 11 at sizes 8, 9 and 10, then the index costs 1, for 31. The list splices each insertion "
                     "for 1, and at size 11 halfway is position 5, which costs 6 hops: 9 in all. "
                     "Twenty-seven forgets that the size grows between insertions. Fourteen is the "
                     "list's total with the position at the back, where the index costs 11. Four "
@@ -421,15 +421,19 @@ LESSONS = [
                   "examined; the longest chain; and the empty slots. The lab adds each key at "
                   "the end of its chain rather than the front, which leaves the total over a "
                   "chain, and so the mean, unchanged."),
-            ("p", "One tile needs care. The lab's expected successful cost uses `α/(2m)` where "
-                  "Theorem 11.2's sum gives `α/(2n)`, so it differs slightly from the book's "
-                  "figure; compute the book's `1 + (n − 1)/(2m)` beside it yourself. On the "
-                  "worked example <code>eight-slots</code>, twenty keys from the stream in "
-                  "eight slots, α is 5/2, the book's successful expectation is 35/16, about "
-                  "2.19, and the measured mean is 23/10 = 2.300, with a longest chain of 5 and "
-                  "1 of 8 slots empty. On <code>half-full</code>, eight keys in sixteen slots, "
-                  "α is 1/2, the book's figure 39/32, about 1.22, and the mean 9/8 = 1.125: "
-                  "below the expectation this time, as a single small table can be."),
+            ("p", "One tile is not the book's figure, so do not read it as Theorem 11.2. The "
+                  "lab's tile for the expected successful cost computes `1 + α/2 − α/(2m)`, "
+                  "with m where the book's last term has n; the book's value is "
+                  "`1 + α/2 − α/(2n)`, which is `1 + (n − 1)/(2m)`, and you should compute it "
+                  "yourself beside the tile. The two agree only when n equals m. On the worked "
+                  "example <code>eight-slots</code>, twenty keys from the stream in eight "
+                  "slots, α is 5/2, the tile prints 67/32, about 2.09, the book's successful "
+                  "expectation is 35/16, about 2.19, and the measured mean is 23/10 = 2.300, "
+                  "with a longest chain of 5 and 1 of 8 slots empty. On <code>half-full</code>, "
+                  "eight keys in sixteen slots, α is 1/2, the tile prints 79/64, the book's "
+                  "figure is 39/32, about 1.22, and the mean is 9/8 = 1.125: below the "
+                  "expectation this time, as a single small table can be. The unsuccessful "
+                  "tile, α, is the book's figure exactly."),
             ("p", "Then choose <code>degenerate</code>: twenty keys, every one a multiple of 8, "
                   "under `h(k) = k mod 8`. The load factor is still 5/2 and the expectations "
                   "have not moved, but every key is in slot 0, the longest chain is 20, 7 of 8 "
@@ -501,7 +505,8 @@ LESSONS = [
                 "cost three each; the singletons one each. The mean, 1.8, sits above the "
                 "expectation 1.64 because slot 2 drew four keys where the average is under one "
                 "and a half. Type the keys into the lab with m = 7 and the division rule: it "
-                "prints 9/5, a longest chain of 4 and 2 of 7 slots empty.",
+                "prints 9/5, a longest chain of 4 and 2 of 7 slots empty, and 79/49 on the "
+                "successful tile, which uses m where the book's 23/14 uses n.",
             ],
         },
         "quiz_title": "Load factors, chains and averages",
@@ -581,8 +586,9 @@ LESSONS = [
             "`1 + (n − 1)/(2m)`."
         ),
         "note": (
-            "The lab's tile for the expected successful cost uses α/(2m) where Theorem 11.2 has "
-            "α/(2n); the lesson gives the book's figure beside it. The measured mean and the "
+            "The lab's tile for the expected successful cost computes 1 + α/2 − α/(2m), where "
+            "Theorem 11.2's analysis gives 1 + α/2 − α/(2n); it is not the book's figure, and "
+            "the lesson gives the book's beside it. The measured mean and the "
             "longest chain describe the keys on screen. Whether a set of keys hashes uniformly "
             "cannot be read off one table; the expectations are averages over the assumption."
         ),
@@ -988,7 +994,11 @@ LESSONS = [
                   "power-of-two size from a seeded stream of keys up to the load you choose, "
                   "searches for twelve keys that are absent and for every key present, and "
                   "counts probes. Its double hashing uses an odd second hash, the book's first "
-                  "way. The tiles are the load factor, the mean probes counted for the absent "
+                  "way. Its quadratic rule departs from the book: it offsets by `i + i²`, that is "
+                  "`c₁ = c₂ = 1`, and since `i + i²` is always even, in a power-of-two table it "
+                  "only ever reaches slots of the home slot's parity, so its probe sequence is "
+                  "not a permutation of the slots as Section 11.4 requires. Leave it aside; the "
+                  "lesson uses the linear and double rules. The tiles are the load factor, the mean probes counted for the absent "
                   "and the present keys, two values of Knuth's approximation for linear "
                   "probing, the longest run of occupied slots, and how many keys a delete would "
                   "lose if it emptied its slot instead of marking it."),
@@ -1150,8 +1160,9 @@ LESSONS = [
         "note": (
             "The lab fills its table from a seeded stream at power-of-two sizes and does not take "
             "your keys; the worked example and the exercise use an 11-slot table by hand. Its "
-            "quadratic rule is not the one Problem 11-3 recommends, so the lesson does not use "
-            "it. Its counts are a dozen searches on one table; the bounds are expectations under "
+            "quadratic rule, h′(k) + i + i², reaches only half the slots of a power-of-two "
+            "table, so it is not a probe sequence in the book's sense and the lesson does not "
+            "use it. Its counts are a dozen searches on one table; the bounds are expectations under "
             "uniform hashing."
         ),
     },
@@ -1273,6 +1284,18 @@ LESSONS = [
                   "whole sequence, whether the tree is still a search tree, and what the shown "
                   "step did. A smaller drawing beside it is a tree in which every node lies "
                   "between its two children and which is still not a search tree."),
+            ("p", "The lab deletes a two-child node differently from the book, and the "
+                  "difference is worth knowing. It copies the successor's key into z's node and "
+                  "then deletes the successor from z's right subtree by a second search, the "
+                  "method of the book's first two editions. The third edition's TREE-DELETE "
+                  "moves the successor's node itself into z's place with TRANSPLANT; the "
+                  "chapter notes explain why, since a program holding a pointer to the "
+                  "successor's node would otherwise find it carrying the wrong key, or freed. "
+                  "The two methods leave the same keys in the same places, so the drawings, "
+                  "heights and inorder sequences agree with the book's. The comparison count "
+                  "does not quite: the lab's second search compares keys on its way to the "
+                  "successor, where TREE-DELETE reaches it by TREE-MINIMUM, following left "
+                  "pointers without comparing."),
             ("p", "The worked example <code>two-child-delete</code> inserts seven keys and "
                   "deletes 30, which has two children: successor 40 moved up, 6 keys at height 2, "
                   "13 comparisons. <code>delete-the-root</code> deletes 50 instead and the "
@@ -1349,7 +1372,9 @@ LESSONS = [
                 "child. 72 has no right subtree, so lifting it out leaves 91 with no left child; "
                 "72 then takes 91 as its right subtree and 50 as its left, and replaces 65 under "
                 "41. The inorder sequence, 11 20 29 32 41 50 72 91 99, is still sorted. The lab "
-                "prints 23 comparisons: 19 for the insertions, 2 to find 65, 2 to reach 72.",
+                "prints 23 comparisons: 19 for the insertions, 2 to find 65, and 2 more for its "
+                "second search down to 72, which TREE-DELETE would replace by following one left "
+                "pointer from 91 without comparing.",
             ],
         },
         "quiz_title": "Search-tree operations and their heights",
@@ -1429,8 +1454,10 @@ LESSONS = [
             "child, and give the height and inorder sequence after each step."
         ),
         "note": (
-            "The lab deletes with the successor and searches by key; it has no predecessor or "
-            "successor query of its own, so those are worked by hand. Its height is in edges, as "
+            "The lab deletes a two-child node by copying its successor's key and deleting the "
+            "successor below, the older method, not the third edition's TRANSPLANT; the "
+            "resulting tree is the same, and its comparison count includes the second search. "
+            "It has no predecessor or successor query of its own, so those are worked by hand. Its height is in edges, as "
             "in Chapter 12. Its comparison counts are for the sequence typed; Theorem 12.4's "
             "expectation is over random insertion orders and is not something one run can show."
         ),

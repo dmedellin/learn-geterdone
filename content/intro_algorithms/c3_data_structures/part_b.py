@@ -443,8 +443,10 @@ LESSONS = [
                   "on the far side: recolour and rotate at the parent, and the extra black is "
                   "gone."),
             ("p", "Only case 2 repeats, and it moves x up one level without rotating, so the loop "
-                  "runs `O(lg n)` times. Cases 1, 3 and 4 end the loop after a constant "
-                  "number of recolourings, and the worst path through them, 1 then 3 then 4, "
+                  "runs `O(lg n)` times. Case 1 leads into case 2, 3 or 4; a case 2 reached "
+                  "from case 1 leaves x red-and-black, because the parent was red, so the loop "
+                  "stops; and cases 3 and 4 end it at once. Past the climbing case 2 there are "
+                  "a constant number of recolourings, and the worst path, 1 then 3 then 4, "
                   "rotates three times. RB-DELETE therefore takes `O(lg n)` with at most three "
                   "rotations. Here is one deletion by hand, from the tree the worked example "
                   "below ends with."),
@@ -470,9 +472,9 @@ LESSONS = [
                   "insertion, and a final height of 4 against `2 lg 9 ≈ 6.34`. Chapter 12's tree "
                   "on the same order is a chain of height 7. <code>descending</code> is the "
                   "mirror image: case 1 ×3, case 3 ×4, the same 19 and 4. <code>zigzag</code>, "
-                  "10 30 20 50 40 70 60, makes every third insertion bend inward: case 1′ ×2, "
+                  "10 30 20 50 40 70 60, makes every other insertion from the third on bend inward: case 1′ ×2, "
                   "case 2′ ×3, case 3′ ×3, 14 recolourings and 6 rotations, 2 in each bent "
-                  "insertion, the most the theorem allows. <code>spread-order</code>, ten keys "
+                  "insertion, the most the analysis allows. <code>spread-order</code>, ten keys "
                   "in an order that keeps the tree bushy, needs only case 1 ×2: 8 recolourings "
                   "and no rotations at all."),
             ("p", "None of those counts reached three rotations in one insertion, and the "
@@ -581,15 +583,15 @@ LESSONS = [
                     "black uncle and must rotate. Leaving 5 red forgets case 1′'s recolouring."},
             {"q": "Which case of RB-INSERT-FIXUP can repeat, and what does it do to z?",
              "a": ["Case 1: it recolours and moves z up two levels, without rotating",
-                   "Case 2: it rotates and moves z down one level, so the loop runs again",
+                   "Case 2: after its rotation the loop tests again from the old parent",
                    "Case 3: it rotates at the grandparent and moves z to the root",
                    "None: each case ends the loop after one pass"],
              "c": 0,
              "why": "Case 1 makes the grandparent red and sets z to it, and the grandparent's "
                     "parent may be red, so the loop goes on; this is why the recolouring is "
-                    "`O(lg n)` while the rotations are at most two. Case 2 does move z down, but "
-                    "only to fall straight into case 3. Case 3 ends the loop with z's parent "
-                    "black. Case 1 does not end it."},
+                    "`O(lg n)` while the rotations are at most two. Case 2 falls straight "
+                    "through into case 3 in the same pass. Case 3 ends the loop with z's parent "
+                    "black. So not every case ends the loop: case 1 does not."},
             {"q": "RB-DELETE removes a node y that was red. What must RB-DELETE-FIXUP do?",
              "a": ["Nothing; it is not called, because no black count changes, no two reds "
                    "become adjacent and the root stays black",
@@ -795,8 +797,10 @@ LESSONS = [
             ("h3", "Exercise"),
             ("p", "In the tree built from `44 21 70 9 33 58 86 27 39 64`, write every node's size. "
                   "Then run OS-RANK on the node holding 39 by climbing, writing r after each "
-                  "step, and give its rank. Check the rank in the lab with the rank query, and "
-                  "count how many nodes its downward walk visits."),
+                  "step, and give its rank. Check it in the lab: choose the rank query and move "
+                  "the slider until it reads rank of 39. The lab picks the key by its sorted "
+                  "position, so the answer is no surprise; what to compare is its downward "
+                  "walk, which visits 4 nodes and makes the same additions your climb made."),
             ("p", "This ends Part III. The next course, Advanced Design and Analysis Techniques, "
                   "reads Part IV: dynamic programming, greedy algorithms and amortized analysis, "
                   "beginning with rod cutting."),
