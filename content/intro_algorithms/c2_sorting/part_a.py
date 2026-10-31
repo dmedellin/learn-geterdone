@@ -150,8 +150,8 @@ LESSONS = [
                   "inserting one key at a time makes 30. Choose the worked example labelled "
                   "keys arriving in decreasing order, <code>worst-for-inserts</code>: every key "
                   "is as far from its place as a key can be, the bottom-up build makes 26 swaps, "
-                  "exactly the sum, and insertion makes 98. The bound is met, so on this input "
-                  "it cannot be improved. The third example, <code>already-a-heap</code>, sends "
+                  "exactly the sum, and insertion makes 98. The bound is met, so at 31 keys no "
+                  "smaller number could bound every arrival order. The third example, <code>already-a-heap</code>, sends "
                   "the keys in increasing order: no swaps at all for either method."),
             ("p", "Move the slider to 20 keys and you have the table above: the sum is 21, "
                   "which the lab prints as 21/20 per element. On the shuffle the build swaps 11 "
@@ -374,8 +374,9 @@ LESSONS = [
                   "much. Its long-range exchange, root to end, carries a key past others equal "
                   "to it, so equal keys can leave in a different order from the one they "
                   "arrived in: heapsort is not stable. And it does not get cheaper on input "
-                  "that is already nearly sorted. Section 7.4 and Chapter 8 return to both "
-                  "properties; here they are things to watch the lab for."),
+                  "that is already nearly sorted. Chapter 8 defines stability and asks, in "
+                  "Exercise 8.3-2, which of the sorts met so far have it; the book does not "
+                  "dwell on the second property. Both are things to watch the lab for."),
             ("p", "Section 6.5 turns to priority queues. A max-priority queue supports four "
                   "operations on a set S: INSERT adds an element, MAXIMUM returns the element "
                   "with the largest key, EXTRACT-MAX removes and returns it, and INCREASE-KEY "
@@ -416,9 +417,11 @@ LESSONS = [
             ("p", "Set those beside the bounds. Every comparison sort needs at least "
                   "`⌈lg 16!⌉ = 45` comparisons in the worst case on 16 keys, a bound Chapter 8 "
                   "proves, and the 15 extractions can cost at most two comparisons per level of "
-                  "a heap that is shrinking. The counts sit inside those limits on every array "
-                  "the lab offers; that they stay inside them on every array is the theorem's "
-                  "work, not the lab's."),
+                  "a heap that is shrinking. Heapsort's counts, 72 to 85 on the three arrays, "
+                  "sit between those limits. Merge sort's 32 on sorted input is below 45, and "
+                  "that breaks nothing: the lower bound is about each sort's worst input, not "
+                  "about every input. That heapsort stays within its upper limit on every array "
+                  "is the theorem's work, not the lab's."),
             ("h3", "Exercise"),
             ("p", "Start from the max-heap of the last lesson's worked example, `[15, 12, 14, "
                   "11, 9, 1, 3, 8, 6, 2]`. Perform HEAP-EXTRACT-MAX, then MAX-HEAP-INSERT with "
@@ -515,8 +518,9 @@ LESSONS = [
              "c": 1,
              "why": "Two counts on one array describe that array. Both sorts are `O(n lg n)` in "
                     "the worst case, so the worst-case growth is the same, and on the sorted "
-                    "array the ratio is 85/32, not 5/3. Neither count can be below the bound "
-                    "`⌈lg 16!⌉ = 45` on its worst input, and merge sort's 48 is above it."},
+                    "array the ratio is 85/32, not 5/3. The lower bound `⌈lg 16!⌉ = 45` is about "
+                    "each sort's worst input, and on this array both counts, 80 and 48, are "
+                    "above it anyway."},
             {"q": "Why does HEAP-INCREASE-KEY run in `O(lg n)` time on an n-element heap?",
              "a": ["It calls BUILD-MAX-HEAP after changing the key, and the build is linear",
                    "It changes one key and returns, which is constant time",
@@ -1056,7 +1060,8 @@ LESSONS = [
              "why": "Here i = 2 and j = 6, so `Zᵢⱼ` has `6 − 2 + 1 = 5` keys, and the two are "
                     "compared exactly when one of those two is the first of the five chosen as a "
                     "pivot: 2/5. One fifth counts only one of the two keys. One third uses "
-                    "`2/(j − i + 2)`. One half ignores the three keys between them."},
+                    "`2/(j − i + 2)`. One half is `2/(j − i)`, a set of four that leaves one "
+                    "of the five keys out."},
             {"q": "In the lab at n = 7, the mean over 200 seeds is 13.7150 while the closed form "
                   "is 13.4857. What explains the difference?",
              "a": ["The closed form is asymptotic and is only approximate at small n",

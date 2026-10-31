@@ -97,13 +97,13 @@ COURSE = {
         "The book's pseudocode, figures and exercises. They are named in the lessons and left "
         "to the book; the arrays in these lessons are written for them.",
         "The chapter-end problems, among them the d-ary heaps and Young tableaus of Chapter 6, "
-        "Hoare's partition and stooge sort of Chapter 7, and the nuts-and-bolts problem of "
+        "Hoare's partition and median-of-3 partitioning of Chapter 7, and the water jugs of "
         "Chapter 8. They are worth working in the book.",
         "Bucket sort's lab. Section 8.4's average-case argument is set out in prose and by "
         "hand; the Algorithms lesson Bucket Sort and Average-Case Claims runs it.",
-        "The full proofs the book leaves to its exercises, such as the expected-time bound "
-        "for randomized selection in detail and the exact 140 of Section 9.3, which the "
-        "lessons state and point to.",
+        "The substitution proofs of Sections 9.2 and 9.3 in full, the expected linear time of "
+        "randomized selection and the worst-case bound with its constant 140, which the "
+        "lessons outline and leave to the book.",
     ],
     "footer_lead": (
         "Every figure in this course is computed in your browser by running the algorithm on "

@@ -385,19 +385,20 @@ LESSONS = [
             ("math", [
                 "T(n) ≤ T(⌈n/5⌉) + T(7n/10 + 6) + O(n)",
                 "",
-                "the two recursive sizes, as fractions of n:",
+                "the two recursive sizes, ignoring ceiling and + 6:",
                 "1/5 + 7/10 = 9/10, which is less than 1",
                 "",
                 "level 0 of the tree:   cn",
-                "level 1:               (9/10)·cn, at most",
-                "level 2:               (81/100)·cn, at most",
-                "total:                 at most 10·cn",
+                "level 1:               about (9/10)·cn",
+                "level 2:               about (81/100)·cn",
+                "total:                 about 10·cn",
             ]),
-            ("p", "The two recursive calls together handle at most nine tenths of the keys, so "
-                  "each level of the recursion tree costs at most nine tenths of the level above "
-                  "and the whole tree is linear. The book proves it by substitution, assuming "
-                  "inputs below a threshold take constant time and showing where its constant "
-                  "140 comes from. It also notes why this does not contradict Chapter 8: SELECT "
+            ("p", "The two recursive calls together handle about nine tenths of the keys, plus a "
+                  "constant, so each level of the recursion tree costs roughly nine tenths of "
+                  "the level above and the whole tree is linear. That sketch ignores the ceiling "
+                  "and the + 6, which only become negligible for large n, so the book proves the "
+                  "bound by substitution instead, assuming inputs of fewer than 140 keys take "
+                  "constant time and showing where that constant comes from. It also notes why this does not contradict Chapter 8: SELECT "
                   "and RANDOMIZED-SELECT compare keys but do not sort them, and the lower bound "
                   "is about sorting."),
             ("p", "Now the lab, the one the Algorithms Subject's lesson Quickselect uses; its "
