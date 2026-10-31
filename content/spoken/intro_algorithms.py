@@ -157,7 +157,6 @@ SPOKEN.update({
     "(a.freq − x.freq)·(d(a) − d(x))": "a dot freq minus x dot freq, times the quantity d of a minus d of x",
     "−(a.freq − x.freq)·(d(a) − d(x))": "minus the quantity a dot freq minus x dot freq, times the quantity d of a minus d of x",
     "w₀ − w(e)": "w nought minus w of e",
-    "(S, ℐ)": "the pair S and script I",
     "T     0    0↑    0↑    0↑    0↑    1↖": "row T, 0, then 0 up, 0 up, 0 up, 0 up, and 1 diagonal",
     "A     0    0↑    0↑    0↑    1↖    1↑": "row A, 0, then 0 up, 0 up, 0 up, 1 diagonal, and 1 up",
     "B     0   [1↖]   1←    1←    1↑    1↑": "row B, 0, then 1 diagonal on the path, 1 left, 1 left, 1 up, and 1 up",
@@ -201,4 +200,5 @@ SPOKEN.update({
     "O(m α(n))": "big O of m times alpha of n",
     "α(n)": "alpha of n",
     "φ(n)": "phi of n",
+    "M = (S, ℐ)": "M equals the pair S and script I",
 })

@@ -598,7 +598,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Matroid",
-             "A pair `(S, ℐ)` of a finite set S and a nonempty family ℐ of its subsets, the "
+             "A pair `M = (S, ℐ)` of a finite set S and a nonempty family ℐ of its subsets, the "
              "independent sets, that is <strong>hereditary</strong>, every subset of an "
              "independent set is independent, and has the <strong>exchange property</strong>: if "
              "A and B are independent and `|A| < |B|`, some element of B not in A can be added "
