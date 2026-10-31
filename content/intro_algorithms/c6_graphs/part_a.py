@@ -62,7 +62,7 @@ LESSONS = [
             "lists: Θ(V + E) memory; matrix: Θ(V²)",
             "undirected lists hold 2E entries",
             "a FIFO queue holds the grey frontier",
-            "d = d[u] + 1 when v is discovered",
+            "v.d = u.d + 1 when v is discovered",
             "each list is scanned once: O(V + E)",
             "d ends equal to the fewest edges",
             "parents form a breadth-first tree",
@@ -113,7 +113,7 @@ LESSONS = [
                   "vertex white, gives it distance infinity and no parent, then colours `s` grey "
                   "with distance 0 and puts it in a queue. While the queue is not empty it takes "
                   "the vertex `u` at the head, looks at every entry `v` on `u`'s list, and for "
-                  "each white `v` sets its distance to `d[u] + 1`, its parent to `u`, colours it "
+                  "each white `v` sets its distance to `u.d + 1`, its parent to `u`, colours it "
                   "grey and puts it at the tail. When `u`'s list is done, `u` turns black. The "
                   "queue is why the search spreads evenly: every vertex at distance `k` is "
                   "discovered before any at distance `k + 1`."),
@@ -157,7 +157,7 @@ LESSONS = [
                   "would be found; direction decides what a search can see."),
             ("p", "The preset <code>hexagon</code> is a cycle of six vertices searched from 1. "
                   "The far vertex, 4, is at distance 3 by either way round, and the lab gives it "
-                  "the parent 3, because the edge to 3 was dequeued first: layers 0: 1; 1: 2 6; "
+                  "the parent 3, because 3 is dequeued before 5: layers 0: 1; 1: 2 6; "
                   "2: 3 5; 3: 4. Type the edge <code>6, 1</code> first instead and 4's parent becomes 5. "
                   "The distances cannot change, since Theorem 22.5 fixes them as δ(s, v); the "
                   "tree can, and the theorem promises only that it is a breadth-first tree."),
@@ -380,7 +380,7 @@ LESSONS = [
         ),
         "body": [
             ("p", "&ldquo;The strategy followed by depth-first search is, as its name implies, "
-                  "to search &ldquo;deeper&rdquo; in the graph whenever possible.&rdquo; So "
+                  "to search &lsquo;deeper&rsquo; in the graph whenever possible.&rdquo; So "
                   "Section 22.3 of CLRS opens. Breadth-first search, in the lesson before, "
                   "spreads out from one source a layer at a time; depth-first search follows "
                   "one edge after another from the vertex it reached last, and only when that "
@@ -411,7 +411,7 @@ LESSONS = [
                   "containment means descent. The proof is two cases on which vertex was "
                   "discovered first and whether the second was discovered before the first "
                   "finished. Corollary 22.8 restates it as a test: `v` is a proper descendant "
-                  "of `u` if and only if `d[u] < d[v] < f[v] < f[u]`."),
+                  "of `u` if and only if `u.d < v.d < v.f < u.f`."),
             ("p", "The white-path theorem, Theorem 22.9, says which vertices end up below `u`: "
                   "exactly those that, at the moment `u` is discovered, can be reached from `u` "
                   "along a path of vertices that are all still white. Reachability alone is not "
@@ -455,7 +455,8 @@ LESSONS = [
                   "11 nested pairs: the same eight arcs, classified differently, because the "
                   "classes describe one walk. Put the start back at 1 and switch the reading to "
                   "undirected: 5 tree edges, 3 back edges, 0 forward, 0 cross, which is Theorem "
-                  "22.10 holding on this graph. What does not change is whether there is a back "
+                  "22.10 holding on this graph. (Read undirected, `1 → 4` and `4 → 1` become two "
+                  "parallel edges between 1 and 4, and the lab classifies both as back edges.) What does not change is whether there is a back "
                   "arc at all; the next lesson proves that this one fact belongs to the graph."),
             ("p", "The lab does not print the work count, so do it by hand: from root 1 the walk "
                   "makes 6 calls, one per vertex, and examines 8 arcs, one per adjacency entry. "
@@ -668,7 +669,7 @@ LESSONS = [
                   "the rest of the cycle is a white path from it, so by the white-path theorem "
                   "the vertex just before it on the cycle becomes its descendant, and the arc "
                   "back is a back edge. With that, Theorem 22.12 shows that for every arc from "
-                  "`u` to `v` in a dag, `f[v] < f[u]`: when the arc is explored, `v` cannot be "
+                  "`u` to `v` in a dag, `v.f < u.f`: when the arc is explored, `v` cannot be "
                   "grey, and white or black both finish it before `u`."),
             ("p", "Section 22.5 drops the requirement that the graph be acyclic. Any digraph "
                   "splits into strongly connected components, and the authors' procedure "
@@ -689,9 +690,9 @@ LESSONS = [
                   "mutual reachability computed straight from the definition, and draws the "
                   "condensation, the component graph. It opens on its preset <code>dag</code>, "
                   "four arcs on four vertices: 4 components of 1 vertex each, as an acyclic "
-                  "graph must give. The preset <code>three</code> has 3 components, the largest "
+                  "graph must give. The preset <code>three</code>, a triangle with a second cycle below it, has 3 components, the largest "
                   "with 3 vertices, and 2 arcs in the condensation; <code>onebig</code> is a "
-                  "single cycle, 1 component of 4 vertices; <code>sourcefirst</code> has 2 "
+                  "single cycle, 1 component of 4 vertices; <code>sourcefirst</code>, a source component above a sink, has 2 "
                   "components and reports where the latest finish landed: component 1, with 0 "
                   "arcs into it."),
             ("p", "First the sort. Type this lesson's dag, six tasks and six arcs: <code>"
@@ -917,9 +918,9 @@ LESSONS = [
         ),
         "body": [
             ("p", "&ldquo;The greedy strategy advocates making the choice that is the best at "
-                  "the moment.&rdquo; Chapter 23 of CLRS quotes the strategy of Chapter 16 in "
-                  "its first page and then does what Chapter 16 said must always be done: "
-                  "prove that the greedy choice is safe. The problem is to connect every vertex "
+                  "the moment.&rdquo; Chapter 23 of CLRS recalls Chapter 16's greedy strategy on "
+                  "its first page, notes that it does not in general find an optimum, and then "
+                  "proves that for this problem it does. The problem is to connect every vertex "
                   "of a weighted, connected, undirected graph using edges of least total "
                   "weight. The cheapest such set has no cycle, so it is a tree that spans the "
                   "graph, with exactly |V| − 1 edges."),
@@ -939,8 +940,8 @@ LESSONS = [
                   "and no heavier, so it is minimum too, and it contains A and the light edge."),
             ("p", "Corollary 23.2 is the form both algorithms use: a light edge joining one tree "
                   "of the forest A to a different tree is safe, taking the cut around that one "
-                  "tree. Exercise 23.1-2 warns against the converse: a safe edge need not be "
-                  "light for every cut that respects A."),
+                  "tree. Exercise 23.1-2 warns against the converse: a safe edge crossing a "
+                  "cut that respects A need not be light for that cut."),
             ("p", "Section 23.2 gives two ways to find such an edge quickly. Kruskal's algorithm "
                   "sorts all the edges by weight and takes them in order, keeping each edge "
                   "whose ends lie in different trees of the forest and skipping each edge "
@@ -1063,7 +1064,7 @@ LESSONS = [
                     "and {3, 4} splits both."},
             {"q": "Which statement is Theorem 23.1?",
              "a": ["A light edge crossing a cut that respects A is safe for A",
-                   "An edge safe for A is light for every cut that respects A",
+                   "An edge safe for A is light for every cut it crosses that respects A",
                    "The lightest edge in the graph is in every minimum spanning tree",
                    "The heaviest edge in the graph is in no minimum spanning tree"],
              "c": 0,
@@ -1131,8 +1132,8 @@ LESSONS = [
             "with three negative arcs and count the rounds and the relaxations."
         ),
         "key": [
-            "relax: d[v] > d[u] + w lowers d[v]",
-            "d[v] never falls below δ(s, v)",
+            "relax: v.d > u.d + w lowers v.d",
+            "v.d never falls below δ(s, v)",
             "|V| − 1 rounds fix every simple path",
             "one more improvement: negative cycle",
             "Bellman-Ford: O(V·E)",
@@ -1150,12 +1151,12 @@ LESSONS = [
              "infinity for every vertex beyond it."),
             ("Relaxation",
              "Each vertex keeps an estimate d, infinity at first and 0 at the source. Relaxing "
-             "the arc from u to v asks whether going through u improves v: if d[u] plus the "
-             "arc's weight is less than d[v], lower d[v] to it and record u as v's "
+             "the arc from u to v asks whether going through u improves v: if u.d plus the "
+             "arc's weight is less than v.d, lower v.d to it and record u as v's "
              "predecessor. The algorithms of Chapter 24 differ only in which arcs they relax and "
              "in what order."),
             ("The upper-bound and path-relaxation properties",
-             "Relaxation never makes d[v] smaller than δ(s, v), and once equal it stays equal. "
+             "Relaxation never makes v.d smaller than δ(s, v), and once equal it stays equal. "
              "If the arcs of a shortest path are relaxed in path order, with anything else "
              "relaxed in between, d at the path's end becomes exact. Section 24.5 proves both."),
         ],
@@ -1180,10 +1181,10 @@ LESSONS = [
                   "cycle of nonnegative weight never hurts, so it has at most |V| − 1 arcs. The "
                   "answer is kept as a predecessor for each vertex, and the predecessors form a "
                   "shortest-paths tree rooted at s."),
-            ("p", "Then the operation. INITIALIZE-SINGLE-SOURCE sets every estimate `d[v]` to "
-                  "infinity, `d[s]` to 0 and every predecessor to nil; RELAX on an arc from `u` "
-                  "to `v` lowers `d[v]` to `d[u] + w` when that is smaller. The introduction "
-                  "lists the properties relaxation has, and Section 24.5 proves them: `d[v]` "
+            ("p", "Then the operation. INITIALIZE-SINGLE-SOURCE sets every estimate `v.d` to "
+                  "infinity, `s.d` to 0 and every predecessor to nil; RELAX on an arc from `u` "
+                  "to `v` lowers `v.d` to `u.d + w` when that is smaller. The introduction "
+                  "lists the properties relaxation has, and Section 24.5 proves them: `v.d` "
                   "never drops below δ(s, v) and never rises; relaxing the arcs of a shortest "
                   "path in order, with any other relaxations interleaved, makes the last "
                   "estimate exact. Every algorithm in the chapter is a schedule of relaxations "
@@ -1212,7 +1213,7 @@ LESSONS = [
                   "its preset <code>worstorder</code>, a chain typed backwards: 6 of the 6 "
                   "allowed rounds and 20 relaxations. The preset <code>bestorder</code>, the "
                   "same chain typed forwards, needs 2 of the 6 and 10 relaxations; "
-                  "<code>negcycle</code> reports the negative cycle 2 → 3 → 4 → 2 itself."),
+                  "<code>negcycle</code>, four arcs with a loop through a −3, reports the negative cycle 2 → 3 → 4 → 2 itself."),
             ("p", "This lesson's graph has five vertices, seven arcs, three of them negative, "
                   "and no cycle: <code>" + BF_GRAPH + "</code>, with labels from 1. The lab "
                   "runs 3 of the 5 allowed rounds and 21 relaxations, finds no negative cycle, "
@@ -1228,8 +1229,9 @@ LESSONS = [
                   "28 calls to RELAX, and then its check of 7 arcs. Finally add one arc, "
                   "<code>5>3 -1</code>, to the original: the lab reports the negative cycle "
                   "2 → 4 → 5 → 3 → 2, of weight −4, and refuses to call anything a distance."),
-            ("p", "The graph is a dag, so do Section 24.2 by hand. A topological order is 1, 3, "
-                  "2, 4, 5. From 1: `d[2]` becomes 4 and `d[3]` 5. From 3: `d[2]` falls to 2 "
+            ("p", "The graph is a dag, so do Section 24.2 by hand. The book writes vertex v's "
+                  "estimate as v.d; with numbered vertices this lesson writes `d[2]` for vertex "
+                  "2's. A topological order is 1, 3, 2, 4, 5. From 1: `d[2]` becomes 4 and `d[3]` 5. From 3: `d[2]` falls to 2 "
                   "and `d[4]` becomes 8. From 2: `d[4]` falls to 0 and `d[5]` becomes 8. From 4: "
                   "`d[5]` falls to 2. Seven relaxations, one per arc, and the same distances, "
                   "0, 2, 5, 0, 2, with three negative arcs on the way. The Algorithms Subject's "

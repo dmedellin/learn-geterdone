@@ -97,10 +97,12 @@ LESSONS = [
                   "min-priority queue keyed by its estimate, and repeats: extract the vertex of "
                   "least estimate, add it to the settled set S, and relax every arc leaving it. "
                   "Theorem 24.6 proves that each vertex's estimate equals its true distance at "
-                  "the moment it is extracted. The proof takes the first vertex for which that "
-                  "fails and a shortest path to it; the path leaves S at some arc, the vertex "
-                  "just beyond that arc already has its true distance by convergence, and with "
-                  "no negative weights the rest of the path cannot make it any shorter. "
+                  "the moment it is extracted. The proof takes the first vertex `u` for which that "
+                  "fails and a shortest path to it. The path leaves S at some arc into a vertex "
+                  "`y`, which already has its true distance by convergence; with no negative "
+                  "weights the rest of the path cannot be negative, so δ(s, y) ≤ δ(s, u) ≤ u.d; "
+                  "and `u` was extracted ahead of `y`, so u.d ≤ y.d = δ(s, y). The chain closes, "
+                  "and u.d = δ(s, u) after all. "
                   "Corollary 24.7 adds that the predecessors form a shortest-paths tree."),
             ("p", "The running time depends on the queue. There are |V| extractions and at most "
                   "|E| decreases of a key. With a plain array indexed by vertex, a decrease "
@@ -131,15 +133,16 @@ LESSONS = [
                   "checks the upper-bound property against distances computed another way. Its "
                   "heap pushes a second entry when a label improves instead of decreasing a key "
                   "in place, so its counts are pushes and pops, and stale entries are skipped. It "
-                  "opens on its preset <code>stale</code>: 12 relaxations, 6 pushes and 6 pops. "
+                  "opens on its preset <code>stale</code>, built to fill the heap with stale entries: 12 relaxations, 6 pushes and 6 pops. "
                   "The preset <code>dense</code>, ten edges on five vertices, makes 20 "
-                  "relaxations against a reference E·lg V of 20; <code>far</code>, a chain of "
+                  "relaxations against a reference E·lg V of 20 (the page rounds lg V down to a "
+                  "whole number, here lg 5 to 2); <code>far</code>, a chain of "
                   "seven, makes 12 with all 7 labels exact."),
             ("p", "This lesson's graph has five vertices and seven edges: <code>"
                   + DIJKSTRA_GRAPH + "</code>, shortest paths from 1. With the heap the lab "
                   "settles 1 at 0, then 3 at 1, then 2 at 3, then 4 at 8, then 5 at 10. It "
                   "performs 14 relaxations, every edge once from each end, with 7 pushes and 7 "
-                  "pops; the reference E·lg V, rounded down by the page, is 14; the upper-bound "
+                  "pops; the reference E·lg V, with lg 5 taken as 2, is 14; the upper-bound "
                   "invariant is never violated; and all 5 labels equal the true distances. The "
                   "paths are 1 → 3 → 2 for vertex 2, 1 → 3 → 2 → 4 for 4 and 1 → 3 → 5 for 5."),
             ("p", "Switch the schedule. Scanning every vertex instead of using a heap gives the "
@@ -401,7 +404,7 @@ LESSONS = [
                   "interior vertices: distance 23, along 1 → 2 → 4 → 3. The preset "
                   "<code>sparse</code>, a chain of eight vertices, does 512 relaxations for 512 "
                   "cell visits, against a reference of 168 for running a heap-based single "
-                  "source from each vertex; <code>negcycle</code> reports the negative diagonal "
+                  "source from each vertex; <code>negcycle</code>, five arcs with a loop through a −3, reports the negative diagonal "
                   "entries 2, 3, 4."),
             ("p", "This lesson's graph has four vertices, six arcs and one negative weight: "
                   "<code>" + APSP_GRAPH + "</code>. Rebuild the path from 4 to 2. The lab "
@@ -624,8 +627,9 @@ LESSONS = [
                   "and the flow already carried as capacity backward, since sending against an "
                   "arc's flow cancels some of it. Find any route from `s` to `t` through the residual "
                   "network, an augmenting path; push along it the least residual capacity on "
-                  "the path, its bottleneck; repeat until no such path remains. Lemmas 26.1 and "
-                  "26.2 show each push yields a flow whose value has grown by the bottleneck."),
+                  "the path, its bottleneck; repeat until no such path remains. Lemma 26.1, "
+                  "Lemma 26.2 and Corollary 26.3 show each push yields a flow whose value has "
+                  "grown by the bottleneck."),
             ("p", "Why stop exactly at the maximum? Lemma 26.4 says the net flow across any cut "
                   "equals the flow's value, so every flow is at most every cut's capacity. "
                   "Theorem 26.6, the max-flow min-cut theorem, says three things are "
@@ -650,7 +654,8 @@ LESSONS = [
                   "they are for. Its preset <code>forwardonly</code>, four vertices with every "
                   "capacity 1, reaches 1 against a true maximum of 2 with them out; "
                   "<code>zigzag</code>, one thin arc between two fat ones, reaches 199 against "
-                  "200, and needs 3 augmentations against 2 for the shortest-path rule."),
+                  "200 with them out, and with them in needs 4 augmentations to reach 200, "
+                  "against 2 for the shortest-path rule."),
             ("p", "This lesson's network has five vertices and six arcs, source 1 and sink 5: "
                   "<code>" + FLOW_GRAPH + "</code>. With the first path found and backward arcs "
                   "out, the lab pushes 2 along 1 → 2 → 3 → 4 → 5 in 1 augmentation and stops at "
@@ -666,7 +671,7 @@ LESSONS = [
             ("p", "That cut is not the only one of capacity 3. The arcs into 4 make another, "
                   "`2 → 4` and `3 → 4` at 1 + 2, and the arc `4 → 5` alone a third. The lab's list of "
                   "full arcs at the end has five entries, `1 → 2`, `1 → 3`, `2 → 4`, `3 → 4` and `4 → 5`, "
-                  "but the cut it returns has two. The Algorithms Subject's lessons Augmenting "
+                  "but the cut the final search marks, {1}, has two. The Algorithms Subject's lessons Augmenting "
                   "Paths and Max Flow and Min Cut run both labs on more networks."),
             ("h3", "Exercise"),
             ("p", "Take the network <code>1>2 3, 1>3 2, 2>3 1, 2>4 2, 3>4 3, 4>5 4</code> with "
@@ -785,8 +790,8 @@ LESSONS = [
              "not about which arcs are saturated."),
             ("Assuming Ford-Fulkerson's time depends only on the graph's size",
              "With an arbitrary choice of path the bound is O(E·|f*|), which grows with the "
-             "capacities. The lab's preset zigzag needs 3 augmentations with first-found paths "
-             "against 2 with shortest ones, and Section 26.2 shows a poor choice of paths "
+             "capacities. With backward arcs in, the lab's preset zigzag needs 4 augmentations with "
+             "first-found paths against 2 with shortest ones, and Section 26.2 shows a poor choice of paths "
              "needing a number of augmentations that grows with the capacities. Edmonds and Karp's shortest-path choice removes the dependence: O(VE²)."),
         ],
         "standard": (
@@ -885,23 +890,24 @@ LESSONS = [
                   "network, and the method finds both."),
             ("p", "The running time is the method's own bound with a small maximum. A matching "
                   "has at most min(|L|, |R|) edges, which is O(V), so there are O(V) "
-                  "augmentations, each found in O(E) time: O(VE) in all. The section closes by "
-                  "pointing ahead. Section 26.4 develops push-relabel algorithms, which push "
+                  "augmentations, each found in O(E) time: O(VE) in all. Section 26.4, which "
+                  "follows, develops push-relabel algorithms, which push "
                   "excess flow from vertex to vertex guided by a height function instead of "
                   "following whole paths, and bounds the generic version at O(V²E); Section "
                   "26.5's relabel-to-front algorithm runs in O(V³). Both sections are starred, "
                   "and their proofs are left to the book."),
             ("p", "The lab builds the network from the pairs you type, finds a maximum flow, and "
                   "reads the matching off the middle arcs. It also checks the answer three other "
-                  "ways the section does not discuss but that make good evidence: every subset "
+                  "ways that make good evidence: every subset "
                   "of the pairs is tried; the cut is read back as a vertex cover, a set of "
                   "vertices touching every pair, which can never be smaller than a matching; and "
                   "Hall's condition, that every set of left vertices has at least as many "
-                  "neighbours, is tested. Beside them it runs a greedy pass that takes pairs in "
+                  "neighbours, is tested (the section's text never uses it; it appears only in "
+                  "Exercise 26.3-4). Beside them it runs a greedy pass that takes pairs in "
                   "typed order whenever both ends are free."),
             ("p", "It opens on its preset <code>maximal</code>, two vertices a side and three "
                   "pairs: a matching of 2, while the greedy pass stops at 1, maximal and not "
-                  "maximum. The preset <code>perfect</code> matches all three left vertices, "
+                  "maximum. The preset <code>perfect</code>, three a side and six pairs, matches all three left vertices, "
                   "with a cover of 3 and Hall's condition holding; <code>hall</code> puts three "
                   "left vertices against two and reports the condition failing at {1, 2}; "
                   "<code>star</code> has one popular right vertex, a matching of 2 of 5 pairs, "
@@ -972,7 +978,7 @@ LESSONS = [
                 "L1 to R2, back to L3",
                 "L3 to R3, back to L4",
                 "L4 to R4: path found",
-                "now L2 with R1, L1 with R2, L3 with R3,"
+                "now L2 with R1, L1 with R2, L3 with R3,",
                 "  and L4 with R4",
             ],
             "after": [
@@ -1026,13 +1032,14 @@ LESSONS = [
              "what the residual network's backward arcs make possible."),
             ("Believing every maximum flow in the network is a matching",
              "The reduction relies on the flow being integral, and Theorem 26.10 promises that "
-             "for the flow Ford-Fulkerson returns, not for every maximum flow. In a network with "
-             "a cycle of choices a half-unit on each of two arcs can also be maximum. The lab "
+             "for the flow Ford-Fulkerson returns, not for every maximum flow. If L1 and L2 are "
+             "both joined to R1 and R2, half a unit on each of the four middle arcs is a "
+             "maximum flow of value 2 that is no matching. The lab "
              "checks the whole-number property on its own flow: yes, every one."),
             ("Expecting push-relabel to be needed for matching",
-             "Section 26.4's methods give better bounds for general flow, O(V²E) and O(V³), but "
+             "The push-relabel methods of Sections 26.4 and 26.5 give better bounds for general flow, O(V²E) and O(V³), but "
              "matching already has O(VE) from Ford-Fulkerson because its maximum is at most "
-             "O(V). The section names push-relabel as the route to faster flow algorithms, not "
+             "O(V). The book presents push-relabel as the route to faster flow algorithms, not "
              "as a requirement for matching."),
         ],
         "standard": (
