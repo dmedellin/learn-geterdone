@@ -806,7 +806,7 @@ LESSONS = [
                   "made a child)."),
             ("thm", ("DECREASE-KEY is O(1) amortized",
                      "Suppose one call makes c calls of CASCADING-CUT. Its actual cost is `O(c)`. "
-                     "Afterwards there are `t(H) + c` trees: x's and `c − 1` cut by cascading. At "
+                     "Afterwards there are `t(H) + c` trees: the original ones, x's, and the `c − 1` cut by cascading. At "
                      "most `m(H) − c + 2` nodes are marked: `c − 1` lost their mark when cut, and "
                      "the last call may have marked one. So the potential rises by at most "
                      "`c + 2·(2 − c) = 4 − c`, and with the unit of potential scaled to cover the "
@@ -858,7 +858,7 @@ LESSONS = [
                   "170, repeat the first three in shape."),
             ("p", "The worked example <code>fresh-tree</code> stops there: no cuts, nothing "
                   "marked, one root, degree 4 against the bound 5, and the lemma holds at all 16 "
-                  "nodes, closest at 40, of degree 1 and size 2, which is exactly `F(3) = 2`. Choose "
+                  "nodes, closest at 40, of degree 1 and size 2, which is exactly `F(3) = 2` (the leaves, each of size `1 = F(2)`, are just as close; the lab breaks the tie toward the larger degree). Choose "
                   "<code>one-cascade</code>, the worked example below: three decreases make 4 cuts, "
                   "1 of them cascading, in 4 calls of CASCADING-CUT, and leave no node marked; the "
                   "largest amortized DECREASE-KEY is 5, the ceiling, and the root list read from "
@@ -1000,15 +1000,15 @@ LESSONS = [
              "why": "Three cuts (x and two cascading) plus the decrease cost 4. Three new roots add "
                     "3; the two cascading cuts clear two marks, −4; the last call sets one, +2; so "
                     "ΔΦ = 1 and the amortized cost is 5. Leaving out the new mark gives −1 and 3; "
-                    "counting the cut nodes' marks as added gives 7; and counting only x's cut "
-                    "misses two steps."},
-            {"q": "By Lemma 19.4, what is the smallest possible size of a node of degree 5 in a "
-                  "Fibonacci heap?",
+                    "counting the two cleared marks as added, +4, and dropping the new one gives 7; "
+                    "and counting only x's cut misses two steps."},
+            {"q": "What is the least size Lemma 19.4 allows a node of degree 5 in a Fibonacci "
+                  "heap?",
              "a": ["32", "13", "11", "6"],
              "c": 1,
              "why": "The bound is `F(k + 2) = F(7) = 13`. Thirty-two is `2⁵`, the size of a binomial "
                     "tree of degree 5, which cuts can reduce. Eleven is `⌊φ⁵⌋`, a weaker bound the "
-                    "lemma also proves, but a node cannot reach it, since the least size is 13. Six "
+                    "lemma also proves, but the lemma's sharper bound, 13, already rules it out. Six "
                     "would be a node with five leaf children, which Lemma 19.1 forbids: its later "
                     "children must have children of their own."},
             {"q": "Why does the potential count each marked node twice?",
@@ -1187,7 +1187,8 @@ LESSONS = [
                   "MINIMUM and MAXIMUM read a field. SUCCESSOR compares low(x) with the maximum of "
                   "x's cluster and so knows, without a call, whether to recurse into the cluster or "
                   "into the summary, never both. INSERT into an empty tree sets min and max; "
-                  "otherwise, if x's cluster is empty, it recurses into the summary and fills the "
+                  "otherwise it first swaps x with min when x is smaller, so that the old minimum is "
+                  "the element carried down, and then, if x's cluster is empty, it recurses into the summary and fills the "
                   "cluster in constant time, and if the cluster is not empty the summary already "
                   "knows it, and it recurses into the cluster only. The price is space: a vEB tree "
                   "takes `O(u)` space and `O(u)` time to create (Problem 20-1)."),
@@ -1548,9 +1549,11 @@ LESSONS = [
                   "by a slider from 4 to 16. Three union patterns are built in, each followed by one "
                   "find of every element, and two switches turn union by rank and path compression "
                   "on and off; UNION links the first root under the second exactly as LINK does. The "
-                  "tiles count the operations, the pointer hops walked by every find (including the "
-                  "two inside each union), the worst single find, the tallest root's rank (its depth "
-                  "when the rank rule is off), `2ʳ` against the elements present, and the hops the "
+                  "tiles count the operations (the unions and finds; the n MAKE-SETs that the book's m "
+                  "includes are not counted), the pointer hops walked by every find (including the "
+                  "two inside each union), the worst single find, the tallest root's rank (with the "
+                  "rank rule off, the depth the unions built, which compression may since have "
+                  "flattened: on <code>chain</code> with compression alone it still reads 11), `2ʳ` against the elements present, and the hops the "
                   "two rules together save against neither. The table runs all four combinations."),
             ("p", "The worked example <code>chain</code> unites each element with the next, 0 with "
                   "1, 1 with 2, and so on, with both rules off. At 12 elements that builds a single "
@@ -1656,15 +1659,16 @@ LESSONS = [
                     "→ 8, three pointers, and compression points both 1 and 2 at 8 (4 already "
                     "does). Root 4 forgets the last union; only 1 moving forgets that compression "
                     "redirects every node on the path; rank 4 would need 16 elements."},
-            {"q": "With linked lists and the weighted-union heuristic on 1,000 objects, at most how "
+            {"q": "With linked lists and the weighted-union heuristic on 1,024 objects, at most how "
                   "many times can one object's back-pointer be changed?",
-             "a": ["999", "500", "10", "32"],
+             "a": ["1,023", "512", "10", "32"],
              "c": 2,
-             "why": "Each change at least doubles the size of the object's set, and no set exceeds "
-                    "1,000, so at most `⌈lg 1000⌉ = 10` changes. Nine hundred and ninety-nine is the "
-                    "number of unions, all of which could move some object, but not the same one "
-                    "each time; 500 halves n instead of taking its logarithm; 32 is about the square "
-                    "root of 1,000."},
+             "why": "Each change at least doubles the size of the object's set, so after j changes "
+                    "the set holds at least `2ʲ` objects, and no set exceeds `1024 = 2¹⁰`: at most "
+                    "`lg 1024 = 10` changes, and ten are reached when sets of equal size are united "
+                    "again and again. One thousand and twenty-three is the number of unions, all of "
+                    "which could move some object, but not the same one each time; 512 halves n "
+                    "instead of taking its logarithm; 32 is the square root of 1,024."},
             {"q": "Using `A_3(1) = 2047` and `A_4(1) > 10^80`, what is `α(n)` for `n = 10⁶`?",
              "a": ["3", "4", "6", "20"],
              "c": 1,
@@ -1683,15 +1687,16 @@ LESSONS = [
              "why": "LINK sets ranks and FIND-SET leaves them alone, so when compression shortens "
                     "a tree, ranks overstate heights; that is why the chapter defines rank as an "
                     "upper bound rather than the height. Without compression rank and height "
-                    "coincide under union by rank, but not with it. Rank counts levels, and a root "
-                    "of rank r has at least `2ʳ` nodes, not exactly r."},
+                    "coincide under union by rank, but not with it. A root of rank r has at least "
+                    "`2ʳ` nodes, so a rank is about the logarithm of a tree's size, never the size "
+                    "itself."},
         ],
         "mistakes": [
             ("Reading O(m α(n)) as a constant-time find",
              "The bound is on the whole sequence of m operations, so it is an amortized "
              "statement. A single find can still be slow: with union by rank alone it can walk "
-             "`⌊lg n⌋` pointers, and on <code>pairs</code> at 12 elements the worst find walks 3 "
-             "even with both rules on. What the bound says is that such finds are rare enough, "
+             "`⌊lg n⌋` pointers, and on <code>pairs</code> at 12 elements with union by rank "
+             "on, as the preset starts, the worst find walks 3. What the bound says is that such finds are rare enough, "
              "and compression repairs enough of what they walk, that the total stays within "
              "`O(m α(n))`."),
             ("Taking rank for the height of the tree",
