@@ -356,7 +356,7 @@ LESSONS = [
         "body": [
             ("p", "&ldquo;The naive string-matcher is inefficient because it entirely ignores "
                   "information gained about the text for one value of s when it considers "
-                  "other values of s.&rdquo; That sentence closes section 32.1, and sections "
+                  "other values of s.&rdquo; That sentence comes in the last paragraph of section 32.1, and sections "
                   "32.3 and 32.4 are two answers to it. Both keep one number while they scan, "
                   "how much of the pattern the text has just matched, and both use it to decide "
                   "the next move without looking back. This lesson reads both sections and "
@@ -414,8 +414,7 @@ LESSONS = [
                   "text of 20 a's against naive's 80. <code>abcabcabd</code> builds a border of "
                   "5 and then loses it at the final d, ending at 0 after 2 iterations. "
                   "<code>abcdefg</code> has no border, and KMP's 23 comparisons beat naive's 34 "
-                  "only narrowly. <code>ababaca</code> is the pattern the chapter's own figures "
-                  "use, so you can follow those figures with it."),
+                  "only narrowly."),
             ("p", "Then type the lesson's pattern `abaabab` and the text `abaababaabaababab`. "
                   "The table reads π = 0, 0, 1, 1, 2, 3, 2, agreeing with the definition on all "
                   "seven prefixes, and the inner loop ran 2 times against the book's bound of "
@@ -537,7 +536,8 @@ LESSONS = [
              "is not a bound on each step; it is a bound on all of them together, from the fact "
              "that q cannot fall further in total than it has risen. On the lesson's pattern two "
              "falls happen at two different prefixes, and the pattern aaaab against the text "
-             "aaaac puts four at the c: from 4 to 3, 2, 1 and 0."),
+             "aaaac puts four at the c: from 4 to 3, 2, 1 and 0. (The lab's inner-loop tile "
+             "counts the construction of π, which for aaaab is three falls at the b.)"),
             ("Confusing π[q] with a shift",
              "π[q] is a length: the longest proper border of the first q characters. The shift "
              "KMP moves the pattern by is q − π[q]. On the lesson's pattern, after 6 characters "
@@ -799,7 +799,7 @@ LESSONS = [
             ("Mixing the two sign conventions",
              "The book's DIRECTION(a, b, c) is (c − a) × (b − a) and the lab's orient(a, b, c) "
              "is (b − a) × (c − a); one is the negative of the other. A rule such as "
-             "&ldquo;positive is a left turn&rdquo; is true in one convention and false in the "
+             "<em>positive is a left turn</em> is true in one convention and false in the "
              "other. Fix one convention before reading any sign, and note that the intersection "
              "verdict is unchanged because it compares signs in pairs."),
             ("Solving for the intersection point",
@@ -897,9 +897,10 @@ LESSONS = [
                   "each point is pushed once and popped at most once, so the whole loop is "
                   "`O(n)` and the `O(n lg n)` sort dominates."),
             ("p", "Jarvis's march wraps the set like paper. From the lowest point it repeatedly "
-                  "chooses the point with the smallest polar angle relative to the last edge, "
-                  "one pass over all n points per vertex found, building a right chain up to "
-                  "the highest point and then a left chain back down. With h vertices that is "
+                  "chooses the point with the smallest polar angle about the vertex just found, "
+                  "one pass over all n points per vertex found: angles measured from the positive "
+                  "x-axis build the right chain up to the highest point, and angles from the "
+                  "negative x-axis build the left chain back down. With h vertices that is "
                   "`O(n·h)`, asymptotically better than Graham's scan when h grows more slowly than lg n, and worse "
                   "when nearly every point is a vertex."),
             ("p", "Section 33.4 finds the closest pair among n points in `O(n lg n)`, where "
@@ -912,11 +913,13 @@ LESSONS = [
                   "sorted lists keeps each level linear, giving `T(n) = 2T(n/2) + O(n)`. The "
                   "Algorithms lessons The Convex Hull and Its Definition and The Closest Pair "
                   "and the Strip run both algorithms."),
-            ("p", "Now the lab. It runs a hull algorithm that differs from GRAHAM-SCAN in one "
-                  "respect: Andrew's monotone chain sorts the points by x instead of by angle and "
-                  "builds the lower and upper chains with the same stack and the same "
-                  "pop-while-not-a-left-turn rule. So each point is pushed twice, once per "
-                  "chain, and the lab compares pushes and pops with 4n. It also runs gift "
+            ("p", "Now the lab. It does not run GRAHAM-SCAN. It runs Andrew's monotone chain, a "
+                  "close relative: it has no p0 and no angular sort, but sorts the points by x and "
+                  "builds a lower and an upper chain, each with the same stack and the same "
+                  "pop-while-not-a-left-turn rule. Each point is pushed twice, once per chain, "
+                  "and the lab compares pushes and pops with 4n. Its hull is the same as "
+                  "GRAHAM-SCAN's; its pushes and pops are not, so trace GRAHAM-SCAN by hand, as "
+                  "the worked example below does. It also runs gift "
                   "wrapping, Jarvis's march, and reports the vertices it returns, the points on "
                   "the boundary by definition, and the work n·h beside n·lg n. A second run with "
                   "floating-point turns shows what rounding does."),
@@ -929,8 +932,11 @@ LESSONS = [
                   "<code>duplicate</code> has 6 points typed and 4 distinct. "
                   "<code>needle</code> is a thin triangle whose floating-point run returns 2 "
                   "vertices, a vertex short. <code>single</code> is one point typed twice. The "
-                  "book's assumptions, distinct points and three not colinear, exclude the last "
-                  "four, which is why it can state the algorithms so cleanly."),
+                  "book's assumption, distinct points with at least three not colinear, rules out "
+                  "segment, duplicate and single; edges and needle satisfy it, and show what is "
+                  "left: points in the middle of a side, which GRAHAM-SCAN "
+                  "discards, and floating-point turns, which exact integer cross products "
+                  "avoid."),
             ("p", "Then type the lesson's points: `1, 0; 7, 1; 4, 3; 9, 5; 5, 9; 0, 6; 6, 6; "
                   "2, 3`. The lab finds 5 hull vertices, (1, 0), (7, 1), (9, 5), (5, 9) and "
                   "(0, 6), agreeing with the definition point by point; (4, 3), (6, 6) and "
@@ -954,7 +960,7 @@ LESSONS = [
             "preset": "general",
             "panel_title": "Find the hull, and count the stack operations",
             "panel_intro": "Type points as x, y pairs. The lab runs the monotone chain, a "
-                           "Graham's scan that sorts by x and builds two chains, and gift "
+                           "relative of GRAHAM-SCAN that sorts by x and builds two chains, and gift "
                            "wrapping, and checks both against the definition point by point. "
                            "Type the lesson's eight points, then the exercise's six.",
         }),
@@ -989,7 +995,7 @@ LESSONS = [
             "lines": [
                 "push (1, 0), (7, 1), (9, 5)",
                 "(4, 3): turn at (9, 5) is 16, left; push",
-                "(6, 6): turn at (4, 3) is −3; pop (4, 3)",
+                "(6, 6): turn at (4, 3) is −11; pop (4, 3)",
                 "        turn at (9, 5) is 14, left; push",
                 "(5, 9): turn at (6, 6) is −8; pop (6, 6)",
                 "        turn at (9, 5) is 24, left; push",
@@ -1035,8 +1041,8 @@ LESSONS = [
             {"q": "In the closest-pair algorithm, why does each point in the strip need comparing "
                   "with only the next seven in order of y?",
              "a": ["Because the strip contains at most eight points",
-                   "Because at most eight points with pairwise distance at least δ fit in a "
-                   "δ by 2δ rectangle",
+                   "Because a δ by 2δ rectangle on the line holds at most four points from each "
+                   "half, since points on the same side are at least δ apart",
                    "Because the closest pair is always among the eight points nearest the line",
                    "Because seven comparisons per point make the combine step O(n lg n)"],
              "c": 1,
@@ -1045,19 +1051,21 @@ LESSONS = [
                     "point must be among the seven after it. The strip itself can hold many "
                     "points. Seven comparisons per point make the combine step linear, which is "
                     "what gives O(n lg n) overall."},
-            {"q": "A set of 64 points has 6 hull vertices. Which bound is smaller here, and is "
-                  "that a reason to prefer Jarvis's march on every input?",
-             "a": ["n·h = 384 is below n·lg n = 384; no",
-                   "n·h = 384 is below n·lg n = 4,096; yes",
-                   "n·h = 384 equals n·lg n = 384, so the bounds tie here; no",
-                   "n·lg n = 384 is below n·h = 2,048; yes"],
-             "c": 2,
-             "why": "lg 64 = 6, so n·lg n = 64 · 6 = 384, and n·h = 64 · 6 = 384: they tie, and "
-                    "with fewer hull vertices the march's bound would be smaller. The comparison "
-                    "is of bounds on this one set: a set of the same size with all 64 points on "
-                    "the hull gives n·h = 4,096, and Graham's bound does not depend on h. "
-                    "Saying one bound is below the other when they are equal misreads the "
-                    "arithmetic."},
+            {"q": "A set of 64 points has 4 hull vertices. Compare n·h with n·lg n, and say what "
+                  "the comparison shows.",
+             "a": ["n·h = 256 is below n·lg n = 384; on this set the march's bound is the "
+                   "smaller, and that says nothing about sets with many hull vertices",
+                   "n·h = 256 is below n·lg n = 384, so Jarvis's march is faster than Graham's "
+                   "scan on every set of 64 points",
+                   "n·h = 256 is below n·lg n = 4,096, so Graham's scan is never the better "
+                   "choice",
+                   "n·h = 384 equals n·lg n = 384, so the two bounds tie on this set"],
+             "c": 0,
+             "why": "lg 64 = 6, so n·lg n = 384, and n·h = 64 · 4 = 256. The comparison is "
+                    "about this one set: 64 points all on the hull give n·h = 4,096, while "
+                    "Graham's bound does not depend on h, and both bounds hide constant factors "
+                    "besides. 4,096 is n², not n·lg n; 384 for n·h would need h = 6, which is "
+                    "lg n and not this set's hull."},
         ],
         "mistakes": [
             ("Thinking the hull algorithm must find interior points to discard them",
@@ -1066,10 +1074,12 @@ LESSONS = [
              "such a point is not a vertex of the hull so far. On the lesson's points, (4, 3) is "
              "pushed and later popped; nothing ever asked whether it was inside."),
             ("Expecting every algorithm to return the same list on every input",
-             "The book assumes distinct points and no three colinear on the hull. On the lab's "
-             "edges preset, a square with midpoints, the monotone chain returns 4 vertices, the "
-             "boundary has 8 points and gift wrapping returns 6. Each answers a slightly "
-             "different question; the assumption is what makes the answer unique."),
+             "The book assumes only distinct points with at least three not colinear, so a point "
+             "may sit in the middle of a hull side. On the lab's edges preset, a square with "
+             "midpoints, the monotone chain returns 4 vertices, the boundary has 8 points and "
+             "gift wrapping returns 6. Each answers a slightly different question. GRAHAM-SCAN "
+             "drops such points, by the farthest-only rule of its sort or by popping on a "
+             "colinear turn, and returns the 4 corners."),
             ("Reading O(n·h) as always faster or always slower",
              "Jarvis's march wins asymptotically when h grows more slowly than lg n and loses when h is large. "
              "Which applies depends on the input, and on the lesson's eight points n·h = 40 "

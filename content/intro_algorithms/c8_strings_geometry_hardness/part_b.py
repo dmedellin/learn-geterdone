@@ -241,15 +241,16 @@ LESSONS = [
              "c": 1,
              "why": "The inclusion is proved in one line. Whether it is strict, whether NP equals "
                     "co-NP, and whether HAM-CYCLE has a polynomial-time algorithm are all open; "
-                    "the section draws the possible relations among the classes without choosing "
-                    "one. A certificate that a graph is hamiltonian says nothing about how to "
+                    "the section draws the possible relations among the classes and proves none "
+                    "of them. A certificate that a graph is hamiltonian says nothing about how to "
                     "certify that another graph is not."},
         ],
         "mistakes": [
             ("Reading NP as not polynomial",
              "NP stands for nondeterministic polynomial time, and the book defines it by "
              "verification: a short certificate, checked in polynomial time. Every problem in P "
-             "is in NP. Sorting is in NP; so is finding a shortest path. The formula in this "
+             "is in NP: whether a graph has a path of at most k edges between two vertices is in "
+             "NP and in P. The formula in this "
              "lesson is checked in one pass over four clauses; what is not known is how to find "
              "a certificate that fast on every formula."),
             ("Measuring time against the value instead of the length",
@@ -277,7 +278,7 @@ LESSONS = [
     # CLRS 34.3-34.5, pp. 1067-1105. Quote: p. 1050, 34 words, quotes.py OK.
     # Lesson total: 34 words. Lab: reduction/subsetsum (the book's own
     # 3-CNF-SAT to SUBSET-SUM construction, base 10), kit presets; the
-    # lesson's formula 1 -2 3; -1 2 -3 and the exercise's 1 2 3; -1 -2 -3
+    # lesson's formula 1 -2 3; -1 2 -3 and the exercise's 1 2 -3; -1 2 3
     # (each: 10 numbers, target 11144, 6 subsets, 6 of 8 models), read off
     # the kit.
     {
@@ -404,11 +405,11 @@ LESSONS = [
                   "column would need 4 from slack that can supply only 3."),
             ("h3", "Exercise"),
             ("code", [
-                "1 2 3; -1 -2 -3",
+                "1 2 -3; -1 2 3",
             ]),
             ("p", "Build the subset-sum instance for this formula by hand: write the ten numbers "
                   "as five-digit strings and the target. Then take the assignment x1 true, x2 "
-                  "false, x3 false, choose its three variable numbers and the slack each clause "
+                  "false, x3 true, choose its three variable numbers and the slack each clause "
                   "needs, and add them. Finally, say how many subsets hit the target and why. "
                   "Check the table in the lab."),
             ("p", "A proof of NP-completeness is a reason to stop looking for an exact fast "
@@ -474,20 +475,22 @@ LESSONS = [
         },
         "quiz_title": "Reductions and the subset-sum gadget",
         "quiz": [
-            {"q": "For the exercise's formula (x1 ∨ x2 ∨ x3) ∧ (¬x1 ∨ ¬x2 ∨ ¬x3), which numbers "
-                  "make up the subset for x1 true, x2 false, x3 false, and how many subsets hit "
+            {"q": "For the exercise's formula (x1 ∨ x2 ∨ ¬x3) ∧ (¬x1 ∨ x2 ∨ x3), which numbers "
+                  "make up the subset for x1 true, x2 false, x3 true, and how many subsets hit "
                   "the target?",
-             "a": ["10010, 1001, 101, 10, 20 and 2; 6 subsets",
-                   "10010, 1010, 110, 10 and 2; 6 subsets",
-                   "10010, 1001, 101, 10, 20 and 2; 8 subsets",
-                   "10010, 1001, 101 and 30; 6 subsets"],
+             "a": ["10010, 1000, 101, 10, 20, 1 and 2; 6 subsets",
+                   "10010, 1011, 110, 10, 20, 1 and 2; 6 subsets",
+                   "10010, 1000, 101, 10, 20, 1 and 2; 8 subsets",
+                   "10010, 1000, 101, 30 and 3; 6 subsets"],
              "c": 0,
-             "why": "x1 true is 10010 (it satisfies C1); x2 false is 1001 and x3 false is 101 "
-                    "(each satisfies C2). C1 then holds 1 and needs slack 10 and 20; C2 holds 2 "
-                    "and needs slack 2. The total is 11144. Six of the eight assignments satisfy "
-                    "both clauses, all false and all true being the exceptions, and the map is "
-                    "one to one, so 6 subsets. 1010 and 110 are the true numbers for x2 and x3. "
-                    "There is no number 30: the slack comes as 10 and 20."},
+             "why": "x1 true is 10010 (it satisfies C1) and x3 true is 101 (it satisfies C2). "
+                    "x2 false is 1000: ¬x2 is in neither clause, so its number has only its own "
+                    "column. Each clause column then holds 1 and needs both its slack numbers, "
+                    "10 and 20 for C1, 1 and 2 for C2, and the total is 11144. Six of the eight "
+                    "assignments satisfy both clauses, the two exceptions each making one clause "
+                    "false, and the slack choice is forced, so 6 subsets. 1011 and 110 are the "
+                    "numbers for x2 true and x3 false; there are no numbers 30 and 3, because "
+                    "the slack comes as 1 and 2 in each clause's column."},
             {"q": "To show a new language L is NP-complete by the method of section 34.4, which "
                   "direction must the reduction go?",
              "a": ["From L to a known NP-complete language",
