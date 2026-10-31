@@ -198,4 +198,7 @@ SPOKEN.update({
     "φ(n) = (p − 1)·(q − 1)": "phi of n equals the quantity p minus 1, times the quantity q minus 1",
     "φ(n) = 42·66 = 2772": "phi of n equals 42 times 66, which is 2772",
     "φ(n) = 10·16 = 160": "phi of n equals 10 times 16, which is 160",
+    "O(m α(n))": "big O of m times alpha of n",
+    "α(n)": "alpha of n",
+    "φ(n)": "phi of n",
 })
