@@ -1,0 +1,2368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Red-Black Trees and Rotations | Lesson | Data Structures | Introduction to Algorithms, Read Along | Learn · geterdone.io</title>
+  <meta name="description" content="Sections 13.1 and 13.2 add a colour to each node of a search tree, state the five red-black properties, define black-height, and prove that a tree obeying them has height at most 2 lg(n + 1). They then give the rotation, the local restructuring that later sections use to restore the properties without breaking search-tree order. Check a tree&#x27;s properties by hand, then let the lab check five trees and point to the first node where each property fails." />
+  <link rel="canonical" href="https://learn.geterdone.io/intro-algorithms-data-structures/red-black-trees/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Red-Black Trees and Rotations | Lesson | Data Structures | Introduction to Algorithms, Read Along | Learn · geterdone.io" />
+  <meta property="og:description" content="Sections 13.1 and 13.2 add a colour to each node of a search tree, state the five red-black properties, define black-height, and prove that a tree obeying them has height at most 2 lg(n + 1). They then give the rotation, the local restructuring that later sections use to restore the properties without breaking search-tree order. Check a tree&#x27;s properties by hand, then let the lab check five trees and point to the first node where each property fails." />
+  <meta property="og:url" content="https://learn.geterdone.io/intro-algorithms-data-structures/red-black-trees/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Red-Black Trees and Rotations | Lesson | Data Structures | Introduction to Algorithms, Read Along | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Sections 13.1 and 13.2 add a colour to each node of a search tree, state the five red-black properties, define black-height, and prove that a tree obeying them has height at most 2 lg(n + 1). They then give the rotation, the local restructuring that later sections use to restore the properties without breaking search-tree order. Check a tree&#x27;s properties by hand, then let the lab check five trees and point to the first node where each property fails." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/intro-algorithms-data-structures/red-black-trees/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    /* The hero's right column carries a monospace key block, and the block is
+       authored to a fixed 46 characters because it is `white-space: pre-wrap`
+       -- a line that does not fit is not reflowed, it is broken.
+       The column holds 46 only while the shell is at its full 1160px, which
+       takes a 1192px viewport. Below that it shrinks fast: 41 characters at
+       1100, 37 at 1024, 31 at 900, and 22 at 721 -- one pixel above the old
+       720px collapse, where the same block jumps back to 63. Every width in
+       that range was WORSE than stacking, so the hero now stacks below the
+       width its own content was written for. Measured in Chrome, not derived.
+       This subsumes the supplemental-only collapse that used to sit at 920. */
+    @media (max-width: 1191px) {
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/intro-algorithms/">Introduction to Algorithms, Read Along</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Data Structures</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Red-Black Trees and Rotations</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The red-black trees is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Data Structures &middot; Chapter 13 · Red-Black Trees</span>
+        <h1>Red-Black Trees and Rotations</h1>
+        <p>Sections 13.1 and 13.2 add a colour to each node of a search tree, state the five red-black properties, define black-height, and prove that a tree obeying them has height at most 2 lg(n + 1). They then give the rotation, the local restructuring that later sections use to restore the properties without breaking search-tree order. Check a tree's properties by hand, then let the lab check five trees and point to the first node where each property fails.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" data-say="every node red or black, the root black. every NIL leaf counts as black. a red node has two black children. equal black counts down every path. bh of x, black nodes below x to a leaf. height at most 2 times log base 2 of the quantity n plus 1. a rotation keeps the inorder sequence" tabindex="0" role="region" aria-label="Mathematical notation">every node red or black; the root black
+every NIL leaf counts as black
+a red node has two black children
+equal black counts down every path
+bh(x): black nodes below x to a leaf
+height at most 2 lg(n + 1)
+a rotation keeps the inorder sequence</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Sections 13.1 and 13.2 in seven lines</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas carry the first two sections. The next lesson's insertion and deletion are written in terms of all three.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The red-black properties</h3><p>Five rules on a search tree whose nodes are coloured: every node is red or black; the root is black; every leaf, the NIL below a node with a missing child, is black; a red node's children are both black; and from each node, every path down to a leaf passes the same number of black nodes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Black-height</h3><p>For a node x, the number of black nodes on any path from x down to a leaf, not counting x and counting the NIL leaf. Property 5 is exactly the statement that this number is the same on every path, so <span class="math" data-say="bh of x">bh(x)</span> is well defined. The tree's black-height is its root's.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Rotation</h3><p>A local change at a node x and one child y that makes y the parent and x its child, handing y's inner subtree across to x. A left rotation lifts x's right child, a right rotation its left. It changes a constant number of pointers and keeps the inorder sequence, so the search-tree property survives.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The chapter&#x27;s argument first, then the check</h2></div><p>Read the chapter opening and sections 13.1 and 13.2 in your own copy first. The lesson sets out the properties, the lemma and the rotation in its own words, checks one tree by hand, and then lets the lab check five.</p></div>
+      <article class="card card-pad prose"><p>A red-black tree, the authors write in Section 13.1, constrains colours so that &ldquo;no such path is more than twice as long as any other, so that the tree is approximately balanced.&rdquo; The paths are the ones from the root down to a leaf, and the claim is the chapter's whole purpose: Chapter 12 made every operation cost the height, and this chapter keeps the height logarithmic whatever order the keys arrive in. This lesson reads the opening and sections 13.1 and 13.2.</p><p>Section 13.1 starts with a convention. Wherever a node lacks a child, the missing child is treated as a leaf, an external node, and the key-bearing nodes are internal. Every internal node then has exactly two children, and the properties can speak of leaves without exceptions. The book uses one sentinel, <span class="math" data-say="T, nil">T.nil</span>, a black node standing for every leaf and for the root's parent, which is the economy Section 10.2 recommended: one extra object per tree rather than one per missing child. Drawings usually leave the leaves out.</p><div class="defbox"><span class="label">Definition &middot; The five red-black properties, in the book&#x27;s order</span><p>1. Each node carries one of two colours, red or black. 2. The root must be black. 3. Each leaf, <span class="math" data-say="T, nil">T.nil</span>, is black. 4. A red node has two black children. 5. From any node, every downward path to a leaf meets equally many black nodes.</p></div><p>Properties 4 and 5 together do the work. By property 5 every path from the root to a leaf has the same number of black nodes, the black-height; by property 4 no two reds are adjacent, so reds can at most alternate with blacks. The shortest possible path is all black and the longest alternates, which is the factor of two in the quotation. The other three properties make the count well defined: every node has a colour, the leaves are black, and the root is black, which a fix-up can always restore by recolouring it.</p><div class="thm"><span class="label">Theorem &middot; Lemma 13.1</span><p>If a red-black tree has n internal nodes, its height is at most <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></div><p>The proof has two steps. First, by induction on height, the subtree rooted at any node x holds at least <span class="math" data-say="2 to the power b h of x minus 1">2^bh(x) − 1</span> internal nodes: a leaf holds 0, and each child of an internal node has black-height at least <span class="math" data-say="bh of x minus 1">bh(x) − 1</span>, so x's subtree holds at least <span class="math" data-say="2 times the quantity 2 to the power the quantity bh of x minus 1, minus 1, plus 1">2·(2^(bh(x) − 1) − 1) + 1</span> nodes, which is the claim. Second, property 4 means black nodes make up at least half of every root-to-leaf path, the root left out, so a tree of height h has black-height at least h/2. Then <span class="math" data-say="n is at least 2 to the power the quantity h over 2, minus 1">n ≥ 2^(h/2) − 1</span>, and taking logarithms gives the bound. Search, minimum, maximum, successor and predecessor therefore run in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> with no change to Chapter 12's code.</p><p>Insertion and deletion are a different matter, since Chapter 12's versions can break the properties. Section 13.2 supplies the tool for repairing them. LEFT-ROTATE at a node x whose right child y is not <span class="math" data-say="T, nil">T.nil</span> makes y the root of the subtree, makes x y's left child, and gives y's former left subtree to x as its right subtree. RIGHT-ROTATE is the mirror image. Each runs in <span class="math" data-say="big O of 1">O(1)</span> and changes only pointers; the inorder sequence, and with it the search-tree property, is untouched. The Algorithms Subject's lesson Rotations and the AVL Invariant lets you rotate any node of a tree and watch what stays fixed.</p><div class="mathblock" data-say="a left rotation at x, with y equals x &#x27; s right child. before, x has left subtree alpha and right child y. y has left subtree beta and right subtree gamma. after, y has left child x and right subtree gamma. x has left subtree alpha and right subtree beta. inorder, before and after, alpha, x, beta, y, gamma" tabindex="0" role="region" aria-label="Mathematical notation">a left rotation at x, with y = x&#x27;s right child
+
+before:   x has left subtree α and right child y;
+          y has left subtree β and right subtree γ
+after:    y has left child x and right subtree γ;
+          x has left subtree α and right subtree β
+inorder, before and after:   α  x  β  y  γ</div><p>Now the lab, which checks a tree against all five properties and against search-tree order. You write the tree as records, one per node: its key, its colour, and its parent's key, or a dash for the root; a child smaller than its parent is its left child. The tiles say whether the tree is red-black, then each property in turn, holding or failing at the first node found, then search-tree order, the number of nodes, the root's black-height, the height, and the bound of Lemma 13.1. The lab's height counts the edges down to the deepest leaf, NIL included, as the lemma's proof does, so it is one more than Chapter 12's height of the same tree.</p><p>The worked example <code>valid-eight</code> is the tree of the worked example below: every property holds, 8 nodes, black-height 2, height 4, against the bound <span class="math" data-say="2 times log base 2 of 9 is approximately 6.34">2 lg 9 ≈ 6.34</span>. <code>red-child</code> adds a red 30 below the red 33, and property 4 fails at 33 while property 5 still holds, since a red node adds no black. <code>unequal-black</code> blackens 52, and property 5 fails at 41: one black node down its left side, two down its right. <code>red-root</code> is a tree whose only fault is its red root, the fault RB-INSERT-FIXUP's last line repairs by recolouring. And <code>out-of-order</code> is coloured correctly and is not a search tree: 30 sits in 26's left subtree, which the colours cannot detect.</p><p>Each verdict is about the tree on screen, and the lemma is about every tree. No tree of 8 nodes has height below 4 in the lab's count, and the lemma says no valid red-black tree of 8 nodes can reach 7; only its proof shows that.</p><h3>Exercise</h3><p>Check by hand the tree with root 20 black; 10 black and 30 red below it; 5 red below 10; 25 and 40 black below 30; 35 and 45 red below 40. Give every node's black-height. Then colour 40 red and 35 and 45 black, and say which property fails, at which node, and whether the black-height changes. Type both trees into the lab to check.</p><p>Rotations restore balance, but something has to decide when to rotate and what to recolour. The next lesson, Red-Black Insertion and Deletion, reads the two fix-up procedures that do, and counts their work.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Red-black trees</h2></div><p>the five red-black properties, checked</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Red-black trees</strong><span>the five red-black properties, checked</span></div>
+      </div>
+      <div class="status-banner" id="rbiStatus" style="margin-top:12px;" aria-live="polite"></div>
+      <div class="table-wrap" id="rbiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rbiTable"></table></div>
+      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is a node: its key, its color and its parent's key. A child with a smaller key than its parent is the left child, otherwise the right; every missing child is a black NIL leaf. Property 4 names the first red node with a red child in preorder (root, left subtree, right subtree). Property 5 names the first node, in postorder (left subtree, right subtree, node), whose two sides have different numbers of black nodes down to their NIL leaves. Search-tree order names the first pair out of order in the inorder walk. The height counts the edges from the root down to its deepest NIL leaf, so a lone node has height 1; black-height bh(x) counts the black nodes below x on a path down to a NIL leaf, the NIL leaf counted and x not. Lemma 13.1's bound 2 lg(n + 1) is printed to two places, rounded half up by exact integer comparison, with = only when it is exact.</p>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Check a tree against the five properties</h3>
+          <p>A count over the situation the lesson states. Write one record per node: key, colour, parent (a dash for the root). The lab checks each red-black property and search-tree order, names the first node where one fails, and sets the height beside Lemma 13.1's bound. A verdict is about this tree; the lemma holds for every red-black tree.</p>
+        <div class="field">
+          <label for="rbiPreset">Worked example</label>
+          <select id="rbiPreset"><option value="valid-eight" selected>An eight-node tree, the lesson's worked example</option><option value="red-child">The same tree with a red 30 below the red 33</option><option value="unequal-black">The same tree with 52 coloured black</option><option value="red-root">A seven-node tree with a red root</option><option value="out-of-order">A seven-node tree with 30 below 14</option></select>
+        </div>
+        <div class="field">
+          <label for="rbiInNodes">Nodes (key, color: red or black, parent key; - for the root)</label>
+          <textarea id="rbiInNodes" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">26, black, -; 14, red, 26; 41, black, 26; 9, black, 14; 19, black, 14; 5, red, 9; 33, red, 41; 52, red, 41</textarea>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>A red-black tree</span><strong id="rbiVerdict">&mdash;</strong></div>
+          <div class="kpi"><span>1. Every node red or black</span><strong id="rbiP1">&mdash;</strong></div>
+          <div class="kpi"><span>2. The root black</span><strong id="rbiP2">&mdash;</strong></div>
+          <div class="kpi"><span>3. Every leaf (NIL) black</span><strong id="rbiP3">&mdash;</strong></div>
+          <div class="kpi"><span>4. A red node's children black</span><strong id="rbiP4">&mdash;</strong></div>
+          <div class="kpi"><span>5. Equal black counts below each node</span><strong id="rbiP5">&mdash;</strong></div>
+          <div class="kpi"><span>Search-tree order</span><strong id="rbiBst">&mdash;</strong></div>
+          <div class="kpi"><span>Nodes n</span><strong id="rbiNodes">&mdash;</strong></div>
+          <div class="kpi"><span>Black-height of the root</span><strong id="rbiBh">&mdash;</strong></div>
+          <div class="kpi"><span>Height</span><strong id="rbiHeight">&mdash;</strong></div>
+          <div class="kpi"><span>Lemma 13.1 bound</span><strong id="rbiBound">&mdash;</strong></div>
+        </div>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a red-black tree by hand</h2></div><p>Four steps on a drawn tree, then one in the lab.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the leaves</h3><p>Hang a black NIL leaf wherever a node lacks a child. Every internal node now has two children, and properties 3 and 5 can be read off the drawing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check the colours locally</h3><p>The root must be black, and no red node may have a red child. These are properties 2 and 4, and each needs only a node and its children.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute black-heights from the bottom</h3><p>A NIL has black-height 0. For each node, add 1 to a child's black-height if the child is black; the two children must give the same number, or property 5 fails at that node.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Apply the lemma</h3><p>With n internal nodes, check <span class="math" data-say="2 to the power b h minus 1 is at most n">2^bh − 1 ≤ n</span> at the root and the height against <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check a tree of your own</h3><p>Draw a red-black tree of nine to twelve nodes, type it into the lab, and confirm your black-height. Then recolour one node so that exactly one property fails, and predict which node the lab will name.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Properties, black-height and the bound</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Eight nodes, black-height 2</h3><p>Root 26 black; 14 red and 41 black below it; 9 and 19 black below 14; 5 red below 9; 33 and 52 red below 41. Black-heights are computed from the leaves up.</p><div class="mathblock" data-say="5, 19, 33, 52, children NIL, bh 1. 9, children 5 red, bh 1 and NIL, bh 1. 41, children 33 and 52, both red, bh 1. 14, children 9, 19, both black, bh 2. 26, 14 red gives 2, 41 black gives 2. bh of 26 equals 2, at least 2 squared minus 1 equals 3 nodes. longest path 26, 14, 9, 5, NIL, 4 edges. bound 2 times log base 2 of 9 is approximately 6.34" tabindex="0" role="region" aria-label="Mathematical notation">5, 19, 33, 52: children NIL, bh 1
+9: children 5 (red, bh 1) and NIL: bh 1
+41: children 33 and 52, both red: bh 1
+14: children 9, 19, both black: bh 2
+26: 14 red gives 2, 41 black gives 2
+bh(26) = 2: at least 2² − 1 = 3 nodes
+longest path 26, 14, 9, 5, NIL: 4 edges
+bound 2·lg 9 ≈ 6.34</div><p>Property 5 holds at every node because each node's two children give the same count; at 26 the red 14 adds nothing and the black 41 adds one, and both sides come to 2. Property 4 holds because the reds, 14, 5, 33 and 52, all have black children or NIL leaves. The longest path alternates red and black for part of its length, which is as long as the rules allow a path to be.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the red-black rules as making the tree perfectly balanced</strong><span>The rules bound the longest root-to-leaf path at twice the shortest, not at one more. The worked example's tree has paths of 3 and 4 edges to its leaves, and Lemma 13.1 allows a valid tree of 8 nodes a height of up to 6. What the rules buy is a guarantee of <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> height for every insertion order, with a constant of 2, at the price of one bit per node.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting black-height wrongly</strong><span>The book's <span class="math" data-say="bh of x">bh(x)</span> leaves x out and counts the NIL leaf. Counting x, or leaving out the leaf, gives a number one off, and Lemma 13.1's <span class="math" data-say="2 to the power b h of x minus 1">2^bh(x) − 1</span> then stops matching small cases. In the worked example the root 26 has black-height 2: the path 26, 14, 9 and its leaf passes 9 and the leaf, and not 26.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the colours can stand in for the search-tree property</strong><span>The colours constrain shape and say nothing about key order. The lab's <code>out-of-order</code> tree satisfies all five properties and is not a search tree, because 30 sits in 26's left subtree. A red-black tree is first a binary search tree, and the five properties are added to it.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a red-black tree and bound its height.</strong><p>Given a coloured tree of eight to fifteen nodes, check each property, give every node's black-height, name the first node where a property fails, and compare the height with <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab checks a tree you write; it does not rotate. Rotation is worked by hand here, and the Algorithms lesson named above rotates any node. Its height counts the edges to the deepest NIL leaf, one more than Chapter 12's height. Each verdict is about one tree; Lemma 13.1 is proved for all of them.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../binary-search-trees/" rel="prev"><span>Lesson</span><strong>Binary Search Trees</strong></a>
+      <a class="lesson-link next" href="../red-black-insertion-and-deletion/" rel="next"><span>Lesson</span><strong>Red-Black Insertion and Deletion</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="intro-algorithms-data-structures/red-black-trees" data-lesson-title="Red-Black Trees and Rotations" data-course-title="Data Structures">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Data Structures.</strong> Every figure in this course is computed in your browser by running the structure on the input a lesson states: the cost of an operation sequence on an array and on a list, chain lengths and probe counts beside the load factor, collisions counted over every function in a universal family, the comparisons of a search tree, the red-black properties checked node by node with the recolorings and rotations of each insertion, and the nodes an order-statistic query visits. The keys are written for these lessons. A count describes one input; the book's bounds are proved for all of them.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count on this path is produced by running the algorithm in your browser on the instance a lesson states, and a count on one instance is evidence about that instance &mdash; the bound the book proves holds for every input, and only its proof establishes that.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Take the exercise's tree and colour 40 red and its children 35 and 45 black. Which property fails, and where?", "a": ["Property 4, at 30: a red node with the red child 40", "Property 5, at 30: the paths through 40 now pass one more black node", "Property 4, at 40: a red node with black children", "No property fails; recolouring a node and its children together is always safe"], "c": 0, "why": "30 is red and its child 40 is now red too. Property 5 still holds: below 30, the path through 25 passes 25 and a leaf, and the path through 40 passes 35 or 45 and a leaf, two black nodes either way, so the black-height stays 2. A red node with black children is what property 4 requires. Swapping a node's colour with its children's preserves property 5, which is why case 1 of the insertion fix-up does it, but it can create a red-red pair above."}, {"q": "A red-black tree has black-height 3. What is the fewest internal nodes it can have?", "a": ["7", "3", "8", "15"], "c": 0, "why": "The proof of Lemma 13.1 shows a subtree rooted at x has at least <span class=\"math\" data-say=\"2 to the power b h of x minus 1\">2^bh(x) \u2212 1<\/span> internal nodes, here <span class=\"math\" data-say=\"2 cubed minus 1 equals 7\">2\u00b3 \u2212 1 = 7<\/span>, and an all-black complete tree of three levels attains it. Three is the black-height itself. Eight forgets the minus one. Fifteen is a complete tree of four levels, more nodes than a black-height of 3 requires."}, {"q": "What does Lemma 13.1 allow as the height of a red-black tree with 15 internal nodes?", "a": ["At most 8", "At most 4", "At most 15", "At most 3"], "c": 0, "why": "<span class=\"math\" data-say=\"2 times log base 2 of the quantity 15 plus 1, equals 2 times 4 equals 8\">2\u00b7lg(15 + 1) = 2\u00b74 = 8<\/span>. The tree need not be that tall: a perfectly balanced one has height 4 counted to the leaves. Four is that best case, not the bound. Fifteen is a chain, which property 5 forbids. Three is <span class=\"math\" data-say=\"the floor of log base 2 of 15\">\u230alg 15\u230b<\/span>, the height of a complete tree counted without the leaves."}, {"q": "A left rotation at x lifts its right child y. Which statement is true of it?", "a": ["It changes a constant number of pointers and leaves the inorder sequence of keys unchanged", "It restores all five red-black properties at x", "It costs O(lg n), because the subtree below y must be rebalanced", "It swaps the keys of x and y so that the larger key is on top"], "c": 0, "why": "LEFT-ROTATE relinks x, y and y's left subtree and their parents, a fixed number of pointers, and the inorder sequence <span data-say=\"alpha x beta y gamma\">\u03b1 x \u03b2 y \u03b3<\/span> is the same before and after. It changes no colours, so by itself it restores nothing; the fix-ups pair it with recolourings. The subtrees below are moved whole, not rebalanced. Keys stay in their nodes; the nodes move."}];
+
+  (function () {
+
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  var EA_DASH = '—', EA_MINUS = '−';
+  function eaEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function eaClean(text) { return String(text === null || text === undefined ? '' : text).replace(/−/g, '-').trim(); }
+  function eaGroup(digits) { return digits.replace(/\B(?=(\d{3})+$)/g, ','); }
+  function eaInt(n) { n = BigInt(n); return (n < 0n ? EA_MINUS : '') + eaGroup(String(n < 0n ? -n : n)); }
+  function eaFrac(r) { return eaInt(r.n) + '/' + eaInt(r.d); }
+  function eaFixed(r, places) {
+    var neg = r.n < 0n, num = neg ? -r.n : r.n, scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / r.d + 1n) / 2n, s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    return (neg && q !== 0n ? EA_MINUS : '') + eaGroup(s.slice(0, s.length - places))
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+  }
+  function eaExactAt(r, places) { return (r.n * 10n ** BigInt(places)) % r.d === 0n; }
+  function eaDigits(n) { return String(n < 0n ? -n : n).length; }
+  function eaBig(r) { return eaDigits(r.n) > 30 || eaDigits(r.d) > 30; }
+  function eaSci(r) {
+    var a = Rabs(r), e = eaDigits(a.n) - eaDigits(a.d);
+    var ten = function (k) { return k >= 0 ? R(10n ** BigInt(k)) : R(1n, 10n ** BigInt(-k)); };
+    if (Rcmp(a, ten(e)) < 0) e -= 1;
+    var t = eaFixed(Rdiv(a, ten(e)), 2);
+    if (t === '10.00') { t = '1.00'; e += 1; }
+    return '≈ ' + (r.n < 0n ? EA_MINUS : '') + t + ' × 10^' + (e < 0 ? EA_MINUS + (-e) : e);
+  }
+  function eaNum(r) {
+    if (eaBig(r)) return eaSci(r);
+    if (Rint(r)) return eaInt(r.n);
+    return eaFrac(r) + (eaExactAt(r, 2) ? ' = ' : ' ≈ ') + eaFixed(r, 2);
+  }
+  function eaPct(r) {
+    var p = Rmul(r, R(100n)), exact = Rint(p) || eaExactAt(p, 1);
+    var d = (Rint(p) ? eaInt(p.n) : eaFixed(p, 1)) + '%';
+    if (eaBig(r)) return (exact ? '= ' : '≈ ') + d;
+    return (Rint(r) ? eaInt(r.n) : eaFrac(r)) + (exact ? ' = ' : ' ≈ ') + d;
+  }
+  function eaTimes(r) {
+    if (eaBig(r)) return eaSci(r) + '×';
+    return Rint(r) ? eaInt(r.n) + '×' : eaFrac(r) + ' ≈ ' + eaFixed(r, 1) + '×';
+  }
+  function eaSigned(n) { n = BigInt(n); return (n > 0n ? '+' : '') + eaInt(n); }
+  function eaNames(list) { return list.length ? list.join(', ') : 'none'; }
+  function eaCount(list) { return list.length + ': ' + eaNames(list); }
+  function eaPlural(n, one, many) { return eaInt(n) + ' ' + (BigInt(n) === 1n ? one : many); }
+  function eaSum(v) { var s = R0; v.forEach(function (x) { s = Radd(s, x); }); return s; }
+  function eaFloor(r) { var q = r.n / r.d; return (r.n < 0n && q * r.d !== r.n) ? q - 1n : q; }
+  function eaCeil(r) { return -eaFloor(Rneg(r)); }
+  function eaRefuse(why) { var e = new Error(why); e.eaRefuse = true; throw e; }
+  function eaRun(fn, inst, opts) {
+    try { return fn(inst, opts || {}); } catch (e) { if (e && e.eaRefuse) return { refuse: e.message }; throw e; }
+  }
+  function eaWhole(r) { return Number(r.n); }
+  function eaSort(list) { return list.slice().sort(function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); }); }
+
+  var EA_NAME = /^[A-Za-z0-9._-]+$/, EA_NUMBER = /^-?(?:\d+(?:\.(\d+))?|\.(\d+))$/;
+  function eaQuote(s) { s = String(s); return '"' + (s.length > 40 ? s.slice(0, 40) + '…' : s) + '"'; }
+  function eaBound(f, key) { return f[key] === undefined ? undefined : Rparse(f[key]); }
+  function eaScalar(f, text, what) {
+    var s = eaClean(text), m, r, lo, hi;
+    switch (f.kind) {
+      case 'name':
+      case 'parent':
+        if (s === '') throw new Error(what + ' is empty');
+        if (s === '-') {
+          if (f.kind === 'parent') return s;
+          throw new Error(what + ' cannot be "-", which marks none');
+        }
+        if (!EA_NAME.test(s)) throw new Error(what + ' ' + eaQuote(s) + ' should be letters, digits, dots, hyphens or underscores');
+        return s;
+      case 'word':
+        if (f.words.indexOf(s) < 0) throw new Error(what + ' should be one of ' + f.words.join(', ') + ', not ' + eaQuote(s));
+        return s;
+      case 'whole':
+        if (s === '') throw new Error(what + ' is empty');
+        if (!/^-?\d+$/.test(s)) throw new Error(what + ' should be a whole number, and ' + eaQuote(s) + ' is not one');
+        r = R(BigInt(s));
+        lo = eaBound(f, 'min'); hi = eaBound(f, 'max');
+        if (Rcmp(r, lo) < 0 || Rcmp(r, hi) > 0) {
+          throw new Error(what + ' is a whole number from ' + eaNum(lo) + ' to ' + eaNum(hi) + ', and it is ' + eaNum(r));
+        }
+        return r;
+      case 'num':
+        if (s === '') throw new Error(what + ' is empty');
+        m = EA_NUMBER.exec(s);
+        if (!m) throw new Error(what + ' should be a number such as 3 or 0.25 (no fractions or exponents), and ' + eaQuote(s) + ' is not one');
+        if ((m[1] || m[2] || '').length > 6) throw new Error(what + ' has more than 6 decimal places');
+        r = Rparse(s);
+        m = s.replace('-', EA_MINUS);
+        if (f.gt !== undefined && Rcmp(r, Rparse(f.gt)) <= 0) throw new Error(what + ' must be more than ' + eaNum(Rparse(f.gt)) + ', and it is ' + m);
+        if (f.min !== undefined && Rcmp(r, Rparse(f.min)) < 0) throw new Error(what + ' cannot be less than ' + eaNum(Rparse(f.min)) + ', and it is ' + m);
+        if (Rcmp(r, Rparse(f.max)) > 0) throw new Error(what + ' is at most ' + eaNum(Rparse(f.max)) + ', and it is ' + m);
+        return r;
+    }
+    throw new Error(what + ': no such kind of field');
+  }
+  function eaSized(n, f, what, things) {
+    if (n < f.lo) throw new Error(what + (n === 0 ? ' is empty' : ': this lab needs at least ' + f.lo + ' ' + things + ', and there ' + (n === 1 ? 'is 1' : 'are ' + n)));
+    if (n > f.hi) throw new Error(what + ': this lab takes at most ' + f.hi + ' ' + things + ', and there are ' + n);
+  }
+  function eaRecords(text, f, what) {
+    var s = eaClean(text), rows = s === '' ? [] : s.split(';').map(function (r) { return r.trim(); });
+    if (rows.length && rows[rows.length - 1] === '') rows.pop();
+    eaSized(rows.length, f, what, 'records');
+    var seen = {};
+    return rows.map(function (row, i) {
+      var cells = row.split(',').map(function (c) { return c.trim(); });
+      if (cells.length !== f.sub.length) {
+        throw new Error(what + ': record ' + (i + 1) + ' has ' + cells.length + ' field' + (cells.length === 1 ? '' : 's')
+          + '; this list needs ' + f.sub.length + ' (' + f.sub.map(function (k) { return k[0]; }).join(', ') + ')');
+      }
+      var rec = {};
+      f.sub.forEach(function (k, j) { rec[k[0]] = eaScalar(k[1], cells[j], what + ', record ' + (i + 1) + ': ' + k[0]); });
+      if (f.unique) {
+        if (Object.prototype.hasOwnProperty.call(seen, cells[0])) throw new Error(what + ' names ' + eaQuote(cells[0]) + ' twice');
+        seen[cells[0]] = true;
+      }
+      return rec;
+    });
+  }
+  function eaPairs(text, f, what) {
+    var s = eaClean(text), out = [], parts = s === '' ? [] : s.split(';');
+    parts.forEach(function (part, i) {
+      part = part.trim();
+      if (part === '' && i === parts.length - 1) return;
+      var m = /^([^=\s]+)\s*=\s*([^=\s]+)$/.exec(part);
+      if (!m || !EA_NAME.test(m[1]) || !EA_NAME.test(m[2]) || m[1] === '-' || m[2] === '-') {
+        throw new Error(what + ': ' + eaQuote(part) + ' should be ' + f.shape + ', two names joined by =');
+      }
+      if (out.some(function (o) { return o.a === m[1]; })) throw new Error(what + ' names ' + eaQuote(m[1]) + ' twice');
+      out.push({ a: m[1], b: m[2] });
+    });
+    if (out.length > f.hi) throw new Error(what + ': this lab takes at most ' + f.hi + ', and there are ' + out.length);
+    return out;
+  }
+  function eaList(text, f, what) {
+    var s = eaClean(text), toks = s === '' ? [] : s.split(/[\s,]+/).filter(function (t) { return t !== ''; });
+    eaSized(toks.length, f, what, f.things);
+    var vals = toks.map(function (t, i) { return eaScalar(f.each, t, what + ', entry ' + (i + 1)); });
+    if (f.each.kind === 'name') {
+      toks.forEach(function (t, i) { if (toks.indexOf(t) !== i) throw new Error(what + ' names ' + eaQuote(t) + ' twice'); });
+    }
+    return vals;
+  }
+  function eaField(f, text) {
+    if (f.kind === 'rec') return eaRecords(text, f, f.what);
+    if (f.kind === 'pairs') return eaPairs(text, f, f.what);
+    if (f.kind === 'list') return eaList(text, f, f.what);
+    return eaScalar(f, text, f.what);
+  }
+  function eaRead(spec, raw) {
+    var out = {};
+    spec.forEach(function (f) { out[f.key] = eaField(f, raw[f.key]); });
+    return out;
+  }
+
+  function eaTableHtml(t, compact) {
+    var h = '<caption style="white-space:normal;">' + eaEsc(t.caption) + '</caption><thead><tr>';
+    if (compact) {
+      h += '<th scope="col" style="text-align:left;white-space:normal;">' + t.head.map(eaEsc).join(' · ') + '</th></tr></thead><tbody>';
+      t.rows.forEach(function (row) {
+        var parts = [];
+        row.forEach(function (cell, k) {
+          if (cell !== '') parts.push('<span style="color:var(--muted);">' + eaEsc(t.head[k]) + '</span> ' + eaEsc(cell));
+        });
+        h += '<tr><td style="text-align:left;white-space:normal;overflow-wrap:anywhere;">' + parts.join(' · ') + '</td></tr>';
+      });
+      return h + '</tbody>';
+    }
+    h += t.head.map(function (x) { return '<th scope="col">' + eaEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    t.rows.forEach(function (row) {
+      h += '<tr>' + row.map(function (cell) { return '<td>' + eaEsc(cell) + '</td>'; }).join('') + '</tr>';
+    });
+    return h + '</tbody>';
+  }
+
+  function itaQ(r) { return Rint(r) ? eaInt(r.n) : eaInt(r.n) + '/' + eaInt(r.d); }
+  function itaList(a) {
+    return a.map(function (x) { return typeof x === 'object' ? itaQ(x) : eaInt(x); }).join(', ');
+  }
+  function itaApprox(r, places) { return '≈ ' + eaFixed(r, places); }
+  function itaBitLen(n) { return n.toString(2).length; }
+  function itaLg(n, bits) {
+    n = BigInt(n); bits = bits || 64;
+    var m = BigInt(itaBitLen(n) - 1);
+    if (n === (1n << m)) return { exact: R(m) };
+    var P = BigInt(bits + 24), two = 2n << P;
+    var lo = (n << P) >> m, hi = lo + 1n, digits = 0n, k = 0n;
+    for (var i = 0; i < bits; i += 1) {
+      lo = (lo * lo) >> P; hi = ((hi * hi) >> P) + 1n;
+      if (lo >= two) { digits = digits * 2n + 1n; lo >>= 1n; hi = (hi >> 1n) + 1n; }
+      else if (hi < two) { digits = digits * 2n; }
+      else break;
+      k += 1n;
+    }
+    var scale = 1n << k;
+    return { lo: R(m * scale + digits, scale), hi: R(m * scale + digits + 1n, scale) };
+  }
+  function itaLgCmp(n, x) {
+    n = BigInt(n);
+    var m = BigInt(itaBitLen(n) - 1);
+    if (n === (1n << m)) return Rcmp(R(m), x);
+    if (Rcmp(x, R(m)) <= 0) return 1;
+    if (Rcmp(x, R(m + 1n)) >= 0) return -1;
+    var widths = [64, 256, 1024];
+    for (var i = 0; i < widths.length; i += 1) {
+      var b = itaLg(n, widths[i]);
+      if (Rcmp(x, b.lo) <= 0) return 1;
+      if (Rcmp(x, b.hi) >= 0) return -1;
+    }
+    eaRefuse('lg ' + eaInt(n) + ' and ' + itaQ(x) + ' agree to 1,024 binary places, too close for this lab to compare');
+  }
+  function itaLgMid(n) { var b = itaLg(n, 64); return b.exact || Rdiv(Radd(b.lo, b.hi), R(2n)); }
+
+  var RBI_VIEW = {};
+  function rbiCompute(view, inst, opts) { return eaRun(RBI_VIEW[view], inst, opts); }
+  function rbiTree() { var nil = { key: null, color: 'B' }; nil.left = nil; nil.right = nil; nil.p = nil; return { nil: nil, root: nil }; }
+  function rbiText(T, x) {
+    if (x === T.nil) return '-';
+    var me = x.key + x.color;
+    if (x.left === T.nil && x.right === T.nil) return me;
+    return me + '(' + rbiText(T, x.left) + ' ' + rbiText(T, x.right) + ')';
+  }
+  function rbiHeight(T, x) { return x === T.nil ? 0 : 1 + Math.max(rbiHeight(T, x.left), rbiHeight(T, x.right)); }
+  function rbiCount(T, x) { return x === T.nil ? 0 : 1 + rbiCount(T, x.left) + rbiCount(T, x.right); }
+  function rbiBh(T, x) { var h = 0; x = x.left; while (true) { if (x.color === 'B') h += 1; if (x === T.nil) return h; x = x.left; } }
+  function rbiLog(a, d, base) {
+    var A200 = a ** 200n, D200 = d ** 200n, m = 0n, t = base;
+    while (t * D200 <= A200) { m += 1n; t *= base; }
+    var k = (m + 1n) / 2n, exact = a ** 100n === base ** k * d ** 100n;
+    var txt = (k / 100n).toString() + (k % 100n === 0n && exact ? '' : '.' + String(k % 100n).padStart(2, '0'));
+    return (exact ? '= ' : '≈ ') + txt;
+  }
+  function rbiBound(n) { var m = BigInt(n + 1); return '2 lg ' + (n + 1) + ' ' + rbiLog(m * m, 1n, 2n); }
+
+  RBI_VIEW.check = function (inst) {
+    var T = rbiTree(), by = {}, roots = [];
+    inst.nodes.forEach(function (r) {
+      var k = Number(r.key.n);
+      if (Object.prototype.hasOwnProperty.call(by, k)) eaRefuse('Nodes names ' + k + ' twice');
+      by[k] = { key: k, color: r.color === 'red' ? 'R' : 'B', left: T.nil, right: T.nil, p: T.nil, par: r.parent };
+    });
+    inst.nodes.forEach(function (r) {
+      var x = by[Number(r.key.n)];
+      if (r.parent === '-') { roots.push(x.key); return; }
+      if (!/^\d+$/.test(r.parent) || !Object.prototype.hasOwnProperty.call(by, Number(r.parent))) eaRefuse(x.key + '\'s parent ' + r.parent + ' is not a key of the tree');
+      var y = by[Number(r.parent)];
+      if (y === x) eaRefuse(x.key + ' is its own parent');
+      var side = x.key < y.key ? 'left' : 'right';
+      if (y[side] !== T.nil) eaRefuse(y.key + ' has two ' + side + ' children, ' + y[side].key + ' and ' + x.key + ' (a child smaller than its parent is its left child)');
+      y[side] = x; x.p = y;
+    });
+    if (roots.length !== 1) eaRefuse(roots.length ? 'The tree has ' + roots.length + ' roots (' + roots.join(', ') + '); give exactly one node the parent -' : 'The tree has no root: give one node the parent -');
+    T.root = by[roots[0]];
+    var n = rbiCount(T, T.root);
+    if (n !== inst.nodes.length) {
+      var lost = inst.nodes.map(function (r) { return Number(r.key.n); }).filter(function (k) {
+        var z = by[k], steps = 0;
+        while (z.p !== T.nil && steps <= inst.nodes.length) { z = z.p; steps += 1; }
+        return z !== T.root;
+      });
+      eaRefuse('The parents form a cycle through ' + lost.join(', ') + ', which the root never reaches');
+    }
+    var ino = [], pre = [], post = [];
+    (function walk(x) { if (x === T.nil) return; pre.push(x); walk(x.left); ino.push(x); walk(x.right); post.push(x); })(T.root);
+    var bst = 'holds';
+    for (var i = 1; i < ino.length; i += 1) {
+      if (ino[i - 1].key > ino[i].key) { bst = 'fails: ' + ino[i - 1].key + ' comes before ' + ino[i].key + ' in the inorder walk'; break; }
+    }
+    var p2 = T.root.color === 'B' ? 'holds' : 'fails: the root ' + T.root.key + ' is red';
+    var p4 = 'holds';
+    for (i = 0; i < pre.length; i += 1) {
+      var x = pre[i];
+      if (x.color === 'R' && (x.left.color === 'R' || x.right.color === 'R')) {
+        p4 = 'fails at ' + x.key + ': red, with red child ' + (x.left.color === 'R' ? x.left.key : x.right.key);
+        break;
+      }
+    }
+    var down = new Map(), p5 = 'holds';
+    down.set(T.nil, 1);
+    post.forEach(function (x) {
+      var l = down.get(x.left), r = down.get(x.right);
+      if (l !== r && p5 === 'holds') p5 = 'fails at ' + x.key + ': ' + eaPlural(l, 'black node', 'black nodes') + ' down its left side, ' + r + ' down its right';
+      down.set(x, Math.max(l, r) + (x.color === 'B' ? 1 : 0));
+    });
+    var fails = [];
+    if (p2 !== 'holds') fails.push(2);
+    if (p4 !== 'holds') fails.push(4);
+    if (p5 !== 'holds') fails.push(5);
+    var bh = p5 === 'holds' ? String(rbiBh(T, T.root)) : '— (property 5 fails)', h = rbiHeight(T, T.root);
+    var rows = ino.map(function (x) {
+      var d = 0, z = x; while (z.p !== T.nil) { d += 1; z = z.p; }
+      return [String(x.key), x.color === 'R' ? 'red' : 'black', x.p === T.nil ? '-' : String(x.p.key), x.p === T.nil ? 'root' : (x.p.left === x ? 'left' : 'right'), String(d),
+        String(down.get(x.left)) + ' / ' + String(down.get(x.right))];
+    });
+    return {
+      tiles: { rbiP1: 'holds', rbiP2: p2, rbiP3: 'holds', rbiP4: p4, rbiP5: p5, rbiBst: bst,
+        rbiVerdict: fails.length || bst !== 'holds' ? 'no' + (fails.length ? ': property ' + fails.join(', ') + (fails.length === 1 ? ' fails' : ' fail') : ': not in search-tree order') : 'yes',
+        rbiNodes: eaInt(n), rbiBh: bh, rbiHeight: String(h), rbiBound: rbiBound(n) },
+      status: 'Every record names red or black, so property 1 holds, and the NIL leaves are black by definition, so property 3 holds. '
+        + 'The height is ' + h + (2n ** BigInt(h) <= BigInt(n + 1) ** 2n ? ', within' : ', beyond') + ' Lemma 13.1\'s 2 lg(n + 1), which a red-black tree always meets.',
+      table: { caption: 'Each node in key order, with the black nodes below it on each side (NIL leaves counted)',
+        head: ['key', 'color', 'parent', 'side', 'depth', 'black below left / right'], rows: rows }
+    };
+  };
+  var PRESETS = {"valid-eight": {"nodes": "26, black, -; 14, red, 26; 41, black, 26; 9, black, 14; 19, black, 14; 5, red, 9; 33, red, 41; 52, red, 41"}, "red-child": {"nodes": "26, black, -; 14, red, 26; 41, black, 26; 9, black, 14; 19, black, 14; 5, red, 9; 33, red, 41; 52, red, 41; 30, red, 33"}, "unequal-black": {"nodes": "26, black, -; 14, red, 26; 41, black, 26; 9, black, 14; 19, black, 14; 5, red, 9; 33, red, 41; 52, black, 41"}, "red-root": {"nodes": "26, red, -; 14, black, 26; 41, black, 26; 9, red, 14; 19, red, 14; 33, red, 41; 52, red, 41"}, "out-of-order": {"nodes": "26, black, -; 14, red, 26; 41, black, 26; 9, black, 14; 30, black, 14; 33, red, 41; 52, red, 41"}};
+  var SPEC = [{"kind": "rec", "what": "Nodes (key, color: red or black, parent key; - for the root)", "control": "area", "rows": 4, "sub": [["key", {"kind": "whole", "min": "0", "max": "1000000"}], ["color", {"kind": "word", "words": ["red", "black"]}], ["parent", {"kind": "parent"}]], "lo": 1, "hi": 60, "unique": true, "key": "nodes", "id": "rbiInNodes"}];
+  var TILES = ["rbiVerdict", "rbiP1", "rbiP2", "rbiP3", "rbiP4", "rbiP5", "rbiBst", "rbiNodes", "rbiBh", "rbiHeight", "rbiBound"];
+  var FIXED = {};
+  var VIEW = "check";
+
+  function eaEl(id) { return document.getElementById(id); }
+  var eaPresetS = eaEl('rbiPreset'), eaStatusEl = eaEl('rbiStatus'), eaTableEl = eaEl('rbiTable');
+  function eaRed(why) {
+    TILES.forEach(function (id) { eaEl(id).textContent = EA_DASH; });
+    eaLastTable = null;
+    eaTableEl.innerHTML = '';
+    eaStatusEl.innerHTML = '<span class="tone-red">' + eaEsc(String(why).replace(/\.$/, '')) + '.</span>';
+  }
+  function eaRedraw() {
+    var raw = {}, inst, out;
+    SPEC.forEach(function (f) { raw[f.key] = eaEl(f.id).value; });
+    try { inst = eaRead(SPEC, raw); } catch (err) { eaRed(err.message); return; }
+    out = rbiCompute(VIEW, inst, FIXED);
+    if (out.refuse) { eaRed(out.refuse); return; }
+    TILES.forEach(function (id) { eaEl(id).textContent = out.tiles[id] === undefined ? EA_DASH : out.tiles[id]; });
+    eaPaint(out.table || null);
+    eaStatusEl.textContent = out.status;
+  }
+  var eaLastTable = null;
+  function eaPaint(t) {
+    eaLastTable = t;
+    if (!t) { eaTableEl.innerHTML = ''; return; }
+    eaTableEl.innerHTML = eaTableHtml(t, false);
+    var box = eaEl('rbiTableBox');
+    if (box && box.clientWidth > 0 && Math.max(eaTableEl.offsetWidth || 0, box.scrollWidth || 0) > box.clientWidth) eaTableEl.innerHTML = eaTableHtml(t, true);
+  }
+  if (window.addEventListener) window.addEventListener('resize', function () { if (eaLastTable) eaPaint(eaLastTable); });
+  function eaFill(id) {
+    var inst = PRESETS[id];
+    if (!inst) return false;
+    SPEC.forEach(function (f) { if (inst[f.key] !== undefined) eaEl(f.id).value = inst[f.key]; });
+    return true;
+  }
+  eaPresetS.addEventListener('change', function () { if (eaFill(eaPresetS.value)) eaRedraw(); });
+  SPEC.forEach(function (f) {
+    eaEl(f.id).addEventListener(f.control === 'select' ? 'change' : 'input', eaRedraw);
+  });
+  eaFill(eaPresetS.value);
+  eaRedraw();
+  window.redrawLab = eaRedraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "intro-algorithms-data-structures/red-black-trees";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre:not([data-say])')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+  </script>
+</body>
+</html>
