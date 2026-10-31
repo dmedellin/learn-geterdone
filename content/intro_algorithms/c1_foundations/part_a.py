@@ -65,8 +65,8 @@ LESSONS = [
         ),
         "body": [
             ("p", "&ldquo;Total system performance depends on choosing efficient algorithms as "
-                  "much as on choosing fast hardware.&rdquo; The authors reach that sentence at "
-                  "the end of Section 1.2, after a calculation that most readers remember long "
+                  "much as on choosing fast hardware.&rdquo; The authors reach that sentence in "
+                  "the last part of Section 1.2, just after a calculation that most readers remember long "
                   "after the rest of the chapter. This lesson reads Chapter 1, The Role of "
                   "Algorithms in Computing: Section 1.1 on what an algorithm is, and Section 1.2 "
                   "on why its efficiency is a technology in its own right."),
@@ -90,8 +90,9 @@ LESSONS = [
                   "the book later teaches: shortest paths, longest common subsequences, "
                   "topological sorting, convex hulls, linear programming. Two features recur. "
                   "Each problem has a great many candidate solutions, most of them not what is "
-                  "wanted, and each has practical use. The section closes by naming three themes "
-                  "the book returns to: data structures, problems for which no efficient "
+                  "wanted, and each has practical use. The section closes with four threads "
+                  "the book returns to: data structures, techniques of design and analysis for "
+                  "problems no published algorithm covers, problems for which no efficient "
                   "algorithm is known (the NP-complete problems of Chapter 34), and parallelism "
                   "on multicore machines (Chapter 27)."),
             ("p", "Section 1.2 asks a question to clear the ground. If computers were infinitely "
@@ -262,8 +263,8 @@ LESSONS = [
              "c": 2,
              "why": "B now wins when `n > 500·lg n`, and the least such n is 6,312 (the lab "
                     "confirms it). The crossover does move, because it is where the two times "
-                    "meet, and it falls by more than half a power of ten but not by exactly ten, "
-                    "because `lg n` changes too as n shrinks. Ten times 81,580 would mean B got "
+                    "meet, and it falls by a factor of about 13, not exactly 10, because `lg n` "
+                    "shrinks too as n shrinks. Ten times 81,580 would mean B got "
                     "slower."},
             {"q": "Which of these is what Section 1.1 means by a correct algorithm?",
              "a": ["It halts with the correct output on every input it has been tested on",
@@ -554,9 +555,9 @@ LESSONS = [
              "why": "The inner test is `A[i] > key`; when 4b is the key it meets 4a, the test "
                     "fails, and 4b stays to its right. Every later shift moves both 4s together, "
                     "so the order never changes. Inserting to the left of equal keys would need "
-                    "the test `A[i] ≥ key`. The smaller keys do not affect it. And 4a is shifted "
-                    "right twice, by keys 1 and 2, so insertion sort does move keys that end where "
-                    "they started."},
+                    "the test `A[i] ≥ key`. The smaller keys do not affect it. The last answer has "
+                    "the right order for a wrong reason: neither 4 starts in its final place (4a is "
+                    "shifted right three times, 4b twice), so the rule it cites never applies."},
             {"q": "Suppose the invariant were weakened to: at the start of each pass, "
                   "`A[1..j − 1]` is in sorted order. Which part of the proof is no longer enough?",
              "a": ["Initialisation, because one element might not count as sorted",
@@ -884,7 +885,7 @@ LESSONS = [
              "test fails at once and the time is linear, `a·n + b`. On the lesson's eight keys the "
              "line count runs from 36 for the sorted array to 120 for the reversed one, and a "
              "nearly sorted array costs 42. The next chapter gives the precise words: the running "
-             "time is `O(n²)` on every input and `Ω(n)`, and neither bound is `Θ` on every input."),
+             "time is `O(n²)` and `Ω(n)`, and over all inputs it is neither `Θ(n²)` nor `Θ(n)`."),
             ("Taking t_j for the number of comparisons or shifts",
              "`t_j` counts the runs of the inner test, which is one more than the shifts in that "
              "pass. It equals the key comparisons except when the key reaches the front, where "
@@ -1438,7 +1439,8 @@ LESSONS = [
              "because the side you dropped only shrinks as n grows."),
             ("Witness a claim of your own",
              "Prove `n³ − 4n² = Θ(n³)` with constants of your choice, then enter f, g and your "
-             "witness in the lab and confirm it holds and fails one step earlier."),
+             "witness in the lab, confirm it holds, and if your `n₀` is the least for your "
+             "constants, see it fail one step earlier."),
         ],
         "worked": {
             "title": "A Θ bound with its witness",

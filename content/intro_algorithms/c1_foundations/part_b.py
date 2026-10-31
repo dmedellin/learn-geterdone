@@ -406,8 +406,9 @@ LESSONS = [
                   "levels gives the total. The authors use the tree mainly to generate a guess, "
                   "tolerating some sloppiness (assuming n a power of b, dropping floors) because "
                   "substitution will verify the guess afterwards. Uneven splits, such as a third "
-                  "and two thirds, give trees whose leaves sit at different depths, and the "
-                  "section shows how to bound them from both sides."),
+                  "and two thirds, give trees whose leaves sit at different depths; the section "
+                  "reads a guess of `O(n lg n)` off such a tree and then verifies it by "
+                  "substitution."),
             ("thm", ("The master theorem (Theorem 4.1)",
                      "Let `a ≥ 1` and `b > 1` be constants and `T(n) = a·T(n/b) + f(n)`. (1) If "
                      "`f(n) = O(n^(log_b a − ε))` for some `ε > 0`, then `T(n) = Θ(n^(log_b a))`. "
@@ -616,7 +617,7 @@ LESSONS = [
              "For recurrences of this kind the boundary value scales part of the answer and "
              "leaves the order alone, which is why the book omits it. The lab's "
              "<code>strassen-big-base</code> raises `T(1)` from 1 to 50 and the exact value grows "
-             "about twentyfold while the case and the solution stay the same."),
+             "about 22-fold while the case and the solution stay the same."),
         ],
         "standard": (
             "Finish when you can solve a divide-and-conquer recurrence by two methods.",
