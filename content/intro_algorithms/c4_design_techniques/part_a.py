@@ -744,11 +744,12 @@ LESSONS = [
             ("p", "Type this lesson's instance: coins `1 4 6` and an amount of 20. The fewest "
                   "coins is 4, from 6 + 6 + 4 + 4; taking the largest coin first would give "
                   "6 + 6 + 6 + 1 + 1, five coins, a first hint of why Chapter 16 needs proofs. "
-                  "The plain recursion makes 3,053 calls and the memoized one 53, with 21 "
-                  "distinct amounts from 0 to 20 ever stored, and the lab prints the saving as "
-                  "`3053/53`, about 57.6 times fewer calls; the table fills 84 cells. The "
-                  "ratio grows with the amount and the 53 barely does: raise the amount to 24 and "
-                  "watch the plain count multiply while the memoized one adds a few calls."),
+                  "The plain recursion makes 3,053 calls and the memoized one 53, while the memo "
+                  "holds only 20 distinct subproblems, the amounts 1 to 20 (amount 0 is the base "
+                  "case and is never stored). The lab prints the saving as `3053/53`, about 57.6 "
+                  "times fewer calls, and the table fills 84 cells. The ratio grows with the "
+                  "amount and the 53 barely does: raise the amount to 24 and the plain count "
+                  "jumps to 14,085 while the memoized one adds twelve calls, to 65."),
             ("h3", "Exercise"),
             ("p", "In the lesson's graph, add the arc w→u. Find the longest simple path from u "
                   "to v now, check whether its two parts at w are longest for their own "
@@ -790,7 +791,7 @@ LESSONS = [
             ("Do it on a problem of your own",
              "Take the coin problem with coins of your choice, run the four checks, then type the "
              "coins and an amount into the lab and record the plain and memoized call counts and "
-             "the number of distinct amounts below your amount."),
+             "the number of distinct subproblems the lab says its memo holds."),
         ],
         "worked": {
             "title": "The calls a plain recursion makes, counted by hand",
@@ -806,7 +807,7 @@ LESSONS = [
                 "C(6) = 1 + C(5) + C(2) + C(0) = 14",
                 "C(7) = 1 + C(6) + C(3) + C(1) = 21",
                 "C(8) = 1 + C(7) + C(4) + C(2) = 31",
-                "distinct amounts at 8: 9;  memoized calls: 17",
+                "amounts the memo stores at 8: 1 to 8;  memoized calls: 17",
             ],
             "after": [
                 "The memoized count is the first call plus one call per coin that fits at each "
@@ -860,8 +861,8 @@ LESSONS = [
              "c": 2,
              "why": "The first call, then at each amount a from 1 to 8 one call per coin no "
                     "larger than a: 1 + 1 + 1 + 1 + 2 + 2 + 3 + 3 + 3 = 17. 31 is the plain "
-                    "recursion's count, `C(8)`. Nine is the number of distinct amounts stored, "
-                    "0 to 8. 24 charges every amount all three coins, `8·3`, which forgets that "
+                    "recursion's count, `C(8)`. Nine counts the distinct amounts 0 to 8, which are "
+                    "subproblems, not calls. 24 charges every amount all three coins, `8·3`, which forgets that "
                     "coins larger than the amount are never tried."},
         ],
         "mistakes": [
@@ -881,7 +882,7 @@ LESSONS = [
              "A memoized recursion solves each subproblem once, as the table does, and has the "
              "same asymptotic running time; the difference is the constant for calls and table "
              "checks. When some subproblems are never needed, memoization does less work. On the "
-             "lesson's coins at 20 the memo makes 53 calls for 21 distinct amounts, and the "
+             "lesson's coins at 20 the memo makes 53 calls and stores 20 amounts, and the "
              "table fills 84 cells."),
         ],
         "standard": (

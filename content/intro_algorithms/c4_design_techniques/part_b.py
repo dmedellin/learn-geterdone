@@ -164,8 +164,8 @@ LESSONS = [
             ("p", "On the lesson's ten activities, run the rule that picks the activity that "
                   "starts last, and works backwards from the end of the day, taking each "
                   "activity that finishes by the time the last chosen one starts. Compare its "
-                  "selection and size with the earliest-finish rule's. This is the rule of "
-                  "Exercise 16.1-2; say which step of Theorem 16.1's exchange changes for it."),
+                  "selection and size with the earliest-finish rule's. The rule is the one in "
+                  "Exercise 16.1-2, which asks for its proof; work that in the book."),
             ("p", "Activity selection's greedy choice was easy to see. The next lesson, Huffman "
                   "Codes, makes a greedy choice that is not obvious at all, and proves it by the "
                   "same kind of exchange."),
@@ -997,7 +997,9 @@ LESSONS = [
                   "started, at 0; there are 4 expansions and no contraction. Played by hand under "
                   "the half rule, the same sequence costs 72, because every round of delete, "
                   "delete, insert, insert after the first expansion costs `1 + 8 + 1 + 9 = 19` "
-                  "instead of 4. <code>grow</code> makes 33 insertions: actual 96, bound 99, "
+                  "instead of 4, and the closing delete, delete, insert costs 10 instead of 3. With "
+                  "the nine opening insertions at 24 under either rule, that is "
+                  "`24 + 19 + 19 + 10 = 72`. <code>grow</code> makes 33 insertions: actual 96, bound 99, "
                   "amortized 98 because Φ ends at 2, with 6 expansions moving 63 items. "
                   "<code>fill-and-empty</code> inserts 16 items and deletes them all: actual 51 "
                   "against a bound of 80, with two contractions on the way down and the table "
@@ -1014,7 +1016,8 @@ LESSONS = [
                   "term `b₀` at all."),
             ("p", "This lesson ends Part IV. The next course, Advanced Data Structures, puts the "
                   "potential method to work at once: Fibonacci heaps are designed around a "
-                  "potential function, and disjoint sets are priced by an aggregate count."),
+                  "potential function, and disjoint sets are priced first by an aggregate count "
+                  "and then, in a starred section, by a potential."),
         ],
         "lab": ("itakit", {
             "mode": "amortized",
@@ -1117,7 +1120,7 @@ LESSONS = [
              "why": "The actual cost is 9, 8 items moved and 1 inserted. Before, `num = size = 8`, "
                     "so Φ = 8; after, `num = 9` and `size = 16`, so Φ = 2. The amortized cost is "
                     "`9 + 2 − 8 = 3`. Nine forgets the potential, 1 is an insertion with room, and "
-                    "−5 subtracts the actual cost instead of adding it."},
+                    "−5 is `1 + 2 − 8`, which keeps the drop in Φ but forgets the 8 items moved."},
             {"q": "Why does halving a table when it falls below half full make the amortized "
                   "cost large?",
              "a": ["Because a contraction costs more than an expansion",
