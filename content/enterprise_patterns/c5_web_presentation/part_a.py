@@ -128,10 +128,10 @@ class InvoicePage extends SecurePage {
 FRONT_HANDLER = """\
 // One handler for every request; a command does each page's part.
 void handle(Request req, Response res) throws IOException {
-    User u = sessions.user(req);
-    if (u == null) { res.redirect("/login"); return; }
-    audit.log(u, req.path());
     Command c = commands.get(req.path());
+    User u = sessions.user(req);
+    if (u == null && c.needsLogin()) { res.redirect("/login"); return; }
+    audit.log(u, req.path());
     c.run(req, res);
 }"""
 
@@ -189,7 +189,7 @@ String cell(Item item, Locale locale) {
     } else {
         html = html + money(item.cents(), locale);
     }
-    if (item.stock() == 0 || item.isWithdrawn()) {
+    if (item.stock() == 0 || item.isWithdrawn() || item.isRecalled()) {
         html = html + " (unavailable)";
     }
     return html + "</td>";
@@ -251,6 +251,7 @@ void afterDetails(Claim c, Response res) throws IOException {
 
 void afterPhotos(Claim c, Response res) throws IOException {
     if (c.photos() == 0) { res.redirect("/photos"); return; }
+    if (c.photosTooLarge()) { res.redirect("/resize"); return; }
     if (c.amount() > 10000) { res.redirect("/assessor"); return; }
     if (c.hasInjury()) { res.redirect("/medical"); return; }
     res.redirect("/bank");
@@ -355,10 +356,10 @@ MODEL_VIEW_CONTROLLER = {
               "His picture of a request is a round trip: the input controller pulls "
               "information off the request and hands the business logic to a model object; "
               "the model talks to the data source and gathers what the response needs; "
-              "control returns to the input controller, which looks at the result, decides "
-              "which view to show and passes it the data. The first and most important "
-              "reason for all this, Chapter 4 says, is that the models are completely "
-              "separated from the web presentation, which makes the presentation easier to "
+              "then the input controller gets control back, reads what came of it, picks "
+              "a view and hands it the data. The first and most important reason for all "
+              "this, Chapter 4 says, is that the models are kept entirely apart from the "
+              "web presentation, which makes the presentation easier to "
               "change, a second presentation easier to add, and the domain logic easier to "
               "test."),
         ("p", "Model View Controller, in Chapter 14, is read as a pattern: a tool with its "
@@ -371,12 +372,12 @@ MODEL_VIEW_CONTROLLER = {
               "presentation from model, and controller from view."),
         ("p", "The first, he argues, matters for three reasons. Presentation and model are "
               "different concerns, written with different libraries and often by people "
-              "who prefer one side. Users want the same model shown in different ways, a "
-              "rich client, a browser, a remote API and a command line, and the separation "
+              "who prefer one side. Users want the same model shown in different ways, in a "
+              "desktop program, a web page, a service other programs call, or a terminal, "
+              "and the separation "
               "lets all of them share the model's code. And nonvisual objects are easier to "
-              "test. The key point, he says, is the direction of the dependencies: the "
-              "presentation depends on the model, and the model does not depend on the "
-              "presentation, so the people writing the model need not know which "
+              "test. The key point, he says, is which way the dependencies run: the "
+              "presentation uses the model, and the model never uses the presentation, so the people writing the model need not know which "
               "presentation is in use, and the presentation can change freely."),
         ("p", "The second separation, of view from controller, Fowler calls less important. "
               "The irony he points out is that almost every version of Smalltalk did not "
@@ -402,7 +403,8 @@ MODEL_VIEW_CONTROLLER = {
               "`html` and the lab prints 1: concert directly and 3: concert, concertpage, "
               "concertreport in all. The report, which has nothing to do with HTML, is "
               "reached only because the model knew about HTML."),
-        ("p", "In <code>separated</code> the design is the listing's: `concertpage` uses "
+        ("p", "In <code>separated</code> the design is the listing's (`concertpage` is the "
+              "listing's `ConcertView`): `concertpage` uses "
               "`concert` and `html`, and `concertreport` uses `concert`. The same change "
               "prints 1: concertpage directly and 1: concertpage in all. Only the class that "
               "renders HTML is reached, which is Fowler's direction of dependencies as a "
@@ -487,12 +489,11 @@ MODEL_VIEW_CONTROLLER = {
     "quiz": [
         {"q": "Take the exercise's four records and change `widgets`. What does a change to "
               "`widgets` reach directly, and in all?",
-         "a": ["Directly 2: basket, checkoutpage; in all 3: basket, basketapi, checkoutpage",
-               "Directly 1: basket; in all 3: basket, basketapi, checkoutpage",
+         "a": ["Directly 1: basket; in all 3: basket, basketapi, checkoutpage",
                "Directly 2: basket, checkoutpage; in all 2: basket, checkoutpage",
-               "Directly 2: basket, checkoutpage; in all 4: basket, basketapi, "
-               "checkoutpage, widgets"],
-         "c": 0,
+               "Directly 2: basket, checkoutpage; in all 4: basket, basketapi, checkoutpage, widgets",
+               "Directly 2: basket, checkoutpage; in all 3: basket, basketapi, checkoutpage"],
+         "c": 3,
          "why": "`basket` and `checkoutpage` each have a record pointing at `widgets`, so 2 "
                 "directly. `basketapi` uses `basket`, so the change reaches it through the "
                 "model: 3 in all. The changed class is never in the list. Remove `basket, "
@@ -500,30 +501,30 @@ MODEL_VIEW_CONTROLLER = {
                 "the API that has nothing to do with form controls drops out."},
         {"q": "Which dependency does Model View Controller, as Chapter 14 describes it, rule "
               "out?",
-         "a": ["The view depending on the model",
-               "The model depending on the presentation",
-               "The controller depending on the model",
-               "The controller depending on the view"],
-         "c": 1,
+         "a": ["The model depending on the presentation above it",
+               "The view depending on the model it displays",
+               "The controller depending on the model it updates",
+               "The controller depending on the view it updates"],
+         "c": 0,
          "why": "Fowler's key point is the direction: the presentation, view and controller, "
                 "depends on the model, and the model does not depend on the presentation. "
                 "The other three are dependencies the pattern expects."},
         {"q": "What does Chapter 14 say about separating the view from the controller?",
-         "a": ["It is the most important of the two separations",
-               "It is less important, rarely done in rich clients, and common on the web",
-               "Every version of Smalltalk made it, and modern frameworks dropped it",
-               "It is what the Application Controller pattern describes"],
-         "c": 1,
+         "a": ["It is the more important of the two separations Fowler finds in MVC",
+               "Every version of Smalltalk made it, and later web frameworks dropped it",
+               "It is less important, rarely done in rich clients, common on the web",
+               "It is the separation the Application Controller pattern describes in full"],
+         "c": 2,
          "why": "Fowler calls it less important and notes that almost every version of "
-                "Smalltalk did not make it; it came back with web front ends, where the "
-                "controller is separated out. An Application Controller, Fowler says, is a "
+                "Smalltalk did not make it; it came back with web front ends, which give the "
+                "controller an object of its own. An Application Controller, Fowler says, is a "
                 "different thing from an MVC controller."},
         {"q": "Records `a, b` and `b, c`, with `c` changed. What does the lab print?",
-         "a": ["Directly 1: b; in all 2: a, b",
-               "Directly 1: b; in all 1: b",
+         "a": ["Directly 1: b; in all 1: b",
+               "Directly 1: b; in all 2: a, b",
                "Directly 2: a, b; in all 2: a, b",
                "Directly 1: b; in all 3: a, b, c"],
-         "c": 0,
+         "c": 1,
          "why": "Only `b` has a record pointing at `c`, so 1 directly. `a` uses `b`, so "
                 "following the records backwards reaches it: 2 in all. The changed class "
                 "itself is never listed."},
@@ -531,8 +532,8 @@ MODEL_VIEW_CONTROLLER = {
     "mistakes": [
         ("Taking Model View Controller to be three folders",
          "On this reading the pattern is satisfied once the code is filed as models, views "
-         "and controllers. Fowler's point is the direction of the dependencies: the "
-         "presentation depends on the model, and the model never on the presentation. A "
+         "and controllers. Fowler's point is which way the dependencies run: the "
+         "presentation uses the model, and the model never uses the presentation. A "
          "model in the models folder that calls an HTML routine breaks the pattern however "
          "it is filed. On the lesson's illustration, the report, which has nothing to do "
          "with HTML, is reached by an HTML change only because the model knew about HTML: "
@@ -636,8 +637,8 @@ PAGE_CONTROLLER = {
               "quite one controller to one page, though. The more precise thought, he says, "
               "is a controller for each action, a button or a link, because a link can lead "
               "to different pages depending on some condition."),
-        ("p", "Any input controller, the section goes on, has two responsibilities: handling "
-              "the HTTP request and deciding what to do with it. It often makes sense to "
+        ("p", "Any input controller, the section goes on, does two things: it deals with the "
+              "HTTP request, and it decides what should happen as a result. It often makes sense to "
               "separate them, with a server page handling the request and a helper object "
               "deciding. Front Controller, the next lesson, takes that separation further."),
         ("p", "Page Controller, in Chapter 14, is read as a pattern. It starts from the "
@@ -663,7 +664,9 @@ PAGE_CONTROLLER = {
               "script, and it works particularly well where most of the controller logic is "
               "simple; there, Fowler says, a Front Controller adds a lot of overhead. The "
               "two mix without much trouble, and a site being moved from one to the other "
-              "often has both."),
+              "often has both. The pattern's three examples, a servlet controller with a JSP "
+              "view, a JSP as the handler, and a C# page handler with a code-behind, are "
+              "worth reading in the book."),
         ("p", "Now the code, written for the lesson. `Request` and `Response` stand for a "
               "servlet-like API: `req.param` reads a parameter and `res.forward` hands the "
               "response to a view with the object it should show. The controller below "
@@ -677,11 +680,11 @@ PAGE_CONTROLLER = {
               "other tiles are a band, 0–5, which is McConnell's from Code Complete and not "
               "Fowler's (Fowler gives no count); the deepest nesting, 1, counting the blocks "
               "inside the routine's own braces; and the first line at that depth, line 5."),
-        ("p", "Read the five as three kinds of question. The test `c == null` on line 4 is "
-              "about the request: was there such a concert? `isSoldOut`, `isSeated` and "
-              "`hasSeatMap` are questions about the concert, which the model answers. The "
-              "choice among the four pages, and the `&&` that combines two of the "
-              "predicates to make it, is presentation: which view to show. Move that choice "
+        ("p", "Leave aside the 1 every routine starts with. Of the four decisions, the test "
+              "`c == null` on line 4 is about the request: was there such a concert? "
+              "`isSoldOut`, `isSeated` and `hasSeatMap` are questions the concert answers; "
+              "and using their answers to pick one of four pages is presentation: which "
+              "view to show. Move that choice "
               "to a helper on the presentation side and the controller becomes the "
               "listing below."),
         ("code", _lines(CONCERT_PAGE_SPLIT)),
@@ -760,9 +763,9 @@ PAGE_CONTROLLER = {
             "line 10, else: adds nothing, still 5",
         ],
         "after": [
-            "The breakdown is `1 + if 3 + && 1`. One decision is about the request, the "
-            "three predicates are the model's, and the choice of four pages is the "
-            "helper's, which is why <code>concert-page-split</code> prints 1.",
+            "The breakdown is `1 + if 3 + && 1`. Of the four decisions, one is about the "
+            "request; the other three ask the model's predicates, and using the answers "
+            "to pick a page is the helper's work, which is why <code>concert-page-split</code> prints 1.",
         ],
     },
     "quiz_title": "Decisions and the section's claims",
@@ -770,40 +773,44 @@ PAGE_CONTROLLER = {
         {"q": "Count the exercise's booking controller by the lab's rule: one, plus one for "
               "each `if`, `while`, `for`, `case`, `&&` and `||`. How many decision points, and what is "
               "the breakdown?",
-         "a": ["7: 1 + if 3 + && 1 + || 2",
-               "6: if 3 + && 1 + || 2",
-               "5: 1 + if 3 + && 1",
-               "8: 1 + if 3 + && 1 + || 2 + else 1"],
-         "c": 0,
+         "a": ["6: if 3 + && 1 + || 2",
+               "7: 1 + if 3 + && 1 + || 2",
+               "8: 1 + if 3 + && 1 + || 2 + else 1",
+               "5: 1 + if 3 + && 1"],
+         "c": 1,
          "why": "Start at 1. Line 4 is an `if` with one `||`, line 9 an `if` with one `||`, "
                 "and line 11 an `else if` with one `&&`: 1 + 3 + 1 + 2 = 7. The rule starts at one, and "
                 "else adds nothing; the `!` is not a connective. Sorted, the null checks "
-                "on line 4 are about the request; the seat range and the rule that a paid, "
+                "on line 4 are about the request; the seat range (the limit of eight seats is a "
+                "rule about bookings, not about the form) and the rule that a paid, "
                 "non-refundable booking is locked belong to `Booking` as predicates; and "
                 "the choice among booking, locked and confirm pages belongs to the helper."},
         {"q": "By the same rule, how many decision points does a routine hold whose only "
-              "branches are `if (a && b)`, then `else if (c)`, then a final `else`?",
-         "a": ["3", "4", "5", "6"],
-         "c": 1,
+              "branches are `if (p && q)`, then `else if (r)`, then a final `else`?",
+         "a": ["3: if 2 + && 1",
+               "5: 1 + if 2 + && 1 + else 1",
+               "6: 1 + if 3 + && 1 + else 1",
+               "4: 1 + if 2 + && 1"],
+         "c": 3,
          "why": "1 to start, plus 2 for the if and the else if, plus 1 for the `&&`: 4. The "
                 "final else adds nothing."},
         {"q": "What does Chapter 4 call the more precise version of one Page Controller per "
               "page?",
-         "a": ["One Page Controller for each view",
-               "One Page Controller for each server page file",
-               "One Page Controller for each action, a button or a link",
-               "One Page Controller for each domain object"],
-         "c": 2,
+         "a": ["One for each action, such as a button or a link the user presses",
+               "One for each view the site can show to a user",
+               "One for each server page file deployed on the site",
+               "One for each domain object the page displays"],
+         "c": 0,
          "why": "Most actions correspond to pages, but a link may lead to different pages "
                 "depending on a condition, so Fowler's more precise thought is a controller "
                 "for each action."},
         {"q": "Page Controller passes the model all the data it needs from the request. Why, "
               "by the pattern's account?",
-         "a": ["So that the model objects need no connection to the HTML request",
-               "So that the request can be cached",
-               "So that the view does not have to call the model",
-               "So that the model can choose the view"],
-         "c": 0,
+         "a": ["So that the request can be cached between the model's calls",
+               "So that the view does not have to call the model itself",
+               "So that the model needs no connection to the request",
+               "So that the model can choose which view shows the result"],
+         "c": 2,
          "why": "Chapter 14 lists it as the controller's second job: create and invoke the "
                 "model objects with all the relevant data, so that they need no connection "
                 "to the request. Choosing the view is the controller's third job, not the "
@@ -813,8 +820,8 @@ PAGE_CONTROLLER = {
         ("Taking a page controller to be a page",
          "The name suggests one controller for each page, and most of the time that is "
          "what you get. Fowler's more precise version is one controller for each action, a "
-         "button or a link, because one link can go to a couple of different pages "
-         "depending on a condition. The concert page's controller is an example: one "
+         "button or a link, because one link may lead to two or more pages, chosen by "
+         "a condition. The concert page's controller is an example: one "
          "action, four pages."),
         ("Thinking that moving a decision out removes it",
          "<code>concert-page-split</code> prints 1, and it is tempting to read that as four "
@@ -880,7 +887,8 @@ FRONT_CONTROLLER = {
         ("Web handler",
          "The one object the web server hands every request to. It reads just enough of the "
          "URL and the request to decide which action is wanted, and then passes the request "
-         "to a command. It produces no response itself."),
+         "to a command. It renders no page itself: once it has chosen the command, the "
+         "command chooses the view."),
         ("Command",
          "An object for one kind of request, with a method that carries the action out. The "
          "commands are part of the controller and choose the view; the handler only chooses "
@@ -908,11 +916,11 @@ FRONT_CONTROLLER = {
               "than Page Controller. Where should the code that every request needs live, "
               "if not in every page? This lesson reads his answer. Read Front Controller in "
               "your own copy first, with Input Controller Patterns from Chapter 4."),
-        ("p", "Chapter 4's argument was that an input controller has two jobs, handling the "
-              "request and deciding what to do with it. Front Controller, it says, goes "
-              "further in separating them: one object handles every request, interprets the "
-              "URL to see what kind of request it is, and creates a separate object to "
-              "process it. All the HTTP handling is then in one place, and the web server "
+        ("p", "Chapter 4's argument was that an input controller has two jobs: dealing with "
+              "the request, and deciding what should come of it. Front Controller, it says, "
+              "pulls the two further apart: a single object receives every request, reads "
+              "the URL to tell which kind it is, and makes another object to carry it out. "
+              "All the HTTP handling is then in one place, and the web server "
               "need not be reconfigured whenever the site's set of actions changes."),
         ("p", "The pattern, read as a tool, begins with a problem. A complex site does "
               "similar things on every request, such as security, internationalisation and "
@@ -921,11 +929,11 @@ FRONT_CONTROLLER = {
               "change at run time. Front Controller puts every request through one handler "
               "object, which does the common work and then dispatches to a command for "
               "the part particular to the request. The handler is a class, not a server "
-              "page, because it produces no response; the commands need not know about the "
+              "page, because it renders no page of its own; the commands need not know about the "
               "web at all, though they are often passed the request."),
         ("p", "The handler can choose its command statically, by parsing the URL with "
-              "conditional logic, which gives explicit logic, compile-time checking of the "
-              "dispatch and freedom in the shape of the URLs; or dynamically, by taking part "
+              "conditional logic, which makes the logic plain to read, lets the compiler "
+              "check the dispatch and leaves the URLs free in their shape; or dynamically, by taking part "
               "of the URL and creating a command class from it, which lets you add commands "
               "without changing the handler. A useful companion, Fowler says, is Intercepting "
               "Filter, as the book cites Alur, Crupi and Malks: decorators wrapped round the "
@@ -933,8 +941,8 @@ FRONT_CONTROLLER = {
               "a variation Rob Mee showed him, a handler split in two, a thin web part that "
               "pulls the data out of the request and a dispatcher that knows nothing of the "
               "web server, so that tests can drive the dispatcher directly. Whichever way it "
-              "is built, the commands choose the view; the handler's only job is to choose "
-              "the command."),
+              "is built, the commands choose the view; once the handler has chosen the "
+              "command, it plays no further part in the request."),
         ("p", "Fowler's case for using it is a list of four advantages. Only one handler is "
               "configured into the web server, which helps where the server is awkward to "
               "configure and eases porting; with dynamic commands, new ones are added "
@@ -959,19 +967,24 @@ FRONT_CONTROLLER = {
               "shared steps and then calls `show`, which each page overrides. The lab reads "
               "the whole listing, all three classes, and prints 0 blocks, 0 lines, none."),
         ("code", _lines(PAGES_SUPERCLASS)),
-        ("p", "In <code>front-handler</code> one handler does the three steps for every "
-              "request, then looks the request's path up in a table of commands and runs "
-              "the command it finds; each page's part would be a command's `run`. Again 0, "
-              "0, none. As written it would also send the login page's own request to the "
-              "login page, so a real handler exempts that path, or leaves the check to a "
-              "filter that knows which paths are public."),
+        ("p", "In <code>front-handler</code> one handler looks the request's path up in a "
+              "table of commands, sends a visitor with no session to the login page unless "
+              "the command is public, writes the audit record, and runs the command; each "
+              "page's part would be a command's `run`. Again 0, 0, none. The pages under "
+              "`SecurePage` never needed that exemption, because the login page simply does "
+              "not extend it; a handler that sees every request has to be told which ones "
+              "are open."),
         ("code", _lines(FRONT_HANDLER)),
         ("p", "The count cannot choose between the second and third designs: both reach 0. "
-              "That is Fowler's point in a number. Removing duplicated lines is not a "
-              "reason to prefer a Front Controller, because a superclass removes them too; "
-              "the reasons are the one configuration, the dynamic commands, the fresh "
-              "command for each request, and the decorators, and none of them is something "
-              "a count of repeated lines can see."),
+              "The handler's listing is a single routine with its commands left out, so its "
+              "0 is certain; the commands, each one page's `forward`, differ as the pages' "
+              "last lines did. Removing duplicated lines is a weak reason on its own to "
+              "prefer a Front Controller, because a superclass can do much of it too; the "
+              "reasons Fowler gives for one handler are the one configuration, the dynamic "
+              "commands, the fresh command for each request, and the decorators, and none "
+              "of them is something a count of repeated lines can see. The pattern's own "
+              "example, a simple display with dynamic commands, is worth reading in the "
+              "book."),
         ("h3", "Exercise"),
         ("code", _lines(REPORTS_REPEAT)),
         ("p", "Two report pages, written for the lesson. Mark by hand the lines that repeat, "
@@ -1033,7 +1046,7 @@ FRONT_CONTROLLER = {
             "Take the preset <code>pages-repeat</code> and compare the two routines.",
         ],
         "lines": [
-            "lines 2 and 9: read the session's user",
+            "lines 2 and 9: read the user from the session",
             "lines 3 and 10: no user, so go to the login page",
             "lines 4 and 11: write the audit record",
             "lines 5 and 12: differ, an order and an invoice",
@@ -1051,23 +1064,22 @@ FRONT_CONTROLLER = {
         {"q": "In the exercise's two report pages, which lines repeat by the lab's rule "
               "(identical statement lines, in runs of two or more), and how many lines do "
               "the copies hold?",
-         "a": ["Lines 2–3 and lines 9–10: 4 lines",
-               "Lines 2–4 and lines 9–11: 6 lines",
-               "Lines 2–3 and lines 9–10: 2 lines",
-               "Lines 1–3 and lines 8–10: 6 lines"],
-         "c": 0,
+         "a": ["Lines 2–4 and lines 9–11: 6 lines in the two copies",
+               "Lines 2–3 and lines 9–10: 2 lines, one copy counted",
+               "Lines 2–3 and lines 9–10: 4 lines in the copies",
+               "Lines 1–3 and lines 8–10: 6 lines, headers included"],
+         "c": 2,
          "why": "Lines 2 and 3, the Cache-Control header and the locale, are the same text as "
                 "lines 9 and 10: one block of 2 lines in 2 copies, 4 lines. Line 4 differs "
                 "from line 11 (`sales` against `stock`), and the headers on lines 1 and 8 "
                 "name different routines. A superclass or a front handler would set the "
                 "header and the locale once."},
         {"q": "Which of these does Fowler give as an advantage of Front Controller?",
-         "a": ["It is a simpler design than Page Controller",
-               "It is the only way to remove code page controllers duplicate",
-               "A new command object for each request, so command classes need not be "
-               "thread-safe",
-               "The handler chooses the view for every request"],
-         "c": 2,
+         "a": ["It is a simpler design than Page Controller, with less to configure",
+               "A fresh command per request, so commands need not be thread-safe",
+               "It is the only way to remove the code page controllers duplicate",
+               "The handler chooses the view for every request it receives"],
+         "c": 1,
          "why": "Chapter 14 lists one configured handler, dynamic commands, a fresh command "
                 "per request (no thread-safety worries for the commands), and decorators. "
                 "Fowler calls the pattern more complicated than Page Controller, grants that "
@@ -1076,21 +1088,23 @@ FRONT_CONTROLLER = {
         {"q": "What does a static choice of command offer that a dynamic one does not, by "
               "Chapter 14's account?",
          "a": ["Adding commands without changing the handler",
-               "Compile-time checking of the dispatch",
                "A properties file binding URLs to command classes",
-               "A new command object for each request"],
-         "c": 1,
-         "why": "The static version parses the URL with conditional logic, which gives "
-                "explicit logic, compile-time error checking on the dispatch and freedom in "
-                "the URLs. Adding commands without changing the handler, with or without a "
+               "A new command object for each request",
+               "Compile-time checking of which command each URL reaches"],
+         "c": 3,
+         "why": "The static version parses the URL with conditional logic, which keeps "
+                "the logic in plain view, lets the compiler check the dispatch, and leaves "
+                "the URLs free in their shape. Adding commands without changing the handler, with or without a "
                 "properties file, is the dynamic version's; a fresh command per request "
                 "holds either way."},
-        {"q": "Two routines each open with `User u = sessions.user(req);` and the null "
-              "check on `u`, but the second names its variable `user` throughout. What does "
-              "the lab report for those opening lines?",
-         "a": ["1 block, 4 lines", "1 block, 2 lines", "Nothing: the lines are not the same text",
-               "2 blocks, 4 lines"],
-         "c": 2,
+        {"q": "The first routine opens with `User u = sessions.user(req);` and a null "
+              "check on `u`; the second opens with the same two lines but calls the "
+              "variable `user`. What does the lab report for those opening lines?",
+         "a": ["Nothing: the lines are not the same text at all",
+               "1 block, 4 lines: the two opening lines in each routine",
+               "1 block, 2 lines: the null checks, once in each routine",
+               "2 blocks, 4 lines: one block for each opening line"],
+         "c": 0,
          "why": "The lab compares lines as text, with only spacing collapsed. `User u` and "
                 "`User user` differ, so the lines do not match, and the repetition is wider "
                 "than the count."},
@@ -1099,9 +1113,9 @@ FRONT_CONTROLLER = {
         ("Taking a Front Controller for one huge controller",
          "A single object for every request sounds like everything in one place. Fowler's "
          "Front Controller is one handler and many small commands. The handler does only "
-         "what every request shares and then chooses a command; the command does the "
+         "the work common to requests and then chooses a command; the command does the "
          "action and chooses the view. In <code>front-handler</code> the handler's body is "
-         "five statements."),
+         "five statements, and the login check is skipped for a command that is public."),
         ("Thinking only a Front Controller removes what pages repeat",
          "Duplicated code is the reason most often given for the pattern. Fowler grants "
          "that a superclass Page Controller does much of that too, and the "
@@ -1153,7 +1167,7 @@ TEMPLATE_AND_TRANSFORM_VIEW = {
     "key": [
         "template: the page, with markers in it",
         "transform: walk the data, write the page",
-        "a helper holds the page's logic",
+        "a helper holds the logic of the page",
         "a condition: one Boolean of the helper",
         "moved decisions still count somewhere",
     ],
@@ -1188,20 +1202,20 @@ TEMPLATE_AND_TRANSFORM_VIEW = {
     "body": [
         ("p", "&ldquo;This clearly provides a lot of power and flexibility; sadly, it also "
               "leads to very messy code that's difficult to maintain.&rdquo; Fowler is "
-              "writing in Chapter 4 about server pages, which put a full programming "
-              "language into the page. You may know the result from a template of your own "
+              "writing in Chapter 4 about server pages, which let a page hold a complete "
+              "programming language. You may know the result from a template of your own "
               "that began as HTML with a few markers and now has a condition for every "
               "special case. This lesson reads View Patterns in Chapter 4, and Template "
               "View and Transform View in Chapter 14. Read them in your own copy first."),
         ("p", "View Patterns sets out the choices. There are three view patterns, Fowler "
               "says, and they give two decisions: Template View or Transform View, and "
               "either one in a single stage or as a Two Step View, which is the next "
-              "lesson. Template View writes the presentation in the structure of the page "
-              "and embeds markers where dynamic content goes; Transform View uses a "
+              "lesson. Template View lays the presentation out as the page itself, with "
+              "markers where the changing content goes; Transform View uses a "
               "transform style of program, usually XSLT, applied by the input controller to "
               "XML taken from the model. A procedural script can be written in either style "
-              "or a mix of the two. If you use server pages, the section warns, you must be "
-              "very disciplined to keep programming logic out of the page, often with a "
+              "or a mix of the two. If you use server pages, the section warns, it takes "
+              "real discipline to keep the program out of the page, often with a "
               "helper object."),
         ("p", "Template View, read as a pattern, starts from the difficulty of writing a "
               "program that produces a page of HTML, and the ease of writing a static page "
@@ -1219,30 +1233,33 @@ TEMPLATE_AND_TRANSFORM_VIEW = {
               "purely conditional tags a bad smell. The helper can return an empty string "
               "when there is nothing to show, or generate the markup itself, which takes "
               "the choice of markup away from the designer; where the designer must keep "
-              "it, he prefers a focused tag, and in every case a condition based on a "
-              "single Boolean property of the helper. Iteration over a collection is the "
+              "it, he prefers a focused tag, and in every case a condition that asks the "
+              "helper one true-or-false question. Iteration over a collection is the "
               "other hard case, and a general loop tag is hard to avoid but usually fits "
               "well enough."),
         ("p", "Template View's strength, he says, is that you compose the page by looking at "
               "its structure, which most people find easier, and which lets a graphic "
               "designer lay out the page while a programmer writes the helper. Its two "
-              "weaknesses are that the common implementations make it too easy to put "
-              "complicated logic in the page, and that it is hard to test outside a web "
+              "weaknesses are that the usual tools make it all too easy to let complicated "
+              "logic into the page, and that it is hard to test outside a web "
               "server."),
         ("p", "Transform View is organised the other way round. Where a template is "
               "organised around the output, a transform view is organised around the "
               "input: a program walks the domain data and, as it recognises each kind of "
-              "element, writes out the HTML for it, and its rules can be arranged in any "
-              "order without changing the result. It can be written in any language; the "
+              "element, writes out the HTML for it, and the order in which its rules are "
+              "written makes no difference to the page. It can be written in any language; the "
               "dominant choice when the book was written was XSLT, a functional language "
               "with an awkward XML syntax. The choice between the two, Fowler says, comes "
               "down mostly to what the team prefers and the tools it has. A transform is "
               "easier to keep focused on rendering and easy to test without a web server; "
               "a change to the whole site's appearance can mean changing many transforms, "
-              "which is where Two Step View comes in."),
+              "which is where Two Step View comes in. The examples, a JSP as a view with a "
+              "separate controller, an ASP.NET server page, and a simple transform, are "
+              "worth reading in the book."),
         ("p", "Now the code, written for the lesson. The routine below builds one row of a "
               "concert's ticket table, and decides inline whether to mark the seats as few "
-              "and whether to label them as resale."),
+              "and whether to label them as resale. The lab reads Java, so the row stands "
+              "in for a server page whose scriptlets make the same two decisions."),
         ("code", _lines(TICKET_ROW)),
         ("p", "On the preset <code>ticket-row</code> the lab prints 5 decision points, "
               "broken down as `1 + if 2 + && 1 + || 1`, by the same rule as the last two "
@@ -1338,47 +1355,46 @@ TEMPLATE_AND_TRANSFORM_VIEW = {
     "quiz": [
         {"q": "Count the exercise's price cell by the lab's rule: one, plus one for each if, "
               "while, for, case, `&&` and `||`. How many decision points, with the breakdown?",
-         "a": ["5: 1 + if 2 + && 1 + || 1",
-               "4: if 2 + && 1 + || 1",
-               "6: 1 + if 3 + && 1 + || 1",
-               "3: 1 + if 2"],
+         "a": ["6: 1 + if 2 + && 1 + || 2",
+               "5: 1 + if 2 + && 1 + || 1",
+               "7: 1 + if 2 + && 1 + || 2 + else 1",
+               "5: if 2 + && 1 + || 2"],
          "c": 0,
-         "why": "Start at 1. Line 3 is an `if` with one `&&`, line 9 an `if` with one `||`, and the "
-                "else on line 6 adds nothing: 1 + 2 + 1 + 1 = 5. A helper would hold two "
-                "Boolean methods, such as `showWasPrice()` for the sale price below the "
-                "full price, and `isUnavailable()` for no stock or a withdrawn item, and "
-                "the template would ask each one."},
+         "why": "Start at 1. Line 3 is an `if` with one `&&`, line 9 an `if` with two `||`, "
+                "and the else on line 6 adds nothing: 1 + 2 + 1 + 2 = 6. A helper would "
+                "hold two Boolean methods, such as `showWasPrice()` for the sale price below "
+                "the full price, and `isUnavailable()` for no stock, a withdrawn item or a "
+                "recalled one, and the template would ask each one."},
         {"q": "Where Template View must show something only under a condition, what does "
               "Chapter 14 recommend the condition be based on?",
-         "a": ["A general IF tag holding an expression",
-               "A scriptlet in the page",
-               "A single Boolean property of the helper",
-               "A separate page for each case"],
+         "a": ["A general IF tag holding the whole expression",
+               "A scriptlet placed in the page at that point",
+               "One true-or-false method of the page's helper",
+               "A separate page for each case of the condition"],
          "c": 2,
          "why": "Fowler calls purely conditional tags a bad smell, because they turn the "
                 "template into a programming language, and scriptlets a big problem. "
-                "Whatever tag is used, the condition should be one Boolean property of the "
-                "helper; a more complex expression puts the logic in the page."},
+                "Whatever tag is used, the condition should ask the helper one true-or-false "
+                "question; a more complex expression puts the logic in the page."},
         {"q": "What is the key difference Chapter 14 draws between Template View and "
               "Transform View?",
-         "a": ["Template View is organised around the output, Transform View around the "
-               "input's elements",
-               "Template View needs a web server, Transform View needs XSLT",
-               "Template View is for static pages, Transform View for dynamic ones",
-               "Template View has no logic, Transform View has all of it"],
-         "c": 0,
+         "a": ["Template View needs a web server to run, and Transform View needs XSLT",
+               "Template View follows the output, and Transform View the input's elements",
+               "Template View is for static pages, and Transform View for dynamic ones",
+               "Template View holds no logic at all, and Transform View holds all of it"],
+         "c": 1,
          "why": "A template is the page with markers in it; a transform view has a "
                 "transform for each kind of input element and a loop that walks the data. "
                 "Transform View can be written in any language, and both views serve "
                 "dynamic pages."},
         {"q": "Which of these is one of the two weaknesses Fowler names in Template View?",
          "a": ["It cannot display anything conditionally",
-               "It is harder to test than Transform View",
                "It cannot be edited in a visual HTML editor",
-               "It must be written in XSLT"],
-         "c": 1,
-         "why": "The two weaknesses are that the common implementations make it too easy "
-                "to put complicated logic in the page, and that most implementations are "
+               "It must be written in XSLT to be tested",
+               "It is harder to test than Transform View, outside a web server"],
+         "c": 3,
+         "why": "The two weaknesses are that the usual implementations let complicated "
+                "logic into the page too easily, and that most implementations are "
                 "hard or impossible to test outside a web server. Conditional display is "
                 "one of its hard cases, met with a helper, and editing in a visual editor "
                 "is one of its strengths."},
@@ -1394,8 +1410,8 @@ TEMPLATE_AND_TRANSFORM_VIEW = {
          "The book's examples of Transform View are XSLT, and XSLT was the dominant choice "
          "when it was written. But the pattern is a transformation organised around the "
          "input, element by element, and Fowler says it can be written in any language: a "
-         "method that renders a customer and loops over its orders, calling a method that "
-         "renders an order, is one."),
+         "method that renders a concert and loops over its ticket sections, calling a "
+         "method that renders a section, is one."),
         ("Thinking the two views differ only in syntax",
          "Both produce HTML, so the choice can look like a matter of notation. Fowler's "
          "difference is organisation, the output's structure against the input's, and it "
@@ -1482,22 +1498,22 @@ TWO_STEP_VIEW = {
               "waiting in every page's template, you have met the problem it answers. This "
               "lesson reads the second half of View Patterns in Chapter 4 and Two Step View "
               "in Chapter 14. Read them in your own copy first."),
-        ("p", "Chapter 4 sets the two shapes side by side. A single-stage view mostly has one "
-              "view component for each screen, which takes domain-oriented data and renders "
-              "it in HTML. A two-stage view breaks that into a logical screen produced from "
+        ("p", "Chapter 4 sets the two shapes side by side. In a single-stage view there is, "
+              "for the most part, one view component per screen, which turns the domain's "
+              "data straight into HTML. A two-stage view breaks that into a logical screen produced from "
               "the domain data and then rendered in HTML, with one first stage for each "
               "screen and only one second stage for the application. The advantage, Fowler "
               "says, is that the decision about which HTML to use is in one place, so a "
               "global change to the HTML is one object to alter. He qualifies it at once: "
-              "you get that advantage only while the logical presentation stays the same, "
+              "the gain lasts only as long as every screen keeps to one logical layout, "
               "so it works best where screens share a basic layout, and highly "
               "design-intensive sites will not find a good logical screen."),
         ("p", "The section adds the case where the pattern works even better: one service "
               "fronted by several customers, his example being several airlines in front of "
               "one reservation system, each with its own look through its own second "
               "stage; and, in the same way, separate second stages for different devices. "
-              "The limit is the same each time. Every look must share a common logical "
-              "screen, which may not be possible when the interfaces are very different."),
+              "The limit is the same each time. Every look must fit one logical screen, and "
+              "very different interfaces may not."),
         ("p", "Two Step View, read as a pattern, makes the logical screen concrete. Its "
               "elements might be fields, headers, footers, tables and choices: "
               "presentation-oriented, and forcing the screens into a definite style, but "
@@ -1513,15 +1529,16 @@ TWO_STEP_VIEW = {
               "one second stage for the site, so a change to the site's appearance is one "
               "change. With several appearances the saving compounds. Fowler's own figures: "
               "ten screens and three appearances need thirty single-stage view modules, "
-              "against ten first stages and three second stages. The more screens and "
-              "appearances, he says, the bigger the saving."),
+              "where two stages need thirteen, ten for the screens and three for the looks. "
+              "The saving, he says, grows with both numbers."),
         ("p", "The costs are as plain. The pattern depends on making the logical screen "
-              "serve the look, and a design-heavy site, where each page is meant to look "
-              "different, is constrained by it, too much for many sites. Designers who lay "
+              "serve the look, and a site built on visual design, whose every page is to "
+              "look unlike the others, is constrained by it, too much for many sites. Designers who lay "
               "out pages in visual editors cannot write a renderer, so programmers are "
               "involved in every design change. And it is a harder programming model to "
               "learn, Fowler concedes, though not difficult once you are used to it, and "
-              "it may cut repetitive code."),
+              "it may cut repetitive code. Its examples, a two-stage XSLT and JSP with "
+              "custom tags, are worth reading in the book."),
         ("p", "Now the code, written for the lesson. A `Field` is the smallest logical "
               "screen there is, a label and a value. `HtmlRenderer` is a second stage: it "
               "takes any list of fields and writes them as a definition list. A first stage "
@@ -1623,12 +1640,11 @@ TWO_STEP_VIEW = {
     "quiz": [
         {"q": "Take the exercise's seven records and change `screen`. What does the change "
               "reach directly, and in all?",
-         "a": ["Directly 2: printrenderer, renderer; in all 2",
-               "Directly 5: account, home, printrenderer, renderer, search; in all the "
-               "same 5",
-               "Directly 5; in all 7, adding look and printlook",
-               "Directly 3: account, home, search; in all 5"],
-         "c": 1,
+         "a": ["Directly 2: printrenderer, renderer; in all 2, the same two renderers",
+               "Directly 5, the pages and renderers; in all 7, adding look and printlook",
+               "Directly 3: account, home, search; in all 5, adding both renderers",
+               "Directly 5: account, home, printrenderer, renderer, search; in all 5"],
+         "c": 3,
          "why": "Five records point at `screen`: the three pages and both renderers. Nothing "
                 "depends on any of the five, so the change reaches the same 5 in all: "
                 "account, home, printrenderer, renderer, search. `look` and `printlook` are "
@@ -1638,27 +1654,31 @@ TWO_STEP_VIEW = {
         {"q": "Fowler's illustration in Two Step View: ten screens and three appearances. "
               "How many view modules does a single-stage design need, and how many first "
               "and second stages does a Two Step View need?",
-         "a": ["Thirty; thirteen", "Thirty; thirty", "Thirteen; thirty", "Ten; three"],
+         "a": ["Thirty; thirteen",
+               "Thirty; thirty, one view for each pairing",
+               "Thirteen; thirty",
+               "Ten; three, one for each screen and look"],
          "c": 0,
-         "why": "Single-stage needs a view for each combination of screen and appearance, "
+         "why": "Single-stage needs a view for every pairing of a screen with a look, "
                 "10 × 3 = 30. Two Step View needs a first stage for each screen and a second "
                 "stage for each appearance, 10 + 3 = 13. The figures are the book's "
                 "illustration, not a measurement."},
         {"q": "Which kind of site does Chapter 14 say Two Step View does not suit?",
-         "a": ["A site with one look throughout",
-               "A site offered under several organisations' looks",
-               "A design-heavy site where each page is meant to look different",
+         "a": ["A site with one look throughout all of its pages",
+               "A site offered under several organisations' own looks",
+               "A design-led site whose every page looks different",
                "A site whose screens all share one basic layout"],
          "c": 2,
          "why": "It is hard to find a simple enough logical screen for a site whose pages "
                 "are all different, and the design is constrained by it. Single-appearance "
-                "sites are the easiest case, multiappearance sites gain most, and screens "
+                "sites are the common case and gain from one second stage, "
+                "multiappearance sites gain most, and screens "
                 "that share a basic layout are what the pattern needs."},
         {"q": "What does a first stage produce?",
-         "a": ["The page's HTML",
-               "A logical screen with no HTML in it",
-               "An XSLT stylesheet",
-               "The domain-oriented XML"],
+         "a": ["The finished HTML of the page, ready to send",
+               "A logical screen of fields and tables, with no HTML in it",
+               "An XSLT stylesheet for the second stage to apply",
+               "The domain-oriented XML the model produced"],
          "c": 1,
          "why": "The first stage reads the domain-oriented model and fills a "
                 "presentation-oriented structure, fields, tables and the like, with no "
@@ -1674,8 +1694,7 @@ TWO_STEP_VIEW = {
         ("Thinking a second stage makes every change cheaper",
          "It makes a change of look cheaper by putting all the HTML in one place. A change "
          "to the logical screen itself, a new kind of element or a changed field, is the "
-         "expensive one: it reaches every first stage that builds the screen and every "
-         "second stage that reads it."),
+         "expensive one; the exercise counts it."),
         ("Expecting the pattern to suit every site",
          "If one place for the HTML is good, it seems every site should have it. Fowler "
          "says a design-intensive site, where each page is meant to look different, will "
@@ -1742,8 +1761,8 @@ APPLICATION_CONTROLLER = {
          "domain command to run and which view to show next. It is a different thing from "
          "the controller of Model View Controller, which handles one request."),
         ("Mediating layer",
-         "A layer between two others that each talks to but that neither needs to know "
-         "about. An Application Controller with no links to the user-interface machinery "
+         "A layer between two others that both talk to, so that neither needs to know the "
+         "other. An Application Controller with no links to the user-interface machinery "
          "can be thought of as one, between the presentation and the domain; Chapter 8 "
          "places it so, in the last course."),
     ],
@@ -1770,20 +1789,20 @@ APPLICATION_CONTROLLER = {
               "between presentation and domain, and written independently of any one "
               "presentation it can be reused across several, though different "
               "presentations are often best given different flows."),
-        ("p", "Not every system needs one, the chapter goes on. It is useful where there is "
-              "a lot of logic about the order of screens, or no simple mapping between "
-              "pages and the actions on the domain; where someone can see pretty much any "
-              "screen in any order, there is little need. Fowler's test fits in a line: if "
-              "the machine is in control of the screen flow, you need an Application "
-              "Controller, and if the user is in control, you do not."),
+        ("p", "Not every system needs one, the chapter goes on. It earns its place where much "
+              "of the code is about which screen follows which, or where pages do not line "
+              "up simply with actions on the domain; where a user may open the screens in "
+              "nearly any order, there is little for it to do. Fowler's test fits in a "
+              "line: when the application decides which screen the user sees next, you "
+              "want an Application Controller; when the user decides, you do not."),
         ("p", "Application Controller, read as a pattern, starts from the wizard: the user "
               "led through screens in a set order, screens shown only under conditions, a "
               "choice of screen that depends on earlier input. Input controllers can make "
               "those decisions, but as the application grows, several of them come to need "
               "the same knowledge, and the code is duplicated. The pattern puts all the "
               "flow logic in one object, which the input controllers ask for the command to "
-              "run against the model and the view to show. It has two responsibilities, "
-              "deciding which domain logic to run and which view to display, and typically "
+              "run against the model and the view to show. It has two jobs, choosing the "
+              "domain logic to run and choosing the view for the response, and typically "
               "holds two collections of references, one of domain commands and one of "
               "views: command objects, references to functions, names for reflection, or "
               "server page names."),
@@ -1803,8 +1822,10 @@ APPLICATION_CONTROLLER = {
               "Controller; if they occur in many places, the Domain Model should be "
               "designed to drive them. The pattern's ideas, he writes, came mostly from "
               "Knight and Dai, as the book cites them (IEEE Software, 2002), whose "
-              "explanations he found remarkably clear; Chapter 4 says he took from them the "
-              "very terms input controller and application controller."),
+              "explanations he found unusually clear; Chapter 4's Further Reading credits them "
+              "with the vocabulary that separates input controllers from application "
+              "controllers. The pattern's example, a controller driven by a state model, "
+              "is worth reading in the book."),
         ("p", "Now the code, written for the lesson. Two input controllers of a checkout each "
               "decide where to send the customer after their step: after the address, and "
               "after the cart."),
@@ -1867,7 +1888,7 @@ APPLICATION_CONTROLLER = {
     "steps_intro": "Four steps, the last of them on a flow of your own.",
     "steps": [
         ("Ask who controls the flow",
-         "If the user can visit any screen in pretty much any order, stop: there are no "
+         "If the user can open the screens in nearly any order, stop: there are no "
          "rules for an Application Controller to hold. If the application leads, go on."),
         ("Mark the repeated rules",
          "Line up the input controllers and mark every run of lines that decides the next "
@@ -1902,43 +1923,45 @@ APPLICATION_CONTROLLER = {
         {"q": "In the exercise's two claim controllers, which lines repeat by the lab's rule "
               "(identical statement lines, in runs of two or more), and how many lines do "
               "the copies hold?",
-         "a": ["Lines 2–3 and lines 9–10: 4 lines",
-               "Lines 2–4 and lines 9–11: 6 lines",
-               "Lines 1–4 and lines 8–11: 8 lines",
-               "Lines 2–4 and lines 9–11: 3 lines"],
+         "a": ["Lines 2–4 and lines 9–11: 6 lines, as in the checkout",
+               "Lines 2–4 and lines 10–12: 6 lines, in two copies",
+               "Lines 2–3 and lines 10–11: 4 lines, without the bank",
+               "Lines 2–4 and lines 10–12: 3 lines, one copy counted"],
          "c": 1,
          "why": "The assessor check, the medical check and the redirect to the bank details "
-                "are the same text on lines 2 to 4 and 9 to 11: one block of 3 lines in 2 "
-                "copies, 6 lines. Line 8, the photo check, is in one controller only, and "
-                "the routine headers differ. One `nextStep(Claim c)` asking for photos, "
-                "then the assessor, then the medical screen, and otherwise the bank, "
-                "replaces them, once you have checked, as the lesson did for the "
-                "address, that asking for photos first gives each controller's old "
-                "answer."},
+                "are the same text on lines 2 to 4 and 10 to 12: one block of 3 lines in 2 "
+                "copies, 6 lines. Lines 8 and 9, the photo checks, are in one controller "
+                "only, and the routine headers differ. One `nextStep(Claim c)` asking about "
+                "the photos, then the assessor, then the medical screen, and otherwise the "
+                "bank, replaces them, with one difference to decide: a claim with no photos "
+                "leaving the details step now goes to `/photos`, where the old controller "
+                "sent it on. If the details step can come before the photos, that is a "
+                "change in the flow, and possibly the fix it needed; if it cannot, the "
+                "answers are the same."},
         {"q": "What is Chapter 4's test for whether a system needs an Application "
               "Controller?",
-         "a": ["Whether it has more than one input controller",
-               "Whether the machine or the user is in control of the screen flow",
-               "Whether it uses a Front Controller",
-               "Whether it has more than one presentation"],
-         "c": 1,
-         "why": "If the machine is in control of the screen flow, you need one; if the user "
-                "is, you do not. Several input controllers, a Front Controller or several "
+         "a": ["Whether it has more than one input controller handling pages",
+               "Whether it already sends every request through a Front Controller",
+               "Whether it serves more than one presentation of the same model",
+               "Whether the machine or the user is the one controlling the flow"],
+         "c": 3,
+         "why": "When the application decides the order of screens, it needs one; when the "
+                "user decides, it does not. Several input controllers, a Front Controller or several "
                 "presentations do not by themselves make flow rules."},
         {"q": "What are an Application Controller's two responsibilities, as Chapter 14 "
               "gives them?",
-         "a": ["Handling the HTTP request and rendering the response",
-               "Deciding which domain logic to run and which view to display",
-               "Validating input and saving the model",
-               "Choosing the command and configuring the web server"],
-         "c": 1,
+         "a": ["Choosing the domain logic to run and the view to show next",
+               "Handling the HTTP request and rendering the full response",
+               "Validating the user's input and saving the changed model",
+               "Choosing the command and configuring the web server for it"],
+         "c": 0,
          "why": "It decides which domain logic to run and which view displays the response, "
                 "and holds a collection of references for each. Handling the request is the "
                 "input controller's job, and the commands do the domain work."},
         {"q": "Which design for an Application Controller does Fowler prefer?",
-         "a": ["One that reads the HTTP session directly",
-               "One that forwards to server pages itself",
-               "One with no links to the user-interface machinery",
+         "a": ["One that reads the HTTP session directly for its state",
+               "One that forwards to the server pages itself when done",
+               "One with no links at all to the user-interface machinery",
                "One that holds the domain logic for each request"],
          "c": 2,
          "why": "With no links to the interface machinery it can be tested independently and "
@@ -1949,7 +1972,7 @@ APPLICATION_CONTROLLER = {
         ("Thinking every web application needs an Application Controller",
          "Any application has an order of screens, so it seems any application needs "
          "something to hold it. Fowler's signal is the quotation: similar changes in many "
-         "places when the flow changes. Where any screen can be visited in pretty much any "
+         "places when the flow changes. Where a user may open the screens in nearly any "
          "order there are no rules for it to hold, and it adds little; if the user is in "
          "control of the flow, you do not need one."),
         ("Thinking the application controller does the work",
@@ -1958,8 +1981,8 @@ APPLICATION_CONTROLLER = {
          "The domain commands do the work, and Fowler comes down hard against putting "
          "domain logic in it."),
         ("Sharing one flow across every presentation",
-         "An Application Controller free of the interface can serve a web front end, a "
-         "rich client and a small device at once, and that seems the point of making it "
+         "An Application Controller free of the interface can serve a browser, a desktop "
+         "program and a handheld device at once, and that seems the point of making it "
          "free. Fowler says not to be too eager: different interfaces often need different "
          "flows to be usable, though one shared controller may be worth a more awkward "
          "interface for the effort it saves."),

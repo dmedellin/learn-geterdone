@@ -100,3 +100,13 @@ End with a short report: lessons written; every §C deviation and why; any kit
 gap; renderer or read-out problems; pages or figures corrected against the
 text; each quotation with its `ea_quotes.py` result; the preview command's
 final output line; spoken forms added.
+
+## Overlap scan (added after the first reviews)
+
+`python3 /tmp/claude-0/-home-claude/d46a89a5-ae93-5f9f-84a3-4e1ae07e83c0/scratchpad/tools/overlap.py content/enterprise_patterns/<course dir> 8` prints
+every run of 8 or more consecutive words your course shares with the book, with
+its PDF page. Every run it prints must be one of: a chapter, section or pattern
+title or a list of titles; one of the lesson's counted quotations (in quotation
+marks, within the 40/60-word limits, checked with `ea_quotes.py`); or a code
+token sequence. Anything else, including a pattern's one-line intent, is
+reworded in your own words. Run it until it prints nothing else.

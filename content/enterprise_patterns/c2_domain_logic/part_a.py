@@ -289,12 +289,12 @@ LESSONS = [
                   "would have one script for checking out and another for showing what is "
                   "in the basket. Pieces can be split into subroutines, and scripts can "
                   "share them, but the shape is still a procedure per action."),
-            ("p", "He gives it three advantages: it is a simple procedural model most "
-                  "developers understand; it works well with a simple data source layer, a "
+            ("p", "He gives it three advantages: most developers already know the "
+                  "procedural style; it sits easily on a simple data source layer, a "
                   "Row Data Gateway or a Table Data Gateway; and the transaction boundary "
                   "is obvious, opened at the start of the script and closed at its end. "
                   "Its disadvantages appear as the domain logic grows. Several "
-                  "transactions need to do similar things, so code is duplicated; some of "
+                  "transactions do much the same work, so code is duplicated; some of "
                   "that can be factored into common subroutines, but much of it, he says, "
                   "is hard to remove and harder still to notice, and the application can "
                   "end up a tangle of routines with no clear structure."),
@@ -305,7 +305,7 @@ LESSONS = [
                   "in classes separate from presentation and data source, and never "
                   "calling presentation logic, so that they are easy to change and to "
                   "test. He describes two ways of putting scripts into classes. The common "
-                  "one, and the best bet for most cases, is several related scripts to a "
+                  "one, which suits most designs, is several related scripts to a "
                   "class. The other is a class for each script, after the Command pattern, "
                   "with a supertype that declares an execute method; he has rarely seen "
                   "the need."),
@@ -397,7 +397,7 @@ LESSONS = [
                 "Find the repeated block in <code>two-scripts</code>.",
             ],
             "lines": [
-                "line 3 and line 12: long total = o.subtotal();",
+                "line 3 and line 12: the subtotal",
                 "line 4 and line 13: the test for a member",
                 "line 5 and line 14: the discount itself",
                 "lines 6 and 15: a lone brace, not counted",
@@ -426,8 +426,12 @@ LESSONS = [
                     "four lines in two copies, 8. Lines 7 and 17 are lone braces, which are "
                     "not statement lines, and lines 2 and 12 are the two different "
                     "headers. Line 6 is in the run: `shipping = 0;` is identical in both. "
-                    "A subroutine `long shippingFor(long cents)` holding those four lines "
-                    "and returning the shipping is what both scripts would call."},
+                    "A subroutine `long shippingFor(long cents)` holding lines 4 to 6 and "
+                    "returning the shipping is what both scripts would call. Each script "
+                    "keeps line 3, since both still need `cents`: one adds it to the "
+                    "order, the other writes it to the page. The lab then finds no "
+                    "repeated run, because one identical line is shorter than the "
+                    "minimum."},
             {"q": "According to Chapter 9's When to Use It, what is the particular problem "
                   "to watch for as a Transaction Script design grows?",
              "a": ["Transactions that run too long and hold their locks",
@@ -442,13 +446,13 @@ LESSONS = [
             {"q": "In Chapter 8, Down to the Data Source Layer, what does Fowler say about "
                   "a Transaction Script that holds its own SQL?",
              "a": ["It is the normal form of the pattern",
-                   "He avoids it even in the simplest cases, and uses a gateway",
+                   "He keeps the database apart even in the plainest scripts, with a gateway",
                    "It is acceptable only with a Domain Model beside it",
                    "It is required, since the script is the transaction"],
              "c": 1,
              "why": "The simplest scripts contain their own database logic, he says, but "
-                    "he avoids that even in the simplest cases, separating the database "
-                    "with a Row Data Gateway or a Table Data Gateway. The lesson's scripts "
+                    "he keeps the database apart even in the plainest scripts, with a "
+                    "Row Data Gateway or a Table Data Gateway. The lesson's scripts "
                     "call `db.insertOrder` for that reason."},
             {"q": "On the preset <code>two-scripts</code>, the second script's variable is "
                   "renamed from `total` to `price` throughout. What does the lab report?",
@@ -475,7 +479,7 @@ LESSONS = [
              "is the duplication as its logic grows, which the lab counts on the lesson's "
              "illustration."),
             ("Thinking a Transaction Script must contain its own SQL",
-             "The simplest ones do, but Fowler avoids it even in the simplest cases "
+             "The simplest ones do, but Fowler keeps the database apart even in the plainest "
              "(Chapter 8, Down to the Data Source Layer), putting a Row Data Gateway or a "
              "Table Data Gateway between the script and the database, because the two "
              "make sense as separate parts. The lesson's scripts call `db.insertOrder` "
@@ -534,7 +538,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Domain Model",
-             "An object model of the business area that holds both behaviour and data. "
+             "A model of the business made of objects, each holding its data and the behaviour that uses it. "
              "Its objects stand for meaningful things, as large as a company or as small "
              "as one line on an order, and the rules sit beside the data they use."),
             ("Simple and rich",
@@ -560,8 +564,8 @@ LESSONS = [
                   "paradigm shift. This lesson reads Chapter 2 on Domain Model, as "
                   "argument, and the pattern in Chapter 9, as a tool. Read both in your "
                   "own copy first."),
-            ("p", "Fowler's case begins where the last lesson's ended: complex logic is "
-                  "where objects come in. A Domain Model is organised, to a first "
+            ("p", "Fowler's case begins where the last lesson's ended: objects are his "
+                  "answer to complicated logic. A Domain Model is organised, to a first "
                   "approximation, around the nouns of the domain, with a class for each "
                   "thing the business talks about, and the validations and calculations "
                   "go into those classes. A procedure for some action may still exist, but "
@@ -574,14 +578,14 @@ LESSONS = [
                   "a new strategy, where a Transaction Script adds another condition to "
                   "its conditional logic. Its costs are the effort of learning it, which "
                   "can take months and which, he says, a significant minority of "
-                  "developers never make, and the database mapping: the richer the model, "
+                  "developers seem unable to make, and the database mapping: the richer the model, "
                   "the more complex the mapping, usually a Data Mapper. Fowler, who calls "
                   "himself an object bigot, says that once the shift is made it "
                   "usually lasts a lifetime."),
-            ("p", "Chapter 9 gives the pattern. A Domain Model inserts a whole layer of "
-                  "objects that model the business, mingling data and process, with "
+            ("p", "Chapter 9 gives the pattern. A Domain Model adds a layer of objects "
+                  "that stand for the business area, mingling data and process, with "
                   "multivalued attributes, a web of associations and inheritance. Fowler "
-                  "sees two styles in the field. A simple Domain Model looks very like the "
+                  "sees two styles in practice. In the simple one the model mirrors the "
                   "database design, mostly one object for each table, and can use Active "
                   "Record. A rich one can look different, with inheritance, strategies and "
                   "other design patterns, and needs a Data Mapper. Because business rules "
@@ -590,14 +594,14 @@ LESSONS = [
             ("p", "He takes up a common worry: bloated domain objects, an order class "
                   "swollen with behaviour that only one screen needs. Moving such behaviour "
                   "into a class for the use case, he answers, leads to duplication, "
-                  "because behaviour kept away from the order is harder to find, so people "
-                  "write it again. In his experience bloat happens much less often than "
+                  "because behaviour kept apart from the order is easy to miss, so it gets "
+                  "written a second time. In his experience bloat happens much less often than "
                   "predicted and is easy to see and fix, so his advice is to put behaviour "
                   "in the object that is its natural fit and deal with bloat only if and "
-                  "when it becomes a problem. When to Use It comes down to the complexity of "
+                  "when it becomes a problem. When to Use It turns on the complexity of "
                   "the behaviour: complicated, ever-changing rules of validation, "
-                  "calculation and derivation want an object model; simple not-null "
-                  "checks and a couple of sums are better as a Transaction Script."),
+                  "calculation and derivation want an object model; a few checks for "
+                  "missing values and some totals are better as a Transaction Script."),
             ("p", "Now the count. The lab counts decision points by a stated rule: one, "
                   "plus one for each `if`, `while`, `for`, `case`, `&&` and `||`, with "
                   "`else` adding nothing. It also prints a band, the deepest nesting and "
@@ -642,7 +646,7 @@ LESSONS = [
                   "shipping method carried its own rule, keeping every price the routine "
                   "gives for every parcel, staff parcels included. Paste it into the lab "
                   "to check the count; the classes are yours."),
-            ("p", "A Domain Model gives each row of the database an object of its own. "
+            ("p", "A Domain Model gives each thing the business tracks an object of its own. "
                   "The next lesson, Table Module, and Making a Choice, reads the pattern "
                   "that gives a whole table one object, and Fowler's advice on choosing "
                   "among the three."),
@@ -723,7 +727,9 @@ LESSONS = [
                     "forgets the `||`. A `Collect` class alone changes a price: in the "
                     "routine a staff parcel sent by any method but post or courier pays "
                     "nothing, so a staff parcel with no class of its own would pay 999. "
-                    "The staff rule belongs in the default class, beside `COLLECT`."},
+                    "The staff rule belongs in the default class. `COLLECT` can sit beside it "
+                    "there, or have a `Collect` class of its own charging 0, as long as the "
+                    "default still charges a staff parcel nothing."},
             {"q": "On <code>price-delegated</code>, by the same rule, how many decision "
                   "points does the lab count?",
              "a": ["1", "2", "4", "5"],
@@ -791,8 +797,8 @@ LESSONS = [
     # Record Set (pp. 449-451); Chapter 2, Making a Choice (pp. 42-43); Chapter 8,
     # Starting with the Domain Layer (p. 101).
     # Quote: PDF p. 42 of the operator's copy, 15 words, ea_quotes.py OK.
-    # F8, PDF p. 42 of the operator's copy: nobody knows how to measure the
-    # complexity of domain logic. Lesson total: 15 words.
+    # F8, PDF p. 42 of the operator's copy: domain complexity cannot be
+    # measured, says Making a Choice. Lesson total: 15 words.
     {
         "slug": "table-module-and-making-a-choice",
         "title": "Table Module, and Making a Choice",
@@ -819,13 +825,11 @@ LESSONS = [
         ),
         "concepts": [
             ("Table Module",
-             "A single object that handles the business logic for all the rows of a "
-             "table or view. It has no object for each row, so to act on one row you "
+             "One object that carries the business logic for a whole table or view. It has no object for each row, so to act on one row you "
              "pass the module that row's key."),
             ("Record Set",
-             "An in-memory representation of tabular data that looks exactly like the "
-             "result of a SQL query but can be built and changed by other parts of the "
-             "program. It is usually the platform's own, such as a data set or a row "
+             "Tabular data held in memory in the shape a query returns, which other "
+             "code can also create and edit. It usually the platform's own, such as a data set or a row "
              "set."),
             ("Identity",
              "What makes one object a particular thing, so that holding a reference to "
@@ -840,15 +844,15 @@ LESSONS = [
         ),
         "body": [
             ("p", "&ldquo;The bad news is that nobody knows how to measure the complexity "
-                  "of domain logic.&rdquo; That is from Making a Choice, at the end of "
-                  "Chapter 2, which this lesson reads last. First come Chapter 9's Table "
+                  "of domain logic.&rdquo; That is from Making a Choice, the section of "
+                  "Chapter 2 that follows the three patterns and comes before Service "
+                  "Layer, which this lesson reads last. First come Chapter 9's Table "
                   "Module and the Record Set it works on, from Chapter 18, both read as "
                   "tools; then the choice among the three patterns, read as Fowler's "
                   "argument. Read them in your own copy first."),
-            ("p", "A Table Module organises domain logic with one class for each table "
-                  "in the database, and a single instance holds the procedures that act "
-                  "on that table's data. The difference from a Domain Model, Fowler says, "
-                  "is the whole pattern: with many orders, a Domain Model has an object "
+            ("p", "A Table Module gives each table one class, and one instance of it "
+                  "carries every operation on that table's data. The main difference "
+                  "from a Domain Model, Fowler says, is this: with many orders, a Domain Model has an object "
                   "for each order, and a Table Module has one object for all of them. So "
                   "the module has no notion of identity for the rows it works with. To ask "
                   "about one row you call a method on the module and pass the row's key, "
@@ -865,7 +869,7 @@ LESSONS = [
                   "direct links between instances, and polymorphism does not work well, "
                   "so for complicated logic a Domain Model is the better choice."),
             ("p", "Record Set, in Chapter 18, is the structure that makes the module "
-                  "worth having. It looks exactly like the result of a database query, so "
+                  "worth having. It has the shape of a query's result, so "
                   "it can go straight to a data-aware screen, and it can be built or "
                   "changed by domain code. It is usually the vendor's, and Fowler's 2002 "
                   "examples are ADO.NET's data set and JDBC's row set. Most have an "
@@ -904,8 +908,8 @@ LESSONS = [
                   "count is silent on that."),
             ("p", "Making a Choice asks how to choose, and answers that it depends very "
                   "much on how complex the domain logic is. Fowler draws a sketch of "
-                  "effort against complexity for the three patterns and apologises for "
-                  "it, as one of the unquantified graphs that irritate him in slides. "
+                  "effort against complexity for the three patterns and disowns it in "
+                  "advance, as one of the unquantified graphs that irritate him in slides. "
                   "With simple logic a Domain Model costs more than it pays back; as the "
                   "logic grows, the other two hit a wall. He then names a threshold to "
                   "two decimal places, and takes it back in the sentence quoted above. "
@@ -918,7 +922,8 @@ LESSONS = [
                   "on .NET, it is much more attractive, and without them he would not "
                   "bother. The decision can be changed, with difficulty: from scripts, do "
                   "not hesitate to refactor toward a Domain Model; the other way is "
-                  "rarely worth it. And the three can be mixed. Chapter 8, Starting with "
+                  "usually less worth it, unless it lets you simplify the data source "
+                  "layer. And the three can be mixed. Chapter 8, Starting with "
                   "the Domain Layer, makes the same choice again with the database in "
                   "view, calls it the central choice, and adds that the tools you have "
                   "shape the architecture: of the three, Table Module gains most when the "
@@ -1121,7 +1126,7 @@ LESSONS = [
              "application's responsibilities, such as telling people and other systems "
              "that something happened, and running the work in one transaction."),
             ("Domain facade",
-             "A Service Layer made of thin facades over a Domain Model. The facades hold "
+             "A Service Layer of thin classes in front of a Domain Model. They hold "
              "no business logic; they set the boundary and the operations, and the "
              "model does the rest."),
             ("Operation script",
@@ -1152,13 +1157,12 @@ LESSONS = [
                   "objects below; at the other, most of the business logic is in "
                   "Transaction Scripts inside it, over simple domain objects. Between them "
                   "is the controller-entity style, which he has never liked much: its "
-                  "use-case controllers, like any Transaction Script, encourage duplicate "
-                  "code."),
+                  "use-case controllers invite duplicate code, as scripts do."),
             ("p", "His own preference is as thin a Service Layer as possible, and none "
                   "if he can manage without one; he assumes he does not and adds it when the "
                   "application seems to need it. Then he concedes the point at once. Many "
                   "good designers, he says, always use a Service Layer with a good deal "
-                  "of logic, and Randy Stafford has had a lot of success with a rich one, "
+                  "of logic, and Stafford has done well with a rich layer, "
                   "which is why Fowler asked him to write the pattern. So the book holds "
                   "two answers to how thick the layer should be, and says so."),
             ("p", "Stafford's pattern defines the layer as an application's boundary: a "
@@ -1166,8 +1170,8 @@ LESSONS = [
                   "coordinates the application's response. His motivation is that "
                   "enterprise applications have several kinds of interface, such as data "
                   "loaders, user interfaces and integration gateways, which need the same "
-                  "interactions with the application, and writing those interactions "
-                  "separately in each interface causes a lot of duplication. His section "
+                  "interactions with the application, and coding them again in each "
+                  "interface duplicates them. His section "
                   "Kinds of &ldquo;Business Logic&rdquo; then divides the logic into "
                   "domain logic, about the problem domain, and application logic, about "
                   "the application's responsibilities, such as notifying administrators "
@@ -1195,13 +1199,12 @@ LESSONS = [
                   "that builds the order differs, from the form in one and from the "
                   "imported row in the other."),
             ("code", _lines(ORDERS_TWICE)),
-            ("p", "Read what repeats with Stafford's distinction. Most of it is "
-                  "application logic: opening and committing the transaction, reserving "
-                  "the stock inside it, and sending the mail after it. Wrapped in the "
-                  "middle is one call of domain logic, `order.confirm()`. The domain call "
-                  "is already in one place, on the order; it is the response around it "
-                  "that each client has had to write for itself, and a third kind of "
-                  "client would write it a third time."),
+            ("p", "Read what repeats with Stafford's distinction. The transaction and "
+                  "the mail are application logic. Inside them are two domain calls, "
+                  "reserving the stock and `order.confirm()`, each already in one place "
+                  "on its own object. What each client has had to write for itself is "
+                  "the response that coordinates them, and a third kind of client would "
+                  "write it a third time."),
             ("p", "On <code>orders-served</code> the response is one operation, "
                   "`placeOrder` in an `OrderService`, and each client builds its order "
                   "and calls it: 0 repeated blocks, 0 lines, none. This is Stafford's "
@@ -1273,10 +1276,12 @@ LESSONS = [
                 "one block, five lines in two copies: 10",
             ],
             "after": [
-                "Four of the five repeated lines are application logic and one is "
-                "domain logic. Stafford's operation script takes all five, because they "
-                "are the use case's response; the order's own rule stays in "
-                "`confirm`.",
+                "Three of the five repeated lines are plainly application logic: the "
+                "transaction's begin and commit, and the mail. Two are calls into the "
+                "domain, `inventory.reserve` and `order.confirm()`, which the response "
+                "must run together inside the transaction. Stafford's operation script "
+                "takes all five, because together they are the use case's response; "
+                "the rules themselves stay in `reserve` and `confirm`.",
             ],
         },
         "quiz_title": "Clients, logic and the two answers",
@@ -1318,8 +1323,9 @@ LESSONS = [
              "c": 1,
              "why": "With one kind of client, such as a user interface, and responses "
                     "that touch one transactional resource, the page controllers can "
-                    "control the transactions themselves. He recommends the layer even in "
-                    "an undistributed architecture when those conditions do not hold."},
+                    "control the transactions themselves. Once a further kind of client or "
+                    "a further transactional resource appears, he says it pays to "
+                    "design the layer in, even in an undistributed architecture."},
             {"q": "What is Fowler's own preference in Chapter 2, and what does he concede?",
              "a": ["A rich layer always; he concedes it costs more to build",
                    "As thin a layer as possible, if any; he concedes many good "
@@ -1345,8 +1351,9 @@ LESSONS = [
             ("Thinking every application needs a Service Layer",
              "Stafford says not: with one kind of client and no response spanning "
              "several transactional resources, page controllers can manage the "
-             "transactions. The condition in the lesson's opening quotation, a second "
-             "kind of client or a second resource, is the reason to have one."),
+             "transactions. The condition in the lesson's opening quotation, another "
+             "kind of client or another transactional resource, is the reason to "
+             "have one."),
             ("Taking a Service Layer for a remote interface",
              "Its interface is coarse-grained, so it can be called remotely, and the J2EE "
              "Session Facade looks similar. Stafford separates them: Session Facade was "

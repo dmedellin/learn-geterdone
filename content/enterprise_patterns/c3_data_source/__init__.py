@@ -1,4 +1,4 @@
-"""Course 3 -- Talking to the Database: Chapter 3's first half and Chapter 10.
+"""Course 3 -- Talking to the Database: Chapter 3 (in part) and Chapter 10.
 
 Six lessons in two modules, all in part_a: four read Chapter 10, Data Source
 Architectural Patterns, with the narrative of Chapter 3 that introduces each
@@ -18,7 +18,8 @@ COURSE = {
     "title": "Talking to the Database",
     "level": "Intermediate",
     "summary": (
-        "Chapter 3, Mapping to Relational Databases, in its first half (Architectural "
+        "The sections of Chapter 3, Mapping to Relational Databases, on the architectural "
+        "patterns, reading data, building the mapping and connections (Architectural "
         "Patterns, Reading in Data, Building the Mapping, Database Connections and Some "
         "Miscellaneous Points), read with Chapter 10, Data Source Architectural Patterns, "
         "and three of Chapter 18's Base Patterns: Gateway, Mapper and Registry. Fowler "
@@ -41,7 +42,7 @@ COURSE = {
     ),
     "key": [
         "keep the SQL out of the domain logic",
-        "a gateway holds a table's SQL",
+        "a gateway holds the SQL for a table",
         "domain logic makes it an Active Record",
         "a mapper keeps both sides ignorant",
         "each statement pays the latency",
@@ -107,15 +108,17 @@ COURSE = {
         "a system you know, with a count to make there.",
     ],
     "not_covered": [
-        "SQL tuning and stored procedures. Fowler names them where they bear on a pattern "
-        "(stored procedures organised as a Table Data Gateway, indexes and clustering as "
-        "the database administrator's business), and the lessons name them there; they "
-        "are not taught.",
+        "SQL tuning and stored procedures. Fowler names them where they bear on a pattern: "
+        "Gateways names stored procedures where Fowler treats a table's procedures as its "
+        "Table Data Gateway, and tuning is left, as he leaves it, to the database "
+        "administrator. Neither is taught.",
         "The structural and behavioral mapping patterns. Unit of Work, Identity Map, Lazy "
-        "Load, the inheritance mappings and the rest of Chapter 3's second half are the "
+        "Load, the inheritance mappings and the rest of Chapter 3 (the behavioral problem, "
+        "structural mapping, inheritance and metadata) are the "
         "next course's; this one names them where a Data Mapper needs them.",
-        "Platform specifics: ADO.NET data sets and readers, JDBC beyond the four calls the "
-        "snippets use, and the connection pools of particular servers.",
+        "Platform specifics: ADO.NET data sets and readers, JDBC beyond the few calls the "
+        "snippets use, the main ones explained where they first appear, and the "
+        "connection pools of particular servers.",
         "The book's code examples. They are the book's, and each lesson points to its "
         "pattern's examples by name.",
     ],

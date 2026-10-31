@@ -309,9 +309,9 @@ LESSONS = [
                   "savings goes from 600 to 700 and is read before it. What total does the "
                   "report see, and does it match a state of the data?",
              "a": ["900; it matches no state, since the total is 1,000 both before and after",
-                   "1,000; a transfer only moves money, so the total is right",
-                   "1,100; it matches no state",
-                   "900; it matches the state after the commit"],
+                   "1,000; a transfer only moves money, so the total seen is unchanged",
+                   "1,100; it matches no state, since the reads straddle the commit",
+                   "900; it matches the state after the commit, when cash had moved"],
              "c": 0,
              "why": "The report read 300 + 600 = 900. Before the commit the accounts held "
                     "400 + 600 = 1,000, and after it 300 + 700 = 1,000, so the lab prints "
@@ -330,10 +330,10 @@ LESSONS = [
                     "the total of one stale read and one fresh one."},
             {"q": "By Chapter 5's account, what is the least an inconsistent read needs?",
              "a": ["Two sessions that both write the same data",
-                   "One session that writes and another that reads",
-                   "Two sessions that both only read",
-                   "One session reading the same item twice, with nobody writing"],
-             "c": 1,
+                   "Two sessions that both only read the same data",
+                   "One session reading the same item twice, with nobody writing",
+                   "One session that writes and another that reads"],
+             "c": 3,
              "why": "In the chapter's story only David writes; Martin only reads. A lost update "
                     "needs two writers, but an inconsistent read needs one writer whose commit "
                     "falls between another session's reads. With nobody writing, every read "
@@ -425,8 +425,8 @@ LESSONS = [
              "session wait or give up before it starts."),
             ("Deadlock",
              "Two sessions each hold a lock the other needs, so neither can go on. It is a "
-             "hazard of pessimistic locking, and Chapter 5 prefers schemes that keep it from "
-             "happening to schemes that detect it afterwards."),
+             "hazard of pessimistic locking, and Chapter 5 prefers very simple, conservative "
+             "schemes, even at the cost of unnecessary victims."),
         ],
         "read_title": "The section's argument first, then the replay",
         "read_intro": (
@@ -439,8 +439,8 @@ LESSONS = [
                   "conflict detection while a pessimistic lock is about conflict "
                   "prevention.&rdquo; The sentence is Fowler's and Rice's, from Chapter 5's "
                   "section Optimistic and Pessimistic Concurrency Control, which this lesson "
-                  "reads with its two parts, Preventing Inconsistent Reads and Deadlocks. Read "
-                  "it in your own copy first."),
+                  "reads with its two parts, Preventing Inconsistent Reads and Deadlocks. It is "
+                  "a narrative, read as an argument; read it in your own copy first."),
             ("p", "The section's question is what to do with data that can change and cannot be "
                   "isolated, and it answers with two forms of control, on the source code "
                   "example again. Martin and David both want to edit one file. With "
@@ -488,7 +488,8 @@ LESSONS = [
                   "pessimistic one: the session asks for the file before it loads it, and is "
                   "turned away at once if another session holds it. The class leaves out moving "
                   "the version on after a commit and releasing the lock, which a real store "
-                  "must do."),
+                  "must do, and it does not serialize access to its maps, so two threads could "
+                  "both find a file free; a real lock manager must."),
             ("code", _lines(TWO_CONTROLS)),
             ("p", "The lab replays a timeline of events, each a minute, a session, an action "
                   "(read, edit or commit) and a record. Every record has a version that starts "
@@ -513,7 +514,10 @@ LESSONS = [
                   "lock held. Martin loads the design for editing at minute 0 and takes the lock "
                   "then, because a pessimistic lock is taken before the data is loaded, not when "
                   "the editing starts. David is refused at minute 1, before he has done any "
-                  "work, and the lab skips his later events. What no tile shows is his wait: he "
+                  "work, and the lab skips his later events. His read is refused because he "
+                  "goes on to edit the design: the lab's lock is the exclusive write lock, taken "
+                  "when a session loads a record it means to edit, as `tryLoadForEdit` asks for "
+                  "it. A session that only read the design would be let through. What no tile shows is his wait: he "
                   "cannot work on the design until Martin commits at minute 10."),
             ("p", "So which is safer? On this timeline the two sessions do collide, and the "
                   "schemes only choose who pays: ten minutes of Martin's work, or David kept "
@@ -634,11 +638,11 @@ LESSONS = [
                     "not at the edit, and a refused session ends rather than waits."},
             {"q": "What does the section say the choice between optimistic and pessimistic "
                   "locking turns on?",
-             "a": ["How many users the system has",
-                   "Whether the database supports transactions",
-                   "How often conflicts happen and how severe each one is",
-                   "Nothing: prevention is always safer, so choose pessimistic"],
-             "c": 2,
+             "a": ["How many users the system has, and how many edit at once",
+                   "Whether the database supports transactions across requests",
+                   "Nothing: prevention is always safer, so choose pessimistic",
+                   "How often conflicts happen and how severe each one is"],
+             "c": 3,
              "why": "The essence of the choice, in the section's terms, is the frequency and "
                     "severity of conflicts: optimistic when they are rare or cheap, pessimistic "
                     "when a conflict is painful for users. Prevention has its own cost, the "
@@ -653,11 +657,12 @@ LESSONS = [
              "one costs. On the lesson's illustration the schemes only move the cost: ten "
              "minutes of Martin's work optimistically, David kept out for nine "
              "pessimistically."),
-            ("Thinking optimistic locking prevents lost updates",
-             "It prevents the overwrite, not the loss. The second session's commit is refused, "
-             "so David's change survives, but Martin's work is still gone unless he can merge "
-             "it, and the section warns that business data is seldom easy to merge. On the "
-             "lesson's timeline Martin redoes ten minutes."),
+            ("Thinking optimistic locking loses no work",
+             "It does stop the lost update: Martin's commit is refused, David's change "
+             "survives, and the lab counts 0 lost updates. But it stops it by throwing away "
+             "the second session's work, not by saving it. Unless Martin can merge, everything "
+             "he did is gone, and the section warns that business data is seldom easy to "
+             "merge. On the lesson's timeline Martin redoes ten minutes."),
             ("Checking only what you write",
              "A version check on the records a session writes catches lost updates, and misses "
              "the inconsistent read: work built on something another session changed "
@@ -741,7 +746,8 @@ LESSONS = [
                   "isolation level.&rdquo; Read on, because the next sentence in Chapter 5 "
                   "gives its cost. This lesson reads three sections of the chapter, "
                   "Transactions, Patterns for Offline Concurrency Control and Application "
-                  "Server Concurrency; read them in your own copy first."),
+                  "Server Concurrency. They are narrative, read as an argument; read them in "
+                  "your own copy first."),
             ("p", "The section's question is what the transaction, the main tool for "
                   "concurrency in enterprise applications, actually promises. A transaction is "
                   "a bounded piece of work that leaves everything it touches in a consistent "
@@ -780,8 +786,8 @@ LESSONS = [
                   "Transactions then raises the harder case. The user's business transaction, "
                   "logging in, choosing an account, setting up payments and pressing OK, should "
                   "be ACID too, and running it as one long system transaction would make it so. "
-                  "If your concurrency needs are modest, the authors suggest you do just that; "
-                  "otherwise the database becomes a bottleneck, and you are left with a run of "
+                  "Where the database is not under heavy concurrent load, the authors advise "
+                  "doing exactly that; otherwise the database becomes a bottleneck, and you are left with a run of "
                   "short system transactions and the glue between them. Atomicity and "
                   "durability come from doing the final save in one system transaction; "
                   "isolation is the hard part."),
@@ -797,20 +803,21 @@ LESSONS = [
                   "concurrency bugs are hard to reproduce, the authors advise experienced help."),
             ("p", "Application Server Concurrency, the last section, is about threads inside "
                   "the server. Explicit locks and synchronisation are easy to get wrong in ways "
-                  "that are almost impossible to reproduce, giving a system that, in the book's "
-                  "figure, works correctly 99 percent of the time and throws random fits; so "
-                  "the authors' policy is to avoid explicit synchronisation as far as possible. "
+                  "that are almost impossible to reproduce, and the result, in the book's figure, "
+                  "behaves for 99 percent of the time and fails at random for the rest; so the "
+                  "authors set out to keep explicit synchronisation out of application code. "
                   "Process-per-session isolates completely and costs most; pooled "
                   "process-per-request is nearly as isolated and much cheaper; thread-per-request "
                   "is cheaper still and isolates nothing, so the authors see a lot to be said for "
-                  "processes. With threads, create fresh objects for each request, keep them out "
+                  "process-per-request, as just as scalable and more robust. With threads, create fresh objects for each request, keep them out "
                   "of statics and singletons, and synchronise only the explicit pools, such as "
                   "database connections."),
             ("p", "The snippet is the first lesson's routine with the two counts inside one "
                   "transaction. `setAutoCommit(false)` stops the driver committing after each "
                   "statement, `setTransactionIsolation` asks for serializable, and `commit` "
                   "ends the transaction. Under that level the two counts see one state, and the "
-                  "routine returns 12 or 17, never 15."),
+                  "routine returns 12 or 17, never 15, or throws if the database aborts the "
+                  "transaction to keep that promise."),
             ("code", _lines(COUNT_SERIALIZABLE)),
             ("p", "The lab is the first lesson's, now with its last tile. When reads straddle a "
                   "commit, the stale item decides the error: if its change was an update, it is "
@@ -955,26 +962,25 @@ LESSONS = [
                     "(17). Chapter 5 says it cannot promise which, only that it is a correct "
                     "one. Fifteen is the straddled read serializable rules out."},
             {"q": "What does Chapter 5 say straight after advising serializable for correctness?",
-             "a": ["That every transaction should therefore run at serializable",
-                   "That serializable is needed only for business transactions",
-                   "That serializable so damages liveness that you often reduce it for "
-                   "throughput, transaction by transaction",
-                   "That read committed is the right default for every system"],
+             "a": ["That every transaction should therefore run at it, whatever it costs",
+                   "That it is needed only for business transactions, not system ones",
+                   "That it costs so much liveness that you often lower it for throughput",
+                   "That read committed is the right default level for every system"],
              "c": 2,
-             "why": "The advice is followed at once by its cost: serializable messes up a "
-                    "system's liveness so badly that you often have to reduce it to increase "
-                    "throughput, deciding the trade of errors against performance for each "
-                    "transaction. The chapter names no default."},
+             "why": "The advice comes with its price in the very next sentence: serializable "
+                    "hurts liveness badly enough that systems commonly step down a level to get "
+                    "the throughput they need, and you weigh errors against performance "
+                    "transaction by transaction. The chapter names no default."},
             {"q": "What policy does Application Server Concurrency state on explicit locks and "
                   "synchronisation in application code?",
-             "a": ["Avoid needing them as far as possible",
-                   "Use them in every class that two threads might share",
-                   "Replace them with deadlock detection",
-                   "Pool every object and synchronise the pools"],
-             "c": 0,
-             "why": "Because such bugs are almost impossible to reproduce, the authors' policy is "
-                    "to avoid the need for explicit synchronisation and locks as much as "
-                    "possible: isolate each request's objects instead. They synchronise only "
+             "a": ["Use them in every class that two threads might share",
+                   "Replace them with deadlock detection and timeouts",
+                   "Pool every object and synchronise access to the pools",
+                   "Arrange things so that application code seldom needs them"],
+             "c": 3,
+             "why": "Because such bugs can hardly ever be reproduced, the authors aim to keep "
+                    "locks and synchronisation out of application code wherever they can, and "
+                    "to isolate each request's objects instead. They synchronise only "
                     "explicit pools of expensive things, such as connections, and recommend "
                     "fresh objects over pooled ones."},
         ],
@@ -982,21 +988,24 @@ LESSONS = [
             ("Using serializable for every transaction",
              "Serializable prevents every read error the standard names, so it looks like the "
              "safe default. Chapter 5 gives the advice and its cost in consecutive sentences: "
-             "serializable damages a system's liveness so much that you often have to reduce "
-             "it to get throughput, and each transaction can be given its own level. The point "
+             "serializable costs so much liveness that systems often step down a level for "
+             "throughput, and each transaction can be given its own level. The point "
              "of knowing the levels is knowing which errors a weaker one lets through, as the "
              "lab names them on the lesson's illustrations."),
             ("Thinking isolation levels are about writes",
              "They govern what a transaction can read of others' work: uncommitted data, a "
-             "value that changes under it, rows that appear while it reads. Writes are "
-             "protected by locks the database takes either way; the levels decide how "
-             "consistent a transaction's reads are."),
+             "value that changes under it, rows that appear while it reads. The "
+             "database's own write locks stop two transactions changing one row at the same "
+             "instant at every level, but that does not make every write safe: a transaction "
+             "that reads a value and writes back a result can still lose another's update at "
+             "a weak level. The levels, as the chapter states them, decide how consistent a "
+             "transaction's reads are."),
             ("Ruling out long transactions on principle",
              "The general advice is to keep transactions short, and long transactions do not "
-             "scale. But the chapter also says that if your database has only modest "
-             "concurrency needs you may be able to run a business transaction as one long "
-             "transaction, and that if you can get away with it you should, because it avoids "
-             "a lot of awkward problems. The offline patterns are for when you cannot."),
+             "scale. But the chapter also says that a database with little contention may "
+             "cope with a business transaction run as one long transaction, and that where it "
+             "does, that is the better course, since it sidesteps many of the offline "
+             "problems. The offline patterns are for when you cannot."),
         ],
         "standard": (
             "Finish when you can name a read error and the level that stops it.",

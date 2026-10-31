@@ -85,14 +85,14 @@ class Carts {
 # is in one quiz item's `why` only.
 
 EXERCISE_POLICY = [
-    "0, ana, read, policy;",
-    "1, ben, read, policy;",
-    "2, ana, edit, policy;",
+    "0, ana, read, budget;",
+    "1, ben, read, budget;",
+    "2, ana, edit, budget;",
     "5, ana, commit, -;",
-    "6, ben, edit, policy;",
+    "6, ben, edit, budget;",
     "30, ben, commit, -;",
-    "31, cy, read, policy;",
-    "32, cy, edit, policy;",
+    "31, cy, read, budget;",
+    "32, cy, edit, budget;",
     "40, cy, commit, -",
 ]
 
@@ -105,7 +105,7 @@ EXERCISE_ROOMS = [
     "8, cy, commit, -",
 ]
 
-_INVOICE_RATE = ("0, kim, read, rate; 0, kim, edit, invoice; 1, lee, edit, rate; "
+_QUOTE_DISCOUNT = ("0, kim, read, discount; 0, kim, edit, quote; 1, lee, edit, discount; "
                  "2, lee, commit, -; 6, kim, commit, -")
 _TWO_LINES = "0, kim, edit, line1; 1, lee, edit, line2; 4, kim, commit, -; 5, lee, commit, -"
 
@@ -125,8 +125,8 @@ LESSONS = [
         "summary": (
             "David Rice's Optimistic Offline Lock, in Fowler's book: a version in each row, "
             "checked in the update's WHERE and incremented by it, so that a row count of zero "
-            "means someone else committed first. Replay two clerks on one invoice, then an "
-            "invoice built from a rate someone else changed, and count the conflicts and the "
+            "means someone else committed first. Replay two clerks on one invoice, then a "
+            "quote built from a discount someone else changed, and count the conflicts and the "
             "minutes of work each one discards."
         ),
         "key": [
@@ -191,8 +191,8 @@ LESSONS = [
                   "transaction and then gives up or resolves the conflict and tries again. Rice "
                   "also suggests recording who changed a record and when, so that the user can "
                   "be told; but he warns against checking with the modification time instead of "
-                  "a version count, because system clocks are too unreliable, especially across "
-                  "servers. A `WHERE` that compares every field is an alternative where no "
+                  "a version count, since the clocks of different machines cannot be trusted to "
+                  "agree. A `WHERE` that compares every field is an alternative where no "
                   "version column can be added."),
             ("p", "Most implementations stop at the version in `UPDATE` and `DELETE`, Rice says, "
                   "and that misses the inconsistent read. His illustration is a session that "
@@ -206,7 +206,8 @@ LESSONS = [
                   "simpler answer."),
             ("p", "Two further points close How It Works. Whether a changed record really is a "
                   "conflict is a business question as much as a technical one, and two sessions "
-                  "adding to one collection may break a rule that no version check sees. And a "
+                  "adding to one collection may break a rule that the usual version check does not "
+                  "see. And a "
                   "good merge makes the pattern far stronger, as source code control shows, "
                   "though a business system may need hundreds of kinds of merge. When to Use It "
                   "then gives the quotation's condition: when conflicts are likely, announcing "
@@ -219,25 +220,29 @@ LESSONS = [
                   "in order, and `executeUpdate` returns the number of rows changed. Line 10 "
                   "turns that count into the answer: true for one row, false for none, and "
                   "false is the caller's signal to reload the invoice and let the user try "
-                  "again. The snippet leaves the system transaction around it to its caller."),
+                  "again. The snippet leaves the system transaction around it, closing the statement and "
+                  "moving its own copy of the version on after a save, to its caller."),
             ("code", _lines(OPTIMISTIC_SAVE)),
             ("p", "The lab is the timeline of lesson 2 with the scheme set to optimistic. In "
                   "<code>two-clerks</code> Kim reads the invoice at minute 0, at version 0. Lee "
                   "reads it at 1, edits at 2 and commits at 3, moving it to version 1. Kim edits "
                   "at 4 and saves at 20, and her update matches no row. The lab prints "
                   "&ldquo;1: lee&rdquo; committed, &ldquo;1: kim&rdquo; in conflict, and 20 "
-                  "minutes redone, from her read at minute 0 to the failed save."),
-            ("p", "The other two presets share a timeline: Kim reads a rate and edits an invoice "
-                  "computed from it at minute 0, Lee edits the rate at 1 and commits at 2, and "
+                  "minutes redone, from her read at minute 0 to the failed save. The table's "
+                  "version on each read or edit row is the record's version at that minute; "
+                  "what the session holds is the version at its first read or edit, which is "
+                  "why Kim's edit row shows 1 while she still holds the 0 she read."),
+            ("p", "The other two presets share a timeline: Kim reads a discount and edits a quote "
+                  "computed from it at minute 0, Lee edits the discount at 1 and commits at 2, and "
                   "Kim commits at 6. The last control, which checks the records only read, "
                   "makes the difference. In <code>inconsistent-read</code> it is set to no: the "
                   "lab prints &ldquo;2: lee, kim&rdquo; committed, &ldquo;0: none&rdquo; in "
-                  "conflict and 0 minutes redone. Both saves succeed, and Kim's invoice is "
-                  "built on a rate that no longer exists. In <code>check-the-read</code> it is "
+                  "conflict and 0 minutes redone. Both saves succeed, and Kim's quote is "
+                  "built on a discount that no longer exists. In <code>check-the-read</code> it is "
                   "set to yes: &ldquo;1: lee&rdquo; committed, &ldquo;1: kim&rdquo; in conflict, "
                   "6 minutes redone."),
             ("p", "Both of the pattern's limits are in those figures. A version check on what a "
-                  "session writes catches the clerks' collision and misses the rate, which only "
+                  "session writes catches the clerks' collision and misses the discount, which only "
                   "a check on reads finds. And the check finds a conflict at the last possible "
                   "moment: on the lesson's illustration Kim loses twenty minutes in one case and "
                   "six in the other. The pattern is cheap to build and costs nothing while "
@@ -245,7 +250,7 @@ LESSONS = [
                   "is why Rice makes the chance of conflict the condition for using it."),
             ("h3", "Exercise"),
             ("code", EXERCISE_POLICY),
-            ("p", "Three users edit one policy, and the scheme is optimistic. Replay it by hand: "
+            ("p", "Three users edit one budget, and the scheme is optimistic. Replay it by hand: "
                   "for each user, write the version seen and the version at commit, say who "
                   "commits and whose save fails, and how many minutes of work the failure "
                   "discards."),
@@ -265,13 +270,13 @@ LESSONS = [
                            "3, lee, commit, -; 4, kim, edit, invoice; 20, kim, commit, -",
                  "expect": {"olCommitted": "1: lee", "olConflicts": "1: kim", "olRedo": "20"}},
                 {"id": "inconsistent-read",
-                 "label": "An invoice built from a rate Lee changes, reads not checked",
-                 "events": _INVOICE_RATE,
+                 "label": "A quote built from a discount Lee changes, reads not checked",
+                 "events": _QUOTE_DISCOUNT,
                  "checkReads": "no",
                  "expect": {"olCommitted": "2: lee, kim", "olConflicts": "0: none", "olRedo": "0"}},
                 {"id": "check-the-read",
-                 "label": "The same, with the rate's version checked at commit",
-                 "events": _INVOICE_RATE,
+                 "label": "The same, with the discount's version checked at commit",
+                 "events": _QUOTE_DISCOUNT,
                  "checkReads": "yes",
                  "expect": {"olCommitted": "1: lee", "olConflicts": "1: kim", "olRedo": "6"}},
             ],
@@ -324,7 +329,7 @@ LESSONS = [
         },
         "quiz_title": "Versions, conflicts and the pattern's limits",
         "quiz": [
-            {"q": "Work the exercise, optimistic: ana reads the policy at 0, edits at 2 and "
+            {"q": "Work the exercise, optimistic: ana reads the budget at 0, edits at 2 and "
                   "commits at 5; ben reads at 1, edits at 6 and commits at 30; cy reads at 31, "
                   "edits at 32 and commits at 40. What happens?",
              "a": ["ana and cy commit; ben conflicts at minute 30 and redoes 29 minutes",
@@ -332,7 +337,7 @@ LESSONS = [
                    "ana commits; ben and cy both conflict",
                    "All three commit, each in turn"],
              "c": 0,
-             "why": "ben saw version 0 at minute 1; ana's commit at 5 moved the policy to 1, so "
+             "why": "ben saw version 0 at minute 1; ana's commit at 5 moved the budget to 1, so "
                     "ben's save at 30 fails, and his redo runs from his first event, 30 − 1 = 29 "
                     "minutes, not from his edit at 6. cy first reads at 31, after ana's commit, "
                     "and sees version 1; ben's failed save moved nothing, so cy's commit at 40 "
@@ -341,45 +346,45 @@ LESSONS = [
                   "version 0 and calls trySave. What does executeUpdate return, and what does "
                   "trySave return?",
              "a": ["1, and true, so Kim's total replaces Lee's",
-                   "0, and false",
                    "It throws an exception, so trySave never returns",
-                   "0, and true"],
-             "c": 1,
+                   "0, and true, since the statement itself ran without error",
+                   "0, and false, so the caller must reload the invoice"],
+             "c": 3,
              "why": "The WHERE asks for the row whose id matches and whose version is 0, and "
                     "no such row exists any more, so the update changes no rows and returns 0. "
                     "Line 10 compares that with 1 and returns false. A row count of zero is the "
                     "signal, not an error: nothing is thrown."},
-            {"q": "In inconsistent-read, Kim's invoice depends on a rate that Lee changes and "
+            {"q": "In inconsistent-read, Kim's quote depends on a discount that Lee changes and "
                   "commits while Kim works. Kim checks only the records she edited. What "
                   "happens at her commit?",
-             "a": ["It conflicts, because the rate's version moved",
-                   "It is refused a lock on the rate",
-                   "It succeeds, and the invoice is built on the old rate",
-                   "It waits for Lee's commit, then rereads the rate"],
+             "a": ["It conflicts, because the discount's version moved",
+                   "It is refused a lock on the discount",
+                   "It succeeds, and the quote is built on the old discount",
+                   "It waits for Lee's commit, then rereads the discount"],
              "c": 2,
-             "why": "Kim edited only the invoice, whose version nobody changed, so the check "
+             "why": "Kim edited only the quote, whose version nobody changed, so the check "
                     "passes and both sessions commit (&ldquo;2: lee, kim&rdquo;). Only checking "
-                    "the version of the rate she read, as in check-the-read, turns this into a "
+                    "the version of the discount she read, as in check-the-read, turns this into a "
                     "conflict. There are no locks to refuse under an optimistic scheme, and no "
                     "waiting."},
             {"q": "Why does Rice advise against using the modification time instead of a "
                   "version count for the check?",
-             "a": ["A timestamp cannot appear in a WHERE clause",
-                   "System clocks are too unreliable, especially across servers",
-                   "Timestamps take more space than counters",
-                   "The database reorders rows with equal timestamps"],
+             "a": ["A timestamp cannot appear in the WHERE clause of an UPDATE",
+                   "Clocks cannot be trusted, least of all on several servers",
+                   "Timestamps take more space in each row than counters do",
+                   "The database reorders rows that carry equal timestamps"],
              "c": 1,
-             "why": "How It Works says it is a bad idea to check with the modification "
-                    "timestamp because system clocks are simply too unreliable, especially when "
-                    "you are coordinating across several servers. Recording who changed a "
+             "why": "How It Works rules out the modification time for the check because "
+                    "machine clocks cannot be relied on, and on several servers they will not "
+                    "agree. Recording who changed a "
                     "record and when is still useful, for telling the user."},
         ],
         "mistakes": [
             ("Thinking a version check catches every conflict",
              "It catches a conflict on what the session writes. Rice's point is that most "
              "implementations stop there and miss the inconsistent read: a session whose result "
-             "depends on a record it only read. On the lesson's illustration Kim's invoice is "
-             "computed from a rate Lee changed, and the check passes unless the rate's version "
+             "depends on a record it only read. On the lesson's illustration Kim's quote is "
+             "computed from a discount Lee changed, and the check passes unless the discount's version "
              "is checked too; with the read checked, Kim's save fails."),
             ("Thinking optimistic locking costs nothing",
              "It costs nothing while nobody conflicts, and then it costs the whole of the "
@@ -403,7 +408,7 @@ LESSONS = [
         "note": (
             "The lab checks whole records, as a version column does, and it cannot see a "
             "conflict that is only a business rule, such as two sessions each adding to one "
-            "collection, which Rice notes no version check prevents. It does not model merging, "
+            "collection, which Rice notes the usual version check does not prevent. It does not model merging, "
             "which would turn a conflict into less lost work. Whether a changed record is a "
             "real conflict is a question about your domain."
         ),
@@ -415,9 +420,9 @@ LESSONS = [
     # pp. 391-399 (When to Use It p. 393); Implicit Lock, by Rice,
     # pp. 400-403. Examples pointed to, not used.
     # Quote: PDF p. 382 of the operator's copy, 9 words, ea_quotes.py OK;
-    # Rice's words, in his pattern. Implicit Lock's "if an item might be
-    # locked anywhere it must be locked everywhere": PDF p. 400, 12 words,
-    # ea_quotes.py OK. Lesson total: 21 words.
+    # Rice's words, in his pattern. Implicit Lock's sentence on locking an
+    # item everywhere: PDF p. 400, 12 words, ea_quotes.py OK. Lesson total:
+    # 21 words.
     # F18, PDF p. 385 of the operator's copy: a business transaction might
     # take 20 minutes.
     {
@@ -475,8 +480,8 @@ LESSONS = [
                   "several people work on the same data one commits and the others fail, and "
                   "they find out only at the end, after doing all the work. On long business "
                   "transactions that soon makes a system unpopular. A pessimistic lock makes the "
-                  "business transaction take a lock on the data before it starts to use it, so "
-                  "that once it has begun it can usually expect to finish."),
+                  "business transaction lock the data before touching it, and in return a session "
+                  "that has started can usually expect to finish."),
             ("p", "How It Works has three parts. First, the kind of lock. An <em>exclusive "
                   "write lock</em> is needed only to edit, and ignores reading. An "
                   "<em>exclusive read lock</em> is needed even to load the record, for when a "
@@ -484,10 +489,11 @@ LESSONS = [
                   "severely. A <em>read/write lock</em> combines them: many readers or one "
                   "writer. Rice asks you to weigh concurrency, the business's needs and the "
                   "complexity of the code, and to choose a scheme the domain's analysts can "
-                  "understand, since locking every record turns a multi-user system into "
-                  "something close to a single-user one. Second, the <em>lock manager</em>: a "
+                  "understand; a poor choice, such as locking every record, can leave a "
+                  "multi-user system behaving much like a single-user one. Second, the <em>lock manager</em>: a "
                   "table from locks to owners, in memory or in the database, exactly one of it, "
-                  "and in the database once the servers are clustered."),
+                  "and, once the servers are clustered, probably in the database, since a table "
+                  "in one server's memory works only if it is pinned to that server."),
             ("p", "Third, the protocol. Take the lock before loading the data, since a lock is "
                   "of little use without the assurance that you have the latest version, and "
                   "lock the record's id, which lets you lock before you load. Release locks when "
@@ -495,10 +501,11 @@ LESSONS = [
                   "should accept that, because it happens early, and the earlier the better, "
                   "ideally before any work begins. Do not wait for a lock: a business "
                   "transaction might take twenty minutes, in the book's example, so the lock "
-                  "manager should refuse at once, which also removes the burden of deadlock. "
+                  "manager should refuse at once, which also takes deadlock off the table. "
                   "Give abandoned sessions a timeout. Use the pattern where conflicts are likely "
                   "or too costly, as a complement to Optimistic Offline Lock rather than on every "
-                  "record, and consider a long transaction before it."),
+                  "record, and weigh a long transaction too, which may do no more harm and be "
+                  "easier to program; load test before choosing."),
             ("p", "Coarse-Grained Lock answers the cost of many locks. Locking each object of a "
                   "group means finding and perhaps loading every member, and with pessimistic "
                   "locks a large lock set crowds the lock table. One lock for the group removes "
@@ -525,8 +532,10 @@ LESSONS = [
                   "is given: line 3 builds a key from the line's order, so every line of one "
                   "order asks for the same lock. `owners` stands for the lock manager's table, a "
                   "map from key to session declared elsewhere. A key another session holds "
-                  "refuses the edit at once, on line 6; there is no waiting. Releasing the lock "
-                  "at commit is the caller's job."),
+                  "refuses the edit at once, on line 6; there is no waiting. A real lock manager "
+                  "must also serialize access to that table, as Rice requires, so that two "
+                  "sessions cannot both find the key free; the snippet leaves that, like "
+                  "releasing the lock at commit, to the code around it."),
             ("code", _lines(GROUP_LOCK)),
             ("p", "The lab is the timeline again, with the scheme set to pessimistic and one "
                   "more input, the groups: a list of `record=group` pairs, where a record not "
@@ -633,11 +642,10 @@ LESSONS = [
             {"q": "Work the exercise, pessimistic, with groups room1=floor1, room2=floor1 and "
                   "room3=floor2: ann edits room1 at 0, bo room2 at 1, cy room3 at 2; they commit "
                   "at 3, 7 and 8. What happens?",
-             "a": ["All three commit, and at most 3 locks are held",
-                   "ann commits; bo and cy are refused",
-                   "ann and cy commit; bo is refused at minute 1, losing 0 minutes; at most 2 "
-                   "locks are held",
-                   "ann and cy commit; bo is refused at minute 7, when he commits"],
+             "a": ["All three commit, since each edits a different room; at most 3 locks",
+                   "ann commits; bo and cy are refused while floor1 is held; at most 1 lock",
+                   "ann and cy commit; bo is refused at minute 1, losing nothing; at most 2 locks",
+                   "ann and cy commit; bo is refused at minute 7, when he commits; at most 2"],
              "c": 2,
              "why": "ann's edit at minute 0 locks floor1. bo's edit at 1 asks for floor1 too, "
                     "and is refused there, at his first event, so he loses 1 − 1 = 0 minutes. "
@@ -647,17 +655,16 @@ LESSONS = [
                     "commit."},
             {"q": "Why does Rice's lock manager refuse a lock at once instead of making the "
                   "session wait?",
-             "a": ["Because a refused session can retry immediately and usually succeeds",
-                   "Because a business transaction might hold its lock for twenty minutes, and "
-                   "refusing at once also removes the burden of deadlock",
-                   "Because waiting is impossible across system transactions",
-                   "Because the database refuses locks at once anyway"],
-             "c": 1,
-             "why": "Across system transactions, Rice says, waiting makes little sense when a "
-                    "business transaction might take 20 minutes, in the book's example; coding a "
-                    "wait means timeouts and gets complicated; throwing as soon as a lock is "
-                    "unavailable removes the burden of coping with deadlock. Waiting is "
-                    "possible, as SELECT FOR UPDATE shows; it is a bad idea here."},
+             "a": ["Because a refused session can retry at once and usually wins the second time",
+                   "Because waiting cannot be programmed across several system transactions",
+                   "Because the database already refuses every lock at once, so it must too",
+                   "Because a lock may be held for twenty minutes, and waiting invites deadlock"],
+             "c": 3,
+             "why": "Across system transactions, Rice argues, nobody wants to wait for a lock "
+                    "that a business transaction might hold for 20 minutes, in the book's "
+                    "example; a wait needs timeouts and soon turns complicated; and failing "
+                    "straight away means deadlock never has to be handled. Waiting is possible, "
+                    "as SELECT FOR UPDATE shows; it is a bad idea here."},
             {"q": "Under Pessimistic Offline Lock, when does Rice say a business transaction "
                   "should generally acquire its lock?",
              "a": ["Before loading the data",
@@ -671,10 +678,10 @@ LESSONS = [
                     "possible. Taking it at the first change or at commit leaves the session "
                     "working on data that may already be stale."},
             {"q": "Which locks does Implicit Lock say the framework should not take implicitly?",
-             "a": ["The locks needed to load data",
-                   "The version checks of an optimistic scheme",
-                   "The locks needed only to edit, which it should check for at commit instead",
-                   "The release of every lock when the transaction ends"],
+             "a": ["The locks needed to load data, which a developer might forget",
+                   "The version checks of an optimistic scheme, kept in the SQL",
+                   "The locks needed only to edit, checked for at commit instead",
+                   "The release of every lock when the business transaction ends"],
              "c": 2,
              "why": "Rice lists loading locks, versions and releasing locks as mandatory tasks "
                     "the framework should do. Write locks are the exception: an implicit point to "
@@ -784,7 +791,8 @@ LESSONS = [
                   "from the database, and then those values are useless; the next request starts "
                   "afresh. Make it remember every product a client has viewed, a list that "
                   "must outlive the request, and it is stateful."),
-            ("p", "Fowler's objection to stateful servers is resources, and he makes it with a "
+            ("p", "Many people, Fowler says, regard stateful servers as a disaster, and he "
+                  "explains why: the main issue is resources. He makes the case with a "
                   "thought experiment he calls completely unrealistic but helpful. A hundred "
                   "people want to know about books; handling a request takes one second; each "
                   "person sends one request every ten seconds, perfectly balanced. With a "
@@ -824,9 +832,9 @@ LESSONS = [
                   "average, the stateful ones are idle &ldquo;1/2 = 50%&rdquo; of the time, and "
                   "each stateless object serves 2 users. The saving is the idle time, and when "
                   "users wait less it shrinks, which is Fowler's point about idle users the "
-                  "other way round. The banner adds the experiment's other unrealistic part: "
-                  "the stateless figure is an average, and real requests are not perfectly "
-                  "balanced, so a pool sized to it is too small at a peak."),
+                  "other way round. The experiment also assumes perfectly balanced "
+                  "requests, and real ones bunch; the banner adds that the stateless figure is "
+                  "an average, so a pool sized to it is too small at a peak."),
             ("p", "What the figures do not say is that the application kept less. The cart in "
                   "the snippet is the same size whether the handler is stateful or not. "
                   "Statelessness moves the state out of the server object, to the client or "
@@ -928,10 +936,9 @@ LESSONS = [
                   "server object?",
              "a": ["No: a stateless object has no fields",
                    "No: it saves the cart, so it keeps state",
-                   "Yes: it keeps nothing between requests; its one field is fixed when it is "
-                   "built",
-                   "No: it keeps the cart between requests, in itself"],
-             "c": 2,
+                   "No: it keeps the cart between requests, in itself",
+                   "Yes: it keeps nothing between requests"],
+             "c": 3,
              "why": "The section says that a stateless server, as people use the term, is an "
                     "object that keeps no state between requests; it may well have fields. "
                     "CartHandler's store is set once and holds no client's data; the cart is "
@@ -939,9 +946,8 @@ LESSONS = [
                     "session keeps its state while the handler keeps none."},
             {"q": "Does a stateless server mean a stateless session, by the section's account?",
              "a": ["Yes: with stateless servers there is nowhere to keep a cart",
-                   "No: a stateless server can carry a stateful session, whose state is kept "
-                   "elsewhere",
-                   "Yes: HTTP is stateless, so every session is",
+                   "No: the state can be kept outside the server",
+                   "Yes: HTTP is stateless, so every session on it is",
                    "No: a stateless server always has a stateful session"],
              "c": 1,
              "why": "Fowler's good news is that a stateless server can implement a stateful "
@@ -950,15 +956,13 @@ LESSONS = [
                     "stateful whatever the server."},
             {"q": "On hundred-users, ten stateless objects are busy on average. Why might a pool "
                   "of exactly ten be too small?",
-             "a": ["Because each stateless object can serve only one user",
-                   "Because requests are not perfectly balanced, so at a peak more than ten "
-                   "arrive at once",
-                   "Because the stateful figure, 100, is the real requirement",
-                   "Because a stateless object is busy only 10% of the time"],
+             "a": ["Because each stateless object can serve only one user at a time",
+                   "Because requests bunch, so at a peak more than ten arrive at once",
+                   "Because the stateful figure, 100, is the real requirement for this load",
+                   "Because a stateless object is busy only 10% of the time, so more are needed"],
              "c": 1,
              "why": "Ten is users × service / time between requests, an average that assumes "
-                    "requests evenly spread, which Fowler calls the experiment's unrealistic "
-                    "part. Requests bunch, and at a peak more than ten are in progress at once. "
+                    "requests evenly spread, as Fowler's experiment does. Requests bunch, and at a peak more than ten are in progress at once. "
                     "Each stateless object serves ten users on average, and is busy all the "
                     "time in the experiment."},
         ],
@@ -972,8 +976,9 @@ LESSONS = [
             ("Thinking stateful is always worse",
              "The arithmetic favours stateless objects when users are idle, and Fowler reports "
              "that many people regard stateful servers as a disaster. But the "
-             "cart has to live somewhere, and moving it costs too: on busier the saving falls "
-             "to half. The question the chapter asks is where the state should live, not "
+             "cart has to live somewhere, and moving it out of the server object has its own "
+             "costs, which the next lesson counts; and the saving itself depends on idle time: "
+             "on busier the stateless pool is 50 objects against 100, not 10. The question the chapter asks is where the state should live, not "
              "whether to have it."),
             ("Thinking a stateless object has no fields",
              "A true stateless object, with no fields at all, is rare, and the section suggests "
@@ -1059,7 +1064,7 @@ LESSONS = [
                   "data</em> is the long-term data in the database that every session sees. "
                   "Because session state lives inside a business transaction, Fowler says, it "
                   "has the transaction's properties, with consequences people miss. It need not "
-                  "be valid while it is being worked on; a half-edited policy may break the "
+                  "be valid while it is being worked on; a half-filled form may break the "
                   "rules until it is committed. It must be isolated, with the inconsistent read "
                   "of Chapter 5 as the danger. And a cache is not session state, since losing a "
                   "cache loses only speed."),
@@ -1102,15 +1107,16 @@ LESSONS = [
                   "serializing the state to a memento, binary or text, kept locally or on a "
                   "shared store, perhaps a session table in the database holding a Serialized "
                   "LOB, the point where the boundary with Database Session State is, Fowler "
-                  "admits, arbitrary. Expiring those rows can be contentious; Kai Yu told Fowler "
-                  "of splitting the session table into twelve segments and clearing the oldest "
+                  "admits, arbitrary. Deleting expired rows with a daemon can cause heavy "
+                  "contention for that table; Kai Yu described to Fowler a scheme "
+                  "that split the session table into twelve segments and cleared the oldest "
                   "every two hours, which dropped any session active for twenty-four hours, "
                   "rarely enough not to matter. Its appeal is simplicity; its cost comes with "
                   "clustering and failover."),
             ("p", "Database Session State pulls what a request needs from the database, does the "
                   "work and saves it back, with at least an id kept on the client. Its problem "
-                  "is keeping pending data out of everyone else's queries, such as daily "
-                  "revenue: a session id in each row, which every query must then filter, or "
+                  "is keeping pending data out of everyone else's queries, such as a "
+                  "sales report: a session id in each row, which every query must then filter, or "
                   "pending tables cloned from the real ones. Integrity and validation rules often "
                   "differ for pending data, abandoned sessions need a cleanup, and rolling back "
                   "updates to existing records is awkward. It gains stateless servers, pooling "
@@ -1118,10 +1124,12 @@ LESSONS = [
                   "request; caching saves the reads, not the writes."),
             ("p", "The snippet is Server Session State at its simplest: a map in memory from the "
                   "id the browser sends to the session's cart, creating a cart the first time "
-                  "an id is seen. Only this server can find these carts, and a crash loses them, "
-                  "the two assumptions Chapter 17 names. In a thread-per-request server the map "
-                  "is also shared between threads, which Chapter 5 says must be synchronised; "
-                  "a platform's own session support usually does that for you."),
+                  "an id is seen. Only this server can find these carts, and a crash loses them: "
+                  "two of the three assumptions Chapter 17 names. In a thread-per-request server "
+                  "the map is also shared between threads, which Chapter 5 says must be "
+                  "synchronised. Chapter 17 names the platform support of its day, the HTTP "
+                  "session and stateful session beans in Java and the built-in session state of "
+                  ".NET, which does this for you."),
             ("code", _lines(SERVER_SESSION)),
             ("p", "The lab counts bytes. Its inputs are the users, the size of one session's "
                   "state, the requests in a session and the size of a session id. Its tiles are "
@@ -1133,7 +1141,8 @@ LESSONS = [
                   "<code>a-megabyte</code> takes the book's session of about a megabyte, for "
                   "100 users, 20 requests and a 32-byte id: 2,000,000 bytes a request, "
                   "40,000,000 a session, 32 with the id, 100,000,000 in memory and 2,000,000 "
-                  "through the database a request."),
+                  "through the database a request. The table below the tiles is one user's "
+                  "request; the memory tile multiplies by the users."),
             ("p", "In <code>a-small-cart</code> the state is 2,000 bytes: 4,000 a request, 80,000 "
                   "a session, still 32 with the id, 200,000 in memory and 4,000 through the "
                   "database. Every figure but the id scales with the state, which is why Fowler "
@@ -1144,8 +1153,9 @@ LESSONS = [
             ("p", "Two readings fail on these numbers. Client session state is not free because "
                   "the server stores nothing: on the first preset it sends forty million bytes "
                   "over one session. And server session state is simple only until there are "
-                  "two servers, when the hundred megabytes in one server's memory must follow "
-                  "each user or be shared, which is Fowler's clustering problem."),
+                  "two servers, when the hundred megabytes in one server's memory must be "
+                  "reachable from whichever server takes the request, or each user must be "
+                  "pinned to one server, which is Fowler's clustering problem."),
             ("h3", "Exercise"),
             ("ul", [
                 "5,000 users.",
@@ -1245,33 +1255,34 @@ LESSONS = [
                     "40,000 counts one direction only."},
             {"q": "Which way of storing session state does Fowler say he prefers?",
              "a": ["Database Session State, for its failover",
-                   "Server Session State, particularly with the memento stored remotely",
-                   "Client Session State, for everything",
-                   "None: he declines to choose"],
+                   "Server Session State, ideally with its memento kept off the server",
+                   "Client Session State, for everything a session holds",
+                   "None: he declines to choose between the three"],
              "c": 1,
-             "why": "Chapter 6 ends with his preference for Server Session State, particularly "
-                    "if the memento is stored remotely so it survives a server crash; he likes "
+             "why": "Chapter 6 ends with his preference for Server Session State, best of all "
+                    "with the serialized state kept away from the server so that a crash does "
+                    "not lose it; he likes "
                     "Client Session State for session ids and very small data, and Database "
                     "Session State only when failover and clustering require it."},
             {"q": "With Server or Database Session State, what must still be kept on the "
                   "client?",
-             "a": ["Nothing at all",
-                   "A copy of the state, for failover",
-                   "At least a session identifier",
-                   "The pending rows"],
-             "c": 2,
-             "why": "Whatever else you use, Fowler says, you will keep at least a session "
-                    "identifier in Client Session State, so that the server can find the "
+             "a": ["Nothing at all, since the server holds everything",
+                   "A copy of the state, kept there for failover",
+                   "The pending rows, until the session commits",
+                   "At least the id that names the session"],
+             "c": 3,
+             "why": "Whatever else you use, Fowler says, the client still carries the session's "
+                    "id as Client Session State, so that the server can find the "
                     "session's state; the lab's 32 bytes a request are that id."},
             {"q": "Why does Database Session State need a pending field or pending tables?",
              "a": ["To keep uncommitted session data out of queries on record data",
-                   "To make the database faster",
-                   "To let the client read its own state",
-                   "To encrypt the session's data"],
+                   "To make the database's queries on record data faster",
+                   "To let the client read its own state back from the tables",
+                   "To encrypt the session's data before it is committed"],
              "c": 0,
              "why": "Session data should not affect the rest of the system until the session "
-                    "commits, so a pending order must not show up in queries such as book "
-                    "availability or daily revenue. A session id field, or separate pending "
+                    "commits, so a pending order must not show up in reports such as "
+                    "the day's sales. A session id field, or separate pending "
                     "tables, keeps it apart, at the cost of invasiveness or extra mapping code."},
         ],
         "mistakes": [
@@ -1284,7 +1295,7 @@ LESSONS = [
             ("Thinking server session state is the simple choice",
              "It is the simplest to build, and Fowler prefers it. It stays simple while there is "
              "one server with enough memory and losing a session in a crash is acceptable. "
-             "With two servers the session must follow the user or be shared, which is the "
+             "With two servers the session must be reachable from either, or each user pinned to one, which is the "
              "clustering and failover problem the chapter and the pattern both name."),
             ("Treating a cache as session state",
              "A server may keep data between requests only to be faster. Fowler separates that "

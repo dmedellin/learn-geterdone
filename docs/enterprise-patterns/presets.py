@@ -534,9 +534,9 @@ class Member {
     private long id;
     public String email;
     private int points;
-    public final String joined = "2024-01-01";
 
     static Member find(Connection db, long id) throws SQLException {
+        // SELECT email, points FROM member WHERE id = ?
         return new Member();
     }
 
@@ -729,15 +729,25 @@ Lease load(ResultSet rs) throws SQLException {
     return new Lease(rs.getLong("id"), term);
 }"""
 
-S["LOB_TEXT"] = """\
-// Writes a whole department tree into one text column.
-String toText(Dept d) {
+S["THREAD_TEXT"] = """\
+// Writes a reply thread into one text column, a line per post.
+String toText(Post first) {
     StringBuilder out = new StringBuilder();
-    out.append('(').append(d.name());
-    for (Dept child : d.children()) {
-        out.append(' ').append(toText(child));
+    Deque<Post> todo = new ArrayDeque<Post>();
+    Deque<Integer> depths = new ArrayDeque<Integer>();
+    todo.push(first);
+    depths.push(0);
+    while (!todo.isEmpty()) {
+        Post p = todo.pop();
+        int depth = depths.pop();
+        out.append(depth).append(' ').append(p.id()).append('\\n');
+        List<Post> replies = p.replies();
+        for (int i = replies.size() - 1; i >= 0; i--) {
+            todo.push(replies.get(i));
+            depths.push(depth + 1);
+        }
     }
-    return out.append(')').toString();
+    return out.toString();
 }"""
 
 S["SINGLE_TABLE_LOAD"] = """\
@@ -746,13 +756,14 @@ Staff load(ResultSet rs) throws SQLException {
     String type = rs.getString("type");
     long id = rs.getLong("id");
     String name = rs.getString("name");
-    if (type.equals("M")) {
-        return new Manager(id, name, rs.getInt("reports"));
-    }
     if (type.equals("C")) {
         return new Contractor(id, name, rs.getLong("day_rate"));
     }
-    return new Employee(id, name, rs.getLong("salary"));
+    long salary = rs.getLong("salary");
+    if (type.equals("M")) {
+        return new Manager(id, name, salary, rs.getInt("reports"));
+    }
+    return new Employee(id, name, salary);
 }"""
 
 S["CLASS_TABLE_FIND"] = """\
@@ -932,10 +943,10 @@ class InvoicePage extends SecurePage {
 S["FRONT_HANDLER"] = """\
 // One handler for every request; a command does each page's part.
 void handle(Request req, Response res) throws IOException {
-    User u = sessions.user(req);
-    if (u == null) { res.redirect("/login"); return; }
-    audit.log(u, req.path());
     Command c = commands.get(req.path());
+    User u = sessions.user(req);
+    if (u == null && c.needsLogin()) { res.redirect("/login"); return; }
+    audit.log(u, req.path());
     c.run(req, res);
 }"""
 
@@ -991,7 +1002,7 @@ String cell(Item item, Locale locale) {
     } else {
         html = html + money(item.cents(), locale);
     }
-    if (item.stock() == 0 || item.isWithdrawn()) {
+    if (item.stock() == 0 || item.isWithdrawn() || item.isRecalled()) {
         html = html + " (unavailable)";
     }
     return html + "</td>";
@@ -1051,6 +1062,7 @@ void afterDetails(Claim c, Response res) throws IOException {
 
 void afterPhotos(Claim c, Response res) throws IOException {
     if (c.photos() == 0) { res.redirect("/photos"); return; }
+    if (c.photosTooLarge()) { res.redirect("/resize"); return; }
     if (c.amount() > 10000) { res.redirect("/assessor"); return; }
     if (c.hasInjury()) { res.redirect("/medical"); return; }
     res.redirect("/bank");
@@ -1304,9 +1316,9 @@ LESSONS = [
                       "as": "hotel guest booking room charge"}),
     ]),
     ("4.5", "load", "tree", {}, [
-        ("departments", {"nodes": "company, -; sales, company; north, sales; south, sales; "
-                                  "it, company; support, it; desk, support; field, support"}),
-        ("flat", {"nodes": "company, -; sales, company; it, company; legal, company"}),
+        ("thread", {"nodes": "start, -; ann, start; bo, ann; cy, ann; "
+                             "dee, start; eli, dee; fay, eli; gus, eli"}),
+        ("flat-thread", {"nodes": "start, -; ann, start; bo, start; cy, start"}),
         ("exercise", {"nodes": "root, -; a, root; b, a; c, b; d, c; e, root"}),
     ]),
     ("4.6", "inherit", "tables", {}, [
@@ -1327,9 +1339,9 @@ LESSONS = [
         ("staff-find-employee", {"classes": "person, -, 3, no; employee, person, 2, yes; "
                                             "manager, employee, 2, yes; contractor, person, 2, yes",
                                  "load": "contractor", "find": "employee", "alter": "employee"}),
-        ("exercise", {"classes": "account, -, 3, no; saving, account, 2, yes; isa, saving, 1, yes; "
-                                 "current, account, 2, yes",
-                      "load": "isa", "find": "saving", "alter": "account"}),
+        ("exercise", {"classes": "account, -, 3, no; saving, account, 2, no; isa, saving, 1, yes; "
+                                 "bond, saving, 2, yes; current, account, 2, yes",
+                      "load": "bond", "find": "saving", "alter": "saving"}),
     ]),
     ("6.1", "lock", "reads", {}, [
         ("martin-and-david", {"items": "locking, 7, 9, before, insert; multiphase, 5, 8, after, insert"}),
@@ -1365,15 +1377,15 @@ LESSONS = [
         ("two-clerks", {"events": "0, kim, read, invoice; 1, lee, read, invoice; 2, lee, edit, invoice; "
                                   "3, lee, commit, -; 4, kim, edit, invoice; 20, kim, commit, -",
                         "scheme": "optimistic"}),
-        ("inconsistent-read", {"events": "0, kim, read, rate; 0, kim, edit, invoice; 1, lee, edit, rate; "
+        ("inconsistent-read", {"events": "0, kim, read, discount; 0, kim, edit, quote; 1, lee, edit, discount; "
                                          "2, lee, commit, -; 6, kim, commit, -",
                                "scheme": "optimistic", "checkReads": "no"}),
-        ("check-the-read", {"events": "0, kim, read, rate; 0, kim, edit, invoice; 1, lee, edit, rate; "
+        ("check-the-read", {"events": "0, kim, read, discount; 0, kim, edit, quote; 1, lee, edit, discount; "
                                       "2, lee, commit, -; 6, kim, commit, -",
                             "scheme": "optimistic", "checkReads": "yes"}),
-        ("exercise", {"events": "0, ana, read, policy; 1, ben, read, policy; 2, ana, edit, policy; "
-                                "5, ana, commit, -; 6, ben, edit, policy; 30, ben, commit, -; "
-                                "31, cy, read, policy; 32, cy, edit, policy; 40, cy, commit, -",
+        ("exercise", {"events": "0, ana, read, budget; 1, ben, read, budget; 2, ana, edit, budget; "
+                                "5, ana, commit, -; 6, ben, edit, budget; 30, ben, commit, -; "
+                                "31, cy, read, budget; 32, cy, edit, budget; 40, cy, commit, -",
                       "scheme": "optimistic"}),
     ]),
     ("6.5", "lock", "timeline", {}, [

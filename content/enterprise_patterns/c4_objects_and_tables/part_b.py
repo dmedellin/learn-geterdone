@@ -32,15 +32,25 @@ Lease load(ResultSet rs) throws SQLException {
     return new Lease(rs.getLong("id"), term);
 }"""
 
-LOB_TEXT = """\
-// Writes a whole department tree into one text column.
-String toText(Dept d) {
+THREAD_TEXT = """\
+// Writes a reply thread into one text column, a line per post.
+String toText(Post first) {
     StringBuilder out = new StringBuilder();
-    out.append('(').append(d.name());
-    for (Dept child : d.children()) {
-        out.append(' ').append(toText(child));
+    Deque<Post> todo = new ArrayDeque<Post>();
+    Deque<Integer> depths = new ArrayDeque<Integer>();
+    todo.push(first);
+    depths.push(0);
+    while (!todo.isEmpty()) {
+        Post p = todo.pop();
+        int depth = depths.pop();
+        out.append(depth).append(' ').append(p.id()).append('\\n');
+        List<Post> replies = p.replies();
+        for (int i = replies.size() - 1; i >= 0; i--) {
+            todo.push(replies.get(i));
+            depths.push(depth + 1);
+        }
     }
-    return out.append(')').toString();
+    return out.toString();
 }"""
 
 SINGLE_TABLE_LOAD = """\
@@ -49,13 +59,14 @@ Staff load(ResultSet rs) throws SQLException {
     String type = rs.getString("type");
     long id = rs.getLong("id");
     String name = rs.getString("name");
-    if (type.equals("M")) {
-        return new Manager(id, name, rs.getInt("reports"));
-    }
     if (type.equals("C")) {
         return new Contractor(id, name, rs.getLong("day_rate"));
     }
-    return new Employee(id, name, rs.getLong("salary"));
+    long salary = rs.getLong("salary");
+    if (type.equals("M")) {
+        return new Manager(id, name, salary, rs.getInt("reports"));
+    }
+    return new Employee(id, name, salary);
 }"""
 
 CLASS_TABLE_FIND = """\
@@ -144,7 +155,9 @@ LESSONS = [
     # structures, SQL not aware of it. Chapter 12, Embedded Value (PDF pp.
     # 246-248; When to Use It pp. 246-247) and Serialized LOB (pp. 249-253;
     # BLOB and CLOB pp. 249-250, identity problems p. 250, When to Use It p.
-    # 250).
+    # 250). The book's own example (a department hierarchy, from p. 250) is
+    # pointed to, not reused: the lesson's tree is a reply thread, and its
+    # serializer an explicit-stack walk, not a recursive element builder.
     # Quote: PDF p. 55, 20 words, ea_quotes.py OK. Lesson total: 20 words.
     # The course's one modern aside (PLAN section F rule 3) is the late p on
     # databases that query inside a document column.
@@ -202,8 +215,8 @@ LESSONS = [
             ("p", "The chapter's question is which objects deserve a table. Its first answer "
                   "is about small values. A date range or an amount of money is a Value "
                   "Object, Course 2's pattern: it has no identity, only a value, so nobody "
-                  "needs to find it by key, and Chapter 12's Embedded Value says no sane "
-                  "person would want a table of money values. Its fields go into the owner's "
+                  "needs to find it by key, and Chapter 12's Embedded Value thinks a table "
+                  "of nothing but amounts absurd. Its fields go into the owner's "
                   "row instead, and the owner loads and saves them. Because a value has no "
                   "identity it needs no Identity Map either: you can make a new one on every "
                   "read."),
@@ -235,27 +248,31 @@ LESSONS = [
                   "snapshot of the customer at the time of the order is exactly what you "
                   "want. And it works poorly when objects outside the LOB must refer to "
                   "objects inside it. Fowler also thinks it is considered less often than it "
-                  "might be. Here is a text serialization written for this lesson: "
-                  "`toText` writes a department's name in brackets (line 4) and then each "
-                  "child's text inside them (lines 5 to 7), so a sales department with two "
-                  "regions becomes `(sales (north) (south))`."),
-            ("code", _lines(LOB_TEXT)),
+                  "might be. Here is a text serialization written for this lesson, for a "
+                  "discussion thread whose posts answer one another. It walks the thread "
+                  "with an explicit stack of posts and a matching stack of depths (lines 4 "
+                  "to 7), and writes one line per post, its depth, a space and its id (line "
+                  "11). The replies are pushed last first (lines 13 to 16), so they come off "
+                  "the stack in order. A first post with one reply that has its own reply "
+                  "becomes three lines, `0 start`, `1 ann` and `2 bo`."),
+            ("code", _lines(THREAD_TEXT)),
             ("p", "Now the count. The lab reads a tree as records `node, parent`, with a dash "
                   "for the root, and prints five tiles: the nodes; the depth, counting the "
                   "root as 1; the queries to read the tree one node at a time, one for the "
                   "root and then one for each node's children; the queries one level at a "
-                  "time; and the queries for a LOB, always 1. In "
-                  "<code>departments</code>, a company with sales and IT, sales with two "
-                  "regions, IT with a support group of two teams, there are 8 nodes, depth 4, "
-                  "9 queries node by node, 5 level by level and 1 from the column."),
+                  "time; and the queries for a LOB, always 1. In <code>thread</code>, a "
+                  "first post `start` with two replies, `ann` and `dee`; `bo` and `cy` "
+                  "answering `ann`; `eli` answering `dee`; and `fay` and `gus` answering "
+                  "`eli`, there are 8 posts, depth 4, 9 queries post by post, 5 level by "
+                  "level and 1 from the column."),
             ("p", "Both multi-query counts include the queries that come back empty: each "
                   "leaf's query for children it does not have, and the query for the level "
                   "below the deepest, which is how a program reading level by level finds "
-                  "that it has finished. The preset <code>flat</code>, a company with three "
-                  "departments and nothing below them, has 4 nodes and depth 2: 5 queries "
-                  "node by node, 3 level by level, 1 as a LOB. The column always wins on "
-                  "queries, and the tiles cannot show what it costs: every query you might "
-                  "have run against the departments is gone."),
+                  "that it has finished. The preset <code>flat-thread</code>, a first post "
+                  "with three replies and nothing below them, has 4 nodes and depth 2: 5 "
+                  "queries node by node, 3 level by level, 1 as a LOB. The column always wins "
+                  "on queries, and the tiles cannot show what it costs: every query you might "
+                  "have run against the posts, such as all of one person's replies, is gone."),
             ("p", "That cost is the one part of the chapter that time has moved. Fowler "
                   "already expected XML query extensions to SQL to soften it, while noting "
                   "that they were largely nonstandard. Many databases now store a JSON or XML "
@@ -268,24 +285,24 @@ LESSONS = [
             ("p", "A tree has the records `root, -; a, root; b, a; c, b; d, c; e, root`. By "
                   "hand, give its nodes and depth, and the queries to read it node by node, "
                   "level by level and as a Serialized LOB. Then type it into the lab."),
-            ("p", "A tree of departments is one kind of hierarchy. The next lesson, Single "
+            ("p", "A reply thread is one kind of hierarchy. The next lesson, Single "
                   "Table Inheritance, reads the other kind Chapter 3 names, a hierarchy of "
                   "classes, and the first of three ways to map it."),
         ],
         "lab": ("eakit", {
             "mode": "load",
             "view": "tree",
-            "preset": "departments",
+            "preset": "thread",
             "presets": [
-                {"id": "departments",
-                 "label": "Departments: a company four levels deep",
-                 "nodes": "company, -; sales, company; north, sales; south, sales; "
-                          "it, company; support, it; desk, support; field, support",
+                {"id": "thread",
+                 "label": "A reply thread: a first post and seven replies, four levels deep",
+                 "nodes": "start, -; ann, start; bo, ann; cy, ann; "
+                          "dee, start; eli, dee; fay, eli; gus, eli",
                  "expect": {"ldNodes": "8", "ldDepth": "4", "ldPerNode": "9",
                             "ldPerLevel": "5", "ldLob": "1"}},
-                {"id": "flat",
-                 "label": "Flat: a company with three departments",
-                 "nodes": "company, -; sales, company; it, company; legal, company",
+                {"id": "flat-thread",
+                 "label": "A flat thread: a first post with three replies",
+                 "nodes": "start, -; ann, start; bo, start; cy, start",
                  "expect": {"ldNodes": "4", "ldDepth": "2", "ldPerNode": "5",
                             "ldPerLevel": "3", "ldLob": "1"}},
             ],
@@ -314,14 +331,14 @@ LESSONS = [
              "prevents or makes harder."),
         ],
         "worked": {
-            "title": "Reading the departments",
+            "title": "Reading the thread",
             "intro": [
-                "Take the preset departments and count by each rule.",
+                "Take the preset thread and count by each rule.",
             ],
             "lines": [
-                "nodes: 8; depth: company 1, sales 2,",
-                "  north 3, desk 4: depth 4",
-                "node by node: 1 for company + 8, so 9",
+                "nodes: 8",
+                "deepest: start, dee, eli, fay: depth 4",
+                "node by node: 1 for start + 8, so 9",
                 "level by level: 4 levels + 1 empty, so 5",
                 "from one column: 1",
             ],
@@ -335,19 +352,22 @@ LESSONS = [
         "quiz": [
             {"q": "The exercise's tree is `root, -; a, root; b, a; c, b; d, c; e, root`. How "
                   "many queries does it take node by node, level by level and as a LOB?",
-             "a": ["7, 6 and 1", "6, 5 and 1", "7, 5 and 1", "6, 6 and 1"],
-             "c": 0,
+             "a": ["6, 5 and 1",
+                   "7, 5 and 1",
+                   "7, 6 and 1",
+                   "6, 6 and 1"],
+             "c": 2,
              "why": "There are 6 nodes, and the path root, a, b, c, d gives depth 5. Node by "
                     "node is 1 + 6 = 7, counting the leaves' empty queries; level by level is "
                     "5 + 1 = 6, counting the empty level below d; a LOB is always 1. The other "
-                    "answers drop one of the empty queries."},
+                    "answers drop one or both of the empty queries."},
             {"q": "Why does Chapter 12 say Embedded Value suits a Value Object such as a date "
                   "range?",
-             "a": ["It has no identity, so it needs no key, no table and no Identity Map",
-                   "It is always too large for a row of its own",
+             "a": ["It is always too large to fit beside the owner's other columns",
+                   "It has no identity, so it needs no key, no table and no Identity Map",
                    "Its fields cannot be queried, so they may as well be embedded",
-                   "It needs a key, which the owner's row supplies"],
-             "c": 0,
+                   "It needs a key of its own, which the owner's row supplies to it"],
+             "c": 1,
              "why": "A Value Object is equal to any other with the same value, so nothing ever "
                     "finds it by key; it is saved as columns of its owner's row and created "
                     "afresh on each read. The embedded columns can still be queried, which is "
@@ -355,32 +375,35 @@ LESSONS = [
                     "the value's."},
             {"q": "Serialized LOB's discussion warns against putting a customer's details in a "
                   "LOB on every order. Why?",
-             "a": ["The customer data is copied on every order, so an update must reach them "
-                   "all",
-                   "A LOB cannot hold more than one customer",
-                   "A LOB on an order cannot be read with the order",
-                   "Orders cannot have large columns"],
-             "c": 0,
+             "a": ["A LOB cannot hold more than one customer, so each order needs its own",
+                   "A LOB on an order cannot be read in the same query as the order",
+                   "Orders cannot have large columns beside their own small ones",
+                   "The customer data is copied on every order, so an update must reach "
+                   "them all"],
+             "c": 3,
              "why": "The details would be duplicated in every order, which makes updates a "
                     "problem. Fowler notes the exception: when a snapshot of the customer as "
                     "it was when the order was placed is what you want, the copy is the point. "
                     "Otherwise put the LOB in a customer table and let orders refer to it."},
-            {"q": "A company with five departments and nothing below them. How many queries "
+            {"q": "A first post with five replies and nothing below them. How many queries "
                   "does the lab count level by level?",
-             "a": ["3", "2", "6", "7"],
+             "a": ["3",
+                   "2",
+                   "6",
+                   "7"],
              "c": 0,
-             "why": "The tree has depth 2, the company and its departments, and level by level "
+             "why": "The tree has depth 2, the first post and its replies, and level by level "
                     "is the depth + 1: a query for each level and one that finds nothing below "
-                    "the departments. Node by node it would be 1 + 6 = 7."},
+                    "the replies. Node by node it would be 1 + 6 = 7."},
         ],
         "mistakes": [
             ("Preferring a Serialized LOB because it is fast",
              "On this view one query beats nine, so the LOB is the better design. It is one "
-             "read, and on the lesson's illustration, <code>departments</code>, one against "
-             "9 node by node; but nothing else can query inside it, and Fowler's caution is "
-             "the opening quotation: used too much, it turns the database into little more "
-             "than a transactional file system. He recommends it for a relatively isolated "
-             "group of objects nobody will query from outside the application."),
+             "read, and on the lesson's illustration, <code>thread</code>, one against 9 "
+             "node by node; but nothing else can query inside it, and Fowler's caution is the "
+             "opening quotation: lean on it everywhere and the database is reduced to storing "
+             "files with transactions. He recommends it for a fairly self-contained group of "
+             "objects nobody will query from outside the application."),
             ("Giving an Embedded Value a key of its own",
              "An embedded value seems to need an id like any other object. It has none: it is "
              "part of its owner's row and is loaded and saved with it, which is exactly why "
@@ -475,15 +498,16 @@ LESSONS = [
                   "the fields of every class, and a row uses only its own class's, so the rest "
                   "are empty: wasted space, though Fowler notes that many databases compress "
                   "it well. The one table can grow large, with many indexes and frequent "
-                  "locking, and become a bottleneck. Its great advantage, in Chapter 3's "
-                  "words, is that it puts everything in one place, which makes changes easier "
-                  "and avoids joins."),
-            ("p", "Chapter 3 then declines to name a winner. Fowler's own first choice tends "
-                  "to be Single Table Inheritance, as easy to do and resilient to many "
-                  "refactorings, with the other two used as needed to deal with irrelevant and "
-                  "wasted columns; the three can be mixed in one hierarchy, at the price of "
-                  "more complexity; and the database administrators often have good advice on "
-                  "the access that suits the database."),
+                  "locking, and become a bottleneck. What it buys, as Chapter 3 weighs it, is "
+                  "a single home for the whole hierarchy: a change has one table to touch, "
+                  "and no load ever needs a join."),
+            ("p", "Chapter 3 then declines to name a winner, and says what Fowler himself "
+                  "usually does: start with the single table, because it is simple to build "
+                  "and survives most reshuffling of the classes, and reach for the other two "
+                  "when particular subclasses bring too many columns nobody else uses. The "
+                  "three may be combined in one hierarchy, which adds complexity, and he "
+                  "suggests asking the database administrators which access patterns suit "
+                  "their database."),
             ("p", "Chapter 12 adds the pattern's working parts. The table needs a column that "
                   "says which class each row is: a class name, which takes space and ties "
                   "the schema to the class names, or a code, which some code must translate "
@@ -493,11 +517,12 @@ LESSONS = [
                   "columns share one namespace, so two classes cannot use one name for "
                   "different fields."),
             ("p", "Here is a single-table load written for this lesson. It reads the type "
-                  "code on line 3 and the columns every kind shares on lines 4 and 5, then "
-                  "chooses the class on lines 6 to 12, each branch reading the column its "
-                  "class adds: `reports` for a manager, `day_rate` for a contractor, `salary` "
-                  "otherwise. Every one of those columns is in every row, and in each row "
-                  "the ones its class does not use are empty."),
+                  "code on line 3 and the columns every person has on lines 4 and 5. A "
+                  "contractor adds only `day_rate` (lines 6 to 8). Everyone else is an "
+                  "employee, so line 9 reads `salary` once; a manager adds `reports` as well "
+                  "(lines 10 to 12), and line 13 builds a plain employee. Every one of those "
+                  "columns is in every row, and in each row the ones its class does not use "
+                  "are empty."),
             ("code", _lines(SINGLE_TABLE_LOAD)),
             ("p", "Now the count. The lab reads a hierarchy as records of a class, its parent "
                   "(a dash for the root), how many fields it declares itself, and whether it is "
@@ -583,7 +608,7 @@ LESSONS = [
                 "chain of a manager: person, employee,",
                 "  manager",
                 "its fields: 3 + 2 + 2, so 7",
-                "empty in its row: 9 - 7, so 2",
+                "empty in its row: 9 − 7, so 2",
             ],
             "after": [
                 "The two empty columns are the contractor's. Every manager row carries them, "
@@ -596,11 +621,11 @@ LESSONS = [
                   "vehicle, 3, yes; truck, vehicle, 5, yes`, loading a van. What are the single "
                   "table's columns and a van row's empty columns, and the other two mappings' "
                   "columns?",
-             "a": ["Single 16, 7 empty; class table 18 in 4 tables; concrete 25 in 3",
-                   "Single 14, 7 empty; class table 14 in 4 tables; concrete 21 in 3",
+             "a": ["Single 14, 7 empty; class table 14 in 4 tables; concrete 21 in 3",
+                   "Single 16, 7 empty; class table 18 in 4 tables; concrete 25 in 3",
                    "Single 16, 9 empty; class table 18 in 4 tables; concrete 25 in 3",
                    "Single 16, 7 empty; class table 18 in 3 tables; concrete 25 in 4"],
-             "c": 0,
+             "c": 1,
              "why": "The fields are 4 + 2 + 3 + 5 = 14, so the single table has 2 + 14 = 16 "
                     "columns; a van uses 4 + 3 = 7, leaving 7 empty. Class table: a table a "
                     "class, each with a key, 5 + 3 + 4 + 6 = 18 columns in 4 tables. Concrete "
@@ -608,19 +633,22 @@ LESSONS = [
                     "fields, 7 + 8 + 10 = 25 in 3. Fourteen forgets the key and type; 9 empty "
                     "counts only the van's own fields as used."},
             {"q": "What does Chapter 3 name as Single Table Inheritance's great advantage?",
-             "a": ["Everything in one place, which makes changes easier and avoids joins",
-                   "No wasted space, since every column is used",
-                   "The simplest correspondence between classes and tables",
-                   "Each table is accessed only when its class is"],
-             "c": 0,
-             "why": "Its great advantage is that it puts everything in one place, easing "
-                    "modification and avoiding joins. The simplest correspondence is Class "
+             "a": ["No wasted space, since every column in the table is used by every row",
+                   "The simplest correspondence between classes and tables, one for one",
+                   "Each table is read only when its own class is, spreading the load",
+                   "One table for the hierarchy: changes touch one place and loads never join"],
+             "c": 3,
+             "why": "Chapter 3 credits the single table with keeping the whole hierarchy in "
+                    "one place, so that a change touches one table and no load joins. The simplest correspondence is Class "
                     "Table Inheritance's strength, and spreading access across tables is "
                     "Concrete Table Inheritance's; wasted space is the single table's best-known "
                     "cost."},
             {"q": "In the staff hierarchy, a contractor declares 2 fields and person 3. How "
                   "many columns are empty in a contractor's row of the single table?",
-             "a": ["4", "2", "5", "6"],
+             "a": ["4",
+                   "2",
+                   "5",
+                   "6"],
              "c": 0,
              "why": "The single table has 9 field columns. A contractor's chain is contractor "
                     "and person, 2 + 3 = 5 fields, so 9 − 5 = 4 are empty: the employee's 2 "
@@ -629,8 +657,8 @@ LESSONS = [
         "mistakes": [
             ("Calling Single Table Inheritance the beginner's mapping",
              "On this view one table for a hierarchy is the naive design that a careful one "
-             "outgrows. Fowler names its great advantage, everything in one place with no "
-             "joins, and says his own first choice tends to be it, using the other two as "
+             "outgrows. Fowler credits it with keeping the hierarchy in one place with no "
+             "joins, and says he usually starts with it, turning to the other two when "
              "needed; its costs are the empty columns and the size of the one table. The "
              "chapter's trade-off is between duplication and speed, and no mapping wins it "
              "everywhere."),
@@ -692,7 +720,7 @@ LESSONS = [
         "concepts": [
             ("Class Table Inheritance",
              "One table for each class in the hierarchy, holding the fields that class "
-             "declares. The rows of one object share a key across the tables, and loading it "
+             "declares. The rows of one object usually share one key value across the tables, and loading it "
              "joins the tables of its class and its ancestors."),
             ("Concrete Table Inheritance",
              "One table for each concrete class, holding all its fields, inherited ones "
@@ -719,12 +747,14 @@ LESSONS = [
                   "both share, Inheritance Mappers. Read the three patterns in your own copy "
                   "first."),
             ("p", "Class Table Inheritance gives every class a table of the fields it "
-                  "declares. Its strengths, as the pattern lists them, are that every column "
-                  "is relevant to every row, so nothing is wasted, and that the relationship "
-                  "between the domain model and the database is very straightforward. The "
-                  "rows of one object can share one key value across the tables. The cost is "
-                  "the quotation: loading an object reads several tables, and joins of more "
-                  "than three or four tables tend to be slow. Worse, a query for a group of "
+                  "declares. Its strengths, as the pattern lists them, are that no row "
+                  "carries a column it does not use, so nothing is wasted, and that classes "
+                  "and tables correspond one to one, which makes the mapping easy to follow. "
+                  "The rows of one object can share one key value across the tables, or each "
+                  "table can have its own key and a foreign key into the superclass table. "
+                  "The cost is the quotation: loading an object reads several tables, and a "
+                  "join across more than three or four of them is slow on most databases. "
+                  "Worse, a query for a group of "
                   "objects of mixed classes does not know which tables to join, so it needs "
                   "outer joins or a first read of the root table followed by more queries. "
                   "Moving a field up or down the hierarchy changes the database, and the "
@@ -777,9 +807,11 @@ LESSONS = [
                   "count does not know that."),
             ("h3", "Exercise"),
             ("p", "A bank's hierarchy has the records `account, -, 3, no; saving, account, 2, "
-                  "yes; isa, saving, 1, yes; current, account, 2, yes`. You load an `isa`, "
-                  "find every saving account and add a field to account. By hand, give the "
-                  "tables each touches under the three mappings, then check them in the lab."),
+                  "no; isa, saving, 1, yes; bond, saving, 2, yes; current, account, 2, yes`: "
+                  "a saving account is abstract, with two concrete kinds below it. You load a "
+                  "`bond`, find every saving account and add a field to saving. By hand, give "
+                  "the tables each touches under the three mappings, then check them in the "
+                  "lab."),
             ("p", "Every mapping so far has been written by hand. The next lesson, Metadata "
                   "Mapping, Query Object and Repository, reads Chapter 13's way of holding "
                   "the mapping as data instead."),
@@ -847,25 +879,29 @@ LESSONS = [
         },
         "quiz_title": "Loads, finds and alterations",
         "quiz": [
-            {"q": "The exercise's hierarchy: `account, -, 3, no; saving, account, 2, yes; isa, "
-                  "saving, 1, yes; current, account, 2, yes`. Load an `isa`, find every saving "
-                  "account, add a field to account. What are the three tiles, single, class, "
-                  "concrete?",
-             "a": ["Load 1, 3, 1; find 1, 3, 2; alter 1, 1, 3",
-                   "Load 1, 3, 1; find 1, 2, 2; alter 1, 1, 3",
-                   "Load 1, 2, 1; find 1, 3, 2; alter 1, 1, 4",
-                   "Load 1, 3, 1; find 1, 4, 3; alter 1, 1, 3"],
-             "c": 0,
-             "why": "An isa's chain is isa, saving and account: 3 tables to load under class "
+            {"q": "The exercise's hierarchy: `account, -, 3, no; saving, account, 2, no; isa, "
+                  "saving, 1, yes; bond, saving, 2, yes; current, account, 2, yes`. Load a "
+                  "`bond`, find every saving account, add a field to saving. What are the "
+                  "three tiles, single, class, concrete?",
+             "a": ["Load 1, 3, 1; find 1, 3, 2; alter 1, 1, 2",
+                   "Load 1, 3, 1; find 1, 4, 3; alter 1, 1, 3",
+                   "Load 1, 2, 1; find 1, 4, 2; alter 1, 1, 2",
+                   "Load 1, 3, 1; find 1, 4, 2; alter 1, 1, 2"],
+             "c": 3,
+             "why": "A bond's chain is bond, saving and account: 3 tables to load under class "
                     "table. Finding every saving account joins account above and unions isa "
-                    "below, account, saving and isa, 3 tables; under concrete table it unions "
-                    "the saving and isa tables, 2. Adding a field to account alters the 3 "
-                    "concrete tables, saving, isa and current, and one table otherwise. "
-                    "Forgetting the join up to account gives 2 for the find; counting the "
-                    "whole hierarchy gives 4."},
+                    "and bond below, account, saving, isa and bond, 4 tables; under concrete "
+                    "table it unions the isa and bond tables, 2, because saving is abstract "
+                    "and has no concrete table. Adding a field to saving alters those same 2 "
+                    "concrete tables, and one table otherwise. Leaving out the join up to "
+                    "account gives 3 for the find; treating saving as concrete gives 3 "
+                    "concrete tables; forgetting account in the chain gives a load of 2."},
             {"q": "Under Class Table Inheritance, how many tables does loading one contractor "
                   "touch in the staff hierarchy, against one manager?",
-             "a": ["2 against 3", "4 against 4", "1 against 1", "3 against 3"],
+             "a": ["2 against 3",
+                   "4 against 4",
+                   "1 against 1",
+                   "3 against 3"],
              "c": 0,
              "why": "A class-table load joins the class and its ancestors. A contractor's "
                     "chain is contractor and person, 2 tables; a manager's is manager, "
@@ -873,27 +909,28 @@ LESSONS = [
                     "person reads, not what a load reads."},
             {"q": "Which weakness does Chapter 12 give Concrete Table Inheritance and not "
                   "Class Table Inheritance?",
-             "a": ["A superclass field change alters every table that has the field",
-                   "Loading one object needs a join",
+             "a": ["Loading one object needs a join",
                    "Some columns are irrelevant to some rows",
+                   "A superclass field change alters every table that has the field",
                    "The superclass tables are read on every access and can become a "
                    "bottleneck"],
-             "c": 0,
+             "c": 2,
              "why": "Superclass fields are duplicated across the concrete tables, so changing "
                     "one means changing each table. Joins to load and busy supertype tables "
                     "are Class Table Inheritance's weaknesses, and columns irrelevant to a "
                     "row are the single table's; a concrete table has no supertype table and "
                     "no irrelevant columns."},
             {"q": "In the lesson's `FIND_MANAGER`, which lines join the tables, and on what?",
-             "a": ["Lines 5 and 6, on the shared key `id`",
-                   "Lines 3 and 4, on the name",
-                   "Line 7, on `p.id`",
-                   "Lines 5 and 6, on a type code"],
-             "c": 0,
+             "a": ["Lines 3 and 4, on the name the tables share",
+                   "Lines 5 and 6, each on the key `id` the rows share",
+                   "Line 7 alone, on `p.id` in its WHERE clause",
+                   "Lines 5 and 6, on a type code in the root table"],
+             "c": 1,
              "why": "Line 5 joins `employee` and line 6 joins `manager`, each `ON` its id "
                     "equal to the person's id: the rows of one object share a key. Line 7's "
-                    "`WHERE` picks the manager; there is no type code in a class-table schema "
-                    "here, since each class has its own table."},
+                    "`WHERE` picks the manager. This query needs no type code because it "
+                    "already knows the class; a query for people of mixed classes might read "
+                    "a code in the root table to choose its joins."},
         ],
         "mistakes": [
             ("Choosing Concrete Table Inheritance as the fast one",
@@ -903,7 +940,7 @@ LESSONS = [
              "<code>staff-find-person</code>, 3 tables each time. It also makes keys and "
              "references to the abstract class awkward. Chapter 3's trade-off between "
              "duplication and speed is still a trade-off."),
-            ("Expecting one join per class in the hierarchy",
+            ("Expecting every load to join every table",
              "Class Table Inheritance can sound as if every load joins every table. It joins "
              "one table per class in the loaded object's chain: a contractor touches 2 tables, "
              "a manager 3. The whole hierarchy is read only by a find on the root, which must "
@@ -1007,10 +1044,10 @@ LESSONS = [
                   "appropriate here, and the slowness small beside the database call it sits "
                   "in. Even so, generated code is easier to follow in a debugger, so he "
                   "usually prefers generation, which he says makes him unsophisticated."),
-            ("p", "Its warning is about the cases left over. A simple metadata scheme, the "
-                  "pattern says, often works well 90 percent of the time, and the special "
-                  "cases can add a great deal of complexity to it; a useful alternative is to "
-                  "override the generic code with hand-written subclasses for those cases. "
+            ("p", "Its warning is about the cases left over. By the pattern's rough guide, "
+                  "plain metadata covers about 90 percent of a mapping, and the odd cases "
+                  "that remain can make the generic code much harder to follow. For those, "
+                  "Fowler suggests hand-written subclasses that take over from it. "
                   "Metadata can also interfere with refactoring, since a field renamed in the "
                   "code is still named in the data. And a good Layer Supertype, Fowler adds, "
                   "can reduce hand-coding a long way before metadata is needed at all."),
@@ -1050,7 +1087,8 @@ LESSONS = [
                   "numbers. Then write the metadata, column and field pairs, that the single "
                   "metadata finder would read for each class. You can paste the listing into "
                   "the lab to check the first part."),
-            ("p", "That ends the database half of the book. The next course, Web "
+            ("p", "That ends the book's object-relational patterns, Chapters 10 to 13. "
+                  "The next course, Web "
                   "Presentation, puts a front on the system these patterns have mapped to its "
                   "tables, beginning with Model View Controller."),
         ],
@@ -1116,11 +1154,14 @@ LESSONS = [
         "quiz": [
             {"q": "In the exercise's listing, which lines repeat exactly, and what metadata "
                   "would a single finder read?",
-             "a": ["Lines 3–5 and 14–16; total and due for the invoice, paid for the receipt",
-                   "Lines 3–5 and 13–15; total and due for the invoice, paid for the receipt",
-                   "Lines 2–5 and 13–16; total, due and paid for both",
-                   "Lines 3–9 and 14–19; total and due for the invoice, paid for the receipt"],
-             "c": 0,
+             "a": ["Lines 3–5 and 13–15; total and due for the invoice, paid for the "
+                   "receipt",
+                   "Lines 2–5 and 13–16; total, due and paid for each of the two",
+                   "Lines 3–5 and 14–16; total and due for the invoice, paid for the "
+                   "receipt",
+                   "Lines 3–9 and 14–19; total and due for the invoice, paid for the "
+                   "receipt"],
+             "c": 2,
              "why": "Line 11 is blank, so the receipt's finder starts at line 12, and the "
                     "bind, execute and `next` are lines 3 to 5 and 14 to 16: 1 block, 6 lines. "
                     "Lines 2 and 13 prepare different statements. The metadata is "
@@ -1129,32 +1170,32 @@ LESSONS = [
                     "the one metadata finder."},
             {"q": "How often, by Metadata Mapping's own warning, does a simple metadata scheme "
                   "work well?",
-             "a": ["About 90 percent of the time, with special cases that make life much "
-                   "harder",
-                   "Always, once the metadata is complete",
-                   "About half the time",
-                   "Only with code generation, never with reflection"],
-             "c": 0,
-             "why": "The pattern says a simple scheme often works well 90 percent of the time, "
-                    "and that the minority cases can add a lot of complexity; it suggests "
-                    "hand-written subclasses that override the generic code for them. The "
-                    "figure is the book's rough guide, not a measurement."},
+             "a": ["Always, once the metadata covers every field of every class",
+                   "About half the time, the rest needing code written by hand",
+                   "Only with code generation, never when it is read by reflection",
+                   "About 90 percent of the time, with the rest adding much complexity"],
+             "c": 3,
+             "why": "The pattern's guide is that plain metadata handles about nine cases in "
+                    "ten, and that the rest can make the generic code much more complex; for "
+                    "those it suggests hand-written subclasses in its place. The figure is a "
+                    "rough guide, not a measurement."},
             {"q": "By Query Object's When to Use It, when do you really need one?",
-             "a": ["With a Domain Model and a Data Mapper, and Metadata Mapping for serious "
-                   "use",
-                   "In any project with a hand-built data source layer",
-                   "Whenever the developers do not know SQL",
-                   "With a Table Module and a Record Set"],
-             "c": 0,
+             "a": ["In any project that builds its own data source layer by hand",
+                   "With a Domain Model and a Data Mapper, and Metadata Mapping for "
+                   "serious use",
+                   "Whenever the developers on the project do not know SQL well",
+                   "With a Table Module and a Record Set, for queries built at run time"],
+             "c": 1,
              "why": "Fowler says most projects with a hand-built data source layer do without "
                     "one, that you only really need it with a Domain Model and a Data Mapper, "
                     "and that serious use needs Metadata Mapping. Even then many developers "
                     "are comfortable with SQL, and most people who use one get it from a tool."},
             {"q": "What does a Repository offer domain code, in Hieatt and Mee's pattern?",
-             "a": ["A collection-like interface: ask for the objects matching some criteria",
-                   "A mapper class per table, renamed",
-                   "A cache shared between sessions",
-                   "The SQL for each query, built by hand"],
+             "a": ["A collection-like interface: ask for the objects matching some "
+                   "criteria",
+                   "A mapper class for each table, renamed and moved to the domain",
+                   "A cache of loaded objects shared between every session",
+                   "The SQL for each of its queries, written by hand by the caller"],
              "c": 0,
              "why": "A Repository mediates between the domain and the mapping layers and acts "
                     "like an in-memory collection of domain objects; the client builds criteria "
@@ -1165,8 +1206,8 @@ LESSONS = [
             ("Thinking metadata mapping removes the mapping work",
              "On this view, once the mapping is data the work is gone. It moves: into the "
              "metadata, and into the generic code that reads it, which must handle every "
-             "case. Metadata Mapping's own warning is that a simple scheme often works well "
-             "90 percent of the time, and the rest can tangle it; Fowler's advice is "
+             "case. Metadata Mapping's own warning is that plain metadata covers about 90 "
+             "percent of a mapping, and the remainder can tangle it; Fowler's advice is "
              "hand-written overrides for the special cases, and he notes the setup work and "
              "the trouble metadata makes for refactoring."),
             ("Taking a Repository for a Data Mapper renamed",
@@ -1190,8 +1231,10 @@ LESSONS = [
             "The lab finds identical lines only, so it understates repetition that differs "
             "by a name, which is most of what a metadata mapping removes. It cannot weigh "
             "what the metadata costs in setup, special cases and refactoring, and it does not "
-            "count Query Object or Repository at all, which Fowler himself advises most "
-            "hand-built projects to do without or to buy."
+            "count Query Object or Repository at all. Of Query Object, Fowler says most "
+            "hand-built data source layers do without one and that buying a tool is almost "
+            "always better; Repository, Hieatt and Mee's, is worth most in a large system "
+            "with many queries or more than one data source."
         ),
     },
 ]

@@ -166,19 +166,19 @@ LESSONS = [
                   "places where, the law notwithstanding, you will have to distribute. Read "
                   "it in your own copy first; it is an argument, not a catalogue."),
             ("p", "The chapter opens, in The Allure of Distributed Objects, with a design "
-                  "Fowler says he used to be shown two or three times a year. An ordering "
-                  "system is drawn as separate remote objects for customers, orders, products "
-                  "and deliveries, each a component that can be put on its own processing "
-                  "node. The reason given is performance: if one component gets busy, give it "
+                  "Fowler says he was shown again and again in design reviews. An ordering "
+                  "system is split by kind of object, one remote component for the "
+                  "customers, another for the orders, and so on, and each component can be "
+                  "placed on a machine of its own. The reason given is performance: if one component gets busy, give it "
                   "more boxes. The vendors' promise behind it is transparency, that an object "
                   "can call another without knowing whether the callee is in its own process "
-                  "or on another machine. Transparency is valuable, Fowler grants, but "
-                  "performance is not usually one of the things it makes transparent, and the "
-                  "design will usually slow the system badly, or make it harder to build and "
-                  "deploy, and usually both."),
-            ("p", "Remote and Local Interfaces gives the reason. A procedure call within a "
-                  "process is very fast; a call between two processes is orders of magnitude "
-                  "slower, and another machine adds an order or two more. So the interface "
+                  "or on another machine. Fowler grants transparency its value and denies "
+                  "that it reaches speed: the cost of a call is the one thing middleware "
+                  "cannot hide, and the design he was shown would, he says, slow the system "
+                  "badly or make it harder to build and deploy, and usually both."),
+            ("p", "Remote and Local Interfaces gives the reason. Calling a procedure in your "
+                  "own process costs almost nothing; a call between two processes is orders of magnitude "
+                  "slower, and another machine slower again. So the interface "
                   "of an object used remotely must differ from one used locally. Locally, "
                   "fine-grained is best: an address class with separate methods to get and "
                   "set the city, the state and the rest, small pieces that can be combined "
@@ -190,9 +190,10 @@ LESSONS = [
                   "collaborations as you can get. Distribute by class and you get many remote "
                   "calls, coarse interfaces on every class, and, into the bargain, a system "
                   "that is hard to change."),
-            ("p", "Hence the law, and its alternative. To use several processors, Fowler "
-                  "says, put all the classes in a single process and run copies of that "
-                  "process on the various nodes. That is clustering: every call inside a copy "
+            ("p", "Hence the law, and its alternative. In most cases, Fowler says, the way "
+                  "to use several processors is to keep the whole application together, "
+                  "one process holding every class, and to run that same process on each "
+                  "machine. That is clustering: every call inside a copy "
                   "is local, every class keeps its fine-grained interface, and the load is "
                   "spread by the number of copies, not by the class of object."),
             # PDF p. 97 of the operator's copy.
@@ -203,11 +204,11 @@ LESSONS = [
                   "and the shared data are different machines. The application server and "
                   "the database, unless everything runs inside the database as stored "
                   "procedures; SQL, he notes, is designed as a remote interface, so the cost "
-                  "can usually be kept down. The web server and the application server, "
-                  "which are best in one process when all else is equal. A vendor's package, "
-                  "which runs in its own process. And, rarely, a genuine reason to split the "
-                  "application server's own software, which he advises avoiding at almost "
-                  "any price."),
+                  "can usually be kept down. The web tier and the application tier, "
+                  "which are best kept in one process when all else is equal. A vendor's package, "
+                  "which runs in its own process. And, now and then, a genuine reason to "
+                  "split the application server's own software, a case he concedes does "
+                  "come up and advises avoiding at almost any price."),
             ("p", "The last two sections look ahead to the rest of the course. Working with "
                   "the Distribution Boundary says to keep fine-grained objects inside the "
                   "process and put coarse-grained objects at the boundary, whose only job is "
@@ -215,8 +216,8 @@ LESSONS = [
                   "to carry the data. Interfaces for Distribution weighs XML over HTTP "
                   "against a platform's own remote call: XML carries a lot of structured data "
                   "in one round trip and crosses platforms and firewalls, but adds a burden "
-                  "to each call, so Fowler would use XML web services only when a more direct "
-                  "approach is not possible. He adds that he increasingly prefers "
+                  "to each call, so Fowler would reach for XML web services only when nothing "
+                  "more direct will do. He adds that he increasingly prefers "
                   "asynchronous messaging to the synchronous calls the book assumes, and "
                   "leaves its patterns to another book."),
             ("code", _lines(REMOTE_CUSTOMER)),
@@ -334,11 +335,11 @@ LESSONS = [
                   "tax, rates, 16`, with `web` on a front node, `tax` and `rates` on a back "
                   "node, a remote call at 800 µs and a local one at 2 µs. How many calls are "
                   "remote, and what is the total time?",
-             "a": ["20 remote, 16,048 µs",
+             "a": ["44 remote, 35,200 µs",
                    "36 remote, 28,816 µs",
                    "12 remote, 9,664 µs",
-                   "44 remote, 35,200 µs"],
-             "c": 0,
+                   "20 remote, 16,048 µs"],
+             "c": 3,
              "why": "There are 44 calls. The 12 from `web` to `cart` cross from the front "
                     "node to `main`, and the 8 from `cart` to `tax` cross from `main` to the "
                     "back node: 20 remote. `cart` and `stock` share `main`, and `tax` and "
@@ -348,7 +349,7 @@ LESSONS = [
                     "on one node, 2,006/11 ≈ 182.4×. Counting `tax, rates` as remote gives "
                     "36; counting only the front node's calls gives 12."},
             {"q": "In the preset by-class, the customer class is moved onto the orders node "
-                  "(`customer=orders`), and nothing else changes. How many of the 75 calls "
+                  "as well, and nothing else changes. How many of the 75 calls "
                   "are now remote?",
              "a": ["55", "65", "10", "75"],
              "c": 1,
@@ -357,11 +358,11 @@ LESSONS = [
                     "order's 30 to the product and 15 to pricing, still cross a node: 65 "
                     "remote, 65,010 µs. Ten is the number that became local, not the number "
                     "left remote."},
-            {"q": "How does Chapter 7 say to use several processors, instead of putting each "
+            {"q": "How does Chapter 7 say, for most cases, to use several processors, instead of putting each "
                   "kind of object on its own node?",
              "a": ["Give each busy component more boxes and balance the load across them",
-                   "Put every class in one process and run copies of that process on the "
-                   "nodes",
+                   "Keep the whole application in one process, and run that process on each "
+                   "node",
                    "Give every remotable class a coarse-grained interface",
                    "Rely on the middleware's transparency to make remote calls local"],
              "c": 1,
@@ -374,12 +375,12 @@ LESSONS = [
                   "names?",
              "a": ["Between a client on the desktop and the shared data on a server",
                    "Between the application server and the database",
-                   "Between the web server and the application server",
+                   "Between the web tier and the application tier",
                    "Between the order and customer classes, so that each can be scaled "
                    "separately"],
              "c": 3,
              "why": "The section names client and server, application server and database, "
-                    "web server and application server, a vendor's package, and, rarely, a "
+                    "web server and application server, a vendor's package, and, now and then, a "
                     "genuine need to split the application server's software. Splitting "
                     "classes so that each can be scaled is the design the chapter opens with "
                     "and argues against."},
@@ -456,7 +457,7 @@ LESSONS = [
         "concepts": [
             ("Remote Facade",
              "A coarse-grained object at the process boundary over many fine-grained "
-             "objects. None of the fine-grained objects has a remote interface; the facade "
+             "objects, which themselves offer only local interfaces; the facade "
              "translates each coarse call into the calls on them, and does nothing more."),
             ("No domain logic",
              "Fowler's description of the facade: it holds no domain logic. Validation, "
@@ -493,15 +494,16 @@ LESSONS = [
                   "coarse-grained interface, and that affects the whole object structure: you "
                   "update an order and its lines in one call, and give up the clear intent of "
                   "small methods."),
-            ("p", "Remote Facade keeps both. It is a coarse-grained facade over a web of "
-                  "fine-grained objects; none of those objects has a remote interface, and "
+            ("p", "Remote Facade keeps both. It puts one coarse-grained object in front "
+                  "of a tangle of small ones, which stay purely local, and "
                   "the facade contains no domain logic. All it does is translate. In the "
                   "simplest case it replaces an address's getters and setters with one bulk "
                   "getter and one bulk setter, which call the real object's accessors and do "
                   "nothing more, so that validation and computation stay on the address. More "
                   "often one facade has many methods, each passing on data from several "
-                  "objects, and Fowler prefers few facades with many methods each, perhaps "
-                  "one for a moderate application, where others make one per use case. A "
+                  "objects, and Fowler prefers few facades with many methods each, a single "
+                  "facade even for a moderate application, where others make one per use "
+                  "case. A "
                   "facade is designed for one client's usage, typically a family of screens, "
                   "and two of its methods may do much the same thing underneath, because the "
                   "client thinks of them as different commands."),
@@ -519,11 +521,12 @@ LESSONS = [
                   "Alur, Crupi and Malks, which as usually described holds workflow logic, and "
                   "from Stafford's Service Layer, in Fowler's book, which need not be remote "
                   "and may sit under a facade."),
-            ("p", "When to Use It answers the quotation's question. The commonest use is "
-                  "between a presentation and a Domain Model in different processes, such "
+            ("p", "When to Use It answers the quotation's question. Its usual place is "
+                  "where a user interface and a Domain Model run in different processes, such "
                   "as a desktop client and a server model, or a servlet and an object model "
-                  "when the web and application servers are separate. The cost of a call "
-                  "between processes on the same machine is large enough to need it too. "
+                  "when the web and application servers are separate. Nor is a shared machine "
+                  "an exemption: two processes on one box, the section says, pay enough for "
+                  "each call to need a coarse-grained interface too. "
                   "Within one process it is not needed, and it is not usually used with a "
                   "Transaction Script, which is coarse-grained already. It implies "
                   "synchronous calls, and Fowler notes that asynchronous messaging can do "
@@ -531,8 +534,9 @@ LESSONS = [
             ("code", _lines(CUSTOMER_FACADE)),
             ("p", "The snippet is one facade method. A remote client calls `moveHouse` "
                   "(lines 9 to 15) once, with the new street, city and postcode. Inside the "
-                  "server's process the facade makes five local calls: it finds the "
-                  "customer, sets the three parts of the address one by one, and saves. "
+                  "server's process the facade makes five calls on the domain, besides "
+                  "fetching the address each time: it finds the customer, sets the three "
+                  "parts of the address one by one, and saves. "
                   "Nothing in it decides anything. If a postcode must be checked against its "
                   "city, that rule belongs to the address, where the local code that uses "
                   "`setPostcode` gets it too."),
@@ -547,16 +551,18 @@ LESSONS = [
             ("p", "The preset <code>move-house</code> has two facade methods, "
                   "`moveHouse`, which does the work of 5 fine-grained calls, and "
                   "`showCustomer`, a bulk getter in place of 6, at a latency of 20 ms and "
-                  "0.5 ms of work a call. The fine-grained client makes 11 round trips, "
-                  "451/2 = 225.50 ms, 40/41 ≈ 97.6% of it waiting; the facade makes 2, "
+                  "0.5 ms of work a call. The fine-grained client makes 11 round trips and "
+                  "takes 451/2 = 225.50 ms, and 40/41 ≈ 97.6% of that is waiting; the facade "
+                  "makes 2, "
                   "91/2 = 45.50 ms, and the speed-up is 451/91 ≈ 5.0×."),
             ("p", "The preset <code>on-a-fast-network</code> cuts the latency to 1 ms. Now "
-                  "the fine-grained calls take 33/2 = 16.50 ms, 2/3 ≈ 66.7% of it waiting, "
-                  "against 15/2 = 7.50 ms through the facade: 11/5 ≈ 2.2×. The facade removes "
+                  "the fine-grained calls take 33/2 = 16.50 ms, and 2/3 ≈ 66.7% of that is "
+                  "waiting, against 15/2 = 7.50 ms through the facade: 11/5 ≈ 2.2×. The facade removes "
                   "waits, not work, so it saves most where the waits are most of the time. "
-                  "On the lesson's illustration even a fast network leaves two thirds of the "
-                  "fine-grained time in waiting, which is Fowler's point about processes on "
-                  "one machine."),
+                  "On the lesson's illustration the saving shrinks as the latency falls, but "
+                  "does not vanish. When to Use It goes further than any figure here: it "
+                  "says that even two processes on one machine pay enough a call to need the "
+                  "facade."),
             ("h3", "Exercise"),
             ("ul", [
                 "A trip-booking service whose facade has three methods: `bookTrip`, doing the "
@@ -638,13 +644,13 @@ LESSONS = [
             {"q": "Count the exercise: a facade with `bookTrip` (8 fine-grained calls), "
                   "`cancelTrip` (3) and `showTrip` (9), a latency of 15 ms and 1 ms of work a "
                   "fine-grained call. What are the two times?",
-             "a": ["320 ms fine-grained, 65 ms through the facade, about 4.9× faster",
+             "a": ["20 ms fine-grained, 3 ms through the facade, about 6.7× faster",
                    "320 ms fine-grained, 45 ms through the facade, about 7.1× faster",
                    "300 ms fine-grained, 65 ms through the facade, about 4.6× faster",
-                   "20 ms fine-grained, 3 ms through the facade, about 6.7× faster"],
-             "c": 0,
+                   "320 ms fine-grained, 65 ms through the facade, about 4.9× faster"],
+             "c": 3,
              "why": "There are 20 fine-grained calls against 3 facade calls. The fine-grained "
-                    "time is 20 × (15 + 1) = 320 ms, 15/16 ≈ 93.8% of it waiting; the facade's "
+                    "time is 20 × (15 + 1) = 320 ms, and 15/16 ≈ 93.8% of that is waiting; the facade's "
                     "is 3 × 15 + 20 × 1 = 65 ms, and 320/65 = 64/13 ≈ 4.9×. Leaving out the "
                     "work the facade still does gives 45 ms; leaving it out of the "
                     "fine-grained time gives 300; 20 and 3 are the round trips, not times."},
@@ -659,7 +665,7 @@ LESSONS = [
              "why": "Remote Facade has no domain logic: if workflow or coordination is "
                     "needed, Fowler puts it in the fine-grained objects or a separate "
                     "nonremotable Transaction Script, so the application can run locally "
-                    "without the facade. A transfer object carries data and has no behaviour, "
+                    "without the facade. A transfer object carries data and has no domain behaviour, "
                     "and moving the rule to the client only puts the logic on the other side "
                     "of the wire."},
             {"q": "A single facade method replaces 5 fine-grained calls. The latency is 20 ms "
@@ -667,8 +673,9 @@ LESSONS = [
              "a": ["1×", "4×", "5×", "25×"],
              "c": 2,
              "why": "Fine-grained: 5 × 20 = 100 ms. Facade: one round trip, 20 ms, and no "
-                    "work. 100/20 = 5×. With no work the speed-up is just the number of "
-                    "round trips saved over one; work would bring it down."},
+                    "work. 100/20 = 5×. With no work the speed-up is the ratio of round "
+                    "trips, 5 to 1. 4× counts the trips saved, not the ratio, and work would "
+                    "bring the speed-up down."},
             {"q": "Which of these does When to Use It say needs no Remote Facade?",
              "a": ["A desktop client calling a domain model on a server",
                    "A servlet calling an object model in a separate application server",
@@ -677,9 +684,9 @@ LESSONS = [
              "c": 2,
              "why": "Within a single process no conversion is needed, and Fowler names a CGI "
                     "script and a Domain Model in one web server as such a case. Two "
-                    "processes on one machine still need a coarse-grained interface: the "
-                    "section says the cost of an inter-process call on the same box is large "
-                    "enough."},
+                    "processes on one machine still need a coarse-grained interface: even "
+                    "there, the section says, each call between processes costs enough to "
+                    "need one."},
         ],
         "mistakes": [
             ("Putting the business logic in the facade",
@@ -699,9 +706,9 @@ LESSONS = [
             ("Thinking a facade matters only between machines",
              "On the lesson's illustration the facade saves least at the lowest latency, and "
              "it is tempting to drop it when the processes share a box. When to Use It says "
-             "the cost of a call between processes on the same machine is large enough to "
-             "need a coarse-grained interface regardless of where the processes live. The "
-             "line Fowler draws is the process, not the machine."),
+             "otherwise: a call from one process to another on the same machine still "
+             "costs enough to want a coarse-grained interface, wherever the two processes "
+             "run. The line Fowler draws is the process, not the machine."),
         ],
         "standard": (
             "Finish when you can price a facade's saving by hand.",
@@ -726,7 +733,7 @@ LESSONS = [
         "slug": "data-transfer-object",
         "title": "Data Transfer Object",
         "module": "Chapter 15 · Distribution Patterns",
-        "one_line": "An object with no behaviour that carries everything one call needs across a process boundary, built from the domain by an assembler.",
+        "one_line": "An object with no domain behaviour that carries everything one call needs across a process boundary, built from the domain by an assembler.",
         "summary": (
             "A Data Transfer Object bundles the data for a call, from several domain "
             "objects, into one serializable object, so that a remote client asks once. "
@@ -749,11 +756,12 @@ LESSONS = [
         "concepts": [
             ("Data Transfer Object",
              "An object that carries the data for one remote call: fields, getters and "
-             "setters, no behaviour. It is serializable, it holds only simple values and other "
+             "setters, and no domain behaviour beyond its accessors and, usually, its own "
+             "serialization. It is serializable, it holds only simple values and other "
              "transfer objects, and its class is present on both sides of the wire."),
             ("Serialization",
              "Turning an object into bytes to send, and back on arrival. The book weighs "
-             "binary forms, compact but fragile when the class changes, against text forms "
+             "a direct binary form, compact but fragile when the class changes, against text forms "
              "such as XML, easy to read and more tolerant of change but larger and slower."),
             ("Assembler",
              "A separate object on the server that builds a transfer object from the domain "
@@ -773,11 +781,11 @@ LESSONS = [
                   "sentence is from How It Works in Chapter 15's Data Transfer Object, and it "
                   "is the pattern's argument in one line. A Remote Facade needs coarse "
                   "methods; this lesson reads the coarse object those methods take and "
-                  "return."),
+                  "return, as a pattern, a tool to look up and use."),
             ("p", "Each call to a remote interface is expensive, so each call has to carry "
                   "more data. Many parameters would do it for an update, awkwardly, but Java "
-                  "returns only one value. So the pattern makes one object to hold all the "
-                  "data for the call. It must be serializable to cross the connection, and "
+                  "returns only one value. So the pattern gathers everything the call "
+                  "needs into one object. It must be serializable to cross the connection, and "
                   "an assembler on the server usually moves data between it and the domain "
                   "objects. Fowler admits it is the kind of object you were brought up not to write, "
                   "a bag of fields and accessors, whose whole value is that it moves many "
@@ -797,9 +805,10 @@ LESSONS = [
             ("p", "Serializing the Data Transfer Object weighs the forms. Use the platform's "
                   "built-in serialization when there is one. Text forms such as XML are easy "
                   "to read and to generate, but need more bandwidth for the same data, XML "
-                  "especially, and can be markedly slower. Binary forms are fragile: a change "
+                  "especially, and can be markedly slower. A direct binary form is fragile: a change "
                   "as small as adding an optional field can break an out-of-date client, "
-                  "where XML can be written to tolerate it. Chapter 6, Session State, gives "
+                  "where XML, or a binary form written through a dictionary, can be made to "
+                  "tolerate it. Chapter 6, Session State, gives "
                   "the book's illustration of the size: one application's session data, sent "
                   "as XML, came to about a megabyte, which one of Fowler's team likened to "
                   "three Shakespeare plays."),
@@ -817,7 +826,7 @@ LESSONS = [
             ("p", "The snippet is a transfer object shaped for one screen. Lines 3 to 7 hold "
                   "what the order screen shows: the order's id, the customer's name, the "
                   "status, the total and a summary of each line, gathered from at least three "
-                  "domain objects by an assembler the snippet leaves out. It has no "
+                  "domain objects by an assembler the snippet leaves out. It has no domain "
                   "behaviour, and nothing in it refers to a domain class, so the client can "
                   "hold the class without the domain."),
             ("p", "Now the count. The lab reads records `field, bytes, needed`, one per "
@@ -832,8 +841,8 @@ LESSONS = [
                   "carried: one fewer than the getter calls, times the latency, times the "
                   "bandwidth. The model sends data at a steady rate after a fixed latency, "
                   "and the panel says real networks are lumpier."),
-            ("p", "The preset <code>order-screen</code> is the snippet's screen, with a "
-                  "4,000-byte `notes` field the screen does not show, as if the assembler had "
+            ("p", "The preset <code>order-screen</code> is the snippet's five fields, with a "
+                  "4,000-byte `notes` field added that the screen does not show, as if the assembler had "
                   "copied the whole order: the err-on-the-side-of-too-much case. At 20 ms "
                   "and 1,000 bytes a millisecond, five getters take 51,033/500 ≈ 102.07 ms; "
                   "one transfer object of 6,066 bytes takes 13,033/500 ≈ 26.07 ms, though "
@@ -935,13 +944,14 @@ LESSONS = [
                   "and `history` 9,000, not needed; 10 ms latency, 2,000 bytes a millisecond, "
                   "factor 1. Which is faster, two getters or one transfer object carrying all "
                   "four fields?",
-             "a": ["The two getters: 4,007/200 ≈ 20.04 ms against 8,907/200 ≈ 44.54 ms",
+             "a": ["Neither: both take 20 ms, one latency each way",
                    "The transfer object: 2,007/200 ≈ 10.04 ms against 4,007/200 ≈ 20.04 ms",
                    "The transfer object: 8,907/200 ≈ 44.54 ms against 69 ms for the getters",
-                   "Neither: both take 20 ms, one latency each way"],
-             "c": 0,
-             "why": "Two getters cost 2 × 10 ms plus 70 bytes at 2,000 a ms, 4,007/200 ≈ "
-                    "20.04 ms. One transfer object of 69,070 bytes costs 10 ms plus 34.535 ms, "
+                   "The two getters: 4,007/200 ≈ 20.04 ms against 8,907/200 ≈ 44.54 ms"],
+             "c": 3,
+             "why": "Two getters cost two latencies of 10 ms each, plus 70 bytes at 2,000 "
+                    "bytes a millisecond: 4,007/200 ≈ 20.04 ms. One transfer object of 69,070 "
+                    "bytes costs one latency of 10 ms, plus 34.535 milliseconds of sending: "
                     "8,907/200 ≈ 44.54 ms: here it is slower, because it carries 69,000 "
                     "unneeded bytes, more than the 20,000 the one saved round trip could have "
                     "carried. A transfer object shaped for the screen, with no photo and no "
@@ -972,8 +982,8 @@ LESSONS = [
             {"q": "A screen needs three fields. The latency is 10 ms and the bandwidth 500 "
                   "bytes a millisecond. How many bytes could the round trips saved by one "
                   "transfer object have carried?",
-             "a": ["5,000", "10,000", "15,000", "1,500"],
-             "c": 1,
+             "a": ["5,000", "15,000", "10,000", "1,500"],
+             "c": 2,
              "why": "Three getters against one transfer object save two round trips. Each is "
                     "10 ms, at 500 bytes a millisecond: 2 × 10 × 500 = 10,000 bytes. Counting "
                     "three saved trips gives 15,000; one gives 5,000."},
@@ -987,7 +997,7 @@ LESSONS = [
              "than the bytes most fields add, so Fowler would rather send too much than call "
              "again. The advice has a limit, which the exercise finds."),
             ("Taking a transfer object for a domain object with getters",
-             "Both have fields and accessors, but a transfer object has no behaviour and is "
+             "Both have fields and accessors, but a transfer object has no domain behaviour and is "
              "shaped by the call, often by one screen, gathering data from several domain "
              "objects. It must not refer to the domain, so that it can live on both sides of "
              "the wire. An assembler builds it; it does not build itself from the domain."),
@@ -1002,7 +1012,7 @@ LESSONS = [
             "Finish when you can weigh a transfer object by hand.",
             "Given fields with sizes and whether the screen needs them, a latency, a "
             "bandwidth and an encoding factor, compute the getters' time and the transfer "
-            "object's, the unneeded bytes it sends, and the bytes one saved round trip would "
+            "object's, the unneeded bytes it sends, and the bytes the saved round trips could "
             "have carried."
         ),
         "note": (
@@ -1077,8 +1087,10 @@ LESSONS = [
                   "far better than he can. Read the chapter in your own copy first."),
             ("p", "He also says your decisions are not cast in stone. Architectural "
                   "refactoring is hard and its full costs are unknown, but it is possible, "
-                  "and he recommends three practices that make it easier to change your mind: "
-                  "continuous integration, test-driven development and refactoring. You will "
+                  "and he asks you to consider seriously three practices, even if you dislike "
+                  "the rest of extreme programming: continuous integration, test-driven "
+                  "development and refactoring. They are no panacea, he says, but they make it "
+                  "easier to change your mind. You will "
                   "need to change it, he adds, unless you are luckier or more skilful than "
                   "anyone he has met."),
             ("p", "Starting with the Domain Layer repeats Chapter 2, with a second force "
@@ -1145,16 +1157,19 @@ LESSONS = [
                   "domain to the mappers and 6 from the mappers to the database, 74 in all, "
                   "at 2,000 µs a remote call and 1 µs a local one. The preset "
                   "<code>web-and-database</code> puts the browser and the database on their "
-                  "own nodes, the two boundaries Chapter 7 says you cannot avoid: 7 remote "
+                  "own nodes, the two boundaries Chapter 7 expects most systems to keep, client "
+                  "and server, and application and database: 7 remote "
                   "calls, 14,067 µs, 14,067/74 ≈ 190.1× the time on one node."),
             ("p", "The preset <code>service-split-off</code> moves the service, domain and "
                   "mappers to an application node, a boundary above the Service Layer: 9 "
                   "remote calls, 18,065 µs. The preset <code>domain-split-off</code> leaves "
                   "the service with the page and moves the domain and mappers, a boundary "
                   "under the Service Layer: 47 remote calls, 94,027 µs. On the lesson's "
-                  "illustration the first adds 2 remote calls to the unavoidable seven and "
-                  "the second adds 40, which is why, when Fowler must split, he puts the "
-                  "facade on the coarse side. The lab prices every remote hop alike, the "
+                  "illustration the first adds 2 remote calls to those seven and the second "
+                  "adds 40: a boundary above the Service Layer is crossed by a few coarse "
+                  "calls, one under it by the domain's many fine ones, which is the "
+                  "arithmetic behind Chapter 8's advice to wrap the domain layer in a Remote "
+                  "Facade when the presentation must run apart. The lab prices every remote hop alike, the "
                   "browser's and the database's; the panel says so."),
             ("h3", "Exercise"),
             ("ul", [
@@ -1197,7 +1212,8 @@ LESSONS = [
                 "Each record is one pair of layers and how many times the first calls the "
                 "second for one request; each node assignment puts a layer on a named node. "
                 "One remote cost prices every hop alike, the browser's and the database's as "
-                "well as any boundary between layers. The times are the lesson's, in "
+                "well as any boundary between layers, and where the one-node tile "
+                "says every class, read every layer. The times are the lesson's, in "
                 "microseconds."
             ),
         }),
@@ -1208,18 +1224,18 @@ LESSONS = [
              "List each pair of layers that call each other for one request, and how many "
              "times, from the browser down to the database."),
             ("Place the layers on nodes",
-             "Mark the nodes you cannot avoid first, the client and the database, then any "
+             "Mark first the nodes most systems keep apart, the client and the database, then any "
              "boundary between layers you are considering."),
             ("Price each deployment",
              "Count the calls that cross a node, price them and the local calls, and compare "
-             "each deployment with the unavoidable one."),
+             "each deployment with the one that keeps only those two."),
             ("Do it on a system you know",
              "Write the layers of one system you know with the node each runs on. Count the "
              "calls that cross a node for one request, write the figure, and say in one "
              "sentence which boundary you would remove first."),
         ],
         "worked": {
-            "title": "The two boundaries you cannot avoid",
+            "title": "The two boundaries most systems keep",
             "intro": [
                 "Take the preset <code>web-and-database</code>: the browser on a client node, "
                 "the database on its own, everything else on one.",
@@ -1233,7 +1249,7 @@ LESSONS = [
             ],
             "after": [
                 "Almost all the time is in seven calls, and none of them can be removed by "
-                "rearranging the layers. Any further split can only add to it; the question "
+                "rearranging the layers between those two nodes. Any further split can only add to it; the question "
                 "is how much, and the two other presets answer it.",
             ],
         },
@@ -1251,7 +1267,7 @@ LESSONS = [
                     "node, since the database shares the server's node. The time is 3 × "
                     "50,000 + 54 × 1 = 150,054 µs, almost all of it the three phone calls, "
                     "against 57 µs on one node (50,018/19 ≈ 2,632.5×). One Remote Facade "
-                    "method for the screen would make it one call, about 50,054 µs. Counting "
+                    "method for the screen would make it one call, 50,054 µs. Counting "
                     "the database hop as remote gives 7; leaving out the 54 local calls gives "
                     "150,000."},
             {"q": "Down to the Data Source Layer: for a fairly simple Domain Model, the "
@@ -1309,7 +1325,7 @@ LESSONS = [
             "Finish when you can price a deployment of the layers by hand.",
             "Given the calls between layers for one request and the node each layer runs on, "
             "compute the remote calls and the time for each deployment, and say which "
-            "boundaries Chapter 7 says you cannot avoid."
+            "boundaries Chapter 7 says you will usually have to keep."
         ),
         "note": (
             "What has happened to distribution since 2002, services and then microservices, "
@@ -1376,12 +1392,12 @@ LESSONS = [
             ("p", "&ldquo;Use Service Stub whenever you find that dependence on a particular "
                   "service is hindering your development and testing.&rdquo; The words are "
                   "David Rice's, in his Service Stub, one of Chapter 18's Base Patterns. "
-                  "This lesson reads it with Plugin, which Rice wrote with Matt Foemmel, "
-                  "because each needs the other: a stub is no use unless something chooses "
+                  "This lesson reads it with Plugin, which Rice wrote with Matt Foemmel, both "
+                  "as patterns, tools to look up and use, because each needs the other: a stub is no use unless something chooses "
                   "it for the tests and the real service for production."),
             ("p", "Plugin starts from Separated Interface, where code running in several "
-                  "environments needs a different implementation in each: an in-memory "
-                  "counter for unit tests and a database sequence in production, say. The "
+                  "environments needs a different implementation in each: files on a local "
+                  "disk for unit tests and a shared document store in production, say. The "
                   "usual answer is a factory method with a conditional on the environment, "
                   "and once there are a few such factories, Rice and Foemmel say, you have a "
                   "mess: a new deployment configuration means editing conditionals in "
@@ -1403,7 +1419,7 @@ LESSONS = [
                   "unreliable. Developers wait, or hack around them, and worse, tests cannot "
                   "run, which Rice says breaks the development process. A stand-in that runs "
                   "locally, fast and in memory fixes that."),
-            ("p", "The steps are the two earlier patterns. Define access to the service with "
+            ("p", "The steps are the two earlier patterns. Reach the service through "
                   "a Gateway, and make the Gateway a Separated Interface, not a class, so "
                   "that one implementation calls the real service and another is the stub. "
                   "Load the right one with a Plugin. Then keep the stub as simple as possible, "
@@ -1419,7 +1435,10 @@ LESSONS = [
                   "`ZZ`, so a test can ask for either answer. Lines 12 to 20 are the plugin "
                   "in its simplest form, one `switch` on the environment's name, read once "
                   "at startup: the stub for `test`, the real post office check for `live`. "
-                  "It is the one place that knows both implementations."),
+                  "It is the one place that knows both implementations. It solves the "
+                  "scattering and not the rebuild: a new environment, say a staging setup "
+                  "that uses the stub, is still a change to this code, which a configuration "
+                  "file read at startup, or reflection, would remove."),
             ("p", "Now the count. The lab reads records `dependent, dependency` and the name "
                   "of the class that changes, and walks the dependencies backwards from it. "
                   "Its tiles list what depends on the changed class directly and everything "
@@ -1428,7 +1447,8 @@ LESSONS = [
                   "`network` library, and the signup's test calls the signup. Change "
                   "`network` and it reaches 1 directly, `postoffice`, and 3 in all, "
                   "`postoffice, signup, signuptest`: the test depends on the network."),
-            ("p", "The preset <code>plugin-and-stub</code> is the snippet's design. The "
+            ("p", "The preset <code>plugin-and-stub</code> is the snippet's design, wired from "
+                  "the edge. The "
                   "signup depends on `addresscheck`; `postofficecheck` and "
                   "`addresscheckstub` implement it; the test uses the signup and the stub; "
                   "and `main`, the startup code that calls the plugin and hands the result to "
@@ -1442,14 +1462,16 @@ LESSONS = [
                   "signuptest`. That is the compile-time dependency Rice and Foemmel's "
                   "reflection removes, and one reason to read the configuration at one point "
                   "at the edge of the system, as the lesson's `main` does, not inside the "
-                  "code that uses the interface."),
+                  "code that uses the interface. That edge is the lesson's choice: the "
+                  "book's own examples call the factory from the interface, which "
+                  "reflection makes harmless."),
             ("h3", "Exercise"),
             ("ul", [
                 "An invoice priced from an exchange-rate feed: `invoice, ratesfeed; "
                 "ratesfeed, http; invoicetest, invoice`, with `http` changed.",
                 "The same invoice redesigned: an interface `rates`, implemented by "
                 "`httprates`, which uses `http`, and by `ratesstub`; the invoice and its test "
-                "as in the snippet's design; `main` wiring `httprates`.",
+                "as in the preset plugin-and-stub; `main` wiring `httprates`.",
             ]),
             ("p", "For each design, list by hand what depends on `http` directly and "
                   "everything a change to it reaches, and say in one sentence whether the "
@@ -1546,10 +1568,10 @@ LESSONS = [
                     "last option gives only the direct dependents."},
             {"q": "What does a Service Stub let a test check?",
              "a": ["That the real service returns correct answers",
-                   "The code that uses the service, without the service",
+                   "The service's performance under load",
                    "That the network is available",
-                   "The service's performance under load"],
-             "c": 1,
+                   "The code that uses the service, without the service"],
+             "c": 3,
              "why": "A stub stands in for the service, so a test that uses it checks the "
                     "caller's behaviour for the answers the stub gives. Whether the real "
                     "service answers correctly, or at all, needs tests of its own against "
@@ -1568,11 +1590,11 @@ LESSONS = [
                     "scattered configuration Plugin was written to remove."},
             {"q": "In the preset plugin-and-stub, the signup calls the plugin itself, so the "
                   "record `signup, main` is added. What does a change to `network` reach now?",
-             "a": ["2: main, postofficecheck",
+             "a": ["4: main, postofficecheck, signup, signuptest",
                    "3: main, postofficecheck, signup",
-                   "4: main, postofficecheck, signup, signuptest",
+                   "2: main, postofficecheck",
                    "5: addresscheck, main, postofficecheck, signup, signuptest"],
-             "c": 2,
+             "c": 0,
              "why": "`network` reaches `postofficecheck`, then `main`, which the signup now "
                     "uses, then the signup, then its test: 4. Stopping at the signup forgets "
                     "that the test uses it. `addresscheck` is not reached: it is used by the "
@@ -1591,7 +1613,8 @@ LESSONS = [
              "and Foemmel ask for less: one place, stated outside the code that uses the "
              "interface and read at configuration time, that chooses the implementation for "
              "the environment. Without reflection that can be a conditional, and the "
-             "snippet does it with one `switch`."),
+             "snippet does it with one `switch`, though a new environment then still "
+             "means a rebuild, which the book's text file of linking rules avoids."),
             ("Making the stub faithful to the service",
              "A stub that reproduces the service's rules seems more useful the more it "
              "copies. Rice says the opposite: keep it as simple as possible, because "

@@ -176,7 +176,7 @@ LESSONS = [
                   "the rows that refer to it can be written."),
             ("p", "His answer is an object that does the remembering. A Unit of Work keeps "
                   "track of the objects read and the objects created, changed or deleted, and "
-                  "at commit it decides what to do: it opens a transaction, runs any "
+                  "at commit it works out the database work itself: it starts a transaction, runs any "
                   "concurrency check (the offline locks of a later course), and writes the "
                   "changes out. Chapter 3 calls it the controller of the database mapping, "
                   "behavior that without it lives scattered through the domain layer."),
@@ -191,11 +191,12 @@ LESSONS = [
                   "which costs time at commit but lets it update only the fields that "
                   "changed. The pattern also gives the commit a place to order the writes "
                   "for the database's keys, which is lesson 4.4's subject, and to send them "
-                  "as one batch."),
+                  "as one batch. The pattern's worked example, with object registration, is "
+                  "David Rice's, and is better read in the book."),
             ("p", "Its When to Use It sets out the alternatives. The simplest is to save each "
                   "object whenever you alter it, and the book's illustration of what that "
                   "costs is one object altered at three points in a piece of work: three "
-                  "database calls rather than one call with its final state. Keeping the "
+                  "writes where a single write of its last state would do. Keeping the "
                   "changed objects in variables works for a few, and works with a Transaction "
                   "Script, but soon becomes unmanageable; a dirty flag on each object works "
                   "if you can find all the dirty ones, which in a Domain Model's network of "
@@ -242,9 +243,9 @@ LESSONS = [
                   "once, list the statements a Unit of Work writes at commit, inserts first, "
                   "and give the writes saved as a share. Then type the script into the lab to "
                   "check."),
-            ("p", "A Unit of Work writes each row once, but it may still write a row before "
-                  "another row it depends on. The next lesson, Identity Map, deals first with "
-                  "the other half of the behavioral problem: loading the same row twice."),
+            ("p", "A Unit of Work writes each row once; putting those writes in an order the "
+                  "keys allow is lesson 4.4's. The next lesson, Identity Map, takes the other "
+                  "half of the behavioral problem: loading the same row twice."),
         ],
         "lab": ("eakit", {
             "mode": "uow",
@@ -321,15 +322,15 @@ LESSONS = [
                   "payment1; change, invoice4; change, invoice4; load, account2; change, "
                   "account2; new, note1; delete, note1; change, payment1`. What does the Unit "
                   "of Work write at commit?",
-             "a": ["3 statements: INSERT payment1; UPDATE invoice4; UPDATE account2, saving "
-                   "4 of 7",
-                   "4 statements: INSERT payment1; INSERT note1; UPDATE invoice4; UPDATE "
+             "a": ["4 statements: INSERT payment1; INSERT note1; UPDATE invoice4; UPDATE "
                    "account2, saving 3 of 7",
-                   "4 statements: INSERT payment1; UPDATE payment1; UPDATE invoice4; UPDATE "
-                   "account2, saving 3 of 7",
-                   "3 statements: INSERT payment1; UPDATE invoice4; UPDATE account2, saving "
-                   "6 of 9"],
-             "c": 0,
+                   "4 statements: INSERT payment1; UPDATE payment1; UPDATE invoice4; "
+                   "UPDATE account2, saving 3 of 7",
+                   "3 statements: INSERT payment1; UPDATE invoice4; UPDATE account2, "
+                   "saving 4 of 7",
+                   "3 statements: INSERT payment1; UPDATE invoice4; UPDATE account2, "
+                   "saving 6 of 9"],
+             "c": 2,
              "why": "At once there are 7 writes: two news, four changes and a delete; the "
                     "two loads write nothing. At commit `note1` was created and deleted, so "
                     "it writes nothing; `payment1` was created, so one INSERT, however it "
@@ -340,21 +341,21 @@ LESSONS = [
             {"q": "The book's illustration in Unit of Work's When to Use It: one object is "
                   "altered at three points in a piece of work, and saved each time. How many "
                   "database calls does that make, against a Unit of Work?",
-             "a": ["Three, against one",
-                   "One, against one: the database merges them",
-                   "Three, against three: the Unit of Work only delays them",
-                   "Four, against one: a load and three saves"],
+             "a": ["Three, against one: one write of its last state at commit",
+                   "One, against one: the database merges the three saves into one",
+                   "Three, against three: the Unit of Work only delays the same writes",
+                   "Four, against one: the load and three saves, against one at commit"],
              "c": 0,
-             "why": "The illustration is three calls rather than one call with the object in "
-                    "its final state. A Unit of Work marks the object dirty once and writes "
+             "why": "The illustration is three writes where one, of the object as it ends "
+                    "up, would do. A Unit of Work marks the object dirty once and writes "
                     "it once at commit; the load is a read, not a save."},
             {"q": "In the lesson's snippet, `mark` is called on one object with NEW and then "
                   "with REMOVED. What does the commit write for it?",
-             "a": ["Nothing: the mark becomes GONE, which no case of the switch writes",
-                   "A DELETE: REMOVED is the last mark",
-                   "An INSERT and then a DELETE",
-                   "An INSERT: a NEW object keeps its mark"],
-             "c": 0,
+             "a": ["A DELETE: REMOVED is the last mark, so the switch deletes the row",
+                   "An INSERT and then a DELETE, one for each mark in the order set",
+                   "An INSERT: line 7 keeps a NEW object's mark whatever comes after",
+                   "Nothing: the mark becomes GONE, which no case of the switch writes"],
+             "c": 3,
              "why": "Line 8 makes `undone` true when the old mark is NEW and the new one "
                     "REMOVED, and line 9 then stores GONE. The switch on lines 13 to 17 has "
                     "cases for NEW, DIRTY and REMOVED only, so GONE writes nothing. Line 7's "
@@ -362,11 +363,11 @@ LESSONS = [
                     "as DIRTY."},
             {"q": "Which registration scheme does Chapter 11 argue causes more confusion than "
                   "its flexibility is worth?",
-             "a": ["Caller registration",
-                   "Object registration",
-                   "The unit of work controller",
-                   "None: every scheme writes every change"],
-             "c": 0,
+             "a": ["Object registration, where the object's setters register it",
+                   "Caller registration, where the user of an object registers it",
+                   "The unit of work controller, comparing copies taken at read time",
+                   "None: Chapter 11 finds each scheme's flexibility worth its cost"],
+             "c": 1,
              "why": "With caller registration the user of an object must remember to "
                     "register it, and an object nobody registered is not written on commit; "
                     "Fowler grants the flexibility, but would rather make an explicit copy for "
@@ -380,9 +381,9 @@ LESSONS = [
              "the commit. It is not. It is a record of changes held in memory, which becomes a "
              "short system transaction at commit; until then the loads have read the "
              "database, but nothing has been written to it. Chapter 11 makes the point "
-             "against saving as you go: that needs a transaction open for the whole "
-             "interaction, which is impractical when a business transaction spans several "
-             "requests."),
+             "against saving as you go: it would keep a database transaction running from "
+             "the first change to the last, which cannot work when one business transaction "
+             "stretches over several requests."),
             ("Thinking that saving each change at once is safer",
              "It can feel safer to write each change the moment it is made, so that nothing "
              "is lost. On the lesson's illustration, <code>edit-an-order</code>, saving at "
@@ -394,7 +395,7 @@ LESSONS = [
              "The lab's commit, like the snippet's, writes each object once, but in an order "
              "set by the kind of write or by when the object was first marked, not by the "
              "database's keys. A line written before its order can break a foreign key. "
-             "Chapter 11 says the Unit of Work is the natural place to sort that out, and "
+             "Chapter 11 makes the Unit of Work the obvious home for that ordering, and "
              "lesson 4.4 counts how."),
         ],
         "standard": (
@@ -456,8 +457,8 @@ LESSONS = [
             ("Session scope",
              "Each session gets its own maps, isolated from every other session's, usually "
              "held by its Unit of Work. Sharing one map between sessions would need "
-             "transactional protection, which Fowler says is more work than any sane developer "
-             "wants; read-only objects are the exception."),
+             "transactional protection, a burden Fowler advises against taking on; for a "
+             "plain map, read-only objects are the main exception."),
         ],
         "read_title": "The chapter's warning first, then the map",
         "read_intro": (
@@ -477,8 +478,8 @@ LESSONS = [
                   "whichever is written last decides what the database holds. The cure is to "
                   "keep a record of every row read, check it before each read, and return a "
                   "second reference to the object already loaded. As a benefit the record "
-                  "doubles as a cache, but Fowler's warning is explicit: its primary purpose "
-                  "is to keep identities correct, not to boost performance."),
+                  "doubles as a cache, but Fowler's warning is explicit: the map is there "
+                  "first so that each row has one object, and speed is a side benefit."),
             ("p", "Chapter 11 makes the record a pattern. Its How It Works keys the map on the "
                   "table's primary key, which works well if the key is one column and never "
                   "changes, so a surrogate key, a number with no meaning outside the database, "
@@ -492,9 +493,10 @@ LESSONS = [
                   "from every other session's, so they belong on a session object, and the "
                   "Unit of Work of the last lesson is by far the best place. A map shared "
                   "between sessions would need transactional protection of its own. Fowler "
-                  "allows one exception: objects that can never be changed may be loaded "
-                  "once and held for the whole process, in a read-only map beside the "
-                  "session's updatable one."),
+                  "names two exceptions: an object database used as a transactional cache, "
+                  "which he thinks worth a look, and objects that are never or very rarely "
+                  "changed, which may be held for the whole process in a read-only map "
+                  "beside the session's updatable one."),
             ("p", "There are also things the map does not do. It answers a find by key; a "
                   "query for many rows, such as everyone whose surname matches a pattern, "
                   "still has to go to the database, because nothing guarantees that all the "
@@ -585,7 +587,7 @@ LESSONS = [
                 "finds: 7",
                 "pairs: customer 7, order 31, order 32,",
                 "  product 5: 4 distinct",
-                "duplicates: 7 - 4, which is 3",
+                "duplicates: 7 − 4, which is 3",
                 "customer 7 found 3 times, product 5 twice",
             ],
             "after": [
@@ -599,41 +601,44 @@ LESSONS = [
             {"q": "Count the exercise's finds: `room, 12; guest, 3; room, 14; guest, 3; room, "
                   "12; guest, 9; guest, 3`. How many distinct rows and duplicates are there, "
                   "and which objects are shared?",
-             "a": ["4 distinct, 3 duplicates: room 12 ×2, guest 3 ×3",
-                   "5 distinct, 2 duplicates: room 12 ×2, guest 3 ×2",
+             "a": ["5 distinct, 2 duplicates: room 12 ×2, guest 3 ×2",
+                   "4 distinct, 3 duplicates: room 12 ×2, guest 3 ×3",
                    "4 distinct, 3 duplicates: guest 3 ×3, room 14 ×2",
                    "3 distinct, 4 duplicates: room 12 ×2, guest 3 ×3"],
-             "c": 0,
+             "c": 1,
              "why": "There are 7 finds of 4 distinct pairs, room 12, guest 3, room 14 and "
                     "guest 9, so 7 − 4 = 3 duplicates. Room 12 is found twice and guest 3 "
                     "three times; room 14 and guest 9 once each. Two duplicates of guest 3 "
                     "plus one of room 12 make the 3."},
-            {"q": "Which reason does Chapter 3 give as the primary purpose of an Identity Map?",
-             "a": ["To maintain correct identities: one in-memory object per row",
-                   "To boost performance by caching database reads",
-                   "To share loaded objects between sessions",
-                   "To order the writes at commit"],
-             "c": 0,
-             "why": "Chapter 3 says the map doubles as a cache, and adds that its primary "
-                    "purpose is to maintain correct identities, not to boost performance. "
+            {"q": "Which reason does Chapter 3 put first for an Identity Map?",
+             "a": ["Performance: a cache that saves a database read on each repeat find",
+                   "Sharing: one set of loaded objects used by every session at once",
+                   "Ordering: the writes at commit follow the order objects entered it",
+                   "Correctness: one in-memory object for each row the session reads"],
+             "c": 3,
+             "why": "Chapter 3 says the map doubles as a cache, and then insists that keeping "
+                    "one object per row comes first and speed second. "
                     "Sharing between sessions is what it avoids, and ordering writes belongs "
                     "to the Unit of Work."},
             {"q": "Where may a whole process share one Identity Map, by Chapter 11's How It "
                   "Works?",
              "a": ["For objects that can never be changed, held in a read-only map",
-                   "For every object, once the server has enough memory",
-                   "For objects whose keys are database-unique",
-                   "Nowhere: every map is per session without exception"],
+                   "For every object, once the server has enough memory to hold them",
+                   "For objects whose keys are unique across the whole database",
+                   "Nowhere: every map is per session, read-only data included"],
              "c": 0,
              "why": "Each session gets its own map, so that one user's uncommitted objects are "
-                    "not another's. The exception is read-only data, which may be loaded once "
+                    "not another's. For a plain map the exception is read-only data, which may be loaded once "
                     "and held in a process-wide map beside the session's updatable one. "
                     "Database-unique keys allow one map for a session, not one for the "
                     "process."},
             {"q": "In the lesson's `CustomerMapper`, a session calls `find(7)` twice. How many "
                   "times does line 9, `c = load(id);`, run?",
-             "a": ["Once", "Twice", "Never", "Once for each session in the server"],
-             "c": 0,
+             "a": ["Twice: line 9 runs on each call, and line 10 only records it",
+                   "Never: the map is filled before the first call is made",
+                   "Once: the second call finds the object at line 7 and skips it",
+                   "Once for every session in the server, whatever its calls"],
+             "c": 2,
              "why": "The first call finds nothing at line 7, so line 8's test is true and line "
                     "9 loads the row; line 10 puts it in the map. The second call finds the "
                     "object at line 7 and skips lines 9 and 10. The map is a field of one "
@@ -687,7 +692,7 @@ LESSONS = [
         "module": "Chapter 11 · Object-Relational Behavioral Patterns",
         "one_line": "Leave a marker where related data would go, and load it only when something asks, which saves what is never used and costs a query for each thing that is.",
         "summary": (
-            "Lazy Load is an object that does not hold all its data but knows how to get it. "
+            "A Lazy Load stands in for data not yet read and fetches it on first use. "
             "Chapter 11 gives four ways to build one and warns of ripple loading, a query for "
             "each lazy object in a collection; Chapter 3's Reading in Data gives the rules of "
             "thumb on queries and joins. Count the statements and rows four loading "
@@ -708,7 +713,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Lazy Load",
-             "An object that does not contain all the data you need but knows how to get it. "
+             "A stand-in for data not yet read, which fetches it the first time it is used. "
              "It leaves a marker in the object structure, and the data is loaded only when "
              "something follows the marker. Chapter 11 builds it four ways: lazy "
              "initialization, a virtual proxy, a value holder and a ghost."),
@@ -752,11 +757,12 @@ LESSONS = [
                   "Fowler adds that in practice two degrees of laziness are enough: a "
                   "complete load, and enough to identify each item in a list."),
             ("p", "Then the warning. Fill a collection with lazy objects and look at them one "
-                  "by one, and you go to the database once for each of them instead of once "
-                  "for all: ripple loading. One cure is to make the collection itself the lazy "
-                  "thing, and load all its contents when it is first touched; another is to "
-                  "give different use cases different loaders, one that loads the lines with "
-                  "the order and one that waits. When to Use It puts the decision plainly: "
+                  "by one, and each of them makes its own trip to the database where one trip "
+                  "could have fetched them all: ripple loading. Fowler's cure is to make the "
+                  "collection itself the lazy thing, and load all its contents when it is "
+                  "first touched. A related remedy, from the pattern's discussion of use "
+                  "cases, is to give different use cases different loaders, one that loads "
+                  "the lines with the order and one that waits. When to Use It puts the decision plainly: "
                   "Lazy Load is worth considering when the data needs an extra call and is "
                   "not used whenever the main object is, and Fowler's own preference is not "
                   "to add it until he thinks he needs it."),
@@ -764,16 +770,18 @@ LESSONS = [
                   "thumb, the book's illustration, is that one query bringing back more rows "
                   "than you need is usually better than fifty separate ones, and that joins "
                   "can pull several tables back in one query, though databases are optimized "
-                  "for about three or four joins in a query. Fowler then tells you to profile "
+                  "for up to three or four joins in a query. Fowler then tells you to profile "
                   "on your own database, because every rule of thumb has its surprising "
                   "exceptions."),
             ("p", "Here is lazy initialization written for this lesson. The `Order` keeps its "
                   "lines in a list (line 5) and a flag saying whether they have been loaded "
                   "(line 6). The first call of `lines()` finds the flag false on line 13, "
                   "asks the mapper for the lines on line 14, and sets the flag on line 15; "
-                  "every later call skips straight to line 17. The flag, rather than a null "
-                  "list, is the marker, because an order with no lines has a legitimately "
-                  "empty list, the case Chapter 11 warns about when null is a legal value."),
+                  "every later call skips straight to line 17. The flag is the marker because "
+                  "the list is created empty and stays a real list (line 5), so there is no "
+                  "null to test. It is also the shape Chapter 11 points to wherever null is a "
+                  "legal loaded value, when a null test would go back to the database on every "
+                  "call."),
             ("code", _lines(LAZY_LINES)),
             ("p", "Now the count. The lab reads parents as records of a name, how many "
                   "children each has and whether its children are used, with a batch size, "
@@ -879,38 +887,48 @@ LESSONS = [
             {"q": "Count the exercise: `a, 10, yes; b, 0, no; c, 2, no; d, 6, yes; e, 1, no; "
                   "f, 3, yes`, batch 3. What do lazy loading, lazy in batches, two queries and "
                   "the join issue?",
-             "a": ["Lazy 4 statements, 25 rows; batches 2, 25; two queries 2, 28; join 1, 23",
-                   "Lazy 4 statements, 19 rows; batches 2, 19; two queries 2, 22; join 1, 23",
-                   "Lazy 7 statements, 28 rows; batches 3, 28; two queries 2, 28; join 1, 22",
-                   "Lazy 4 statements, 25 rows; batches 3, 25; two queries 2, 28; join 1, 22"],
-             "c": 0,
+             "a": ["Lazy 4 statements, 19 rows; batches 2, 19; two queries 2, 22; join 1, "
+                   "23",
+                   "Lazy 7 statements, 28 rows; batches 3, 28; two queries 2, 28; join 1, "
+                   "22",
+                   "Lazy 4 statements, 25 rows; batches 3, 25; two queries 2, 28; join 1, "
+                   "22",
+                   "Lazy 4 statements, 25 rows; batches 2, 25; two queries 2, 28; join 1, "
+                   "23"],
+             "c": 3,
              "why": "Six parents, three used (a, d, f) with 10 + 6 + 3 = 19 children, and 22 "
                     "children in all. Lazy: 1 + 3 = 4 statements, 6 + 19 = 25 rows. Batches: "
                     "the 3 used parents fit one batch of 3, so 1 + 1 = 2 statements, 25 rows. "
                     "Two queries: 2 statements, 6 + 22 = 28 rows. The join: 10 + 1 + 2 + 6 + 1 "
                     "+ 3 = 23 rows, because b has no children and is still one row. The other "
-                    "answers forget the parents' rows, forget b's join row, or round the "
-                    "batches wrongly."},
+                    "answers count every parent as used, forget the parents' rows, forget "
+                    "b's join row, or round the batches wrongly."},
             {"q": "Four orders, every one used, with 2, 2, 2 and 2 lines. How many statements "
                   "does the lazy strategy issue, against two queries?",
-             "a": ["5 against 2", "4 against 2", "5 against 5", "8 against 2"],
-             "c": 0,
+             "a": ["4 against 2",
+                   "5 against 5",
+                   "5 against 2",
+                   "8 against 2"],
+             "c": 2,
              "why": "Lazy is one query for the orders and one for each used order's lines: 1 "
                     "+ 4 = 5. Two queries is always 2. Both return 4 + 8 = 12 rows, so here "
                     "laziness loads nothing less and sends more statements."},
             {"q": "What does Chapter 11 call the danger of a collection of lazy objects "
                   "examined one at a time?",
-             "a": ["Ripple loading", "A ghost", "A virtual proxy", "Lazy initialization"],
-             "c": 0,
-             "why": "Ripple loading is going to the database once for each object instead of "
-                    "once for all of them. A ghost and a virtual proxy are two of the four "
+             "a": ["A ghost",
+                   "Ripple loading",
+                   "A virtual proxy",
+                   "Lazy initialization"],
+             "c": 1,
+             "why": "Ripple loading is a separate trip to the database for each object where "
+                    "one trip could have read them all. A ghost and a virtual proxy are two of the four "
                     "ways to build a Lazy Load, and lazy initialization is the simplest of "
                     "them."},
             {"q": "By Lazy Load's When to Use It, when is the pattern usually pointless?",
-             "a": ["On a field stored in the same row as the rest of the object",
-                   "On a collection that needs an extra query",
-                   "On data that is used only some of the times the object is",
-                   "On an object loaded through a Data Mapper"],
+             "a": ["On a field kept in the object's own row, beside its other columns",
+                   "On a collection whose items need an extra query to read",
+                   "On data used only some of the times the object itself is used",
+                   "On any object loaded through a Data Mapper rather than a record"],
              "c": 0,
              "why": "Fowler says it is usually pointless on a field in the same row, because "
                     "bringing back extra data in a call usually costs no more; it is worth "
@@ -929,13 +947,14 @@ LESSONS = [
             ("Making each item of a collection lazy",
              "A collection of lazy objects, each loading itself, is the shape that ripple "
              "loads: one query per item as the list is walked. Fowler's cure is to make the "
-             "collection the lazy thing and load all of it at once when first touched, or to "
-             "give the use case that walks the list a loader that reads it eagerly."),
+             "collection the lazy thing and load all of it at once when first touched; a "
+             "related remedy is to give the use case that walks the list a loader that reads "
+             "it eagerly."),
             ("Reading the join's rows as its whole cost",
              "The join returns the fewest rows in both presets, 15 against 19, and one "
              "statement. But each of those rows carries the parent's columns as well as the "
              "child's, the lab counts rows and not their width, and Chapter 3 notes that "
-             "databases handle only three or four joins in a query well."),
+             "databases are optimized for up to three or four joins in a query."),
         ],
         "standard": (
             "Finish when you can count four loading strategies by hand.",
@@ -962,7 +981,8 @@ LESSONS = [
     # When to Use It p. 221); Association Table Mapping (pp. 229-240); Dependent
     # Mapping (pp. 241-245).
     # Quote: PDF p. 53, 11 words, ea_quotes.py OK; "a rare stand on the side of
-    # meaninglessness", PDF p. 201, 8 words, OK. Lesson total: 19 words.
+    # meaninglessness", PDF p. 201, 8 words, OK; it is quoted twice, in the
+    # body and mistakes[0]. Lesson total: 11 + 8 + 8 = 27 words.
     {
         "slug": "identity-field-and-foreign-keys",
         "title": "Identity Field and Foreign Keys",
@@ -1041,10 +1061,12 @@ LESSONS = [
                   "auto-generates is the easiest, until you insert an order and its lines and "
                   "need the order's key for the lines' foreign keys before the transaction "
                   "commits. A GUID is unique without asking anyone, but long, hard to type and read, "
-                  "and a possible strain on indexes. "
-                  "Fowler's own suggestion is a separate key table, a row per table with the "
-                  "next free value, read and updated in its own short transaction so that it "
-                  "does not lock out everyone else who wants a key. The pattern's examples, "
+                  "and a possible strain on indexes. A database counter, such as a sequence, "
+                  "avoids the auto-generated field's problem, and Fowler calls it perfect "
+                  "where you have one, but it is nonstandard. If you roll your own, he "
+                  "prefers a separate key table to scanning for the largest key: a row per "
+                  "table with the next free value, read and updated in its own short "
+                  "transaction so that it does not lock out everyone else who wants a key. The pattern's examples, "
                   "one of them by Matt Foemmel and Fowler, are in the book."),
             ("p", "Foreign Key Mapping turns a reference into a key, and reverses a "
                   "collection into keys held by the children; updating such a collection "
@@ -1169,10 +1191,10 @@ LESSONS = [
                   "booking`, and the order proposed is `hotel guest booking room charge`. "
                   "Which keys does it break, and what is a valid insert order?",
              "a": ["One, booking before room; guest, hotel, room, booking, charge",
-                   "Two, booking before room and booking before guest; guest, hotel, room, "
-                   "booking, charge",
+                   "Two, booking before room and booking before guest; guest, hotel, "
+                   "room, booking, charge",
                    "One, booking before room; charge, booking, room, hotel, guest",
-                   "None; hotel, guest, booking, room, charge"],
+                   "None; hotel, guest, booking, room, charge already follows the keys"],
              "c": 0,
              "why": "In the order given, `hotel` precedes `room`, `guest` precedes `booking` "
                     "and `booking` precedes `charge`, but `booking` comes before `room`, which "
@@ -1182,39 +1204,41 @@ LESSONS = [
                     "an insert order."},
             {"q": "By Chapter 3's Mapping Relationships, which row holds the foreign key "
                   "between an order and its lines?",
-             "a": ["Each line row holds the order's key",
-                   "The order row holds a list of its lines' keys",
+             "a": ["The order row holds a list of its lines' keys",
                    "Both rows hold each other's keys",
-                   "Neither: a third table holds the pairs"],
-             "c": 0,
+                   "Neither: a third table holds the pairs",
+                   "Each line row holds the order's key"],
+             "c": 3,
              "why": "A normalized table cannot hold a many-valued field, so the structure is "
                     "reversed: the order object holds a collection of lines, but each line "
                     "row holds the key of its order. A third table of pairs is Association "
                     "Table Mapping, needed for many-to-many links."},
             {"q": "Where the database can defer its referential integrity checks to the end "
                   "of the transaction, what does Chapter 3 advise?",
-             "a": ["Defer them: there is no reason not to",
-                   "Keep them on every statement and order the writes",
+             "a": ["Keep them on every statement and order the writes",
                    "Turn them off and rely on the Unit of Work",
+                   "Defer them: there is no reason not to",
                    "Defer them only for deletes"],
-             "c": 0,
+             "c": 2,
              "why": "Fowler's first advice is to use deferral if the database has it, and "
                     "only otherwise to order the writes, with a topological sort as one "
                     "technique. With the checks deferred, the order of writes inside the "
                     "transaction does not matter. The lab models the other case."},
             {"q": "Why does Identity Field's discussion distrust meaningful keys such as a "
                   "national identity number?",
-             "a": ["Human error makes them neither unique nor immutable, and every foreign "
-                   "key holding one must change with it",
-                   "They take more space than a long integer",
-                   "Databases cannot index them",
-                   "They cannot be used as foreign keys"],
-             "c": 0,
+             "a": ["They take more space than a long integer, which slows every join on "
+                   "them",
+                   "Mistakes make them neither unique nor immutable, and a fix reaches "
+                   "every foreign key",
+                   "Databases cannot index them, so every lookup by key scans the table",
+                   "They cannot be used as foreign keys, so links need a second, "
+                   "meaningless key"],
+             "c": 1,
              "why": "Keys must be unique to work at all and immutable to work well; a "
                     "mistyped number is neither once it is corrected, and the correction "
                     "reaches every row that refers to it. Fowler allows that small or very "
-                    "stable systems may get away with one, and otherwise takes his stand on "
-                    "the side of meaninglessness."},
+                    "stable systems may get away with one, and otherwise prefers keys that "
+                    "mean nothing to the business."},
         ],
         "mistakes": [
             ("Using a meaningful key to save a column",

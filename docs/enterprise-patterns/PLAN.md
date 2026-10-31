@@ -1141,9 +1141,15 @@ procedures are named where Fowler names them, not taught.
      the find and save methods.
    - **Worked:** `active-record`: three routines, two of them SQL and one,
      `canWithdraw`, a business rule.
-   - **Exercise:** `MEMBER_RECORD`. **Answer:** 4 fields, 1 public and not
-     final (`email`); 3 routines (`find` and `insert` are database access,
-     `level` is domain logic), so it is an Active Record.
+   - **Exercise:** `MEMBER_RECORD`: its routines, sorted. **Answer:** 3
+     routines; `find` and `insert` are database access, `level` is domain
+     logic (a derivation from one row), so it is an Active Record. (The lab
+     also prints 3 fields, 1 public and not final, and 2 public routines;
+     the exercise does not ask for them.) Corrected at authoring after the
+     course review's SF-5: the exercise asks only for the sorting, and
+     `MEMBER_RECORD` loses its `public final String joined` field (which
+     no routine read or wrote) and gains `find`'s SELECT comment (N-5);
+     still 18 lines, compiled with `javac --release 8`.
    - **Own:** one class in a system you know that both saves itself and
      carries a business rule; list its methods in the two columns.
    - **Snippet:** `ACCOUNT_RECORD`, 19 lines; `ACCOUNT_ROW`, 15.
@@ -1512,11 +1518,11 @@ to, not reworked.
    - **Standard:** given a tree as node, parent records, state its depth and
      the queries to read it one node at a time, one level at a time, and from
      one column.
-   - **Lab:** eakit `load/tree`. Presets `departments` (`company, -; sales,
-     company; north, sales; south, sales; it, company; support, it; desk,
-     support; field, support` → `ldNodes` 8, `ldDepth` 4, `ldPerNode` 9,
-     `ldPerLevel` 5, `ldLob` 1) and `flat` (`company, -; sales, company; it,
-     company; legal, company` → 4, 2, 5, 3, 1). Pins `ldPerNode`,
+   - **Lab:** eakit `load/tree`. Presets `thread` (`start, -; ann, start; bo,
+     ann; cy, ann; dee, start; eli, dee; fay, eli; gus, eli` → `ldNodes` 8,
+     `ldDepth` 4, `ldPerNode` 9, `ldPerLevel` 5, `ldLob` 1) and `flat-thread`
+     (`start, -; ann, start; bo, start; cy, start` → 4, 2, 5, 3, 1): a reply
+     thread, each post's parent the post it answers. Pins `ldPerNode`,
      `ldPerLevel`. The panel states the three rules (§D.1), and that both
      counts include the queries that come back empty: a leaf's query for its
      children, and the query for the level below the deepest.
@@ -1525,14 +1531,17 @@ to, not reworked.
      the quotation.
    - **Also:** "An Embedded Value needs its own key." It has none: it is part of
      its owner's row, which is why it suits a Value Object.
-   - **Worked:** `departments`: 1 + 8 = 9 queries node by node (one for the
+   - **Worked:** `thread`: deepest chain start, dee, eli, fay, depth 4;
+     1 + 8 = 9 queries node by node (one for the
      root, then one for each node's children), 4 + 1 = 5 level by level (the
      fifth finds nothing below the deepest level), 1 as a LOB.
    - **Exercise:** `root, -; a, root; b, a; c, b; d, c; e, root`. **Answer:** 6
      nodes, depth 5: 7 queries node by node, 6 level by level, 1 as a LOB.
    - **Own:** one column in a schema you know that holds JSON or XML; write
      one query someone might want that it now prevents.
-   - **Snippet:** `EMBEDDED_TERM`, 7 lines; `LOB_TEXT`, 9.
+   - **Snippet:** `EMBEDDED_TERM`, 7 lines; `THREAD_TEXT`, 19 (a reply
+     thread written as depth-and-id lines; the book's own example, a
+     department hierarchy, p. 250, is pointed to, not reused).
    - **Sources:** Chapter 3, Structural Mapping Patterns; Chapter 12, Embedded
      Value, Serialized LOB.
 
@@ -1575,7 +1584,8 @@ to, not reworked.
    - **Own:** one hierarchy in a system you know; write which of the three
      mappings it uses and count the columns a row of its largest subclass
      leaves empty.
-   - **Snippet:** `SINGLE_TABLE_LOAD`, 13 lines.
+   - **Snippet:** `SINGLE_TABLE_LOAD`, 14 lines (salary read once for the
+     two employee kinds; a manager is an employee).
    - **Sources:** Chapter 3, Inheritance; Chapter 12, Single Table Inheritance.
 
 7. **class-and-concrete-table-inheritance** — Class and Concrete Table Inheritance — *Chapter 12 · Object-Relational Structural Patterns* — 18 min
@@ -1613,10 +1623,11 @@ to, not reworked.
    - **Worked:** `staff-find-person`: a manager's row is split across person,
      employee and manager, 3 tables; under concrete table it is one table of
      1 + 3 + 2 + 2 = 8 columns.
-   - **Exercise:** `account, -, 3, no; saving, account, 2, yes; isa, saving, 1,
-     yes; current, account, 2, yes`, load `isa`, find `saving`, alter
-     `account`. **Answer:** load 1, 3, 1; find `saving` 1, 3, 2 (class table
-     joins account and unions isa); alter `account` 1, 1, 3.
+   - **Exercise:** `account, -, 3, no; saving, account, 2, no; isa, saving, 1,
+     yes; bond, saving, 2, yes; current, account, 2, yes`, load `bond`, find
+     `saving`, alter `saving`. **Answer:** load 1, 3, 1; find `saving` 1, 4, 2
+     (class table joins account and reaches isa and bond; concrete unions isa
+     and bond); alter `saving` 1, 1, 2 (its fields sit in isa and bond).
    - **Own:** the hierarchy from 4.6's step; count the tables a query for all
      instances of its root touches under each mapping.
    - **Snippet:** `CLASS_TABLE_FIND`, 7 lines (a SQL string constant).
@@ -1788,6 +1799,11 @@ aside is in Template View and Transform View.
      (`FRONT_HANDLER`: 0, 0, "none"). Pins all three. The body says the
      count cannot choose between the second and third presets, which both
      reach 0, and gives Fowler's four reasons for the Front Controller.
+     *Changed at review (Course 5 review MF-2):* `FRONT_HANDLER` looks the
+     command up first and redirects to `/login` only when there is no user
+     and `c.needsLogin()`, so the login page no longer redirects to itself;
+     still 8 lines, compiled with `javac --release 8`, cckit figures
+     unchanged (0, 0, "none").
    - **Misconception:** "A Front Controller is one huge controller." It is one
      handler and many small commands; the handler does only what every
      request shares.
@@ -1838,8 +1854,11 @@ aside is in Template View and Transform View.
      the pattern is a transformation element by element, in any language.
    - **Worked:** `ticket-row`: 1 + 2 `if` + 1 `||` + 1 `&&` = 5, inside the
      HTML-building code.
-   - **Exercise:** `PRICE_CELL`. **Answer:** 5 (1 + if 2 + && 1 + || 1); a
-     helper with `showWasPrice()` and `isUnavailable()`.
+   - **Exercise:** `PRICE_CELL`. **Answer:** 6 (1 + if 2 + && 1 + || 2); a
+     helper with `showWasPrice()` and `isUnavailable()`. *Changed at review
+     (SF-11):* line 9 gains `|| item.isRecalled()`, so the exercise no longer
+     prints exactly what `ticket-row` prints (cckit: 6, "1 + if 2 + && 1 +
+     || 2", band 6–10, depth 1, line 4).
    - **Own:** one template in a system you know; count the conditionals in
      it.
    - **Snippet:** `TICKET_ROW`, 13 lines; `TICKET_HELPER`, 11.
@@ -1917,8 +1936,13 @@ aside is in Template View and Transform View.
      comes next; the domain commands do the work.
    - **Worked:** `flow-repeat`: the customs, approval and payment lines
      appear in both controllers.
-   - **Exercise:** `CLAIM_FLOW`. **Answer:** lines 2–4 and 9–11 (6 lines): the
-     assessor, medical and bank steps; one `nextStep(Claim c)` replaces them.
+   - **Exercise:** `CLAIM_FLOW`. **Answer:** lines 2–4 and 10–12 (6 lines): the
+     assessor, medical and bank steps; one `nextStep(Claim c)` replaces them,
+     with one difference to decide (a claim with no photos leaving the details
+     step now goes to `/photos`). *Changed at review (SF-11):* `afterPhotos`
+     gains a second check, `photosTooLarge()` → `/resize`, before the shared
+     block, so the copies sit at lines 2–4 and 10–12 (cckit: 1, 6, "lines
+     2–4 and lines 10–12"); 13 lines.
    - **Own:** one wizard or checkout in a system you know; count the places
      its order of screens is written down.
    - **Snippet:** `FLOW_REPEAT`, 12 lines; `NEXT_SCREEN`, 7.
@@ -2017,7 +2041,8 @@ locking are named, not taught.
      4, bo, edit, plan; 9, bo, commit, -; 12, ann, commit, -`, optimistic.
      **Answer:** bo commits; ann's commit conflicts, 12 minutes of work redone.
      Pessimistic: ann takes the lock when she loads the plan at minute 0, bo
-     is refused at minute 2 and redoes nothing.
+     is refused at minute 2 and redoes nothing. The two halves of the answer are the `why`s of
+     two quiz items, one for each scheme (recorded at review).
    - **Own:** one record in a system you know that two people edit; write
      which scheme it uses (if any) and what the second editor sees.
    - **Snippet:** `TWO_CONTROLS`, 19 lines.
@@ -2094,22 +2119,27 @@ locking are named, not taught.
      (`0, kim, read, invoice; 1, lee, read, invoice; 2, lee, edit, invoice; 3,
      lee, commit, -; 4, kim, edit, invoice; 20, kim, commit, -` →
      `olCommitted` "1: lee", `olConflicts` "1: kim", `olRedo` 20),
-     `inconsistent-read` (`0, kim, read, rate; 0, kim, edit, invoice; 1, lee,
-     edit, rate; 2, lee, commit, -; 6, kim, commit, -`, checkReads no → "2:
+     `inconsistent-read` (`0, kim, read, discount; 0, kim, edit, quote; 1, lee,
+     edit, discount; 2, lee, commit, -; 6, kim, commit, -`, checkReads no → "2:
      lee, kim", "0: none", 0) and `check-the-read` (checkReads yes → "1: lee",
      "1: kim", 6). Pins `olCommitted`, `olConflicts`, `olRedo`.
    - **Misconception:** "A version check catches every conflict." It catches
      conflicts on what the session wrote; on the lesson's illustration Kim's
-     invoice is computed from a rate Lee changed, and the check passes unless
+     quote is computed from a discount Lee changed, and the check passes unless
      the read is checked too.
    - **Also:** "Optimistic locking costs nothing." It costs the work of
      every failed session; on `two-clerks` Kim loses 20 minutes.
    - **Worked:** `two-clerks`: Kim read version 0, Lee committed version 1 at
      minute 3, and Kim's update at minute 20 matches no row.
-   - **Exercise:** `0, ana, read, policy; 1, ben, read, policy; 2, ana, edit,
-     policy; 5, ana, commit, -; 6, ben, edit, policy; 30, ben, commit, -; 31,
-     cy, read, policy; 32, cy, edit, policy; 40, cy, commit, -`. **Answer:**
+   - **Exercise:** `0, ana, read, budget; 1, ben, read, budget; 2, ana, edit,
+     budget; 5, ana, commit, -; 6, ben, edit, budget; 30, ben, commit, -; 31,
+     cy, read, budget; 32, cy, edit, budget; 40, cy, commit, -`. **Answer:**
      ana and cy commit; ben conflicts at minute 30 and redoes 29 minutes.
+   - **Renamed at review:** `inconsistent-read`'s records are `discount`
+     and `quote` (were `rate` and `invoice`), and the exercise's record is
+     `budget` (was `policy`), to keep the instances away from the book's
+     billing-and-address and insurance-policy examples (PDF pp. 376, 89).
+     Names only; every figure is unchanged.
    - **Own:** one table in a system you know that two users update; check
      whether it has a version column, and what the second save does.
    - **Snippet:** `OPTIMISTIC_SAVE`, 11 lines: the version check in the
@@ -3674,9 +3704,9 @@ class Member {
     private long id;
     public String email;
     private int points;
-    public final String joined = "2024-01-01";
 
     static Member find(Connection db, long id) throws SQLException {
+        // SELECT email, points FROM member WHERE id = ?
         return new Member();
     }
 
@@ -3914,23 +3944,33 @@ Lease load(ResultSet rs) throws SQLException {
 }
 ```
 
-`LOB_TEXT` (body; 9 lines):
+`THREAD_TEXT` (body; 19 lines):
 
 ```java
-// Writes a whole department tree into one text column.
-String toText(Dept d) {
+// Writes a reply thread into one text column, a line per post.
+String toText(Post first) {
     StringBuilder out = new StringBuilder();
-    out.append('(').append(d.name());
-    for (Dept child : d.children()) {
-        out.append(' ').append(toText(child));
+    Deque<Post> todo = new ArrayDeque<Post>();
+    Deque<Integer> depths = new ArrayDeque<Integer>();
+    todo.push(first);
+    depths.push(0);
+    while (!todo.isEmpty()) {
+        Post p = todo.pop();
+        int depth = depths.pop();
+        out.append(depth).append(' ').append(p.id()).append('\n');
+        List<Post> replies = p.replies();
+        for (int i = replies.size() - 1; i >= 0; i--) {
+            todo.push(replies.get(i));
+            depths.push(depth + 1);
+        }
     }
-    return out.append(')').toString();
+    return out.toString();
 }
 ```
 
 #### 4.6 Single Table Inheritance
 
-`SINGLE_TABLE_LOAD` (body; 13 lines):
+`SINGLE_TABLE_LOAD` (body; 14 lines):
 
 ```java
 // One table for every kind of staff; a type column says which.
@@ -3938,13 +3978,14 @@ Staff load(ResultSet rs) throws SQLException {
     String type = rs.getString("type");
     long id = rs.getLong("id");
     String name = rs.getString("name");
-    if (type.equals("M")) {
-        return new Manager(id, name, rs.getInt("reports"));
-    }
     if (type.equals("C")) {
         return new Contractor(id, name, rs.getLong("day_rate"));
     }
-    return new Employee(id, name, rs.getLong("salary"));
+    long salary = rs.getLong("salary");
+    if (type.equals("M")) {
+        return new Manager(id, name, salary, rs.getInt("reports"));
+    }
+    return new Employee(id, name, salary);
 }
 ```
 
@@ -4165,10 +4206,10 @@ class InvoicePage extends SecurePage {
 ```java
 // One handler for every request; a command does each page's part.
 void handle(Request req, Response res) throws IOException {
-    User u = sessions.user(req);
-    if (u == null) { res.redirect("/login"); return; }
-    audit.log(u, req.path());
     Command c = commands.get(req.path());
+    User u = sessions.user(req);
+    if (u == null && c.needsLogin()) { res.redirect("/login"); return; }
+    audit.log(u, req.path());
     c.run(req, res);
 }
 ```
@@ -4238,7 +4279,7 @@ String cell(Item item, Locale locale) {
     } else {
         html = html + money(item.cents(), locale);
     }
-    if (item.stock() == 0 || item.isWithdrawn()) {
+    if (item.stock() == 0 || item.isWithdrawn() || item.isRecalled()) {
         html = html + " (unavailable)";
     }
     return html + "</td>";
@@ -4303,7 +4344,7 @@ String nextScreen(Order o) {
 }
 ```
 
-`CLAIM_FLOW` (exercise; 12 lines):
+`CLAIM_FLOW` (exercise; 13 lines):
 
 ```java
 void afterDetails(Claim c, Response res) throws IOException {
@@ -4314,6 +4355,7 @@ void afterDetails(Claim c, Response res) throws IOException {
 
 void afterPhotos(Claim c, Response res) throws IOException {
     if (c.photos() == 0) { res.redirect("/photos"); return; }
+    if (c.photosTooLarge()) { res.redirect("/resize"); return; }
     if (c.amount() > 10000) { res.redirect("/assessor"); return; }
     if (c.hasInjury()) { res.redirect("/medical"); return; }
     res.redirect("/bank");
@@ -4786,7 +4828,8 @@ are Code Complete's §E.3, applied to this book:
 - This document quotes the book only in §C's **Quote** lines and in a few
   phrases of two to eight words in §C and §S.2 that identify a claim ("a rare
   stand on the side of meaninglessness" is the longest, at 8 words, in 4.4's
-  misconception; it counts against that lesson's 60, for a total of 19).
+  misconception; the lesson quotes it twice, in its body and that misconception,
+  so it counts twice against that lesson's 60, for a total of 27).
 
 ### E.4 The author's checklist
 
@@ -5321,3 +5364,15 @@ server's node; it now gives 3 remote calls, 150,054 µs). `presets.py` and
 **Rejected outright:** none. One note was declined in part (N-10's swap),
 and two should-fixes were met by the review's other option so as not to
 change §D further while the kit is being built (SF-21, SF-26).
+
+### R.C4 Course 4 review (Objects and Tables)
+
+`docs/reviews/enterprise-patterns-objects-and-tables-review.md` changed
+these specification entries: 4.5's domain (MF-1) is now a reply thread, with
+`THREAD_TEXT` (19 lines) in place of `LOB_TEXT` and the presets `thread` and
+`flat-thread` (the same five figures as before, 8, 4, 9, 5, 1 and 4, 2, 5, 3,
+1); `SINGLE_TABLE_LOAD` reads `salary` once and builds a `Manager` with it
+(14 lines, SF-6); 4.7's exercise adds `bond` under an abstract `saving`, so
+that find and alter differ between the mappings (SF-7; 1, 3, 1 / 1, 4, 2 /
+1, 1, 2). Figures re-run with `earef.py --cc`, snippets compiled with
+`javac --release 8`, pins taken from `labcheck --observe`.

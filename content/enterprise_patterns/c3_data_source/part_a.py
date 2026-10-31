@@ -1,4 +1,4 @@
-"""Talking to the Database, lessons 1-6 -- Chapter 3's first half and Chapter 10.
+"""Talking to the Database, lessons 1-6 -- Chapter 3 (in part) and Chapter 10.
 
 Fowler et al., Patterns of Enterprise Application Architecture (Addison-Wesley,
 2002): Chapter 3, Mapping to Relational Databases (Architectural Patterns,
@@ -97,9 +97,9 @@ MEMBER_RECORD = """class Member {
     private long id;
     public String email;
     private int points;
-    public final String joined = "2024-01-01";
 
     static Member find(Connection db, long id) throws SQLException {
+        // SELECT email, points FROM member WHERE id = ?
         return new Member();
     }
 
@@ -243,12 +243,12 @@ LESSONS = [
              "Chapter 18 says to keep it as small as it can be: it adapts the resource and "
              "gives a place to substitute a stand-in for tests."),
             ("Table Data Gateway",
-             "A gateway with one instance for a whole table: it holds every SELECT, INSERT, "
-             "UPDATE and DELETE for that table, and other code calls its methods for all "
-             "access to it. It is usually stateless, pushing data back and forth."),
+             "A gateway of which one object serves a whole table. Every query and every "
+             "change to that table is written in it, and the rest of the program asks it "
+             "rather than writing SQL. It normally keeps no data of its own between calls."),
             ("Record Set",
-             "A generic in-memory structure of tables and rows that mimics the database's "
-             "own shape. Many environments of the time provided one, and user-interface "
+             "A general-purpose in-memory table: rows and columns laid out the way the "
+             "database lays them out. Many environments of the time provided one, and user-interface "
              "controls worked with it directly; a Table Data Gateway's finders can return "
              "one."),
         ],
@@ -285,29 +285,32 @@ LESSONS = [
                   "you built the domain logic, which is why the previous course came first."),
             # F10, PDF p. 49 of the operator's copy.
             ("p", "The section closes on what all this costs. Weighing object databases, "
-                  "which need no mapping, Fowler reports that anecdotal observations put "
-                  "the effort of mapping to a relational database at around a third of "
-                  "programming effort, a cost that goes on through maintenance. He says "
-                  "himself that he knows of no controlled tests; it is a figure from "
-                  "projects he has seen, not a measurement, and your own records can test "
-                  "it."),
+                  "which need no mapping, Fowler puts the cost of the alternative at about "
+                  "a third of all programming effort, carried on into maintenance. He says "
+                  "that this rests on anecdote, and that he knows of no controlled test. "
+                  "Treat it as an estimate, which your own records can check."),
             ("p", "Gateway, in Chapter 18, is the general tool. Wrap the special API of an "
                   "external resource, JDBC and SQL for a database, in a class whose interface "
                   "looks like any other object's, and let everything else go through it. "
                   "Keep it minimal: adapt the resource, give tests a place to substitute a "
-                  "stand-in, and leave any cleverer logic to its callers. Its chief benefit, "
-                  "the pattern says, is that a change of resource alters only the gateway "
-                  "and does not ripple through the rest of the system."),
+                  "stand-in, and leave any cleverer logic to its callers. One clear benefit, "
+                  "the pattern says, is that swapping the resource means changing only the "
+                  "gateway, and nothing beyond it. It adds that the simplicity and the place "
+                  "for a test stand-in are worth having even if the resource never "
+                  "changes."),
             ("p", "Table Data Gateway, in Chapter 10, is that tool for one table: finds, "
                   "inserts, updates and deletes, each mapping its parameters into SQL. Its "
                   "trickiest question is what a query returns. A map works, but Fowler calls "
-                  "it bad form, because it defeats compile-time checking; a Data Transfer "
+                  "it bad form: it gives up type checks at compile time, so a mistyped key "
+                  "is found only when it fails. A Data Transfer "
                   "Object is better, at the cost of another class; the Record Set itself is "
                   "conceptually messy but very effective where tools are built around it; "
                   "and with a Domain Model the gateway can return domain objects, which he is "
                   "reluctant to do, because each side then depends on the other. The book "
                   "notes that Alur, Crupi and Malks's Data Access Object is this pattern "
-                  "under another name."),
+                  "under another name. And where a team does all its access through stored "
+                  "procedures, Fowler treats the set of procedures for a table as its Table "
+                  "Data Gateway, and would still wrap the calls in an in-memory one."),
             ("p", "The lesson's snippet is a small Table Data Gateway for a `price` table. "
                   "In JDBC, `prepareStatement` compiles a SQL statement with a question "
                   "mark as its placeholder, `setString` fills the placeholder, and `executeQuery` runs "
@@ -421,11 +424,11 @@ LESSONS = [
             {"q": "Take the exercise: `signup`, `profile` and `mailer` hold SQL against "
                   "`member-table`, and `profile` also uses `mailer`. How many classes must a "
                   "column rename be edited in without a gateway, and with `membergateway`?",
-             "a": ["3 without (mailer, profile, signup); 1 with (membergateway)",
-                   "2 without (mailer, signup); 1 with (membergateway)",
+             "a": ["2 without (mailer, signup); 1 with (membergateway)",
                    "3 without; 4 with (mailer, membergateway, profile, signup)",
-                   "4 without, counting profile twice; 1 with"],
-             "c": 0,
+                   "4 without, counting profile once for each path; 1 with (membergateway)",
+                   "3 without (mailer, profile, signup); 1 with"],
+             "c": 3,
              "why": "Without the gateway three classes hold SQL against the table, so the "
                     "lab's direct tile prints 3: mailer, profile, signup, and its second tile "
                     "prints the same 3, since `profile` is reached directly as well as "
@@ -436,21 +439,23 @@ LESSONS = [
                     "rename is edited in."},
             {"q": "Of the four things a Table Data Gateway's finder can return, which does "
                   "Chapter 10 call bad form?",
-             "a": ["A map", "A Data Transfer Object", "A Record Set", "Domain objects"],
-             "c": 0,
-             "why": "A map, because it defeats compile-time checking and is not an explicit "
-                    "interface, so a misspelt key becomes a bug. A Data Transfer Object is "
+             "a": ["A Data Transfer Object",
+                   "A map",
+                   "A Record Set",
+                   "Domain objects"],
+             "c": 1,
+             "why": "A map: it gives up the compiler's type checks and says nothing about what "
+                    "it holds, so a mistyped key is found only when it fails. A Data Transfer Object is "
                     "another class but a better choice; a Record Set is conceptually messy "
                     "and very effective where tools use it; returning domain objects makes "
                     "each side depend on the other, which Fowler is reluctant to do but does "
                     "not call bad form."},
             {"q": "On <code>one-gateway</code> the lab's second tile prints 5: admin, cart, "
                   "checkout, pricegateway, report. What do those five classes count?",
-             "a": ["The classes a column rename must be edited in",
-                   "The classes holding SQL against the price table",
-                   "Everything the change would reach if it got past the gateway's "
-                   "interface",
-                   "The classes plus the table itself"],
+             "a": ["The classes a column rename must be edited in, the gateway included",
+                   "Every class in the design counted once, with the table left out",
+                   "What the change reaches if it gets past the gateway's interface",
+                   "The classes holding SQL against the price table, plus the table"],
              "c": 2,
              "why": "The tile follows every dependency back from the changed table, as if "
                     "nothing absorbed the change. Only `pricegateway` holds SQL, so a rename "
@@ -458,12 +463,11 @@ LESSONS = [
                     "never appears in the list."},
             {"q": "Which of these is one of Architectural Patterns' reasons for taking SQL "
                   "out of the domain logic?",
-             "a": ["Embedded SQL cannot use a connection pool",
-                   "Database administrators want to find the SQL that accesses a table, to "
-                   "tune it and arrange its indexes",
-                   "SQL in a domain class cannot be precompiled",
-                   "A relational database cannot be reached from a domain class"],
-             "c": 1,
+             "a": ["Database administrators want to find a table's SQL to tune it",
+                   "Embedded SQL cannot draw on the connection pool the platform provides",
+                   "SQL written in a domain class cannot be precompiled by the driver",
+                   "A domain class cannot reach a relational database without a gateway"],
+             "c": 0,
              "why": "The section gives three reasons: many application developers do not "
                     "know SQL well, every way of embedding it is somewhat awkward, and "
                     "database administrators want to find it. Pooling and precompiling "
@@ -501,9 +505,7 @@ LESSONS = [
         "note": (
             "The lab follows the dependencies you state; it cannot find SQL in code, and it "
             "cannot tell whether a change stops at a gateway's interface, which is why its "
-            "second tile is an upper bound. The figure of a third of programming effort is "
-            "Fowler's report of anecdotal observation, as he says himself, not a measured "
-            "rate."
+            "second tile is an upper bound."
         ),
     },
     # ---------------------------------------------------------------- 02
@@ -591,8 +593,8 @@ LESSONS = [
                   "there is none."),
             ("code", _lines(ORDER_ROW)),
             ("p", "Reading in Data adds a warning that is easy to miss: a finder reads the "
-                  "database, not what is in memory. Add a member to a club in memory, run a "
-                  "query for the club's members, and the new one is not in the result. "
+                  "database, not what is in memory. Add a line to an order in memory, then run "
+                  "a finder for the order's lines, and the new line is not among them. "
                   "Fowler's advice is to do queries at the beginning. Then come his rules of "
                   "thumb on speed. Pull back many rows at once; never query one table "
                   "repeatedly to get several rows; it is almost always better to bring back "
@@ -620,15 +622,15 @@ LESSONS = [
                   "latency, 0.1 ms a row and batches of 10 are illustrative. Keyed finds make "
                   "50 statements and take 255 ms. The broad query returns 200 rows, 150 of "
                   "them unneeded, in 25 ms. Batched finds make 5 statements and take 30 ms. "
-                  "Fifty keyed finds take ten times as long as one query that returns four "
+                  "Fifty keyed finds take about ten times as long as one query that returns four "
                   "times the rows, because forty-nine of their fifty waits are the cost."),
             ("p", "In <code>local-database</code> the latency falls to 0.2 ms, as if the "
                   "database sat on the same machine, and the advice reverses on its own "
                   "figures: keyed finds take 15 ms, the broad query 101/5 = 20.20 ms, and "
                   "batches 6 ms. With a short wait, the 150 rows nobody wanted cost more "
-                  "than the 49 extra statements. That is Fowler's point about measuring, "
-                  "made by the lab: the rule of thumb is a rule about latency, and it holds "
-                  "where a statement's wait is large against a row's cost."),
+                  "than the 49 extra statements. Fowler's advice is to measure, and the "
+                  "lab shows why: on these figures, the rule of thumb holds only where a "
+                  "statement's wait is large against a row's cost."),
             ("h3", "Exercise"),
             ("ul", [
                 "Rows wanted: 30. Rows the broad query returns: 600.",
@@ -711,11 +713,11 @@ LESSONS = [
         "quiz": [
             {"q": "Take the exercise: 30 rows wanted, a broad query of 600 rows, batches of "
                   "15, 4 ms a statement and 0.05 ms a row. What are the three times?",
-             "a": ["keyed 121.50 ms, broad 34 ms, batched 9.50 ms",
-                   "keyed 120 ms, broad 34 ms, batched 9.50 ms",
-                   "keyed 121.50 ms, broad 30 ms, batched 9.50 ms",
-                   "keyed 121.50 ms, broad 34 ms, batched 8 ms"],
-             "c": 0,
+             "a": ["keyed 120.00 ms, broad 34 ms, batched 9.50 ms",
+                   "keyed 121.50 ms, broad 30.00 ms, batched 9.50 ms",
+                   "keyed 121.50 ms, broad 34 ms, batched 8 ms",
+                   "keyed 121.50 ms, broad 34 ms, batched 9.50 ms"],
+             "c": 3,
              "why": "Keyed: 30 statements of 4 + 0.05 ms, 30 × 4.05 = 243/2 = 121.50 ms. "
                     "Broad: 4 + 600 × 0.05 = 34 ms, with 570 rows unneeded. Batched: 30 / 15 "
                     "= 2 statements, 2 × 4 + 30 × 0.05 = 19/2 = 9.50 ms. Batching wins here, "
@@ -724,34 +726,33 @@ LESSONS = [
                     "rows' time."},
             {"q": "Reading in Data names one cost of making a row-based class's finders "
                   "static. What is it?",
-             "a": ["A static finder issues one query for every row",
-                   "A static finder cannot be substituted, so a test cannot replace the "
-                   "database with a Service Stub",
-                   "A static finder reads the objects in memory instead of the database",
-                   "A static finder cannot take a parameter"],
-             "c": 1,
+             "a": ["It issues one separate query for every row that the finder returns",
+                   "It reads the objects already in memory rather than the database rows",
+                   "It cannot be swapped, so a test cannot put a Service Stub in place",
+                   "It cannot take a parameter, so every find must load the whole table"],
+             "c": 2,
              "why": "The section's point is substitutability: a static method cannot be "
                     "swapped for another, which is why Fowler prefers finder objects. How "
                     "many queries a finder issues depends on its SQL, not on `static`, and "
                     "every finder reads the database."},
-            {"q": "You add a member to a club in memory and then run a finder for the club's "
-                  "members. What does Reading in Data warn?",
-             "a": ["The new member is returned twice",
-                   "The finder fails until the change is committed",
-                   "The new member is not in the result, because finders work on the "
-                   "database's state",
-                   "The new member is returned, because the gateway holds it"],
-             "c": 2,
+            {"q": "You add a line to an order in memory and then run a finder for the order's "
+                  "lines. What does Reading in Data's warning about finders lead you to "
+                  "expect?",
+             "a": ["It is missing: finders read the database, not memory",
+                   "It is returned twice, once from memory and once from the table",
+                   "The finder fails with an error until the change is committed",
+                   "It is returned, because the gateway already holds the new row"],
+             "c": 0,
              "why": "Finders query the database, so an object added only in memory is not "
                     "picked up. Fowler's advice is to do queries at the beginning."},
             {"q": "On <code>local-database</code> (50 wanted of 200, batches of 10, 0.2 ms a "
                   "statement, 0.1 ms a row), which order does the lab put the three times "
                   "in, fastest first?",
              "a": ["broad, batched, keyed",
-                   "batched, keyed, broad",
-                   "keyed, batched, broad",
-                   "batched, broad, keyed"],
-             "c": 1,
+                   "keyed, then batched, then broad",
+                   "batched, broad, keyed",
+                   "batched, keyed, broad"],
+             "c": 3,
              "why": "Batched 5 × 0.2 + 50 × 0.1 = 6 ms; keyed 50 × 0.3 = 15 ms; broad 0.2 + "
                     "200 × 0.1 = 101/5 = 20.20 ms. With a short wait the broad query's 150 "
                     "extra rows cost more than the extra statements, which is why the rule "
@@ -761,7 +762,7 @@ LESSONS = [
             ("Thinking that fetching only the rows you need is always cheaper",
              "Every statement pays the latency, whatever it returns. On the lesson's first "
              "preset, fifty keyed finds take 255 ms and one query that returns four times "
-             "the rows takes 25 ms, ten times less: the extra 150 rows cost 15 ms, and the "
+             "the rows takes 25 ms, about a tenth of the time: the extra 150 rows cost 15 ms, and the "
              "49 extra waits 245. Reading in Data's advice, to pull back too much rather "
              "than too little, is that arithmetic in words."),
             ("Thinking a static finder is as good as a finder object",
@@ -803,8 +804,8 @@ LESSONS = [
         "module": "Chapter 10 · Data Source Architectural Patterns",
         "one_line": "An Active Record is a row object that also carries the domain logic on its data; a Row Data Gateway is the same shape with none.",
         "summary": (
-            "Chapter 10's Active Record wraps a row, holds its SQL and adds the domain logic "
-            "that acts on its data. It has the shape of a Row Data Gateway, and Chapter 10 "
+            "Chapter 10's Active Record is a row object that saves and loads itself and also "
+            "carries the business rules about its own fields. It has the shape of a Row Data Gateway, and Chapter 10 "
             "tells the two apart by one thing. Count the routines of two classes over one "
             "account row, sort them into database access and domain logic, and name each "
             "pattern."
@@ -823,9 +824,9 @@ LESSONS = [
         ),
         "concepts": [
             ("Active Record",
-             "An object that wraps a row of a table or view, does its own database access, "
-             "and adds domain logic on that data. Chapter 10 calls its essence a Domain "
-             "Model whose classes match the database's records very closely."),
+             "A domain object for one row that reads and writes that row itself and also "
+             "holds the rules of the business about it. Chapter 10 describes it as, at "
+             "heart, a Domain Model shaped like its tables."),
             ("Isomorphic schema",
              "A schema with the same shape as the classes: one class for each table, one "
              "field for each column. Active Record works well only on such a schema, the "
@@ -848,31 +849,28 @@ LESSONS = [
                   "lesson reads Active Record as a tool, with that test beside it. Read "
                   "the pattern in your own copy first."),
             ("p", "Active Record puts data access in the domain object, so that each object "
-                  "knows how to read and write its own data. Its structure should match the "
-                  "table exactly, one field for each column, typed as the SQL interface gives "
-                  "the data. The pattern lists what such a class typically does: build "
-                  "itself from a result-set row, build a new instance for later insertion, "
-                  "offer static finders that wrap common queries, insert and update its row, "
-                  "get and set its fields, and implement some pieces of business logic. That "
-                  "last item is the difference."),
+                  "knows how to read and write its own data. Its fields mirror the "
+                  "table's columns, with no conversion yet. The pattern's own list of what "
+                  "such a class does runs from building itself out of a result row, through "
+                  "finders, inserts, updates and accessors, to one last item: some of the "
+                  "business logic. That last item is the difference."),
             ("p", "Fowler puts the difference plainly in both places: a Row Data Gateway "
                   "holds only database access, an Active Record both database access and "
-                  "domain logic, and he grants that the line between them, like most in "
-                  "software, is not terribly sharp, but useful. Chapter 3 gives the same "
+                  "domain logic, and he calls the line between them blurred, and "
+                  "still worth drawing. Chapter 3 gives the same "
                   "relation as a route: start with a Row Data Gateway and add domain logic "
                   "to it, particularly when you see the same code repeated in several "
                   "Transaction Scripts. Row Data Gateway's own pages say that moving such "
                   "logic in gradually turns the gateway into an Active Record, and that this "
                   "is often good, since it reduces duplication."),
             # F22, PDF p. 102 of the operator's copy.
-            ("p", "When to use it: for domain logic that is not too complex, such as creates, "
-                  "reads, updates and deletes, and derivations and validations on one record. "
-                  "Its primary advantage is simplicity. Its primary problem is that it works "
-                  "well only when the objects correspond directly to the tables; once the "
-                  "logic wants collections, inheritance and direct relationships, adding "
-                  "them piecemeal gets messy, and that leads to a Data Mapper. It also "
-                  "couples the object design to the database design, so each is harder to "
-                  "refactor. Chapter 8 puts a size on simple: a Domain Model of a couple of "
+            ("p", "Chapter 10 recommends Active Record for logic that stays close to one "
+                  "record: the ordinary create, read, update and delete work, and rules "
+                  "computed from a single row. Its appeal is that it is simple. It stops "
+                  "working once the classes and the tables part ways, because collections, "
+                  "inheritance and links between objects do not fit it, and that is when a "
+                  "Data Mapper is needed. And because it ties the class design to the table "
+                  "design, neither can be refactored without the other. Chapter 8 puts a size on simple: a Domain Model of a couple of "
                   "dozen classes close to the database, the book's illustration, is where an "
                   "Active Record makes sense."),
             ("p", "The lesson's two classes cover one `account` row with three fields. Each "
@@ -902,10 +900,10 @@ LESSONS = [
                   "as with Row Data Gateway, is better for testing."),
             ("h3", "Exercise"),
             ("code", _lines(MEMBER_RECORD)),
-            ("p", "For this `Member`, count the fields, the public fields that are not final "
-                  "and the routines. Then sort the routines into database access and domain "
-                  "logic, and say which of the two patterns the class is. Paste it into the "
-                  "lab afterwards to check the counts; the sorting is yours."),
+            ("p", "For this `Member`, list the routines and sort them into database access "
+                  "and domain logic, then say which of the two patterns the class is. Paste "
+                  "it into the lab afterwards to check the routine count; the sorting is "
+                  "yours."),
             ("p", "Active Record breaks down as the domain gets richer. The next lesson, Data "
                   "Mapper, reads the pattern Fowler turns to then, and counts what it "
                   "changes about who depends on whom."),
@@ -969,37 +967,38 @@ LESSONS = [
         },
         "quiz_title": "Active Record, counted and sorted",
         "quiz": [
-            {"q": "Take the exercise's `Member`. How many fields, public fields that are not "
-                  "final and routines does it have, and which pattern is it?",
-             "a": ["4 fields, 1 public and not final, 3 routines; an Active Record",
-                   "4 fields, 2 public and not final, 3 routines; an Active Record",
-                   "4 fields, 1 public and not final, 3 routines; a Row Data Gateway",
-                   "3 fields, 1 public and not final, 3 routines; an Active Record"],
-             "c": 0,
-             "why": "`id`, `email`, `points` and `joined` are 4 fields; `email` is public and "
-                    "not final, while `joined` is public but final, so 1. The routines are "
-                    "`find`, `insert` and `level`, 3 (the lab also prints 2 public: `insert` "
-                    "and `level`). `find` and `insert` are database access; `level` derives a "
-                    "member's level from their points, which is domain logic, so the class "
-                    "is an Active Record. Leaving out `joined` gives 3 fields; counting it as "
-                    "public data gives 2."},
+            {"q": "Take the exercise's `Member`. How do its routines sort, and which pattern "
+                  "is it?",
+             "a": ["3 routines; `level` only converts a stored type, so a Row Data Gateway",
+                   "3 routines; `find`, `insert` access, `level` domain logic; Active Record",
+                   "2 routines, `find` and `insert`, both database access; a Row Data Gateway",
+                   "4 routines, counting the class's implicit constructor; an Active Record"],
+             "c": 1,
+             "why": "The routines are `find`, `insert` and `level`, 3, which is what the lab "
+                    "prints (it also prints 3 fields, 1 public, and 2 public routines). "
+                    "`find` and `insert` run SQL, so they are database access. `level` "
+                    "derives a member's level from their points: a rule computed from one "
+                    "row, which Active Record's When to Use It counts as the pattern's "
+                    "business, not a type conversion. So the class is an Active Record. "
+                    "Leaving out `level` drops the one routine that decides the pattern, "
+                    "and the class declares no constructor, so the lab counts none."},
             {"q": "By what one thing does Chapter 10 tell a Row Data Gateway from an Active "
                   "Record?",
-             "a": ["Whether its finders are static",
-                   "Whether it maps one table or several",
-                   "Whether its fields are public",
-                   "Whether it contains any domain logic"],
-             "c": 3,
+             "a": ["Whether it contains any domain logic",
+                   "Whether its finders are static or objects",
+                   "Whether it maps one table or several tables",
+                   "Whether its fields are public"],
+             "c": 0,
              "why": "The crux, Row Data Gateway's pages say, is whether any domain logic is "
                     "present; if it is, the class is an Active Record. Static finders appear "
                     "with both, and both map one row of one table."},
             {"q": "What does Active Record's When to Use It give as the pattern's primary "
                   "problem?",
-             "a": ["It cannot hold business logic",
-                   "It works well only when the objects correspond directly to the tables",
-                   "It cannot be used with views",
-                   "It needs a separate finder class"],
-             "c": 1,
+             "a": ["It cannot hold any business logic of its own",
+                   "It cannot be used with views, only with tables",
+                   "It fits only a schema shaped like the classes",
+                   "It needs a separate finder class for each table"],
+             "c": 2,
              "why": "It works well only on an isomorphic schema; collections, inheritance and "
                     "direct relationships do not map easily onto it. It holds business logic "
                     "by definition, it can be used with views (updates through them are "
@@ -1007,11 +1006,11 @@ LESSONS = [
             {"q": "The lab prints 3 routines for <code>active-record</code> and 2 for "
                   "<code>row-gateway</code>. Which routine makes the difference, and what "
                   "kind is it?",
-             "a": ["`canWithdraw`, domain logic",
-                   "`update`, database access",
-                   "`find`, database access",
-                   "a constructor, which the kit counts"],
-             "c": 0,
+             "a": ["`update`, database access",
+                   "`canWithdraw`, domain logic",
+                   "a constructor, which the kit counts",
+                   "`find`, database access"],
+             "c": 1,
              "why": "Both classes have `find` and `update`, which run SQL; neither declares a "
                     "constructor. Only `Account` has `canWithdraw`, a business rule on the "
                     "balance and overdraft."},
@@ -1030,8 +1029,8 @@ LESSONS = [
              "into a class of their own is better for testing."),
             ("Placing Active Record outside the Domain Model",
              "It is tempting to read the four patterns as gateways on one side and the "
-             "Domain Model on the other. Chapter 10 says the essence of an Active Record is "
-             "a Domain Model whose classes match the database's records closely. It is one "
+             "Domain Model on the other. Chapter 10 describes an Active Record as, at heart, "
+             "a Domain Model shaped like its tables. It is one "
              "way to build a simple Domain Model, and Data Mapper the way for a rich one."),
         ],
         "standard": (
@@ -1061,7 +1060,7 @@ LESSONS = [
         "one_line": "A Data Mapper moves data between the objects and the database and keeps each ignorant of the other; it reverses a dependency and adds one.",
         "summary": (
             "Chapter 10's Data Mapper is a layer that moves data between a rich domain "
-            "model and the database while keeping them independent of each other and of the "
+            "model and the database so that neither knows the other, and neither knows the "
             "mapper. Read it with Chapter 18's Mapper, then trace what a change to the "
             "database library and a change to the domain class reach with an Active Record "
             "and with a mapper."
@@ -1106,7 +1105,7 @@ LESSONS = [
                   "tools. Read them in your own copy first; the pattern's examples are "
                   "worth reading in the book."),
             ("p", "The problem comes first. Objects have collections and inheritance, and "
-                  "relational databases do not, so a model with a lot of business logic "
+                  "relational databases do not, so a model rich in business rules "
                   "ends up with a schema of its own that does not match the tables. Data "
                   "must still move between the two, and if the objects know the database's "
                   "structure, a change on one side tends to ripple to the other. The mapper "
@@ -1121,7 +1120,7 @@ LESSONS = [
                   "interaction, which in enterprise applications mostly means the database."),
             ("p", "How it works, in brief: a client asks the mapper to find an object, the "
                   "mapper checks an Identity Map for it and loads it if it is not there, and "
-                  "a save pulls the data out of the object and shuttles it to the database. "
+                  "a save reads the object's values and writes them to its rows. "
                   "Knowing what changed, what is new and what is gone is a Unit of Work's "
                   "job; how much of a graph of objects to load at once is the mapper's "
                   "design, with Lazy Load to stop it pulling back the whole database. The "
@@ -1143,11 +1142,12 @@ LESSONS = [
             ("code", _lines(ACCOUNT_MAPPER)),
             ("p", "Now the count, with the lab of the first lesson: records `dependent, "
                   "dependency`, the name that changes, what depends on it directly, and what "
-                  "it reaches in all. In <code>active-record</code> a screen and a report "
+                  "it reaches in all, at most: as in the first lesson, the second tile is "
+                  "what the change reaches if each class's interface passes it on. In <code>active-record</code> a screen and a report "
                   "use `account`, and `account` uses `jdbc`. Change `jdbc` and the lab "
                   "prints 1: account directly and 3: account, report, screen in all: the "
-                  "database library's change reaches the screen and the report through the "
-                  "domain class."),
+                  "database library's change can reach the screen and the report through "
+                  "the domain class."),
             ("p", "In <code>mapper</code> the screen and the report still use `account`, but "
                   "`account` uses nothing; `mapper` uses `account` and `jdbc`, and `main` "
                   "uses `mapper`. Change `jdbc` and the lab prints 1: mapper and 2: main, "
@@ -1162,15 +1162,15 @@ LESSONS = [
                   "the one between the domain and the database, and added one, its own on "
                   "the domain. That is the price When to Use It names, counted."),
             ("p", "Fowler did not expect most readers to write this layer by hand. Chapter "
-                  "3 says that anyone with a Domain Model should seriously consider buying "
-                  "an O/R mapping tool, and Chapter 8 strongly suggests one unless the team "
+                  "3 tells anyone with a Domain Model to think hard about buying a tool for "
+                  "the object-relational mapping, and Chapter 8 strongly suggests one unless the team "
                   "is strong or the mapping can be simplified. Since 2002 that advice has "
                   "become the usual practice: the object-relational frameworks most "
                   "platforms now provide implement Data Mapper, with Unit of Work and "
                   "Identity Map, for you. This is a continuation of the chapter rather than "
-                  "a view against it. Fowler's own caveat still applies: a tool makes a big "
-                  "dent in the effort, and using and tuning it is still a small but real "
-                  "piece of work, which these patterns help you choose among."),
+                  "a view against it. Fowler's own caveat still applies: a tool removes much "
+                  "of the work, but choosing and tuning it is still a job of its own, and "
+                  "these patterns are the vocabulary for its options."),
             ("h3", "Exercise"),
             ("ul", [
                 "`web, invoice; invoice, customer; invoicemapper, invoice; invoicemapper, "
@@ -1262,11 +1262,11 @@ LESSONS = [
         "quiz": [
             {"q": "Take the exercise's eight records, with `jdbc` changed. What depends on it "
                   "directly, and what does the change reach in all?",
-             "a": ["2 directly (customermapper, invoicemapper); 3 in all, adding main",
-                   "2 directly; 5 in all, adding main, invoice and customer",
-                   "2 directly; 4 in all, adding main and web",
-                   "3 directly (customermapper, invoicemapper, main); 3 in all"],
-             "c": 0,
+             "a": ["2 directly; 5 in all, adding main, invoice and customer",
+                   "3 directly (customermapper, invoicemapper, main); 3 in all",
+                   "2 directly (the two mappers); 3 in all, adding main",
+                   "2 directly; 4 in all, adding main and then web"],
+             "c": 2,
              "why": "Only the two mappers use `jdbc`, so the lab prints 2: customermapper, "
                     "invoicemapper, and the only thing that uses a mapper is `main`, so 3: "
                     "customermapper, invoicemapper, main in all. The mappers use `invoice` "
@@ -1276,32 +1276,31 @@ LESSONS = [
                     "not directly."},
             {"q": "In <code>mapper-domain-change</code> the `account` class changes. What "
                   "does the lab print, against Active Record's 2: report, screen?",
-             "a": ["2: report, screen and 2 in all, as with Active Record",
-                   "3: mapper, report, screen directly and 4 in all, adding main",
-                   "1: mapper directly and 2 in all",
-                   "3: mapper, report, screen directly and 3 in all"],
-             "c": 1,
+             "a": ["2: report, screen directly and 2 in all, as with Active Record",
+                   "1: mapper directly and 2 in all, adding main",
+                   "3: mapper, report, screen directly and 3 in all, without main",
+                   "3: mapper, report, screen directly; 4 in all, adding main"],
+             "c": 3,
              "why": "The mapper depends on the domain class, so it is one more direct "
                     "dependent, and `main`, which uses the mapper, is reached through it: 4: "
                     "main, mapper, report, screen. The mapper reverses the dependency "
                     "between domain and database and adds its own on the domain."},
             {"q": "What does Data Mapper's When to Use It give as the primary occasion for "
                   "the pattern?",
-             "a": ["Whenever an application uses a relational database",
+             "a": ["Whenever an application keeps its data in a relational database",
+                   "When the schema and the object model must evolve independently",
                    "When the domain logic is mostly creates, reads, updates and deletes",
-                   "When the database schema and the object model must evolve independently",
-                   "When the classes match the tables one to one"],
-             "c": 2,
+                   "When the classes match the tables one to one, column by column"],
+             "c": 1,
              "why": "Independent evolution, most often with a Domain Model. Simple CRUD logic "
                     "over tables that match the classes is Active Record's case, and Fowler "
                     "says he would not choose a Data Mapper without a Domain Model."},
             {"q": "Chapter 18's Mapper names one part of using a mapper as the complicated "
                   "one. Which?",
-             "a": ["Deciding how to invoke it, since neither subsystem it separates may "
-                   "call it",
-                   "Writing its SQL",
-                   "Moving the data, once it is invoked",
-                   "Keeping the two subsystems in one package"],
+             "a": ["Deciding how to invoke it, since neither side may call it",
+                   "Writing the SQL for every table the two subsystems share",
+                   "Moving the data across, once something has invoked it",
+                   "Keeping the two subsystems in one package so it can see both"],
              "c": 0,
              "why": "Once it is activated the shuffling of data is fairly easy to follow, the "
                     "pattern says; the complicated part is invoking it, which a third "
@@ -1313,7 +1312,7 @@ LESSONS = [
              "It reverses them. The domain no longer depends on the database, and the mapper "
              "depends on both. On the lesson's illustration a change to `jdbc` stops at the "
              "mapper and `main`, but a change to `account` now has one more direct dependent, "
-             "the mapper, and reaches two more classes in all, the mapper and the `main` that "
+             "the mapper, and can reach two more classes in all, the mapper and the `main` that "
              "wires it."),
             ("Using a Data Mapper for every application",
              "Fowler ties it to a rich Domain Model. Its price is an extra layer, he would "
@@ -1323,7 +1322,7 @@ LESSONS = [
              "complicated."),
             ("Expecting the domain to be wholly ignorant of the mapping",
              "The quotation says the objects need not know there is a database. The "
-             "pattern's own pages add that they cannot be entirely ignorant of the mapping "
+             "pattern's own pages add that they cannot be wholly unaware of the mapping "
              "layer: with Lazy Load and finders they may need to know a few of its "
              "mechanisms. The remedy is a Separated Interface in the domain package for the "
              "finders they call, so that the dependency points the right way."),
@@ -1337,8 +1336,8 @@ LESSONS = [
         "note": (
             "The lab follows dependencies you state and treats each one alike; it cannot see "
             "how much of the mapper a domain change touches, or how often the domain changes "
-            "against the database. The designs are the lesson's, and the frameworks the "
-            "late paragraph names are the lesson's account, not the book's."
+            "against the database. The designs are the lesson's, and the late paragraph's "
+            "account of the frameworks since 2002 is the lesson's, not the book's."
         ),
     },
     # ---------------------------------------------------------------- 05
@@ -1385,7 +1384,7 @@ LESSONS = [
              "change; or you map to an existing one whose changes are negotiable. Which you "
              "are in, with the domain pattern, decides what to build."),
             ("Double mapping",
-             "The same kind of data pulled from more than one source: two databases whose "
+             "One kind of data that arrives from several places: two databases whose "
              "schemas differ a little, or a database and a stream of messages. Each source "
              "needs its own mapping."),
             ("Logical data store schema",
@@ -1411,32 +1410,33 @@ LESSONS = [
                   "map to an existing schema that cannot change; or you map to an existing "
                   "one whose changes are negotiable. The simplest is the first with little "
                   "to moderate domain logic, a Transaction Script or a Table Module. Then "
-                  "design the tables around the data by classic database design, and pull "
-                  "the SQL away from the domain logic with a Row or a Table Data Gateway."),
+                  "design the tables around the data in the usual way of database design, "
+                  "and keep the SQL apart from the domain code with a Row or a Table Data "
+                  "Gateway."),
             # F12, PDF p. 58 of the operator's copy.
             ("p", "With a Domain Model the advice turns round. Beware a model that looks like "
                   "a database design: build the model without regard to the database, so as "
                   "to make the domain logic as simple as it can be, and treat the database "
                   "as the way its data persists. A Data Mapper gives the most room for "
                   "that; an Active Record suits a database shaped like the model. Then the "
-                  "quotation's limit. Spending six months on a model with no database and "
-                  "persisting it at the end is, he says, highly risky, because the design "
-                  "may have crippling performance problems that take too much refactoring "
-                  "to fix. Build the database up with each iteration instead, of no more than "
-                  "six weeks and preferably fewer, the book's figure, so that you learn early "
-                  "how the database interactions work in practice."),
+                  "quotation's limit. A model built for months with no database and "
+                  "only then persisted is highly risky, he says: by then the design may be "
+                  "too slow in ways that would take more rework than anyone can afford. Grow "
+                  "the database with the model instead, in iterations of six weeks at most "
+                  "and shorter if you can, the book's figure, so that what the database "
+                  "does to the design shows up early."),
             # F22, PDF p. 102 of the operator's copy.
-            ("p", "When the schema is already there, the choices are the same and the process "
-                  "differs: with simple logic, gateways that mimic the database and domain "
-                  "logic layered on them; with complex logic, a Domain Model, which is very "
-                  "unlikely to match the existing tables, built up gradually with Data "
-                  "Mappers to persist it. Chapter 8's Down to the Data Source Layer pairs the "
+            ("p", "With a schema that already exists, the options do not change but the order "
+                  "of work does. Simple logic sits on gateways shaped like the tables. "
+                  "Complex logic needs a Domain Model, which will almost never fit tables "
+                  "designed before it, so it grows a piece at a time with Data Mappers "
+                  "writing it to the old schema. Chapter 8's Down to the Data Source Layer pairs the "
                   "patterns the same way: a Row or Table Data Gateway for a Transaction "
                   "Script, a Table Data Gateway for a Table Module, and for a Domain Model an "
                   "Active Record while it is a couple of dozen classes close to the database, "
                   "the book's illustration of simple, then a Data Mapper as it grows."),
-            ("p", "The section's second half is double mapping: one kind of data from more "
-                  "than one source. There may be several databases holding the same data "
+            ("p", "The section ends with double mapping: one kind of data with several "
+                  "origins. They may be several databases holding the same data "
                   "with small schema differences left by copy-and-paste reuse; Fowler "
                   "observes that the smaller the difference, the more it annoys. "
                   "Or the data may arrive sometimes from tables and sometimes in messages. "
@@ -1549,37 +1549,34 @@ LESSONS = [
         "quiz": [
             {"q": "Take the exercise's `toTable` and `toMessage`. Which lines does the lab "
                   "mark, and what goes in the shared step?",
-             "a": ["Lines 2–4 and 12–14, 6 lines: the reference, grams and postcode "
-                   "conversions, which a ShipmentData filled once would carry to a step "
-                   "for each sink",
-                   "Lines 5–7 and 15–17, 6 lines: the three writes, which a shared step "
-                   "would make once",
-                   "Lines 2–8 and 12–17, 13 lines: everything but the headers",
-                   "None: the routines write to different sinks, so nothing repeats"],
-             "c": 0,
+             "a": ["Lines 5–7 and 15–17: the three writes, which one shared step would make once",
+                   "Lines 2–8 and 12–17, 13 lines: everything but the two routine headers",
+                   "None: the routines write to different sinks, so no line repeats exactly",
+                   "Lines 2–4 and 12–14: three conversions, held once via a ShipmentData"],
+             "c": 3,
              "why": "Lines 2–4 and 12–14 are identical: the upper-cased reference, the "
                     "weight in grams and the postcode without spaces (1 repeated block, "
                     "6 lines in all). The writes differ, `setString` and `setLong` against "
                     "`setAttribute`, and `executeUpdate` has no partner, so they are not "
                     "counted. A `ShipmentData` filled once from the shipment holds the "
                     "conversions, and each sink's own step writes its fields."},
-            {"q": "In Building the Mapping's advice to build up the database with each "
+            {"q": "In Building the Mapping's advice to grow the database along with each "
                   "iteration, how long may an iteration be?",
-             "a": ["No more than six months",
-                   "No more than two weeks",
-                   "No more than six weeks, and preferably fewer",
+             "a": ["No more than six weeks, and preferably fewer",
+                   "No more than six months, then persist the model",
+                   "No more than two weeks, whatever the project",
                    "As long as the domain model takes to finish"],
-             "c": 2,
+             "c": 0,
              "why": "No more than six weeks, preferably fewer, the book's figure. Six months "
                     "is the length of the database-free model the section calls highly "
                     "risky, and finishing the model before persisting it is what the advice "
                     "rules out."},
             {"q": "In Fowler's two-step mapping, which step holds the differences between "
                   "the sources?",
-             "a": ["The step from the in-memory objects to the logical schema",
+             "a": ["Neither: the logical schema removes the differences",
                    "The step from the logical schema to each physical store",
-                   "Neither: the logical schema removes them",
-                   "Both, equally"],
+                   "The step from the in-memory objects to the logical schema",
+                   "Both steps, equally, one half of the differences each"],
              "c": 1,
              "why": "His second step, from the logical data store schema to each physical "
                     "one, contains the differences, and he suggests treating it as a "
@@ -1588,12 +1585,11 @@ LESSONS = [
                     "the other end."},
             {"q": "You choose the schema yourself and use a Transaction Script. What does "
                   "Building the Mapping advise?",
-             "a": ["Build the domain model first, without regard to the database",
-                   "Design the tables around the data, and pull the SQL out with a Row or "
-                   "Table Data Gateway",
-                   "Use a Data Mapper, which gives the most flexibility",
-                   "Map in two steps through a logical schema"],
-             "c": 1,
+             "a": ["Build the domain model first, without any regard to the database schema",
+                   "Use a Data Mapper, since it gives the most flexibility over the schema",
+                   "Design the tables around the data, with a Row or Table Data Gateway",
+                   "Map in two steps through a logical schema, then to the tables"],
+             "c": 2,
              "why": "That is the simplest situation: classic database design and a gateway. "
                     "Model first, and a Data Mapper, are the advice for a Domain Model, and "
                     "two steps are for one kind of data from several sources."},
@@ -1636,8 +1632,8 @@ LESSONS = [
     # thread-safe example by Matt Foemmel and Fowler, p. 427).
     # Quote: PDF p. 63, 16 words, ea_quotes.py OK. "guilty until proven
     # innocent": PDF p. 426, 4 words, ea_quotes.py OK. Lesson total: 20 words.
-    # F13, PDF p. 425 of the operator's copy: a parameter not needed 90
-    # percent of the time is what leads Fowler to a Registry.
+    # F13, PDF p. 425 of the operator's copy: Fowler takes a Registry when a
+    # parameter would go unused in 90 percent of the calls carrying it.
     # The lab holds the work of each statement the same either way; that is
     # the lab's assumption (PLAN section R.4, N-8), and the body says so.
     {
@@ -1726,14 +1722,17 @@ LESSONS = [
                   "static method. The book's thread-safe example is Matt Foemmel's and "
                   "Fowler's. He is uncomfortable with it all the same, because a Registry is "
                   "still global data: pass the object as a parameter if you can, and he "
-                  "turns to a Registry when the parameter would not be needed 90 percent of "
-                  "the time by the calls it passes through, the book's figure. Any global "
+                  "takes a Registry when the parameter would sit unused in nine of every ten "
+                  "calls that carry it, the book's figure. Any global "
                   "data, he ends, is &ldquo;guilty until proven innocent&rdquo;."),
             ("p", "The lesson's snippet takes its connection as a parameter, the choice "
                   "Fowler prefers. It prepares one INSERT, and for each line of an order it "
                   "sets the three placeholders and calls `addBatch`, which queues the "
                   "statement instead of sending it; `executeBatch` then sends every queued "
-                  "statement in one call."),
+                  "statement in one call to the driver, which a batching driver sends as "
+                  "one round trip; the last step asks you to check yours. Like every "
+                  "snippet in the course, it leaves out the try-with-resources that would "
+                  "close the statement."),
             ("code", _lines(SAVE_LINES_BATCH)),
             ("p", "Now the arithmetic. The lab treats the database as the far end of a "
                   "round trip. Each record is one batch and the statements it carries; "
@@ -1748,8 +1747,8 @@ LESSONS = [
             ("p", "In <code>save-an-order</code> a save makes 1 insert for the order, 12 for "
                   "its lines and 12 stock updates, with an illustrative 2 ms latency and 0.5 "
                   "ms of work a statement. One at a time that is 25 round trips and 125/2 = "
-                  "62.50 ms, of which 4/5 = 80% is waiting; in 3 batches it is 37/2 = 18.50 "
-                  "ms, 125/37 ≈ 3.4× faster. In <code>same-machine</code> the latency is 0.1 "
+                  "62.50 ms, of which 4/5 = 80% is waiting; in 3 batches it is 37/2, or 18.50 "
+                  "ms, which the lab prints as 125/37 ≈ 3.4× faster. In <code>same-machine</code> the latency is 0.1 "
                   "ms: 15 ms against 64/5 = 12.80 ms, waiting only 1/6 ≈ 16.7% of the first, "
                   "and 75/64 ≈ 1.2×. Batching removes waits; where the waits are short it "
                   "has little to remove, and only your own measurement says which case you "
@@ -1835,11 +1834,11 @@ LESSONS = [
         "quiz": [
             {"q": "Take the exercise: 41 statements in 2 batches, 3 ms a round trip and 0.2 "
                   "ms of work a statement. What are the two times and the ratio?",
-             "a": ["131.20 ms one at a time, 14.20 ms batched, about 9.2× faster",
-                   "123 ms one at a time, 14.20 ms batched, about 8.7× faster",
-                   "131.20 ms one at a time, 6.40 ms batched, about 20.5× faster",
-                   "131.20 ms one at a time, 8.20 ms batched, 16× faster"],
-             "c": 0,
+             "a": ["123 ms one at a time, 14.20 ms batched, about 8.7× faster",
+                   "131.20 ms one at a time, 14.20 ms batched, ≈ 9.2× faster",
+                   "131.20 ms one at a time, 8.20 ms batched, about 16× faster",
+                   "131.20 ms one at a time, 6.40 ms batched, about 20.5× faster"],
+             "c": 1,
              "why": "One at a time: 41 × (3 + 0.2) = 656/5 = 131.20 ms. Batched: 2 × 3 + 41 "
                     "× 0.2 = 71/5 = 14.20 ms. Waiting is 41 × 3 = 123 ms, 15/16 ≈ 93.8% of "
                     "the first time, and 656/71 ≈ 9.2×. 123 ms leaves out the work, 6.40 ms "
@@ -1847,37 +1846,34 @@ LESSONS = [
                     "leaves out the batches' waits."},
             {"q": "When does Registry's When to Use It say Fowler turns to a Registry "
                   "instead of a parameter?",
-             "a": ["Whenever an object is needed in more than one layer",
-                   "Never, since a Registry is global data",
-                   "When the object is immutable",
-                   "When the parameter would not be needed 90 percent of the time by the "
-                   "calls it passes through"],
-             "c": 3,
-             "why": "The book's figure: a parameter not needed 90 percent of the time is "
-                    "what leads him to a Registry, though he calls it a last resort and "
+             "a": ["Whenever an object is needed in more than one layer of the system",
+                   "Never: a Registry is global data, so it is always to be avoided",
+                   "When the parameter would go unused in nine calls of ten",
+                   "When the object is immutable and can be shared by every thread"],
+             "c": 2,
+             "why": "The book's figure: when the parameter would sit unused in nine calls "
+                    "out of ten, he takes a Registry instead, though he calls it a last resort and "
                     "global data guilty until proven innocent. Immutable data is what makes "
                     "a process-wide singleton safe, which is a question of the Registry's "
                     "scope, not of whether to have one."},
             {"q": "What scope does Chapter 3 give the Registry that holds a database "
                   "connection, and why?",
-             "a": ["Process scope, so that every thread shares one connection",
-                   "Thread scope, because you do not want several threads using the same "
-                   "connection",
+             "a": ["Process scope, so that every thread shares the one connection",
                    "Session scope, so that a user keeps one connection between requests",
-                   "No scope: the connection is a static field"],
-             "c": 1,
+                   "No scope: the connection is a static field set at start-up",
+                   "Thread scope, so that no two threads share a connection"],
+             "c": 3,
              "why": "Database Connections asks for a thread-scoped Registry for exactly that "
                     "reason, and Registry shows it held in thread-local storage behind a "
                     "static method. A connection held across a user's requests would sit "
                     "open while they think, the opposite of closing it as soon as you are "
                     "done."},
             {"q": "What does Database Connections recommend tying a connection to?",
-             "a": ["The garbage collector, which closes it once nothing refers to it",
-                   "Each command, closing it after every statement",
-                   "A transaction: open it when the transaction begins and close it at "
-                   "commit or rollback",
-                   "The connection pool's lifetime"],
-             "c": 2,
+             "a": ["A transaction: open at its start, close at commit or rollback",
+                   "The garbage collector, which closes it once nothing refers to it",
+                   "Each command, closing the connection after every single statement",
+                   "The connection pool's lifetime, from start-up to shutdown"],
+             "c": 0,
              "why": "A transaction's end is visible, so it is easy to remember and to spot "
                     "when forgotten, and a Unit of Work fits it. The garbage collector "
                     "closes too late and is only a backup; closing after every command "

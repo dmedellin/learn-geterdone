@@ -61,10 +61,10 @@ COURSE = {
          "coarse calls, for a latency and a work time, and the share of it spent waiting."),
         ("Weigh a Data Transfer Object",
          "Compute one getter a field against one object carrying every field, the bytes it "
-         "sends that the screen never shows, and what a saved round trip could have carried."),
+         "sends that the screen never shows, and what the saved round trips could have carried."),
         ("Compare deployments of one stack",
          "Count the calls that cross a node for one request under several deployments of "
-         "the same layers, and say which boundaries Chapter 7 says you cannot avoid."),
+         "the same layers, and say which boundaries Chapter 7 says you will usually have to keep."),
         ("Keep a test off the network",
          "List what a change to a network library reaches with a direct dependency and "
          "with a Separated Interface, a Service Stub and a Plugin."),

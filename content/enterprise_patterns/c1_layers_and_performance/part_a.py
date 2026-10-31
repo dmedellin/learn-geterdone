@@ -248,18 +248,14 @@ LESSONS = [
                   "<em>business logic</em> in the Introduction's section Enterprise "
                   "Applications, and the sentence holds the whole book's starting point: the "
                   "hard part of these systems is not clever algorithms but a great deal of "
-                  "shared data and a great many rules nobody can simplify. This lesson reads "
+                  "shared data and a great many rules nobody can derive. This lesson reads "
                   "the Preface and the Introduction's first sections. Read them in your own "
                   "copy first."),
-            ("p", "The Preface begins with a project. In the spring of 1999 Fowler flew to "
-                  "Chicago to consult for ThoughtWorks on a back-end leasing system, the kind "
-                  "that handles everything after a lease is signed: billing, upgrades, chasing "
-                  "late payers, early returns. Leasing deals, he says, vary without end, "
-                  "because small variations win business, and every such victory adds "
-                  "complexity. The domain model had to be stored in a relational database, "
-                  "given a user interface, opened to remote applications and joined to other "
-                  "packages, all on J2EE, which nobody yet had real experience of. The book is "
-                  "written for that situation. It has two parts: narrative chapters to read "
+            ("p", "The Preface starts from a leasing system Fowler worked on with "
+                  "ThoughtWorks in 1999, whose rules grew one won deal at a time and which had "
+                  "to be stored, given screens, opened to other programs and built on a "
+                  "platform nobody yet knew. The book is written for that situation, in two "
+                  "parts: narrative chapters to read "
                   "from start to finish, and patterns to dip into as a reference. This "
                   "read-along takes them together, each narrative with the patterns it "
                   "introduces."),
@@ -276,7 +272,7 @@ LESSONS = [
                   "kept for years, outliving hardware, operating systems and compilers, and "
                   "migrated whenever the application is replaced. There is a lot of it: a "
                   "moderate system, Fowler says, holds over 1 GB in tens of millions of "
-                  "records, so managing it is a major part of the work. Many people use it at "
+                  "records, so looking after it is much of the work. Many people use it at "
                   "once, through many screens, and there is batch processing that is easy to "
                   "forget. And it lives among other systems built at different times with "
                   "different technologies, which disagree even about what a customer is. Then "
@@ -286,8 +282,8 @@ LESSONS = [
                   "one-off cases add up to what he calls business illogic."),
             ("p", "Kinds of Enterprise Application then refuses a single answer. Fowler sets "
                   "out three points on a large plane: an online retailer with a very high "
-                  "number of users and fairly simple logic, which must above all scale; a "
-                  "leasing system with few users, no more than a hundred or so at a time, but "
+                  "number of users and fairly simple logic, which must scale; a "
+                  "leasing system with few users, at most a hundred or so at once, but "
                   "complicated and arbitrary rules, a richer interface and a large schema; and "
                   "a small company's expense tracker, simple in every way except that it must "
                   "be built quickly and may grow. Each has different difficulties, so no one "
@@ -299,9 +295,10 @@ LESSONS = [
                   "can be reused endlessly and never comes out in quite the same form, "
                   "and adds his own: a pattern is a piece of advice, rooted in practice, "
                   "discovered rather than invented, and its value to an experienced designer "
-                  "is the shared vocabulary it gives. Every pattern in Part 2 has the same "
-                  "parts: a name, an intent and a sketch, a motivating problem, How It Works, "
-                  "When to Use It, further reading and examples. He insists that the example "
+                  "is the shared vocabulary it gives. Each pattern in Part 2 is written to the "
+                  "same form, a name, an intent and a sketch, a motivating problem, How It "
+                  "Works, When to Use It, further reading and examples, though a pattern "
+                  "leaves out a section it has nothing good to put in. He insists that the example "
                   "is not the pattern; patterns are, in his phrase, &ldquo;half baked,&rdquo; and you finish "
                   "them in your own project."),
             ("code", _lines(DUE_DAY)),
@@ -322,7 +319,10 @@ LESSONS = [
                   "<code>due-day-plain</code> is the same routine with every agreement taken "
                   "out: 1 decision point, breakdown 1, band 0–5, nesting 0, line 3. The eight "
                   "points between the two listings are the agreements, and none of them could "
-                  "have been derived from the plain rule. That is what the count shows: not "
+                  "have been derived from the plain rule. The four agreements cost eight points "
+                  "between them: government one (an `if`), the northern customers two (an "
+                  "`if` and an `&&`), the late retail or online invoice three (two `if`s and "
+                  "the `||`), and the cap two (an `if` and an `&&`). That is what the count shows: not "
                   "that the routine is badly written, but how much of it a reader has to learn "
                   "case by case."),
             ("h3", "Exercise"),
@@ -411,27 +411,27 @@ LESSONS = [
              "why": "Enterprise Applications names persistent data, a lot of it, concurrent "
                     "access, many screens and integration with other systems. It says that not "
                     "all enterprise applications are large, that they mostly lack the "
-                    "multithreading and hardware problems of telecoms software, and that many "
-                    "use a Web presentation rather than a rich client."},
+                    "multithreading and hardware problems of telecoms software. A rich client is "
+                    "not one of the marks; Kinds of Enterprise Application gives a Web "
+                    "presentation to two of its three examples."},
             {"q": "On the Introduction's account, why can business logic not be simplified "
                   "by finding its principle?",
              "a": ["Because it is usually written in the presentation layer",
-                   "Because its rules were agreed one case at a time, often to win business, "
-                   "and follow from no principle",
                    "Because there is too much data for any principle to cover",
-                   "Because business people write the code themselves"],
-             "c": 1,
+                   "Because business people write the code themselves",
+                   "Because its rules were agreed one case at a time, often to win business, and follow from no principle"],
+             "c": 3,
              "why": "Fowler's point is that business rules are given to you and changeable "
                     "only with political effort; a salesman's one-off agreement to win a deal "
                     "is his example, and a few thousand of them make the illogic. Where the "
                     "logic sits, and how much data there is, are other questions."},
             {"q": "The lab prints the band 6–10 beside the count of 9 for <code>due-day</code>. Whose "
                   "thresholds are those bands?",
-             "a": ["Fowler's, from the Introduction",
-                   "McConnell's, from Code Complete",
+             "a": ["McConnell's, from Code Complete",
+                   "Fowler's, from the Introduction",
                    "The lesson's own, chosen for this course",
                    "Alexander's, from A Pattern Language"],
-             "c": 1,
+             "c": 0,
              "why": "The bands are McConnell's guidance in <em>Code Complete</em>, which the "
                     "lab reuses. Fowler gives no count of decision points and no threshold; "
                     "the panel and the banner both say whose the bands are."},
@@ -466,8 +466,8 @@ LESSONS = [
             "The lab counts decision points in the listing; it cannot tell which came from an "
             "agreement and which from a slip, and it cannot say whether an agreement still "
             "holds. Fowler gives no count at all, and the bands are another book's. What the "
-            "chapter asks of you is to organise these rules as well as you can, because the "
-            "only certain thing about them is that they will change."
+            "chapter asks of you is to organise these rules as well as possible, since the "
+            "one thing sure about them is that they will change."
         ),
     },
     # ---------------------------------------------------------------- 1.2
@@ -506,7 +506,7 @@ LESSONS = [
             ("Response time and responsiveness",
              "Response time is how long the system takes to process a request from outside, "
              "a button press or an API call. Responsiveness is how quickly it acknowledges "
-             "the request. A progress bar during a file copy improves responsiveness and "
+             "the request. Showing progress while a file is copied improves responsiveness and "
              "leaves response time as it was."),
             ("Latency and throughput",
              "Latency is the least time any response takes, even when there is no work to do; "
@@ -516,7 +516,7 @@ LESSONS = [
             ("Load and load sensitivity",
              "Load is how much stress the system is under, such as how many users are "
              "connected, and it is the context of another measurement: a response time is "
-             "at some load. Load sensitivity is how the response time varies with the load. "
+             "at some load. Load sensitivity is how response time changes as load rises or falls. "
              "A system that degrades more is more load sensitive."),
         ],
         "read_title": "The section's caution first, then its terms",
@@ -556,8 +556,8 @@ LESSONS = [
                   "more in your case, and he prefers to name the one meant."),
             ("p", "Load is how much stress the system is under, for example how many users "
                   "are connected, and it is usually the context of another figure: a response "
-                  "time is at some load. Load sensitivity is how the response time varies with "
-                  "the load. Fowler's illustration is two systems. System A answers in 0.5 "
+                  "time is at some load. Load sensitivity is how response time changes as "
+                  "load changes. Fowler's illustration is two systems. System A answers in 0.5 "
                   "seconds from 10 users through 20; system B answers in 0.2 seconds at 10 "
                   "users and 2 seconds at 20. A is the less load sensitive; B, he says, "
                   "degrades more. The figures are the book's illustration, not a measurement "
@@ -576,7 +576,7 @@ LESSONS = [
                   "user, the rise from the first measurement to the last over the rise in "
                   "users: a 0 ms a user; b 180 ms a user, since B rises 1,800 ms over 10 users. "
                   "The second is the ratio of the last response time to the first: a 1×; b "
-                  "10×. The third reads each system at 15 users on a straight line between its "
+                  "10×; a ratio that is not whole prints as a fraction and its decimal. The third reads each system at 15 users on a straight line between its "
                   "two measurements: a 500 ms; b 1,100 ms. That line is the lab's assumption, "
                   "not the book's; Fowler gives only the two ends, and the banner says so."),
             ("p", "The preset <code>at-ten-users</code> reads the same measurements at 10 "
@@ -597,7 +597,7 @@ LESSONS = [
                   "faster at 20 users and which at 5. Check your figures in the lab afterwards "
                   "by typing the records `north, 5, 400; north, 25, 1400; south, 5, 900; south, "
                   "25, 1000`."),
-            ("p", "Load sensitivity is one of several words Fowler says are used loosely; "
+            ("p", "Fowler says many of these words are used loosely; "
                   "scalability is the worst. The next lesson, Capacity and Scalability, reads "
                   "the rest of the section and his Swordfish and Camel."),
         ],
@@ -688,7 +688,7 @@ LESSONS = [
                     "20 are interpolated. The 1,400 and 1,000 are the 25-user measurements, "
                     "and 900 and 950 are the readings at 15 users."},
             {"q": "Which of Fowler's terms names how quickly a system acknowledges a "
-                  "request, as opposed to processing it?",
+                  "request, rather than how long it takes to deal with it?",
              "a": ["Response time", "Latency", "Responsiveness", "Throughput"],
              "c": 2,
              "why": "Responsiveness is about acknowledging a request; response time is the "
@@ -710,10 +710,10 @@ LESSONS = [
             {"q": "What does Fowler say a significant change of configuration, such as a new "
                   "virtual machine or database, does to what you know about performance?",
              "a": ["Nothing, if the optimisations were measured when they were made",
-                   "It may invalidate it, so the optimisations must be redone and checked",
                    "It improves it, since newer versions are faster",
-                   "It affects throughput but never response time"],
-             "c": 1,
+                   "It affects throughput but never response time",
+                   "It may invalidate it, so the optimisations must be redone and checked"],
+             "c": 3,
              "why": "His corollary is that a significant change of configuration may "
                     "invalidate any facts about performance: you redo the optimisations and "
                     "check they still help, and an old one may now hurt."},
@@ -722,8 +722,8 @@ LESSONS = [
             ("Thinking the faster system at one load is faster at every load",
              "On this view the system with the lower response time at one load is the "
              "faster system. Fowler's illustration says otherwise: B answers sooner at 10 "
-             "users and degrades so much that A answers sooner from about 12 users up. Which "
-             "is better depends on the load, which is why he separates response time from "
+             "users and ten times slower at 20, where A is faster. On the lab's straight line "
+             "the two meet a little below 12 users. Which is better depends on the load, which is why he separates response time from "
              "load sensitivity. On the book's figures, read on the lab's line, B is 300 ms "
              "faster at 10 users and 600 ms slower at 15."),
             ("Treating responsiveness and response time as one thing",
@@ -776,7 +776,7 @@ LESSONS = [
         ),
         "key": [
             "efficiency: performance / resources",
-            "capacity: the most effective throughput",
+            "capacity: the maximum effective throughput",
             "scalability: what more hardware adds",
             "up: a bigger server; out: more servers",
             "gain: rise in tps / servers added",
@@ -793,7 +793,7 @@ LESSONS = [
              "second on two CPUs is more efficient than 40 on four identical CPUs: 15 a CPU "
              "against 10."),
             ("Capacity",
-             "The most effective throughput or load the system can take, either an absolute "
+             "The maximum effective throughput or load the system can take, either an absolute "
              "maximum or the point at which performance falls below what is acceptable."),
             ("Scalability, vertical and horizontal",
              "How adding resources, usually hardware, changes performance. A scalable system "
@@ -816,7 +816,7 @@ LESSONS = [
                   "from. Read it in your own copy first."),
             ("p", "The three terms come in order. Efficiency is performance divided by "
                   "resources, and Fowler's example is that 30 transactions a second on two CPUs "
-                  "is more efficient than 40 on four identical CPUs. Capacity is the most "
+                  "is more efficient than 40 on four identical CPUs. Capacity is the maximum "
                   "effective throughput or load, which may be an absolute maximum or the point "
                   "at which performance falls below an acceptable threshold. Scalability is "
                   "the measure of what more hardware adds, and a scalable system gives a "
@@ -840,7 +840,7 @@ LESSONS = [
                   "as much more as a couple of servers, Swordfish would be cheaper even at 40 "
                   "transactions a second. He admits that he grumbles too whenever he "
                   "must upgrade his laptop for the latest version of Word, and still holds that "
-                  "hardware usually costs less than the programmers it would take to do "
+                  "hardware often costs less than the programmers it would take to do "
                   "without it, as long as the system can make use of it."),
             ("code", _lines(SERVERS_NEEDED)),
             ("p", "The snippet, written for the lesson, is the count the lab's servers-needed "
@@ -858,7 +858,8 @@ LESSONS = [
                   "camel 10. The third is where the two projections meet or cross: 5 servers "
                   "(both 80). The fourth is the fewest servers that reach the target: "
                   "swordfish 3; camel 1. The fifth projects each at 5 servers: swordfish 80; "
-                  "camel 80. Past the last measurement the lab carries on at the measured "
+                  "camel 80. Unlike the last lesson's lab, which reads only between "
+                  "measurements, this one carries on past them, at the measured "
                   "rate, which is the book's own assumption when it says what further servers "
                   "add, and nothing more."),
             ("p", "The preset <code>need-120</code> asks for 120 transactions a second and a "
@@ -972,11 +973,11 @@ LESSONS = [
                     "and twelve are the rises over two servers, not the gain a server."},
             {"q": "By Fowler's definition of efficiency, which is more efficient: 30 tps on "
                   "two CPUs, or 40 tps on four identical CPUs?",
-             "a": ["40 tps on four CPUs, because its throughput is higher",
-                   "30 tps on two CPUs: 15 a CPU against 10",
+             "a": ["30 tps on two CPUs: 15 a CPU against 10",
+                   "40 tps on four CPUs, because its throughput is higher",
                    "They are equally efficient",
                    "40 tps on four CPUs: 10 a CPU against 15"],
-             "c": 1,
+             "c": 0,
              "why": "Efficiency is performance divided by resources: 30/2 = 15 a CPU against "
                     "40/4 = 10. This is the book's own example. The higher throughput is the "
                     "less efficient system."},
@@ -993,9 +994,9 @@ LESSONS = [
             {"q": "In Fowler's terms, which of these is scaling out?",
              "a": ["Adding memory to the one server the system runs on",
                    "Rewriting the code so that one server handles more",
-                   "Adding more servers",
-                   "Raising the system's capacity on its present server"],
-             "c": 2,
+                   "Raising the system's capacity on its present server",
+                   "Adding more servers"],
+             "c": 3,
              "why": "Scaling out, horizontal scalability, means adding servers. Adding power "
                     "to one server is scaling up. Rewriting the code changes efficiency or "
                     "capacity, not what more hardware adds."},
@@ -1088,13 +1089,13 @@ LESSONS = [
         ],
         "read_title": "The chapter's argument first, then the copied lines",
         "read_intro": (
-            "Read Chapter 1, Layering, in your own copy first, all five of its sections. The "
+            "Read Chapter 1, Layering, in your own copy first: its opening and its three sections. The "
             "lesson sets out its argument in its own words, then counts the lines a second "
             "presentation forces you to copy."
         ),
         "body": [
             ("p", "&ldquo;The domain and data source should never be dependent on the "
-                  "presentation.&rdquo; That is the one fixed rule in Chapter 1, Layering, in "
+                  "presentation.&rdquo; This is the one fixed rule in Chapter 1, Layering, in "
                   "its section The Three Principal Layers, and the rest of the book keeps it. "
                   "This lesson reads the whole chapter: what layers are for, how enterprise "
                   "applications came to have three, what belongs in each, and where each "
@@ -1127,7 +1128,7 @@ LESSONS = [
                   "databases, messaging systems and other packages that do work for you; domain "
                   "is the work itself, calculation, validation and choosing which data source "
                   "logic to run. Fowler notes that the presentation often reads the data "
-                  "source directly, which is less tidy and, in his experience, the better choice in practice. "
+                  "source directly, which is less tidy and, he concedes, often the better choice in practice. "
                   "He contrasts his scheme with Alistair Cockburn's Hexagonal Architecture, "
                   "which treats everything outside as one kind of interface, and keeps the "
                   "asymmetry because a service you offer and a service you use are different. "
@@ -1142,9 +1143,8 @@ LESSONS = [
                   "with the comparison done in the page. The domain should have a method that "
                   "says whether sales are improving; the page asks it and chooses how to "
                   "highlight. He will not be dogmatic about it: a reviewer, Alan Knight, "
-                  "wondered whether the rule in the page began a slide into disorder or was a "
-                  "sensible shortcut only a purist would mind, and Fowler's answer is that it "
-                  "is both."),
+                  "wondered whether it was the start of a decline or a reasonable shortcut, "
+                  "and Fowler's answer is that it is both."),
             ("p", "Choosing Where to Run Your Layers turns to machines. Running everything on "
                   "servers is the simplest choice, because there is one place to upgrade and "
                   "fix; the case for the client is responsiveness or working while "
@@ -1156,7 +1156,7 @@ LESSONS = [
                   "processes cost performance and complexity. The chapter ends with the "
                   "complexity boosters, Jens Coldewey's name for distribution, explicit "
                   "multithreading, paradigm chasms such as objects and tables, multiplatform "
-                  "work and extreme performance requirements, which the book puts at more than "
+                  "work and extreme performance requirements, for which the book's example is more than "
                   "100 transactions a second. Each has a cost, in building and in maintenance."),
             ("code", _lines(RISING_TWICE)),
             ("p", "Here is the book's red-product rule in code written for the lesson: a Web "
@@ -1170,7 +1170,9 @@ LESSONS = [
                   "the lesson's."),
             ("code", _lines(RISING_ONCE)),
             ("p", "The preset <code>rising-once</code> is the same two presentations after the "
-                  "rule has moved into the domain as `isRising`. The lab reports 0 repeated "
+                  "rule has moved into the domain as `isRising`. In a Domain Model it would be a "
+                  "method on `Product`; it is written here as a function so that both "
+                  "presentations fit in one listing. The lab reports 0 repeated "
                   "blocks, 0 lines, and where: none. The two presentations still differ, one "
                   "passes a flag to the page and the other appends a star, and that is the "
                   "split Fowler describes: the domain decides whether there is something to "
@@ -1279,17 +1281,17 @@ LESSONS = [
                    "Two layers, since the database is local"],
              "c": 0,
              "why": "A layer is a logical division and a tier usually a physical one. Fowler "
-                    "says plainly that with a local database he can run all three layers on a "
-                    "single laptop, and they are still three distinct layers."},
+                    "says plainly that with a local database one laptop can run all three "
+                    "layers, and they are still three distinct layers."},
             {"q": "Which dependency does Chapter 1's rule forbid?",
              "a": ["The presentation reading the data source directly",
                    "The presentation calling the domain",
-                   "The domain calling the presentation",
-                   "The domain calling the data source"],
-             "c": 2,
+                   "The domain calling the data source",
+                   "The domain calling the presentation"],
+             "c": 3,
              "why": "The rule is that the domain and data source never depend on the "
                     "presentation. Fowler says the presentation often reads the data source "
-                    "directly, less tidy but, he finds, better in practice; the presentation calling the "
+                    "directly, less tidy but, he concedes, often better in practice; the presentation calling the "
                     "domain is the normal direction; and the domain's relation to the data "
                     "source depends on the data-source patterns chosen."},
             {"q": "Which of these is among the complexity boosters that close Chapter 1, in "
@@ -1299,7 +1301,7 @@ LESSONS = [
              "c": 1,
              "why": "The boosters are distribution, explicit multithreading, paradigm chasms "
                     "such as objects against tables, multiplatform development and extreme "
-                    "performance requirements, more than 100 transactions a second in the "
+                    "performance requirements, for example more than 100 transactions a second in the "
                     "book. Layering is the chapter's recommendation, and a Web presentation "
                     "Fowler's preferred one."},
         ],
@@ -1320,7 +1322,7 @@ LESSONS = [
             ("Thinking the presentation must never touch the data source",
              "The chapter's rule runs the other way: the domain and data source must not "
              "depend on the presentation. Fowler says the presentation more often reads the "
-             "data source directly than not, which is less tidy and, he finds, works better in "
+             "data source directly than not, which is less tidy and, he concedes, often the better choice in "
              "practice. A layered design forbids calls into the presentation, not every call "
              "that skips a layer."),
         ],
@@ -1422,8 +1424,8 @@ LESSONS = [
                   "package that knows both and wires them together when the application "
                   "starts."),
             ("p", "When to Use It gives the occasions: a framework that must call application "
-                  "code, a layer that must call one it should not see, such as domain code "
-                  "calling a Data Mapper, and code that must call another team's work without "
+                  "code, a layer that must reach one it should not see, for instance a "
+                  "domain object that needs its Data Mapper, and code that must call another team's work without "
                   "depending on its API. Fowler also says when not to bother. Some developers "
                   "write a separate interface for every class, which he thinks excessive; for "
                   "applications he recommends one only to break a dependency or to allow "
@@ -1450,7 +1452,7 @@ LESSONS = [
                   "changes: depend on it directly, 1: mapper; reached in all, 3: mapper, "
                   "order, screen. The lab follows the cycle without going round it twice."),
             ("p", "On the preset <code>separated</code>, `order` uses `finder`, the interface "
-                  "in its own package, `mapper` uses `finder` and `order`, and `main` uses "
+                  "in the domain package, `mapper` uses `finder` and `order`, and `main` uses "
                   "`mapper` to wire it. The same change to `jdbc` gives 1: mapper directly and "
                   "2: main, mapper in all. No domain class is reached. The count does not say "
                   "the second design is better; it says what the stated dependencies let a "
@@ -1536,8 +1538,7 @@ LESSONS = [
         "quiz_title": "Separated Interface and what a change reaches",
         "quiz": [
             {"q": "In the exercise, `fontlib` changes. What does it reach before the "
-                  "interface, and what after an interface InvoiceRenderer in the invoice "
-                  "package, implemented by pdfwriter and wired by main?",
+                  "interface, and after the Separated Interface the exercise asks for?",
              "a": ["before 1: pdfwriter; after 1: pdfwriter",
                    "before 4: fontlib, invoice, pdfwriter, report; after 3: fontlib, main, pdfwriter",
                    "before 3: invoice, pdfwriter, report; after 3: invoice, main, pdfwriter",
@@ -1545,7 +1546,8 @@ LESSONS = [
              "c": 3,
              "why": "Before: `pdfwriter` depends on `fontlib` directly (1: pdfwriter), "
                     "`invoice` on `pdfwriter` and `report` on `invoice`, so 3: invoice, "
-                    "pdfwriter, report. With `InvoiceRenderer` in the invoice package, the "
+                    "pdfwriter, report. The interface goes in the invoice package, say "
+                    "`InvoiceRenderer`, implemented by `pdfwriter`: the "
                     "edge `invoice, pdfwriter` becomes `pdfwriter, invoice`, and `main, "
                     "pdfwriter` wires it: the change reaches `pdfwriter` and `main`, 2: main, "
                     "pdfwriter, and neither `invoice` nor `report`. The changed class itself "
@@ -1576,9 +1578,10 @@ LESSONS = [
         "mistakes": [
             ("Thinking an interface is worth having only with two implementations",
              "On this view an interface earns its place by being implemented more than once. "
-             "Separated Interface usually has one implementation; its point is the direction "
-             "of the dependency, which Fowler argues from packages and the rules between "
-             "them, not from substitution. In the lesson's illustration one interface and one "
+             "Separated Interface can have a single implementation and still earn its place: "
+             "several implementations are a second reason for it, not a requirement. "
+             "Fowler's case is the direction of the dependency between packages, and When "
+             "to Use It opens with breaking a dependency. In the lesson's illustration one interface and one "
              "mapper take every domain class out of reach of a database change."),
             ("Thinking a Layer Supertype is a class that does everything",
              "A Layer Supertype holds only what every object in its layer shares, so that it "

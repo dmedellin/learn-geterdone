@@ -93,7 +93,7 @@ COURSE = {
         "Expect timelines, not running code. The concurrency labs replay a timeline of "
         "sessions that the lesson states, minute by minute, and count what each scheme "
         "commits, refuses and loses. Real concurrency bugs cannot be reproduced on demand, "
-        "which is the chapter's own reason for preferring designs that avoid them: isolation, "
+        "which is one of the chapter's reasons for preferring designs that avoid them: isolation, "
         "immutability, and transactions that the database manages for you.",
         "Treat each count as a model of the situation. The figures come from what the "
         "lesson states: who reads and writes when, how long a request takes, how big a "
@@ -120,7 +120,7 @@ COURSE = {
         "What has changed since 2002, except one development: snapshot isolation in "
         "multiversion databases, set beside Chapter 5's four levels in Transactions and "
         "Isolation. The platform advice of Chapter 17 (HTTP sessions, stateful session beans, "
-        ".NET's session state) is named, not taught.",
+        ".NET's session state) is named once in Session State, not taught.",
     ],
     "footer_lead": (
         "Every figure in this course is computed in your browser from what a lesson states: "

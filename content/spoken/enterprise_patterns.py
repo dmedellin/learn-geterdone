@@ -39,6 +39,44 @@ SPOKEN.update({
         "local, 67 calls at 1 microsecond, 67 microseconds",
     "time: 14,067 µs":
         "time, 14067 microseconds",
+    "facade: 2 trips at 20 ms, which is 40 ms":
+        "facade, 2 trips at 20 milliseconds, which is 40 milliseconds",
+    "facade work: 11 calls at 0.5 ms, 5.5 ms":
+        "facade work, 11 calls at 0.5 milliseconds, 5.5 milliseconds",
+    "facade time: 45.5 ms":
+        "facade time, 45.5 milliseconds",
+    "getters: 5 trips at 20 ms, 100 ms":
+        "getters, 5 trips at 20 milliseconds, 100 milliseconds",
+    "getter time: about 102.07 ms":
+        "getter time, about 102.07 milliseconds",
+    "one object: 1 trip, 20 ms":
+        "one object, 1 trip, 20 milliseconds",
+    "object time: about 26.07 ms":
+        "object time, about 26.07 milliseconds",
+    # Prose runs: grouped thousands in a fraction, and a class=node pair, which
+    # the code reader would say as "is set to".
+    "51,033/500 ≈ 102.07 ms":
+        "51033 over 500, about 102.07 milliseconds",
+    "13,033/500 ≈ 26.07 ms":
+        "13033 over 500, about 26.07 milliseconds",
+    "53,099/500 ≈ 106.20 ms":
+        "53099 over 500, about 106.20 milliseconds",
+    "19,099/500 ≈ 38.20 ms":
+        "19099 over 500, about 38.20 milliseconds",
+    "class=node":
+        "class equals node",
+    "4,007/200 ≈ 20.04 ms":
+        "4007 over 200, about 20.04 milliseconds",
+    "8,907/200 ≈ 44.54 ms":
+        "8907 over 200, about 44.54 milliseconds",
+    "2,007/200 ≈ 10.04 ms":
+        "2007 over 200, about 10.04 milliseconds",
+    "20 × (15 + 1) = 320 ms":
+        "20 times the sum of 15 and 1, which is 320 milliseconds",
+    "3 × 15 + 20 × 1 = 65 ms":
+        "3 times 15, plus 20 times 1, which is 65 milliseconds",
+    "5 × 20 = 100 ms":
+        "5 times 20, which is 100 milliseconds",
 })
 
 # Layers and Performance
@@ -61,6 +99,43 @@ SPOKEN.update({
         "gain, the rise in transactions a second divided by the servers added",
     "at n: last tps + gain * (n - last n)":
         "at n servers, the last throughput plus the gain times the quantity n minus the last n",
+    # Worked lines: the quantity, not "open bracket".
+    "swordfish at n: 20 + 15 * (n - 1)":
+        "swordfish at n servers, 20 plus 15 times the quantity n minus 1",
+    "camel at n: 40 + 10 * (n - 1)":
+        "camel at n servers, 40 plus 10 times the quantity n minus 1",
+    "equal when 5 * (n - 1) is 20: n is 5":
+        "equal when 5 times the quantity n minus 1 is 20, so n is 5",
+    # Record formats and dependency records: read as who uses whom, so a
+    # listener can tell which name depends on which.
+    "system, users, ms":
+        "system, users, then response time in milliseconds",
+    "system, servers, tps":
+        "system, servers, then transactions a second",
+    "dependent, dependency":
+        "dependent, then what it depends on",
+    "report, invoice; invoice, pdfwriter; pdfwriter, fontlib":
+        "report uses invoice, invoice uses pdf writer, pdf writer uses font lib",
+    "invoice, pdfwriter":
+        "invoice uses pdf writer",
+    "pdfwriter, invoice":
+        "pdf writer uses invoice",
+    "main, pdfwriter":
+        "main uses pdf writer",
+    "pdfwriter":
+        "pdf writer",
+    "fontlib":
+        "font lib",
+    "jdbc":
+        "J D B C",
+    # The exercises' measurement records, read as measurements so that no
+    # field pair sounds like a grouped thousand.
+    "north, 5, 400; north, 25, 1400; south, 5, 900; south, 25, 1000":
+        "north at 5 users, 400 milliseconds, north at 25 users, 1400 milliseconds, "
+        "south at 5 users, 900 milliseconds, south at 25 users, 1000 milliseconds",
+    "heron, 1, 30; heron, 3, 54; stork, 1, 45; stork, 3, 57":
+        "heron on 1 server, 30, heron on 3 servers, 54, "
+        "stork on 1 server, 45, stork on 3 servers, 57",
 })
 
 # Talking to the Database
@@ -110,31 +185,34 @@ SPOKEN.update({
 
 # Objects and Tables
 # Tree and hierarchy records whose "-" marks the root (the code reader says
-# "minus"), the serialized tree of lesson 4.5, whose brackets it would read as
-# calls, and lesson 4.2's shared-objects tile, whose "×" it reads as "times".
+# "minus"), and lesson 4.2's shared-objects tile, whose "×" it reads as
+# "times".
 # Each is read as written.
 SPOKEN.update({
     "root, -; a, root; b, a; c, b; d, c; e, root":
         "root, no parent, a under root, b under a, c under b, d under c, e under root",
-    "account, -, 3, no; saving, account, 2, yes; isa, saving, 1, yes; current, account, 2, yes":
-        "account, no parent, 3 fields, not concrete, saving under account, 2, concrete, "
-        "isa under saving, 1, concrete, current under account, 2, concrete",
+    "account, -, 3, no; saving, account, 2, no; isa, saving, 1, yes; bond, saving, 2, yes; "
+    "current, account, 2, yes":
+        "account, no parent, 3 fields, not concrete, saving under account, 2, not concrete, "
+        "isa under saving, 1, concrete, bond under saving, 2, concrete, "
+        "current under account, 2, concrete",
     "vehicle, -, 4, no; car, vehicle, 2, yes; van, vehicle, 3, yes; truck, vehicle, 5, yes":
         "vehicle, no parent, 4 fields, not concrete, car under vehicle, 2, concrete, "
         "van under vehicle, 3, concrete, truck under vehicle, 5, concrete",
-    "(sales (north) (south))":
-        "open bracket sales, open bracket north close bracket, "
-        "open bracket south close bracket, close bracket",
     "customer 7 ×3, product 5 ×2":
         "customer 7, three times, product 5, twice",
 })
 
 # Concurrency and Session State
 # The exercises' event records end a commit with "-", which the code reader
-# says as "minus", a group pair's "=" would be "is set to", and the worked
-# lines' grouped thousands would be split at each comma. Each is read as
-# written.
+# says as "minus"; a group pair's "=" would be "is set to"; the worked lines'
+# grouped thousands would be split at each comma; and inside OPTIMISTIC_SAVE's
+# SQL string the "=" and "+ 1" would go unspoken. Each is read as written.
 SPOKEN.update({
+    '        "UPDATE invoice SET total = ?, version = version + 1"':
+        "string, update invoice set total equals placeholder, version equals version plus 1",
+    '        + " WHERE id = ? AND version = ?");':
+        "plus the string, where id equals placeholder and version equals placeholder",
     "9, bo, commit, -;": "9, bo, commit, no record",
     "12, ann, commit, -": "12, ann, commit, no record",
     "5, ana, commit, -;": "5, ana, commit, no record",

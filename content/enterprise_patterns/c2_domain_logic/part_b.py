@@ -201,11 +201,11 @@ LESSONS = [
                   "But the real difference is equality. A reference object's equality is "
                   "its identity, either the language's own object identity or an ID such "
                   "as a primary key. A Value Object's equality is its field values: two "
-                  "dates are the same if their day, month and year are. So values are "
+                  "dates are equal when they name the same day of the same month and year. So values are "
                   "passed around freely, and you do not care how many objects for the "
                   "same date exist or whether two owners share one."),
-            ("p", "That freedom is where the quotation comes in. Most languages have no "
-                  "special facility for values, so Fowler advises making them immutable, "
+            ("p", "That freedom is where the quotation comes in. Few languages treat "
+                  "values specially, so Fowler advises making them immutable, "
                   "and the reason he gives is aliasing bugs. If two owners share one date "
                   "and one of them changes a field in it, the other's date changes too. "
                   "His point is less that this is wrong than that nobody expects it: "
@@ -217,8 +217,8 @@ LESSONS = [
                   "course, keeps its fields in the owner's row, which also lets SQL query "
                   "them, and Serialized LOB is the other option. .NET gives values "
                   "first-class treatment as structs, which the pattern names as a "
-                  "platform note. When to Use It is a single test: treat something as a "
-                  "Value Object when its equality rests on something other than identity, "
+                  "platform note. When to Use It is a single test: use the pattern for a "
+                  "thing whose equality rests on something other than identity, "
                   "and consider it for any small object that is easy to create. Fowler "
                   "ends on a name clash: some J2EE writing of the time used value object "
                   "for what the book calls a Data Transfer Object, read in the last "
@@ -463,7 +463,8 @@ LESSONS = [
                   "amount and a currency. The amount is an integral type or a fixed "
                   "decimal, and he says to avoid any floating point type absolutely, "
                   "because it brings back the rounding problems Money exists to avoid. "
-                  "The reason, in one sentence of this lesson's own: binary floating "
+                  "The book's example shows the effect; the reason, in one sentence of "
+                  "this lesson's own: binary floating "
                   "point cannot hold most decimal fractions exactly, so ten cents is "
                   "stored as a number very near ten cents, and the error shows in "
                   "totals."),
@@ -475,8 +476,8 @@ LESSONS = [
                   "currencies goes through a convertor object, because some conversion "
                   "rules, like the fixed euro rates, round in their own way. Comparison is "
                   "currency-aware too, and Money can print and parse itself. When to Use "
-                  "It is broad: Fowler uses Money for pretty much all numeric calculation "
-                  "in object-oriented environments, chiefly to keep the rounding in one "
+                  "It is broad: Fowler reaches for Money in nearly every calculation an "
+                  "object-oriented program does, chiefly to keep the rounding in one "
                   "place."),
             ("p", "Then the conundrum, which the book credits to Matt Foemmel. A rule "
                   "says a sum must be split 70% to one account and 30% to another, and "
@@ -489,8 +490,8 @@ LESSONS = [
                   "rounding for each share, which gets complicated across ten accounts; "
                   "and his favourite, an allocator that takes the ratios and returns "
                   "shares with no penny dropped. Its faults, he says, are that you must "
-                  "remember to use it and that precise rules for where the pennies go "
-                  "are hard to enforce."),
+                  "remember to use it, and that it is hard to guarantee which share gets "
+                  "each spare penny."),
             ("p", "The lab works the split exactly. It takes an amount in cents, the "
                   "ratios and a rule, computes each exact share as the amount times its "
                   "ratio over the sum of the ratios, and prints five tiles: the shares, "
@@ -701,8 +702,8 @@ LESSONS = [
             "The lab does the arithmetic of the amounts and ratios it is given, exactly, "
             "and its allocator is one rule among those the book allows. Which rule is "
             "right, and which share should take a spare cent, is a business decision the "
-            "lab cannot make; Fowler says that precise rules about where the pennies go "
-            "are hard to enforce."
+            "lab cannot make; Fowler says the allocator cannot easily guarantee where "
+            "the spare pennies land."
         ),
     },
     # ---------------------------------------------------------------- 07
@@ -736,7 +737,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Special Case",
-             "A subclass that provides special behaviour for a particular case, such as "
+             "A subclass that stands in for one particular situation, such as "
              "a customer who is missing, returned in place of null so that callers can "
              "call the usual methods on it."),
             ("Null Object",
@@ -762,8 +763,8 @@ LESSONS = [
             ("p", "Fowler's starting point is that nulls defeat polymorphism. You can "
                   "normally call a method on a variable without caring which subclass it "
                   "holds, and a typed language checks the call for you, but if the "
-                  "variable can be null the call fails at run time, and, as he notes "
-                  "drily, you get a stack trace for your trouble. So every caller that might see a null must "
+                  "variable can be null the call fails at run time, and, as he notes, "
+                  "you get a stack trace for your trouble. So every caller that might see a null must "
                   "test for it, and since the right response is often the same in many "
                   "places, the same test is written in many places, which is duplication, "
                   "and Fowler counts it a sin. Nulls are the common case; infinity in arithmetic and a "
@@ -776,14 +777,14 @@ LESSONS = [
                   "can also mean different things, such as no customer at all or a "
                   "customer nobody has identified, and Fowler suggests separate special "
                   "cases for each. A special case's methods often return other special "
-                  "cases, so an unknown customer's last bill is an unknown bill."),
+                  "cases, so what an unknown customer owes is itself unknown."),
             ("p", "He finds a good example outside business code: IEEE 754 floating "
                   "point, whose infinities and not-a-number are special values a "
                   "division by zero can return instead of raising an exception, and "
                   "which then take part in arithmetic like any other number. When to Use "
                   "It is a single test: use a Special Case wherever several places in the "
-                  "system do the same thing after a conditional check for a particular "
-                  "instance, or after a null check. The book cites Bobby Woolf's Null "
+                  "system respond alike once a test has found one particular instance, "
+                  "or found a null. The book cites Bobby Woolf's Null "
                   "Object and, pardoning what Fowler calls the pun, files Null Object "
                   "as a special case of Special Case. A caller that does need to know can "
                   "still ask: the example gives the class an `isNull` method, or a marker "
@@ -798,10 +799,15 @@ LESSONS = [
                   "instead of null, whose name is &ldquo;friend&rdquo; and whose plan is "
                   "the basic one, and the greeting asks its questions directly: 1 "
                   "decision point, breakdown 1, band 0–5, deepest nesting 0, first at "
-                  "line 3. The listing is a class and a routine, and the lab counts the "
+                  "line 3. The lab finds a routine header here, `greeting` on line 7, so "
+                  "it measures depth from inside a routine, as it did on the Domain "
+                  "Model lesson's first preset, and the class's one-line methods above "
+                  "it read as 0. The listing is a class and a routine, and the lab counts the "
                   "whole listing; neither holds a test. Unlike the Domain Model lesson, "
-                  "where the decisions moved into the classes, here they are gone, because the answer was the same wherever the question was "
-                  "asked."),
+                  "where each branch moved into the class it concerned, here the guarded "
+                  "answers all move into one class and the decision moves to one place, "
+                  "the finder that returns the guest. It leaves every caller, because "
+                  "the answer was the same wherever the question was asked."),
             ("code", _lines(GUEST_CUSTOMER)),
             ("p", "The rewrite assumes something the original did not: that a real "
                   "customer always has a name and a plan. `NULL_CHECKS` also guarded "
@@ -943,8 +949,9 @@ LESSONS = [
              "customer knows the special case exists."),
             ("Using one null object for every meaning of null",
              "A null can mean no customer at all, or a customer nobody has identified, "
-             "and these may need different answers: a guest can be greeted, while charges "
-             "against an account nobody has identified must still be kept apart. Fowler suggests separate "
+             "and these may need different answers. The book's own case is a utility "
+             "customer nobody has identified, whose charges must still be kept apart. "
+             "Fowler suggests separate "
              "special cases for missing and unknown, and keeps those with state of "
              "their own apart rather than sharing one instance."),
         ],
