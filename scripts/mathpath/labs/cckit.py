@@ -29,7 +29,7 @@ the tokenizer and the condition parser are the kit's own.
 
 VIEW IS NOT A CONTROL. cfg["view"] fixes which inputs and tiles the page shows;
 an unknown mode or view raises. The lesson-level values (min_run, min, bands,
-indent; table, tag, tag_label, target, unit, source) come from the cfg, never from
+book, indent; table, tag, tag_label, target, unit, source) come from the cfg, never from
 a preset.
 
 IDS. Every tile id begins with its mode's prefix (co dg cd se lp nu df pf pj);
@@ -460,6 +460,27 @@ CO_VIEW_JS["complexity"] = r"""
   };
 """
 
+# cfg "book": "other" (docs/enterprise-patterns/PLAN.md H.1). On a path whose
+# "book" is not Code Complete, the complexity banner's two sentences about "the
+# book" and the ?: note would name the wrong author. This block ships ONLY when
+# a lesson sets book "other", after the complexity view's own block, and
+# rewrites those three phrases of its banner; with the default it is not on the
+# page, so every Code Complete page is byte-for-byte what it was.
+CO_BOOK_OTHER_JS = r"""
+  (function (plain) {
+    CO_VIEW.complexity = function (L, inst, opts) {
+      var out = plain(L, inst, opts);
+      if (out.status) {
+        out.status = out.status
+          .replace('McConnell\'s guidance on what', 'McConnell\'s guidance in Code Complete on what')
+          .replace('The book prints its bands', 'McConnell prints his bands')
+          .replace('the kit\'s choice, not the book\'s.', 'the kit\'s choice, not McConnell\'s.');
+      }
+      return out;
+    };
+  })(CO_VIEW.complexity);
+"""
+
 CO_VIEW_JS["basis"] = r"""
   CO_VIEW.basis = function (L) {
     var D = coDecisions(L), n = 1 + D.pts.length + D.noDefault;
@@ -690,7 +711,9 @@ def _code_options(cfg, kit, view):
         if (not isinstance(b, (list, tuple)) or len(b) != 2 or any(isinstance(x, bool) or not isinstance(x, int) for x in b)
                 or not 0 < b[0] < b[1]):
             raise ValueError("%s: cfg['bands'] is %r; it is two whole numbers 0 < a < b" % (kit, b))
-        fixed["bands"], keys = list(b), ["bands"]
+        fixed["bands"], keys = list(b), ["bands", "book"]
+        if cfg.get("book", "code-complete") not in ("code-complete", "other"):
+            raise ValueError("%s: cfg['book'] is %r; it is \"code-complete\" (the default) or \"other\"" % (kit, cfg.get("book")))
     if view == "layout":
         n = cfg.get("indent", 4)
         if isinstance(n, bool) or not isinstance(n, int) or not 1 <= n <= 8:
@@ -729,7 +752,8 @@ def _code_lab(cfg, view):
     fields, tiles = CODE_VIEWS[view]
     fixed, keys = _code_options(cfg, kit, view)
     lab = cc.build_lab(cfg, kit=kit, prefix="co", view=view, fields=fields, tiles=tiles, fn="coCompute",
-                       js=CO_JS + (CO_DECIDE_JS if view in ("complexity", "basis") else "") + CO_VIEW_JS[view],
+                       js=CO_JS + (CO_DECIDE_JS if view in ("complexity", "basis") else "") + CO_VIEW_JS[view]
+                       + (CO_BOOK_OTHER_JS if view == "complexity" and cfg.get("book") == "other" else ""),
                        fixed=fixed, title="Reading the code", subtitle=_SUBTITLES[view], family=1,
                        intro=cc.FAMILY[1] + " The lab reads the listing; it never runs it, and no count is a verdict.",
                        extra_keys=keys, rules=_SUBSET + "<p>" + _RULE[view] + "</p>", listing_key="code")
