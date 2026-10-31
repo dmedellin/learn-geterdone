@@ -15,6 +15,7 @@ from . import (
     readkit,
     cckit,
     eakit,
+    itakit,
     argkit,
     choicekit,
     algebra_equations,
@@ -175,6 +176,7 @@ REGISTRY = {
     "readkit": readkit.readkit_lab,
     "cckit": cckit.cckit_lab,
     "eakit": eakit.eakit_lab,
+    "itakit": itakit.itakit_lab,
 }
 
 
