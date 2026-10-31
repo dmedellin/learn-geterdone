@@ -78,7 +78,7 @@ pattern to its contributing author where PLAN §F rule 6 says so.
 ## The loop, with this Subject's commands
 
 Render your course only:
-`python3 scripts/preview_subject.py enterprise-patterns --course <course-slug> --out <dir>`
+`python3 scripts/preview_subject.py enterprise_patterns --course <course-slug> --out <dir>`
 with `<dir>` a new folder under
 `/tmp/claude-0/-home-claude/d46a89a5-ae93-5f9f-84a3-4e1ae07e83c0/scratchpad/`.
 Write presets with `expect: {}` first, then

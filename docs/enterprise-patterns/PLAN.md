@@ -592,8 +592,10 @@ named, not taught.
      passes stork at 4 servers (66 against 63); both need 4 servers for 60;
      at 6, heron 90 and stork 75.
    - **Own:** the last time your team scaled a system, by hardware or by
-     code; write which of Fowler's two scalabilities it was and the figure
-     that justified it.
+     code; write whether it was scaling up, scaling out, or (if it was done
+     by code) a gain in efficiency instead, and the figure that justified it.
+     (Corrected at authoring: a change made in code is neither of Fowler's
+     two scalabilities, which are both about adding hardware.)
    - **Snippet:** `SERVERS_NEEDED`, 13 lines: the loop that `pzNeed` does,
      run by hand in the exercise, with a guard for a system that gains
      nothing from another server (the loop would never end).
@@ -797,7 +799,8 @@ says Fowler's full revenue-recognition example is pointed to, not reworked.
      orders, 1500; product, 120; line, 6000` → `ldTables` 4, `ldRows` 7,820,
      `ldRowObjects` 7,820, `ldTableObjects` 4, `ldLargest` "line 6,000") and
      `one-big-table` (`reading, 250000; meter, 400` → 2, 250,400, 250,400, 2,
-     "reading 250,000"). Pins `ldRowObjects`, `ldTableObjects`. The panel says the count
+     "reading 250,000"). Pins `ldRowObjects`, `ldTableObjects` and, as authored,
+     `ldLargest`. The panel says the count
      is objects, not memory, and assumes every row is loaded, which neither
      pattern requires.
    - **Misconception:** "Table Module is a Domain Model with fewer objects."
@@ -982,7 +985,10 @@ says Fowler's full revenue-recognition example is pointed to, not reworked.
    - **Lab:** cckit `code/complexity`, `bands` [5, 10]. Presets `null-checks`
      (`NULL_CHECKS`: 5, "1 + if 2 + && 2", "0–5", 1, "line 4") and
      `guest-customer` (`GUEST_CUSTOMER`: 1, "1", "0–5", 0, "line 3"). Pins
-     `coDecisions`, `coBreakdown`.
+     `coDecisions`, `coBreakdown`. As authored (2.2 too), `"book": "other"`,
+     and the panel intro states the operators in words ("each conditional
+     and and conditional or"), because cckit refuses `&` in panel text, so
+     §D.5's example intro does not build.
    - **Misconception:** "A Special Case hides errors." It is for a case with
      the same behaviour wherever it turns up (When to Use It), and it hides
      nothing a caller needs: the book's own example can still be tested for
@@ -1216,7 +1222,11 @@ procedures are named where Fowler names them, not taught.
      each source fills a `CustomerData`, and one `toCustomer` does the rest
      → 0, 0, "none"). Pins all three. The body says the kit finds only the
      identical lines; the reading lines differ in their source calls, which
-     is what the per-source step is for.
+     is what the per-source step is for. `TWO_STEP` reads data in, so its
+     comments number the per-source step "step one"; Fowler numbers from the
+     in-memory schema outward, and his second step is the per-source one,
+     which holds the differences (PDF p. 58). The body says so (added at
+     authoring).
    - **Misconception:** "Design the database first, then the objects to fit."
      Fowler's advice for a Domain Model is the reverse, within short
      iterations: the model first, the database as its persistence; for a
@@ -1265,7 +1275,8 @@ procedures are named where Fowler names them, not taught.
      `same-machine` (latency 0.1 → 25, 3, 15, "64/5 = 12.80", "1/6 ≈ 16.7%",
      "75/64 ≈ 1.2×"). Pins `rrFineMs`, `rrCoarseMs`, `rrSpeedup`. The panel
      calls a batch a coarse call; the labels say "statements" and
-     "batches" here (§D.1, cfg `labels`).
+     "batches" here (§D.0, cfg `fine_label` and `coarse_label`, as
+     the kit report's deviation 14 implements them; corrected at authoring).
    - **Misconception:** "Batching is faster because the database does less
      work." The lab holds the work the same, 25 × 0.5 ms, and batching is
      still 3.4× faster: it removes 22 of the 25 waits. The body says that
@@ -1353,7 +1364,8 @@ to, not reworked.
      (the example is David Rice's); *F14*.
 
 2. **identity-map** — Identity Map — *Chapter 11 · Object-Relational Behavioral Patterns* — 15 min
-   - **Read:** Chapter 3, The Behavioral Problem (PDF p. 51) on loading the same
+   - **Read:** Chapter 3, The Behavioral Problem (PDF p. 50; p. 51 is blank in
+     the operator's copy, corrected at authoring) on loading the same
      row twice; Chapter 11, Identity Map (pp. 183–186): a map from key to
      loaded object, consulted before every load, so each row is one object
      per session; explicit or generic maps, one per class or one per session;
@@ -1577,6 +1589,8 @@ to, not reworked.
      Inheritance (p. 57), on mixing the three in one hierarchy.
    - **Quote:** PDF p. 262, 21 words — “You need to touch multiple tables to load
      an object, which means a join or multiple queries and sewing in memory.”
+     The body also quotes Inheritance Mappers' “a heinous crime” (PDF p. 278,
+     3 words; ea_quotes.py OK), for a lesson total of 24 (added at authoring).
    - **Do:** count what loading, finding and altering touch under class- and
      concrete-table mappings.
    - **Standard:** given a hierarchy, a class to load, a class to find all
@@ -1747,7 +1761,8 @@ aside is in Template View and Transform View.
      Controller.
 
 3. **front-controller** — Front Controller — *Chapter 14 · Web Presentation Patterns* — 15 min
-   - **Read:** Chapter 4, Input Controller Patterns (PDF pp. 70–71) on Front
+   - **Read:** Chapter 4, Input Controller Patterns (PDF p. 70; p. 71 is
+     Further Reading, corrected at authoring) on Front
      Controller; Chapter 14, Front Controller (pp. 312–317): one handler for
      every request, which does the common work (security, logging,
      internationalisation) and dispatches to a command per action, chosen
@@ -1840,8 +1855,10 @@ aside is in Template View and Transform View.
      Chapter 14, Two Step View (pp. 331–343; examples pointed to): the first
      stage turns domain data into a logical screen with no formatting, and the
      second turns logical screens into HTML, so a site-wide change of look is
-     made in one place and a site can have several looks; its cost, that the
-     logical screen has to be designed and every page fits it.
+     made in one place and a site can have several looks (ten screens and
+     three appearances: thirty single-stage views against thirteen stages,
+     *F24*, p. 336); its cost, that the logical screen has to be designed and
+     every page fits it.
    - **Quote:** PDF p. 333, 22 words — “Two Step View's key value comes from the
      separation of first and second stages, allowing you to make global
      changes more easily.”
@@ -1871,8 +1888,10 @@ aside is in Template View and Transform View.
    - **Sources:** Chapter 4, View Patterns; Chapter 14, Two Step View.
 
 6. **application-controller** — Application Controller — *Chapter 14 · Web Presentation Patterns* — 15 min
-   - **Read:** Chapter 4, Input Controller Patterns (PDF p. 71) on screen
-     flow; Chapter 14, Application Controller (pp. 344–350): a central point
+   - **Read:** Chapter 4's opening (PDF p. 66) on screen flow and the test
+     of who controls it, and Further Reading (p. 71) for the terminology
+     taken from Knight and Dai (corrected at authoring: Input Controller
+     Patterns, p. 70, does not discuss flow); Chapter 14, Application Controller (pp. 344–350): a central point
      for screen navigation and flow, which input controllers ask for the
      domain command to run and the view to show next; it adds little when
      any screen can be visited in pretty much any order, and its strength is
@@ -1962,7 +1981,8 @@ locking are named, not taught.
      the conflict when the second commits; choosing between them by how often
      conflicts happen and what one costs; preventing inconsistent reads (read
      locks, version markers, temporal reads); deadlocks, and the avoidance
-     techniques Fowler prefers to detection.
+     techniques Fowler and Rice prefer to detection (the chapter's "we",
+     PDF p. 78; corrected at authoring from "Fowler").
    - **Quote:** PDF p. 76, 24 words — “A good way of thinking about this is that
      an optimistic lock is about conflict detection while a pessimistic lock is
      about conflict prevention.”
@@ -2013,7 +2033,9 @@ locking are named, not taught.
      transactions. Patterns for Offline Concurrency Control (pp. 83–84), the
      map of Chapter 16. Application Server Concurrency (pp. 84–86):
      process-per-session, process-per-request and thread-per-request, and
-     Fowler's policy of avoiding explicit synchronisation (*F17*).
+     Fowler's and Rice's policy of avoiding explicit synchronisation
+     (*F17*; the chapter's "our policy", corrected at authoring from
+     "Fowler's").
    - **Quote:** PDF p. 81, 13 words — “To be sure of correctness you should
      always use the serializable isolation level.”
    - **Do:** name the weakest isolation level that prevents a stated
@@ -2229,8 +2251,9 @@ locking are named, not taught.
 
 Chapters 7, 8 and 15, with the two base patterns that let a system be wired
 from outside. When to cross a process boundary, how to do it when you must,
-and Fowler's own summary of the book. Its `how_to` says every lab here counts
-calls across a boundary from a latency the lesson states. Its `not_covered`
+and Fowler's own summary of the book. Its `how_to` says four of its five labs
+count calls across a boundary from a latency the lesson states, and the last
+(7.5, cckit `deps/ripple`) counts what a change reaches. Its `not_covered`
 says the web-services and messaging technologies of 2002 are named as the
 book names them, not taught. The course's §F.4 aside is in Putting It All
 Together.
@@ -2282,9 +2305,11 @@ Together.
    - **Read:** Chapter 15, Remote Facade (PDF pp. 352–362; examples pointed
      to): a coarse-grained facade over fine-grained objects, with no domain
      logic of its own, so the fine-grained model stays usable locally; one
-     facade method doing the work of several calls; facades by use case,
-     with many methods each; stateful and stateless facades; security and
-     transactions applied at the facade.
+     facade method doing the work of several calls; granularity, where
+     Fowler prefers few facades with many methods each (perhaps one for a
+     moderate application) to the one-per-use-case some prefer (PDF p. 353),
+     each designed for one client's usage; stateful and stateless facades;
+     security and transactions applied at the facade.
    - **Quote:** PDF p. 355, 13 words — “Use Remote Facade whenever you need
      remote access to a fine-grained object model.”
    - **Do:** compute the time fine-grained calls take across a network
@@ -4766,7 +4791,7 @@ are Code Complete's §E.3, applied to this book:
 ### E.4 The author's checklist
 
 The per-lesson procedure of Code Complete §E.4, with
-`python3 scripts/preview_subject.py enterprise-patterns --course <slug> --out <dir>`
+`python3 scripts/preview_subject.py enterprise_patterns --course <slug> --out <dir>`
 to render, and these differences:
 
 1. Open with §C's **Quote** (or none), set as the first body block with its
@@ -4982,6 +5007,7 @@ attributed to the book, and every other figure in §C is illustrative.
 | F21 | expiring server sessions | a session table partitioned into twelve segments, rotated every two hours, so a session active for twenty-four hours is dropped | Chapter 17, Server Session State, p. 408 |
 | F22 | a simple Domain Model | a couple of dozen classes close to the database | Chapter 8, Down to the Data Source Layer, p. 102 |
 | F23 | the book's date | written in early 2002 | Chapter 8, Some Technology-Specific Advice, p. 104 |
+| F24 | the multiappearance saving (5.5) | ten screens and three appearances need thirty single-stage view modules, against ten first stages and three second stages | Chapter 14, Two Step View, p. 336 |
 
 ---
 
