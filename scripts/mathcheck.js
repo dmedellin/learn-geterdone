@@ -22684,6 +22684,386 @@ console.log('domain-driven design: dddkit family B, four modes');
 }
 // ---- end dddkit family B ----
 
+// ---- gofkit (Design Patterns), family A ----
+// ==========================================================================
+// Design Patterns, Read Along: gofkit.py (family A: classes, tree, expr)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS, DDD_CORE_JS (dddkit.py) and GOF_CORE_JS, then one
+// vm context per mode holding its base block and every one of its view
+// blocks. Each <xx>Compute(view, inst, opts) is called on inputs read by
+// dddkit's reader (dddRead) and compared on the exact tile string a reader
+// sees. The figures were counted by hand on the design stated; every case was
+// seen to FAIL when the line it tests was broken on purpose
+// (docs/design-patterns/kit-report.md, "Verification").
+console.log('design patterns: gofkit family A, three modes');
+{
+  const vm = require('vm');
+  const gaFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const gaSrc = { core: fs.readFileSync(gaFile('eakit_core.py'), 'utf8'), d: fs.readFileSync(gaFile('dddkit.py'), 'utf8'),
+    a: fs.readFileSync(gaFile('gofkit.py'), 'utf8') };
+  const gaBlock = (src, name) => blockFrom(gaSrc[src], name.replace(/[[\]]/g, '\\$&'), 'gofkit (' + src + ')');
+  const gaViews = (dict, list) => list.map((v) => gaBlock('a', dict + '["' + v + '"]')).join('');
+  /* Field specs as gofkit.py's SPECS declare them. */
+  const GA_SPECS = String.raw`
+    var LIM = '10000000';
+    function WD(list) { return { kind: 'word', words: list.split('|') }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    function VREC(sub, rest, lr, hr, lo, hi) { return { kind: 'vrec', sub: sub, rest: rest, restWhat: 'variant', loRest: lr, hiRest: hr, lo: lo, hi: hi, unique: true }; }
+    function LIST(lo, hi) { return { kind: 'list', lo: lo, hi: hi, things: 'names', each: { kind: 'name' } }; }
+    var NM = { kind: 'name' }, PAR = { kind: 'parent' }, NUM = { kind: 'num', min: '-' + LIM, max: LIM }, EXPR = { kind: 'expr' };
+    var NODES = REC([['node', NM], ['parent', PAR], ['kind', NM], ['value', PAR]], 1, 60, true);
+    var SPEC_OF = {
+      'classes/explosion': { aspects: VREC([['aspect', NM]], NM, 1, 8, 2, 4), added: PAR },
+      'classes/factory': { families: LIST(1, 8), kinds: LIST(1, 8), scheme: WD('abstract-factory|factory-method|prototype'), change: WD('none|family|kind') },
+      'tree/compose': { nodes: NODES, asks: LIST(0, 60), declare: WD('safe|transparent') },
+      'tree/traverse': { nodes: NODES, find: PAR },
+      'tree/visit': { nodes: NODES, visitors: LIST(1, 4), adding: WD('none|operation|kind') },
+      'expr/interpret': { expr: EXPR, context: REC([['name', NM], ['value', NUM]], 0, 60, true) }
+    };
+    var DEFAULTS = { added: '-', scheme: 'abstract-factory', change: 'none', asks: '', declare: 'safe', find: '-', adding: 'none', context: '' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = dddRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+    function TB(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.table.rows.map(function (r) { return r.join(' / '); }).join('; '); }
+  `;
+  const gaMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + gaBlock('core', 'EA_CORE_JS') + gaBlock('d', 'DDD_CORE_JS') + gaBlock('a', 'GOF_CORE_JS')
+      + code + GA_SPECS + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'gofkit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const gaArgs = (mode, view, raw) => JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw);
+  const gaCall = (run, mode) => (view, raw, ids) => run('T(RUN(' + gaArgs(mode, view, raw) + '), ' + JSON.stringify(ids) + ')');
+  const gaTable = (run, mode) => (view, raw) => run('TB(RUN(' + gaArgs(mode, view, raw) + '))');
+  const gaStatus = (run, mode) => (view, raw) => run('S(RUN(' + gaArgs(mode, view, raw) + '))');
+
+  /* --- GOF_CORE_JS ------------------------------------------------------- */
+  const gc = gaMk('');
+  eq(gc("gofStatus('Ten classes.') + ' | ' + gofDec(R(31n, 2n)) + ' | ' + gofDec(R(1234567n, 1000n)) + ' | ' + gofNum(R(7n, 8n)) + ' | ' + gofNum(R(2n, 3n)) + ' | ' + gofNum(R(-12n))"),
+     'Ten classes; the count is of the design stated. | 15.5 | 1,234.567 | 7/8 = 0.875 | 2/3 ≈ 0.67 | −12',
+     'GOF_CORE_JS: the caution, exact decimals, a fraction with its exact decimal');
+
+  /* --- classes (gcl) ----------------------------------------------------- */
+  const clRun = gaMk(gaBlock('a', 'GCL_JS') + gaViews('GCL_VIEW_JS', ['explosion', 'factory']), 'gclCompute');
+  const cl = gaCall(clRun, 'classes');
+  const COFFEE = 'size, small, medium, large; milk, whole, oat; cup, paper, ceramic';
+  const EX = 'gclCombos gclSubclass gclCompose gclRatio gclRefs gclAddSubclass gclAddCompose';
+  eq(cl('explosion', { aspects: COFFEE, added: 'milk' }, EX),
+     '3 × 2 × 2 = 12 | 12 + 1 = 13 | (3 + 1) + (2 + 1) + (2 + 1) = 10 | 13/10 ≈ 1.3× | 2: milk, cup | 3 × 2 = 6 (13 → 19) | 1 (10 → 11)',
+     'classes/explosion: product + 1 against sum + aspects; a new milk adds size × cup subclasses');
+  eq(cl('explosion', { aspects: COFFEE, added: 'size' }, 'gclAddSubclass gclAddCompose'), '2 × 2 = 4 (13 → 17) | 1 (10 → 11)',
+     'classes/explosion: a new size adds milk × cup subclasses');
+  eq(cl('explosion', { aspects: 'job, flyer, poster, banner, card; finish, matte, gloss' }, 'gclSubclass gclCompose gclRatio gclAddSubclass'),
+     '8 + 1 = 9 | (4 + 1) + (2 + 1) = 8 | 9/8 ≈ 1.1× | no aspect gains a variant', 'classes/explosion: two aspects, no addition');
+  eq(cl('explosion', { aspects: 'size, small, large; milk, oat, small' }, 'gclCombos'),
+     'REFUSED Aspects: small is named twice; every aspect and every variant is a class, and each needs a name of its own', 'classes/explosion: one name per class');
+  const FAM = { families: 'paper steel glass', kinds: 'cup lid' };
+  const FX = 'gclClasses gclFactories gclAdded gclChanged gclConfigChange';
+  eq(cl('factory', Object.assign({ scheme: 'abstract-factory', change: 'kind' }, FAM), FX),
+     '1 + 3 + 2 + 6 = 12 | 1 + 3 = 4 | 4 (12 → 16): 1 abstract product, 3 concrete products | 4: the abstract factory and 3 concrete factories, each given an operation to make the new kind | none: this scheme configures no prototypes',
+     'classes/factory: a new kind under Abstract Factory edits the interface and every concrete factory');
+  eq(cl('factory', Object.assign({ scheme: 'abstract-factory', change: 'family' }, FAM), 'gclAdded gclChanged'),
+     '3 (12 → 15): 1 concrete factory, 2 concrete products | 0', 'classes/factory: a new family under Abstract Factory edits nothing');
+  eq(cl('factory', Object.assign({ scheme: 'factory-method', change: 'kind' }, FAM), 'gclClasses gclFactories gclAdded gclChanged'),
+     '2 + 6 + 2 + 6 = 16 | 2 + 6 = 8 | 8 (16 → 24): 1 abstract creator, 3 creator subclasses, 1 abstract product, 3 concrete products | 0',
+     'classes/factory: Factory Method, one creator subclass per concrete product');
+  eq(cl('factory', Object.assign({ scheme: 'factory-method', change: 'family' }, FAM), 'gclAdded'),
+     '4 (16 → 20): 2 creator subclasses, 2 concrete products', 'classes/factory: a new family under Factory Method adds a creator per kind');
+  eq(cl('factory', Object.assign({ scheme: 'prototype', change: 'family' }, FAM), 'gclClasses gclFactories gclConfigs gclAdded gclConfigChange'),
+     '1 + 2 + 6 = 9 | 1 | 3 configurations of 2 prototypes (6 instances) | 2 (9 → 11): 2 concrete products | 1 added, registering 2 prototypes',
+     'classes/factory: Prototype replaces factory subclasses with configured instances');
+  eq(cl('factory', Object.assign({ scheme: 'prototype', change: 'kind' }, FAM), 'gclAdded gclChanged gclConfigChange'),
+     '4 (9 → 13): 1 abstract product, 3 concrete products | 0 | 3 changed, each registering 1 more prototype', 'classes/factory: a new kind under Prototype');
+  eq(gaTable(clRun, 'classes')('factory', Object.assign({ scheme: 'abstract-factory', change: 'kind' }, FAM)),
+     'abstract factory / 1 / 1 / 1; concrete factories / families / 3 / 3; abstract products / kinds / 2 / 3 (+1); concrete products / families × kinds / 6 / 9 (+3); in all /  / 12 / 16 (+4)',
+     'classes/factory: the table before and after');
+
+  /* --- tree (gtr) -------------------------------------------------------- */
+  const trRun = gaMk(gaBlock('a', 'GTR_JS') + gaViews('GTR_VIEW_JS', ['compose', 'traverse', 'visit']), 'gtrCompute');
+  const tr = gaCall(trRun, 'tree');
+  const HAMPER = 'hamper, -, Box, -; tray, hamper, Box, -; jam, hamper, Item, 4.5; bread, tray, Item, 3.25; scone, tray, Item, 1.75; tin, hamper, Box, -; tea, tin, Item, 6';
+  eq(tr('compose', { nodes: HAMPER, asks: 'jam tin' }, 'gtrNodes gtrLeaves gtrComposites gtrDepth gtrCalls gtrTotal gtrAskLeaves gtrAskTaken'),
+     '7 | 4 | 3 | 2 | 7: 1 from the client + 6 forwarded by composites | 15.5 | 1: jam (refused by the compiler: add is declared only on composites) | 1: tin',
+     'tree/compose: one call per node, the leaves summed exactly');
+  eq(tr('compose', { nodes: HAMPER, asks: 'jam', declare: 'transparent' }, 'gtrAskLeaves'),
+     '1: jam (accepted by the interface: each ignores it or fails at run time)', 'tree/compose: transparency accepts the call');
+  eq(gaTable(trRun, 'tree')('compose', { nodes: HAMPER }), 'hamper / Box / 3 / 4 / 15.5 / 7; tray / Box / 2 / 2 / 5 / 3; tin / Box / 1 / 1 / 6 / 2',
+     'tree/compose: subtotals and calls per subtree');
+  eq(tr('compose', { nodes: 'a, -, B, -; b, a, I, 2; c, b, I, 3' }, 'gtrTotal'),
+     'REFUSED Nodes, record 2 (b) has a value, so it is a leaf, and a leaf has no children, but it has 1 (c); a composite has the value -', 'tree: a leaf has no children');
+  eq(tr('compose', { nodes: 'a, -, B, -; b, c, B, -; c, b, B, -' }, 'gtrTotal'),
+     'REFUSED Nodes b, c cannot be reached from the root a; their parents form a cycle', 'tree: a cycle below no root');
+  eq(tr('compose', { nodes: 'a, -, B, -; b, a, B, 2' }, 'gtrTotal'),
+     'REFUSED The kind B is a composite class for a and a leaf class for b; a class is one or the other', 'tree: a kind is a leaf class or a composite class');
+  eq(tr('traverse', { nodes: HAMPER, find: 'scone' }, 'gtrPre gtrPost gtrLevel gtrFind'),
+     'hamper, tray, bread, scone, jam, tin, tea | bread, scone, tray, jam, tea, tin, hamper | hamper, tray, jam, tin, bread, scone, tea | pre-order 4, post-order 2, level-order 6 (of 7)',
+     'tree/traverse: pre-, post- and level-order, children in record order');
+  eq(tr('visit', { nodes: HAMPER, visitors: 'price weigh', adding: 'kind' }, 'gtrAccepts gtrElements gtrVisitorClasses gtrMethods gtrMethodsPlain gtrAddVisitor gtrAddPlain'),
+     '14: 7 nodes × 2 visitors | 1 + 2 = 3 (the abstract element; Box, Item) | 1 + 2 = 3 (the abstract visitor; price, weigh) | 2 × 2 + 2 = 6 | 2 × 2 = 4 | 1 added (the new element class), 3 changed (the abstract visitor and 2 visitors) | 1 added (the new element class), 0 changed',
+     'tree/visit: a new kind changes every visitor');
+  eq(tr('visit', { nodes: HAMPER, visitors: 'price weigh label', adding: 'operation' }, 'gtrAccepts gtrAddVisitor gtrAddPlain'),
+     '21: 7 nodes × 3 visitors | 1 added (the new visitor), 0 changed | 0 added, 3 changed (the abstract element and 2 element classes)', 'tree/visit: a new operation changes every element class without Visitor');
+
+  /* --- expr (gex) -------------------------------------------------------- */
+  const exRun = gaMk(gaBlock('a', 'GEX_JS') + gaViews('GEX_VIEW_JS', ['interpret']), 'gexCompute');
+  const ex = gaCall(exRun, 'expr');
+  eq(ex('interpret', { expr: 'base + shots * 0.6 - discount', context: 'base, 3.2; shots, 2; discount, 0.5; tip, 1' }, 'gexValue gexNodes gexByClass gexClasses gexCalls gexDepth gexVars gexUnused'),
+     '39/10 = 3.9 | 7 | Number 1, Variable 3, Add 1, Subtract 1, Multiply 1 | 5 of the 7 | 7: 1 from the client + 6 from nodes to their operands | 3 | 3: base, shots, discount | 1: tip',
+     'expr/interpret: an order total, * before + and -, exactly');
+  eq(gaTable(exRun, 'expr')('interpret', { expr: 'a - b * 2', context: 'a, 10; b, 1.5' }),
+     '1 / Variable / a / 10; 2 / Variable / b / 3/2 = 1.5; 3 / Number / 2 / 2; 4 / Multiply / b * 2 / 3; 5 / Subtract / a - b * 2 / 7', 'expr/interpret: the post-order table');
+  eq(['8 - 3 - 2', '24 / 4 / 2', '2 + 3 * 4', '-2 * -(3 + 1)', '7 / 8', '((5))'].map((e) => exRun('T(RUN("expr", "interpret", ' + JSON.stringify({ expr: e }) + '), "gexValue gexNodes")')).join(' ; '),
+     '3 | 5 ; 3 | 5 ; 14 | 5 ; 8 | 7 ; 7/8 = 0.875 | 3 ; 5 | 1', 'expr: left-associative, precedence, unary minus as Negate, parentheses make no node');
+  eq(ex('interpret', { expr: 'a / (b - 2)', context: 'a, 1; b, 2' }, 'gexValue'), 'REFUSED Division by zero: the divisor b - 2 is 0 in a / (b - 2)', 'expr: division by zero names the subexpression');
+  eq(ex('interpret', { expr: 'rate * hours + x', context: 'rate, 2' }, 'gexValue'), 'REFUSED The context gives no value for hours, x; add a record name, value for each', 'expr: unbound variables by name');
+  eq(ex('interpret', { expr: 'rate * hours + rate', context: 'rate, 2; hours, 3' }, 'gexValue gexVars gexByClass'),
+     '8 | 2: rate, hours | Variable 3, Add 1, Multiply 1', 'expr: a variable used twice is two nodes and one variable');
+  eq(ex('interpret', { expr: '1 + 2)' }, 'gexValue'), 'REFUSED The expression has ) at character 6 with no ( to close', 'expr: a stray parenthesis');
+  eq(gaStatus(exRun, 'expr')('interpret', { expr: '6 * 7' }), 'The expression interprets to 42 in 3 interpret calls; the count is of the design stated.', 'expr: the status ends with the caution');
+}
+// ---- end gofkit family A ----
+
+// ---- gofkit (Design Patterns), family B ----
+// ==========================================================================
+// Design Patterns, Read Along: gofkit_b.py (family B: route, notify,
+// history, machine, share, proxy)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS, DDD_CORE_JS and GOF_CORE_JS, then one vm context
+// per mode holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by dddRead and
+// compared on the exact tile string a reader sees. Every figure was counted by
+// hand on the design stated (docs/design-patterns/kit-report.md, Family B)
+// and confirmed on a rendered page; every case was seen to FAIL when the line
+// it tests was broken on purpose.
+console.log('design patterns: gofkit family B, six modes');
+{
+  const vm = require('vm');
+  const gbFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const gbSrc = { core: fs.readFileSync(gbFile('eakit_core.py'), 'utf8'), d: fs.readFileSync(gbFile('dddkit.py'), 'utf8'),
+    a: fs.readFileSync(gbFile('gofkit.py'), 'utf8'), b: fs.readFileSync(gbFile('gofkit_b.py'), 'utf8') };
+  const gbBlock = (src, name) => blockFrom(gbSrc[src], name.replace(/[[\]]/g, '\\$&'), 'gofkit (' + src + ')');
+  const gbViews = (dict, list) => list.map((v) => gbBlock('b', dict + '["' + v + '"]')).join('');
+  /* Field specs as gofkit_b.py's mode dicts declare them. */
+  const GB_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function WD(list) { return { kind: 'word', words: list.split('|') }; }
+    var NM = { kind: 'name' }, PA = { kind: 'parent' }, SG = W('-' + LIM, LIM);
+    function LIST(lo, hi, each) { return { kind: 'list', lo: lo, hi: hi, things: 'names', each: each || NM }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    function VREC(sub, rest, lo, hi, loRest, hiRest) { return { kind: 'vrec', sub: sub, rest: rest, restWhat: 'cell', loRest: loRest, hiRest: hiRest, lo: lo, hi: hi, unique: true }; }
+    var SPEC_OF = {
+      'route/chain': { handlers: VREC([['handler', NM]], PA, 1, 12, 1, 12), requests: LIST(1, 60, PA) },
+      'route/wrap': { core: REC([['component', NM], ['value', NM]], 1, 1), layers: REC([['decorator', NM], ['op', WD('add|times|then')], ['amount', NM]], 1, 8, true),
+        order: LIST(0, 8) },
+      'route/template': { steps: REC([['step', NM], ['kind', WD('fixed|primitive|hook')]], 1, 12, true), subclasses: VREC([['subclass', NM]], PA, 1, 8, 1, 12) },
+      'notify/observer': { subjects: LIST(1, 12), observers: VREC([['observer', NM]], NM, 1, 20, 1, 12), operations: VREC([['operation', NM]], NM, 1, 20, 1, 12),
+        scheme: WD('direct|managed') },
+      'history/undo': { state: REC([['cell', NM], ['value', SG]], 1, 12, true), commands: REC([['command', NM], ['op', WD('set|add')], ['cell', NM], ['amount', SG]], 1, 20, true),
+        script: LIST(1, 60, PA), scheme: WD('inverse|snapshot') },
+      'machine/states': { states: LIST(1, 12), events: LIST(1, 12), transitions: REC([['state', NM], ['event', NM], ['next', NM]], 1, 60), input: LIST(1, 60, PA) },
+      'share/flyweight': { objects: REC([['key', NM], ['count', W(1, 1000000)]], 1, 60, true), intrinsic: W(1, 1000000), extrinsic: W(0, 1000000),
+        stored: WD('yes|no'), ref: W(0, 64) },
+      'proxy/access': { subjects: REC([['subject', NM], ['cost', W(0)]], 1, 20, true), requests: REC([['client', NM], ['subject', NM]], 1, 60),
+        scheme: WD('eager|lazy|fresh'), rights: VREC([['client', NM]], NM, 0, 20, 1, 20) }
+    };
+    var DEFAULTS = { order: '', scheme: null, stored: 'yes', ref: '0', rights: '' };
+    var SCHEME = { observer: 'direct', undo: 'inverse', access: 'lazy' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) {
+        var d = f.key === 'scheme' ? SCHEME[view] : DEFAULTS[f.key];
+        r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (d !== undefined ? d : '');
+      });
+      var inst;
+      try { inst = dddRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+    function TB(out, row) { return out.refuse ? 'REFUSED ' + out.refuse : out.table.rows[row].join(' | '); }
+  `;
+  const gbMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + gbBlock('core', 'EA_CORE_JS') + gbBlock('d', 'DDD_CORE_JS') + gbBlock('a', 'GOF_CORE_JS') + code + GB_SPECS
+      + 'var COMPUTE = ' + fn + ';', ctx, { filename: 'gofkit_b' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const gbArgs = (mode, view, raw) => JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw);
+  const gbCall = (run, mode) => (view, raw, ids) => run('T(RUN(' + gbArgs(mode, view, raw) + '), ' + JSON.stringify(ids) + ')');
+  const gbStatus = (run, mode) => (view, raw) => run('S(RUN(' + gbArgs(mode, view, raw) + '))');
+  const gbRow = (run, mode) => (view, raw, row) => run('TB(RUN(' + gbArgs(mode, view, raw) + '), ' + row + ')');
+
+  /* --- route (grt) ------------------------------------------------------- */
+  const rtRun = gbMk(gbBlock('b', 'GRT_JS') + gbViews('GRT_VIEW_JS', ['chain', 'wrap', 'template']), 'grtCompute');
+  const rt = gbCall(rtRun, 'route'), rtS = gbStatus(rtRun, 'route'), rtR = gbRow(rtRun, 'route');
+  const RT_BIKE = { handlers: 'logger, -; bot, unlock, balance; agent, unlock, refund, damage; supervisor, refund, ban',
+    requests: 'unlock balance refund ban theft unlock damage theft' };
+  eq(rt('chain', RT_BIKE, 'grtRequests grtHandled grtHops grtUnhandled grtPer grtBusiest'),
+     '8 | 6 of 8 | 16 | 2: theft (5), theft (8) | logger 0, bot 3, agent 2, supervisor 1 | bot, 3 requests',
+     'route/chain: a request taken by the k-th handler is passed on k − 1 times, an unhandled one n − 1');
+  eq(rtR('chain', RT_BIKE, 4), '5 | theft | logger → bot → agent → supervisor → off the end | no one | 3', 'route/chain: an unhandled request falls off the end');
+  const RT_BOX = { handlers: 'kiosk, collect; clerk, collect, exchange, refund; manager, all', requests: 'refund collect comp exchange collect' };
+  eq(rt('chain', RT_BOX, 'grtHandled grtHops grtUnhandled grtPer grtBusiest'), '5 of 5 | 4 | 0: none | kiosk 2, clerk 2, manager 1 | kiosk, 2 requests',
+     'route/chain: all takes everything; a tie for the busiest goes to the first in the chain');
+  eq(rtS('chain', RT_BOX).indexOf('clerk ties for the busiest; the tile shows the first in the chain; the count is of the design stated.') > 0, true,
+     'route/chain: the status names the tie and ends with the caution');
+  eq(rt('chain', { handlers: 'a, -; b, -', requests: 'x constructor __proto__' }, 'grtHandled grtHops grtBusiest'), '0 of 3 | 3 | none',
+     'route/chain: no handler takes anything; a topic named constructor is only a name');
+  eq(rt('chain', { handlers: 'a, x, -', requests: 'x' }, 'grtHops'), 'REFUSED Handlers, record 1: a gives - with other topics; - stands alone', 'route/chain: - stands alone');
+  eq(rt('chain', { handlers: 'a, x, x', requests: 'x' }, 'grtHops'), 'REFUSED Handlers, record 1: a takes x twice', 'route/chain: a topic twice');
+  eq(rt('chain', { handlers: 'a, x', requests: 'x all' }, 'grtHops'), 'REFUSED Requests, entry 2: all is not a topic (all and - mark what a handler takes)',
+     'route/chain: all is not a request topic');
+
+  const RT_COFFEE = { core: 'flatwhite, 2.50', layers: 'milk, add, 0.40; double, times, 2; syrup, add, 0.35' };
+  eq(rt('wrap', RT_COFFEE, 'grtLayers grtCalls grtResult grtOther grtMatters grtSubclass grtDecorator grtAddOne'),
+     '3 | in: syrup, double, milk; core: flatwhite; out: milk, double, syrup | 6.15 | 6.1 | yes | 8 (the component + 7 combinations) | '
+     + '6 (interface, component, abstract decorator + 3) | subclassing +8, Decorator +1',
+     'route/wrap: ((2.50 + 0.40) × 2) + 0.35 = 6.15, reversed ((2.50 + 0.35) × 2) + 0.40 = 6.10; 2ⁿ against n + 3');
+  eq(rtR('wrap', RT_COFFEE, 1), '2 | double | times 2 | 5.8', 'route/wrap: the value as the call returns through each decorator');
+  eq(rt('wrap', { core: 'ticket, Row-F', layers: 'date, then, Sat-14; seat, then, F12; vip, then, VIP', order: 'vip date seat' }, 'grtResult grtOther grtMatters'),
+     'Row-F Sat-14 F12 VIP | Row-F VIP Sat-14 F12 | yes', 'route/wrap: words appended innermost first, against a given order');
+  eq(rt('wrap', { core: 'parcel, 4', layers: 'insured, add, 1.5; tracked, add, 0.75' }, 'grtResult grtOther grtMatters grtSubclass grtDecorator'),
+     '6.25 | 6.25 | no | 4 (the component + 3 combinations) | 5 (interface, component, abstract decorator + 2)', 'route/wrap: adds commute');
+  eq(rt('wrap', { core: 'x, 1', layers: 'a, times, 0.000001; b, times, 0.000001; c, add, -3' }, 'grtResult'), '−2.999999999999', 'route/wrap: exact to every place, a minus sign');
+  eq(rt('wrap', { core: 'x, 1', layers: 'a, then, b' }, 'grtResult'), 'REFUSED Decorators, record 1: a uses then, and the component’s value 1 is a number, which takes add or times',
+     'route/wrap: a number takes no then');
+  eq(rt('wrap', { core: 'x, word', layers: 'a, add, 1' }, 'grtResult'), 'REFUSED Decorators, record 1: a uses add, and the component’s value word is a word, which takes only then',
+     'route/wrap: a word takes only then');
+  eq(rt('wrap', { core: 'x, 1', layers: 'a, add, b' }, 'grtResult'), 'REFUSED Decorators, record 1: a: amount b should be a number for add', 'route/wrap: a numeric amount');
+  eq(rt('wrap', { core: 'x, 1e5', layers: 'a, add, 1' }, 'grtResult'),
+     'REFUSED The component’s value "1e5" should be a number such as 3 or 0.25, or a word that begins with a letter (letters, digits, dots, hyphens, underscores)',
+     'route/wrap: no exponents');
+  eq(rt('wrap', { core: 'x, 1', layers: 'x, add, 1' }, 'grtResult'), 'REFUSED Decorators, record 1: x has the component’s name', 'route/wrap: a decorator is not the component');
+  eq(rt('wrap', { core: 'x, 1', layers: 'a, add, 1; b, add, 2', order: 'a' }, 'grtResult'), 'REFUSED The other order names 1 of the 2 decorators; give each once, innermost first',
+     'route/wrap: the other order names every decorator');
+  eq(rt('wrap', { core: 'x, 1', layers: 'a, add, 1', order: 'z' }, 'grtResult'), 'REFUSED The other order, entry 1: z is not one of the decorators', 'route/wrap: an unknown decorator');
+
+  const RT_BAKE = { steps: 'weigh, fixed; mix, primitive; proof, hook; bake, primitive; cool, fixed; glaze, hook',
+    subclasses: 'Sourdough, mix, bake, proof; Brioche, mix, bake, glaze; Flatbread, mix, proof' };
+  eq(rt('template', RT_BAKE, 'grtSteps grtOwn grtAbstract grtHooks grtBase grtWhole grtWith'),
+     '6: 2 fixed, 2 primitive, 2 hooks | Sourdough 3, Brioche 3, Flatbread 2 | 1: Flatbread (lacks bake) | Sourdough 1, Brioche 1, Flatbread 1 | 4 | 18 | 12',
+     'route/template: 6 × 3 written whole against 4 in the base + 8 overrides');
+  eq(rtR('template', RT_BAKE, 2), 'Flatbread | weigh base, mix own, proof own, bake MISSING, cool base, glaze base default | 1 of 2 | 1 of 2',
+     'route/template: the sequence a subclass runs');
+  eq(rt('template', { steps: 'load, fixed; ask, primitive; score, primitive; report, fixed; badge, hook', subclasses: 'Timed, ask, score; Practice, ask, score, badge' },
+     'grtSteps grtOwn grtAbstract grtHooks grtBase grtWhole grtWith'), '5: 2 fixed, 2 primitive, 1 hook | Timed 2, Practice 3 | 0: none | Timed 0, Practice 1 | 3 | 10 | 8',
+     'route/template: no subclass left abstract');
+  eq(rt('template', { steps: 'a, hook', subclasses: 'S, -' }, 'grtOwn grtWith'), 'S 0 | 1', 'route/template: - overrides nothing');
+  eq(rt('template', { steps: 'a, fixed', subclasses: 'S, a' }, 'grtOwn'), 'REFUSED Subclasses, record 1: S overrides a, a fixed step; only primitive operations and hooks are overridden',
+     'route/template: a fixed step is not overridden');
+  eq(rt('template', { steps: 'a, hook', subclasses: 'S, b' }, 'grtOwn'), 'REFUSED Subclasses, record 1: S overrides b, which is not one of the steps', 'route/template: an unknown step');
+  eq(rt('template', { steps: 'a, hook', subclasses: 'S, a, a' }, 'grtOwn'), 'REFUSED Subclasses, record 1: S overrides a twice', 'route/template: a step twice');
+  eq(rt('template', { steps: 'a, hook', subclasses: 'S, a, -' }, 'grtOwn'), 'REFUSED Subclasses, record 1: S gives - with steps; - stands alone', 'route/template: - stands alone');
+
+  /* --- notify (gno) ------------------------------------------------------ */
+  const noRun = gbMk(gbBlock('b', 'GNO_JS') + gbViews('GNO_VIEW_JS', ['observer']), 'gnoCompute');
+  const no = gbCall(noRun, 'notify'), noS = gbStatus(noRun, 'notify'), noR = gbRow(noRun, 'notify');
+  const NO_ALL = 'gnoChanges gnoSent gnoOther gnoRedundant gnoPer gnoNever gnoUnobserved';
+  const NO_TH = { subjects: 'temp humidity mode', observers: 'display, temp, humidity, mode; logger, temp, humidity; fan, temp; app, mode',
+    operations: 'reading, temp, humidity; storm, temp, humidity, temp; switch, mode; calibrate, humidity' };
+  eq(no('observer', NO_TH, NO_ALL), '7 | 17 | managed: 10 | 7 | display 7, logger 6, fan 3, app 1 | 0: none | 0: none',
+     'notify/observer: one update per change per observer, against one per observer per operation');
+  eq(no('observer', Object.assign({ scheme: 'managed' }, NO_TH), 'gnoSent gnoOther gnoRedundant gnoPer'), '10 | direct: 17 | 7 | display 4, logger 3, fan 2, app 1',
+     'notify/observer: the same design through a change manager');
+  eq(noR('observer', Object.assign({ scheme: 'managed' }, NO_TH), 1), 'storm | 3 | 1 (of 3) | 1 (of 3) | 1 (of 2) | 0', 'notify/observer: a managed cell shows what direct would send');
+  eq(no('observer', { subjects: 'hall gallery cafe garden', observers: 'guide, hall, gallery; map, hall, gallery; ticket, cafe',
+    operations: 'open, hall, gallery; tour, gallery, gallery; close, hall; rain, garden', scheme: 'managed' }, NO_ALL),
+     '6 | 6 | direct: 10 | 4 | guide 3, map 3, ticket 0 | 1: ticket | 1: garden', 'notify/observer: an observer never notified, a subject no one observes');
+  eq(noS('observer', NO_TH), '4 operations make 7 changes. Sent directly, each change notifies every observer of its subject: 17 updates. Through a change manager, '
+     + 'each observer is updated once per operation that changed what it observes: 10, so 7 direct updates are redundant; the count is of the design stated.',
+     'notify/observer: the status line');
+  eq(no('observer', { subjects: 'a', observers: 'o, b', operations: 'p, a' }, 'gnoSent'), 'REFUSED Observers, record 1: o observes b, which is not one of the subjects', 'notify: an unknown subject observed');
+  eq(no('observer', { subjects: 'a', observers: 'o, a, a', operations: 'p, a' }, 'gnoSent'), 'REFUSED Observers, record 1: o observes a twice', 'notify: a subject observed twice');
+  eq(no('observer', { subjects: 'a', observers: 'o, a', operations: 'p, z' }, 'gnoSent'), 'REFUSED Operations, record 1: p changes z, which is not one of the subjects', 'notify: an unknown subject changed');
+
+  /* --- history (ghi) ----------------------------------------------------- */
+  const hiRun = gbMk(gbBlock('b', 'GHI_JS') + gbViews('GHI_VIEW_JS', ['undo']), 'ghiCompute');
+  const hi = gbCall(hiRun, 'history'), hiR = gbRow(hiRun, 'history');
+  const HI_ALL = 'ghiFinal ghiUndo ghiRedo ghiRefused ghiDiscarded ghiStored ghiOther';
+  const HI_DOCK = { state: 'bikes, 10; fee, 2', commands: 'rent, add, bikes, -1; ret, add, bikes, 1; price, set, fee, 3; free, set, fee, 0',
+    script: 'rent rent price undo undo redo free undo undo undo undo' };
+  eq(hi('undo', HI_DOCK, HI_ALL), 'bikes 10, fee 2 | 0: none | 3: free, rent, rent | undo 1, redo 0 | 1 | 1 | snapshot: 6',
+     'history/undo: undo, redo, a new command discarding the redo stack, an undo with nothing to undo');
+  eq(hiR('undo', HI_DOCK, 6), '7 | free | ran free, discarding 1 redo | bikes 8, fee 0 | 3: rent, rent, free | 0: none', 'history/undo: the step a new command discards a redo');
+  eq(hiR('undo', HI_DOCK, 5), '6 | redo | redid rent | bikes 8, fee 2 | 2: rent, rent | 1: price', 'history/undo: redo runs the command again');
+  eq(hi('undo', { state: 'flour, 500; sugar, 100; eggs, 2', commands: 'double, set, flour, 1000; sweet, add, sugar, 50; egg, add, eggs, 1; plain, set, sugar, 0',
+    script: 'double sweet egg undo plain redo undo', scheme: 'snapshot' }, HI_ALL),
+     'flour 1,000, sugar 150, eggs 2 | 2: double, sweet | 1: plain | undo 0, redo 1 | 1 | 9 | inverse: 2', 'history/undo: snapshots hold every cell per entry');
+  eq(hi('undo', { state: 'a, 5', commands: 's, set, a, 9', script: 's s undo undo' }, 'ghiFinal'), 'a 5', 'history/undo: a set undone restores the value before it, twice over');
+  eq(hi('undo', { state: 'a, 1', commands: 'undo, add, a, 1', script: 'undo' }, 'ghiFinal'), 'REFUSED Commands, record 1: undo is a word the script reserves; name the command otherwise',
+     'history: undo is reserved');
+  eq(hi('undo', { state: 'a, 1', commands: 'c, add, b, 1', script: 'c' }, 'ghiFinal'), 'REFUSED Commands, record 1: c acts on b, which is not one of the cells', 'history: an unknown cell');
+  eq(hi('undo', { state: 'a, 1', commands: 'c, add, a, 1', script: 'c d' }, 'ghiFinal'), 'REFUSED Script, entry 2: d is not undo, redo or one of the commands', 'history: an unknown script entry');
+  eq(hi('undo', { state: 'a, 1', commands: 'c, add, a, 1', script: 'c -' }, 'ghiFinal'), 'REFUSED Script, entry 2: - is not undo, redo or one of the commands', 'history: - in the script');
+
+  /* --- machine (gsm) ----------------------------------------------------- */
+  const smRun = gbMk(gbBlock('b', 'GSM_JS') + gbViews('GSM_VIEW_JS', ['states']), 'gsmCompute');
+  const sm = gbCall(smRun, 'machine'), smR = gbRow(smRun, 'machine');
+  const SM_ALL = 'gsmFinal gsmIgnored gsmDefined gsmBranches gsmClasses gsmLargest gsmNever';
+  const SM_LOCK = { states: 'idle reserved loaded emptied jammed', events: 'reserve load collect cancel timeout jam',
+    transitions: 'idle, reserve, reserved; reserved, load, loaded; reserved, cancel, idle; loaded, collect, emptied; loaded, timeout, reserved; '
+      + 'emptied, reserve, reserved; loaded, jam, jammed; jammed, cancel, idle', input: 'load reserve load timeout load collect cancel reserve' };
+  eq(sm('states', SM_LOCK, SM_ALL), 'reserved | 2: load at idle (1), cancel at emptied (7) | 8 | 13 | 7 | loaded, 3 transitions | 1: jammed',
+     'machine/states: the trace; transitions + states branches against states + 2 classes');
+  eq(smR('states', SM_LOCK, 0), '1 | idle | load | ignored: stays idle', 'machine/states: an event with no transition is ignored');
+  eq(sm('states', { states: 'ready paid', events: 'coin push refund', transitions: 'ready, coin, paid; paid, push, ready; paid, refund, ready; paid, coin, paid',
+    input: 'push coin coin push' }, SM_ALL), 'ready | 1: push at ready (1) | 4 | 6 | 4 | paid, 3 transitions | 0: none', 'machine/states: a vending machine');
+  eq(sm('states', { states: 'a b', events: 'e', transitions: 'a, e, b; b, e, a', input: 'e' }, 'gsmLargest'), 'a, 1 transition', 'machine/states: a tie goes to the first state');
+  eq(sm('states', { states: 'a b', events: 'e', transitions: 'a, e, b; a, e, a', input: 'e' }, 'gsmFinal'), 'REFUSED Transitions, record 2: a already has a transition on e (record 1)',
+     'machine: one transition per state and event');
+  eq(sm('states', { states: 'a', events: 'e', transitions: 'a, e, z', input: 'e' }, 'gsmFinal'), 'REFUSED Transitions, record 1: z is not one of the states', 'machine: an unknown state');
+  eq(sm('states', { states: 'a', events: 'e', transitions: 'a, f, a', input: 'e' }, 'gsmFinal'), 'REFUSED Transitions, record 1: f is not one of the events', 'machine: an unknown event');
+  eq(sm('states', { states: 'a', events: 'e', transitions: 'a, e, a', input: 'e f' }, 'gsmFinal'), 'REFUSED Input, entry 2: f is not one of the events', 'machine: an unknown input event');
+
+  /* --- share (gsh) ------------------------------------------------------- */
+  const sh = gbCall(gbMk(gbBlock('b', 'GSH_JS') + gbViews('GSH_VIEW_JS', ['flyweight']), 'gshCompute'), 'share');
+  const SH_ALL = 'gshObjects gshFlyweights gshWithout gshWith gshSaved gshShare gshLargest gshSmallest';
+  eq(sh('flyweight', { objects: 'grass, 4000; water, 2500; road, 600; forest, 900', intrinsic: '4096', extrinsic: '8' }, SH_ALL),
+     '8,000 | 4 | 32,832,000 | 80,384 | 32,751,616 | 63,968/64,125 ≈ 99.8% | grass, 4,000 objects | road, 600 objects',
+     'share/flyweight: 8,000 × 4,104 unshared against 4 × 4,096 + 8,000 × 8');
+  eq(sh('flyweight', { objects: 'standard, 40; premium, 12; box, 4', intrinsic: '64', extrinsic: '6', stored: 'no', ref: '2' }, SH_ALL),
+     '56 | 3 | 3,920 | 304 | 3,616 | 226/245 ≈ 92.2% | standard, 40 objects | box, 4 objects', 'share/flyweight: extrinsic state computed, a reference per object');
+  eq(sh('flyweight', { objects: 'a, 1; b, 1', intrinsic: '4', extrinsic: '0', ref: '8' }, 'gshWith gshSaved gshShare gshLargest'), '24 | −16 | −2 = −200% | a, 1 object',
+     'share/flyweight: sharing that costs more is printed negative');
+
+  /* --- proxy (gpx) ------------------------------------------------------- */
+  const pxRun = gbMk(gbBlock('b', 'GPX_JS') + gbViews('GPX_VIEW_JS', ['access']), 'gpxCompute');
+  const px = gbCall(pxRun, 'proxy'), pxR = gbRow(pxRun, 'proxy');
+  const PX_ALL = 'gpxRequests gpxRefused gpxCreations gpxStart gpxTotal gpxNever gpxAlive gpxFirst gpxCompare';
+  const PX_GUIDE = { subjects: 'intro, 40; egypt, 120; rome, 90; vault, 200', requests: 'ana, intro; ben, egypt; ana, egypt; guest, vault; ben, intro; cara, egypt',
+    rights: 'ana, intro, egypt, rome; ben, intro, egypt; cara, egypt' };
+  eq(px('access', PX_GUIDE, PX_ALL), '6 | 1: guest → vault (4) | 2 | 0 | 160 | 2: rome, vault | 2 | 40 | eager 450, lazy 160, fresh 440',
+     'proxy/access: lazy creation behind a protection proxy');
+  eq(px('access', Object.assign({ scheme: 'eager' }, PX_GUIDE), 'gpxCreations gpxStart gpxTotal gpxAlive gpxFirst'), '4 | 450 | 450 | 4 | 0', 'proxy/access: eager pays everything at the start');
+  eq(px('access', Object.assign({ scheme: 'fresh' }, PX_GUIDE), 'gpxCreations gpxTotal gpxAlive'), '5 | 440 | 5', 'proxy/access: fresh creates on every served request');
+  eq(pxR('access', PX_GUIDE, 2), '3 | ana | egypt | reused | 0', 'proxy/access: a lazy subject is reused');
+  eq(pxR('access', PX_GUIDE, 3), '4 | guest | vault | refused | —', 'proxy/access: a refused request costs nothing');
+  eq(px('access', { subjects: 'catalogue, 30', requests: 'desk, catalogue; kiosk, catalogue; app, catalogue; desk, catalogue', scheme: 'fresh' }, PX_ALL),
+     '4 | 0: none | 4 | 0 | 120 | 0: none | 4 | 30 | eager 30, lazy 30, fresh 120', 'proxy/access: a fresh instance per request against one singleton');
+  eq(px('access', { subjects: 'a, 5', requests: 'c, a', rights: 'd, a' }, 'gpxRefused gpxFirst gpxTotal'), '1: c → a (1) | none served | 0', 'proxy/access: every request refused');
+  eq(px('access', { subjects: 'a, 5; b, 3', requests: 'c, a; c, b', rights: 'c, a' }, 'gpxRefused gpxTotal'), '1: c → b (2) | 5',
+     'proxy/access: a listed client asking for a subject not among its own is refused');
+  eq(px('access', { subjects: 'a, 5', requests: 'c, b' }, 'gpxTotal'), 'REFUSED Requests, record 1: b is not one of the subjects', 'proxy: an unknown subject requested');
+  eq(px('access', { subjects: 'a, 5', requests: 'c, a', rights: 'c, z' }, 'gpxTotal'), 'REFUSED Rights, record 1: c may use z, which is not one of the subjects', 'proxy: an unknown subject in rights');
+  eq(px('access', { subjects: 'a, 5', requests: 'c, a', rights: 'c, a, a' }, 'gpxTotal'), 'REFUSED Rights, record 1: c names a twice', 'proxy: a subject twice in rights');
+}
+// ---- end gofkit family B ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the
