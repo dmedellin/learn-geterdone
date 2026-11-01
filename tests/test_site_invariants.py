@@ -2083,11 +2083,102 @@ GOF_COURSES = (
 GOF_PATH_COURSE_COUNT = 6
 GOF_UPCOMING_COURSES = ()
 
+# The Accelerate path: eight courses, all published.
+# Generated from content/accelerate/ so these cannot disagree with
+# what is built.
+ACC_PATH_PAGE = "/paths/accelerate/"
+
+ACC_COURSE_1_HOME = "/accelerate-measuring-performance/"
+ACC_COURSE_1_LESSONS = (
+    "capabilities-not-maturity",
+    "the-flaws-in-previous-measures",
+    "the-four-measures",
+    "high-medium-and-low-performers",
+    "delivery-and-organizational-performance",
+)
+ACC_COURSE_2_HOME = "/accelerate-culture/"
+ACC_COURSE_2_LESSONS = (
+    "modeling-culture",
+    "likert-type-questions",
+    "what-westrum-culture-predicts",
+    "how-do-we-change-culture",
+)
+ACC_COURSE_3_HOME = "/accelerate-technical-practices/"
+ACC_COURSE_3_LESSONS = (
+    "what-is-continuous-delivery",
+    "the-impact-of-continuous-delivery",
+    "version-control-and-test-automation",
+    "trunk-based-development",
+    "deployability-and-testability",
+    "loosely-coupled-architecture-enables-scaling",
+    "tools-and-architects",
+)
+ACC_COURSE_4_HOME = "/accelerate-lean-management/"
+ACC_COURSE_4_LESSONS = (
+    "shifting-left-on-security",
+    "lean-management-practices",
+    "lightweight-change-management",
+    "lean-product-development",
+    "team-experimentation-and-product-management",
+)
+ACC_COURSE_5_HOME = "/accelerate-people/"
+ACC_COURSE_5_LESSONS = (
+    "deployment-pain",
+    "burnout",
+    "employee-loyalty-and-nps",
+    "identity-and-job-satisfaction",
+    "diversity-in-tech",
+    "transformational-leadership",
+    "the-role-of-managers",
+)
+ACC_COURSE_6_HOME = "/accelerate-the-science/"
+ACC_COURSE_6_LESSONS = (
+    "primary-secondary-qualitative-quantitative",
+    "descriptive-and-exploratory-analysis",
+    "inferential-predictive-analysis",
+    "classification-analysis",
+    "latent-constructs",
+    "several-views-and-rogue-data",
+    "latent-constructs-and-system-data",
+)
+ACC_COURSE_7_HOME = "/accelerate-surveys-and-data/"
+ACC_COURSE_7_LESSONS = (
+    "surveys-collect-data-quickly",
+    "you-can-trust-survey-data",
+    "the-data-for-the-project",
+    "tests-for-bias",
+    "tests-of-the-measurement-model",
+    "tests-for-relationships-and-classification",
+)
+ACC_COURSE_8_HOME = "/accelerate-transformation/"
+ACC_COURSE_8_LESSONS = (
+    "a-high-performing-management-framework",
+    "stand-ups-catchball-and-kata",
+    "transforming-leadership-and-team-practices",
+    "conclusion",
+    "capabilities-and-the-stats",
+)
+
+ACC_COURSES = (
+    ("Accelerate and Measuring Performance", ACC_COURSE_1_HOME, ACC_COURSE_1_LESSONS),
+    ("Measuring and Changing Culture", ACC_COURSE_2_HOME, ACC_COURSE_2_LESSONS),
+    ("Technical Practices and Architecture", ACC_COURSE_3_HOME, ACC_COURSE_3_LESSONS),
+    ("Security, Lean Management and Product Development", ACC_COURSE_4_HOME, ACC_COURSE_4_LESSONS),
+    ("Sustainable Work, Satisfaction and Leadership", ACC_COURSE_5_HOME, ACC_COURSE_5_LESSONS),
+    ("The Science Behind the Book", ACC_COURSE_6_HOME, ACC_COURSE_6_LESSONS),
+    ("Surveys, Data and Statistical Methods", ACC_COURSE_7_HOME, ACC_COURSE_7_LESSONS),
+    ("Transformation", ACC_COURSE_8_HOME, ACC_COURSE_8_LESSONS),
+)
+
+ACC_PATH_COURSE_COUNT = 8
+ACC_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
                + READ_COURSES + CC_COURSES + EAA_COURSES
-               + ITA_COURSES + DDD_COURSES + GOF_COURSES)
+               + ITA_COURSES + DDD_COURSES + GOF_COURSES
+               + ACC_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -2210,7 +2301,7 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
                        CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE,
-                       DDD_PATH_PAGE, GOF_PATH_PAGE)
+                       DDD_PATH_PAGE, GOF_PATH_PAGE, ACC_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -2249,6 +2340,8 @@ PATHS = (
      DDD_COURSES, DDD_PATH_COURSE_COUNT, DDD_UPCOMING_COURSES),
     ("Design Patterns, Read Along", GOF_PATH_PAGE,
      GOF_COURSES, GOF_PATH_COURSE_COUNT, GOF_UPCOMING_COURSES),
+    ("Accelerate, Read Along", ACC_PATH_PAGE,
+     ACC_COURSES, ACC_PATH_COURSE_COUNT, ACC_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2490,6 +2583,11 @@ DDD_DISCLAIMER_RE = re.compile(
 # em dash.
 GOF_DISCLAIMER_RE = re.compile(
     r"(?i)one consequence of applying a pattern or not")
+# Accelerate promises that every figure is computed from the small sample a
+# lesson states, and warns that it shows what one measure says about that
+# sample, not a finding about any team. The clause after the second em dash.
+ACC_DISCLAIMER_RE = re.compile(
+    r"(?i)shows what one measure says about that sample")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2524,6 +2622,8 @@ PATH_MATERIAL_DISCLAIMER = {
                     DDD_DISCLAIMER_RE),
     GOF_PATH_PAGE: ("the one-consequence-of-applying-a-pattern-or-not disclaimer",
                     GOF_DISCLAIMER_RE),
+    ACC_PATH_PAGE: ("the what-one-measure-says-about-that-sample disclaimer",
+                    ACC_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2888,12 +2988,17 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(GOF_COURSES)
             + sum(len(slugs) for _t, _h, slugs in GOF_COURSES)
         )
+        acc_tree = (
+            1  # the Accelerate path page
+            + len(ACC_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in ACC_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
                        + cc_tree + eaa_tree + ita_tree
-                       + ddd_tree + gof_tree)  # 1 for the index
+                       + ddd_tree + gof_tree + acc_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2997,9 +3102,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 47 pages, got %d" % gof_tree,
         )
         self.assertEqual(
-            1507,
+            55,
+            acc_tree,
+            "the Accelerate path is 1 + 8 + 5 + 4 + 7 + 5 + 7 + 7 + 6 + 5 "
+            "= 55 pages, got %d" % acc_tree,
+        )
+        self.assertEqual(
+            1562,
             course_tree,
-            "the site index plus all seventeen path trees is 1507 pages, got %d" % course_tree,
+            "the site index plus all eighteen path trees is 1562 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -3010,9 +3121,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1511,
+            1566,
             expected,
-            "1507 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1511, "
+            "1562 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1566, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -3235,6 +3346,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "intro_algorithms": getattr(smoke, "ITA_COURSES", ()),
             "domain_driven_design": getattr(smoke, "DDD_COURSES", ()),
             "design_patterns": getattr(smoke, "GOF_COURSES", ()),
+            "accelerate": getattr(smoke, "ACC_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3647,9 +3759,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1489,
+            1543,
             len(course_pages),
-            "one hundred and fifty course homes and 1339 lessons carry a material "
+            "one hundred and fifty-eight course homes and 1385 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4642,7 +4754,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(150, checked, "every published course must be checked")
+        self.assertEqual(158, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4948,6 +5060,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from intro_algorithms import PATH as INTRO_ALGORITHMS
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
             from design_patterns import PATH as DESIGN_PATTERNS
+            from accelerate import PATH as ACCELERATE
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4966,6 +5079,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("intro algorithms", ITA_COURSES, ITA_PATH_PAGE, INTRO_ALGORITHMS),
             ("domain-driven design", DDD_COURSES, DDD_PATH_PAGE, DOMAIN_DRIVEN_DESIGN),
             ("design patterns", GOF_COURSES, GOF_PATH_PAGE, DESIGN_PATTERNS),
+            ("accelerate", ACC_COURSES, ACC_PATH_PAGE, ACCELERATE),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -5106,13 +5220,14 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from intro_algorithms import PATH as INTRO_ALGORITHMS
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
             from design_patterns import PATH as DESIGN_PATTERNS
+            from accelerate import PATH as ACCELERATE
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
-                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS):
+                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -5303,6 +5418,7 @@ class TestEveryLabBuilds(unittest.TestCase):
             from intro_algorithms import PATH as INTRO_ALGORITHMS
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
             from design_patterns import PATH as DESIGN_PATTERNS
+            from accelerate import PATH as ACCELERATE
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
@@ -5310,7 +5426,7 @@ class TestEveryLabBuilds(unittest.TestCase):
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
-                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS):
+                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

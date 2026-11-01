@@ -18,6 +18,7 @@ from . import (
     itakit,
     dddkit,
     gofkit,
+    acckit,
     argkit,
     choicekit,
     algebra_equations,
@@ -181,6 +182,7 @@ REGISTRY = {
     "itakit": itakit.itakit_lab,
     "dddkit": dddkit.dddkit_lab,
     "gofkit": gofkit.gofkit_lab,
+    "acckit": acckit.acckit_lab,
 }
 
 

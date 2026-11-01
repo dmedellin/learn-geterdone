@@ -42,7 +42,8 @@ GROUPS = (
                 "Design and Design Patterns assume only that you can read a "
                 "short routine, "
                 "Introduction to Algorithms that you can program and know "
-                "induction.",
+                "induction, and Accelerate only that you have worked on or "
+                "near a software team.",
     },
     {
         "key": "philosophy",
@@ -162,6 +163,16 @@ SUBJECTS = (
                 "pattern, with each pattern&rsquo;s consequences counted on a "
                 "small design: classes, calls, notifications, undo stacks and "
                 "objects shared.",
+    },
+    {
+        "slug": "accelerate",
+        "group": "computing",
+        "short_title": "Accelerate",
+        "kind": "Read along",
+        "card": "Forsgren, Humble and Kim&rsquo;s <em>Accelerate</em>, chapter "
+                "by chapter, with each finding recomputed on a small sample: "
+                "delivery measures, clusters, culture scores, reliability and "
+                "correlation.",
     },
     {
         "slug": "philosophy",
