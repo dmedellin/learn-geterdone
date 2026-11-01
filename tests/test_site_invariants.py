@@ -1801,10 +1801,116 @@ EAA_COURSES = (
 EAA_PATH_COURSE_COUNT = 7
 EAA_UPCOMING_COURSES = ()
 
+# The Introduction to Algorithms path: eight courses, all published.
+# Generated from content/intro_algorithms/ so these cannot disagree with
+# what is built.
+ITA_PATH_PAGE = "/paths/intro-algorithms/"
+
+ITA_COURSE_1_HOME = "/intro-algorithms-foundations/"
+ITA_COURSE_1_LESSONS = (
+    "algorithms-as-a-technology",
+    "insertion-sort-and-loop-invariants",
+    "analyzing-insertion-sort",
+    "merge-sort-and-divide-and-conquer",
+    "asymptotic-notation",
+    "the-maximum-subarray-problem-and-strassen",
+    "solving-recurrences",
+    "the-hiring-problem-and-randomized-algorithms",
+)
+ITA_COURSE_2_HOME = "/intro-algorithms-sorting/"
+ITA_COURSE_2_LESSONS = (
+    "heaps",
+    "heapsort-and-priority-queues",
+    "quicksort",
+    "analysis-of-randomized-quicksort",
+    "lower-bounds-and-counting-sort",
+    "radix-sort-and-bucket-sort",
+    "medians-and-order-statistics",
+)
+ITA_COURSE_3_HOME = "/intro-algorithms-data-structures/"
+ITA_COURSE_3_LESSONS = (
+    "stacks-queues-and-linked-lists",
+    "hash-tables",
+    "hash-functions",
+    "open-addressing",
+    "binary-search-trees",
+    "red-black-trees",
+    "red-black-insertion-and-deletion",
+    "augmenting-data-structures",
+)
+ITA_COURSE_4_HOME = "/intro-algorithms-design-techniques/"
+ITA_COURSE_4_LESSONS = (
+    "rod-cutting",
+    "matrix-chain-multiplication",
+    "elements-of-dynamic-programming",
+    "longest-common-subsequence",
+    "optimal-binary-search-trees",
+    "activity-selection-and-the-greedy-strategy",
+    "huffman-codes",
+    "matroids-and-greedy-methods",
+    "amortized-analysis",
+)
+ITA_COURSE_5_HOME = "/intro-algorithms-advanced-structures/"
+ITA_COURSE_5_LESSONS = (
+    "b-trees",
+    "fibonacci-heaps",
+    "decrease-key-and-the-degree-bound",
+    "van-emde-boas-trees",
+    "disjoint-sets",
+)
+ITA_COURSE_6_HOME = "/intro-algorithms-graphs/"
+ITA_COURSE_6_LESSONS = (
+    "breadth-first-search",
+    "depth-first-search",
+    "topological-sort-and-strong-components",
+    "minimum-spanning-trees",
+    "bellman-ford-and-dag-shortest-paths",
+    "dijkstra-and-difference-constraints",
+    "all-pairs-shortest-paths",
+    "maximum-flow",
+    "maximum-bipartite-matching",
+)
+ITA_COURSE_7_HOME = "/intro-algorithms-algebraic-topics/"
+ITA_COURSE_7_LESSONS = (
+    "multithreaded-algorithms",
+    "solving-linear-systems",
+    "linear-programming-and-the-simplex-algorithm",
+    "duality-and-the-initial-solution",
+    "polynomials-and-the-fft",
+    "number-theoretic-algorithms",
+    "rsa-and-primality-testing",
+)
+ITA_COURSE_8_HOME = "/intro-algorithms-strings-geometry-hardness/"
+ITA_COURSE_8_LESSONS = (
+    "naive-and-rabin-karp-matching",
+    "automata-and-knuth-morris-pratt",
+    "line-segment-properties",
+    "convex-hull-and-closest-pair",
+    "polynomial-time-and-verification",
+    "np-completeness-and-reductions",
+    "vertex-cover-and-tsp-approximation",
+    "set-cover-randomization-and-subset-sum",
+)
+
+ITA_COURSES = (
+    ("Foundations", ITA_COURSE_1_HOME, ITA_COURSE_1_LESSONS),
+    ("Sorting and Order Statistics", ITA_COURSE_2_HOME, ITA_COURSE_2_LESSONS),
+    ("Data Structures", ITA_COURSE_3_HOME, ITA_COURSE_3_LESSONS),
+    ("Advanced Design and Analysis Techniques", ITA_COURSE_4_HOME, ITA_COURSE_4_LESSONS),
+    ("Advanced Data Structures", ITA_COURSE_5_HOME, ITA_COURSE_5_LESSONS),
+    ("Graph Algorithms", ITA_COURSE_6_HOME, ITA_COURSE_6_LESSONS),
+    ("Parallel, Matrix, Linear and Number Algorithms", ITA_COURSE_7_HOME, ITA_COURSE_7_LESSONS),
+    ("Strings, Geometry and Hardness", ITA_COURSE_8_HOME, ITA_COURSE_8_LESSONS),
+)
+
+ITA_PATH_COURSE_COUNT = 8
+ITA_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
-               + READ_COURSES + CC_COURSES + EAA_COURSES)
+               + READ_COURSES + CC_COURSES + EAA_COURSES
+               + ITA_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -1926,7 +2032,7 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
-                       CC_PATH_PAGE, EAA_PATH_PAGE)
+                       CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -1959,6 +2065,8 @@ PATHS = (
      CC_UPCOMING_COURSES),
     ("Patterns of Enterprise Application Architecture, Read Along", EAA_PATH_PAGE,
      EAA_COURSES, EAA_PATH_COURSE_COUNT, EAA_UPCOMING_COURSES),
+    ("Introduction to Algorithms, Read Along", ITA_PATH_PAGE,
+     ITA_COURSES, ITA_PATH_COURSE_COUNT, ITA_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2183,6 +2291,12 @@ CC_DISCLAIMER_RE = re.compile(
 # Stopping short of the em dash, for OR's reason.
 EAA_DISCLAIMER_RE = re.compile(
     r"(?i)not a measurement of your system")
+# Introduction to Algorithms promises that every count is produced by running
+# the algorithm on the instance a lesson states, and warns that a count is
+# evidence about that instance while only the book's proof bounds every input.
+# The clause after the em dash, which renders as an entity.
+ITA_DISCLAIMER_RE = re.compile(
+    r"(?i)only its proof establishes that")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2211,6 +2325,8 @@ PATH_MATERIAL_DISCLAIMER = {
                    CC_DISCLAIMER_RE),
     EAA_PATH_PAGE: ("the not-a-measurement-of-your-system disclaimer",
                     EAA_DISCLAIMER_RE),
+    ITA_PATH_PAGE: ("the only-its-proof-establishes-that disclaimer",
+                    ITA_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2560,11 +2676,16 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(EAA_COURSES)
             + sum(len(slugs) for _t, _h, slugs in EAA_COURSES)
         )
+        ita_tree = (
+            1  # the Introduction to Algorithms path page
+            + len(ITA_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in ITA_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
-                       + cc_tree + eaa_tree)  # 1 for the index
+                       + cc_tree + eaa_tree + ita_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2650,9 +2771,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 52 pages, got %d" % eaa_tree,
         )
         self.assertEqual(
-            1327,
+            70,
+            ita_tree,
+            "the Introduction to Algorithms path is 1 + 8 + 8 + 7 + 8 + 9 + 5 + 9 + 7 + 8 "
+            "= 70 pages, got %d" % ita_tree,
+        )
+        self.assertEqual(
+            1397,
             course_tree,
-            "the site index plus all fourteen path trees is 1327 pages, got %d" % course_tree,
+            "the site index plus all fifteen path trees is 1397 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2663,9 +2790,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1331,
+            1401,
             expected,
-            "1327 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1331, "
+            "1397 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1401, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -2885,6 +3012,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "reading": getattr(smoke, "READ_COURSES", ()),
             "code_complete": getattr(smoke, "CC_COURSES", ()),
             "enterprise_patterns": getattr(smoke, "EAA_COURSES", ()),
+            "intro_algorithms": getattr(smoke, "ITA_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3297,9 +3425,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1312,
+            1381,
             len(course_pages),
-            "one hundred and twenty-seven course homes and 1185 lessons carry a material "
+            "one hundred and thirty-five course homes and 1246 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4292,7 +4420,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(127, checked, "every published course must be checked")
+        self.assertEqual(135, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4595,6 +4723,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from reading import PATH as READING
             from code_complete import PATH as CODE_COMPLETE
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
+            from intro_algorithms import PATH as INTRO_ALGORITHMS
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4610,6 +4739,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("reading faster", READ_COURSES, READ_PATH_PAGE, READING),
             ("code complete", CC_COURSES, CC_PATH_PAGE, CODE_COMPLETE),
             ("enterprise patterns", EAA_COURSES, EAA_PATH_PAGE, ENTERPRISE_PATTERNS),
+            ("intro algorithms", ITA_COURSES, ITA_PATH_PAGE, INTRO_ALGORITHMS),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4747,12 +4877,13 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from reading import PATH as READING
             from code_complete import PATH as CODE_COMPLETE
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
+            from intro_algorithms import PATH as INTRO_ALGORITHMS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
-                     ENTERPRISE_PATTERNS):
+                     ENTERPRISE_PATTERNS, INTRO_ALGORITHMS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -4940,13 +5071,14 @@ class TestEveryLabBuilds(unittest.TestCase):
             from reading import PATH as READING
             from code_complete import PATH as CODE_COMPLETE
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
+            from intro_algorithms import PATH as INTRO_ALGORITHMS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
-                     ENTERPRISE_PATTERNS):
+                     ENTERPRISE_PATTERNS, INTRO_ALGORITHMS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

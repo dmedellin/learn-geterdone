@@ -21891,6 +21891,408 @@ console.log('enterprise patterns: eakit, eight modes');
 }
 // ---- end eakit ----
 
+// ---- itakit (Introduction to Algorithms), family A ----
+// ==========================================================================
+// Introduction to Algorithms, Read Along: itakit.py (family A: growth,
+// sorting, recurrence, maxsub, hiring, workspan, lup, fft)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS (eakit_core.py, which itakit builds on) and
+// ITA_CORE_JS, then one vm context per mode holding its base block and every
+// one of its view blocks. Each <xx>Compute(view, inst, opts) is called on
+// inputs read by eakit's own parser (eaRead) and compared on the exact tile
+// string a reader sees. The figures were computed independently (by hand and
+// by a separate Python model) and confirmed on rendered pages; every case was
+// seen to FAIL when the line it tests was broken on purpose
+// (docs/intro-algorithms/kit-report.md, "Verification").
+console.log('introduction to algorithms: itakit family A, eight modes');
+{
+  const vm = require('vm');
+  const itFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const itSrc = { core: fs.readFileSync(itFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(itFile('itakit.py'), 'utf8') };
+  const itBlock = (src, name) => blockFrom(itSrc[src], name.replace(/[[\]]/g, '\\$&'), 'itakit (' + src + ')');
+  const itViews = (dict, list) => list.map((v) => itBlock('a', dict + '["' + v + '"]')).join('');
+  /* Field specs as itakit.py's SPECS declare them. */
+  const IT_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function N(gt, lo, hi) { var f = { kind: 'num', max: String(hi || LIM) }; if (gt !== null) f.gt = String(gt); if (lo !== undefined && lo !== null) f.min = String(lo); return f; }
+    function WD(list) { return { kind: 'word', words: list.split('|') }; }
+    function LIST(each, lo, hi) { return { kind: 'list', lo: lo, hi: hi, things: 'numbers', each: each }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    var NM = { kind: 'name' };
+    var RACE = WD('lg n|n|n lg n|n^2|n^3|2^n'), TERM = REC([['coef', N(null, '-10000000')], ['fn', WD('1|lg* n|lg n|n|n lg n|n^2|n^3|F(n)|2^n|n!')]], 1, 4);
+    var ARR = LIST(W('-10000000'), 1, 40);
+    var RC = { a: W(1, 1000), b: W(2, 1000), c: N(0), k: N(null, 0, 8), p: W(-3, 3), t1: N(null, 0), j: W(1, 30) };
+    var SPEC_OF = {
+      'growth/race': { fnA: RACE, costA: N(0), speedA: N(0, null, '1000000000000000'), fnB: RACE, costB: N(0), speedB: N(0, null, '1000000000000000'), n: W(1, '1000000000000') },
+      'growth/bounds': { f: TERM, g: TERM, relation: WD('O|Omega|Theta'), c1: N(0), c2: N(0), n0: W(1, 1000000) },
+      'sorting/insertion': { list: ARR }, 'sorting/cost': { list: ARR }, 'sorting/merge': { list: ARR },
+      'recurrence/master': RC, 'recurrence/tree': RC,
+      'maxsub/compare': { list: LIST(W('-10000000'), 1, 60) },
+      'hiring/order': { order: LIST(W(1, 40), 1, 40), ci: N(null, 0), ch: N(null, 0) },
+      'workspan/dag': { strands: REC([['strand', NM], ['cost', W(1, 1000000)]], 1, 40, true), edges: REC([['from', NM], ['to', NM]], 0, 60), p: W(1, 1000000) },
+      'workspan/recurrence': { program: WD('p-fib|merge-sort'), n: W(0, 1000000), p: W(1, 1000000) },
+      'lup/decompose': { matrix: LIST(N(null, '-10000000'), 1, 25), b: LIST(N(null, '-10000000'), 0, 5) },
+      'fft/multiply': { a: LIST(W(-1000000, 1000000), 1, 16), b: LIST(W(-1000000, 1000000), 1, 16) }
+    };
+    var DEFAULTS = { c1: '1', c2: '1', c: '1', p: '0', t1: '1', ci: '1', ch: '10', edges: '', b: '' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = eaRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+  `;
+  const itMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + itBlock('core', 'EA_CORE_JS') + itBlock('a', 'ITA_CORE_JS') + code + IT_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'itakit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const eaStartsIt = (got, want, label) => eq(String(got).slice(0, want.length), want, label);
+  const itCall = (run, mode) => (view, raw, ids) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '), ' + JSON.stringify(ids) + ')');
+
+  /* --- ITA_CORE_JS: lg n decided exactly -------------------------------- */
+  const ic = itMk('');
+  eq(ic("[itaLgCmp(1024n, R(10n)), itaLgCmp(1023n, R(10n)), itaLgCmp(1025n, R(10n)), itaLgCmp(1000n, R(9966n, 1000n)), itaLgCmp(1000n, R(9965n, 1000n))].join(' ')"),
+     '0 -1 1 -1 1', 'itaLgCmp: lg 1,024 = 10 exactly; lg 1,000 lies between 9.965 and 9.966');
+  eq(ic("(function () { var b = itaLg(3n, 64); return Rcmp(b.lo, R(15849625007211561815n, 10000000000000000000n)) < 0 && Rcmp(b.hi, R(15849625007211561814n, 10000000000000000000n)) > 0 && Rcmp(Rsub(b.hi, b.lo), R(1n, 1n << 60n)) < 0; })()"),
+     'true', 'itaLg: lg 3 = 1.58496250072115618145… bracketed within 2^−60');
+  eq(ic("itaQ(R(-4n, 6n)) + '; ' + itaQ(R(1024n)) + '; ' + itaList([5n, -2n, R(1n, 2n)])"), '−2/3; 1,024; 5, −2, 1/2', 'itaQ and itaList');
+
+  /* --- growth (gri) ------------------------------------------------------ */
+  const gr = itCall(itMk(itBlock('a', 'GRI_JS') + itViews('GRI_VIEW_JS', ['race', 'bounds']), 'griCompute'), 'growth');
+  eq(gr('race', { fnA: 'n^2', costA: '2', speedA: '1000000000', fnB: 'n lg n', costB: '40', speedB: '10000000', n: '1000000' }, 'griCross griTimeA griTimeB griFaster'),
+     'n = 29,719: from there on B (n lg n) is always faster | 2,000 s | ≈ 79.73 s | B, ≈ 25.1× faster',
+     'growth/race: 2n² at 10^9 a second against 40 n lg n at 10^7 crosses at n = 29,719 (n/lg n first exceeds 2,000 there)');
+  eq(gr('race', { fnA: 'n^3', costA: '1', speedA: '1000000', fnB: '2^n', costB: '1', speedB: '1000000', n: '20' }, 'griCross griTimeB'),
+     'n = 10: from there on A (n^3) is always faster | 16,384/15,625 ≈ 1.05 s', 'growth/race: 2^n > n³ from n = 10 (2^9 = 512 < 729)');
+  eq(gr('race', { fnA: 'n', costA: '3', speedA: '100', fnB: 'n', costB: '2', speedB: '100', n: '64' }, 'griCross'),
+     'never: the same order of growth, so A always takes 3/2 ≈ 1.5× B\'s time', 'growth/race: equal orders never cross');
+  eq(gr('race', { fnA: 'n', costA: '1', speedA: '100', fnB: 'n', costB: '41', speedB: '100', n: '64' }, 'griCross'),
+     'never: the same order of growth, so B always takes 41× A\'s time', 'growth/race: a ratio under 1 is stated from the slower program, never as 0.0×');
+  eq(gr('race', { fnA: 'n^2', costA: '1', speedA: '1', fnB: 'n', costB: '8', speedB: '1', n: '8' }, 'griCross griFaster'),
+     'n = 9: from there on B (n) is always faster | neither: the same time', 'growth/race: n² = 8n exactly at n = 8, so B wins for good from 9');
+  eq(gr('race', { fnA: 'n^2', costA: '1', speedA: '1', fnB: 'n', costB: '100', speedB: '1', n: '100' }, 'griCross'),
+     'n = 101: from there on B (n) is always faster', 'growth/race: a tie past 64 is found by the bisection');
+  eq(gr('race', { fnA: 'n lg n', costA: '1', speedA: '1', fnB: 'n^2', costB: '1', speedB: '1', n: '8' }, 'griTimeA griTimeB griFaster'),
+     '24 s | 64 s | A, 8/3 ≈ 2.7× faster', 'growth/race: lg 8 = 3 exactly, so the times are exact');
+  eaStartsIt(gr('race', { fnA: '2^n', costA: '1', speedA: '1', fnB: 'n', costB: '1', speedB: '1', n: '5000' }, 'griCross'), 'REFUSED Program A costs 2^n', 'growth/race: 2^n past 4,096 is refused');
+  eq(gr('bounds', { f: '0.25, n^2; -5, n', g: '1, n^2', relation: 'Theta', c1: '0.1', c2: '0.25', n0: '34' }, 'griHolds griClaim'),
+     'yes, at all 10,001 values of n from 34 to 10,034 | true: some c and n₀ work', 'growth/bounds: n²/4 − 5n ≥ n²/10 exactly when n ≥ 100/3');
+  eq(gr('bounds', { f: '0.25, n^2; -5, n', g: '1, n^2', relation: 'Theta', c1: '0.1', c2: '0.25', n0: '33' }, 'griFirstFail'),
+     'n = 33: f(n) < c₁·g(n)', 'growth/bounds: the same witness fails at n = 33');
+  eq(gr('bounds', { f: '1, 2^n', g: '1, n^3', relation: 'O', c2: '1000', n0: '1' }, 'griFirstFail griOrder griClaim'),
+     'n = 24: f(n) > c₂·g(n) | f = ω(g): 2^n grows faster than n^3 | false: no c and n₀ work', 'growth/bounds: 2^24 > 1,000 · 24³ and 2^23 is not');
+  eq(gr('bounds', { f: '1, n lg n', g: '1, n', relation: 'O', c2: '10', n0: '2' }, 'griFirstFail'),
+     'n = 1,025: f(n) > c₂·g(n)', 'growth/bounds: n lg n ≤ 10n until lg n passes 10, decided exactly at n = 1,024 and 1,025');
+  eq(gr('bounds', { f: '1, n!', g: '1, F(n); 1, lg* n', relation: 'Omega', c1: '1', n0: '1' }, 'griHolds griAtN0'),
+     'yes, at all 10,001 values of n from 1 to 10,001 | f(1) = 1, c₁g(1) = 1', 'growth/bounds: n! ≥ F(n) + lg* n from n = 1');
+
+  /* --- sorting (sti) ----------------------------------------------------- */
+  const st = itCall(itMk(itBlock('a', 'STI_JS') + itViews('STI_VIEW_JS', ['insertion', 'cost', 'merge']), 'stiCompute'), 'sorting');
+  const rev = (n) => Array.from({ length: n }, (_, i) => n - i).join(' ');
+  eq(st('insertion', { list: rev(10) }, 'stiComparisons stiShifts stiInvariant'), '45 | 45 | holds at all 10 checks, j = 2 to 11',
+     'sorting/insertion: a reversed array of 10 makes n(n − 1)/2 = 45 comparisons');
+  eq(st('insertion', { list: rev(40) }, 'stiComparisons'), '780', 'sorting/insertion: reversed 40, n(n − 1)/2 = 780');
+  eq(st('insertion', { list: '31 12 47 5 26 12 40 8' }, 'stiComparisons stiShifts stiSorted'), '21 | 16 | 5, 8, 12, 12, 26, 31, 40, 47',
+     'sorting/insertion: 16 shifts = the 16 inversions; equal keys keep their order');
+  eq(st('cost', { list: '31 12 47 5 26 12 40 8' }, 'stiTj stiSumTj stiLines'), '2, 1, 4, 3, 4, 2, 7 | 23 | 84 (best 5n − 4 = 36, worst (3n² + 7n − 8)/2 = 120)',
+     'sorting/cost: t_j and n + 3(n − 1) + Σt_j + 2Σ(t_j − 1) = 8 + 21 + 23 + 32');
+  eq(st('cost', { list: rev(6) }, 'stiLines stiComparisons stiWorst'), '71 (best 5n − 4 = 26, worst (3n² + 7n − 8)/2 = 71) | 15 | n(n − 1)/2 = 15',
+     'sorting/cost: a reversed array is the worst case of the line sum');
+  eq(st('merge', { list: '31 12 47 5 26 12 40 8' }, 'stiPerLevel stiMergeTotal stiMergeBound stiSentinel'),
+     'level 1: 7; level 2: 6; level 3: 4 | 17 | n⌈lg n⌉ − 2^⌈lg n⌉ + 1 = 17 | 24', 'sorting/merge: comparisons per level on eight numbers');
+  eq(st('merge', { list: '1 2 3 4 5 6 7 8 9 10 11' }, 'stiLevels stiPerLevel stiMergeTotal stiMergeBound'),
+     '4 (⌈lg n⌉ = 4) | level 1: 6; level 2: 6; level 3: 7; level 4: 3 | 22 | n⌈lg n⌉ − 2^⌈lg n⌉ + 1 = 29', 'sorting/merge: a sorted array of 11 makes 22, under the worst case 29');
+
+  /* --- recurrence (rci) -------------------------------------------------- */
+  const rcRun = itMk(itBlock('a', 'RCI_JS') + itViews('RCI_VIEW_JS', ['master', 'tree']), 'rciCompute');
+  const rc = itCall(rcRun, 'recurrence');
+  eq(rc('master', { a: '2', b: '2', k: '1', j: '10' }, 'rciCritical rciCase rciSolution rciLast rciRatio'),
+     'n | case 2: f(n) = Θ(n^(log_b a)) | Θ(n lg n) | T(1,024) = 11,264 | 11/10 = 1.10', 'recurrence/master: 2T(n/2) + n is case 2, T(1,024) = 1,024 · 11');
+  eq(rcRun("(function () { var s = rciSolve(eaRead([{key:'a',kind:'whole',min:'1',max:'9'},{key:'b',kind:'whole',min:'2',max:'9'},{key:'c',kind:'num',max:'9'},{key:'k',kind:'num',max:'9'},{key:'p',kind:'whole',min:'-3',max:'3'},{key:'t1',kind:'num',max:'9'},{key:'j',kind:'whole',min:'1',max:'30'}], {a:'2',b:'2',c:'1',k:'1',p:'0',t1:'1',j:'30'})); var bad = []; for (var j = 0n; j <= 30n; j += 1n) if (!Requ(s.T[Number(j)], R((1n << j) * (j + 1n)))) bad.push(j); return bad.length ? bad.join(',') : 'all'; })()"),
+     'all', 'recurrence: T(2^j) = 2^j (j + 1) = n lg n + n exactly for every j from 0 to 30');
+  eq(rc('master', { a: '7', b: '2', k: '2', j: '8' }, 'rciCritical rciCase rciSolution rciLast'),
+     'n^(log_2 7) ≈ n^2.807 | case 1: f(n) = O(n^(log_b a − ε)) | Θ(n^(log_2 7)) | T(256) = 13,363,821', 'recurrence/master: Strassen 7T(n/2) + n² is case 1');
+  eq(rc('master', { a: '2', b: '2', k: '1', p: '1', j: '10' }, 'rciCase rciLast rciRatio'),
+     'falls in the gap between cases 2 and 3 | T(1,024) = 57,344 | 14/25 = 0.56', 'recurrence/master: 2T(n/2) + n lg n falls in the gap; T(2^j) = 2^j(1 + j(j + 1)/2)');
+  eq(rc('master', { a: '3', b: '4', k: '2', j: '8' }, 'rciCritical rciCase'),
+     'n^(log_4 3) ≈ n^0.792 | case 3: f(n) = Ω(n^(log_b a + ε)), and a·f(n/b) ≤ (3/16)·f(n)', 'recurrence/master: 3T(n/4) + n² is case 3 with regularity 3/16');
+  eq(rc('master', { a: '8', b: '4', k: '1', j: '3' }, 'rciCritical rciSolution'), 'n^(3/2) | Θ(n^(3/2))', 'recurrence/master: log_4 8 = 3/2 found exactly');
+  eaStartsIt(rc('master', { a: '2', b: '3', k: '1', p: '1', j: '3' }, 'rciCase'), 'REFUSED With p ≠ 0, b must be a power of 2', 'recurrence: lg n with b = 3 is refused');
+  eaStartsIt(rc('master', { a: '2', b: '2', k: '0.5', j: '3' }, 'rciCase'), 'REFUSED b^k = 2^1/2 is not a whole number', 'recurrence: an irrational b^k is refused');
+  eq(rc('tree', { a: '3', b: '4', k: '2', j: '4' }, 'rciLevelSums rciLeaves rciTreeTotal rciLast rciTrend'),
+     '65,536, 12,288, 2,304, 432 | 81 × T(1) = 81 | 80,641 | T(256) = 80,641 | each level 3/16 × the one above: decreasing, the root dominates',
+     'recurrence/tree: the levels of 3T(n/4) + n² at n = 256 add up to T(256)');
+
+  /* --- maxsub (msi) ------------------------------------------------------ */
+  const msRun = itMk(itBlock('a', 'MSI_JS') + itViews('MSI_VIEW_JS', ['compare']), 'msiCompute');
+  const ms = itCall(msRun, 'maxsub');
+  eq(ms('compare', { list: '4 -9 6 -2 7 -11 3 5 -1 8 -6 2' }, 'msiBrute msiDc msiLinear msiDcSteps msiAgree'),
+     'A[3..10], sum 15 | A[7..10], sum 15 | A[7..10], sum 15 | 23 calls, 44 elements scanned across the middle | yes: all three find sum 15, by tie-breaking not all the same subarray',
+     'maxsub: three routes agree on the sum, and the subarrays differ by tie-breaking');
+  eq(ms('compare', { list: '-5 -2 -8 -3' }, 'msiLinear msiAgree'), 'A[2..2], sum −2 | yes: all three find sum −2, the same subarray', 'maxsub: all negative, the largest element');
+  eq(msRun("(function () { var seed = 7, bad = 0; function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed; } for (var t = 0; t < 300; t += 1) { var n = 1 + rnd() % 30, a = []; for (var i = 0; i < n; i += 1) a.push(String(rnd() % 41 - 20)); var o = RUN('maxsub', 'compare', { list: a.join(' ') }); var m = -1e9; for (var x = 0; x < n; x += 1) { var s = 0; for (var y = x; y < n; y += 1) { s += Number(a[y]); if (s > m) m = s; } } if (o.tiles.msiAgree.indexOf('yes: all three find sum ' + eaInt(BigInt(m)) + ',') !== 0) bad += 1; } return bad; })()"),
+     '0', 'maxsub: on 300 seeded arrays all three routes find the true maximum sum');
+
+  /* --- hiring (hri) ------------------------------------------------------ */
+  const hr = itCall(itMk(itBlock('a', 'HRI_JS') + itViews('HRI_VIEW_JS', ['order']), 'hriCompute'), 'hiring');
+  eq(hr('order', { order: '2 1 4 3' }, 'hriHires hriCost hriAverage hriHarmonic hriAgree'),
+     '2: candidates 1, 3 | 24 | 25/12 ≈ 2.08 over 24 orders | 25/12 ≈ 2.08 | yes: the average is H_4', 'hiring: the average over all 24 orders of 4 is H_4 = 25/12');
+  eq(hr('order', { order: '9 8 7 6 5 4 3 2 1' }, 'hriHires hriAverage'), '1: candidate 1 | 7,129/2,520 ≈ 2.83 over 362,880 orders', 'hiring: every order of 9, H_9 = 7,129/2,520');
+  eaStartsIt(hr('order', { order: '1 2 2' }, 'hriHires'), 'REFUSED The order gives rank 2 twice', 'hiring: not a permutation is refused');
+
+  /* --- workspan (wsi) ---------------------------------------------------- */
+  const ws = itCall(itMk(itBlock('a', 'WSI_JS') + itViews('WSI_VIEW_JS', ['dag', 'recurrence']), 'wsiCompute'), 'workspan');
+  eq(ws('recurrence', { program: 'p-fib', n: '4', p: '2' }, 'wsiWork wsiSpan wsiParallelism wsiBound wsiCritical'),
+     '17 | 8 | 17/8 ≈ 2.13 | 33/2 = 16.50 | P-FIB(4) → P-FIB(3) → P-FIB(2) → P-FIB(0)', 'workspan: P-FIB(4) has work 17 and span 8');
+  eq(ws('recurrence', { program: 'p-fib', n: '30', p: '1' }, 'wsiWork wsiSpan'), '5,385,073 | 60', 'workspan: P-FIB(30): work 4F(31) − 3, span 2n');
+  eq(ws('recurrence', { program: 'merge-sort', n: '1024', p: '8' }, 'wsiWork wsiSpan'), '11,264 | 2,047', 'workspan: MERGE-SORT′ on 1,024: n lg n + n and 2n − 1');
+  eq(ws('dag', { strands: 'start, 1; left, 4; mid, 2; right, 3; join, 1', edges: 'start, left; start, mid; start, right; left, join; mid, join; right, join', p: '2' },
+     'wsiWork wsiSpan wsiLower wsiCritical'), '11 | 6 | 6 | start → left → join', 'workspan/dag: a fork-join of three');
+  eaStartsIt(ws('dag', { strands: 'a, 1; b, 1', edges: 'a, b; b, a', p: '1' }, 'wsiWork'), 'REFUSED The edges form a cycle', 'workspan/dag: a cycle is refused');
+
+  /* --- lup (lui) --------------------------------------------------------- */
+  const lu = itCall(itMk(itBlock('a', 'LUI_JS') + itViews('LUI_VIEW_JS', ['decompose']), 'luiCompute'), 'lup');
+  eq(lu('decompose', { matrix: '2 0 1\n4 1 3\n-2 5 2', b: '5 13 9' }, 'luiPerm luiPivots luiL luiU luiDet luiX luiCheck'),
+     'π = 2, 3, 1 | 4, 11/2, −2/11 | 1, 0, 0; −1/2, 1, 0; 1/2, −1/11, 1 | 4, 1, 3; 0, 11/2, 7/2; 0, 0, −2/11 | −4 | x = 9/4, 5/2, 1/2 | yes: A·x = b exactly',
+     'lup: a 3 × 3 system solved exactly with partial pivoting');
+  eq(lu('decompose', { matrix: '1 1 1\n1 2 4\n1 3 9', b: '1 0 0' }, 'luiX luiDet'), 'x = 3, −5/2, 1/2 | 2', 'lup: a Vandermonde system with fractions on the way');
+  eaStartsIt(lu('decompose', { matrix: '1 2\n2 4' }, 'luiPerm'), 'REFUSED The matrix is singular: column 2', 'lup: a singular matrix is refused');
+  eaStartsIt(lu('decompose', { matrix: '1 2 3' }, 'luiPerm'), 'REFUSED The matrix has 3 entries', 'lup: a non-square entry count is refused');
+
+  /* --- fft (fti) --------------------------------------------------------- */
+  const ft = itCall(itMk(itBlock('a', 'FTI_JS') + itViews('FTI_VIEW_JS', ['multiply']), 'ftiCompute'), 'fft');
+  eq(ft('multiply', { a: '1 2', b: '3 4' }, 'ftiN ftiSchool ftiFft ftiButterflies ftiAgree'),
+     '4 (product degree 2) | 3, 10, 8 | 3, 10, 8 | 12 (3 transforms × (n/2) lg n = 3 × 4), and 4 pointwise products | yes', 'fft: (1 + 2x)(3 + 4x) = 3 + 10x + 8x²');
+  eq(ft('multiply', { a: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1', b: '1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1 1 -1' }, 'ftiN ftiFft ftiAgree'),
+     '32 (product degree 30) | ' + Array.from({ length: 31 }, (_, i) => (i < 16 ? (i % 2 ? '0' : '1') : (i % 2 ? '0' : '−1'))).join(', ') + ' | yes', 'fft: two length-16 polynomials, rounded and checked against the schoolbook product');
+  eq(ft('multiply', { a: '999999 -1000000 777777', b: '-1000000 1 999999 123456' }, 'ftiAgree'), 'yes', 'fft: coefficients near 10^6 still round to the exact product');
+  eq(ft('multiply', { a: '1000000 -1', b: '-1000000 2' }, 'ftiSchool ftiFft ftiAgree'),
+     '−1000000000000, 3000000, −2 | −1000000000000, 3000000, −2 | yes', 'fft: coefficient lists carry no thousands commas, so every comma separates two coefficients');
+}
+// ---- end itakit family A ----
+
+// ---- itakit (Introduction to Algorithms), family B ----
+// ==========================================================================
+// Introduction to Algorithms, Read Along: itakit_b.py (family B: rod, lcs,
+// obst, amortized, rbtree, btree, fibheap, veb, bfs)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and ITA_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by eakit's own parser
+// (eaRead) and compared on the exact tile string a reader sees. Every figure
+// was worked by hand from the book's procedure (the workings are in
+// docs/intro-algorithms/kit-report.md, "Family B: verification") and confirmed
+// on a rendered page; every mode's cases were seen to FAIL when a line they
+// test was broken on purpose.
+console.log('introduction to algorithms: itakit family B, nine modes');
+{
+  const vm = require('vm');
+  const ibFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const ibSrc = { core: fs.readFileSync(ibFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(ibFile('itakit.py'), 'utf8'),
+    b: fs.readFileSync(ibFile('itakit_b.py'), 'utf8') };
+  const ibBlock = (src, name) => blockFrom(ibSrc[src], name.replace(/[[\]]/g, '\\$&'), 'itakit (' + src + ')');
+  const ibViews = (dict, list) => list.map((v) => ibBlock('b', dict + '["' + v + '"]')).join('');
+  /* Field specs as itakit_b.py's mode dicts declare them. */
+  const IB_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function N0() { return { kind: 'num', min: '0', max: LIM }; }
+    function WD(list) { return { kind: 'word', words: list.split('|') }; }
+    function LIST(each, lo, hi) { return { kind: 'list', lo: lo, hi: hi, things: 'entries', each: each }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    var NM = { kind: 'name' }, PA = { kind: 'parent' }, KEY = W(0, 1000000), OPS = LIST(PA, 1, 400);
+    var SPEC_OF = {
+      'rod/cut': { prices: LIST(N0(), 1, 20) },
+      'lcs/table': { x: NM, y: NM },
+      'obst/table': { p: LIST(N0(), 1, 8), q: LIST(N0(), 2, 9), scale: W(1) },
+      'amortized/counter': { bits: W(1, 20), increments: W(1, 1000), start: W(0, 1048575) },
+      'amortized/stack': { ops: OPS }, 'amortized/table': { ops: OPS },
+      'rbtree/check': { nodes: REC([['key', KEY], ['color', WD('red|black')], ['parent', PA]], 1, 60, true) },
+      'rbtree/insert': { keys: LIST(KEY, 1, 31) },
+      'btree/insert': { t: W(2, 5), keys: LIST(KEY, 1, 60) },
+      'fibheap/ops': { ops: OPS }, 'fibheap/cascade': { ops: OPS },
+      'veb/ops': { k: W(1, 4), ops: LIST(PA, 1, 120) },
+      'bfs/search': { edges: REC([['from', NM], ['to', NM]], 0, 60), graph: WD('undirected|directed'), source: NM, vertices: LIST(NM, 0, 30) }
+    };
+    var DEFAULTS = { scale: '1', start: '0', vertices: '' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = eaRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+  `;
+  const ibMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + ibBlock('core', 'EA_CORE_JS') + ibBlock('a', 'ITA_CORE_JS') + code + IB_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'itakit_b' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const ibCall = (run, mode) => (view, raw, ids) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '), ' + JSON.stringify(ids) + ')');
+  const ibStarts = (got, want, label) => eq(String(got).slice(0, want.length), want, label);
+
+  /* --- rod (rdi) --------------------------------------------------------- */
+  const RD_ALL = 'rdiRevenue rdiCuts rdiNaive rdiWays rdiMemo rdiInner';
+  const rd = ibCall(ibMk(ibBlock('b', 'RDI_JS') + ibViews('RDI_VIEW_JS', ['cut']), 'rdiCompute'), 'rod');
+  eq(rd('cut', { prices: '1 5 8 9' }, RD_ALL), '10 | 2 + 2 | 16 | 8 | 11 | 10',
+     'rod: prices 1 5 8 9 give r_4 = 10 (two pieces of 2); 2^4 naive calls, 1 + 4·5/2 memoized, 4·5/2 loop runs');
+  eq(rd('cut', { prices: '3 5 8 9 10 17 17 20' }, RD_ALL), '24 | 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 | 256 | 128 | 37 | 36',
+     'rod: p_1 = 3 makes eight unit pieces best (r_8 = 24)');
+  eq(rd('cut', { prices: '2 4' }, 'rdiRevenue rdiCuts'), '4 | 1 + 1', 'rod: a tie keeps the smallest first piece (strict <)');
+  eq(rd('cut', { prices: '1 1 10' }, 'rdiRevenue rdiCuts'), '10 | 3 (no cut)', 'rod: sold whole');
+  eq(rd('cut', { prices: '0.5 1.25' }, 'rdiRevenue rdiCuts'), '5/4 = 1.25 | 2 (no cut)', 'rod: decimal prices, exact');
+  eq(rd('cut', { prices: Array(20).fill('1').join(' ') }, 'rdiNaive rdiWays rdiMemo rdiInner'), '1,048,576 | 524,288 | 211 | 210',
+     'rod: n = 20, 2^20 naive calls counted, not made');
+
+  /* --- lcs (lci) --------------------------------------------------------- */
+  const lc = ibCall(ibMk(ibBlock('b', 'LCI_JS') + ibViews('LCI_VIEW_JS', ['table']), 'lciCompute'), 'lcs');
+  eq(lc('table', { x: 'ABAB', y: 'BABA' }, 'lciLength lciLcs lciCells lciArrows'), '3 | ABA | 4 × 4 = 16 | ↖ 8, ↑ 6, ← 2',
+     'lcs: ABAB, BABA; ties go up, so PRINT-LCS reads ABA (not BAB)');
+  eq(lc('table', { x: 'AAA', y: 'BB' }, 'lciLength lciLcs lciArrows'), '0 | (empty) | ↖ 0, ↑ 6, ← 0', 'lcs: nothing in common, every tie up');
+  eq(lc('table', { x: 'a', y: 'A' }, 'lciLength'), '0', 'lcs: case matters');
+  ibStarts(lc('table', { x: 'A'.repeat(31), y: 'A' }, 'lciLength'), 'REFUSED X has 31 characters', 'lcs: at most 30 characters');
+
+  /* --- obst (obi) -------------------------------------------------------- */
+  const OB_ALL = 'obiCost obiTree obiRoots obiBrute';
+  const ob = ibCall(ibMk(ibBlock('b', 'OBI_JS') + ibViews('OBI_VIEW_JS', ['table']), 'obiCompute'), 'obst');
+  eq(ob('table', { p: '0.3 0.2', q: '0.1 0.2 0.2' }, OB_ALL), '21/10 = 2.10 | k1(d0 k2(d1 d2)) | 1: 1 1; 2: 2 | 2 trees; least 21/10 = 2.10 (2 trees); agrees',
+     'obst: two keys whose two trees tie at 2.1; the smaller root is kept');
+  eq(ob('table', { p: '4 2 1', q: '2 2 2 3', scale: '16' }, OB_ALL), '39/16 ≈ 2.44 | k2(k1(d0 d1) k3(d2 d3)) | 1: 1 1 2; 2: 2 2; 3: 3 | 5 trees; least 39/16 ≈ 2.44 (1 tree); agrees',
+     'obst: weights over 16, exact; the balanced tree costs 39/16 against 41/16 for the others');
+  eq(ob('table', { p: '1 1 1 1 1 1 1', q: '1 1 1 1 1 1 1 1', scale: '15' }, 'obiBrute'), '429 trees; least 49/15 ≈ 3.27 (1 tree); agrees',
+     'obst: n = 7, equal weights: the complete tree, 17 + 32 over 15; all 429 trees costed from their depths agree');
+  eq(ob('table', { p: '1 1 1 1 1 1 1 1', q: '1 1 1 1 1 1 1 1 1', scale: '17' }, 'obiBrute'), 'not run at n = 8 (the lab enumerates trees up to n = 7)', 'obst: no brute force at n = 8');
+  ibStarts(ob('table', { p: '0.5', q: '0.25 0.2' }, 'obiCost'), 'REFUSED The probabilities sum to 19/20', 'obst: the sum must be exactly 1');
+  ibStarts(ob('table', { p: '0.25 0.25 0.25', q: '0.125 0.125' }, 'obiCost'), 'REFUSED There are 3 keys, so there are 4 dummy probabilities q0 to q3, and 2 are given', 'obst: q is one longer than p');
+
+  /* --- amortized (ami) --------------------------------------------------- */
+  const am = ibCall(ibMk(ibBlock('b', 'AMI_JS') + ibViews('AMI_VIEW_JS', ['counter', 'stack', 'table']), 'amiCompute'), 'amortized');
+  eq(am('counter', { bits: '3', increments: '8' }, 'amiActual amiPerBit amiBound amiCredit amiPhi amiAmortized amiMax amiValue'),
+     '14 | bit 0: 8, bit 1: 4, bit 2: 2 | 2n = 16 | 0 (least 0) | Φ0 = 0, Φn = 0 | 14 | 2 | 0 (000)',
+     'counter: 3 bits, 8 increments flip 14 bits; the eighth wraps to 000, setting nothing');
+  eq(am('counter', { bits: '3', increments: '3', start: '6' }, 'amiActual amiPerBit amiCredit amiPhi amiAmortized amiValue'),
+     '5 | bit 0: 3, bit 1: 1, bit 2: 1 | −1 (least −2) | Φ0 = 2, Φn = 1 | 4 | 1 (001)',
+     'counter: from 110 the accounting credit goes negative; the potential method still holds (4 = 5 + 1 − 2)');
+  ibStarts(am('counter', { bits: '3', increments: '1', start: '8' }, 'amiActual'), 'REFUSED A 3-bit counter holds 0 to 7', 'counter: the start fits in k bits');
+  eq(am('stack', { ops: 'push 4 pop multipop 2 push 3 multipop 9' }, 'amiActual amiBound amiCredit amiPhi amiAmortized amiMax amiOpCount'),
+     '14 | 2 × 7 pushes = 14 | 0 | Φ0 = 0, Φn = 0 | 14 | 2 | 10', 'stack: the last MULTIPOP 9 pops the 4 left, costing 4');
+  eq(am('stack', { ops: 'multipop 3, push' }, 'amiActual amiBound amiCredit amiPhi amiAmortized'), '1 | 2 × 1 push = 2 | 1 | Φ0 = 0, Φn = 1 | 2',
+     'stack: MULTIPOP of an empty stack costs 0');
+  eq(am('stack', { ops: 'push pop pop' }, 'amiActual'), 'REFUSED Operation 3 pops an empty stack', 'stack: POP of an empty stack refused');
+  eq(am('stack', { ops: 'push 2 multipop' }, 'amiActual'), 'REFUSED Operations, entry 3: multipop needs a number after it', 'stack: MULTIPOP needs k');
+  eq(am('stack', { ops: '3 push' }, 'amiActual'), 'REFUSED Operations, entry 1: "3" follows no push or pop or multipop', 'stack: a number after nothing');
+  eq(am('table', { ops: 'insert 9 delete 7' }, 'amiActual amiBound amiPhi amiAmortized amiMax amiCredit amiSize amiResize'),
+     '34 | 3 × 9 + 2 × 7 = 41 | Φ0 = 0, Φn = 2 | 36 | insert 3, delete 2 | 2 | num 2, size 8, load 1/4 = 0.25 | expansions 4, contractions 1, items moved 18',
+     'table: 9 inserts cost 24 (expansions at 1, 2, 4, 8 items); the delete leaving 3 of 16 contracts to 8');
+  eq(am('table', { ops: 'insert delete' }, 'amiActual amiAmortized amiMax amiSize'), '2 | 2 | insert 2, delete 0 | num 0, size 0',
+     'table: the last delete frees the table (Φ back to 0)');
+  eq(am('table', { ops: 'insert 8 delete 2 insert' }, 'amiActual amiMax amiResize'), '18 | insert 3, delete −1 | expansions 3, contractions 0, items moved 7',
+     'table: deleting from a full table lowers Φ by 2 (amortized −1)');
+  eq(am('table', { ops: 'insert delete 2' }, 'amiActual'), 'REFUSED Operation 3 deletes from an empty table', 'table: a delete from an empty table refused');
+
+  /* --- rbtree (rbi) ------------------------------------------------------ */
+  const rb = ibCall(ibMk(ibBlock('b', 'RBI_JS') + ibViews('RBI_VIEW_JS', ['check', 'insert']), 'rbiCompute'), 'rbtree');
+  const RB_INS = 'rbiCases rbiRecolor rbiRotate rbiMostRot rbiFinal rbiBh rbiHeight rbiBound';
+  eq(rb('insert', { keys: '1 2 3 4 5 6 7' }, RB_INS), 'case 1′ ×2, case 3′ ×3 | 14 | 3 | 1 | 2B(1B 4R(3B 6B(5R 7R))) | 2 | 4 | 2 lg 8 = 6',
+     'rbtree/insert: 1..7 in order: cases 3′ (keys 3, 5, 7) and 1′ (4, 6); 1 + 2 + 4 + 2 + 3 + 2 recolorings, 3 rotations');
+  eq(rb('insert', { keys: '10 5 1' }, 'rbiCases rbiRecolor rbiRotate rbiFinal'), 'case 3 ×1 | 3 | 1 | 5B(1R 10R)', 'rbtree/insert: left-left, case 3');
+  eq(rb('insert', { keys: '10 1 5' }, 'rbiCases rbiRotate rbiMostRot rbiFinal'), 'case 2 ×1, case 3 ×1 | 2 | 2 | 5B(1R 10R)', 'rbtree/insert: left-right, case 2 then 3, two rotations');
+  eq(rb('insert', { keys: '3 2 1 0' }, 'rbiCases rbiRecolor rbiRotate rbiFinal'), 'case 1 ×1, case 3 ×1 | 7 | 1 | 2B(1B(0R -) 3B)',
+     'rbtree/insert: 0 under the red 1 with a red uncle 3: case 1 recolors three, then the root');
+  eq(rb('insert', { keys: '8' }, 'rbiRecolor rbiFinal rbiBh rbiHeight rbiBound'), '1 | 8B | 1 | 1 | 2 lg 2 = 2', 'rbtree/insert: the root turned black counts one');
+  eq(rb('insert', { keys: '1 2 3 4 5 6 7 8 9 10' }, 'rbiHeight rbiBound'), '5 | 2 lg 11 ≈ 6.92', 'rbtree/insert: 2 lg 11 = lg 121, between 6.915 and 6.925');
+  eq(rb('insert', { keys: '3 1 3' }, 'rbiRotate'), 'REFUSED Keys, entry 3: 3 is already in the tree; this lab inserts distinct keys', 'rbtree/insert: distinct keys');
+  const RB_CHK = 'rbiVerdict rbiP1 rbiP2 rbiP3 rbiP4 rbiP5 rbiBst rbiNodes rbiBh rbiHeight rbiBound';
+  eq(rb('check', { nodes: '4, black, -; 2, red, 4; 6, red, 4; 1, black, 2; 3, black, 2; 5, black, 6; 7, black, 6' }, RB_CHK),
+     'yes | holds | holds | holds | holds | holds | holds | 7 | 2 | 3 | 2 lg 8 = 6', 'rbtree/check: a valid tree on 1..7');
+  eq(rb('check', { nodes: '4, red, -; 2, red, 4; 6, black, 4' }, 'rbiVerdict rbiP2 rbiP4 rbiP5 rbiBh rbiHeight rbiBound'),
+     'no: property 2, 4, 5 fail | fails: the root 4 is red | fails at 4: red, with red child 2 | fails at 4: 1 black node down its left side, 2 down its right | — (property 5 fails) | 2 | 2 lg 4 = 4',
+     'rbtree/check: a red root with a red child and unequal black counts');
+  eq(rb('check', { nodes: '5, black, -; 3, black, 5; 7, black, 5; 6, black, 3' }, 'rbiVerdict rbiP5 rbiBst'),
+     'no: property 5 fails | fails at 3: 1 black node down its left side, 2 down its right | fails: 6 comes before 5 in the inorder walk',
+     'rbtree/check: 6 under 3 breaks search-tree order and property 5');
+  eq(rb('check', { nodes: '4, black, -; 2, red, 4; 3, red, 2' }, 'rbiVerdict rbiP4 rbiP5'), 'no: property 4 fails | fails at 2: red, with red child 3 | holds',
+     'rbtree/check: a red right child of a red node');
+  eq(rb('check', { nodes: '5, black, -; 3, red, 5; 1, red, 5' }, 'rbiP1'), 'REFUSED 5 has two left children, 3 and 1 (a child smaller than its parent is its left child)', 'rbtree/check: two left children refused');
+  eq(rb('check', { nodes: '2, red, -; 1, black, 3; 3, black, 1' }, 'rbiP1'), 'REFUSED The parents form a cycle through 1, 3, which the root never reaches', 'rbtree/check: a cycle refused');
+  eq(rb('check', { nodes: '2, red, 1; 1, black, 2' }, 'rbiP1'), 'REFUSED The tree has no root: give one node the parent -', 'rbtree/check: no root');
+
+  /* --- btree (bti) ------------------------------------------------------- */
+  const bt = ibCall(ibMk(ibBlock('b', 'BTI_JS') + ibViews('BTI_VIEW_JS', ['insert']), 'btiCompute'), 'btree');
+  const BT_ALL = 'btiHeight btiNodes btiSplits btiReads btiWrites btiBound btiLevels';
+  eq(bt('insert', { t: '2', keys: '1 2 3 4 5 6 7 8 9 10' }, BT_ALL), '2 | 8 | 5 | 9 | 25 | log_2 5.5 ≈ 2.46 | [4] / [2] [6 8] / [1] [3] [5] [7] [9 10]',
+     'btree: t = 2, keys 1..10: 2 root splits and 3 others, 9 child reads, 10 leaf writes + 15 split writes');
+  eq(bt('insert', { t: '5', keys: '42' }, BT_ALL), '0 | 1 | 0 | 0 | 1 | log_5 1 = 0 | [42]', 'btree: one key, one leaf write');
+  eq(bt('insert', { t: '2', keys: '8 4 12 2 6 10 14 1 3 5 7 9 11 13 15' }, 'btiHeight btiBound'), '2 | log_2 8 = 3', 'btree: n = 15, the bound log_2 8 is exact');
+  eq(bt('insert', { t: '3', keys: '5 5' }, 'btiHeight'), 'REFUSED Keys, entry 2: 5 is already in the tree; this lab inserts distinct keys', 'btree: distinct keys');
+
+  /* --- fibheap (fhi) ----------------------------------------------------- */
+  const fhRun = ibMk(ibBlock('b', 'FHI_JS') + ibViews('FHI_VIEW_JS', ['ops', 'cascade']), 'fhiCompute');
+  const fh = ibCall(fhRun, 'fibheap');
+  eq(fh('ops', { ops: 'insert 5 insert 3 insert 8 insert 1 insert 9 extract' }, 'fhiActual fhiAmortized fhiPhi fhiMostAm fhiRoots fhiDegree fhiN'),
+     '10 | 11 | t(H) + 2m(H) = 1 + 2 × 0 = 1 | insert 2, extract-min 1 | 3 (min) | max degree 2; ⌊log_φ 4⌋ = 2 | 4',
+     'fibheap/ops: five inserts, then EXTRACT-MIN takes 4 roots (cost 5) and links them into one tree of degree 2');
+  const NINE = 'insert 1 insert 2 insert 3 insert 4 insert 5 insert 6 insert 7 insert 8 insert 9 extract ';
+  eq(fh('ops', { ops: NINE + 'delete 4' }, 'fhiActual fhiAmortized fhiMostAm fhiRoots fhiN'), '24 | 26 | insert 2, extract-min 1, delete 7 | 2 (min), 5 | 7',
+     'fibheap/ops: DELETE 4 = a cut (cost 2) then EXTRACT-MIN of minus infinity (1 + 1 child + 2 roots)');
+  eq(fh('cascade', { ops: NINE + 'decrease 7 1 decrease 8 0' }, 'fhiCuts fhiCascades fhiCalls fhiMarked fhiMostDec fhiLemma fhiDegree fhiRoots'),
+     '3 | 1 | 3 | 0: none | 5 | holds at all 8; closest 0: degree 1, size 2, F(3) = 2 | max degree 2; ⌊log_φ 8⌋ = 4 | 0 (min), 6, 1, 2',
+     'fibheap/cascade: cutting 7 marks 6; cutting 8 then cuts the marked 6 (a cascading cut)');
+  eq(fh('cascade', { ops: NINE + 'decrease 5 0 extract extract' }, 'fhiMarked fhiRoots fhiDegree'), '0: none | 3 (min), 6 | max degree 2; ⌊log_φ 6⌋ = 3',
+     'fibheap/cascade: the marked 4 becomes a root with its parent extracted, and linking it under 3 clears its mark');
+  eq(fh('ops', { ops: 'insert 10 insert 20 insert 30 insert 5 extract' }, 'fhiRoots fhiActual'), '10 (min), 30 | 8',
+     'fibheap/ops: CONSOLIDATE starts at the old minimum\'s right neighbour (10), so 10 takes 20 and 30 stays a root');
+  eq(fhRun('[1, 2, 3, 6, 7, 11, 12, 1000].map(fhiDn).join(" ")'), '0 1 2 3 4 4 5 14', 'fhiDn: ⌊log_φ n⌋ exactly (φ^4 ≈ 6.85, φ^5 ≈ 11.09, φ^14 ≈ 843)');
+  eq(fh('ops', { ops: 'insert 1 extract extract' }, 'fhiActual'), 'REFUSED Operation 3 (extract): the heap is empty', 'fibheap: EXTRACT-MIN of an empty heap refused');
+  eq(fh('ops', { ops: 'insert 4 decrease 4 6' }, 'fhiActual'), 'REFUSED Operation 2 (decrease 4 6): the new key 6 is greater than 4', 'fibheap: a key may not grow');
+  eq(fh('ops', { ops: 'insert 4 frob' }, 'fhiActual'), 'REFUSED Operations, entry 3: "frob" should be insert, min, extract, decrease or delete', 'fibheap: an unknown word');
+
+  /* --- veb (vbi) --------------------------------------------------------- */
+  const vb = ibCall(ibMk(ibBlock('b', 'VBI_JS') + ibViews('VBI_VIEW_JS', ['ops']), 'vbiCompute'), 'veb');
+  eq(vb('ops', { k: '2', ops: 'insert 2 insert 3 insert 7 insert 14 member 7 successor 4 delete 2 successor 0' }, 'vbiU vbiProto vbiVeb vbiMost vbiAnswers vbiMembers vbiTop'),
+     'u = 16, √u = 4, lg lg u = 2 | 48 | 19 | proto-vEB 7, vEB 5 | member 7: yes; successor 4: 7; successor 0: 3 | 3: 3, 7, 14 | min 3, max 14; summary: 1, 3; cluster 1: 3 (7); cluster 3: 2 (14)',
+     'veb: u = 16; proto inserts cost 7 calls each (T(u) = 2T(√u) + 1), vEB inserts 1, 2, 3, 3');
+  eq(vb('ops', { k: '4', ops: 'insert 5 member 5 member 6' }, 'vbiU vbiProto vbiVeb'), 'u = 65,536, √u = 256, lg lg u = 4 | 41 | 7',
+     'veb: u = 65,536; a proto insert makes 31 calls, a member 5 (one per level); vEB finds 5 at the min in 1 call and misses 6 in 5');
+  eq(vb('ops', { k: '2', ops: 'insert 2 insert 9 member 2' }, 'vbiAnswers vbiProto vbiVeb'), 'member 2: yes | 17 | 4',
+     'veb: vEB answers a member query at its min in one call; proto-vEB walks 3 levels');
+  eq(vb('ops', { k: '2', ops: 'insert 3 insert 3' }, 'vbiVeb'), 'REFUSED Operation 2 (insert 3): 3 is already a member; VEB-TREE-INSERT assumes it is not', 'veb: inserting a member refused');
+  eq(vb('ops', { k: '2', ops: 'delete 3' }, 'vbiVeb'), 'REFUSED Operation 1 (delete 3): 3 is not a member; VEB-TREE-DELETE assumes it is', 'veb: deleting a non-member refused');
+  eq(vb('ops', { k: '2', ops: 'successor 16' }, 'vbiVeb'), 'REFUSED Operations, entry 2: with u = 16 an element is from 0 to 15, and it is 16', 'veb: x < u');
+
+  /* --- bfs (bfi) --------------------------------------------------------- */
+  const bf = ibCall(ibMk(ibBlock('b', 'BFI_JS') + ibViews('BFI_VIEW_JS', ['search']), 'bfiCompute'), 'bfs');
+  const BF_ALL = 'bfiDist bfiParent bfiLayers bfiEnqueued bfiScanned bfiUnreached';
+  eq(bf('search', { edges: 's, a; s, b; a, c; b, c; c, d', graph: 'undirected', source: 's' }, BF_ALL),
+     's 0, a 1, b 1, c 2, d 3 | a ← s, b ← s, c ← a, d ← c | 0: s; 1: a b; 2: c; 3: d | 5 of 5 vertices | 10 of 10 (2E) | 0: none', 'bfs: undirected, 2E entries examined');
+  eq(bf('search', { edges: 's, a; s, b; a, c; b, c; c, d', graph: 'directed', source: 's' }, 'bfiScanned'), '5 of 5 (E)', 'bfs: directed, E entries');
+  eq(bf('search', { edges: 's, b; s, a; a, c; b, c', graph: 'undirected', source: 's' }, 'bfiParent'), 'b ← s, a ← s, c ← b', 'bfs: adjacency lists in input order decide the tree');
+  eq(bf('search', { edges: 'a, b; c, d', graph: 'directed', source: 'a', vertices: 'a b c d e' }, BF_ALL),
+     'a 0, b 1, c ∞, d ∞, e ∞ | b ← a | 0: a; 1: b | 2 of 5 vertices | 1 of 2 (E) | 3: c, d, e', 'bfs: unreachable vertices keep d = ∞');
+  eq(bf('search', { edges: 'a, a', graph: 'undirected', source: 'a' }, 'bfiDist'), 'REFUSED Edges, record 1: a to itself is a self-loop, which an undirected graph does not have', 'bfs: no undirected self-loop');
+  eq(bf('search', { edges: 'a, b; b, a', graph: 'undirected', source: 'a' }, 'bfiDist'), 'REFUSED Edges, record 2: the edge b, a is given twice', 'bfs: an undirected edge twice');
+  eq(bf('search', { edges: 'a, b; b, a', graph: 'directed', source: 'a' }, 'bfiScanned'), '2 of 2 (E)', 'bfs: a directed edge each way is two edges');
+  eq(bf('search', { edges: 'a, b', graph: 'directed', source: 'z' }, 'bfiDist'), 'REFUSED The source z is not a vertex of the graph', 'bfs: the source is a vertex');
+}
+// ---- end itakit family B ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the

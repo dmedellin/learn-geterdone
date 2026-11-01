@@ -2148,6 +2148,116 @@ EAA_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Introduction to Algorithms, same shape.
+ITA_PATH_PAGE_PATH = "/paths/intro-algorithms/"
+ITA_MATERIAL_MARKER = "only its proof establishes that"
+ITA_COURSES = (
+    ("intro-algorithms-foundations", "Foundations", (
+        "algorithms-as-a-technology",
+        "insertion-sort-and-loop-invariants",
+        "analyzing-insertion-sort",
+        "merge-sort-and-divide-and-conquer",
+        "asymptotic-notation",
+        "the-maximum-subarray-problem-and-strassen",
+        "solving-recurrences",
+        "the-hiring-problem-and-randomized-algorithms",
+    )),
+    ("intro-algorithms-sorting", "Sorting and Order Statistics", (
+        "heaps",
+        "heapsort-and-priority-queues",
+        "quicksort",
+        "analysis-of-randomized-quicksort",
+        "lower-bounds-and-counting-sort",
+        "radix-sort-and-bucket-sort",
+        "medians-and-order-statistics",
+    )),
+    ("intro-algorithms-data-structures", "Data Structures", (
+        "stacks-queues-and-linked-lists",
+        "hash-tables",
+        "hash-functions",
+        "open-addressing",
+        "binary-search-trees",
+        "red-black-trees",
+        "red-black-insertion-and-deletion",
+        "augmenting-data-structures",
+    )),
+    ("intro-algorithms-design-techniques", "Advanced Design and Analysis Techniques", (
+        "rod-cutting",
+        "matrix-chain-multiplication",
+        "elements-of-dynamic-programming",
+        "longest-common-subsequence",
+        "optimal-binary-search-trees",
+        "activity-selection-and-the-greedy-strategy",
+        "huffman-codes",
+        "matroids-and-greedy-methods",
+        "amortized-analysis",
+    )),
+    ("intro-algorithms-advanced-structures", "Advanced Data Structures", (
+        "b-trees",
+        "fibonacci-heaps",
+        "decrease-key-and-the-degree-bound",
+        "van-emde-boas-trees",
+        "disjoint-sets",
+    )),
+    ("intro-algorithms-graphs", "Graph Algorithms", (
+        "breadth-first-search",
+        "depth-first-search",
+        "topological-sort-and-strong-components",
+        "minimum-spanning-trees",
+        "bellman-ford-and-dag-shortest-paths",
+        "dijkstra-and-difference-constraints",
+        "all-pairs-shortest-paths",
+        "maximum-flow",
+        "maximum-bipartite-matching",
+    )),
+    ("intro-algorithms-algebraic-topics", "Parallel, Matrix, Linear and Number Algorithms", (
+        "multithreaded-algorithms",
+        "solving-linear-systems",
+        "linear-programming-and-the-simplex-algorithm",
+        "duality-and-the-initial-solution",
+        "polynomials-and-the-fft",
+        "number-theoretic-algorithms",
+        "rsa-and-primality-testing",
+    )),
+    ("intro-algorithms-strings-geometry-hardness", "Strings, Geometry and Hardness", (
+        "naive-and-rabin-karp-matching",
+        "automata-and-knuth-morris-pratt",
+        "line-segment-properties",
+        "convex-hull-and-closest-pair",
+        "polynomial-time-and-verification",
+        "np-completeness-and-reductions",
+        "vertex-cover-and-tsp-approximation",
+        "set-cover-randomization-and-subset-sum",
+    )),
+)
+
+ITA_PATH_PAGE_MARKERS = (
+    canonical_marker(ITA_PATH_PAGE_PATH),
+    html.escape(ITA_COURSES[0][1]),
+    html.escape(ITA_COURSES[-1][1]),
+    'href="../../%s/"' % ITA_COURSES[-1][0],
+)
+
+ITA_COURSE_HOMES = tuple(
+    (
+        "ita-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, ITA_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(ITA_COURSES, start=1)
+)
+
+ITA_COURSE_LESSONS = tuple(
+    (
+        "ita-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), ITA_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(ITA_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2249,6 +2359,7 @@ def path_page_targets(args):
         ("read-path", READ_PATH_PAGE_PATH, READ_PATH_PAGE_MARKERS),
         ("cc-path", CC_PATH_PAGE_PATH, CC_PATH_PAGE_MARKERS),
         ("eaa-path", EAA_PATH_PAGE_PATH, EAA_PATH_PAGE_MARKERS),
+        ("ita-path", ITA_PATH_PAGE_PATH, ITA_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2277,7 +2388,8 @@ def course_home_targets(args):
                                     + PHEN_COURSE_HOMES
                                     + READ_COURSE_HOMES
                                     + CC_COURSE_HOMES
-                                    + EAA_COURSE_HOMES):
+                                    + EAA_COURSE_HOMES
+                                    + ITA_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2321,6 +2433,7 @@ def lesson_targets(args):
         + READ_COURSE_LESSONS
         + CC_COURSE_LESSONS
         + EAA_COURSE_LESSONS
+        + ITA_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

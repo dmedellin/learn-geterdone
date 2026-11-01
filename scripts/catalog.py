@@ -39,7 +39,8 @@ GROUPS = (
         "note": "Algorithms, System Design and Operations Research build on "
                 "Discrete Mathematics, the last two on Algebra as well; Code "
                 "Complete and Enterprise Application Patterns assume only that "
-                "you can read a short routine.",
+                "you can read a short routine, Introduction to Algorithms that "
+                "you can program and know induction.",
     },
     {
         "key": "philosophy",
@@ -130,6 +131,15 @@ SUBJECTS = (
         "card": "Martin Fowler&rsquo;s <em>Patterns of Enterprise Application "
                 "Architecture</em>, narrative by narrative, with each "
                 "pattern&rsquo;s trade-off counted on a stated situation.",
+    },
+    {
+        "slug": "intro-algorithms",
+        "group": "computing",
+        "short_title": "Introduction to Algorithms",
+        "kind": "Read along",
+        "card": "Cormen, Leiserson, Rivest and Stein&rsquo;s textbook, read "
+                "chapter by chapter, with each algorithm run and counted in "
+                "the lab.",
     },
     {
         "slug": "philosophy",

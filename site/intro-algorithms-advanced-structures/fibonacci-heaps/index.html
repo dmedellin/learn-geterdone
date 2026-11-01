@@ -1,0 +1,2426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fibonacci Heaps | Lesson | Advanced Data Structures | Introduction to Algorithms, Read Along | Learn · geterdone.io</title>
+  <meta name="description" content="Sections 19.1 and 19.2 build a mergeable heap out of min-heap-ordered trees whose roots sit in one circular list. Insertion and union add roots and do nothing else; EXTRACT-MIN removes the minimum, promotes its children and consolidates the root list until no two roots share a degree. The potential t(H) + 2m(H) turns that bargain into amortized bounds: constant for insertion and union, O(D(n)) for extraction. Run one extraction by hand, then watch the lab charge every operation its actual cost and its change in potential." />
+  <link rel="canonical" href="https://learn.geterdone.io/intro-algorithms-advanced-structures/fibonacci-heaps/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Fibonacci Heaps | Lesson | Advanced Data Structures | Introduction to Algorithms, Read Along | Learn · geterdone.io" />
+  <meta property="og:description" content="Sections 19.1 and 19.2 build a mergeable heap out of min-heap-ordered trees whose roots sit in one circular list. Insertion and union add roots and do nothing else; EXTRACT-MIN removes the minimum, promotes its children and consolidates the root list until no two roots share a degree. The potential t(H) + 2m(H) turns that bargain into amortized bounds: constant for insertion and union, O(D(n)) for extraction. Run one extraction by hand, then watch the lab charge every operation its actual cost and its change in potential." />
+  <meta property="og:url" content="https://learn.geterdone.io/intro-algorithms-advanced-structures/fibonacci-heaps/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Fibonacci Heaps | Lesson | Advanced Data Structures | Introduction to Algorithms, Read Along | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Sections 19.1 and 19.2 build a mergeable heap out of min-heap-ordered trees whose roots sit in one circular list. Insertion and union add roots and do nothing else; EXTRACT-MIN removes the minimum, promotes its children and consolidates the root list until no two roots share a degree. The potential t(H) + 2m(H) turns that bargain into amortized bounds: constant for insertion and union, O(D(n)) for extraction. Run one extraction by hand, then watch the lab charge every operation its actual cost and its change in potential." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/intro-algorithms-advanced-structures/fibonacci-heaps/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    /* The hero's right column carries a monospace key block, and the block is
+       authored to a fixed 46 characters because it is `white-space: pre-wrap`
+       -- a line that does not fit is not reflowed, it is broken.
+       The column holds 46 only while the shell is at its full 1160px, which
+       takes a 1192px viewport. Below that it shrinks fast: 41 characters at
+       1100, 37 at 1024, 31 at 900, and 22 at 721 -- one pixel above the old
+       720px collapse, where the same block jumps back to 63. Every width in
+       that range was WORSE than stacking, so the hero now stacks below the
+       width its own content was written for. Measured in Chrome, not derived.
+       This subsumes the supplemental-only collapse that used to sit at 920. */
+    @media (max-width: 1191px) {
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/intro-algorithms/">Introduction to Algorithms, Read Along</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Advanced Data Structures</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Fibonacci Heaps</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The fibonacci heaps is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Advanced Data Structures &middot; Chapter 19 · Fibonacci Heaps</span>
+        <h1>Fibonacci Heaps</h1>
+        <p>Sections 19.1 and 19.2 build a mergeable heap out of min-heap-ordered trees whose roots sit in one circular list. Insertion and union add roots and do nothing else; EXTRACT-MIN removes the minimum, promotes its children and consolidates the root list until no two roots share a degree. The potential t(H) + 2m(H) turns that bargain into amortized bounds: constant for insertion and union, O(D(n)) for extraction. Run one extraction by hand, then watch the lab charge every operation its actual cost and its change in potential.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" data-say="a list of min-heap-ordered trees. Phi of H equals t of H plus 2 times m of H. insert and union only add roots. EXTRACT-MIN consolidates the roots. after it, no two roots share a degree. extraction is big O of D of n amortized" tabindex="0" role="region" aria-label="Mathematical notation">a list of min-heap-ordered trees
+Φ(H) = t(H) + 2m(H)
+insert and union only add roots
+EXTRACT-MIN consolidates the roots
+after it, no two roots share a degree
+extraction is O(D(n)) amortized</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Sections 19.1 and 19.2 in six lines</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas: the interface the chapter implements, the shape that implements it, and the bookkeeping that prices it.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Mergeable heap</h3><p>A structure supporting MAKE-HEAP, INSERT, MINIMUM, EXTRACT-MIN and UNION, the last combining two heaps into one. Fibonacci heaps add DECREASE-KEY and DELETE, which are the next lesson's. A binary heap does everything but UNION in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>; its union costs <span class="math" data-say="theta of n">Θ(n)</span>, which is the gap this chapter closes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Root list</h3><p>The roots of all the heap's trees, linked in a circular, doubly linked list so that a node can be added or removed anywhere, and two lists spliced together, in constant time. The pointer H.min marks the root with the least key; every other root is unordered, waiting for the next extraction to tidy it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Potential</h3><p>The function <span class="math" data-say="Phi of H equals t of H plus 2 times m of H">Φ(H) = t(H) + 2m(H)</span>: how many trees the root list holds, plus twice the number of marked nodes. It starts at 0 and never goes negative, so by Chapter 17's potential method the amortized costs, each the actual cost plus the change in <span data-say="Phi">Φ</span>, add up to at least the actual total.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The chapter&#x27;s argument first, then the count</h2></div><p>Read the chapter opening and sections 19.1 and 19.2 in your own copy first. The lesson sets out the argument in its own words, runs one extraction by hand, and then lets the lab price every operation of a longer sequence.</p></div>
+      <article class="card card-pad prose"><p>&ldquo;The mergeable-heap operations on Fibonacci heaps delay work as long as possible.&rdquo; That sentence opens Section 19.2, and the whole chapter is an account of what the delay buys and who pays for it. This lesson reads the chapter opening and sections 19.1 and 19.2: the operations a mergeable heap supports, the trees and lists a Fibonacci heap is made of, the potential function, and the three operations that leave all the work to the fourth.</p><p>The chapter opens with a comparison. A binary heap, the structure of Chapter 6, inserts, extracts and decreases keys in <span class="math" data-say="theta of log base 2 of n">Θ(lg n)</span> worst-case time, but uniting two of them means concatenating the arrays and rebuilding, <span class="math" data-say="theta of n">Θ(n)</span>. A Fibonacci heap inserts, unites and decreases a key in <span class="math" data-say="theta of 1">Θ(1)</span> amortized time, and extracts or deletes in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> amortized. The authors name two cautions of their own. These are amortized bounds, not per-operation ones; and the constant factors and the programming effort make the structure, in their words, &ldquo;predominantly of theoretical interest.&rdquo; Its appeal is greatest where extractions are few beside the other operations, as in graph algorithms that may decrease a key once per edge (Chapters 23 and 24).</p><div class="defbox"><span class="label">Definition &middot; Fibonacci heap</span><p>A collection of rooted trees, each obeying the min-heap property, whose roots form a circular, doubly linked root list. Each node keeps a parent pointer, a pointer to one child, its siblings in a circular child list, its degree (the number of children) and a boolean mark. The heap keeps H.min, the root with the least key, and H.n, the number of nodes. Siblings and roots may appear in any order.</p></div><p>Section 19.1 sets up the analysis. With <span class="math" data-say="t of H">t(H)</span> trees in the root list and <span class="math" data-say="m of H">m(H)</span> marked nodes, the potential is <span class="math" data-say="t of H plus 2 times m of H">t(H) + 2m(H)</span>; the marks play no part until the next lesson, and here every mark is false. The analysis also needs a bound <span class="math" data-say="D of n">D(n)</span> on the largest degree a node can have in a heap of n nodes. When only the mergeable-heap operations are used, <span class="math" data-say="D of n is at most the floor of log base 2 of n">D(n) ≤ ⌊lg n⌋</span> (Problem 19-2 asks for the proof); the next lesson shows <span class="math" data-say="D of n equals big O of log base 2 of n">D(n) = O(lg n)</span> in general.</p><p>Section 19.2's first three operations are short. FIB-HEAP-INSERT makes the new node a one-node tree, adds it to the root list beside H.min, and updates H.min if the new key is smaller; t rises by one, so the amortized cost is the constant actual cost plus 1. Finding the minimum reads H.min and changes nothing. FIB-HEAP-UNION splices two root lists and keeps the smaller minimum; the trees and marks of the result are those of the two heaps together, so the potential does not change at all. None of the three ever looks at a tree's shape.</p><p>FIB-HEAP-EXTRACT-MIN is where the delayed work is done. It moves every child of the minimum node z into the root list, removes z, and calls CONSOLIDATE, which takes the roots one at a time and keeps an array A indexed by degree. When a root x arrives and <span class="math" data-say="A at d">A[d]</span> already holds a root y of the same degree d, the two are linked: FIB-HEAP-LINK makes the one with the larger key a child of the other, clears its mark, and raises the survivor's degree to <span class="math" data-say="d plus 1">d + 1</span>, and the step repeats at the new degree. The authors prove the inner loop with an invariant, that at the start of each iteration d is x's degree. At the end at most one root of each degree is left, and the root list is rebuilt from A.</p><div class="thm"><span class="label">Theorem &middot; Extraction is O(D(n)) amortized</span><p>The actual cost is <span class="math" data-say="big O of D of n plus t of H">O(D(n) + t(H))</span>: at most D(n) children are moved, and CONSOLIDATE handles at most <span class="math" data-say="D of n plus t of H minus 1">D(n) + t(H) − 1</span> roots, each link removing one. Afterwards at most <span class="math" data-say="D of n plus 1">D(n) + 1</span> roots remain and no node has been marked, so the potential falls from <span class="math" data-say="t of H plus 2 times m of H">t(H) + 2m(H)</span> to at most <span class="math" data-say="D of n plus 1 plus 2 times m of H">D(n) + 1 + 2m(H)</span>. Scaling the unit of potential to cover the constant in <span class="math" data-say="big O of t of H">O(t(H))</span>, the amortized cost is <span class="math" data-say="big O of D of n">O(D(n))</span>.</p></div><p>The lab does not scale the unit: it charges one step for the minimum, one for each child moved, and one for each root CONSOLIDATE takes, and one unit of potential for each root. On those terms the sum can be done exactly. With c children and t roots before and <span data-say="t prime">t′</span> after, the actual cost is <span class="math" data-say="1 plus c plus t minus 1 plus c">1 + c + (t − 1 + c)</span> and the potential changes by <span class="math" data-say="t prime minus t">t′ − t</span> when no node is marked, so the amortized cost is <span class="math" data-say="2 c plus t prime">2c + t′</span>: the children counted twice and the surviving roots once, both bounded by the degree bound, and the t roots that were waiting cost nothing net.</p><div class="mathblock" data-say="the degree bounds the lab prints, beside the floor of log base 2 of n. n, the floor of log base 2 of n, the floor of log base phi n. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">the degree bounds the lab prints, beside ⌊lg n⌋
+
+n        ⌊lg n⌋     ⌊log_φ n⌋
+4          2           2
+7          2           4
+8          3           4
+16         4           5
+100        6           9</div><p>Now the lab. Type operations as words and keys, <span class="math" data-say="insert 12">insert 12</span>, <span class="math" data-say="min">min</span>, <span class="math" data-say="extract">extract</span>, and it runs them on an empty heap, placing each new root just left of H.min and consolidating from the old minimum's right neighbour, as the chapter's figures do. The tiles are the actual and the amortized cost of the whole sequence; the potential now, written out as <span class="math" data-say="t of H plus 2 times m of H">t(H) + 2m(H)</span>; the largest amortized cost of any one operation of each kind; the root list read from H.min; the largest degree beside <span class="math" data-say="the floor of log base phi n">⌊log_φ n⌋</span>, the bound the next lesson proves; and n. The table prices every operation separately.</p><p>The worked example <code>eight-inserts</code> inserts eight keys and stops. Nothing has been tidied: the root list is all eight keys, the potential is 8, the actual cost is 8 and the amortized cost 16, two per insertion, one spent and one stored. Choose <code>then-extract</code>, which adds one EXTRACT-MIN. The extraction scans seven roots, actual cost 8, and links them into three trees of degrees 0, 1 and 2, so the potential falls from 8 to 3 and the amortized cost is 3; the totals are 16 actual and 19 amortized, and 19 is 16 plus the potential left over, as it must be when the heap started empty.</p><p><code>extract-twice</code> extracts again. Now the minimum has two children, so the extraction moves 2, scans 4 roots and costs 7, and leaves two roots, so its amortized cost is <span class="math" data-say="2 times 2 plus 2 equals 6">2·2 + 2 = 6</span>. <code>seventeen-inserts</code> inserts 17 keys and extracts the least: the single extraction costs 17 actual steps and links all 16 survivors into one tree of degree 4, so the potential falls from 17 to 1 and the amortized cost is 1. The 16 units the insertions stored paid for the 16 roots scanned. <code>mixed</code> interleaves extractions, a <code>min</code> and new insertions, and ends with 7 nodes in three trees, 31 actual steps and 34 amortized; its dearest extraction is charged 9.</p><h3>Exercise</h3><p>On an empty heap, run <span class="math" data-say="insert 6, insert 2, insert 9, insert 4, insert 7, insert 1, insert 8, extract">insert 6, insert 2, insert 9, insert 4, insert 7, insert 1, insert 8, extract</span> by hand, placing each new root just left of H.min and consolidating from the old minimum's right neighbour. Write the root list after the extraction and the extraction's actual cost, change in potential and amortized cost. Then type the operations into the lab.</p><p>Extraction pays for itself because roots carry potential. The next lesson, Decreasing a Key and Bounding the Degree, gives the marks their work, cuts nodes out of their trees in constant amortized time, and proves the degree bound the whole analysis has been assuming.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Fibonacci heaps</h2></div><p>lazy insertion and consolidation in EXTRACT-MIN</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Fibonacci heaps</strong><span>lazy insertion and consolidation in EXTRACT-MIN</span></div>
+      </div>
+      <div class="status-banner" id="fhiStatus" style="margin-top:12px;" aria-live="polite"></div>
+      <div class="table-wrap" id="fhiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fhiTable"></table></div>
+      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Keys are distinct whole numbers and name their nodes. The root list is a circle: INSERT and a cut put the new root just left of H.min; EXTRACT-MIN puts the minimum's children where it was, in their child order, then CONSOLIDATE takes every root once, starting at the old minimum's right neighbour and going right, linking the larger key of two equal-degree roots under the smaller (as its last child, mark cleared) and rebuilding the root list in order of degree. DELETE is DECREASE-KEY to minus infinity, then EXTRACT-MIN. Actual cost, in steps: INSERT 1; MIN 1; EXTRACT-MIN 1 for the minimum + 1 for each child moved to the root list + 1 for each root CONSOLIDATE takes (a link is part of taking a root; the pass over the degree array is not counted); DECREASE-KEY 1 + 1 for each cut, its own and the cascading ones; DELETE the sum of its two parts. Φ = t(H) + 2m(H), roots plus twice the marked nodes; amortized cost = actual + ΔΦ. D(n) = ⌊log_φ n⌋ is found exactly, from φ^k = (L_k + F_k√5)/2.</p>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Run a Fibonacci heap and price every operation</h3>
+          <p>A count over the situation the lesson states. Type operations separated by spaces or commas: insert k, min, extract. The lab runs them on an empty heap and charges each its actual cost in steps and its change in the potential t(H) + 2m(H); their sum is the amortized cost. The totals describe this sequence; the chapter's bounds hold for every sequence.</p>
+        <div class="field">
+          <label for="fhiPreset">Worked example</label>
+          <select id="fhiPreset"><option value="eight-inserts" selected>Eight insertions and nothing else</option><option value="then-extract">The same eight insertions, then one extraction</option><option value="extract-twice">The same eight insertions, then two extractions</option><option value="seventeen-inserts">Seventeen insertions, then one extraction</option><option value="mixed">Eight insertions, an extraction, a min, two insertions, two extractions</option></select>
+        </div>
+        <div class="field">
+          <label for="fhiInOps">Operations (insert k, min, extract, decrease k v, delete k)</label>
+          <textarea id="fhiInOps" rows="3" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">insert 12 insert 7 insert 25 insert 3 insert 18 insert 9 insert 30 insert 15</textarea>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Actual cost, total</span><strong id="fhiActual">&mdash;</strong></div>
+          <div class="kpi"><span>Amortized cost, total</span><strong id="fhiAmortized">&mdash;</strong></div>
+          <div class="kpi"><span>Potential now</span><strong id="fhiPhi">&mdash;</strong></div>
+          <div class="kpi"><span>Largest amortized cost, by operation</span><strong id="fhiMostAm">&mdash;</strong></div>
+          <div class="kpi"><span>Root list from H.min</span><strong id="fhiRoots">&mdash;</strong></div>
+          <div class="kpi"><span>Degree against D(n)</span><strong id="fhiDegree">&mdash;</strong></div>
+          <div class="kpi"><span>Nodes n</span><strong id="fhiN">&mdash;</strong></div>
+        </div>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Running a Fibonacci heap by hand</h2></div><p>Four steps on paper, then one on a sequence of your own.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Keep the root list as a circle</h3><p>Write the roots in a row, read round from H.min. Put each inserted key just left of H.min and move H.min if the new key is smaller. Add 1 to t for each.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Extract: promote, then remove</h3><p>Move the minimum's children into the root list where it stood, remove it, and count 1 plus the number of children.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Consolidate by degree</h3><p>Starting at the old minimum's right neighbour and going round, take each root once. If an earlier root has the same degree, link the larger key under the smaller and check again at the new degree. Count one step for each root taken.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Price it</h3><p>Add the steps for the actual cost, subtract t before from t after for the change in potential, and add the two. With no marks, the result is twice the children plus the roots left.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a sequence of your own</h3><p>Write ten insertions and two extractions, run them by hand, then type them into the lab and compare your root lists and costs with its table.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Roots, links and potential</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Five insertions and one extraction</h3><p>Run <span class="math" data-say="insert 40, insert 10, insert 30, insert 20, insert 50, extract">insert 40, insert 10, insert 30, insert 20, insert 50, extract</span> on an empty heap. Each insertion goes just left of H.min, which is 10 from the second on, so the circle read from 10 is 10, 40, 30, 20, 50.</p><div class="mathblock" data-say="5 insertions, 5 roots, Phi equals 5, cost 5. extract 10, no children, 4 roots left. scan from 40, the right neighbour. 40, 30, link 40 under 30 degree 1. 20, 50, link 50 under 20 degree 1. degree 1 twice, 30 goes under 20. one root, 20, of degree 2, Phi equals 1. actual 1 plus 0 plus 4 equals 5, delta Phi equals negative 4. amortized 5 minus 4 equals 1" tabindex="0" role="region" aria-label="Mathematical notation">5 insertions: 5 roots, Φ = 5, cost 5
+extract 10: no children; 4 roots left
+scan from 40, the right neighbour:
+   40, 30: link 40 under 30 (degree 1)
+   20, 50: link 50 under 20 (degree 1)
+   degree 1 twice: 30 goes under 20
+one root, 20, of degree 2; Φ = 1
+actual 1 + 0 + 4 = 5; ΔΦ = −4
+amortized 5 − 4 = 1</div><p>Over the whole sequence the actual cost is 10 and the amortized cost 11, which is 10 plus the final potential of 1. The tree rooted at 20 has 4 nodes and degree 2, and <span class="math" data-say="the floor of log base phi 4, equals 2">⌊log_φ 4⌋ = 2</span>, so it sits exactly at the degree bound. Type the six operations into the lab to see the same root list and costs.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a constant amortized bound as a cheap operation every time</strong><span>Insertion's amortized cost is 2 in the lab's units, but the amortized bound promises only that the total stays within the sum of the amortized costs. Single operations can be expensive: on <code>seventeen-inserts</code> one extraction costs 17 actual steps. It is cheap amortized, 1, because the insertions before it stored the potential that pays for it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the root list to stay short</strong><span>Nothing tidies the root list except EXTRACT-MIN. Insertions and unions only add roots, so after eight insertions there are eight roots, and a long run of them can leave thousands. Every one carries a unit of potential, and the next extraction spends it; the shortness of the list is a fact about the moment after an extraction, not a rule.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Linking any two roots to shorten the list</strong><span>CONSOLIDATE links only roots of equal degree, and that restriction is what keeps degrees small: two trees of degree d make one of degree d + 1, much as a binomial tree doubles. On the exercise, roots of degrees 2 and 1 are left side by side. Linking unequal roots would shorten the list and lose the bound on degree that the amortized cost of extraction depends on.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run a Fibonacci heap by hand and price each operation.</strong><p>Given six to ten insertions and one or two extractions, produce the root list after each extraction and compute every operation's actual cost, change in t(H) + 2m(H) and amortized cost.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab has no UNION operation, since its change in potential is 0 and its work is one splice; the lesson sets it out in prose. Its actual costs are counts of steps under its stated rules, with one unit of potential a root, and the root-list order is the chapter's convention. Both describe the sequence on screen; the bounds are the chapter's.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../b-trees/" rel="prev"><span>Lesson</span><strong>B-Trees</strong></a>
+      <a class="lesson-link next" href="../decrease-key-and-the-degree-bound/" rel="next"><span>Lesson</span><strong>Decreasing a Key and Bounding the Degree</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="intro-algorithms-advanced-structures/fibonacci-heaps" data-lesson-title="Fibonacci Heaps" data-course-title="Advanced Data Structures">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Advanced Data Structures.</strong> Every figure in this course is computed in your browser by running the structure on the operations a lesson states: the splits, reads and writes of B-tree insertion, the actual and amortized cost of each Fibonacci-heap operation with its potential, the cuts and marks of decreasing keys, the recursive calls of two recursive structures over the same universe, and the pointers walked by every find in a disjoint-set forest. The operations are written for these lessons. A count describes one sequence; the book's bounds are proved for all of them.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count on this path is produced by running the algorithm in your browser on the instance a lesson states, and a count on one instance is evidence about that instance &mdash; the bound the book proves holds for every input, and only its proof establishes that.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Run the exercise, <span class=\"math\" data-say=\"insert 6, insert 2, insert 9, insert 4, insert 7, insert 1, insert 8, extract\">insert 6, insert 2, insert 9, insert 4, insert 7, insert 1, insert 8, extract<\/span>, on an empty heap. What is the root list afterwards, and what are the extraction's actual cost, change in potential and amortized cost?", "a": ["Roots 2 (min) and 7; actual <span data-say=\"7, delta Phi equals negative 5\">7, \u0394\u03a6 = \u22125<\/span>, amortized 2", "Roots 2 (min) and 7; actual <span data-say=\"7, delta Phi equals negative 5\">7, \u0394\u03a6 = \u22125<\/span>, amortized 12", "One root, 2; actual <span data-say=\"7, delta Phi equals negative 6\">7, \u0394\u03a6 = \u22126<\/span>, amortized 1", "Roots 2 (min) and 7; actual <span data-say=\"6, delta Phi equals negative 5\">6, \u0394\u03a6 = \u22125<\/span>, amortized 1"], "c": 0, "why": "Before the extraction the circle from 1 is 1, 2, 6, 9, 4, 7, 8. Removing 1 leaves six roots, scanned from 2: 6 goes under 2, 9 under 4, then 4 under 2 (both degree 1), and 8 under 7. Roots 2, of degree 2, and 7, of degree 1, remain; they differ in degree, so they are not linked, which rules out one root. The actual cost is 1 for the minimum plus 6 roots scanned, 7; t falls from 7 to 2. The amortized cost is <span class=\"math\" data-say=\"7 minus 5 equals 2\">7 \u2212 5 = 2<\/span>, not 7 + 5."}, {"q": "Nine keys are inserted into an empty Fibonacci heap and nothing else is done. What are the potential and the total amortized cost?", "a": ["<span data-say=\"Phi equals 9\">\u03a6 = 9<\/span>, amortized total 18", "<span data-say=\"Phi equals 9\">\u03a6 = 9<\/span>, amortized total 9", "<span data-say=\"Phi equals 1\">\u03a6 = 1<\/span>, amortized total 10", "<span data-say=\"Phi equals 0\">\u03a6 = 0<\/span>, amortized total 9"], "c": 0, "why": "Insertion never links, so nine one-node trees sit in the root list: t = 9, no marks, <span data-say=\"Phi equals 9\">\u03a6 = 9<\/span>. Each insertion costs 1 and raises <span data-say=\"Phi\">\u03a6<\/span> by 1, an amortized 2, 18 in all, which is the actual 9 plus the stored 9. One root would need a consolidation, which only EXTRACT-MIN performs."}, {"q": "Why does EXTRACT-MIN's amortized cost not grow with t(H), the number of roots waiting when it is called?", "a": ["Each root scanned either survives, and there are at most D(n) + 1 survivors, or is linked, and each link lowers the potential by one, paying for its scan", "Because t(H) is never more than D(n) + 1", "Because CONSOLIDATE skips the roots of degree 0", "Because EXTRACT-MIN is called less often than INSERT"], "c": 0, "why": "The scan's cost is proportional to the roots it handles, and every root that does not survive was linked under another, taking one unit of potential with it. The root list can be long before an extraction (eight insertions leave eight roots, beyond <span class=\"math\" data-say=\"D of 8 plus 1\">D(8) + 1<\/span>); only afterwards is it short. CONSOLIDATE takes every root, of any degree. How often operations are called has no place in the bound on each operation's amortized cost."}, {"q": "The lab prints the degree bound <span class=\"math\" data-say=\"the floor of log base phi n\">\u230alog_\u03c6 n\u230b<\/span>. What is it at n = 16, and how does it compare with <span data-say=\"the floor of log base 2 of 16\">\u230alg 16\u230b<\/span>?", "a": ["5, one more than <span data-say=\"the floor of log base 2 of 16, equals 4\">\u230alg 16\u230b = 4<\/span>", "4, the same as <span data-say=\"the floor of log base 2 of 16\">\u230alg 16\u230b<\/span>", "3, one less than <span data-say=\"the floor of log base 2 of 16\">\u230alg 16\u230b<\/span>", "16, since a root can have every node as a child"], "c": 0, "why": "<span data-say=\"phi\">\u03c6<\/span> is about 1.618, so <span class=\"math\" data-say=\"phi to the power 5 is approximately 11.09 is at most 16 is less than phi to the power 6 is approximately 17.94\">\u03c6\u2075 \u2248 11.09 \u2264 16 < \u03c6\u2076 \u2248 17.94<\/span> and <span class=\"math\" data-say=\"the floor of log base phi 16, equals 5\">\u230alog_\u03c6 16\u230b = 5<\/span>. The base <span data-say=\"phi\">\u03c6<\/span> is smaller than 2, so the bound is larger than <span class=\"math\" data-say=\"the floor of log base 2 of 16, equals 4\">\u230alg 16\u230b = 4<\/span>; 4 is the tighter bound Problem 19-2 proves when only mergeable-heap operations are used. A root with fifteen children is impossible because roots are only linked at equal degree."}];
+
+  (function () {
+
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  var EA_DASH = '—', EA_MINUS = '−';
+  function eaEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function eaClean(text) { return String(text === null || text === undefined ? '' : text).replace(/−/g, '-').trim(); }
+  function eaGroup(digits) { return digits.replace(/\B(?=(\d{3})+$)/g, ','); }
+  function eaInt(n) { n = BigInt(n); return (n < 0n ? EA_MINUS : '') + eaGroup(String(n < 0n ? -n : n)); }
+  function eaFrac(r) { return eaInt(r.n) + '/' + eaInt(r.d); }
+  function eaFixed(r, places) {
+    var neg = r.n < 0n, num = neg ? -r.n : r.n, scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / r.d + 1n) / 2n, s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    return (neg && q !== 0n ? EA_MINUS : '') + eaGroup(s.slice(0, s.length - places))
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+  }
+  function eaExactAt(r, places) { return (r.n * 10n ** BigInt(places)) % r.d === 0n; }
+  function eaDigits(n) { return String(n < 0n ? -n : n).length; }
+  function eaBig(r) { return eaDigits(r.n) > 30 || eaDigits(r.d) > 30; }
+  function eaSci(r) {
+    var a = Rabs(r), e = eaDigits(a.n) - eaDigits(a.d);
+    var ten = function (k) { return k >= 0 ? R(10n ** BigInt(k)) : R(1n, 10n ** BigInt(-k)); };
+    if (Rcmp(a, ten(e)) < 0) e -= 1;
+    var t = eaFixed(Rdiv(a, ten(e)), 2);
+    if (t === '10.00') { t = '1.00'; e += 1; }
+    return '≈ ' + (r.n < 0n ? EA_MINUS : '') + t + ' × 10^' + (e < 0 ? EA_MINUS + (-e) : e);
+  }
+  function eaNum(r) {
+    if (eaBig(r)) return eaSci(r);
+    if (Rint(r)) return eaInt(r.n);
+    return eaFrac(r) + (eaExactAt(r, 2) ? ' = ' : ' ≈ ') + eaFixed(r, 2);
+  }
+  function eaPct(r) {
+    var p = Rmul(r, R(100n)), exact = Rint(p) || eaExactAt(p, 1);
+    var d = (Rint(p) ? eaInt(p.n) : eaFixed(p, 1)) + '%';
+    if (eaBig(r)) return (exact ? '= ' : '≈ ') + d;
+    return (Rint(r) ? eaInt(r.n) : eaFrac(r)) + (exact ? ' = ' : ' ≈ ') + d;
+  }
+  function eaTimes(r) {
+    if (eaBig(r)) return eaSci(r) + '×';
+    return Rint(r) ? eaInt(r.n) + '×' : eaFrac(r) + ' ≈ ' + eaFixed(r, 1) + '×';
+  }
+  function eaSigned(n) { n = BigInt(n); return (n > 0n ? '+' : '') + eaInt(n); }
+  function eaNames(list) { return list.length ? list.join(', ') : 'none'; }
+  function eaCount(list) { return list.length + ': ' + eaNames(list); }
+  function eaPlural(n, one, many) { return eaInt(n) + ' ' + (BigInt(n) === 1n ? one : many); }
+  function eaSum(v) { var s = R0; v.forEach(function (x) { s = Radd(s, x); }); return s; }
+  function eaFloor(r) { var q = r.n / r.d; return (r.n < 0n && q * r.d !== r.n) ? q - 1n : q; }
+  function eaCeil(r) { return -eaFloor(Rneg(r)); }
+  function eaRefuse(why) { var e = new Error(why); e.eaRefuse = true; throw e; }
+  function eaRun(fn, inst, opts) {
+    try { return fn(inst, opts || {}); } catch (e) { if (e && e.eaRefuse) return { refuse: e.message }; throw e; }
+  }
+  function eaWhole(r) { return Number(r.n); }
+  function eaSort(list) { return list.slice().sort(function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); }); }
+
+  var EA_NAME = /^[A-Za-z0-9._-]+$/, EA_NUMBER = /^-?(?:\d+(?:\.(\d+))?|\.(\d+))$/;
+  function eaQuote(s) { s = String(s); return '"' + (s.length > 40 ? s.slice(0, 40) + '…' : s) + '"'; }
+  function eaBound(f, key) { return f[key] === undefined ? undefined : Rparse(f[key]); }
+  function eaScalar(f, text, what) {
+    var s = eaClean(text), m, r, lo, hi;
+    switch (f.kind) {
+      case 'name':
+      case 'parent':
+        if (s === '') throw new Error(what + ' is empty');
+        if (s === '-') {
+          if (f.kind === 'parent') return s;
+          throw new Error(what + ' cannot be "-", which marks none');
+        }
+        if (!EA_NAME.test(s)) throw new Error(what + ' ' + eaQuote(s) + ' should be letters, digits, dots, hyphens or underscores');
+        return s;
+      case 'word':
+        if (f.words.indexOf(s) < 0) throw new Error(what + ' should be one of ' + f.words.join(', ') + ', not ' + eaQuote(s));
+        return s;
+      case 'whole':
+        if (s === '') throw new Error(what + ' is empty');
+        if (!/^-?\d+$/.test(s)) throw new Error(what + ' should be a whole number, and ' + eaQuote(s) + ' is not one');
+        r = R(BigInt(s));
+        lo = eaBound(f, 'min'); hi = eaBound(f, 'max');
+        if (Rcmp(r, lo) < 0 || Rcmp(r, hi) > 0) {
+          throw new Error(what + ' is a whole number from ' + eaNum(lo) + ' to ' + eaNum(hi) + ', and it is ' + eaNum(r));
+        }
+        return r;
+      case 'num':
+        if (s === '') throw new Error(what + ' is empty');
+        m = EA_NUMBER.exec(s);
+        if (!m) throw new Error(what + ' should be a number such as 3 or 0.25 (no fractions or exponents), and ' + eaQuote(s) + ' is not one');
+        if ((m[1] || m[2] || '').length > 6) throw new Error(what + ' has more than 6 decimal places');
+        r = Rparse(s);
+        m = s.replace('-', EA_MINUS);
+        if (f.gt !== undefined && Rcmp(r, Rparse(f.gt)) <= 0) throw new Error(what + ' must be more than ' + eaNum(Rparse(f.gt)) + ', and it is ' + m);
+        if (f.min !== undefined && Rcmp(r, Rparse(f.min)) < 0) throw new Error(what + ' cannot be less than ' + eaNum(Rparse(f.min)) + ', and it is ' + m);
+        if (Rcmp(r, Rparse(f.max)) > 0) throw new Error(what + ' is at most ' + eaNum(Rparse(f.max)) + ', and it is ' + m);
+        return r;
+    }
+    throw new Error(what + ': no such kind of field');
+  }
+  function eaSized(n, f, what, things) {
+    if (n < f.lo) throw new Error(what + (n === 0 ? ' is empty' : ': this lab needs at least ' + f.lo + ' ' + things + ', and there ' + (n === 1 ? 'is 1' : 'are ' + n)));
+    if (n > f.hi) throw new Error(what + ': this lab takes at most ' + f.hi + ' ' + things + ', and there are ' + n);
+  }
+  function eaRecords(text, f, what) {
+    var s = eaClean(text), rows = s === '' ? [] : s.split(';').map(function (r) { return r.trim(); });
+    if (rows.length && rows[rows.length - 1] === '') rows.pop();
+    eaSized(rows.length, f, what, 'records');
+    var seen = {};
+    return rows.map(function (row, i) {
+      var cells = row.split(',').map(function (c) { return c.trim(); });
+      if (cells.length !== f.sub.length) {
+        throw new Error(what + ': record ' + (i + 1) + ' has ' + cells.length + ' field' + (cells.length === 1 ? '' : 's')
+          + '; this list needs ' + f.sub.length + ' (' + f.sub.map(function (k) { return k[0]; }).join(', ') + ')');
+      }
+      var rec = {};
+      f.sub.forEach(function (k, j) { rec[k[0]] = eaScalar(k[1], cells[j], what + ', record ' + (i + 1) + ': ' + k[0]); });
+      if (f.unique) {
+        if (Object.prototype.hasOwnProperty.call(seen, cells[0])) throw new Error(what + ' names ' + eaQuote(cells[0]) + ' twice');
+        seen[cells[0]] = true;
+      }
+      return rec;
+    });
+  }
+  function eaPairs(text, f, what) {
+    var s = eaClean(text), out = [], parts = s === '' ? [] : s.split(';');
+    parts.forEach(function (part, i) {
+      part = part.trim();
+      if (part === '' && i === parts.length - 1) return;
+      var m = /^([^=\s]+)\s*=\s*([^=\s]+)$/.exec(part);
+      if (!m || !EA_NAME.test(m[1]) || !EA_NAME.test(m[2]) || m[1] === '-' || m[2] === '-') {
+        throw new Error(what + ': ' + eaQuote(part) + ' should be ' + f.shape + ', two names joined by =');
+      }
+      if (out.some(function (o) { return o.a === m[1]; })) throw new Error(what + ' names ' + eaQuote(m[1]) + ' twice');
+      out.push({ a: m[1], b: m[2] });
+    });
+    if (out.length > f.hi) throw new Error(what + ': this lab takes at most ' + f.hi + ', and there are ' + out.length);
+    return out;
+  }
+  function eaList(text, f, what) {
+    var s = eaClean(text), toks = s === '' ? [] : s.split(/[\s,]+/).filter(function (t) { return t !== ''; });
+    eaSized(toks.length, f, what, f.things);
+    var vals = toks.map(function (t, i) { return eaScalar(f.each, t, what + ', entry ' + (i + 1)); });
+    if (f.each.kind === 'name') {
+      toks.forEach(function (t, i) { if (toks.indexOf(t) !== i) throw new Error(what + ' names ' + eaQuote(t) + ' twice'); });
+    }
+    return vals;
+  }
+  function eaField(f, text) {
+    if (f.kind === 'rec') return eaRecords(text, f, f.what);
+    if (f.kind === 'pairs') return eaPairs(text, f, f.what);
+    if (f.kind === 'list') return eaList(text, f, f.what);
+    return eaScalar(f, text, f.what);
+  }
+  function eaRead(spec, raw) {
+    var out = {};
+    spec.forEach(function (f) { out[f.key] = eaField(f, raw[f.key]); });
+    return out;
+  }
+
+  function eaTableHtml(t, compact) {
+    var h = '<caption style="white-space:normal;">' + eaEsc(t.caption) + '</caption><thead><tr>';
+    if (compact) {
+      h += '<th scope="col" style="text-align:left;white-space:normal;">' + t.head.map(eaEsc).join(' · ') + '</th></tr></thead><tbody>';
+      t.rows.forEach(function (row) {
+        var parts = [];
+        row.forEach(function (cell, k) {
+          if (cell !== '') parts.push('<span style="color:var(--muted);">' + eaEsc(t.head[k]) + '</span> ' + eaEsc(cell));
+        });
+        h += '<tr><td style="text-align:left;white-space:normal;overflow-wrap:anywhere;">' + parts.join(' · ') + '</td></tr>';
+      });
+      return h + '</tbody>';
+    }
+    h += t.head.map(function (x) { return '<th scope="col">' + eaEsc(x) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    t.rows.forEach(function (row) {
+      h += '<tr>' + row.map(function (cell) { return '<td>' + eaEsc(cell) + '</td>'; }).join('') + '</tr>';
+    });
+    return h + '</tbody>';
+  }
+
+  function itaQ(r) { return Rint(r) ? eaInt(r.n) : eaInt(r.n) + '/' + eaInt(r.d); }
+  function itaList(a) {
+    return a.map(function (x) { return typeof x === 'object' ? itaQ(x) : eaInt(x); }).join(', ');
+  }
+  function itaApprox(r, places) { return '≈ ' + eaFixed(r, places); }
+  function itaBitLen(n) { return n.toString(2).length; }
+  function itaLg(n, bits) {
+    n = BigInt(n); bits = bits || 64;
+    var m = BigInt(itaBitLen(n) - 1);
+    if (n === (1n << m)) return { exact: R(m) };
+    var P = BigInt(bits + 24), two = 2n << P;
+    var lo = (n << P) >> m, hi = lo + 1n, digits = 0n, k = 0n;
+    for (var i = 0; i < bits; i += 1) {
+      lo = (lo * lo) >> P; hi = ((hi * hi) >> P) + 1n;
+      if (lo >= two) { digits = digits * 2n + 1n; lo >>= 1n; hi = (hi >> 1n) + 1n; }
+      else if (hi < two) { digits = digits * 2n; }
+      else break;
+      k += 1n;
+    }
+    var scale = 1n << k;
+    return { lo: R(m * scale + digits, scale), hi: R(m * scale + digits + 1n, scale) };
+  }
+  function itaLgCmp(n, x) {
+    n = BigInt(n);
+    var m = BigInt(itaBitLen(n) - 1);
+    if (n === (1n << m)) return Rcmp(R(m), x);
+    if (Rcmp(x, R(m)) <= 0) return 1;
+    if (Rcmp(x, R(m + 1n)) >= 0) return -1;
+    var widths = [64, 256, 1024];
+    for (var i = 0; i < widths.length; i += 1) {
+      var b = itaLg(n, widths[i]);
+      if (Rcmp(x, b.lo) <= 0) return 1;
+      if (Rcmp(x, b.hi) >= 0) return -1;
+    }
+    eaRefuse('lg ' + eaInt(n) + ' and ' + itaQ(x) + ' agree to 1,024 binary places, too close for this lab to compare');
+  }
+  function itaLgMid(n) { var b = itaLg(n, 64); return b.exact || Rdiv(Radd(b.lo, b.hi), R(2n)); }
+
+  var FHI_VIEW = {}, FHI_OPS = 120;
+  function fhiCompute(view, inst, opts) { return eaRun(FHI_VIEW[view], inst, opts); }
+  function fhiOps(toks) {
+    var out = [], i = 0, t, what = 'Operations';
+    var num = function (j, after) {
+      if (j >= toks.length || !/^\d+$/.test(toks[j])) eaRefuse(what + ', entry ' + (j) + ': ' + after + ' needs a key (a whole number) after it');
+      var v = Number(toks[j]);
+      if (v > 1000000) eaRefuse(what + ', entry ' + (j + 1) + ': a key is at most 1,000,000, and it is ' + toks[j]);
+      return v;
+    };
+    while (i < toks.length) {
+      t = toks[i];
+      if (t === 'insert' || t === 'delete') { out.push({ op: t, k: num(i + 1, t) }); i += 2; }
+      else if (t === 'decrease') { var k = num(i + 1, t); out.push({ op: t, k: k, v: num(i + 2, 'decrease ' + k) }); i += 3; }
+      else if (t === 'min' || t === 'extract') { out.push({ op: t }); i += 1; }
+      else if (/^\d+$/.test(t)) eaRefuse(what + ', entry ' + (i + 1) + ': "' + t + '" follows no insert, decrease or delete');
+      else eaRefuse(what + ', entry ' + (i + 1) + ': "' + t + '" should be insert, min, extract, decrease or delete');
+    }
+    return out;
+  }
+  function fhiLess(a, b) { return a.key === null ? b.key !== null : (b.key !== null && a.key < b.key); }
+  function fhiHeap() { return { roots: [], min: null, n: 0, nodes: {} }; }
+  function fhiAddRoot(H, x, update) {
+    if (H.min === null) { H.roots = [x]; H.min = x; return; }
+    H.roots.splice(H.roots.indexOf(H.min), 0, x);
+    if (update && fhiLess(x, H.min)) H.min = x;
+  }
+  function fhiMarks(H) { var m = 0; Object.keys(H.nodes).forEach(function (k) { if (H.nodes[k].mark) m += 1; }); return m; }
+  function fhiPhi(H) { return H.roots.length + 2 * fhiMarks(H); }
+  function fhiInsert(H, k, st) { var x = { key: k, children: [], p: null, mark: false }; H.nodes[k] = x; H.n += 1; fhiAddRoot(H, x, true); st.actual += 1; }
+  function fhiExtract(H, st) {
+    var z = H.min, idx = H.roots.indexOf(z), kids = z.children;
+    kids.forEach(function (x) { x.p = null; });
+    H.roots.splice.apply(H.roots, [idx, 1].concat(kids));
+    st.actual += 1 + kids.length;
+    st.moved = kids.length;
+    if (z.key !== null) delete H.nodes[z.key];
+    H.n -= 1;
+    if (H.roots.length === 0) { H.min = null; st.scanned = 0; return z; }
+    var start = (idx + kids.length) % H.roots.length, order = H.roots.slice(start).concat(H.roots.slice(0, start)), A = [];
+    st.scanned = order.length; st.actual += order.length;
+    order.forEach(function (w) {
+      var x = w, d = x.children.length, y, tmp;
+      while (A[d]) {
+        y = A[d];
+        if (fhiLess(y, x)) { tmp = x; x = y; y = tmp; }
+        x.children.push(y); y.p = x; y.mark = false; st.links += 1;
+        A[d] = null; d += 1;
+      }
+      A[d] = x;
+    });
+    H.roots = []; H.min = null;
+    A.forEach(function (x) { if (x) { H.roots.push(x); if (H.min === null || fhiLess(x, H.min)) H.min = x; } });
+    return z;
+  }
+  function fhiCut(H, x, y, st) {
+    y.children.splice(y.children.indexOf(x), 1);
+    x.p = null; x.mark = false; fhiAddRoot(H, x, false);
+    st.cuts += 1; st.actual += 1;
+  }
+  function fhiCascade(H, y, st) {
+    st.calls += 1;
+    var z = y.p;
+    if (z !== null) {
+      if (!y.mark) y.mark = true;
+      else { fhiCut(H, y, z, st); st.cascades += 1; fhiCascade(H, z, st); }
+    }
+  }
+  function fhiDecrease(H, x, v, st) {
+    if (x.key !== null) delete H.nodes[x.key];
+    x.key = v;
+    if (v !== null) H.nodes[v] = x;
+    st.actual += 1;
+    var y = x.p;
+    if (y !== null && fhiLess(x, y)) { fhiCut(H, x, y, st); fhiCascade(H, y, st); }
+    if (fhiLess(x, H.min)) H.min = x;
+  }
+  function fhiDegree(H) {
+    var d = 0;
+    (function walk(list) { list.forEach(function (x) { if (x.children.length > d) d = x.children.length; walk(x.children); }); })(H.roots);
+    return d;
+  }
+  function fhiDn(n) {
+    var k = 0, L = 2n, F = 0n, L1 = 1n, F1 = 1n, N = BigInt(n), t;
+    while (true) {
+      var rhs = 2n * N - L1;
+      if (rhs < 0n || 5n * F1 * F1 > rhs * rhs) return k;
+      k += 1; t = L1; L1 = L1 + L; L = t; t = F1; F1 = F1 + F; F = t;
+    }
+  }
+  function fhiRootText(H) {
+    if (H.min === null) return 'empty';
+    var i = H.roots.indexOf(H.min), out = [];
+    for (var j = 0; j < H.roots.length; j += 1) { var x = H.roots[(i + j) % H.roots.length]; out.push(x.key + (j === 0 ? ' (min)' : '')); }
+    return out.join(', ');
+  }
+  function fhiSize(x) { var s = 1; x.children.forEach(function (c) { s += fhiSize(c); }); return s; }
+  function fhiRun(toks) {
+    var ops = fhiOps(toks), H = fhiHeap(), log = [];
+    if (ops.length > FHI_OPS) eaRefuse('Operations: this lab runs at most ' + FHI_OPS + ' operations, and there are ' + ops.length);
+    ops.forEach(function (o, i) {
+      var st = { actual: 0, links: 0, cuts: 0, cascades: 0, calls: 0, moved: 0, scanned: 0 }, before = fhiPhi(H), label, res = '';
+      var at = 'Operation ' + (i + 1) + ' (' + o.op + (o.k !== undefined ? ' ' + o.k : '') + (o.v !== undefined ? ' ' + o.v : '') + ')';
+      var has = function (k) { return Object.prototype.hasOwnProperty.call(H.nodes, k); };
+      if (o.op === 'insert') {
+        if (has(o.k)) eaRefuse(at + ': ' + o.k + ' is already in the heap; this lab keeps the keys distinct');
+        fhiInsert(H, o.k, st); label = 'insert ' + o.k;
+      } else if (o.op === 'min') {
+        if (H.min === null) eaRefuse(at + ': the heap is empty');
+        st.actual = 1; label = 'min'; res = String(H.min.key);
+      } else if (o.op === 'extract') {
+        if (H.min === null) eaRefuse(at + ': the heap is empty');
+        res = String(fhiExtract(H, st).key); label = 'extract-min';
+      } else if (o.op === 'decrease') {
+        if (!has(o.k)) eaRefuse(at + ': ' + o.k + ' is not in the heap');
+        if (o.v > o.k) eaRefuse(at + ': the new key ' + o.v + ' is greater than ' + o.k);
+        if (o.v !== o.k && has(o.v)) eaRefuse(at + ': ' + o.v + ' is already in the heap; this lab keeps the keys distinct');
+        fhiDecrease(H, H.nodes[o.k], o.v, st); label = 'decrease ' + o.k + ' → ' + o.v;
+      } else {
+        if (!has(o.k)) eaRefuse(at + ': ' + o.k + ' is not in the heap');
+        fhiDecrease(H, H.nodes[o.k], null, st);
+        fhiExtract(H, st); label = 'delete ' + o.k;
+      }
+      var m = fhiMarks(H);
+      log.push({ label: label, op: o.op, result: res, st: st, before: before, after: H.roots.length + 2 * m, t: H.roots.length, m: m,
+        deg: fhiDegree(H), n: H.n, roots: fhiRootText(H) });
+    });
+    return { H: H, log: log };
+  }
+  function fhiAm(e) { return e.st.actual + e.after - e.before; }
+  function fhiDegText(H) { return 'max degree ' + fhiDegree(H) + (H.n ? '; ⌊log_φ ' + H.n + '⌋ = ' + fhiDn(H.n) : ''); }
+  var FHI_NAME = { insert: 'insert', min: 'min', extract: 'extract-min', decrease: 'decrease-key', 'delete': 'delete' };
+
+  FHI_VIEW.ops = function (inst) {
+    var run = fhiRun(inst.ops), H = run.H, total = 0, am = 0, most = {}, order = [], rows = [];
+    run.log.forEach(function (e) {
+      var a = fhiAm(e);
+      total += e.st.actual; am += a;
+      if (most[e.op] === undefined) { most[e.op] = a; order.push(e.op); } else if (a > most[e.op]) most[e.op] = a;
+      rows.push([e.label, e.result, String(e.st.actual), String(e.t), String(e.m), String(e.after), eaSigned(BigInt(e.after - e.before)), String(a), e.roots]);
+    });
+    var m = fhiMarks(H);
+    return {
+      tiles: { fhiActual: eaInt(total), fhiAmortized: eaInt(am), fhiPhi: 't(H) + 2m(H) = ' + H.roots.length + ' + 2 × ' + m + ' = ' + (H.roots.length + 2 * m),
+        fhiMostAm: order.map(function (o) { return FHI_NAME[o] + ' ' + most[o]; }).join(', '), fhiRoots: fhiRootText(H),
+        fhiDegree: fhiDegText(H), fhiN: eaInt(H.n) },
+      status: 'The amortized costs add up to the actual costs plus the final potential (' + eaInt(am) + ' = ' + eaInt(total) + ' + ' + fhiPhi(H)
+        + ', the heap starting empty); since Φ is never negative, they bound the actual total.',
+      table: { caption: 'Each operation: its actual cost, t(H), m(H) and Φ after it, ΔΦ, its amortized cost and the root list from H.min',
+        head: ['operation', 'result', 'actual', 't', 'm', 'Φ', 'ΔΦ', 'amortized', 'root list'], rows: rows }
+    };
+  };
+  var PRESETS = {"eight-inserts": {"ops": "insert 12 insert 7 insert 25 insert 3 insert 18 insert 9 insert 30 insert 15"}, "then-extract": {"ops": "insert 12 insert 7 insert 25 insert 3 insert 18 insert 9 insert 30 insert 15 extract"}, "extract-twice": {"ops": "insert 12 insert 7 insert 25 insert 3 insert 18 insert 9 insert 30 insert 15 extract extract"}, "seventeen-inserts": {"ops": "insert 1 insert 2 insert 3 insert 4 insert 5 insert 6 insert 7 insert 8 insert 9 insert 10 insert 11 insert 12 insert 13 insert 14 insert 15 insert 16 insert 17 extract"}, "mixed": {"ops": "insert 12 insert 7 insert 25 insert 3 insert 18 insert 9 insert 30 insert 15 extract min insert 1 insert 40 extract extract"}};
+  var SPEC = [{"what": "Operations (insert k, min, extract, decrease k v, delete k)", "control": "area", "rows": 3, "kind": "list", "lo": 1, "hi": 400, "things": "words and numbers", "each": {"kind": "parent"}, "key": "ops", "id": "fhiInOps"}];
+  var TILES = ["fhiActual", "fhiAmortized", "fhiPhi", "fhiMostAm", "fhiRoots", "fhiDegree", "fhiN"];
+  var FIXED = {};
+  var VIEW = "ops";
+
+  function eaEl(id) { return document.getElementById(id); }
+  var eaPresetS = eaEl('fhiPreset'), eaStatusEl = eaEl('fhiStatus'), eaTableEl = eaEl('fhiTable');
+  function eaRed(why) {
+    TILES.forEach(function (id) { eaEl(id).textContent = EA_DASH; });
+    eaLastTable = null;
+    eaTableEl.innerHTML = '';
+    eaStatusEl.innerHTML = '<span class="tone-red">' + eaEsc(String(why).replace(/\.$/, '')) + '.</span>';
+  }
+  function eaRedraw() {
+    var raw = {}, inst, out;
+    SPEC.forEach(function (f) { raw[f.key] = eaEl(f.id).value; });
+    try { inst = eaRead(SPEC, raw); } catch (err) { eaRed(err.message); return; }
+    out = fhiCompute(VIEW, inst, FIXED);
+    if (out.refuse) { eaRed(out.refuse); return; }
+    TILES.forEach(function (id) { eaEl(id).textContent = out.tiles[id] === undefined ? EA_DASH : out.tiles[id]; });
+    eaPaint(out.table || null);
+    eaStatusEl.textContent = out.status;
+  }
+  var eaLastTable = null;
+  function eaPaint(t) {
+    eaLastTable = t;
+    if (!t) { eaTableEl.innerHTML = ''; return; }
+    eaTableEl.innerHTML = eaTableHtml(t, false);
+    var box = eaEl('fhiTableBox');
+    if (box && box.clientWidth > 0 && Math.max(eaTableEl.offsetWidth || 0, box.scrollWidth || 0) > box.clientWidth) eaTableEl.innerHTML = eaTableHtml(t, true);
+  }
+  if (window.addEventListener) window.addEventListener('resize', function () { if (eaLastTable) eaPaint(eaLastTable); });
+  function eaFill(id) {
+    var inst = PRESETS[id];
+    if (!inst) return false;
+    SPEC.forEach(function (f) { if (inst[f.key] !== undefined) eaEl(f.id).value = inst[f.key]; });
+    return true;
+  }
+  eaPresetS.addEventListener('change', function () { if (eaFill(eaPresetS.value)) eaRedraw(); });
+  SPEC.forEach(function (f) {
+    eaEl(f.id).addEventListener(f.control === 'select' ? 'change' : 'input', eaRedraw);
+  });
+  eaFill(eaPresetS.value);
+  eaRedraw();
+  window.redrawLab = eaRedraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "intro-algorithms-advanced-structures/fibonacci-heaps";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+
+  (function () {
+    var synth = window.speechSynthesis, main = document.getElementById('main');
+    if (!synth || !window.SpeechSynthesisUtterance || !main) return;
+    var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
+      + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
+    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+      + '.defbox>.label,.thm>.label,.example>.label';
+    var css = document.createElement('style');
+    css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
+      + 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;max-width:calc(100vw - 32px);'
+      + 'background:var(--panel-solid,var(--panel-2));border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow)}'
+      + '.listen-bar[hidden]{display:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{padding:7px 11px;font-size:.83rem;white-space:nowrap}'
+      + '.listen-status{font-size:.8rem;color:var(--muted);padding:0 4px}'
+      + '.listen-voice{max-width:14em;min-height:44px;padding:6px 8px;font:inherit;font-size:.8rem;color:var(--text);'
+      + 'background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px}.listen-voice[hidden]{display:none}'
+      + '.listen-current{outline:2px solid var(--cyan);outline-offset:4px}'
+      + '@media (max-width:560px){.listen-bar{left:16px;right:16px;transform:none;max-width:none;justify-content:space-between;gap:4px}'
+      + '.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;padding:7px 4px;font-size:.8rem}.listen-status{order:-1;flex:1 1 25%}.listen-voice[hidden]+.listen-status{flex-basis:100%;text-align:center}'
+      + '.listen-voice{order:-1;flex:1 1 60%;max-width:none}.listen-bar .btn,body[data-page-kind] .listen-bar .btn{flex-basis:18%}}'
+      + '@media print{.listen-bar,.listen-start{display:none}}';
+    document.head.appendChild(css);
+
+    function spoken(node) {
+      if (node.nodeType === 3) return node.nodeValue;
+      if (node.nodeType !== 1 || node.matches(SKIP) || node.classList.contains('qed')) return '';
+      if (node.hasAttribute('data-say')) return ' ' + node.getAttribute('data-say') + ' ';
+      var out = '';
+      for (var c = node.firstChild; c; c = c.nextSibling) out += spoken(c);
+      return out + ' ';  // <strong>Finish.</strong><p>You ... must not run together
+    }
+    function text(el) {
+      if (el.matches('table')) return 'a table, shown on the page.';
+      if (el.matches('pre:not([data-say])')) return 'a code block, shown on the page.';
+      // Definition · Sets: a voice may say middle dot; it is a pause
+      return spoken(el).replace(/\s+\u00b7\s+/g, ', ').replace(/\s+/g, ' ').trim();
+    }
+    // A Chrome network voice stops after about fifteen seconds of one
+    // utterance, so a long block is spoken a sentence or two at a time.
+    function chunks(s) {
+      var parts = [];
+      // No lookbehind: Safari before 16.4 cannot parse it, and this script
+      // shares one <script> element with the theme, quiz, lab and progress code.
+      s.replace(/([.!?;])\s+/g, '$1\n').split('\n').forEach(function (p) {
+        parts = parts.concat(p.length > 220 ? p.replace(/,\s+/g, ',\n').split('\n') : [p]);
+      });
+      var out = [], cur = '';
+      parts.forEach(function (p) {
+        if (cur && (cur + ' ' + p).length > 220) { out.push(cur); cur = p; }
+        else cur = cur ? cur + ' ' + p : p;
+      });
+      if (cur) out.push(cur);
+      return out;
+    }
+    var blocks = [];
+    main.querySelectorAll(BLOCK).forEach(function (el) {
+      if (el.closest(SKIP) || (el.parentElement && el.parentElement.closest(BLOCK))) return;
+      if (!el.getClientRects().length) return;
+      var t = text(el);
+      if (t) blocks.push({ el: el, parts: chunks(t) });
+    });
+    if (!blocks.length) return;
+
+    var RATES = [0.8, 1, 1.25, 1.5], rate = 1;
+    try { rate = +localStorage.getItem('learn-listen-rate') || 1; } catch (e) {}
+    if (RATES.indexOf(rate) < 0) rate = 1;
+    function btn(label, aria) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    }
+    var start = btn('Listen', 'Listen to this lesson');
+    start.classList.add('listen-start');
+    var actions = main.querySelector('.hero-actions');
+    if (actions) actions.appendChild(start);
+    else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
+
+    var bar = document.createElement('div');
+    bar.className = 'listen-bar'; bar.hidden = true;
+    bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Listen');
+    var prev = btn('‹ Back', 'Previous paragraph'), play = btn('Pause'),
+        next = btn('Next ›', 'Next paragraph'), speed = btn(rate + '×', 'Reading speed ' + rate + '×'),
+        stop = btn('Stop'), status = document.createElement('span');
+    status.className = 'listen-status';  // not live: 3 of 42 at each block would talk over the voice
+    var picker = document.createElement('select');
+    picker.className = 'listen-voice'; picker.setAttribute('aria-label', 'Voice'); picker.hidden = true;
+    [prev, play, next, speed, stop, picker, status].forEach(function (n) { bar.appendChild(n); });
+    document.body.appendChild(bar);
+
+    // Voices differ more than anything else here: a neural voice (Edge Natural,
+    // Apple Premium or Enhanced, Siri) sounds like a person and eSpeak like a
+    // machine. Rank by what the name says, best first; the reader can override,
+    // and the choice is remembered. The language is the page language, not the
+    // browser language: a German browser must not read English with a German voice.
+    // A network voice sends the text to its vendor, so its label says (online).
+    // The eSpeak tier is a name match only; speech-dispatcher usually names its
+    // voices by language, and those sit in the plain-local tier.
+    var voice = null, voices = [], chosen = null;
+    function quality(v) {
+      if (/natural|neural|premium|enhanced|siri/i.test(v.name)) return 3;
+      if (/google|online/i.test(v.name)) return 2;
+      return /espeak/i.test(v.name) ? 0 : 1;
+    }
+    function pickVoice() {
+      var lang = (document.documentElement.lang || 'en').slice(0, 2), saved = null;
+      voices = synth.getVoices().filter(function (v) { return v.lang.slice(0, 2) === lang; });
+      voices.sort(function (a, b) {
+        return quality(b) - quality(a) || (b.default ? 1 : 0) - (a.default ? 1 : 0)
+          || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+      });
+      try { saved = localStorage.getItem('learn-listen-voice'); } catch (e) {}
+      saved = chosen || saved;  // a pick survives a voice list refresh even if storage failed
+      voice = voices.filter(function (v) { return v.voiceURI === saved; })[0] || voices[0] || null;
+      picker.textContent = '';
+      voices.forEach(function (v) {
+        var o = document.createElement('option');
+        o.textContent = v.name.replace(/^(Microsoft|Google) /, '').replace(/ - .*$/, '')
+          + (!v.localService && !/online/i.test(v.name) ? ' (online)' : '');
+        o.selected = v === voice;
+        picker.appendChild(o);
+      });
+      picker.hidden = voices.length < 2;
+    }
+    pickVoice();
+    if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged', pickVoice);
+    picker.addEventListener('change', function () {
+      voice = voices[picker.selectedIndex] || null;
+      chosen = voice ? voice.voiceURI : null;
+      try { localStorage.setItem('learn-listen-voice', voice ? voice.voiceURI : ''); } catch (e) {}
+      if (playing) say();
+    });
+
+    var at = 0, part = 0, playing = false, token = 0, heard = false, current = null;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function mark(el) {
+      if (current) current.classList.remove('listen-current');
+      current = el;
+      if (!el) return;
+      el.classList.add('listen-current');
+      var r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight - 80)
+        el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+    function count() { status.removeAttribute('role'); status.textContent = (at + 1) + ' of ' + blocks.length; }
+    function fail() { status.setAttribute('role', 'alert'); status.textContent = 'No voice is available on this device'; }
+    function say() {
+      var mine = ++token, busy = synth.speaking || synth.pending;
+      if (busy) synth.cancel();
+      if (at >= blocks.length) { finish(); return; }
+      var b = blocks[at];
+      mark(b.el);
+      count();
+      var u = new SpeechSynthesisUtterance(b.parts[part]);
+      u.rate = rate; u.lang = document.documentElement.lang || 'en';
+      if (voice) u.voice = voice;
+      u.onstart = function () { heard = true; if (mine === token) count(); };
+      u.onend = function () {
+        if (mine !== token || !playing) return;
+        if (++part >= b.parts.length) { part = 0; at++; }
+        say();
+      };
+      u.onerror = function (e) {
+        if (mine !== token || e.error === 'interrupted' || e.error === 'canceled') return;
+        playing = false; play.textContent = 'Play'; fail();
+      };
+      // Chrome (Android especially) can drop an utterance spoken in the same
+      // tick as a cancel.
+      if (busy) setTimeout(function () { if (mine === token) synth.speak(u); }, 0);
+      else synth.speak(u);
+    }
+    function go(i) { at = Math.max(0, Math.min(blocks.length - 1, i)); part = 0; if (playing) say(); else { mark(blocks[at].el); count(); } }
+    function begin() {
+      bar.hidden = false; playing = true; play.textContent = 'Pause'; heard = false;
+      say();
+      setTimeout(function () {
+        if (playing && !heard) fail();
+      }, 2500);
+    }
+    function finish() {
+      playing = false; token++; synth.cancel(); mark(null);
+      bar.hidden = true; at = 0; part = 0; start.focus({ preventScroll: true });
+    }
+    start.addEventListener('click', function () {
+      if (bar.hidden) { at = 0; part = 0; }
+      begin();
+      play.focus({ preventScroll: true });  // the bar sits at the end of <body>
+    });
+    // Pause and speed resume from the current sentence, not the start of the block.
+    play.addEventListener('click', function () {
+      if (playing) { playing = false; token++; synth.cancel(); play.textContent = 'Play'; }
+      else begin();
+    });
+    prev.addEventListener('click', function () { go(at - 1); });
+    next.addEventListener('click', function () { go(at + 1); });
+    stop.addEventListener('click', finish);
+    speed.addEventListener('click', function () {
+      rate = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
+      speed.textContent = rate + '×';
+      speed.setAttribute('aria-label', 'Reading speed ' + rate + '×');
+      try { localStorage.setItem('learn-listen-rate', String(rate)); } catch (e) {}
+      if (playing) say();
+    });
+    addEventListener('pagehide', function () {
+      token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+  </script>
+</body>
+</html>
