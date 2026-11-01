@@ -22775,10 +22775,10 @@ console.log('design patterns: gofkit family A, three modes');
   eq(cl('factory', Object.assign({ scheme: 'abstract-factory', change: 'family' }, FAM), 'gclAdded gclChanged'),
      '3 (12 → 15): 1 concrete factory, 2 concrete products | 0', 'classes/factory: a new family under Abstract Factory edits nothing');
   eq(cl('factory', Object.assign({ scheme: 'factory-method', change: 'kind' }, FAM), 'gclClasses gclFactories gclAdded gclChanged'),
-     '2 + 6 + 2 + 6 = 16 | 2 + 6 = 8 | 8 (16 → 24): 1 abstract creator, 3 creator subclasses, 1 abstract product, 3 concrete products | 0',
-     'classes/factory: Factory Method, one creator subclass per concrete product');
-  eq(cl('factory', Object.assign({ scheme: 'factory-method', change: 'family' }, FAM), 'gclAdded'),
-     '4 (16 → 20): 2 creator subclasses, 2 concrete products', 'classes/factory: a new family under Factory Method adds a creator per kind');
+     '1 + 3 + 2 + 6 = 12 | 1 + 3 = 4 | 4 (12 → 16): 1 abstract product, 3 concrete products | 4: the abstract creator and 3 concrete creators, each given a factory method for the new kind',
+     'classes/factory: Factory Method, one concrete creator per family; a new kind edits every creator');
+  eq(cl('factory', Object.assign({ scheme: 'factory-method', change: 'family' }, FAM), 'gclAdded gclChanged'),
+     '3 (12 → 15): 1 concrete creator, 2 concrete products | 0', 'classes/factory: a new family under Factory Method adds one creator subclass');
   eq(cl('factory', Object.assign({ scheme: 'prototype', change: 'family' }, FAM), 'gclClasses gclFactories gclConfigs gclAdded gclConfigChange'),
      '1 + 2 + 6 = 9 | 1 | 3 configurations of 2 prototypes (6 instances) | 2 (9 → 11): 2 concrete products | 1 added, registering 2 prototypes',
      'classes/factory: Prototype replaces factory subclasses with configured instances');

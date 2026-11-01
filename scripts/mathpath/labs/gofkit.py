@@ -126,13 +126,13 @@ GCL_VIEW_JS["factory"] = r"""
   /* Roles in display order: [key, label, one of them, formula]. */
   var GCL_ROLES = [
     ['af', 'abstract factory', 'abstract factory', '1'], ['cf', 'concrete factories', 'concrete factory', 'families'],
-    ['ac', 'abstract creators', 'abstract creator', 'kinds'], ['cs', 'creator subclasses', 'creator subclass', 'families × kinds'],
+    ['ac', 'abstract creator', 'abstract creator', '1'], ['cs', 'concrete creators', 'concrete creator', 'families'],
     ['pm', 'prototype manager', 'prototype manager', '1'],
     ['ap', 'abstract products', 'abstract product', 'kinds'], ['cp', 'concrete products', 'concrete product', 'families × kinds']];
   function gclDesign(scheme, F, K) {
     var d = { ap: K, cp: F * K };
     if (scheme === 'abstract-factory') { d.af = 1; d.cf = F; }
-    else if (scheme === 'factory-method') { d.ac = K; d.cs = F * K; }
+    else if (scheme === 'factory-method') { d.ac = 1; d.cs = F; }
     else { d.pm = 1; }
     return d;
   }
@@ -155,9 +155,12 @@ GCL_VIEW_JS["factory"] = r"""
     if (ch === 'kind' && sc === 'abstract-factory') {
       changed = 1 + F;
       changedText = eaInt(changed) + ': the abstract factory and ' + eaPlural(F, 'concrete factory', 'concrete factories') + ', each given an operation to make the new kind';
+    } else if (ch === 'kind' && sc === 'factory-method') {
+      changed = 1 + F;
+      changedText = eaInt(changed) + ': the abstract creator and ' + eaPlural(F, 'concrete creator', 'concrete creators') + ', each given a factory method for the new kind';
     }
     rows.push(['in all', '', eaInt(n)].concat(ch === 'none' ? [] : [eaInt(nAfter) + ' (+' + (nAfter - n) + ')']));
-    var factories = sc === 'abstract-factory' ? '1 + ' + F + ' = ' + (1 + F) : (sc === 'factory-method' ? K + ' + ' + (F * K) + ' = ' + (K + F * K) : '1');
+    var factories = sc === 'abstract-factory' ? '1 + ' + F + ' = ' + (1 + F) : (sc === 'factory-method' ? '1 + ' + F + ' = ' + (1 + F) : '1');
     var cfg = proto ? eaPlural(F, 'configuration', 'configurations') + ' of ' + eaPlural(K, 'prototype', 'prototypes') + ' (' + eaInt(F * K) + ' instances)'
       : 'none: the factory classes themselves fix what is made';
     var cfgChange = 'no change chosen';
@@ -680,14 +683,16 @@ _EXPLOSION_RULES = (
 _FACTORY_RULES = (
     "F families × K kinds of product. Every scheme has K abstract products and F × K concrete product classes, "
     "counted as if each concrete product differs in behaviour. Abstract Factory adds 1 abstract factory and 1 "
-    "concrete factory per family: 1 + F + K + F × K. Factory Method mirrors the products with creators, 1 abstract "
-    "creator per kind and 1 creator subclass per concrete product: K + F × K + K + F × K. Prototype adds 1 "
+    "concrete factory per family: 1 + F + K + F × K. Factory Method has 1 abstract creator declaring one factory "
+    "method per kind and 1 concrete creator subclass per family overriding them: 1 + F + K + F × K, the same "
+    "count, the difference being that the client subclasses the creator instead of composing with a factory "
+    "object. Prototype adds 1 "
     "prototype manager, a registry keyed by kind, and no factory subclasses: 1 + K + F × K; a family is a "
     "configuration of K prototype instances. A new family adds its K products and, under Abstract Factory, 1 "
-    "concrete factory, under Factory Method K creator subclasses, under Prototype 1 configuration; it edits no "
-    "existing class. A new kind adds 1 abstract product and F concrete products, and under Factory Method 1 "
-    "abstract creator and F creator subclasses; under Abstract Factory it edits the abstract factory and every "
-    "concrete factory (1 + F classes), each gaining an operation; under Prototype it edits no class, and each of the "
+    "concrete factory, under Factory Method 1 concrete creator, under Prototype 1 configuration; it edits no "
+    "existing class. A new kind adds 1 abstract product and F concrete products; under Abstract Factory it "
+    "edits the abstract factory and every concrete factory (1 + F classes), each gaining an operation, and under "
+    "Factory Method the abstract creator and every concrete creator (1 + F), each gaining a factory method; under Prototype it edits no class, and each of the "
     "F configurations registers one more prototype. The client is not counted.")
 
 CLASSES = {
@@ -812,7 +817,7 @@ EXPR = {
             "rules": "The language: numbers (at most 6 decimal places, at most 10,000,000), variables (a letter, then "
                      "letters, digits or underscores; letter case counts), + - * /, a minus in front, and "
                      "parentheses. * and / bind tighter than + and -, a leading minus tighter than either, and each "
-                     "operator groups from the left (8 - 3 - 2 is (8 - 3) - 2). Each number, variable and operator "
+                     "operator groups from the left (8 - 3 - 2 takes away the 3 first and then the 2). Each number, variable and operator "
                      "is one node, of the class Number, Variable, Add, Subtract, Multiply, Divide or Negate; "
                      "parentheses make no node, and -3 is a Negate of the Number 3. Interpreting the root makes one "
                      "interpret call per node. Values are exact fractions; a variable takes its value from the "
@@ -883,9 +888,9 @@ SAMPLES = [{'mode': 'classes',
                'label': 'The bakery under Factory Method, a new family',
                'scheme': 'factory-method',
                'change': 'family',
-               'expect': {'gclClasses': '2 + 6 + 2 + 6 = 16',
-                          'gclFactories': '2 + 6 = 8',
-                          'gclAdded': '4 (16 → 20): 2 creator subclasses, 2 concrete products',
+               'expect': {'gclClasses': '1 + 3 + 2 + 6 = 12',
+                          'gclFactories': '1 + 3 = 4',
+                          'gclAdded': '3 (12 → 15): 1 concrete creator, 2 concrete products',
                           'gclChanged': '0'}},
               {'id': 'proto-kind',
                'label': 'The bakery under Prototype, a new kind',

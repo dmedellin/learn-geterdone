@@ -1,5 +1,12 @@
 # gofkit (Design Patterns, Read Along): kit report
 
+**Change, 2026-11-01:** the factory-method scheme of classes/factory now
+counts the book's convention, 1 abstract creator + 1 concrete creator per
+family (was 1 abstract creator per kind + 1 creator subclass per product).
+Tile ids are unchanged; gclClasses, gclFactories, gclAdded and gclChanged
+print new strings under factory-method, and the table's rows are now
+"abstract creator" and "concrete creators".
+
 Lesson authors configure a lab from this report alone. It records the kit as
 built to `docs/design-patterns/PLAN.md` §0 and §D. Family A (classes, tree,
 expr) is `gofkit.py` and is reported here first; family B's section (route,
@@ -141,38 +148,41 @@ the rest). Nothing typed is evaluated as script.
   - gclFactories, Classes that create (factories or creators), `1 + 3 = 4`;
   - gclConfigs, Prototype configurations, `none: the factory classes themselves fix what is made` (under prototype: `3 configurations of 2 prototypes (6 instances)`);
   - gclAdded, Classes the change adds, `4 (12 → 16): 1 abstract product, 3 concrete products`;
-  - gclChanged, Existing classes the change edits, `4: the abstract factory and 3 concrete factories, each given an operation to make the new kind` (every other case `0`);
+  - gclChanged, Existing classes the change edits, `4: the abstract factory and 3 concrete factories, each given an operation to make the new kind` (factory-method, kind: `4: the abstract creator and 3 concrete creators, each given a factory method for the new kind`; every other case `0`);
   - gclConfigChange, Configurations the change touches, `none: this scheme configures no prototypes` (under prototype: `1 added, registering 2 prototypes` for a family; `3 changed, each registering 1 more prototype` for a kind).
 
   With `change` `none` the three change tiles read `no change chosen`.
   Status: "abstract-factory: 3 × 2 products in 12 classes; a new kind of
   product adds 4 and edits 4; the count is of the design stated." Table: one
   row per class role the scheme has (abstract factory, concrete factories,
-  abstract creators, creator subclasses, prototype manager, abstract
+  abstract creator, concrete creators, prototype manager, abstract
   products, concrete products) with its formula, its count now and, with a
   change, after (`3 (+1)`), then `in all`.
 
   Rules: "F families × K kinds of product. Every scheme has K abstract
   products and F × K concrete product classes, counted as if each concrete
   product differs in behaviour. Abstract Factory adds 1 abstract factory and 1
-  concrete factory per family: 1 + F + K + F × K. Factory Method mirrors the
-  products with creators, 1 abstract creator per kind and 1 creator subclass
-  per concrete product: K + F × K + K + F × K. Prototype adds 1 prototype
+  concrete factory per family: 1 + F + K + F × K. Factory Method has 1
+  abstract creator declaring one factory method per kind and 1 concrete
+  creator subclass per family overriding them: 1 + F + K + F × K, the same
+  count, the difference being that the client subclasses the creator instead
+  of composing with a factory object. Prototype adds 1 prototype
   manager, a registry keyed by kind, and no factory subclasses: 1 + K + F × K;
   a family is a configuration of K prototype instances. A new family adds its
   K products and, under Abstract Factory, 1 concrete factory, under Factory
-  Method K creator subclasses, under Prototype 1 configuration; it edits no
-  existing class. A new kind adds 1 abstract product and F concrete products,
-  and under Factory Method 1 abstract creator and F creator subclasses; under
-  Abstract Factory it edits the abstract factory and every concrete factory
-  (1 + F classes), each gaining an operation; under Prototype it edits no
+  Method 1 concrete creator, under Prototype 1 configuration; it edits no
+  existing class. A new kind adds 1 abstract product and F concrete products;
+  under Abstract Factory it edits the abstract factory and every concrete
+  factory (1 + F classes), each gaining an operation, and under Factory Method
+  the abstract creator and every concrete creator (1 + F), each gaining a
+  factory method; under Prototype it edits no
   class, and each of the F configurations registers one more prototype. The
   client is not counted."
 
   Refuses only what the field parser refuses (an empty list, more than 8, a
   repeated name). A family may share a name with a kind. Further figures:
-  `fm-family` (factory-method, family): gclClasses `2 + 6 + 2 + 6 = 16`,
-  gclFactories `2 + 6 = 8`, gclAdded `4 (16 → 20): 2 creator subclasses, 2
+  `fm-family` (factory-method, family): gclClasses `1 + 3 + 2 + 6 = 12`,
+  gclFactories `1 + 3 = 4`, gclAdded `3 (12 → 15): 1 concrete creator, 2
   concrete products`, gclChanged `0`; `proto-kind` (prototype, kind):
   gclClasses `1 + 2 + 6 = 9`, gclFactories `1`, gclAdded `4 (9 → 13): 1
   abstract product, 3 concrete products`. The Discussion of Creational
@@ -350,14 +360,15 @@ follows.
   totals on the addition tiles.
 - **factory, Abstract Factory**: 1 + F + K + F·K, as §D; a new kind adds 1 + F
   and edits 1 + F; a new family adds K + 1 and edits 0.
-- **factory, Factory Method: deviation.** §D has 1 abstract creator; the kit
-  has **one abstract creator per kind** (the creator hierarchy parallels the
-  product hierarchy, each abstract creator's factory method returning its
-  kind's abstract product) and one creator subclass per concrete product:
-  2(K + F·K). A new family adds 2K, a new kind 2(F + 1), and neither edits a
-  class. A design whose single creator overrides K factory methods per family
-  is not what this scheme counts; a lesson that means that one should say so
-  in prose (its counts are Abstract Factory's).
+- **factory, Factory Method: deviation from §D** (changed 2026-11-01 after a
+  review against the book's Sample Code and its maze and Lexi uses): 1
+  abstract creator declaring one factory method per kind + 1 concrete
+  creator subclass per family + K + F·K, the same total as Abstract Factory.
+  A new kind adds 1 + F and edits 1 + F (the abstract creator and every
+  concrete creator gain a method); a new family adds 1 + K and edits 0. §D's
+  "one creator subclass per concrete product" (the parallel-hierarchy case)
+  is not counted; a lesson about a creator subclassed just to make one
+  product says so in prose.
 - **factory, Prototype**: 1 + K + F·K, as §D. The manager is a registry keyed
   by kind, so a new kind edits no class; §D's "1 configuration changed"
   becomes 1 configuration added for a new family and F configurations

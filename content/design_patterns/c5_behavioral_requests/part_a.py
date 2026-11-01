@@ -694,7 +694,7 @@ LESSONS = [
                   "macro command; the Known Uses run from Lieberman's 1985 paper and "
                   "MacApp's undoable operations to InterViews and Unidraw. Related "
                   "Patterns: Composite for macros, Memento for undo state, Prototype for "
-                  "copied commands. Course 2's User Operations lesson met the same pattern "
+                  "copied commands. The case study's User Operations lesson met the same pattern "
                   "in Lexi; this one reads the pattern itself."),
             ("p", "Now the lab, on a ferry's booking desk with 30 free car spaces and 120 "
                   "foot-passenger places on one sailing. Four commands: <code>car</code> "
@@ -1384,7 +1384,7 @@ LESSONS = [
                   "practically impossible with an internal one?",
              "a": ["Applying one operation to every element",
                    "Comparing two collections for equality",
-                   "Walking a list from front to back",
+                   "Walking a list from its first element to its last",
                    "Freeing the iterator when it is done"],
              "c": 1,
              "why": "Comparing two collections needs both walks advanced in step, which "

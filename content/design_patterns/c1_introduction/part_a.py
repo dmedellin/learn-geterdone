@@ -1010,7 +1010,7 @@ LESSONS = [
                   "use runs from <code>PostSender</code> to <code>Notifier</code>, and "
                   "the app is untouched. The lab leaves out the line that creates a "
                   "<code>PostSender</code> and hands it to the app; that line is what "
-                  "the creational patterns of course 3 are about."),
+                  "the Creational Patterns course is about."),
             ("h3", "Exercise"),
             ("code", _lines(TILE_VIEWER_EXERCISE)),
             ("p", "A map viewer's tile view, before and after its three tile sources are "

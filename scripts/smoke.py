@@ -2362,6 +2362,91 @@ DDD_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Design Patterns, same shape.
+GOF_PATH_PAGE_PATH = "/paths/design-patterns/"
+GOF_MATERIAL_MARKER = "one consequence of applying a pattern or not"
+GOF_COURSES = (
+    ("gof-introduction", "What Design Patterns Are", (
+        "what-is-a-design-pattern",
+        "describing-and-organizing-the-catalog",
+        "objects-interfaces-and-implementations",
+        "inheritance-versus-composition",
+        "designing-for-change",
+        "selecting-and-using-a-pattern",
+    )),
+    ("gof-document-editor", "A Case Study: Designing a Document Editor", (
+        "document-structure",
+        "formatting",
+        "embellishing-the-interface",
+        "look-and-feel",
+        "window-systems",
+        "user-operations",
+        "spelling-and-hyphenation",
+    )),
+    ("gof-creational", "Creational Patterns", (
+        "abstract-factory",
+        "builder",
+        "factory-method",
+        "prototype",
+        "singleton",
+        "creational-discussion",
+    )),
+    ("gof-structural", "Structural Patterns", (
+        "adapter",
+        "bridge",
+        "composite",
+        "decorator",
+        "facade",
+        "flyweight",
+        "proxy",
+        "structural-discussion",
+    )),
+    ("gof-behavioral-requests", "Behavioral Patterns I: Requests, Languages and Traversal", (
+        "chain-of-responsibility",
+        "command",
+        "interpreter",
+        "iterator",
+        "mediator",
+        "memento",
+    )),
+    ("gof-behavioral-objects", "Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion", (
+        "observer",
+        "state",
+        "strategy",
+        "template-method",
+        "visitor",
+        "behavioral-discussion",
+        "conclusion",
+    )),
+)
+
+GOF_PATH_PAGE_MARKERS = (
+    canonical_marker(GOF_PATH_PAGE_PATH),
+    html.escape(GOF_COURSES[0][1]),
+    html.escape(GOF_COURSES[-1][1]),
+    'href="../../%s/"' % GOF_COURSES[-1][0],
+)
+
+GOF_COURSE_HOMES = tuple(
+    (
+        "gof-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, GOF_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(GOF_COURSES, start=1)
+)
+
+GOF_COURSE_LESSONS = tuple(
+    (
+        "gof-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), GOF_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(GOF_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2465,6 +2550,7 @@ def path_page_targets(args):
         ("eaa-path", EAA_PATH_PAGE_PATH, EAA_PATH_PAGE_MARKERS),
         ("ita-path", ITA_PATH_PAGE_PATH, ITA_PATH_PAGE_MARKERS),
         ("ddd-path", DDD_PATH_PAGE_PATH, DDD_PATH_PAGE_MARKERS),
+        ("gof-path", GOF_PATH_PAGE_PATH, GOF_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2495,7 +2581,8 @@ def course_home_targets(args):
                                     + CC_COURSE_HOMES
                                     + EAA_COURSE_HOMES
                                     + ITA_COURSE_HOMES
-                                    + DDD_COURSE_HOMES):
+                                    + DDD_COURSE_HOMES
+                                    + GOF_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2541,6 +2628,7 @@ def lesson_targets(args):
         + EAA_COURSE_LESSONS
         + ITA_COURSE_LESSONS
         + DDD_COURSE_LESSONS
+        + GOF_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

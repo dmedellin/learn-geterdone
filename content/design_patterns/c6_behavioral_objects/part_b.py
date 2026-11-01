@@ -570,6 +570,12 @@ LESSONS = [
                             "dmoLargest": "senior-discount, 2 modules"}},
             ],
             "panel_title": "The modules each change request reaches",
+            "panel_intro": (
+                "The lab counts one consequence of consolidating a design into a "
+                "pattern: the modules each change request reaches before and after; "
+                "whether the consolidation is worth its indirection is weighed in the "
+                "book, against what in the design is expected to vary."
+            ),
         }),
         "steps_title": "Counting what a consolidation changes",
         "steps_intro": "Four steps, the last of them on a system of your own.",

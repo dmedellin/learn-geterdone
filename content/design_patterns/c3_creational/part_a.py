@@ -318,8 +318,8 @@ LESSONS = [
                   "operation for each kind of widget; each standard has a concrete factory "
                   "that returns its own widgets; the application asks the factory and "
                   "never learns which classes it got, and because one factory makes the "
-                  "whole set, widgets of two standards cannot end up side by side. Course "
-                  "2's lesson Supporting Multiple Look-and-Feel Standards met this design "
+                  "whole set, widgets of two standards cannot end up side by side. The "
+                  "case study's lesson Supporting Multiple Look-and-Feel Standards met this design "
                   "inside the Lexi editor; this lesson reads the pattern itself."),
             ("p", "The pattern applies, in the authors' list, when a system should be "
                   "insulated from the way its products are made and put together, when it must be "

@@ -206,7 +206,7 @@ TerrainTile, decode, style, shade"""
 
 MAP_TILE_JAVA = """abstract class MapTile {
     public final Image render(TileKey key) {       // the template method
-        byte[] raw = fetch(key);
+        byte[] raw = fetchBytes(key);
         Image img = style(decode(raw));
         label(img);                                // hook
         shade(img);                                // hook
@@ -217,7 +217,7 @@ MAP_TILE_JAVA = """abstract class MapTile {
     protected abstract Image style(Image img);     // primitive: must be written
     protected void label(Image img) { }            // hook default: nothing
     protected void shade(Image img) { }
-    private byte[] fetch(TileKey key) { return TileStore.download(key); }
+    private byte[] fetchBytes(TileKey key) { return TileStore.download(key); }
     private void cache(TileKey key, Image img) { TileStore.keep(key, img); }
     private Image show(Image img) { return img; }
 }"""

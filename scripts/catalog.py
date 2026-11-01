@@ -38,8 +38,9 @@ GROUPS = (
         "title": "Computing and decisions",
         "note": "Algorithms, System Design and Operations Research build on "
                 "Discrete Mathematics, the last two on Algebra as well; Code "
-                "Complete, Enterprise Application Patterns and Domain-Driven "
-                "Design assume only that you can read a short routine, "
+                "Complete, Enterprise Application Patterns, Domain-Driven "
+                "Design and Design Patterns assume only that you can read a "
+                "short routine, "
                 "Introduction to Algorithms that you can program and know "
                 "induction.",
     },
@@ -151,6 +152,16 @@ SUBJECTS = (
                 "pattern, with each modelling choice counted on a small model: "
                 "translations, references, conflicts, modules touched and "
                 "effort shared.",
+    },
+    {
+        "slug": "design-patterns",
+        "group": "computing",
+        "short_title": "Design Patterns",
+        "kind": "Read along",
+        "card": "The Gang of Four&rsquo;s <em>Design Patterns</em>, pattern by "
+                "pattern, with each pattern&rsquo;s consequences counted on a "
+                "small design: classes, calls, notifications, undo stacks and "
+                "objects shared.",
     },
     {
         "slug": "philosophy",
