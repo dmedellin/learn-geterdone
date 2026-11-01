@@ -22293,6 +22293,397 @@ console.log('introduction to algorithms: itakit family B, nine modes');
 }
 // ---- end itakit family B ----
 
+// ---- dddkit (Domain-Driven Design), family A ----
+// ==========================================================================
+// Domain-Driven Design, Read Along: dddkit.py (family A: lang, assoc,
+// identity, aggregate, spec)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and DDD_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by dddkit's own
+// reader (dddRead) and compared on the exact tile string a reader sees. The
+// figures were counted by hand on the model stated and confirmed on rendered
+// pages; every case was seen to FAIL when the line it tests was broken on
+// purpose (docs/domain-driven-design/kit-report.md, "Verification").
+console.log('domain-driven design: dddkit family A, five modes');
+{
+  const vm = require('vm');
+  const daFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const daSrc = { core: fs.readFileSync(daFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(daFile('dddkit.py'), 'utf8') };
+  const daBlock = (src, name) => blockFrom(daSrc[src], name.replace(/[[\]]/g, '\\$&'), 'dddkit (' + src + ')');
+  const daViews = (dict, list) => list.map((v) => daBlock('a', dict + '["' + v + '"]')).join('');
+  /* Field specs as dddkit.py's SPECS declare them. */
+  const DA_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function WD(list) { return { kind: 'word', words: list.split('|') }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    function VREC(sub, rest, lr, hr, lo, hi) { return { kind: 'vrec', sub: sub, rest: rest, restWhat: 'cell', loRest: lr, hiRest: hr, lo: lo, hi: hi, unique: true }; }
+    var NM = { kind: 'name' }, PAR = { kind: 'parent' }, KV = { kind: 'kv' }, NUM = { kind: 'num', min: '-' + LIM, max: LIM }, EXPR = { kind: 'expr' };
+    var ASUB = [['a', NM], ['b', NM], ['ends', WD('1-1|1-n|n-1|n-n')], ['direction', WD('both|a-b|b-a')], ['qualified', WD('yes|no')]];
+    var CANDS = VREC([['name', NM]], KV, 1, 12, 1, 40);
+    var SPEC_OF = {
+      'lang/glossary': { audiences: { kind: 'list', lo: 2, hi: 4, things: 'audiences', each: NM }, terms: VREC([['concept', NM]], PAR, 1, 4, 1, 60) },
+      'lang/cognates': { contexts: REC([['context', NM], ['term', NM], ['meaning', NM]], 2, 60) },
+      'assoc/simplify': { assocs: REC(ASUB, 1, 60), after: REC(ASUB, 0, 60) },
+      'identity/equality': { objects: VREC([['name', NM], ['id', PAR]], KV, 0, 12, 1, 60), pairs: REC([['x', NM], ['y', NM]], 0, 60) },
+      'identity/sharing': { holders: REC([['holder', NM], ['value', NM]], 1, 60, true), value: NM, change: NM, kind: WD('mutable|immutable') },
+      'aggregate/boundary': { objects: REC([['object', NM], ['aggregate', NM], ['root', WD('yes|no')]], 1, 60, true), refs: REC([['from', NM], ['to', NM]], 0, 60), 'delete': PAR },
+      'aggregate/lock': { items: REC([['item', NM], ['value', NUM]], 1, 20, true), limit: NUM,
+        edits: REC([['minute', W(1, 1440)], ['user', NM], ['item', NM], ['value', NUM]], 1, 60), scheme: WD('object|aggregate') },
+      'spec/validate': { candidates: CANDS, candidate: NM, spec: EXPR },
+      'spec/select': { candidates: CANDS, spec: EXPR },
+      'spec/subsume': { candidates: CANDS, spec: EXPR, other: EXPR }
+    };
+    var DEFAULTS = { audiences: 'experts developers code', after: '', pairs: '', refs: '', 'delete': '-', scheme: 'object' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = dddRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+  `;
+  const daMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + daBlock('core', 'EA_CORE_JS') + daBlock('a', 'DDD_CORE_JS') + code + DA_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'dddkit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const daCall = (run, mode) => (view, raw, ids) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '), ' + JSON.stringify(ids) + ')');
+  const daStatus = (run, mode) => (view, raw) => run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '))');
+  const daStarts = (got, want, label) => eq(String(got).slice(0, want.length), want, label);
+
+  /* --- DDD_CORE_JS ------------------------------------------------------- */
+  const dc = daMk('');
+  eq(dc("dddDec(R(-7n, 2n)) + '; ' + dddDec(R(1234567n)) + '; ' + dddDec(R(3n, 8n)) + '; ' + dddStatus('Five concepts.')"),
+     '−3.5; 1234567; 0.375; Five concepts; the count is of the model stated.', 'dddDec prints as typed; dddStatus appends the caution');
+  eq(dc("[dddValEq(dddValue('4', 'x'), dddValue('4.0', 'x')), dddValEq(dddValue('rye', 'x'), dddValue('Rye', 'x')), dddValEq(dddValue('4', 'x'), dddValue('rye', 'x')), dddValue('-0.5', 'x').kind].join(' ')"),
+     'true false false num', 'dddValEq: 4 = 4.0 exactly; words by exact text; a number never equals a word');
+
+  /* --- lang (dln) -------------------------------------------------------- */
+  const ln = daCall(daMk(daBlock('a', 'DLN_JS') + daViews('DLN_VIEW_JS', ['glossary', 'cognates']), 'dlnCompute'), 'lang');
+  const LIB = 'loan, loan, checkout, Loan; member, member, member, Member; copy, copy, item, Item; hold, hold, reservation, -; fine, fine, item, Fine';
+  eq(ln('glossary', { terms: LIB }, 'dlnConcepts dlnAlike dlnTranslations dlnMissing dlnAmbiguous'),
+     '5 | 1: member | 7 | 1: hold (code) | 1: item (developers: copy, fine)',
+     'lang/glossary: 2 + 0 + 2 + 1 + 2 translations, case ignored, a missing name not counted as one');
+  eq(ln('glossary', { audiences: 'clinicians developers', terms: 'appointment, appointment, booking; patient, patient, user; visit, visit, booking' }, 'dlnTranslations dlnAlike dlnAmbiguous'),
+     '3 | 0: none | 1: booking (developers: appointment, visit)', 'lang/glossary: two audiences, one pair per concept');
+  eq(ln('glossary', { audiences: 'a b c d', terms: 'x, p, q, r, s' }, 'dlnTranslations'), '6', 'lang/glossary: four names all different are C(4,2) = 6 translations');
+  eq(ln('glossary', { terms: 'loan, loan, Loan' }, 'dlnConcepts'),
+     'REFUSED Terms, record 1 (loan) gives 2 names; there are 3 audiences (experts, developers, code), so each record needs 3 names, - where an audience has none',
+     'lang/glossary: one name per audience');
+  eq(ln('cognates', { contexts: 'rental, bike, vehicle; rental, dock, station; rental, trip, ride; maintenance, bike, frame; maintenance, dock, station; maintenance, job, repair; billing, trip, charge; billing, rider, customer; billing, journey, ride' },
+     'dlnContexts dlnTerms dlnShared dlnFalse dlnDuplicate dlnSafe'),
+     '3: rental, maintenance, billing | 6 | 3: bike, dock, trip | 2: bike (rental: vehicle, maintenance: frame); trip (rental: ride, billing: charge) | 1: ride: trip (rental), journey (billing) | 1: dock',
+     'lang/cognates: false cognates, a duplicate concept, one term safe to share');
+  eq(ln('cognates', { contexts: 'a, Item, copy; b, item, Copy' }, 'dlnShared dlnFalse dlnSafe'), '1: Item | 0: none | 1: Item', 'lang/cognates: terms and meanings compare ignoring case');
+  eq(ln('cognates', { contexts: 'a, t, m; a, u, n' }, 'dlnTerms'), 'REFUSED Every record is in the context a; cognates are counted across two or more contexts', 'lang/cognates: two contexts at least');
+
+  /* --- assoc (das) ------------------------------------------------------- */
+  const as = daCall(daMk(daBlock('a', 'DAS_JS') + daViews('DAS_VIEW_JS', ['simplify']), 'dasCompute'), 'assoc');
+  const BEFORE = 'member, loan, 1-n, both, no; book, author, n-n, both, no; branch, copy, 1-n, both, no; loan, copy, n-1, both, no';
+  eq(as('simplify', { assocs: BEFORE, after: 'member, loan, 1-n, a-b, no; book, author, n-n, a-b, no; branch, copy, 1-n, a-b, yes; loan, copy, n-1, a-b, no' },
+     'dasAssocs dasDirections dasTwoWay dasManyMany dasManyEnds dasChange'),
+     '4 → 4 | 8 → 4 | 4 → 0 | 1 → 1 | 5 → 4 | 0 associations, −4 navigable directions, −4 two-way, 0 many-to-many, −1 many ends',
+     'assoc/simplify: one-way halves the directions; a qualifier on branch→copy removes a many end');
+  eq(as('simplify', { assocs: 'book, author, n-n, both, no', after: 'book, author, n-n, a-b, yes' }, 'dasDirections dasManyMany dasManyEnds'),
+     '2 → 1 | 1 → 0 | 2 → 1', 'assoc/simplify: a qualified many-to-many becomes many-to-one');
+  eq(as('simplify', { assocs: 'a, b, n-n, both, yes; c, d, n-1, both, yes; e, f, n-n, b-a, yes' }, 'dasManyEnds dasManyMany'),
+     '2 | 0', 'assoc/simplify: a two-way qualifier reduces b if it is many, else a; one-way b-a reduces the a end');
+  eq(as('simplify', { assocs: 'branch, copy, 1-n, both, yes' }, 'dasManyEnds dasManyMany'), '0 | 0', 'assoc/simplify: a two-way qualifier on 1-n reduces the b end');
+  eq(as('simplify', { assocs: 'a, b, n-1, a-b, yes' }, 'dasAssocs'),
+     'REFUSED before, record 1 (a–b): a qualifier reduces the many end it navigates to, and the b end of n-1 a-b is already one', 'assoc/simplify: a qualifier on a one end');
+
+  /* --- identity (did) ---------------------------------------------------- */
+  const id = daCall(daMk(daBlock('a', 'DID_JS') + daViews('DID_VIEW_JS', ['equality', 'sharing']), 'didCompute'), 'identity');
+  eq(id('equality', { objects: 'p1, P-100, name=Ana, born=1990; p1b, P-100, name=Ana, born=1990, phone=5550101; p2, P-200, name=Ana, born=1990; a1, -, street=Elm, number=4; a2, -, street=Elm, number=4.0' },
+     'didPairs didIdentity didAttrs didChanged didLookalike'),
+     '10 | 1: (p1, p1b) | 2: (p1, p2), (a1, a2) | 1: (p1, p1b): phone | 1: (p1, p2)',
+     'identity/equality: every pair of five; a value object is never the same by identity; 4 = 4.0');
+  eq(id('equality', { objects: 'c1, BC-1, title=Dune, shelf=A3; c1x, BC-1, title=Dune, shelf=B1; c2, BC-2, title=Dune, shelf=A3', pairs: 'c1, c1x; c1, c2' },
+     'didPairs didChanged didLookalike'), '2 | 1: (c1, c1x): shelf | 1: (c1, c2)', 'identity/equality: the pairs given');
+  eq(id('equality', { objects: 'x, -, a=1; y, -, a=1' }, 'didIdentity didAttrs didLookalike'), '0: none | 1: (x, y) | 0: none', 'identity/equality: two equal values are not look-alikes');
+  eq(id('equality', { objects: 'x, K-1, n=2, w=a; y, K-1, n=3, w=a; z, K-2, n=2.50, w=a; v, K-3, n=2.5, w=a' }, 'didChanged didLookalike'),
+     '1: (x, y): n | 1: (z, v)', 'identity/equality: 2 ≠ 3 is a change; 2.50 = 2.5 exactly');
+  eq(id('equality', { objects: Array.from({ length: 13 }, (_, i) => 'o' + i + ', -, a=1').join('; ') }, 'didPairs'),
+     'REFUSED With no pairs given every pair is compared, which this lab does for at most 12 objects, and there are 13; list the pairs to compare', 'identity/equality: at most 12 for every pair');
+  const HOLD = { holders: 'ana, addr1; ben, addr1; cy, addr1; dee, addr2', value: 'addr1', change: 'ana' };
+  eq(id('sharing', Object.assign({ kind: 'mutable' }, HOLD), 'didHolders didSee didSurprised didNew'), '3: ana, ben, cy | 3: ana, ben, cy | 2: ben, cy | 0',
+     'identity/sharing: a mutable shared value changes for every holder');
+  eq(id('sharing', Object.assign({ kind: 'immutable' }, HOLD), 'didSee didSurprised didNew'), '1: ana | 0: none | 1: addr1′, now held by ana',
+     'identity/sharing: an immutable value is replaced for the changer only');
+  eq(id('sharing', Object.assign({ kind: 'mutable' }, HOLD, { change: 'dee' }), 'didSee'),
+     'REFUSED dee holds addr2, not addr1; the change must be made through a holder of addr1', 'identity/sharing: the change goes through a holder of the value');
+
+  /* --- aggregate (dgr) --------------------------------------------------- */
+  const ag = daCall(daMk(daBlock('a', 'DGR_JS') + daViews('DGR_VIEW_JS', ['boundary', 'lock']), 'dgrCompute'), 'aggregate');
+  const LOANS = { objects: 'loan1, loan, yes; line1, loan, no; line2, loan, no; member1, member, yes; card1, member, no',
+    refs: 'member1, loan1; desk, line2; line1, card1; loan1, line1; card1, member1; report, loan1' };
+  eq(ag('boundary', Object.assign({ 'delete': 'loan1' }, LOANS), 'dgrAggregates dgrObjects dgrCrossing dgrViolations dgrRemoves dgrDangling'),
+     '2: loan, member | 5 | 4 | 2: desk → line2, line1 → card1 | 3: loan1, line1, line2 | 3: member1 → loan1, desk → line2, report → loan1',
+     'aggregate/boundary: crossing references, violations, and what deleting the root leaves dangling');
+  eq(ag('boundary', Object.assign({ 'delete': 'line2' }, LOANS), 'dgrRemoves dgrDangling'),
+     'refused: line2 is not the root of loan; delete it through loan1 | none: the delete is refused', 'aggregate/boundary: a non-root delete is refused');
+  eq(ag('boundary', Object.assign({}, LOANS, { objects: LOANS.objects.replace('line1, loan, no', 'line1, loan, yes') }), 'dgrObjects'),
+     'REFUSED The aggregate loan has 2 roots (loan1, line1); an aggregate has exactly one', 'aggregate/boundary: exactly one root');
+  const ORDER = { items: 'bread, 40; cake, 30; pies, 20', limit: '100' };
+  const LK = 'dgrCommitted dgrRefused dgrFinal dgrSum dgrHolds dgrLost';
+  const SKEW = '1, ana, bread, 48; 2, ben, cake, 38; 4, ana, pies, 20';
+  eq(ag('lock', Object.assign({ edits: SKEW, scheme: 'object' }, ORDER), LK),
+     '2: ana, ben | 0: none | bread = 48, cake = 38, pies = 20 | 106 | no: sum 106 over limit 100 | 0: none',
+     'aggregate/lock: object locks let two edits that each keep the invariant break it together (98 and 98 seen, 106 committed)');
+  eq(ag('lock', Object.assign({ edits: SKEW, scheme: 'aggregate' }, ORDER), LK),
+     '1: ana | 1: ben (the aggregate held by ana at minute 2) | bread = 48, cake = 30, pies = 20 | 98 | yes: sum 98 within limit 100 | 0: none',
+     'aggregate/lock: the aggregate lock refuses the second editor');
+  eq(ag('lock', Object.assign({ edits: '1, ana, bread, 45; 2, ana, cake, 31; 2, ben, bread, 50', scheme: 'object' }, ORDER), 'dgrRefused'),
+     '1: ben (bread held by ana at minute 2)', 'aggregate/lock: a lock is held to the end of its holder\'s commit minute');
+  eq(ag('lock', Object.assign({ edits: '1, ana, bread, 45; 2, ana, cake, 31; 3, ben, bread, 50', scheme: 'object' }, ORDER), 'dgrCommitted dgrLost dgrFinal'),
+     '2: ana, ben | 1: bread (ana’s) | bread = 50, cake = 31, pies = 20', 'aggregate/lock: after the commit the lock is free, and the later commit overwrites');
+  eq(ag('lock', Object.assign({ edits: '1, ben, bread, 50; 1, ana, bread, 45', scheme: 'object' }, ORDER), 'dgrRefused'),
+     '1: ana (bread held by ben at minute 1)', 'aggregate/lock: edits in the same minute are taken in record order');
+  eq(ag('lock', Object.assign({ edits: '1, ana, bread, 50' }, ORDER), 'dgrHolds'), 'yes: sum 100 within limit 100', 'aggregate/lock: a sum equal to the limit keeps the invariant');
+  eq(ag('lock', Object.assign({ edits: '1, ana, flour, 5' }, ORDER), 'dgrSum'), 'REFUSED Edits, record 1: flour is not one of the items', 'aggregate/lock: an edit of an unknown item');
+
+  /* --- spec (dsp) -------------------------------------------------------- */
+  const spRun = daMk(daBlock('a', 'DSP_JS') + daViews('DSP_VIEW_JS', ['validate', 'select', 'subsume']), 'dspCompute');
+  const sp = daCall(spRun, 'spec');
+  const BOOKS = 'b1, pages=320, genre=crime, year=2001; b2, pages=412, genre=crime, year=1998; b3, pages=150, genre=poetry, year=2015; b4, pages=280, year=2010; b5, pages=300, genre=crime, year=2020';
+  eq(sp('validate', { candidates: BOOKS, candidate: 'b2', spec: 'genre = crime and pages <= 300 and year >= 2000' }, 'dspSatisfied dspTrue dspFirstFalse dspFalse'),
+     'no | 1 of 3 | clause 2, pages <= 300: pages is 412 | 2: pages <= 300, year >= 2000', 'spec/validate: the first false clause in the order written');
+  eq(sp('validate', { candidates: BOOKS, candidate: 'b4', spec: 'not (genre = crime) or pages < 100' }, 'dspSatisfied dspTrue dspFirstFalse'),
+     'yes | 0 of 2 | clause 1, genre = crime: genre missing', 'spec/validate: a missing attribute makes its clause false, so not of it is true');
+  eq(sp('validate', { candidates: 'x, a=1, b=2', candidate: 'x', spec: 'not a = 1 and b = 2 or a = 5' }, 'dspSatisfied'), 'no', 'spec: not binds tightest, then and, then or');
+  eq(sp('validate', { candidates: 'x, a=1, b=0', candidate: 'x', spec: 'a = 1 or b = 1 and a = 2' }, 'dspSatisfied'), 'yes', 'spec: and binds tighter than or');
+  eq(sp('validate', { candidates: 'x, a=rye', candidate: 'x', spec: 'a < 3 or a != 3' }, 'dspSatisfied dspFirstFalse'), 'yes | clause 1, a < 3: a is rye, not a number',
+     'spec: an ordering clause on a word value is false; a word is != a number');
+  eq(sp('select', { candidates: BOOKS, spec: 'genre = crime and pages <= 320' }, 'dspCandidates dspSatisfying dspFailing'),
+     '5 | 2: b1, b5 | 3: b2 (pages <= 320: pages is 412); b3 (genre = crime: genre is poetry); b4 (genre = crime: genre missing)', 'spec/select: 320 <= 320 holds exactly');
+  eq(sp('select', { candidates: BOOKS, spec: 'not (genre = poetry) and (year > 2000 or pages < 200)' }, 'dspSatisfying dspFailing'),
+     '3: b1, b4, b5 | 2: b2 (year > 2000: year is 1998); b3 (genre = poetry, true under not: genre is poetry)', 'spec/select: the rejecting clause, through or and not');
+  eq(sp('validate', { candidates: 'x, a=1', candidate: 'x', spec: 'b != rye or not b = rye' }, 'dspSatisfied dspFirstFalse'), 'yes | clause 1, b != rye: b missing',
+     'spec: != on a missing attribute is false, not of = on it is true');
+  eq(sp('select', { candidates: 'x, a=1, b=1; y, a=2, b=1', spec: 'not (a = 1 and b = 1)' }, 'dspFailing'), '1: x (a = 1, true under not: a is 1)',
+     'spec/select: a not of an and is blamed on its first true part');
+  eq(sp('select', { candidates: BOOKS, spec: 'genre >= crime' }, 'dspCandidates'), 'REFUSED The specification: genre >= crime orders a word; a word compares only by = and !=',
+     'spec: an ordering op on a word is refused');
+  eq(sp('select', { candidates: BOOKS, spec: 'pages < 3)' }, 'dspCandidates'), 'REFUSED The specification has ")" after the specification ends', 'spec: a stray parenthesis');
+  const SB = 'dspSatB dspSatA dspOnCands dspCounter dspLogical';
+  eq(sp('subsume', { candidates: BOOKS, spec: 'pages <= 400 and genre = crime', other: 'pages <= 320 and pages > 100 and genre = crime and year >= 2000' }, SB),
+     '2: b1, b5 | 2: b1, b5 | yes: all 2 that satisfy B satisfy A | 0: none | yes: every clause of A follows from B’s clauses', 'spec/subsume: interval containment');
+  eq(sp('subsume', { candidates: BOOKS, spec: 'pages <= 320 and genre = crime', other: 'genre = crime and year >= 2000' }, 'dspOnCands dspLogical'),
+     'yes: all 2 that satisfy B satisfy A | no: B says nothing of pages, so a candidate missing it can satisfy B and fail A’s clause pages <= 320',
+     'spec/subsume: the candidates agree where the rules do not');
+  eq(sp('subsume', { candidates: BOOKS, spec: 'pages < 320', other: 'pages <= 320 and genre = crime' }, 'dspOnCands dspCounter dspLogical'),
+     'no: 1 of the 2 that satisfy B fails A | 1: b1 | no: B allows a value of pages that fails A’s clause pages < 320', 'spec/subsume: a closed end against an open one');
+  eq(sp('subsume', { candidates: BOOKS, spec: 'genre = crime or genre = poetry', other: 'genre = poetry and pages < 200' }, 'dspOnCands dspLogical'),
+     'yes: the one candidate that satisfies B satisfies A | not decidable by the lab: A uses or, and the lab decides only clauses joined by and', 'spec/subsume: or is not decided');
+  /* The logical answer alone, on pairs worked by hand. */
+  const lg = (a, b) => spRun('dspLogical(dspParse(' + JSON.stringify(a) + ', "A"), dspParse(' + JSON.stringify(b) + ', "B")).split(":")[0]');
+  eq([lg('x >= 0', 'x > 0'), lg('x > 0', 'x >= 0'), lg('x > 0', 'x >= 0 and x != 0'), lg('x = 5', 'x >= 5 and x <= 5'), lg('x != 5', 'x > 5'), lg('x != 5', 'x >= 5')].join(' '),
+     'yes no yes yes yes no', 'spec/subsume: open and closed ends, an excluded endpoint, a point, an exclusion');
+  eq([lg('c != rye', 'c = wheat'), lg('c != rye', 'c != spelt'), lg('c != rye', 'c != rye and c != spelt'), lg('c = rye', 'c = rye and c != spelt'), lg('x < 10', 'x != 3'), lg('x != 3', 'x = rye')].join(' '),
+     'yes no yes yes no yes', 'spec/subsume: words, and a != that still allows words');
+  eq([lg('c = spelt', 'c = rye and c = wheat'), lg('c = spelt', 'x >= 5 and x <= 5 and x != 5'), lg('c = spelt', 'x = rye and x < 3'), lg('x < 10', 'x = 3 and c = rye'), lg('c != rye', 'x > 3'), lg('not x = 1', 'x = 2'), lg('x > 0', 'x >= 0 and x > 0'), lg('x <= 4', 'x <= 4 and x < 4')].join(' '),
+     'yes, vacuously yes, vacuously yes, vacuously yes no not decidable by the lab yes yes', 'spec/subsume: B empty three ways is vacuous; an unmentioned attribute; not is not decided');
+  daStarts(daStatus(spRun, 'spec')('select', { candidates: BOOKS, spec: 'pages > 0' }), 'The specification selects 5 of 5 candidates; the count is of the model stated.', 'spec: the status ends with the caution');
+}
+// ---- end dddkit family A ----
+
+// ---- dddkit (Domain-Driven Design), family B ----
+// ==========================================================================
+// Domain-Driven Design, Read Along: dddkit_b.py (family B: modules, context,
+// distill, ledger)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and DDD_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by dddkit's own
+// reader (dddRead) and compared on the exact tile string a reader sees. Every
+// figure was counted by hand on the model stated (the workings are in
+// docs/domain-driven-design/kit-report.md, "Family B: verification") and
+// confirmed on a rendered page; every case was seen to FAIL when the line it
+// tests was broken on purpose.
+console.log('domain-driven design: dddkit family B, four modes');
+{
+  const vm = require('vm');
+  const dbFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const dbSrc = { core: fs.readFileSync(dbFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(dbFile('dddkit.py'), 'utf8'),
+    b: fs.readFileSync(dbFile('dddkit_b.py'), 'utf8') };
+  const dbBlock = (src, name) => blockFrom(dbSrc[src], name.replace(/[[\]]/g, '\\$&'), 'dddkit (' + src + ')');
+  const dbViews = (dict, list) => list.map((v) => dbBlock('b', dict + '["' + v + '"]')).join('');
+  /* Field specs as dddkit_b.py's mode dicts declare them. */
+  const DB_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function WD(list) { return { kind: 'word', words: list.split('|') }; }
+    function LIST(lo, hi) { return { kind: 'list', lo: lo, hi: hi, things: 'names', each: { kind: 'name' } }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    var NM = { kind: 'name' }, AMT = { kind: 'num', min: '-' + LIM, max: LIM };
+    var EL = REC([['element', NM], ['module', NM]], 1, 60, true), EL2 = REC([['element', NM], ['module', NM], ['module2', NM]], 1, 60, true);
+    var DEPS = REC([['from', NM], ['to', NM]], 1, 60), CHG = REC([['change', NM], ['element', NM]], 1, 60);
+    var PART = [['part', NM], ['kind', WD('core|supporting|generic')], ['weeks', W(0, 100000)], ['strong', W(0, 1000)]];
+    var ENT = REC([['txn', NM], ['account', NM], ['amount', AMT]], 1, 60);
+    var SPEC_OF = {
+      'modules/cohesion': { elements: EL, deps: DEPS }, 'modules/cohesion2': { elements: EL2, deps: DEPS },
+      'modules/change': { elements: EL, changes: CHG }, 'modules/change2': { elements: EL2, changes: CHG },
+      'modules/layers': { layers: LIST(2, 12), elements: REC([['element', NM], ['layer', NM]], 1, 60, true), deps: DEPS },
+      'context/map': { contexts: LIST(2, 30), rels: REC([['upstream', NM], ['downstream', NM],
+        ['kind', WD('shared-kernel|customer-supplier|conformist|acl|ohs|published-language|separate-ways')]], 1, 60), changed: NM },
+      'context/protocol': { contexts: LIST(1, 60), scheme: WD('pairwise|published') },
+      'distill/effort': { parts: { kind: 'vrec', sub: PART, rest: WD('build|buy|published|outsource'), restWhat: 'option', loRest: 0, hiRest: 1, lo: 1, hi: 60, unique: true } },
+      'ledger/balance': { entries: ENT },
+      'ledger/post': { entries: ENT, rules: REC([['rule', NM], ['from', NM], ['to', NM], ['share', { kind: 'num', min: '0', max: '1' }]], 1, 20, true) }
+    };
+    var DEFAULTS = { scheme: 'pairwise' };
+    function RUN(mode, view, raw, opts) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = dddRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view.replace(/2$/, ''), inst, opts || {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+  `;
+  const dbMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + dbBlock('core', 'EA_CORE_JS') + dbBlock('a', 'DDD_CORE_JS') + code + DB_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'dddkit_b' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const dbCall = (run, mode) => (view, raw, ids, opts) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '), ' + JSON.stringify(ids) + ')');
+  const dbStatus = (run, mode) => (view, raw, opts) =>
+    run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '))');
+  const dbEnds = (got, want, label) => eq(String(got).slice(-want.length), want, label);
+
+  /* --- modules (dmo) ----------------------------------------------------- */
+  const moRun = dbMk(dbBlock('b', 'DMO_JS') + dbViews('DMO_VIEW_JS', ['cohesion', 'change', 'layers']), 'dmoCompute');
+  const mo = dbCall(moRun, 'modules'), moS = dbStatus(moRun, 'modules');
+  const MO_LIB = { elements: 'Book, entities, catalog; Copy, entities, catalog; Loan, entities, lending; Isbn, values, catalog; '
+    + 'DueDate, values, lending; LoanService, services, lending', deps: 'Copy, Book; Book, Isbn; Loan, Copy; Loan, DueDate; LoanService, Loan; LoanService, Copy' };
+  eq(mo('cohesion2', MO_LIB, 'dmoModules dmoInside dmoAcross dmoShare dmoPair dmoModules2 dmoInside2 dmoAcross2 dmoShare2 dmoPair2', { names: ['by pattern', 'by concept'] }),
+     '3 | 2 | 4 | 1/3 ≈ 33.3% | entities and services: 2 | 2 | 4 | 2 | 2/3 ≈ 66.7% | catalog and lending: 2',
+     'modules/cohesion: one model packaged by pattern and by concept; a tied pair goes to the alphabetically first');
+  dbEnds(moS('cohesion2', MO_LIB, { names: ['by pattern', 'by concept'] }), 'entities and services; entities and values; the tile shows the alphabetically first. by concept: 4 of 6 dependencies stay inside a module and 2 cross between 2 modules; the count is of the model stated.',
+     'modules/cohesion: the status names the tied pairs and ends with the caution');
+  const MO_SEED = { elements: 'Accession, intake; Donor, intake; Vault, storage; Packet, storage; GermTest, testing; Result, testing',
+    deps: 'Accession, Donor; Packet, Accession; Accession, Vault; GermTest, Packet; Packet, Result; Vault, Packet' };
+  eq(mo('cohesion', MO_SEED, 'dmoInside dmoShare dmoCycles dmoPair'), '2 | 1/3 ≈ 33.3% | 1: (intake, storage, testing) | intake and storage: 2',
+     'modules/cohesion: two two-way pairs make one cycle of three modules');
+  eq(mo('cohesion', { elements: 'a, m1; b, m2; c, m3; d, m4', deps: 'a, b; b, a; c, d; d, c' }, 'dmoCycles'), '2: (m1, m2), (m3, m4)',
+     'modules/cohesion: separate cycles listed in order of their first module');
+  eq(mo('cohesion', { elements: 'a, m1; b, m2; c, m3', deps: 'a, b; b, c' }, 'dmoCycles dmoPair'), '0: none | m1 and m2: 1', 'modules/cohesion: a chain has no cycle');
+  eq(mo('cohesion', { elements: 'a, m; b, m', deps: 'a, b' }, 'dmoShare dmoPair'), '1 = 100% | none', 'modules/cohesion: all inside, no pair');
+  eq(mo('cohesion', { elements: 'a, m; b, m', deps: 'a, c' }, 'dmoShare'), 'REFUSED Dependencies, record 1: c is not one of the elements', 'modules: an unknown element');
+  eq(mo('cohesion', { elements: 'a, m; b, m', deps: 'a, a' }, 'dmoShare'), 'REFUSED Dependencies, record 1: a depends on itself', 'modules: a self-dependency');
+  eq(mo('cohesion', { elements: 'a, m; b, m', deps: 'a, b; a, b' }, 'dmoShare'), 'REFUSED Dependencies, record 2: a, b is given twice', 'modules: a dependency twice');
+  const MO_CLINIC = { elements: 'Appointment, scheduling; Slot, scheduling; Patient, records; Note, records; Invoice, billing',
+    changes: 'telehealth, Appointment; telehealth, Slot; consent, Patient; consent, Note; consent, Appointment; fee, Invoice' };
+  eq(mo('change', MO_CLINIC, 'dmoChanges dmoPer dmoTotal dmoConfined dmoLargest'),
+     '3 | telehealth 1, consent 2, fee 1 | 4 | 2 of 3: telehealth, fee | consent, 2 modules', 'modules/change: modules each change touches, a module once per change');
+  const MO_THEATRE = { elements: 'Seat, seating, ui; Row, seating, data; Booking, sales, logic; Price, sales, ui; Show, shows, data; Discount, sales, logic',
+    changes: 'discount, Discount; discount, Price; seatmap, Seat; seatmap, Row; matinee, Show; matinee, Price; matinee, Booking' };
+  eq(mo('change2', MO_THEATRE, 'dmoPer dmoTotal dmoConfined dmoLargest dmoPer2 dmoTotal2 dmoConfined2 dmoLargest2'),
+     'discount 1, seatmap 1, matinee 2 | 4 | 2 of 3: discount, seatmap | matinee, 2 modules | discount 2, seatmap 2, matinee 3 | 7 | 0 of 3 | matinee, 3 modules',
+     'modules/change: the same changes against two packagings');
+  eq(mo('change', { elements: 'a, m1; b, m2; c, m3', changes: 'x, a; x, b; y, b; y, c' }, 'dmoLargest'), 'x, 2 modules', 'modules/change: a tie goes to the first change given');
+  eq(mo('change', { elements: 'a, m1', changes: 'x, a; x, a' }, 'dmoTotal'), 'REFUSED Changes, record 2: x already touches a', 'modules/change: an element twice in a change');
+  eq(mo('change', { elements: 'a, m1', changes: 'x, b' }, 'dmoTotal'), 'REFUSED Changes, record 1: b is not one of the elements', 'modules/change: an unknown element');
+  const MO_LAYERS = { layers: 'ui app domain infra', elements: 'LoanForm, ui; LendingService, app; Loan, domain; LoanRepo, infra; Database, infra',
+    deps: 'LoanForm, LendingService; LoanForm, Loan; LoanForm, Database; LendingService, Loan; Loan, LoanRepo; LoanRepo, Database; Loan, LendingService' };
+  eq(mo('layers', MO_LAYERS, 'dmoDeps dmoDown dmoWithin dmoUp dmoSkip dmoEmpty'), '7 | 5 | 1 | 1: Loan → LendingService | 2 | 0: none',
+     'modules/layers: down, within, up and skipping counted');
+  eq(mo('layers', { layers: 'policy commitment decision operations potential',
+    elements: 'Pricing, policy; Plan, decision; Ride, operations; Rebalance, operations; Dock, potential; Bike, potential',
+    deps: 'Pricing, Ride; Plan, Dock; Ride, Bike; Rebalance, Plan; Ride, Rebalance; Dock, Ride' }, 'dmoDown dmoWithin dmoUp dmoSkip dmoEmpty'),
+     '3 | 1 | 2: Rebalance → Plan, Dock → Ride | 2 | 1: commitment', 'modules/layers: responsibility layers, an empty layer');
+  eq(mo('layers', { layers: 'a b', elements: 'x, c', deps: 'x, x' }, 'dmoDeps'), 'REFUSED Elements, record 1: c is not one of the layers', 'modules/layers: an unknown layer');
+
+  /* --- context (dcx) ----------------------------------------------------- */
+  const cxRun = dbMk(dbBlock('b', 'DCX_JS') + dbViews('DCX_VIEW_JS', ['map', 'protocol']), 'dcxCompute');
+  const cx = dbCall(cxRun, 'context');
+  const CX_ALL = 'dcxRels dcxModels dcxTranslators dcxReached dcxUntouched';
+  const CX_LIB = { contexts: 'catalog lending fines holds search reports', changed: 'catalog',
+    rels: 'catalog, lending, conformist; lending, fines, customer-supplier; catalog, search, acl; catalog, holds, ohs; '
+      + 'catalog, reports, published-language; fines, reports, separate-ways; lending, holds, shared-kernel' };
+  eq(cx('map', CX_LIB, CX_ALL), '7 | 3: lending, fines, holds | 2: search’s ACL from catalog, catalog’s protocol | 4: lending, fines, holds, search | 1: reports',
+     'context/map: conformist and customer/supplier carry the change on, a shared kernel both ways, acl and ohs stop it');
+  eq(cx('map', Object.assign({}, CX_LIB, { rels: CX_LIB.rels.replace('catalog, lending, conformist', 'catalog, lending, acl') }), CX_ALL),
+     '7 | 0: none | 3: lending’s ACL from catalog, search’s ACL from catalog, catalog’s protocol | 2: lending, search | 3: fines, holds, reports',
+     'context/map: an ACL instead of conformist stops the change at lending’s translator');
+  eq(cx('map', Object.assign({}, CX_LIB, { changed: 'holds' }), 'dcxModels dcxTranslators dcxUntouched'),
+     '2: lending, fines | 0: none | 3: catalog, search, reports', 'context/map: a shared kernel carries a change up to lending, never on upstream to catalog');
+  eq(cx('map', { contexts: 'a b c', rels: 'a, b, separate-ways; b, c, conformist', changed: 'a' }, 'dcxModels dcxUntouched'), '0: none | 2: b, c',
+     'context/map: separate ways has no effect');
+  eq(cx('map', { contexts: 'a b', rels: 'a, b, conformist; b, a, acl', changed: 'a' }, 'dcxRels'), 'REFUSED Relationships, record 2: b and a already have a relationship (record 1)',
+     'context/map: one relationship per pair');
+  eq(cx('map', { contexts: 'a b', rels: 'a, b, partnership', changed: 'a' }, 'dcxRels'), 'REFUSED rels, record 1: kind should be one of shared-kernel, customer-supplier, conformist, acl, ohs, published-language, separate-ways, not "partnership"',
+     'context/map: only the book\'s kinds');
+  eq(cx('map', { contexts: 'a b', rels: 'a, b, acl', changed: 'z' }, 'dcxRels'), 'REFUSED The changed context, z, is not one of the contexts', 'context/map: the changed context is listed');
+  eq(cx('map', { contexts: 'a b', rels: 'a, a, acl', changed: 'a' }, 'dcxRels'), 'REFUSED Relationships, record 1: a is related to itself', 'context/map: no self-relationship');
+  const CX_P = 'dcxN dcxBuild dcxChange dcxOther dcxBuildRatio dcxChangeRatio';
+  eq(cx('protocol', { contexts: '5', scheme: 'pairwise' }, CX_P, { directed: 'no' }), '5 | 10 | 4 | published: 5 to build, 1 to change | 2× | 4×',
+     'context/protocol: n = 5, two-way: n(n−1)/2 = 10 against n = 5');
+  eq(cx('protocol', { contexts: 'clinic pharmacy lab billing', scheme: 'published' }, CX_P, { directed: 'no' }),
+     '4 | 4 | 1 | pairwise: 6 to build, 3 to change | 3/2 ≈ 1.5× | 3×', 'context/protocol: four named contexts, published');
+  eq(cx('protocol', { contexts: '4', scheme: 'pairwise' }, CX_P, { directed: 'yes' }), '4 | 12 | 6 | published: 8 to build, 2 to change | 3/2 ≈ 1.5× | 3×',
+     'context/protocol: one-way translators double every figure, the ratios unchanged');
+  eq(cx('protocol', { contexts: '61' }, 'dcxN'), 'REFUSED The number of contexts is a whole number from 2 to 60, and it is 61', 'context/protocol: n at most 60');
+  eq(cx('protocol', { contexts: 'clinic' }, 'dcxN'), 'REFUSED Contexts: give at least two names, or one whole number from 2 to 60', 'context/protocol: one name');
+
+  /* --- distill (dds) ----------------------------------------------------- */
+  const ds = dbCall(dbMk(dbBlock('b', 'DDS_JS') + dbViews('DDS_VIEW_JS', ['effort']), 'ddsCompute'), 'distill');
+  const DS_ALL = 'ddsWeeks ddsCore ddsSupporting ddsGeneric ddsStrong ddsBuilt ddsFree';
+  eq(ds('effort', { parts: 'booking, core, 20, 3, build; rota, supporting, 10, 1, build; billing, generic, 8, 1, build; auth, generic, 6, 0, buy' }, DS_ALL),
+     '38 | 10/19 ≈ 52.6% | 5/19 ≈ 26.3% | 4/19 ≈ 21.1% | 3 of 5, 3/5 = 60% | 1: billing | 8', 'distill/effort: a bought part\'s weeks are not counted');
+  eq(ds('effort', { parts: 'booking, core, 20, 2; rota, supporting, 10, 1, build; billing, generic, 8, 1; auth, generic, 6, 1' }, DS_ALL),
+     '44 | 5/11 ≈ 45.5% | 5/22 ≈ 22.7% | 7/22 ≈ 31.8% | 2 of 5, 2/5 = 40% | 2: billing, auth | 14', 'distill/effort: everything built in house');
+  eq(ds('effort', { parts: 'a, core, 4, 0' }, 'ddsStrong ddsCore'), '0 of 0 | 1 = 100%', 'distill/effort: no strongest developers named');
+  eq(ds('effort', { parts: 'a, core, 4, 1, buy' }, 'ddsWeeks'), 'REFUSED Parts, record 1: a is core, and only a generic part can be bought, published or outsourced',
+     'distill/effort: only a generic part has an option');
+  eq(ds('effort', { parts: 'a, core, 4, 1, build; b, generic, 3, 1, outsource' }, 'ddsWeeks'),
+     'REFUSED Parts, record 2: b is not built in house, so none of the team’s strongest developers work on it', 'distill/effort: no strong developer on a bought part');
+  eq(ds('effort', { parts: 'a, core, 0, 1' }, 'ddsWeeks'), 'REFUSED No part is built in house with any weeks, so there is no effort to share', 'distill/effort: no weeks');
+
+  /* --- ledger (dle) ------------------------------------------------------ */
+  const leRun = dbMk(dbBlock('b', 'DLE_JS') + dbViews('DLE_VIEW_JS', ['balance', 'post']), 'dleCompute');
+  const le = dbCall(leRun, 'ledger'), leS = dbStatus(leRun, 'ledger');
+  eq(le('balance', { entries: 'sale1, till, 12.50; sale1, sales, -12.50; sale2, till, 3.00; sale2, sales, -2.99' }, 'dleAccounts dleBalances dleTxns dleUnbalanced dleTotal'),
+     '2 | till 15.50, sales −15.49 | 2 | 1: sale2 +0.01 | 0.01', 'ledger/balance: a transaction a cent out');
+  eq(le('balance', { entries: 'o1, till, 4.20; o1, sales, -4.20; o2, flour, 18.75; o2, till, -18.75' }, 'dleBalances dleUnbalanced dleTotal'),
+     'till −14.55, sales −4.20, flour 18.75 | 0: none | 0.00', 'ledger/balance: balanced, accounts in order of first appearance');
+  eq(le('balance', { entries: 'r1, till, -5.00; r1, sales, 4.75; r2, till, 1; r2, sales, -1' }, 'dleUnbalanced dleTotal'), '1: r1 −0.25 | −0.25',
+     'ledger/balance: a refund a quarter short, a negative net');
+  eq(le('balance', { entries: 't1, till, 12.505' }, 'dleTotal'), 'REFUSED Entries, record 1: 12.505 is not a whole number of cents; give at most 2 decimal places',
+     'ledger: amounts are whole cents');
+  const LE_POST = { entries: 't1, sales, -10.05; t1, till, 10.05; t2, sales, -3.33; t2, till, 3.33', rules: 'vat, sales, vat, 0.2; tip, till, tips, 0.125' };
+  eq(le('post', LE_POST, 'dleGiven dleDerived dleBalances dleLeft'), '4 | 8 | sales −10.70, vat −2.68, till 11.70, tips 1.68 | −0.0035',
+     'ledger/post: each rule once per given entry, to the cent, rounding left summed exactly');
+  eq(leS('post', { entries: 't1, sales, -10.00; t1, till, 10.00; t2, sales, -4.00; t2, till, 4.00', rules: 'vat, sales, vat, 0.2; tip, till, tips, 0.1; fee, cards, bank, 0.02' }),
+     '2 of 3 rules fire, 4 times in all, on 4 given entries, deriving 8 entries; derived entries fire nothing. Rounding to the cent leaves 0 in all; the count is of the model stated.',
+     'ledger/post: the status counts rules that fire and firings apart');
+  eq(le('post', { entries: 't1, sales, -0.05', rules: 'r, sales, tax, 0.5' }, 'dleBalances dleList dleLeft'), 'sales −0.02, tax −0.03 | r on t1: −0.03 to tax | +0.005',
+     'ledger/post: half a cent rounds away from zero');
+  eq(le('post', { entries: 't1, sales, -0.05; t2, sales, -0.05', rules: 'r, sales, tax, 0.5' }, 'dleLeft'), '+0.01', 'ledger/post: two half cents leave a whole cent, printed to 2 places');
+  eq(le('post', { entries: 't1, sales, 0.05', rules: 'r, sales, tax, 0.5' }, 'dleList'), 'r on t1: 0.03 to tax', 'ledger/post: a positive half rounds up');
+  eq(le('post', { entries: 't1, sales, -10.00; t1, till, 10.00', rules: 'vat, sales, vat, 0.2; reserve, vat, reserve, 0.5' }, 'dleDerived dleBalances dleList dleLeft'),
+     '2 | sales −8.00, vat −2.00, till 10.00 | vat on t1: −2.00 to vat | 0', 'ledger/post: a derived entry fires no rule');
+  eq(le('post', { entries: 't1, a, 1', rules: 'r, a, a, 0.5' }, 'dleGiven'), 'REFUSED Rules, record 1: r posts from a back to itself', 'ledger/post: a rule to its own account');
+}
+// ---- end dddkit family B ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the

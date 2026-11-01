@@ -16,6 +16,7 @@ from . import (
     cckit,
     eakit,
     itakit,
+    dddkit,
     argkit,
     choicekit,
     algebra_equations,
@@ -177,6 +178,7 @@ REGISTRY = {
     "cckit": cckit.cckit_lab,
     "eakit": eakit.eakit_lab,
     "itakit": itakit.itakit_lab,
+    "dddkit": dddkit.dddkit_lab,
 }
 
 
