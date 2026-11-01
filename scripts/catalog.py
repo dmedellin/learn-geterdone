@@ -38,9 +38,10 @@ GROUPS = (
         "title": "Computing and decisions",
         "note": "Algorithms, System Design and Operations Research build on "
                 "Discrete Mathematics, the last two on Algebra as well; Code "
-                "Complete and Enterprise Application Patterns assume only that "
-                "you can read a short routine, Introduction to Algorithms that "
-                "you can program and know induction.",
+                "Complete, Enterprise Application Patterns and Domain-Driven "
+                "Design assume only that you can read a short routine, "
+                "Introduction to Algorithms that you can program and know "
+                "induction.",
     },
     {
         "key": "philosophy",
@@ -140,6 +141,16 @@ SUBJECTS = (
         "card": "Cormen, Leiserson, Rivest and Stein&rsquo;s textbook, read "
                 "chapter by chapter, with each algorithm run and counted in "
                 "the lab.",
+    },
+    {
+        "slug": "domain-driven-design",
+        "group": "computing",
+        "short_title": "Domain-Driven Design",
+        "kind": "Read along",
+        "card": "Eric Evans&rsquo;s <em>Domain-Driven Design</em>, pattern by "
+                "pattern, with each modelling choice counted on a small model: "
+                "translations, references, conflicts, modules touched and "
+                "effort shared.",
     },
     {
         "slug": "philosophy",

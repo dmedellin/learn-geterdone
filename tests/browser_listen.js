@@ -21,6 +21,7 @@ const PAGES = [
   ['generated', '/code-complete-statements/boolean-expressions/'],
   ['generated', '/enterprise-patterns-domain-logic/transaction-script/'],
   ['generated', '/intro-algorithms-foundations/insertion-sort-and-loop-invariants/'],
+  ['generated', '/ddd-putting-the-model-to-work/ubiquitous-language/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];

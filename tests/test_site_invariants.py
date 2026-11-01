@@ -1906,11 +1906,112 @@ ITA_COURSES = (
 ITA_PATH_COURSE_COUNT = 8
 ITA_UPCOMING_COURSES = ()
 
+# The Domain-Driven Design path: nine courses, all published.
+# Generated from content/domain_driven_design/ so these cannot disagree with
+# what is built.
+DDD_PATH_PAGE = "/paths/domain-driven-design/"
+
+DDD_COURSE_1_HOME = "/ddd-putting-the-model-to-work/"
+DDD_COURSE_1_LESSONS = (
+    "crunching-knowledge",
+    "knowledge-rich-design-and-deep-models",
+    "ubiquitous-language",
+    "documents-and-explanatory-models",
+    "model-driven-design-and-hands-on-modelers",
+)
+DDD_COURSE_2_HOME = "/ddd-building-blocks/"
+DDD_COURSE_2_LESSONS = (
+    "layered-architecture",
+    "the-smart-ui-anti-pattern",
+    "associations",
+    "entities",
+    "value-objects",
+    "services",
+    "modules-and-modeling-paradigms",
+)
+DDD_COURSE_3_HOME = "/ddd-life-cycle/"
+DDD_COURSE_3_LESSONS = (
+    "aggregates",
+    "aggregate-invariants-and-locking",
+    "factories",
+    "repositories",
+    "an-extended-example",
+    "refactoring-the-example-and-modules",
+)
+DDD_COURSE_4_HOME = "/ddd-implicit-concepts/"
+DDD_COURSE_4_LESSONS = (
+    "breakthrough",
+    "digging-out-concepts",
+    "constraints-and-processes",
+    "specification",
+    "applying-specification",
+)
+DDD_COURSE_5_HOME = "/ddd-supple-design/"
+DDD_COURSE_5_LESSONS = (
+    "intention-revealing-interfaces",
+    "side-effect-free-functions",
+    "assertions",
+    "conceptual-contours",
+    "standalone-classes-and-closure",
+    "declarative-design",
+    "angles-of-attack",
+)
+DDD_COURSE_6_HOME = "/ddd-patterns-and-refactoring/"
+DDD_COURSE_6_LESSONS = (
+    "analysis-patterns",
+    "posting-rules",
+    "strategy-and-composite",
+    "refactoring-toward-deeper-insight",
+)
+DDD_COURSE_7_HOME = "/ddd-model-integrity/"
+DDD_COURSE_7_LESSONS = (
+    "bounded-context",
+    "continuous-integration",
+    "context-map",
+    "shared-kernel-and-customer-supplier",
+    "conformist-and-anticorruption-layer",
+    "separate-ways-open-host-and-published-language",
+    "unifying-an-elephant",
+    "transformations",
+)
+DDD_COURSE_8_HOME = "/ddd-distillation/"
+DDD_COURSE_8_LESSONS = (
+    "core-domain",
+    "generic-subdomains",
+    "domain-vision-statement-and-highlighted-core",
+    "cohesive-mechanisms",
+    "segregated-and-abstract-core",
+)
+DDD_COURSE_9_HOME = "/ddd-large-scale-structure/"
+DDD_COURSE_9_LESSONS = (
+    "evolving-order-and-system-metaphor",
+    "responsibility-layers",
+    "knowledge-level",
+    "pluggable-component-framework",
+    "bringing-the-strategy-together",
+    "who-sets-the-strategy",
+)
+
+DDD_COURSES = (
+    ("Putting the Domain Model to Work", DDD_COURSE_1_HOME, DDD_COURSE_1_LESSONS),
+    ("The Building Blocks of a Model-Driven Design", DDD_COURSE_2_HOME, DDD_COURSE_2_LESSONS),
+    ("The Life Cycle of a Domain Object", DDD_COURSE_3_HOME, DDD_COURSE_3_LESSONS),
+    ("Breakthroughs and Implicit Concepts", DDD_COURSE_4_HOME, DDD_COURSE_4_LESSONS),
+    ("Supple Design", DDD_COURSE_5_HOME, DDD_COURSE_5_LESSONS),
+    ("Analysis Patterns, Design Patterns and Refactoring", DDD_COURSE_6_HOME, DDD_COURSE_6_LESSONS),
+    ("Maintaining Model Integrity", DDD_COURSE_7_HOME, DDD_COURSE_7_LESSONS),
+    ("Distillation", DDD_COURSE_8_HOME, DDD_COURSE_8_LESSONS),
+    ("Large-Scale Structure and Strategy", DDD_COURSE_9_HOME, DDD_COURSE_9_LESSONS),
+)
+
+DDD_PATH_COURSE_COUNT = 9
+DDD_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
                + READ_COURSES + CC_COURSES + EAA_COURSES
-               + ITA_COURSES)
+               + ITA_COURSES + DDD_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -2032,7 +2133,8 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
-                       CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE)
+                       CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE,
+                       DDD_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -2067,6 +2169,8 @@ PATHS = (
      EAA_COURSES, EAA_PATH_COURSE_COUNT, EAA_UPCOMING_COURSES),
     ("Introduction to Algorithms, Read Along", ITA_PATH_PAGE,
      ITA_COURSES, ITA_PATH_COURSE_COUNT, ITA_UPCOMING_COURSES),
+    ("Domain-Driven Design, Read Along", DDD_PATH_PAGE,
+     DDD_COURSES, DDD_PATH_COURSE_COUNT, DDD_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2297,6 +2401,11 @@ EAA_DISCLAIMER_RE = re.compile(
 # The clause after the em dash, which renders as an entity.
 ITA_DISCLAIMER_RE = re.compile(
     r"(?i)only its proof establishes that")
+# Domain-Driven Design promises that every figure is counted from the small
+# model a lesson states, and warns that a count shows one consequence of one
+# modelling choice, not a verdict on it. The clause after the second em dash.
+DDD_DISCLAIMER_RE = re.compile(
+    r"(?i)one consequence of one modelling choice")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2327,6 +2436,8 @@ PATH_MATERIAL_DISCLAIMER = {
                     EAA_DISCLAIMER_RE),
     ITA_PATH_PAGE: ("the only-its-proof-establishes-that disclaimer",
                     ITA_DISCLAIMER_RE),
+    DDD_PATH_PAGE: ("the one-consequence-of-one-modelling-choice disclaimer",
+                    DDD_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2681,11 +2792,17 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(ITA_COURSES)
             + sum(len(slugs) for _t, _h, slugs in ITA_COURSES)
         )
+        ddd_tree = (
+            1  # the Domain-Driven Design path page
+            + len(DDD_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in DDD_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
-                       + cc_tree + eaa_tree + ita_tree)  # 1 for the index
+                       + cc_tree + eaa_tree + ita_tree
+                       + ddd_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2777,9 +2894,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 70 pages, got %d" % ita_tree,
         )
         self.assertEqual(
-            1397,
+            63,
+            ddd_tree,
+            "the Domain-Driven Design path is 1 + 9 + 5 + 7 + 6 + 5 + 7 + 4 + 8 + 5 + 6 "
+            "= 63 pages, got %d" % ddd_tree,
+        )
+        self.assertEqual(
+            1460,
             course_tree,
-            "the site index plus all fifteen path trees is 1397 pages, got %d" % course_tree,
+            "the site index plus all sixteen path trees is 1460 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2790,9 +2913,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1401,
+            1464,
             expected,
-            "1397 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1401, "
+            "1460 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1464, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -3013,6 +3136,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "code_complete": getattr(smoke, "CC_COURSES", ()),
             "enterprise_patterns": getattr(smoke, "EAA_COURSES", ()),
             "intro_algorithms": getattr(smoke, "ITA_COURSES", ()),
+            "domain_driven_design": getattr(smoke, "DDD_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3425,9 +3549,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1381,
+            1443,
             len(course_pages),
-            "one hundred and thirty-five course homes and 1246 lessons carry a material "
+            "one hundred and forty-four course homes and 1299 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4420,7 +4544,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(135, checked, "every published course must be checked")
+        self.assertEqual(144, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4724,6 +4848,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from code_complete import PATH as CODE_COMPLETE
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
             from intro_algorithms import PATH as INTRO_ALGORITHMS
+            from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4740,6 +4865,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("code complete", CC_COURSES, CC_PATH_PAGE, CODE_COMPLETE),
             ("enterprise patterns", EAA_COURSES, EAA_PATH_PAGE, ENTERPRISE_PATTERNS),
             ("intro algorithms", ITA_COURSES, ITA_PATH_PAGE, INTRO_ALGORITHMS),
+            ("domain-driven design", DDD_COURSES, DDD_PATH_PAGE, DOMAIN_DRIVEN_DESIGN),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -4878,12 +5004,14 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from code_complete import PATH as CODE_COMPLETE
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
             from intro_algorithms import PATH as INTRO_ALGORITHMS
+            from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
-                     ENTERPRISE_PATTERNS, INTRO_ALGORITHMS):
+                     ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
+                     DOMAIN_DRIVEN_DESIGN):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -5072,13 +5200,15 @@ class TestEveryLabBuilds(unittest.TestCase):
             from code_complete import PATH as CODE_COMPLETE
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
             from intro_algorithms import PATH as INTRO_ALGORITHMS
+            from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
         cls.used = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
-                     ENTERPRISE_PATTERNS, INTRO_ALGORITHMS):
+                     ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
+                     DOMAIN_DRIVEN_DESIGN):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

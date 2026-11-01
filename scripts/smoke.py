@@ -2258,6 +2258,110 @@ ITA_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Domain-Driven Design, same shape.
+DDD_PATH_PAGE_PATH = "/paths/domain-driven-design/"
+DDD_MATERIAL_MARKER = "one consequence of one modelling choice"
+DDD_COURSES = (
+    ("ddd-putting-the-model-to-work", "Putting the Domain Model to Work", (
+        "crunching-knowledge",
+        "knowledge-rich-design-and-deep-models",
+        "ubiquitous-language",
+        "documents-and-explanatory-models",
+        "model-driven-design-and-hands-on-modelers",
+    )),
+    ("ddd-building-blocks", "The Building Blocks of a Model-Driven Design", (
+        "layered-architecture",
+        "the-smart-ui-anti-pattern",
+        "associations",
+        "entities",
+        "value-objects",
+        "services",
+        "modules-and-modeling-paradigms",
+    )),
+    ("ddd-life-cycle", "The Life Cycle of a Domain Object", (
+        "aggregates",
+        "aggregate-invariants-and-locking",
+        "factories",
+        "repositories",
+        "an-extended-example",
+        "refactoring-the-example-and-modules",
+    )),
+    ("ddd-implicit-concepts", "Breakthroughs and Implicit Concepts", (
+        "breakthrough",
+        "digging-out-concepts",
+        "constraints-and-processes",
+        "specification",
+        "applying-specification",
+    )),
+    ("ddd-supple-design", "Supple Design", (
+        "intention-revealing-interfaces",
+        "side-effect-free-functions",
+        "assertions",
+        "conceptual-contours",
+        "standalone-classes-and-closure",
+        "declarative-design",
+        "angles-of-attack",
+    )),
+    ("ddd-patterns-and-refactoring", "Analysis Patterns, Design Patterns and Refactoring", (
+        "analysis-patterns",
+        "posting-rules",
+        "strategy-and-composite",
+        "refactoring-toward-deeper-insight",
+    )),
+    ("ddd-model-integrity", "Maintaining Model Integrity", (
+        "bounded-context",
+        "continuous-integration",
+        "context-map",
+        "shared-kernel-and-customer-supplier",
+        "conformist-and-anticorruption-layer",
+        "separate-ways-open-host-and-published-language",
+        "unifying-an-elephant",
+        "transformations",
+    )),
+    ("ddd-distillation", "Distillation", (
+        "core-domain",
+        "generic-subdomains",
+        "domain-vision-statement-and-highlighted-core",
+        "cohesive-mechanisms",
+        "segregated-and-abstract-core",
+    )),
+    ("ddd-large-scale-structure", "Large-Scale Structure and Strategy", (
+        "evolving-order-and-system-metaphor",
+        "responsibility-layers",
+        "knowledge-level",
+        "pluggable-component-framework",
+        "bringing-the-strategy-together",
+        "who-sets-the-strategy",
+    )),
+)
+
+DDD_PATH_PAGE_MARKERS = (
+    canonical_marker(DDD_PATH_PAGE_PATH),
+    html.escape(DDD_COURSES[0][1]),
+    html.escape(DDD_COURSES[-1][1]),
+    'href="../../%s/"' % DDD_COURSES[-1][0],
+)
+
+DDD_COURSE_HOMES = tuple(
+    (
+        "ddd-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, DDD_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(DDD_COURSES, start=1)
+)
+
+DDD_COURSE_LESSONS = tuple(
+    (
+        "ddd-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), DDD_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(DDD_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2360,6 +2464,7 @@ def path_page_targets(args):
         ("cc-path", CC_PATH_PAGE_PATH, CC_PATH_PAGE_MARKERS),
         ("eaa-path", EAA_PATH_PAGE_PATH, EAA_PATH_PAGE_MARKERS),
         ("ita-path", ITA_PATH_PAGE_PATH, ITA_PATH_PAGE_MARKERS),
+        ("ddd-path", DDD_PATH_PAGE_PATH, DDD_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2389,7 +2494,8 @@ def course_home_targets(args):
                                     + READ_COURSE_HOMES
                                     + CC_COURSE_HOMES
                                     + EAA_COURSE_HOMES
-                                    + ITA_COURSE_HOMES):
+                                    + ITA_COURSE_HOMES
+                                    + DDD_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2434,6 +2540,7 @@ def lesson_targets(args):
         + CC_COURSE_LESSONS
         + EAA_COURSE_LESSONS
         + ITA_COURSE_LESSONS
+        + DDD_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:
