@@ -23064,6 +23064,501 @@ console.log('design patterns: gofkit family B, six modes');
 }
 // ---- end gofkit family B ----
 
+// ---- acckit (Accelerate), family A ----
+// ==========================================================================
+// Accelerate, Read Along: acckit.py (family A: delivery, flow, branches,
+// release, change, work)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and AKT_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by acckit's own
+// reader (aktRead) and compared on the exact tile string a reader sees. The
+// figures were worked by hand (and Ward's merges by an independent Fraction
+// computation) on the samples stated; every case was seen to FAIL when the
+// line it tests was broken on purpose (docs/accelerate/kit-report.md,
+// "Verification (family A)").
+console.log('accelerate: acckit family A, six modes');
+{
+  const vm = require('vm');
+  const akFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const akSrc = { core: fs.readFileSync(akFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(akFile('acckit.py'), 'utf8') };
+  const akBlock = (s, name) => blockFrom(akSrc[s], name.replace(/[[\]]/g, '\\$&'), 'acckit (' + s + ')');
+  const akViews = (dict, list) => list.map((v) => akBlock('a', dict + '["' + v + '"]')).join('');
+  /* Field specs as acckit.py's SPECS declare them. */
+  const AK_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function RAT(o) { return Object.assign({ kind: 'rat', max: LIM }, o || {}); }
+    function NUMB(lo, hi) { return { kind: 'num', min: String(lo), max: String(hi) }; }
+    function AREC(sub, lo, hi, unique, rest, lr, hr, rw) { return { kind: 'arec', lo: lo, hi: hi, unique: !!unique, sub: sub, rest: rest || { kind: 'name' }, restWhat: rw || 'value', loRest: lr || 0, hiRest: hr || 0 }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'rec', lo: lo, hi: hi, unique: !!unique, sub: sub }; }
+    function ALIST(each, lo, hi) { return { kind: 'alist', each: each, lo: lo, hi: hi, things: 'values' }; }
+    var NM = { kind: 'name' }, YN = { kind: 'word', words: ['yes', 'no'] }, TM = { kind: 'time' }, TMD = { kind: 'time', dash: true }, CK = { kind: 'time', clock: true }, CKD = { kind: 'time', clock: true, dash: true };
+    var CH = [['change', NM], ['committed', TM], ['deployed', TMD], ['failed', YN]], INC = [['incident', NM], ['start', TM], ['restored', TM]];
+    var TIE = [['a', NM], ['b', NM]];
+    var SPEC_OF = {
+      'delivery/metrics': { days: W(1, 366), changes: AREC(CH, 0, 60, true), incidents: AREC(INC, 0, 60, true), changes2: AREC(CH, 0, 60, true), incidents2: AREC(INC, 0, 60, true) },
+      'delivery/cluster': { teams: REC([['team', NM], ['deploy', W(1, 6)], ['lead', W(1, 6)], ['restore', W(1, 6)], ['fail', W(1, 6)]], 3, 30, true), k: W(2, 5), better: { kind: 'word', words: ['1', '6'] } },
+      'flow/utilization': { levels: ALIST(NUMB(0, 100), 1, 12), service: RAT({ gt: '0' }), unit: NM },
+      'flow/batch': { work: W(1, 1000), batch: ALIST(W(1, 1000), 1, 2), per_item: RAT({ gt: '0' }), release_cost: RAT({ min: '0' }), unit: NM },
+      'flow/wip': { throughput: RAT({ gt: '0', dash: true }), wip: ALIST(RAT({ gt: '0' }), 0, 2), days: W(1, 366),
+        items: AREC([['item', NM], ['start', RAT({ min: '0', max: '366' })], ['done', RAT({ min: '0', max: '366', dash: true })]], 0, 60, true) },
+      'branches/trunk': { days: W(1, 92), branches: AREC([['branch', NM], ['created', CK], ['merged', CKD]], 1, 60, true), freezes: ALIST(W(1, 366), 0, 92),
+        max_active: W(0, 60), life_hours: RAT({ gt: '0' }), freeze_max: W(0, 92) },
+      'release/independent': { components: ALIST(NM, 1, 60), teams: REC([['component', NM], ['team', NM]], 0, 60, true), ties: REC(TIE, 0, 60), remove: REC(TIE, 0, 1) },
+      'release/scaling': { orgs: REC([['org', NM], ['developers', W(1)], ['deploys', W(0)]], 2, 30, true), days: W(1, 366) },
+      'change/approval': { changes: AREC([['change', NM], ['route', NM], ['wait', RAT({ min: '0' })], ['failed', YN]], 1, 60, true), compare: ALIST(NM, 0, 2) },
+      'work/split': { kinds: ALIST(NM, 2, 10), 'new': NM, entries: AREC([['kind', NM], ['hours', RAT({ gt: '0' })]], 1, 60, false, NM, 0, 1, 'stage'), scale: AREC([['kind', NM], ['factor', RAT({ min: '0', max: '10' })]], 0, 1), move: { kind: 'word', words: ['yes', 'no'] } }
+    };
+    var DEFAULTS = { days: '14', incidents: '', changes2: '', incidents2: '', k: '3', better: '1', service: '1', unit: 'hours', per_item: '1', release_cost: '0',
+      throughput: '-', wip: '', items: '', freezes: '', max_active: '2', teams: '', life_hours: '24', freeze_max: '0', ties: '', remove: '', compare: '',
+      kinds: 'new unplanned rework', 'new': 'new', scale: '', move: 'yes' };
+    var DAYS_OF = { 'flow/wip': '10', 'branches/trunk': '30', 'release/scaling': '30' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) {
+        var d = f.key === 'days' && DAYS_OF[mode + '/' + view] ? DAYS_OF[mode + '/' + view] : DEFAULTS[f.key];
+        r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (d !== undefined ? d : '');
+      });
+      var inst;
+      try { inst = aktRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+    function TB(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.table.rows.map(function (r) { return r.join(' / '); }).join(' # '); }
+  `;
+  const akMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + akBlock('core', 'EA_CORE_JS') + akBlock('a', 'AKT_CORE_JS') + code + AK_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'acckit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const akCall = (run, mode) => (view, raw, ids) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '), ' + JSON.stringify(ids) + ')');
+  const akStatus = (run, mode) => (view, raw) => run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '))');
+  const akTable = (run, mode) => (view, raw) => run('TB(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '))');
+
+  /* --- AKT_CORE_JS: roots, parsers, durations ----------------------------- */
+  const ak = akMk('');
+  eq(ak("[aktSqrtFixed(R(1n, 2n), 3), aktSqrtFixed(R(2n), 6), aktSqrtFixed(R0, 3), aktSqrtFixed(R(152399025n), 2), aktSqrtFixed(R(1n, 400n), 1), aktSqrtFixed(R(9n, 16n), 3)].join(' | ')"),
+     '0.707 | 1.414214 | 0.000 | 12,345.00 | 0.1 | 0.750', 'aktSqrtFixed: exact digits, half up (sqrt(1/400) = 0.05 exactly rounds to 0.1)');
+  eq(ak("[aktSqrtFixed(R(4n, 9n), 4), aktSqrtFixed(R(99n, 100n), 3), aktSqrtFixed(R(1n, 10000n), 1)].join(' | ')"),
+     '0.6667 | 0.995 | 0.0', 'aktSqrtFixed: 2/3 to four places; sqrt(0.99) = 0.99498…; 0.01 to one place');
+  eq(ak("[aktRootSigned(-1, R(3n, 4n), 3), aktRootSigned(-1, R(1n, 10000000n), 3), aktRootSigned(1, R(1n), 3)].join(' | ')"),
+     '−0.866 | 0.000 | 1.000', 'aktRootSigned: a negative r; a rounded zero carries no sign');
+  eq(ak("[Rtext(aktSqrtExact(R(9n, 16n))), String(aktSqrtExact(R(2n))), Rtext(aktParseRat('-3/4', 'x')), Rtext(aktParseRat('0.125', 'x')), Rtext(aktParseDec('.5', 'x'))].join(' | ')"),
+     '3/4 | null | -3/4 | 1/8 | 1/2', 'aktSqrtExact, aktParseRat, aktParseDec: exact rationals');
+  eq(ak("var e = []; ['1/3', '1/0', '2.1234567'].forEach(function (s) { try { aktParseDec(s, 'x'); } catch (err) { e.push(err.message); } }); e.join(' | ')"),
+     'x should be a number such as 3 or 0.25 (no fractions or exponents), and "1/3" is not one | x should be a number such as 3 or 0.25 (no fractions or exponents), and "1/0" is not one | x has more than 6 decimal places',
+     'aktParseDec refuses fractions and a seventh place');
+  eq(ak("try { aktParseRat('1/0', 'x'); } catch (err) { err.message }"), 'x "1/0" divides by zero', 'aktParseRat refuses a zero denominator');
+  eq(ak("[aktDur(R(53n, 2n)), aktDur(R(1n, 120n)), aktDur(R0), aktDur(R(1n, 7n)), aktTimeText(aktTime('2.10:05', 't')), aktTimeText(R(75n, 2n)), Rtext(aktTime('1.09:30', 't'))].join(' | ')"),
+     '1 d 2 h 30 min | 30 s | 0 min | 1/7 ≈ 0.14 h | 2.10:05 | 2.13:30 | 19/2', 'aktDur, aktTimeText, aktTime: day 1 begins at hour 0');
+  eq(ak("[aktPp(R(2n, 15n)), aktPp(R(-1n, 8n)), aktPp(R(1n, 5n)), aktPp(R0), Rtext(aktMedian([R(3n), R(1n), R(2n), R(10n)])), Rtext(aktMedian([R(3n), R(1n), R(2n)])), Rtext(aktMean([R(1n), R(2n)]))].join(' | ')"),
+     '≈ +13.3 points | −12.5 points | +20 points | 0 points | 5/2 | 2 | 3/2', 'aktPp and aktMedian: the mean of the two middle values');
+
+  /* --- delivery (ade) ---------------------------------------------------- */
+  const de = akMk(akBlock('a', 'ADE_JS') + akViews('ADE_VIEW_JS', ['metrics', 'cluster']), 'adeCompute');
+  const dl = akCall(de, 'delivery'), dt = akTable(de, 'delivery');
+  const LOG = { changes: 'c1, 1.09:00, 1.15:00, no; c2, 1.10:00, 1.15:00, no; c3, 2.09:00, 3.11:00, yes; c4, 4.09:00, 4.09:40, no; c5, 5.10:00, -, no; c6, 6.09:00, 8.09:00, no',
+    incidents: 'i1, 3.11:30, 3.14:00; i2, 9.08:00, 9.08:45' };
+  eq(dl('metrics', LOG, 'adeDeploys adeChanges adePerDay adePerWeek adeFreq adeLead adeLeadOpt adeFail adeFailBand adeRestore adeRestoreOpt'),
+     '4 | 5 of 6 | 2/7 ≈ 0.29 | 2 | between once per day and once per week | 6 h | less than one day | 1/5 = 20% | 16–30% | 1 h 37 min 30 s | less than one day',
+     'delivery/metrics: two changes in one deploy are one deployment; median of five lead times; median of two restores');
+  eq(dt('metrics', LOG).split(' # ')[4], 'change c5 / 5.10:00 / not deployed / — / no', 'delivery/metrics: an undeployed change has no lead time');
+  eq(dl('metrics', { days: '7', changes: 'a, 1.09:00, 1.10:00, no; b, 1.09:00, 1.11:00, no; c, 2.09:00, 2.10:00, no; d, 3.09:00, 3.10:00, no; e, 3.09:00, 3.10:30, no; f, 4.09:00, 4.10:00, no; g, 5.09:00, 5.10:00, no' }, 'adeDeploys adeFreq adeLead adeLeadOpt'),
+     '7 | between once per hour and once per day | 1 h | less than one day', 'delivery/metrics: one a day exactly is the second option; one hour exactly is less than one day');
+  eq(dl('metrics', { days: '7', changes: Array.from({ length: 14 }, (_, i) => 'x' + i + ', ' + (i + 1) + ', ' + (i + 1.5) + ', no').join('; ') }, 'adeFreq adeLeadOpt'),
+     'on demand (multiple deploys per day) | less than one hour', 'delivery/metrics: two a day is on demand; half an hour is less than one hour');
+  eq(dl('metrics', { days: '30', changes: 'a, 1.09:00, 1.10:00, no' }, 'adeFreq adeRestore adeRestoreOpt'),
+     'between once per week and once per month | no incident in the period | no incident in the period', 'delivery/metrics: one in 30 days; no incident, no restore figure');
+  eq(dl('metrics', { days: '14', changes: 'a, 1, 2, yes; b, 1, 2, no; c, 1, 3, no; d, 1, 3, no; e, 1, 4, no; f, 1, 4, no; g, 1, 5, no' }, 'adeFail adeFailBand'),
+     '1/7 ≈ 14.3% | 0–15%', 'delivery/metrics: 1/7 is in the first band');
+  eq(dl('metrics', { changes: 'a, 1, 2, yes; b, 1, 2, yes; c, 1, 3, yes; d, 1, 3, no; e, 1, 4, no; f, 1, 4, no; g, 1, 5, no; h, 1, 6, no; i, 1, 6, no; j, 1, 6, no; k, 1, 6, no; l, 1, 6, no; m, 1, 6, no; n, 1, 6, no; o, 1, 6, no; p, 1, 6, no; q, 1, 6, no; r, 1, 6, no; s, 1, 6, no; t, 1, 6, no' }, 'adeFail adeFailBand'),
+     '3/20 = 15% | 0–15%', 'delivery/metrics: 15% exactly is the top of 0–15%');
+  eq(dl('metrics', { changes: 'a, 1, 2, yes; b, 1, 2, yes; c, 1, 3, yes; d, 1, 3, no; e, 1, 4, no; f, 1, 4, no; g, 1, 5, no; h, 1, 6, no; i, 1, 6, no; j, 1, 6, no; k, 1, 6, no; l, 1, 6, no; m, 1, 6, no; n, 1, 6, no; o, 1, 6, no; p, 1, 6, no; q, 1, 6, no; r, 1, 6, no; s, 1, 6, no' }, 'adeFail adeFailBand'),
+     '3/19 ≈ 15.8% | 16–30%', 'delivery/metrics: 15.8% passes 15, so 16–30%');
+  eq(dl('metrics', { days: '7', changes: 'a, 1.09:00, 1.10:00, no', changes2: 'a, 1.09:00, 1.09:30, no; b, 2.09:00, 2.09:20, yes' }, 'adeDeploys adeLead adeFail'),
+     '1 → 2 | 1 h → 25 min | 0 = 0% → 1/2 = 50%', 'delivery/metrics: two periods read period 1 → period 2');
+  eq(dl('metrics', { changes: 'c1, 1.09:00, -, yes' }, 'adeDeploys'), 'REFUSED Changes, record 1 (c1): failed is yes, but the change was never deployed (deployed -)', 'delivery/metrics: an undeployed change cannot fail');
+  eq(dl('metrics', { days: '2', changes: 'c1, 1.09:00, 48.5, no' }, 'adeDeploys'), 'REFUSED Changes, record 1 (c1): deployed 3.00:30 is after the end of the 2-day period', 'delivery/metrics: a deploy after the period');
+  eq(dl('metrics', { changes: 'c1, 1.09:00, 1.08:00, no' }, 'adeDeploys'), 'REFUSED Changes, record 1 (c1): deployed 1.08:00 is before committed 1.09:00', 'delivery/metrics: deploy before commit');
+  const TEAMS = 'a, 1, 1, 1, 1; b, 1, 2, 1, 1; c, 2, 1, 2, 1; d, 4, 4, 3, 2; e, 4, 5, 4, 3; f, 5, 4, 4, 2; g, 6, 6, 5, 4; h, 6, 6, 6, 4';
+  eq(dl('cluster', { teams: TEAMS }, 'adeTeams adeGroups adeWithin adeLastCoef adeNextCoef'),
+     '8 | G1: a, b, c; G2: d, e, f; G3: g, h | 31/6 ≈ 5.17 | 5/3 ≈ 1.67 ({d, f} + {e}) | 421/30 ≈ 14.03 ({d, e, f} + {g, h})',
+     'delivery/cluster: Ward at k = 3, fusion coefficients as exact fractions');
+  eq(dt('cluster', { teams: TEAMS }).split(' # ').map((r) => r.split(' / ')[2]).join(', '),
+     '1/2 = 0.50, 1/2 = 0.50, 1, 3/2 = 1.50, 5/3 ≈ 1.67, 421/30 ≈ 14.03, 1,511/20 = 75.55',
+     'delivery/cluster: every fusion coefficient (checked against ESS differences computed independently)');
+  eq(dt('cluster', { teams: TEAMS }).split(' # ')[0], '1 / {a} + {b} / 1/2 = 0.50 / 7 / 1/2 = 0.50', 'delivery/cluster: a tie at the first merge goes to the earlier pair (a, b before g, h)');
+  eq(dl('cluster', { teams: TEAMS }, 'adeMedDeploy adeMedRestore'),
+     'G1: 1, on demand (multiple deploys per day); G2: 4, between once per week and once per month; G3: 6, fewer than once every six months | G1: 1, less than one hour; G2: 4, between one week and one month; G3: 5.5, between one month and six months / more than six months',
+     'delivery/cluster: medians decoded, a half code showing both neighbours');
+  eq(dl('cluster', { teams: TEAMS, better: '6' }, 'adeMedFail'), 'G1: 1, 76–100%; G2: 2, 61–75%; G3: 4, 31–45%', 'delivery/cluster: 6 coded best decodes the other way round');
+  eq(dl('cluster', { teams: TEAMS, k: '2' }, 'adeGroups adeNextCoef'), 'G1: a, b, c; G2: d, e, f, g, h | 1,511/20 = 75.55 ({a, b, c} + {d, e, f, g, h})', 'delivery/cluster: k = 2');
+  eq(dl('cluster', { teams: 'a, 1, 1, 1, 1; b, 2, 2, 2, 2; c, 3, 3, 3, 3', k: '3' }, 'adeTeams'), 'REFUSED k is 3, and there are 3 teams; k must be fewer than the teams', 'delivery/cluster: k below the teams');
+
+  /* --- flow (afl) -------------------------------------------------------- */
+  const fl = akMk(akBlock('a', 'AFL_JS') + akViews('AFL_VIEW_JS', ['utilization', 'batch', 'wip']), 'aflCompute');
+  const f = akCall(fl, 'flow');
+  eq(f('utilization', { levels: '50 80 90 95 99' }, 'aflMultiples aflLeads aflHigh aflRatio'),
+     '50%: 1; 80%: 4; 90%: 9; 95%: 19; 99%: 99 | 50%: 2 hours; 80%: 5 hours; 90%: 10 hours; 95%: 20 hours; 99%: 100 hours | 99%: 100× the service time | 50× (50% to 99%)',
+     'flow/utilization: u/(1 − u) and service/(1 − u)');
+  eq(f('utilization', { levels: '60 25', service: '1/2', unit: 'days' }, 'aflMultiples aflLeads aflRatio'),
+     '60%: 3/2 = 1.50; 25%: 1/3 ≈ 0.33 | 60%: 5/4 = 1.25 days; 25%: 2/3 ≈ 0.67 days | 15/8 ≈ 1.9× (25% to 60%)', 'flow/utilization: a rational service time; levels in the order given');
+  eq(f('utilization', { levels: '40 100' }, 'aflLevels'), 'REFUSED Utilization levels, entry 2 is 100%: there u/(1 − u) divides by zero, because work arrives as fast as it can be done, so in this model the queue and the wait grow without bound and no lead time exists', 'flow/utilization: 100% refused');
+  eq(f('batch', { work: '20', batch: '20 5', per_item: '1', release_cost: '2' }, 'aflBatches aflFirst aflLast aflWait aflOverhead aflRatio'),
+     '1 of 20 → 4 of 5 | 22 hours → 7 hours | 22 hours → 28 hours | 22 hours → 35/2 = 17.50 hours | 2 hours → 8 hours | 22/7 ≈ 3.1×', 'flow/batch: four slices bring the first feedback forward');
+  eq(f('batch', { work: '10', batch: '4', per_item: '1/2', release_cost: '1' }, 'aflBatches aflFirst aflLast aflWait'),
+     '3: 2 of 4, the last of 2 | 3 hours | 8 hours | 26/5 = 5.20 hours', 'flow/batch: a short last batch');
+  eq(f('batch', { work: '5', batch: '6' }, 'aflFirst'), 'REFUSED Batch sizes, entry 1 is 6, more than the work (5 items)', 'flow/batch: a batch larger than the work');
+  eq(f('wip', { throughput: '3/2', wip: '12 6' }, 'aflThru aflLeadAt aflChange'),
+     '3/2 = 1.50 items a day | WIP 12: 8 days; WIP 6: 4 days | 1/2 ≈ 0.5× the lead time (8 → 4 days)', 'flow/wip: Little’s law, lead = WIP / throughput');
+  const BOARD = 'w1, 0, 3; w2, 0, 4; w3, 1, 6; w4, 2, 9; w5, 5, -; w6, 7, 10';
+  eq(f('wip', { items: BOARD, wip: '4' }, 'aflThru aflAvgWip aflAvgLead aflLittle aflLeadAt'),
+     '1/2 = 0.50 items a day | 27/10 = 2.70 items | 22/5 = 4.40 days | differs: average WIP 27/10 = 2.70, throughput × average lead time 11/5 = 2.20, because 1 item is still open at the end (w5) | WIP 4: 8 days',
+     'flow/wip: a log with an open item: L ≠ λW, and why');
+  eq(f('wip', { items: 'w1, 0, 3; w2, 1, 5; w3, 2, 10' }, 'aflAvgWip aflLittle'), '3/2 = 1.50 items | holds: average WIP 3/2 = 1.50 = throughput × average lead time', 'flow/wip: no item open, the law holds exactly');
+  eq(f('wip', { items: BOARD, throughput: '2' }, 'aflThru'), 'REFUSED Give a throughput or a board log, not both: with a log the throughput is measured from it (set the throughput to -)', 'flow/wip: not both');
+  eq(f('wip', { items: 'w1, 0, -', wip: '3' }, 'aflThru'), 'REFUSED No item is done in the window, so the throughput is 0 and Little’s law gives no lead time for a work in process', 'flow/wip: throughput 0');
+
+  /* --- branches (atb) ---------------------------------------------------- */
+  const bk = akMk(akBlock('a', 'ATB_JS') + akViews('ATB_VIEW_JS', ['trunk']), 'atbCompute');
+  const b = akCall(bk, 'branches'), bt = akTable(bk, 'branches');
+  const BR = 'f1, 1.09:00, 1.16:00; f2, 1.10:00, 2.11:00; f3, 2.09:00, 2.12:00; f4, 2.10:00, 2.11:00; f5, 3.09:00, 7.17:00; f6, 5.14:00, -; f7, 7.09:00, -';
+  eq(b('trunk', { days: '7', branches: BR, freezes: '6' }, 'atbMaxActive atbMeanLife atbOver atbOpen atbFreeze atbMetActive atbMetLife atbMetFreeze'),
+     '3, first at 2.10:00 | 1 d 4 h | 3: f2 (1 d 1 h); f5 (4 d 8 h); f6 (open, at least 2 d 10 h) | 2: f6, f7 | 1: day 6 | no: 3 at once, and the threshold is at most 2 (fewer than three) | no: 3 branches lived 1 d or longer | no: 1 freeze day, and the threshold is at most 0',
+     'branches/trunk: most open at once, lifetimes, an open branch over the limit, a freeze');
+  eq(bt('trunk', { days: '7', branches: BR, freezes: '6' }).split(' # ').slice(0, 2).join(' # '), '1 / 2 / f1, f2 /  # 2 / 3 / f2, f3, f4 / ', 'branches/trunk: a branch counts on the day it is merged');
+  eq(b('trunk', { days: '5', branches: 'a, 1.09:00, 1.12:00; b, 1.12:00, 1.15:00; c, 2.09:00, 2.10:00; d, 5.20:00, -' }, 'atbMaxActive atbMetActive atbMetLife'),
+     '1, first at 1.09:00 | yes: at most 1 at once, and the threshold is at most 2 (fewer than three) | not yet determined: 1 branch is open and younger than 1 d', 'branches/trunk: a merge ends before a creation at the same moment; a young open branch is undetermined');
+  eq(b('trunk', { days: '5', branches: 'a, 1.09:00, 1.12:00; b, 1.10:00, 1.11:00', max_active: '1', life_hours: '3' }, 'atbMetActive atbMetLife'),
+     'no: 2 at once, and the threshold is at most 1 | no: 1 branch lived 3 h or longer', 'branches/trunk: thresholds from cfg; exactly the limit fails "less than"');
+  eq(b('trunk', { days: '2', branches: 'a, 1.00:00, 2.00:00; b, 2.00:00, -' }, 'atbOver atbMetLife') + ' | ' + bt('trunk', { days: '2', branches: 'a, 1.00:00, 2.00:00; b, 2.00:00, -' }),
+     '2: a (1 d); b (open, at least 1 d) | no: 2 branches lived 1 d or longer | 1 / 1 / a /  # 2 / 2 / a, b / ',
+     'branches/trunk: a lifetime or an open age of exactly the limit fails; a merge at midnight counts on the new day');
+  eq(b('trunk', { days: '5', branches: 'a, 1.09:00, 1.12:00; b, 1.12:00, 1.15:00', max_active: '1' }, 'atbMetActive'), 'yes: at most 1 at once, and the threshold is at most 1', 'branches/trunk: exactly the threshold meets "at most"');
+  eq(b('trunk', { days: '20', branches: 'b1, 1, 1' }, 'atbBranches'), 'REFUSED branches, record 1: created "1" should be a time day.hh:mm, such as 3.14:30; this view takes no bare numbers, because a day number alone cannot tell a lifetime of an hour from one of a day and a half', 'branches/trunk: a bare day number is refused, not read as an hour');
+  eq(b('trunk', { days: '5', branches: 'a, 1.09:00, 1.12:00', freezes: '2 2' }, 'atbBranches'), 'REFUSED Freeze days names day 2 twice', 'branches/trunk: a freeze day twice');
+  eq(b('trunk', { days: '5', branches: 'a, 3.09:00, 2.12:00' }, 'atbBranches'), 'REFUSED Branches, record 1 (a): merged 2.12:00 is before created 3.09:00', 'branches/trunk: merged before created');
+
+  /* --- release (arl) ----------------------------------------------------- */
+  const rl = akMk(akBlock('a', 'ARL_JS') + akViews('ARL_VIEW_JS', ['independent', 'scaling']), 'arlCompute');
+  const r = akCall(rl, 'release');
+  const COMP = 'web cart pay ledger search mail', OWN = 'web, shop; cart, shop; pay, money; ledger, money; search, find; mail, ops';
+  eq(r('independent', { components: COMP, teams: OWN, ties: 'web, cart; cart, pay; pay, ledger', remove: 'cart, pay' }, 'arlGroups arlLargest arlAlone arlCoord arlRemoved arlAfterGroups arlAfterCoord'),
+     '3: {web, cart, pay, ledger}, {search}, {mail} | 4: web, cart, pay, ledger | 2: search, mail | 1: shop + money for {web, cart, pay, ledger} | removing cart–pay splits a group: 3 → 4 release groups | 4: {web, cart}, {pay, ledger}, {search}, {mail} | 0: none',
+     'release/independent: ties chain; removing one tie frees two teams');
+  eq(r('independent', { components: 'a b c', ties: 'a, b; b, c; c, a', remove: 'c, a' }, 'arlRemoved arlAfterGroups arlCoord'),
+     'removing c–a changes no group: c and a are still tied through others | 1: {a, b, c} | no team column given', 'release/independent: a cycle survives one removed tie');
+  eq(r('independent', { components: 'a b', ties: 'a, b; b, a' }, 'arlGroups'), 'REFUSED Ties, record 2: the tie b–a is given twice', 'release/independent: a tie twice, either way round');
+  eq(r('independent', { components: 'a b', teams: 'a, x' }, 'arlGroups'), 'REFUSED Give a team for every component or for none; b has none', 'release/independent: teams for all or none');
+  eq(r('scaling', { orgs: 'big, 400, 9600; small, 10, 150; mid, 80, 2000', days: '30' }, 'arlRates arlTrend'),
+     'small (10 developers): 1/2 = 0.500; mid (80 developers): 5/6 ≈ 0.833; big (400 developers): 4/5 = 0.800 | from small to big, the rate rises and falls: no single direction',
+     'release/scaling: deploys / (developers × days), ordered by size');
+  eq(r('scaling', { orgs: 'a, 10, 30; b, 20, 70; c, 40, 200', days: '10' }, 'arlTrend'), 'from a to c, the rate rises at every step', 'release/scaling: rises');
+  eq(r('scaling', { orgs: 'a, 10, 30; b, 20, 60', days: '10' }, 'arlTrend'), 'from a to b, the rate holds: the same at every size', 'release/scaling: holds');
+  eq(r('scaling', { orgs: 'a, 10, 30; b, 10, 50', days: '10' }, 'arlTrend'), 'REFUSED Organizations, record 2 (b) has as many developers as a (10); this view orders by size, so each needs a different number', 'release/scaling: equal sizes refused');
+
+  /* --- change (acm) ------------------------------------------------------ */
+  const cm = akMk(akBlock('a', 'ACM_JS') + akViews('ACM_VIEW_JS', ['approval']), 'acmCompute');
+  const c = akCall(cm, 'change');
+  const CHG = 'c1, none, 0, no; c2, peer, 2, no; c3, peer, 3.5, yes; c4, cab, 72, no; c5, cab, 120, yes; c6, peer, 1, no; c7, cab, 48, no; c8, none, 0.25, no; c9, peer, 4, no; c10, none, 0, yes';
+  eq(c('approval', { changes: CHG }, 'acmRoutes acmMeanWait acmMedianWait acmFail acmOverall acmDiff'),
+     '3: none (3), peer (4), cab (3) | none 5 min; peer 2 h 37 min 30 s; cab 3 d 8 h | none 0 min; peer 2 h 45 min; cab 3 d | none 1/3 ≈ 33.3%; peer 1/4 = 25%; cab 1/3 ≈ 33.3% | 3/10 = 30% | none 1/3 ≈ 33.3% against peer 1/4 = 25%: ≈ +8.3 points',
+     'change/approval: waits and fail rates by route, the first two routes compared');
+  eq(c('approval', { changes: CHG, compare: 'cab peer' }, 'acmDiff'), 'cab 1/3 ≈ 33.3% against peer 1/4 = 25%: ≈ +8.3 points', 'change/approval: two routes named');
+  eq(c('approval', { changes: CHG, compare: 'cab' }, 'acmDiff'), 'REFUSED Name two routes to compare, or none (the first two routes met are compared)', 'change/approval: one route named');
+  eq(c('approval', { changes: 'a, none, 1, no' }, 'acmDiff'), 'one route only', 'change/approval: one route');
+
+  /* --- work (awk) -------------------------------------------------------- */
+  const wk = akMk(akBlock('a', 'AWK_JS') + akViews('AWK_VIEW_JS', ['split']), 'awkCompute');
+  const w = akCall(wk, 'work');
+  const ENT = 'new, 60; unplanned, 30; rework, 40; new, 30';
+  eq(w('split', { entries: ENT, scale: 'rework, 1/2' }, 'awkTotal awkHours awkShares awkNew awkFreed awkAfter awkNewAfter'),
+     '160 hours | new 90; unplanned 30; rework 40 | new 9/16 ≈ 56.3%; unplanned 3/16 ≈ 18.8%; rework 1/4 = 25% | 9/16 ≈ 56.3% | 20 hours (rework 40 → 20), to new | new 11/16 ≈ 68.8%; unplanned 3/16 ≈ 18.8%; rework 1/8 = 12.5% | 11/16 ≈ 68.8%',
+     'work/split: entries summed by kind; halving rework moves 20 hours to new work');
+  eq(w('split', { entries: ENT, scale: 'rework, 1/2', move: 'no' }, 'awkFreed awkNewAfter'), '20 hours (rework 40 → 20), total 140 | 9/14 ≈ 64.3%', 'work/split: freed hours dropped from the total');
+  eq(w('split', { entries: ENT, scale: 'rework, 4' }, 'awkTotal'), 'REFUSED Scaling rework by 4 adds 120 hours, more than the new work’s 90 hours', 'work/split: a scaling that would make new work negative');
+  eq(w('split', { kinds: 'new security', entries: 'new, 800; security, 4, build; security, 36, test; security, 320, release; security, 6, test' }, 'awkStages awkShares'),
+     'build 4; test 42; release 320 | new 400/583 ≈ 68.6%; security 183/583 ≈ 31.4%', 'work/split: hours by stage; shares by kind (800 of 1,166 hours new)');
+  eq(w('split', { entries: 'new, 10; test, 5' }, 'awkTotal'), 'REFUSED Entries, record 2: test is not one of the kinds (new, unplanned, rework)', 'work/split: an unknown kind');
+}
+// ---- end acckit family A ----
+
+// ---- acckit (Accelerate), family B ----
+// ==========================================================================
+// Accelerate, Read Along: acckit_b.py (family B: likert, stats, validity,
+// groups, sample, capability)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and AKT_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by acckit's own
+// reader (aktRead) and compared on the exact tile string a reader sees. Every
+// figure was computed by hand on the sample stated (the workings are in
+// docs/accelerate/kit-report.md, "Family B: verification") and confirmed on a
+// rendered page; every case was seen to FAIL when the line it tests was
+// broken on purpose.
+console.log('accelerate: acckit family B, six modes');
+{
+  const vm = require('vm');
+  const abFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const abSrc = { core: fs.readFileSync(abFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(abFile('acckit.py'), 'utf8'),
+    b: fs.readFileSync(abFile('acckit_b.py'), 'utf8') };
+  const abBlock = (src, name) => blockFrom(abSrc[src], name.replace(/[[\]]/g, '\\$&'), 'acckit (' + src + ')');
+  const abViews = (dict, list) => list.map((v) => abBlock('b', dict + '["' + v + '"]')).join('');
+  /* Field specs as acckit_b.py's mode dicts declare them. */
+  const AB_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function NUM(lo, hi, gt) { var f = { kind: 'num', max: String(hi === undefined ? LIM : hi) }; if (lo !== undefined) f.min = String(lo); if (gt !== undefined) f.gt = String(gt); return f; }
+    var NM = { kind: 'name' }, PAR = { kind: 'parent' }, YN = { kind: 'word', words: ['yes', 'no'] };
+    function AREC(sub, lo, hi, unique, rest, restWhat, loRest, hiRest) {
+      return { kind: 'arec', sub: sub, rest: rest || NM, restWhat: restWhat || 'value', loRest: loRest || 0, hiRest: hiRest || 0, lo: lo, hi: hi || 60, unique: !!unique };
+    }
+    function ALIST(each, lo, hi) { return { kind: 'alist', each: each, lo: lo, hi: hi || 60, things: 'values' }; }
+    var ITEMS = AREC([['item', NM], ['construct', NM], ['reverse', YN]], 1, 40, true);
+    function ANS(lo, loRest) { return AREC([['respondent', NM]], lo, 60, true, W(1, 7), 'answer', loRest, 40); }
+    var PTS = { kind: 'word', words: ['5', '7'] }, XY = [['x', NUM('-' + LIM)], ['y', NUM('-' + LIM)]];
+    function CAPS(key, lo, loRest) { return AREC([[key, NM]], lo, 60, true, NM, 'capability', loRest, 60); }
+    var SPEC_OF = {
+      'likert/score': { points: PTS, items: ITEMS, answers: ANS(1, 1), line: NUM(0) },
+      'likert/westrum': { points: PTS, items: ITEMS, answers: ANS(1, 1), cuts: ALIST(NUM(0), 1, 4), answers2: ANS(0, 1) },
+      'likert/alpha': { points: PTS, items: ALIST(NM, 2, 20), answers: ANS(3, 2) },
+      'stats/describe': { values: ALIST(NUM('-' + LIM), 2) },
+      'stats/describe2': { values: AREC([['name', NM], ['value', NUM('-' + LIM)]], 2, 60, true) },
+      'stats/pearson': { pairs: AREC([['name', NM]].concat(XY), 3, 60, true) },
+      'stats/spurious': { series: AREC([['t', W(0)]].concat(XY), 4, 60) },
+      'stats/confound': { rows: AREC([['name', NM]].concat(XY).concat([['z', NM]]), 3, 60, true) },
+      'validity/matrix': { items: AREC([['item', NM], ['construct', NM]], 3, 11, true), corr: AREC([['a', NM], ['b', NM], ['r', NUM(-1, 1)]], 1, 60) },
+      'validity/ave': { loadings: AREC([['item', NM], ['construct', NM], ['loading', NUM(0, 1)]], 1, 60, true), between: AREC([['c1', NM], ['c2', NM], ['r', NUM(-1, 1)]], 0, 60) },
+      'groups/likely': { rows: AREC([['group', NM], ['n', W(1)], ['met', W(0)]], 2, 60, true), first: NM, second: NM },
+      'groups/enps': { answers: ALIST(W(0, 10), 1) },
+      'groups/enps2': { answers: AREC([['name', NM], ['answer', W(0, 10)]], 1, 60, true) },
+      'groups/bias': { table: AREC([['category', NM], ['early', W(0)], ['late', W(0)]], 2, 60, true), critical: NUM(undefined, undefined, 0) },
+      'sample/snowball': { people: AREC([['person', NM], ['referred_by', PAR], ['group', NM]], 1, 60, true), drop: PAR },
+      'capability/profile': { capabilities: AREC([['capability', NM], ['category', NM]], 1, 60, true), teams: CAPS('team', 1, 0),
+        levels: CAPS('level', 0, 1), teams2: CAPS('team', 0, 0) }
+    };
+    var DEFAULTS = { points: '7', line: '4', answers2: '', between: '', drop: '-', levels: '', teams2: '' };
+    function RUN(mode, view, raw, opts) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = aktRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view.replace(/2$/, ''), inst, opts || {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+  `;
+  const abMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + abBlock('core', 'EA_CORE_JS') + abBlock('a', 'AKT_CORE_JS') + code + AB_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'acckit_b' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const abCall = (run, mode) => (view, raw, ids, opts) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '), ' + JSON.stringify(ids) + ')');
+  const abStatus = (run, mode) => (view, raw, opts) =>
+    run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '))');
+  const abEnds = (got, want, label) => eq(String(got).slice(-want.length), want, label);
+  const CAUT = '; the figure is of the sample stated.';
+
+  /* --- likert (alk) ------------------------------------------------------ */
+  const lkRun = abMk(abBlock('b', 'ALK_JS') + abViews('ALK_VIEW_JS', ['score', 'westrum', 'alpha']), 'alkCompute');
+  const lk = abCall(lkRun, 'likert'), lkS = abStatus(lkRun, 'likert');
+  const LK_TWO = { items: 'c1, culture, no; c2, culture, no; c3, culture, yes; l1, learning, no; l2, learning, yes',
+    answers: 'r1, 6, 5, 2, 7, 1; r2, 4, 4, 4, 5, 3; r3, 7, 6, 1, 6, 2; r4, 2, 3, 6, 3, 5', line: '4' };
+  /* r1 culture (6 + 5 + 6)/3 = 17/3, learning (7 + 7)/2 = 7; r2 4, 5; r3 20/3, 6; r4 7/3, 3.
+     culture (17/3 + 4 + 20/3 + 7/3)/4 = 14/3; learning 21/4. Unreversed: culture 25/6, learning 4. */
+  eq(lk('score', LK_TWO, 'alkN alkConstructs alkItems alkLine alkReversed alkUnreversed'),
+     '4 | culture 14/3 ≈ 4.667; learning 5.25 | c1 4.75; c2 4.5; c3 4.75; l1 5.25; l2 5.25 | culture: 2 above, 1 at, 1 below; learning: 3 above, 0 at, 1 below | 2: c3, l2 | culture 25/6 ≈ 4.167; learning 4',
+     'likert/score: reverse-coded items scored 8 − the answer; means per construct, item and line');
+  eq(lk('score', { points: '5', items: 'm1, morale, no; m2, morale, yes', answers: 'p1, 5, 1; p2, 3, 3; p3, 2, 4', line: '3' }, 'alkConstructs alkLine alkUnreversed'),
+     'morale 10/3 ≈ 3.333 | morale: 1 above, 1 at, 1 below | morale 3', 'likert/score: a five-point scale reverses as 6 − the answer');
+  abEnds(lkS('score', LK_TWO), 'Left unreversed, 2 construct means would be wrong: culture, learning' + CAUT, 'likert/score: the status ends with the caution');
+  eq(lk('score', Object.assign({}, LK_TWO, { answers: 'r1, 6, 5, 2, 7' }), 'alkN'),
+     'REFUSED Answers, record 1 (r1) gives 4 answers; there are 5 items (c1, c2, c3, l1, l2), so each record needs 5', 'likert/score: a record short of answers is refused');
+  eq(lk('score', Object.assign({}, LK_TWO, { answers: 'r1, 6, 5, 2, 7, 1, 3' }), 'alkN'),
+     'REFUSED Answers, record 1 (r1) gives 6 answers; there are 5 items (c1, c2, c3, l1, l2), so each record needs 5', 'likert/score: a record with an answer too many is refused');
+  eq(lk('score', { points: '5', items: 'm1, morale, no', answers: 'p1, 6', line: '3' }, 'alkN'),
+     'REFUSED Answers, record 1 (p1): answer 1 is 6; on a 5-point scale an answer is 1 to 5', 'likert/score: an answer above the scale is refused');
+  eq(lk('score', Object.assign({}, LK_TWO, { line: '7.5' }), 'alkN'), 'REFUSED The line is 7.5; on a 7-point scale it lies from 1 to 7', 'likert/score: a line off the scale is refused');
+
+  const WS_ITEMS = 'w1, culture, no; w2, culture, no; w3, culture, no; w4, culture, yes';
+  /* a (6 + 7 + 6 + 6)/4 = 6.25 generative; b 4.75; c 2.5 pathological; d 6.5; e 4.25; team 24.25/5 = 4.85. */
+  eq(lk('westrum', { items: WS_ITEMS, cuts: '3.5 5.5', answers: 'a, 6, 7, 6, 2; b, 5, 5, 4, 3; c, 2, 3, 3, 6; d, 6, 6, 7, 1; e, 4, 4, 5, 4' }, 'alkTeam alkBands alkTeam2 alkChange'),
+     '4.85, bureaucratic | pathological 1, bureaucratic 2, generative 2 | no second survey given | no second survey given', 'likert/westrum: bands by the stated cuts');
+  /* second survey: a 6.75, b 5.75, c 3.75, f 4.75; team 21/4 = 5.3125... (6.75 + 5.75 + 3.75 + 5)/4 */
+  eq(lk('westrum', { items: WS_ITEMS, cuts: '3.5 5.5', answers: 'a, 6, 7, 6, 2; b, 5, 5, 4, 3; c, 2, 3, 3, 6; d, 6, 6, 7, 1', answers2: 'a, 7, 7, 6, 1; b, 6, 6, 5, 2; c, 4, 4, 3, 4; f, 5, 5, 5, 3' },
+     'alkTeam alkTeam2 alkBands2 alkChange alkEach'),
+     '5, bureaucratic | 5.3125, bureaucratic | pathological 0, bureaucratic 2, generative 2 | +0.3125 (bureaucratic to bureaucratic) | 3: a +0.5, b +1, c +1.25',
+     'likert/westrum: two surveys, change per respondent named in both');
+  eq(lk('westrum', { items: WS_ITEMS, cuts: '3.5 5', answers: 'a, 5, 5, 5, 3' }, 'alkTeam'), '5, generative', 'likert/westrum: a mean equal to the second cut is generative');
+  eq(lk('westrum', { items: WS_ITEMS, cuts: '5 5.5', answers: 'a, 5, 5, 5, 3' }, 'alkTeam'), '5, bureaucratic', 'likert/westrum: a mean equal to the first cut is bureaucratic');
+  eq(lk('westrum', { items: WS_ITEMS, cuts: '5 3', answers: 'a, 5, 5, 5, 3' }, 'alkTeam'), 'REFUSED The cuts go low then high, and 5 is not below 3', 'likert/westrum: cuts out of order are refused');
+  eq(lk('westrum', { items: WS_ITEMS, cuts: '4 4', answers: 'a, 5, 5, 5, 3' }, 'alkTeam'), 'REFUSED The cuts go low then high, and 4 is not below 4', 'likert/westrum: equal cuts are refused');
+  eq(lk('westrum', { items: 'w1, culture, no; x1, other, no', cuts: '3 5', answers: 'a, 5, 5' }, 'alkTeam'),
+     'REFUSED Items: the westrum view scores one construct, and the items name 2: culture, other', 'likert/westrum: two constructs are refused');
+  abEnds(lkS('westrum', { items: WS_ITEMS, cuts: '3.5 5.5', answers: 'a, 6, 7, 6, 2' }), 'A band names a mean; it does not grade the team' + CAUT, 'likert/westrum: the status ends with the caution');
+
+  /* q1 var 2, q2 9.2/5 = 1.84, q3 6.8/5 = 1.36; totals 13 8 14 7 4, var 70.8/5 = 14.16;
+     alpha = 3/2 (1 − 5.2/14.16) = 56/59. Without q1: 2 (1 − 3.2/6.16) = 0.961. */
+  const AL = { points: '5', items: 'q1 q2 q3', answers: 'r1, 4, 5, 4; r2, 2, 3, 3; r3, 5, 5, 4; r4, 3, 2, 2; r5, 1, 2, 1' };
+  eq(lk('alpha', AL, 'alkK alkN alkVars alkTotal alkAlpha alkDeleted alkMeets'),
+     '3 | 5 | q1 2; q2 1.84; q3 1.36 | 14.16 | 56/59 ≈ 0.949 | q1 0.961; q2 0.909; q3 0.909 | yes: 0.949 ≥ 0.7', 'likert/alpha: Cronbach\'s alpha exact, with each item removed');
+  eq(lk('alpha', AL, 'alkMeets', { alpha_min: '0.95' }), 'no: 0.949 < 0.95', 'likert/alpha: the threshold is the lesson\'s, compared exactly');
+  eq(lk('alpha', { items: 'q1 q2', answers: 'r1, 1, 1; r2, 4, 4; r3, 7, 7' }, 'alkAlpha alkMeets', { alpha_min: '1' }), '1 | yes: 1.000 ≥ 1', 'likert/alpha: identical items give 1, and a value equal to the threshold meets it');
+  eq(lk('alpha', { items: 'q1 q2', answers: 'r1, 7, 1; r2, 1, 7; r3, 4, 5' }, 'alkAlpha alkDeleted'),
+     '−108 | q1 not computed (one item would be left); q2 not computed (one item would be left)', 'likert/alpha: alpha may be negative; two items leave none to remove');
+  eq(lk('alpha', { items: 'q1 q2', answers: 'r1, 7, 1; r2, 1, 7; r3, 4, 4' }, 'alkAlpha'),
+     'REFUSED Answers: every respondent\'s total is the same, so the total varies by nothing and alpha is not defined', 'likert/alpha: a total with no variance is refused');
+
+  /* --- stats (ast) ------------------------------------------------------- */
+  const stRun = abMk(abBlock('b', 'AST_JS') + abViews('AST_VIEW_JS', ['describe', 'pearson', 'spurious', 'confound']), 'astCompute');
+  const st = abCall(stRun, 'stats'), stS = abStatus(stRun, 'stats');
+  /* 2 3 4 7 7 9: mean 16/3, median 5.5; SS 336/9 = 112/3; population 56/9, √ = 2.4944; sample 112/15, √ = 2.7325. */
+  eq(st('describe', { values: '3 7 7 2 9 4' }, 'astN astMean astMedian astMode astMin astMax astRange astPopSd astSampleSd'),
+     '6 | 16/3 ≈ 5.333 | 5.5 | 7 (2 times) | 2 | 9 | 7 | ≈ 2.494 (variance 56/9 ≈ 6.222) | ≈ 2.733 (variance 112/15 ≈ 7.467)', 'stats/describe: centre and spread, roots by the exact method');
+  eq(st('describe', { values: '1.5 2 2.5 4' }, 'astMode astMedian astPopSd'), 'none: every value occurs once | 2.25 | ≈ 0.935 (variance 0.875)', 'stats/describe: no mode when every value occurs once');
+  eq(st('describe', { values: '1 1 2 2 5' }, 'astMode'), '1, 2 (2 times each)', 'stats/describe: two modes');
+  eq(st('describe', { values: '2 2 4 4' }, 'astMode astPopSd'), 'none: every value occurs 2 times | 1 (variance 1)', 'stats/describe: equal frequencies give no mode; an exact root has no ≈');
+  eq(st('describe2', { values: 't1, 10; t2, 10; t3, 4' }, 'astMean astPopSd'), '8 | ≈ 2.828 (variance 8)', 'stats/describe: named values');
+  /* x̄ 3, ȳ 4; Sxx 10, Syy 6, Sxy 6; r = 6/√60, r² = 3/5; b = 0.6, a = 2.2. */
+  const PE = { pairs: 'a, 1, 2; b, 2, 4; c, 3, 5; d, 4, 4; e, 5, 5' };
+  eq(st('pearson', PE, 'astN astMeans astR astR2 astLine astWords'),
+     '5 | x̄ = 3, ȳ = 4 | ≈ 0.775 | 3/5 = 60% | y = 2.2 + 0.6·x | positive, strong', 'stats/pearson: r, r², the least-squares line');
+  eq(st('pearson', PE, 'astWords', { strength: ['0.3', '0.8'] }), 'positive, moderate', 'stats/pearson: strength by the stated cut-offs, on the squares');
+  eq(st('pearson', { pairs: 'a, 1, 4; b, 2, 3; c, 3, 1' }, 'astR astR2 astLine'), '≈ −0.982 | 27/28 ≈ 96.4% | y = 17/3 ≈ 5.667 − 1.5·x', 'stats/pearson: a negative r and slope');
+  eq(st('pearson', { pairs: 'a, 1, 1; b, 2, 2; c, 3, 3' }, 'astR astWords'), '1 | positive, strong', 'stats/pearson: an exact r of 1 prints without ≈');
+  eq(st('pearson', { pairs: 'a, 1, 2; b, 2, 1; c, 3, 2' }, 'astR astWords'), '0 | none: r = 0', 'stats/pearson: r = 0');
+  eq(st('pearson', { pairs: 'a, 2, 1; b, 2, 4; c, 2, 3' }, 'astR'), 'REFUSED Pairs: r is not defined: every x is the same, so there is no correlation to compute', 'stats/pearson: a constant x is refused');
+  abEnds(stS('pearson', PE), 'it does not say x moves y' + CAUT, 'stats/pearson: the status ends with the caution');
+  /* levels: Sxy 66, Sxx 106, Syy 42, r = 66/√4452 = 0.98916; differences 2 3 2 3 2 against 2 1 2 1 2: r = −1. */
+  eq(st('spurious', { series: '1, 10, 5; 2, 12, 7; 3, 15, 8; 4, 17, 10; 5, 20, 11; 6, 22, 13' }, 'astN astRLevels astRDiffs astCompare'),
+     '6 | ≈ 0.989 | −1 | larger in size, the opposite sign', 'stats/spurious: levels against first differences');
+  eq(st('spurious', { series: '1, 1, 3; 2, 2, 5; 3, 3, 6; 4, 4, 9' }, 'astRLevels astRDiffs astCompare'),
+     '≈ 0.981 | not defined: every x is the same | cannot be compared: one r is not defined', 'stats/spurious: a straight-line trend has constant differences');
+  eq(st('spurious', { series: '1, 1, 3; 3, 2, 5; 3, 3, 6; 4, 4, 9' }, 'astN'), 'REFUSED Series, record 3: t is 3, not after 3; give the series in order of t, each t once', 'stats/spurious: t out of order is refused');
+  /* overall: Sxy 33.5, Sxx = Syy = 41.5, r = 67/83; within each group r = −1; pooled −4/√16 = −1. */
+  eq(st('confound', { rows: 'a, 1, 5, small; b, 2, 4, small; c, 3, 3, small; d, 6, 10, large; e, 7, 9, large; f, 8, 8, large' }, 'astN astGroups astR astWithin astPooled astCompare'),
+     '6 | 2: small, large | ≈ 0.807 | small −1 (n = 3); large −1 (n = 3) | −1 | larger in size, the opposite sign', 'stats/confound: the sign reverses within the groups');
+  /* pooled with unequal groups: g1 (1,1),(2,3),(3,2): Sxx 2, Syy 2, Sxy 1; g2 (5,5),(6,5): Sxx 0.5, Syy 0, Sxy 0. pooled 1/√(2.5·2) = 0.4472 */
+  eq(st('confound', { rows: 'a, 1, 1, g1; b, 2, 3, g1; c, 3, 2, g1; d, 5, 5, g2; e, 6, 5, g2' }, 'astWithin astPooled'),
+     'g1 0.5 (n = 3); g2 not computed: fewer than 3 rows (n = 2) | ≈ 0.447', 'stats/confound: pooled from every group\'s sums, a small group included');
+
+  /* --- validity (avd) ---------------------------------------------------- */
+  const vdRun = abMk(abBlock('b', 'AVD_JS') + abViews('AVD_VIEW_JS', ['matrix', 'ave']), 'avdCompute');
+  const vd = abCall(vdRun, 'validity'), vdS = abStatus(vdRun, 'validity');
+  const MX = { items: 's1, speed; s2, speed; s3, speed; k1, care; k2, care',
+    corr: 's1, s2, 0.6; s1, s3, 0.5; s2, s3, 0.4; s1, k1, 0.2; s1, k2, 0.1; s2, k1, 0.3; s2, k2, 0.2; s3, k1, 0.55; s3, k2, 0.5; k1, k2, 0.7' };
+  /* within speed 1.5/3, care 0.7; across 1.85/6 = 37/120; s3 own (0.5 + 0.4)/2 = 0.45 < with care (0.55 + 0.5)/2 = 0.525. */
+  eq(vd('matrix', MX, 'avdItems avdWithin avdCross avdFlagged'),
+     '5 items in 2 constructs | speed 0.5; care 0.7 | 37/120 ≈ 0.308 | 1: s3 (own 0.45; with care 0.525)', 'validity/matrix: within, across, and the item closer to another construct');
+  eq(vd('matrix', Object.assign({}, MX, { corr: MX.corr.replace('s3, k2, 0.5', 's3, k2, 0.35') }), 'avdFlagged'), '0: none', 'validity/matrix: a cross mean equal to the own mean is not flagged');
+  eq(vd('matrix', Object.assign({}, MX, { corr: MX.corr.replace('; k1, k2, 0.7', '') }), 'avdFlagged'),
+     'REFUSED Correlations: the pair k1, k2 is missing; give every pair of different items once, 10 pairs for 5 items', 'validity/matrix: a missing pair is refused');
+  eq(vd('matrix', Object.assign({}, MX, { corr: MX.corr + '; k2, k1, 0.7' }), 'avdFlagged'),
+     'REFUSED Correlations, record 11: the pair k2, k1 is given twice', 'validity/matrix: a pair given twice, either order, is refused');
+  /* speed: λ² 0.64 0.49 0.81, AVE 97/150, CR 5.76/6.82 = 288/341, √AVE 0.8042; care: AVE 0.4325, CR 1.69/2.825 = 338/565, √ 0.6576. */
+  const AV = { loadings: 's1, speed, 0.8; s2, speed, 0.7; s3, speed, 0.9; c1, care, 0.75; c2, care, 0.55', between: 'speed, care, 0.6' };
+  eq(vd('ave', AV, 'avdAve avdCr avdRoot avdLow avdPairs avdTests'),
+     'speed 97/150 ≈ 0.647; care 0.4325 | speed 288/341 ≈ 0.845; care 338/565 ≈ 0.598 | speed ≈ 0.804; care ≈ 0.658 | 1: c2 0.55 | speed, care |r| 0.6: √AVE speed above it yes, √AVE care above it yes, below 0.85 yes | 9 of 12 pass; not passed: care AVE, care CR, c2 loading',
+     'validity/ave: AVE, CR, √AVE and every test');
+  /* √AVE against |r| on the squares: AVE 0.36 against r −0.6 (r² 0.36) is not above it. */
+  eq(vd('ave', { loadings: 'a, x, 0.6; b, y, 1', between: 'x, y, -0.6' }, 'avdRoot avdPairs'),
+     'x 0.6; y 1 | x, y |r| 0.6: √AVE x above it no, √AVE y above it yes, below 0.85 yes', 'validity/ave: √AVE equal to |r| does not pass; the test is on the squares');
+  eq(vd('ave', { loadings: 'a, x, 0.9; b, y, 0.9', between: 'x, y, 0.85' }, 'avdPairs'),
+     'x, y |r| 0.85: √AVE x above it yes, √AVE y above it yes, below 0.85 no', 'validity/ave: |r| equal to the limit is not below it');
+  /* λ 0.6 and 0.8: AVE (0.36 + 0.64)/2 = 0.5, not above 0.5; CR 1.96/2.96; loading 0.6 not above 0.6. */
+  eq(vd('ave', { loadings: 'a, x, 0.6; b, x, 0.8' }, 'avdAve avdCr avdLow avdTests'),
+     'x 0.5 | x 49/74 ≈ 0.662 | 1: a 0.6 | 1 of 4 pass; not passed: x AVE, x CR, a loading', 'validity/ave: values equal to the AVE and loading thresholds do not pass');
+  /* one item at 0.5: CR = AVE = 0.25, equal to a stated CR threshold, which it meets. */
+  eq(vd('ave', { loadings: 'a, x, 0.5' }, 'avdCr avdTests', { cr_min: '0.25', ave_min: '0.2', loading_min: '0.4' }), 'x 0.25 | 3 of 3 pass', 'validity/ave: CR equal to its threshold meets it');
+  eq(vd('ave', AV, 'avdTests', { ave_min: '0.4', cr_min: '0.5', loading_min: '0.5' }), '12 of 12 pass', 'validity/ave: the thresholds are the lesson\'s');
+  eq(vd('ave', { loadings: AV.loadings, between: 'speed, flow, 0.6' }, 'avdTests'),
+     'REFUSED Between, record 1: flow is not one of the constructs (speed, care)', 'validity/ave: an unknown construct is refused');
+  abEnds(vdS('ave', AV), 'it does not say what they measure' + CAUT, 'validity/ave: the status ends with the caution');
+
+  /* --- groups (agr) ------------------------------------------------------ */
+  const grRun = abMk(abBlock('b', 'AGR_JS') + abViews('AGR_VIEW_JS', ['likely', 'enps', 'bias']), 'agrCompute');
+  const gr = abCall(grRun, 'groups'), grS = abStatus(grRun, 'groups');
+  /* 18/30 = 0.6, 8/40 = 0.2: 3×, +40 points; odds (18/12)/(8/32) = 6. */
+  eq(gr('likely', { rows: 'high, 30, 18; low, 40, 8', first: 'high', second: 'low' }, 'agrShares agrRatio agrDiff agrOdds'),
+     'high 18 of 30 = 60%; low 8 of 40 = 20% | 3× | +40 points | 6', 'groups/likely: times as likely against the odds ratio');
+  eq(gr('likely', { rows: 'a, 3, 1; b, 3, 2', first: 'a', second: 'b' }, 'agrRatio agrDiff agrOdds'), '0.50× | ≈ −33.3 points | 0.25', 'groups/likely: a ratio below 1 and a negative difference');
+  eq(gr('likely', { rows: 'a, 7, 3; b, 9, 2', first: 'a', second: 'b' }, 'agrRatio agrOdds'), '≈ 1.93× | ≈ 2.63', 'groups/likely: 27/14 and 21/8 to 2 places');
+  eq(gr('likely', { rows: 'high, 10, 4; low, 5, 0', first: 'high', second: 'low' }, 'agrRatio agrOdds'),
+     'not defined: no one in low met it | not defined: no one in low met it', 'groups/likely: a zero share gives no ratio');
+  eq(gr('likely', { rows: 'high, 4, 4; low, 5, 1', first: 'high', second: 'low' }, 'agrRatio agrOdds'), '5× | not defined: everyone in high met it', 'groups/likely: no odds when everyone met it');
+  eq(gr('likely', { rows: 'high, 4, 5; low, 5, 1', first: 'high', second: 'low' }, 'agrRatio'),
+     'REFUSED Rows, record 1: high has 5 meeting the outcome, more than its n of 4', 'groups/likely: more meeting than n is refused');
+  abEnds(grS('likely', { rows: 'high, 30, 18; low, 40, 8', first: 'high', second: 'low' }), 'is a different figure and is not "times as likely"' + CAUT, 'groups/likely: the status ends with the caution');
+  /* 4 promoters, 3 passives, 3 detractors of 10: +10. */
+  eq(gr('enps', { answers: '10 9 9 8 8 7 6 6 3 10' }, 'agrN agrPromoters agrPassives agrDetractors agrEnps agrNear'),
+     '10 | 4 of 10 = 40% | 3 of 10 = 30% | 3 of 10 = 30% | +10 | 4: 2 at 6 (a detractor one point from passive), 2 at 8 (a passive one point from promoter); each one moved raises eNPS by 10 points',
+     'groups/enps: bands and the score');
+  eq(gr('enps', { answers: '9 6 6' }, 'agrEnps agrNear'),
+     '≈ −33.3 | 2: 2 at 6 (a detractor one point from passive), 0 at 8 (a passive one point from promoter); each one moved raises eNPS by ≈ 33.3 points', 'groups/enps: a score that is not whole');
+  eq(gr('enps', { answers: '9 9 6 7 7 7 7 7' }, 'agrEnps'), '+12.5', 'groups/enps: exact at one place');
+  eq(gr('enps2', { answers: 'ann, 10; bo, 0' }, 'agrEnps'), '0', 'groups/enps: named answers');
+  /* chi² = 41,246/11,655 (worked in Python, Fraction). */
+  const BI = { table: 'yes, 30, 20; no, 10, 15; unsure, 5, 2', critical: '5.991' };
+  eq(gr('bias', BI, 'agrN agrChi agrDf agrExceeds agrSmall'),
+     'early 45, late 37, all 82 | 41,246/11,655 ≈ 3.539 | 2 | no: 3.539 is not above 5.991, the critical value stated | 2: unsure early (expected 315/82 ≈ 3.841), unsure late (expected 259/82 ≈ 3.159)',
+     'groups/bias: chi-square against the critical value stated');
+  eq(gr('bias', { table: 'a, 10, 0; b, 0, 10', critical: '3.841' }, 'agrChi agrExceeds'), '20 | yes: 20.000 is above 3.841, the critical value stated', 'groups/bias: a whole chi-square above the critical value');
+  eq(gr('bias', { table: 'a, 10, 10; b, 10, 10', critical: '3.841' }, 'agrChi agrSmall'), '0 | 0: none', 'groups/bias: identical columns give 0');
+  eq(gr('bias', { table: 'a, 9, 0; b, 0, 9', critical: '3.841' }, 'agrSmall'),
+     '4: a early (expected 4.5), a late (expected 4.5), b early (expected 4.5), b late (expected 4.5)', 'groups/bias: expected 4.5 is flagged');
+  eq(gr('bias', { table: 'a, 9, 1; b, 1, 9', critical: '3.841' }, 'agrChi agrSmall'), '64/5 = 12.800 | 0: none', 'groups/bias: expected exactly 5 is not flagged');
+  eq(gr('bias', { table: 'a, 10, 0; b, 5, 0', critical: '3.841' }, 'agrChi'), 'REFUSED Table: no respondent is late, so there is nothing to compare', 'groups/bias: an empty column is refused');
+  abEnds(grS('bias', BI), 'is an assumption, not a finding' + CAUT, 'groups/bias: the status ends with the caution');
+
+  /* --- sample (asn) ------------------------------------------------------ */
+  const snRun = abMk(abBlock('b', 'ASN_JS') + abViews('ASN_VIEW_JS', ['snowball']), 'asnCompute');
+  const sn = abCall(snRun, 'sample'), snS = abStatus(snRun, 'sample');
+  const PEOPLE = 's1, -, eng; s2, -, ops; a, s1, eng; b, s1, eng; c, a, ops; d, b, eng; e, s2, ops; f, e, eng; g, c, eng';
+  eq(sn('snowball', { people: PEOPLE }, 'asnSeeds asnWaves asnSize asnTrees asnGroups asnLost'),
+     '2: s1, s2 | wave 0: 2; wave 1: 3; wave 2: 3; wave 3: 1 | 9 | s1 6 of 9 ≈ 66.7%; s2 3 of 9 ≈ 33.3% | eng 6 of 9 ≈ 66.7%; ops 3 of 9 ≈ 33.3% | no seed dropped',
+     'sample/snowball: waves by referral depth, shares by tree and group');
+  eq(sn('snowball', { people: PEOPLE, drop: 's2' }, 'asnLost asnAfter'), '3: s2, e, f | eng 5 of 6 ≈ 83.3%; ops 1 of 6 ≈ 16.7%', 'sample/snowball: dropping a seed loses its tree');
+  eq(sn('snowball', { people: 'g, c, eng; c, a, ops; a, s1, eng; s1, -, eng' }, 'asnWaves'), 'wave 0: 1; wave 1: 1; wave 2: 1; wave 3: 1', 'sample/snowball: referrals given before their referrer');
+  eq(sn('snowball', { people: 's1, -, eng; a, b, eng; b, c, eng; c, a, eng' }, 'asnSize'),
+     'REFUSED People: a, b, c refer one another in a loop that reaches no seed', 'sample/snowball: a referral loop is refused');
+  eq(sn('snowball', { people: PEOPLE, drop: 'a' }, 'asnSize'), 'REFUSED The seed to drop, a, is not one of the seeds (s1, s2)', 'sample/snowball: dropping a non-seed is refused');
+  abEnds(snS('snowball', { people: PEOPLE }), 'not of everyone it was drawn to reach' + CAUT, 'sample/snowball: the status ends with the caution');
+
+  /* --- capability (acp) -------------------------------------------------- */
+  const cpRun = abMk(abBlock('b', 'ACP_JS') + abViews('ACP_VIEW_JS', ['profile']), 'acpCompute');
+  const cp = abCall(cpRun, 'capability'), cpS = abStatus(cpRun, 'capability');
+  const CAPS = 'vc, delivery; ta, delivery; tbd, delivery; la, architecture; wip, lean; viz, lean';
+  const TEAMS = 't1, vc, ta, la; t2, vc, tbd, ta, wip';
+  eq(cp('profile', { capabilities: CAPS, teams: TEAMS }, 'acpTeams acpOverall acpCategories acpLevel acpFewest'),
+     '2: t1, t2 | t1 3 of 6; t2 4 of 6 | t1: delivery 2 of 3, architecture 1 of 1, lean 0 of 2; t2: delivery 3 of 3, architecture 0 of 1, lean 1 of 2 | no maturity model given | 0 of 2 teams: viz',
+     'capability/profile: in place by category');
+  /* t1 meets L1 (vc) but not L2 (tbd missing): L1, hiding ta (L2) and la (L3); t2 meets L1 and L2, not L3: L2, hiding wip. */
+  eq(cp('profile', { capabilities: CAPS, teams: TEAMS, levels: 'L1, vc; L2, ta, tbd; L3, la, wip', teams2: 't1, vc, ta, tbd, la' }, 'acpLevel acpHidden acpAdded'),
+     't1 L1 (level 1 of 3); t2 L2 (level 2 of 3) | t1 2: ta, la; t2 1: wip | t1 +1 (tbd)', 'capability/profile: the level reached and what it hides');
+  /* a higher level met does not count when a lower one is not */
+  eq(cp('profile', { capabilities: CAPS, teams: 't3, ta, tbd', levels: 'L1, vc; L2, ta, tbd' }, 'acpLevel acpHidden'), 't3 none (level 1 of 2, L1, not met) | t3 2: ta, tbd', 'capability/profile: a level counts only on every lower level');
+  eq(cp('profile', { capabilities: CAPS, teams: TEAMS, teams2: 't2, vc, viz' }, 'acpAdded'), 't2 +1 (viz), −3 (ta, tbd, wip)', 'capability/profile: added and dropped');
+  eq(cp('profile', { capabilities: CAPS, teams: 't1, vc, ta; t2, ta, vc', teams2: '' }, 'acpFewest'), '0 of 2 teams: tbd, la, wip and 1 more (the table lists all)', 'capability/profile: ties for fewest: the first 3 named, the rest counted');
+  eq(cp('profile', { capabilities: CAPS, teams: 't1, vc, ci' }, 'acpTeams'), 'REFUSED Teams, record 1 (t1): ci is not one of the capabilities', 'capability/profile: an unknown capability is refused');
+  eq(cp('profile', { capabilities: CAPS, teams: TEAMS, levels: 'L1, vc; L2, vc, ta' }, 'acpTeams'), 'REFUSED Levels, record 2 (L2): vc is already required by level L1', 'capability/profile: a capability in two levels is refused');
+  abEnds(cpS('profile', { capabilities: CAPS, teams: TEAMS }), 'It is not a grade of the team' + CAUT, 'capability/profile: the status ends with the caution');
+}
+// ---- end acckit family B ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the

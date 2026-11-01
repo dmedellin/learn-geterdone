@@ -148,7 +148,7 @@ the chapter that reports them; each lab works a sample written for the lesson,
 plainly labelled invented ("a team of eight", "twelve teams"). Where a lab
 needs the book's answer options (the six lead-time options, the six
 deployment-frequency options) or its thresholds (AVE > 0.50, alpha 0.70, items
-loading above 0.60, correlations below 0.85, three or fewer active branches,
+loading above 0.60, correlations below 0.85, fewer than three active branches,
 branches merged within a day), those are facts the lab may use as cfg, cited
 in prose.
 
@@ -267,7 +267,7 @@ cause."
 | `flow` (afl) | `utilization` | `levels`: a list of utilizations as percentages 0–99 (or a single one with `service` time) | for each level the queueing multiple u/(1−u) and the lead time (service × (1 + u/(1−u)) = service/(1−u)), exact; refuses 100 with the reason; the rules sentence names the model (a single server with random arrivals) as a simplification |
 |  | `batch` | `work` items (count), `batch` size(s) (one or two to compare), `per_item` time, `release_cost` fixed time per batch | batches; time to first feedback (first batch done); time to last; average wait per item; releases; total release overhead |
 |  | `wip` | `throughput` items per day (exact rational), `wip` (one or two values: without and with a limit), or a board log `items: record item, start, done` | lead time = WIP / throughput (Little's law) for each; from a log: average WIP, throughput, average lead time, and Little's law checked on the log |
-| `branches` (atb) | `trunk` | `days` (whole); `branches`: records `branch, created, merged` (day numbers; merged `-` = open at the end); `freezes`: days list; thresholds from cfg defaulting to the book's (≤ 3 active, lifetime ≤ 1 day, 0 freeze days) | active branches each day (table); maximum; mean lifetime of merged branches (exact); branches living over the limit (listed); open at the end; freeze days; each threshold met yes/no |
+| `branches` (atb) | `trunk` | `days` (whole); `branches`: records `branch, created, merged` (day numbers; merged `-` = open at the end); `freezes`: days list; thresholds from cfg defaulting to the book's (fewer than three active, i.e. at most 2; lifetime ≤ 1 day; 0 freeze days) | active branches each day (table); maximum; mean lifetime of merged branches (exact); branches living over the limit (listed); open at the end; freeze days; each threshold met yes/no |
 | `release` (arl) | `independent` | `components`; `ties`: records `a, b` ("must release together"); optional `remove` (one tie) | release groups (connected components, listed); largest group; components deployable alone; teams that must coordinate (when a `team` column is given); the same after removing the tie |
 |  | `scaling` | `orgs`: records `org, developers, deploys` over `days` | deploys per developer per day per org, exact; ordered by size; whether the rate rises, holds or falls from smallest to largest (stated as of these rows) |
 | `change` (acm) | `approval` | `changes`: records `change, route, wait, failed` (route `none`/`peer`/`cab`/… a name; wait in hours) | changes by route; mean and median wait each route adds; change fail rate by route (exact %); overall; the difference in fail rate between two named routes |
