@@ -4,6 +4,11 @@ Written by family A's engineer for family B's. PLAN §D is the spec; this file
 fixes only the seam between the two modules. If anything here changes, the
 change is announced at the top of this file with a time.
 
+**Change, 2026-11-01 (tile wording):** `aktUnit`, `aktTwo`, `aktTimes` added
+to AKT_CORE_JS (section 3a); `aktPp` prints `+1 point` for exactly one;
+family B's groups/likely uses `aktTimes`/`aktTwo`. Python: `num_text`,
+`unit_text` mirror `eaNum`/`aktUnit`.
+
 **No prefix changes.** Every PLAN §D prefix is used as given (section 0).
 
 **Change, 2026-11-01 (after the first version), additive only:** `CLOCK`
@@ -160,6 +165,8 @@ replaces all but the first sentence (which is prepended if missing).
 | `aktMedian(list)` | the median of a non-empty list of rationals: the middle one after sorting, or the mean of the two middle ones (exact) |
 | `aktMean(list)` | the exact mean of a non-empty list of rationals |
 | `aktPp(r)` | a difference of two shares as signed percentage points: `+20 points`, `+12.5 points` (exact at one place), `≈ −13.3 points` (one place, half away from zero, `≈` when not exact), `0 points` |
+| `aktUnit(r, word)` | `eaNum(r)` and a unit, singular (final `s` dropped) when r is exactly ±1: `1 hour`, `3/2 = 1.50 days` |
+| `aktTwo(r)` / `aktTimes(r)` | the kit's one rule for ratios: always two places, `≈ ` in front when not exact: `2.00`, `≈ 3.14`; `aktTimes` adds `×` |
 | `aktListed(n, parts, sep)` | `"2: a; b"` (sep default `, `), `"0: none"` |
 | `aktTime(s, what)` | a time from the period's start: `day.hh:mm` (day 1 is the first day, so `1.09:30` is 9.5 h, `2.00:00` is 24 h) or decimal hours (`37.5`); returns hours as a rational. THROWS a sentence otherwise |
 | `aktTimeText(h)` | hours back as `day.hh:mm` when they are whole minutes (`2.10:00`), else the exact hours `aktDec(h) + ' h'` |

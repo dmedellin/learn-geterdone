@@ -256,7 +256,7 @@ AST_JS = r"""
   function astVersus(a, b) {
     if (!a.ok || !b.ok) return 'cannot be compared: one r is not defined';
     var c = Rcmp(b.r2, a.r2), size = c < 0 ? 'smaller in size' : c > 0 ? 'larger in size' : 'the same size';
-    var sign = a.sign === b.sign ? 'the same sign' : (a.sign === 0 || b.sign === 0) ? 'one of them 0' : 'the opposite sign';
+    var sign = a.sign === b.sign ? 'the same sign' : (a.sign === 0 || b.sign === 0) ? 'no sign to compare, since one r is 0' : 'the opposite sign';
     return size + ', ' + sign;
   }
 """
@@ -499,8 +499,8 @@ AGR_JS = r"""
   function agrCompute(view, inst, opts) { return eaRun(AGR_VIEW[view], inst, opts); }
   /* "9 of 12 = 75%", "1 of 3 ≈ 33.3%". */
   function agrShare(m, n) { var t = eaPct(R(BigInt(m), BigInt(n))); return eaInt(m) + ' of ' + eaInt(n) + t.slice(t.search(/ [=≈] /)); }
-  /* Two places: exact when it is a decimal of at most 2 places. */
-  function agrTwo(r) { return Rint(r) ? eaInt(r.n) : (eaExactAt(r, 2) ? '' : '≈ ') + eaFixed(r, 2); }
+  /* Two places always (acckit's rule for ratios): "2.00", "1.50", "≈ 2.67". */
+  function agrTwo(r) { return aktTwo(r); }
   function agrThree(r) {
     if (Rint(r)) return eaInt(r.n);
     if (eaBig(r)) return eaSci(r);
@@ -527,7 +527,7 @@ AGR_VIEW_JS["likely"] = r"""
     if (inst.first === inst.second) eaRefuse('The two groups compared are the same group, ' + inst.first);
     var a = of[inst.first], b = of[inst.second];
     var sa = Rdiv(a.met, a.n), sb = Rdiv(b.met, b.n);
-    var ratio = Rzero(sb) ? 'not defined: no one in ' + b.group + ' met it' : agrTwo(Rdiv(sa, sb)) + '×';
+    var ratio = Rzero(sb) ? 'not defined: no one in ' + b.group + ' met it' : aktTimes(Rdiv(sa, sb));
     var am = a.met.n, an = a.n.n - a.met.n, bm = b.met.n, bn = b.n.n - b.met.n, odds;
     if (an === 0n) odds = 'not defined: everyone in ' + a.group + ' met it';
     else if (bm === 0n) odds = 'not defined: no one in ' + b.group + ' met it';
@@ -539,7 +539,7 @@ AGR_VIEW_JS["likely"] = r"""
         + ' (' + aktPp(Rsub(sa, sb)) + '); the odds ratio, ' + odds + ', is a different figure and is not "times as likely".'),
       table: { caption: 'Each group: n, those meeting the outcome, the share and the odds',
         head: ['group', 'n', 'met', 'share', 'odds (met : not)'],
-        rows: rows.map(function (r) { var no = r.n.n - r.met.n; return [r.group, eaInt(r.n.n), eaInt(r.met.n), agrShare(r.met.n, r.n.n).replace(/^.* of \S+ /, ''), no === 0n ? 'no one missed it' : agrShow(R(r.met.n, no))]; }) }
+        rows: rows.map(function (r) { var no = r.n.n - r.met.n; return [r.group, eaInt(r.n.n), eaInt(r.met.n), eaPct(R(r.met.n, r.n.n)), no === 0n ? 'no one missed it' : agrShow(R(r.met.n, no))]; }) }
     };
   };
 """

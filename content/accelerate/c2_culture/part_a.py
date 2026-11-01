@@ -178,15 +178,15 @@ LESSONS = [
                   "culture: by nation, by the values an organization enacts, and "
                   "more. Within organizational culture they follow Edgar Schein "
                   "(1985), who describes three levels. The first is basic "
-                  "assumptions, formed over time as a group makes sense of what "
-                  "happens to it; they are the least visible, the things a team "
-                  "just knows and finds hard to put into words. The second is "
-                  "values and norms, which a group can discuss and even argue "
-                  "over, and which shape how members act. The third is "
+                  "assumptions, which build up as a group interprets what "
+                  "happens around it; they are the least visible, the things a "
+                  "team simply knows and struggles to articulate. The second is "
+                  "values and norms, which members can debate openly and which "
+                  "shape how they act. The third is "
                   "artifacts, the most visible level: mission statements, "
                   "procedures, technology, heroes and rituals. The authors work "
-                  "at the second level, the one people usually mean when they "
-                  "talk about the culture of a team."),
+                  "at the second level, which is what most people have in mind "
+                  "when they say a team has a culture."),
             ("p", "The model they chose is Ron Westrum&rsquo;s, a sociologist who "
                   "studied human factors in safety in fields where accidents are "
                   "costly. His typology of 1988 has three types. A pathological "
@@ -219,8 +219,7 @@ LESSONS = [
                   "achieving the mission. They add that they have worked with "
                   "United States federal government teams they would call "
                   "generative and with startups that are plainly pathological, so "
-                  "the type is not a matter of an organization&rsquo;s size, age "
-                  "or sector."),
+                  "the type cannot be read off the kind of organization."),
             ("p", "Now the count. The lab takes six aspects, a scale of 1 to 7, "
                   "and each respondent&rsquo;s six answers, written respondent "
                   "then answers. It finds each respondent&rsquo;s mean, the "
@@ -233,7 +232,8 @@ LESSONS = [
                   "<code>mixed</code> the respondent means are 5.667, 4.667, "
                   "2.833, 5.667, 3.667, 2.333 and 4.667; two people fall in the "
                   "pathological band, three in the bureaucratic and two in the "
-                  "generative. The team mean is 177 over 42, which is 4.214, "
+                  "generative. The team mean is 177 over 42 (59 over 14 in lowest terms, as the lab "
+                  "prints it), which is 4.214, "
                   "and the team falls in the bureaucratic band."),
             ("p", "The preset <code>even</code> is a second team of seven with "
                   "the same team mean, 4.214, and a different shape: everyone "
@@ -245,7 +245,7 @@ LESSONS = [
                   "as if it were a good one; a single mean cannot tell you that, "
                   "and it is a reason to look at the answers person by person "
                   "before acting on a team figure."),
-            ("p", "The lab shows how a score is made and nothing more. The "
+            ("p", "The lab shows how a score is made and nothing more. "
                   "Martin Fowler&rsquo;s foreword adds a caution that "
                   "applies here: these are surveys of subjective perceptions, "
                   "and a sample can differ from the industry it is taken from. "
@@ -355,11 +355,11 @@ LESSONS = [
                     "the five."},
             {"q": "Which of Schein's three levels of organizational culture do "
                   "the authors say they work at in Chapter 3?",
-             "a": ["Values, the second level",
-                   "Basic assumptions, the first level",
+             "a": ["Basic assumptions, the first level",
+                   "Values, the second level",
                    "Artifacts, the third level",
                    "National culture, which is not one of the three levels"],
-             "c": 0,
+             "c": 1,
              "why": "Chapter 3 names basic assumptions, values and artifacts, and "
                     "says it chose a model with the second level, values, in "
                     "mind. National culture is mentioned as one way to model "
@@ -367,30 +367,30 @@ LESSONS = [
                     "the chapter's choice."},
             {"q": "On the preset <code>mixed</code>, what is the team mean to three "
                   "decimal places?",
-             "a": ["4.214",
-                   "4.667",
+             "a": ["4.667",
                    "4.000",
+                   "4.214",
                    "3.667"],
-             "c": 0,
+             "c": 2,
              "why": "The team mean is the total of all 42 answers, 177, divided "
                     "by 42, which is 4.214. 4.667 is the median of the seven "
                     "respondent means; 4.000 is the middle of the 1 to 7 scale, "
                     "which is not computed from the answers at all; 3.667 is "
                     "one respondent&rsquo;s mean."},
             {"q": "What do the authors say about the bureaucratic type?",
-             "a": ["It is not necessarily bad: bureaucracy aims at fairness, and "
-                   "the type is one where following the rules matters more than "
-                   "the mission",
-                   "It is the worst of the three, because rules replace thought",
+             "a": ["It is the worst of the three, because rules replace thought",
                    "It cannot occur in a team whose members cooperate",
-                   "It is found only in large, old organizations"],
-             "c": 0,
+                   "It is found only in large, old organizations",
+                   "It is not necessarily bad: bureaucracy aims at fairness, and "
+                   "the type is one where following the rules matters more than "
+                   "the mission"],
+             "c": 3,
              "why": "The authors quote Mark Schwartz on bureaucracy as a "
                     "fairness mechanism and say that Westrum&rsquo;s "
                     "rule-oriented type is best read as rules mattering more "
                     "than the mission. They say too that they have seen "
                     "generative federal teams and pathological startups, so "
-                    "neither size nor age settles the type."},
+                    "the kind of organization does not settle the type."},
         ],
         "mistakes": [
             ("Treating Westrum's types as three boxes a team falls into",
@@ -405,8 +405,8 @@ LESSONS = [
              "Its goal, in the words they quote, is to treat every case alike "
              "and to keep the best rules the organization has learned. The "
              "type describes where the rules rank against the mission, and the "
-             "chapter says a team of any kind of organization can land "
-             "anywhere on the scale."),
+             "authors add that they have met generative teams in the US "
+             "federal government and pathological startups."),
             ("Taking the team mean as a description of the people in the team",
              "A mean of 4.214 comes from seven people whose own means run from "
              "2.333 to 5.667, and it comes equally from seven people who all sit "
@@ -479,7 +479,7 @@ LESSONS = [
              "A statement worded so that agreeing means the opposite of what the "
              "construct measures. Before averaging, its answer is replaced by "
              "the scale&rsquo;s top plus 1, minus the answer: on a scale of 7, "
-             "8 minus the answer. The lab shows the score both ways."),
+             "8 minus the answer. The lab shows the construct mean both ways."),
         ],
         "read_title": "How the chapter measures culture, then the count",
         "read_intro": (
@@ -507,27 +507,25 @@ LESSONS = [
                   "Westrum&rsquo;s model. The lesson does not reproduce them; "
                   "they are best read in the book, and the lab's four items are "
                   "the lesson&rsquo;s own."),
-            ("p", "Asking is the easy half. The chapter says that once you have "
-                  "responses from several people, often dozens or hundreds, you "
-                  "must show that the measure is valid and reliable. That means "
-                  "finding out whether the statements are understood alike by "
-                  "everyone and whether, taken together, they measure "
-                  "organizational culture. If several statistical tests confirm "
-                  "both, what has been measured is called a construct, here "
-                  "&ldquo;Westrum organizational culture&rdquo;, and may be used "
-                  "in further research. The chapter names three families of test: "
-                  "discriminant validity, that items which should be unrelated "
-                  "are; convergent validity, that items which should be related "
-                  "are; and reliability, also called internal consistency, that "
-                  "the items are read and interpreted alike. They come before any "
-                  "test of correlation or prediction. Chapter 13 and Appendix C "
-                  "take them up, and this course leaves them there."),
+            ("p", "Asking is the easy half. The chapter's next step is "
+                  "statistical. With answers in from many people, the authors "
+                  "test whether respondents read the statements the same way "
+                  "and whether the statements belong together; only a set that "
+                  "passes is called a construct, here &ldquo;Westrum "
+                  "organizational culture&rdquo;, and only then does it go into "
+                  "further research. Three kinds of test are named: "
+                  "discriminant and convergent validity, which ask whether "
+                  "unrelated items stay unrelated and related ones hang "
+                  "together, and reliability, which is also called internal "
+                  "consistency. They are run before any correlation or "
+                  "prediction. Chapter 13 and Appendix C take them up, and this "
+                  "course leaves them there."),
             ("p", "The authors report that their Westrum construct has "
                   "consistently been found valid and reliable, so, they say, you "
-                  "can use the questions in your own surveys. To get the score for "
-                  "a response, take the number from 1 to 7 for each answer and "
-                  "calculate the mean across all the questions. After that, the "
-                  "scores of all the responses can go into the further analysis."),
+                  "can use the questions in your own surveys. A response is "
+                  "scored by averaging its 1 to 7 values over every question "
+                  "asked; the scores of all the responses then go into the "
+                  "further analysis."),
             ("p", "The reason for several statements is the lesson&rsquo;s gloss "
                   "on the chapter, not its wording. One answer carries a "
                   "person&rsquo;s mood that day and how they read one sentence; "
@@ -571,7 +569,9 @@ LESSONS = [
                 "Three respondents: `q1, 7, 6, 7, 1; q2, 4, 4, 4, 4; q3, 2, 3, 2, "
                 "6`.",
             ]),
-            ("p", "Score each respondent with `blame` reversed and then without. "
+            ("p", "Score each respondent with `blame` reversed and then without; "
+                  "for the scores without, change `blame, flow, yes` to `blame, "
+                  "flow, no` in the items box. "
                   "Find which respondent&rsquo;s score changes the most when the "
                   "reversal is forgotten, and by how much, and explain why one "
                   "respondent&rsquo;s score does not change at all. Type the "
@@ -655,26 +655,26 @@ LESSONS = [
                     "against 3.25, a change of 1.0. q2 answered 4 on everything "
                     "and 4 reverses to 4, so q2's score is 4.0 either way. The "
                     "change is the distance between the answer and its reverse, "
-                    "8 minus twice the answer, over 4."},
+                    "the size of 8 minus twice the answer, over 4."},
             {"q": "On a scale of 1 to 7, a respondent answers 2 to a reverse-coded "
                   "item. What number enters the mean?",
-             "a": ["6",
-                   "2",
+             "a": ["2",
+                   "6",
                    "5",
                    "4"],
-             "c": 0,
+             "c": 1,
              "why": "Reversing swaps the ends of the scale: 1 and 7, 2 and 6, 3 "
                     "and 5, with 4 fixed, so the value is 8 minus 2, which is 6. "
                     "5 comes from subtracting from 7, which sends 1 to 6 and "
                     "leaves 7 unmatched; 2 is the answer left unreversed."},
             {"q": "According to Chapter 3, how is a response&rsquo;s score on the "
                   "Westrum construct calculated?",
-             "a": ["The mean of the 1 to 7 values of its answers across all the "
-                   "questions",
-                   "The median of its answers across the questions",
+             "a": ["The median of its answers across the questions",
                    "The lowest answer it gave to any question",
+                   "The mean of the 1 to 7 values of its answers across all the "
+                   "questions",
                    "The share of questions answered 5 or higher"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter says to turn each answer into its number from 1 "
                     "to 7 and average those numbers over the whole set of "
                     "questions. The median, the lowest answer and the share "
@@ -682,11 +682,11 @@ LESSONS = [
                     "does not use them."},
             {"q": "On the preset <code>forgotten</code> the lab reports a construct "
                   "mean of 4.375. What is the construct mean on <code>reversed</code>?",
-             "a": ["4.625",
-                   "4.375",
+             "a": ["4.375",
                    "4.500",
-                   "3.500"],
-             "c": 0,
+                   "3.500",
+                   "4.625"],
+             "c": 3,
              "why": "The six scores with blame reversed are 5.75, 5.0, 3.0, 6.5, "
                     "5.5 and 2.0, which total 27.75, a mean of 4.625. Reversing "
                     "changes every answer to blame except a 4, and the six "
@@ -755,7 +755,7 @@ LESSONS = [
             "better information flow, better function",
             "predicts delivery, results, satisfaction",
             "the delivery construct has three measures",
-            "how a team interacts matters most",
+            "how a team works beats who is on it",
             "human error starts an investigation",
             "a correlation is not a cause",
         ],
@@ -834,11 +834,11 @@ LESSONS = [
                   "dynamics. Fowler&rsquo;s foreword reads that study as "
                   "evidence from other researchers for the importance of a "
                   "Westrum-generative culture."),
-            ("p", "The section ends on failure, where the types differ most. "
+            ("p", "The section ends on failure, which the authors single out as telling. "
                   "A pathological organization looks for a throat to choke, "
                   "someone responsible to punish. But in complex systems, the "
-                  "authors write, accidents are almost never the fault of one "
-                  "person who saw what was coming; they emerge from many "
+                  "authors write, an accident is seldom one person's doing, "
+                  "someone who saw it coming; it emerges from many "
                   "contributing factors. So &ldquo;Human error should, instead, be "
                   "the start of the investigation&rdquo;, with the question of how "
                   "information could have reached people sooner or in a better "
@@ -861,7 +861,7 @@ LESSONS = [
                   "r squared to 14.0 percent. With eight teams a single team can "
                   "move the correlation a long way; the book&rsquo;s own "
                   "analyses draw on a far larger survey, over 23,000 responses "
-                  "across its years, as Chapter 1 reports. Neither preset says that culture causes delivery, "
+                  "across its years, as the Preface reports. Neither preset says that culture causes delivery, "
                   "or that delivery causes culture, or that a third thing, such as "
                   "the age of the system, causes both; the correlation is the "
                   "same in all three stories."),
@@ -945,22 +945,22 @@ LESSONS = [
              "a": ["r = 0.900 and r squared = 0.810",
                    "r = 0.810 and r squared = 0.900",
                    "r = 0.900 and r squared = 0.900",
-                   "r = 0.450 and r squared = 0.200"],
+                   "r = 0.900 and r squared = 0.949"],
              "c": 0,
              "why": "The means are 5 and 4. The deviations in culture are -2, -1, "
                     "0, 1, 2 and in delivery -1, -2, 0, 1, 2. The products sum to "
                     "9, the squares of culture to 10 and of delivery to 10, so r "
                     "is 9 over the square root of 100, which is 0.900, and r "
                     "squared is 0.810, 81 percent. Raising w's delivery score to "
-                    "4.0 moves that team onto the line, and r rises to about "
-                    "0.97."},
+                    "4.0 brings it closer to the rising pattern of the other four, "
+                    "and r rises to about 0.97."},
             {"q": "Which measures make up the software delivery performance "
                   "construct as Chapter 3 defines it?",
-             "a": ["Lead time, release frequency and time to restore service",
-                   "All four of Chapter 2's measures",
+             "a": ["All four of Chapter 2's measures",
+                   "Lead time, release frequency and time to restore service",
                    "Lead time, release frequency and change fail rate",
                    "Release frequency and change fail rate"],
-             "c": 0,
+             "c": 1,
              "why": "The four measures together classified performers well, but "
                     "as a construct they did not pass all the validity and "
                     "reliability tests. Only the three, lead time, release "
@@ -969,25 +969,25 @@ LESSONS = [
                     "of it."},
             {"q": "On the preset <code>eight</code> r is 0.929. Which share does r "
                   "squared give?",
-             "a": ["86.2 percent of the spread in delivery score is accounted "
-                   "for by the line",
-                   "92.9 percent of the teams have good delivery",
+             "a": ["92.9 percent of the teams have good delivery",
                    "7.1 percent of delivery is caused by culture",
+                   "86.2 percent of the spread in delivery score is accounted "
+                   "for by the line",
                    "92.9 percent of the spread in delivery score is accounted "
                    "for by the line"],
-             "c": 0,
+             "c": 2,
              "why": "r squared is 0.929 times 0.929, which is 0.862. It is a "
                     "share of the spread in one measure, not a share of teams, "
                     "and it is not a share of causation. The 92.9 percent "
                     "answer confuses r with r squared."},
             {"q": "What did Google's study of its teams find, as the authors "
                   "report it?",
-             "a": ["Team dynamics, how people interact and see their work, "
-                   "mattered more than which individuals were on the team",
-                   "The most skilled individuals made the best teams",
+             "a": ["The most skilled individuals made the best teams",
                    "Team size was the strongest single factor",
-                   "Teams with more experienced managers delivered more"],
-             "c": 0,
+                   "Teams with more experienced managers delivered more",
+                   "Team dynamics, how people interact and see their work, "
+                   "mattered more than which individuals were on the team"],
+             "c": 3,
              "why": "The authors quote Google&rsquo;s finding that team dynamics "
                     "mattered more than the individuals on the team, and cite it "
                     "as support for the importance of a generative culture. The "
@@ -1101,7 +1101,7 @@ LESSONS = [
                   "culture. They looked at both technical practices and "
                   "management practices and measured their impact on culture. "
                   "Their research shows, they say, that Lean management, with the "
-                  "set of technical practices called continuous delivery, do "
+                  "set of technical practices called continuous delivery, does "
                   "affect culture, as the chapter&rsquo;s Figure 3.3 shows. The "
                   "practices themselves are the business of Chapter 4 and "
                   "Chapters 7 and 8, which later lessons read."),
@@ -1246,34 +1246,34 @@ LESSONS = [
                     "3.778, +0.333, and stays bureaucratic."},
             {"q": "According to Shook as the authors quote him, what is the way "
                   "to change a culture?",
-             "a": ["Begin with a change in behaviour, in what people do",
-                   "First change how people think, then their behaviour",
+             "a": ["First change how people think, then their behaviour",
+                   "Begin with a change in behaviour, in what people do",
                    "Write down the values and display them",
                    "Replace the people who hold the old assumptions"],
-             "c": 0,
+             "c": 1,
              "why": "Shook's lesson from Fremont, quoted in the chapter, is that "
                     "the way to change culture is to start by changing behaviour "
                     "and not by first changing thinking. The authors build their "
                     "hypothesis about practices on it."},
             {"q": "What change in the team mean does the lab report on the preset "
                   "<code>unchanged</code>?",
-             "a": ["+0.139",
-                   "+0.639",
+             "a": ["+0.639",
                    "0.000",
+                   "+0.139",
                    "+0.333"],
-             "c": 0,
+             "c": 2,
              "why": "The second team's before total is 126 over 36, 3.500, and "
                     "its after total is 131 over 36, 3.639, a change of 5 over "
                     "36, +0.139. +0.639 is the team that adopted new practices; "
                     "0.000 would need no answer to differ; +0.333 is the "
                     "exercise's change."},
             {"q": "Which practices does Chapter 3 report as affecting culture?",
-             "a": ["Lean management and the technical practices of continuous "
-                   "delivery",
-                   "Written mission statements and creeds",
+             "a": ["Written mission statements and creeds",
                    "Hiring from outside the organization",
-                   "National culture and country of origin"],
-             "c": 0,
+                   "National culture and country of origin",
+                   "Lean management and the technical practices of continuous "
+                   "delivery"],
+             "c": 3,
              "why": "The chapter's research found that Lean management and "
                     "continuous delivery have an impact on culture. Mission "
                     "statements are given in the chapter only as an example of "

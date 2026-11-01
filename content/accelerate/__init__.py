@@ -74,7 +74,7 @@ PATH = {
     "prerequisites": [
         "You have worked on, with or near a team that builds and runs software. Every lesson is about measuring what such a team does, and it lands best on a reader who has shipped a change, waited for a release or been paged.",
         "No programming and no earlier statistics. The arithmetic is counting, sums, shares and, in the later courses, a mean, a correlation and a square root, and the labs do it and show each step.",
-        "No other Subject. <em>System Design, Read Along</em> and <em>Operations Research</em> teach the queueing the book touches in two chapters, and the lessons name the one lesson there where it is taught once.",
+        "No other Subject. <em>System Design</em> and <em>Operations Research</em> teach the queueing the book touches in two chapters, and the lessons name the one lesson there where it is taught once.",
         "A copy of the book is strongly recommended. The book is in copyright, so a lesson states each chapter&rsquo;s findings in its own words, points to the chapter and section by name, and quotes at most a sentence or two. The book&rsquo;s tables, figures and survey items are described and never reproduced; the samples in the lessons are written for them.",
         "Some team of your own, or one you know. Every lesson&rsquo;s last step sends you to a team you work with, with a figure to compute.",
     ],

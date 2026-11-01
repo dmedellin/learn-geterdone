@@ -11,9 +11,8 @@ written for these lessons: none of the book's tables, figures, survey items
 or example data is used, and ING's structure and Obeya appear in prose only.
 The design is docs/accelerate/PLAN.md, section C, Course 8.
 
-PHASE A: the lab cfg keys follow PLAN section D; they are corrected against
-docs/accelerate/kit-report.md in phase B, and every preset's expect is empty
-until the page is observed with labcheck.js --observe.
+The lab cfg keys follow docs/accelerate/kit-report.md; every preset's expect
+was observed with labcheck.js --observe and checked by hand.
 """
 
 
@@ -294,7 +293,7 @@ LESSONS = [
                   "communications with the Bells. It is a story told by people who "
                   "coached there, which is good evidence of what one organization "
                   "does and says it learned, and no evidence of how often it works "
-                  "elsewhere. The chapter is open about that: it closes by saying "
+                  "elsewhere. The chapter is open about that: its last section says "
                   "there is no checklist, and the next two lessons come back to it."),
             ("p", "The visit begins with Jannes Smit, an IT manager at ING who, seven "
                   "years before the chapter was written, began to experiment with "
@@ -312,14 +311,16 @@ LESSONS = [
                   "moved, two years before the chapter, to a matrix organized by "
                   "lines of business, which Lean practitioners would call value "
                   "streams. Each line is a tribe; a tribe holds squads, small "
-                  "self-steering teams, each with a product owner, an IT-area lead "
+                  "self-steering teams, each with a product owner, for IT an IT-area lead, "
                   "and a customer mission, and kept small by the two-pizza rule. "
-                  "Squads mix engineers and marketers, which ING calls BizDevOps. "
+                  "Most squads mix engineers and marketers, which ING calls "
+                  "BizDevOps. "
                   "Chapters group people of one discipline across the squads to "
                   "spread knowledge, and centers of expertise gather specialists "
-                  "such as enterprise architects. The Bells add that a new "
-                  "bridging role, the product area lead, had just emerged from "
-                  "experience, and the caption of their Figure 16.2 says the "
+                  "such as enterprise architects. The Bells add that ING had "
+                  "seen the need for a new bridging role, which it plans to call "
+                  "the product area lead, and that it emerged from experience; "
+                  "the caption of their Figure 16.2 says the "
                   "model has no fixed structure and keeps evolving."),
             ("p", "The squad's workspace is the part of the visit that a team of "
                   "your own could borrow most readily. Its walls hold the squad's "
@@ -369,8 +370,8 @@ LESSONS = [
                 "`3/2` an item a day.",
                 "It usually has 9 items in process, and is considering a limit of 6.",
             ]),
-            ("p", "Type the throughput and the two levels of work in process into "
-                  "the lab. Find the lead time at each, and then work out by hand "
+            ("p", "Choose the preset <code>limit</code>, then type the throughput "
+                  "and the two levels of work in process into the lab. Find the lead time at each, and then work out by hand "
                   "what level of work in process would give a lead time of 2 days "
                   "at this throughput."),
             ("p", "The Bells' squads meet at the board every morning. The next "
@@ -394,7 +395,7 @@ LESSONS = [
                  "label": "The same throughput, with usual work in process of 4 and a limit of 2",
                  "throughput": "4/5",
                  "wip": "4 2",
-                 "expect": {"aflThru": "4/5 = 0.80 items a day", "aflLeadAt": "WIP 4: 5 days; WIP 2: 5/2 = 2.50 days", "aflChange": "1/2 ≈ 0.5× the lead time (5 → 5/2 = 2.50 days)"}},
+                 "expect": {"aflThru": "4/5 = 0.80 items a day", "aflLeadAt": "WIP 4: 5 days; WIP 2: 5/2 = 2.50 days", "aflChange": "0.50× the lead time (5 → 5/2 = 2.50 days)"}},
             ],
             "panel_title": "A squad's board: work in process, throughput and lead time",
             "panel_intro": _PANEL_INTRO,
@@ -411,12 +412,13 @@ LESSONS = [
              "process."),
             ("Find throughput and lead time",
              "Divide the items finished by the length of the window for the "
-             "throughput. Divide the item-days by the items for the average lead "
-             "time."),
+             "throughput. Divide the item-days of the items done by their number "
+             "for the average lead time."),
             ("Check the identity",
-             "Multiply throughput by lead time. If you get the average work in "
-             "process back, the log was complete; if not, an item was started or "
-             "finished outside your window."),
+             "Multiply throughput by lead time. On a log where every item is "
+             "done you get the average work in process back exactly; if an item "
+             "is still open at the end of the window, the two differ, and the "
+             "lab says which item."),
             ("Do it on a board of your own",
              "List the items your team finished in the last two weeks with the "
              "day each started and finished, and type them in. Compare the lead "
@@ -446,26 +448,26 @@ LESSONS = [
         "quiz": [
             {"q": "Who wrote Chapter 16, High-Performance Leadership and "
                   "Management?",
-             "a": ["Steve Bell and Karen Whitley Bell, guests whom the book's "
-                   "authors invited to write Part III",
-                   "Nicole Forsgren, Jez Humble and Gene Kim, as the survey's "
+             "a": ["Nicole Forsgren, Jez Humble and Gene Kim, as the survey's "
                    "authors",
+                   "Steve Bell and Karen Whitley Bell, guests whom the book's "
+                   "authors invited to write Part III",
                    "Jannes Smit, the ING manager at the centre of the visit",
                    "Martin Fowler, who also wrote the first foreword"],
-             "c": 0,
+             "c": 1,
              "why": "The book's front matter credits Chapter 16 to Karen Whitley "
                     "Bell and Steve Bell of Lean IT Strategies, and the "
                     "introduction to Part III says the main authors asked them to "
                     "write it. Jannes Smit is the manager they visited and quote."},
             {"q": "In ING's structure as the chapter describes it, what is a "
                   "<em>chapter</em>?",
-             "a": ["People of one discipline, matrixed across squads, who help "
-                   "squad members learn",
-                   "A self-steering team with one customer mission",
+             "a": ["A self-steering team with one customer mission",
                    "A line of business delivering a portfolio of related products",
+                   "People of one discipline, matrixed across squads, who help "
+                   "squad members learn",
                    "A group of specialists such as enterprise architects, gathered "
                    "as a center of expertise"],
-             "c": 0,
+             "c": 2,
              "why": "A chapter, such as the Data Analytics Chapter, is a "
                     "discipline spread across squads. The self-steering team with "
                     "a mission is the squad, the line of business is the tribe, "
@@ -473,14 +475,14 @@ LESSONS = [
             {"q": "A squad finishes 3 items every 2 days, usually has 9 in "
                   "process, and considers a limit of 6. If throughput holds, what "
                   "are the lead times without and with the limit?",
-             "a": ["6 days, then 4 days",
-                   "13.5 days, then 9 days",
+             "a": ["13.5 days, then 9 days",
                    "6 days, then 6 days",
-                   "1/6 of a day, then 1/4 of a day"],
-             "c": 0,
+                   "1/6 of a day, then 1/4 of a day",
+                   "6 days, then 4 days"],
+             "c": 3,
              "why": "Lead time is work in process divided by throughput: 9 / (3/2) "
-                    "is 6 days and 6 / (3/2) is 4. Multiplying them, as the "
-                    "second option does, gives 13.5 and 9; keeping the lead time "
+                    "is 6 days and 6 / (3/2) is 4. Multiplying instead of "
+                    "dividing gives 13.5 and 9; keeping the lead time "
                     "at 6 forgets that the limit lowers the numerator; dividing "
                     "throughput by work in process turns the ratio upside down. "
                     "For a lead time of 2 days at that throughput the work in "
@@ -579,9 +581,8 @@ LESSONS = [
             ("Strategy deployment",
              "The Lean practice, called Hoshin Kanri, in which frontline teams "
              "learn the strategic priorities and the leaders learn about customers "
-             "from the frontline. The Bells describe it as a rapid cycle of "
-             "learning, testing, validating and adjusting, which they also call "
-             "PDCA."),
+             "from the frontline. The Bells tie it to the cycle they also call "
+             "PDCA, in which a team tries something, checks it and adjusts."),
             ("Current condition and target",
              "A team's measures as they stand, and the measures it means to reach "
              "next. The chapter names Kata among the methods ING tried and blended "
@@ -607,14 +608,9 @@ LESSONS = [
                   "observation of coaches who were there. What the chapter says "
                   "next is about what the meeting is not for: problems are not "
                   "solved at the stand-up."),
-            ("p", "What happens instead is a routine. A problem needing another "
-                  "squad member is noted and discussed later that day. One needing "
-                  "the IT-area lead is noted and escalated, and the lead may "
-                  "resolve it or take it to a stand-up with other area leads and "
-                  "tribe leads. When it is resolved the answer travels back down "
-                  "the same channel, and the problem stays on the board until then. "
-                  "A technical problem goes to the relevant chapter or center of "
-                  "expertise. The Bells call this pattern of vertical and "
+            ("p", "The Bells describe a routine instead: a problem goes to "
+                  "whoever can help, climbs a level when it must, and stays on the "
+                  "board until the answer comes back down. The Bells call this pattern of vertical and "
                   "horizontal communication catchball, a leadership standard-work "
                   "practice, and their Figure 16.3 draws the rhythm; it is worth "
                   "reading in your copy, and this lesson does not reproduce it."),
@@ -653,16 +649,9 @@ LESSONS = [
             ("p", "How ING solves a problem is the nearest the chapter comes to "
                   "the kata of this lesson's title. The Bells report that the chapter "
                   "of Jan Rijkhoff tried A3, Kata, Lean startup and others before "
-                  "settling on a blend of its own. The approach, in the Bells' "
-                  "words, gathers the right people to examine the current "
-                  "condition rigorously, so as to reach root causes and not "
-                  "symptoms; forms a hypothesis about an improvement, including "
-                  "what to measure; runs it as an experiment; and, if it works, "
-                  "makes it standard work, shares it and keeps watching. It works "
-                  "at every level, with problems broken down and passed to the "
-                  "frontline and what is learned fed back up. Standard work is "
-                  "reached by a team experimenting and agreeing on its best way, "
-                  "and reexamined as conditions change."),
+                  "settling on a blend of its own. The Bells describe ING's way as a loop: study the "
+                  "present situation, test an idea against a measure, and make "
+                  "what works the standard, at every level of the organization."),
             ("p", "The chapter says that one part of that approach is to decide how "
                   "and what to measure, and it does not say what ING measured. The "
                   "lab borrows the book's own four measures from Chapter 2: how "
@@ -787,13 +776,13 @@ LESSONS = [
         "quiz": [
             {"q": "In the stand-up as Chapter 16 describes it, what happens to a "
                   "problem a squad member raises?",
-             "a": ["It is noted and kept visible; collaborators discuss it later, "
+             "a": ["The whole squad solves it on the spot before the meeting ends",
+                   "It is noted and kept visible; collaborators discuss it later, "
                    "and one needing the area lead is escalated",
-                   "The whole squad solves it on the spot before the meeting ends",
                    "The product owner ranks it and puts it in the next quarter's "
                    "plan",
                    "It is held until the management team's next boot camp"],
-             "c": 0,
+             "c": 1,
              "why": "The Bells say problems are not solved at the stand-up; there is "
                     "a routine that makes sure they are resolved quickly, "
                     "with escalation where needed and the problem visible until "
@@ -801,23 +790,23 @@ LESSONS = [
                     "or a quarterly plan."},
             {"q": "How, according to the chapter, did ING settle on a way of "
                   "solving problems?",
-             "a": ["By blending elements of methods such as A3, Kata and Lean "
-                   "startup into an approach of their own",
-                   "By adopting Kata exactly as taught, in all its steps",
+             "a": ["By adopting Kata exactly as taught, in all its steps",
                    "By adopting A3 reports alone, written by each squad",
+                   "By blending elements of methods such as A3, Kata and Lean "
+                   "startup into an approach of their own",
                    "By having an outside consultancy prescribe a method"],
-             "c": 0,
-             "why": "A chapter lead says they experimented with several methods and "
-                    "created their own blend. The chapter also says that ING does "
+             "c": 2,
+             "why": "The Bells report that a chapter experimented with several "
+                    "methods and created its own blend. The chapter also says that ING does "
                     "not imitate a way of working prescribed in a book, and warns "
                     "against having consultants do the change for you."},
             {"q": "In the exercise, what are the median lead time and the change "
                   "fail rate of the five changes?",
-             "a": ["30 hours and 20 percent",
-                   "34.4 hours and 20 percent",
+             "a": ["34.4 hours and 20 percent",
                    "80 hours and 20 percent",
-                   "30 hours and 25 percent"],
-             "c": 0,
+                   "30 hours and 25 percent",
+                   "30 hours and 20 percent"],
+             "c": 3,
              "why": "The lead times are 30, 24, 80, 8 and 30 hours, which sorted "
                     "are 8, 24, 30, 30, 80, so the median is 30. The mean, 34.4, "
                     "is the first wrong answer; 80 is just the middle record in "
@@ -934,7 +923,7 @@ LESSONS = [
         "body": [
             ("p", "The Bells put the point of their section in two sentences: "
                   "&ldquo;there is no checklist or playbook. You can&rsquo;t "
-                  "&lsquo;implement&rsquo; culture change.&rdquo; Transforming "
+                  "&ldquo;implement&rdquo; culture change.&rdquo; Transforming "
                   "Your Leadership, Management, and Team Practices is built to "
                   "arrive there. They begin with a question "
                   "leaders put to them often, how do we change our culture, and "
@@ -942,15 +931,11 @@ LESSONS = [
                   "learning be made safe for others, and how do new behaviors "
                   "turn into habits. At ING, they say, it began with "
                   "one leader asking himself those questions."),
-            ("p", "That leader brought in coaches, tasked with challenging everyone, "
-                  "himself included, to question assumptions and try new "
-                  "behaviors, and he asked his management team to try it with him "
-                  "even if it failed, since they would learn from the failure. "
-                  "Each quarter the team came together for new learning and over "
-                  "the following months put it into practice: uncomfortable at "
-                  "first, then easier, then a habit, in time for the next cycle. "
-                  "The Bells' picture is of stretching, and stretching again, just "
-                  "as the team felt comfortable."),
+            ("p", "That leader hired coaches to challenge everyone, himself "
+                  "first, and his managers met each quarter to learn and spent the "
+                  "months between making it habit. The Bells' picture is of "
+                  "stretching, and stretching again, just as the team felt "
+                  "comfortable."),
             ("p", "The first exercise was concrete. In an early boot camp the Bells "
                   "challenged the managers to develop leader standard work, "
                   "meaning work shown visually, short meetings at a board and steady "
@@ -985,7 +970,8 @@ LESSONS = [
                   "developing your own. The lesson does not reproduce it. The "
                   "useful thing it tells you is how much of the chapter is the "
                   "Bells' view and how much the book's data: the unstarred "
-                  "practices are not yet tested."),
+                  "practices are not ones the research has shown to go with high "
+                  "performance."),
             ("p", "Their closing advice comes as a set of suggestions from their own "
                   "experience, and it is worth reading as such. Keep the right "
                   "mindset: learning, not the practices and certainly not the "
@@ -994,8 +980,8 @@ LESSONS = [
                   "them; do not contract the change out to a large consulting "
                   "firm, because teams then feel it is done to them, though outside "
                   "coaching may be needed at first; and grow your own coaches. "
-                  "Lead by example, since a generative culture starts with showing "
-                  "new behaviors and not delegating them. Practice discipline, "
+                  "Lead by example: a new culture is shown, not delegated. "
+                  "Practice discipline, "
                   "patience and practice."),
             ("p", "The research behind the book supports part of this and "
                   "qualifies another. Appendix A lists supporting or embodying "
@@ -1016,7 +1002,8 @@ LESSONS = [
                   "and 2 of 5 cultural. The preset <code>quarter</code> adds its "
                   "quarter: visible flow of work, limits on work in process, "
                   "visual displays and a learning culture, and lists them as added. "
-                  "With the 4 added, Orchid has 13 of 24, and by hand three "
+                  "The preset <code>end</code> enters the end list alone, and "
+                  "the lab prints 13 of 24 for Orchid. Comparing the two, three "
                   "categories changed: product and process to 2 of 4, lean "
                   "management and monitoring to 3 of 5, cultural to 3 of 5. "
                   "Continuous delivery and architecture did not."),
@@ -1065,6 +1052,11 @@ LESSONS = [
                  "teams": _teams(orchid=ORCHID_START),
                  "teams2": _teams(orchid=ORCHID_END),
                  "expect": {"acpOverall": "orchid 9 of 24", "acpAdded": "orchid +4 (visible-flow-of-work, wip-limits, visual-displays, learning-culture)"}},
+                {"id": "end",
+                 "label": "Orchid at the end of the quarter, alone",
+                 "capabilities": CAPABILITIES,
+                 "teams": _teams(orchid=ORCHID_END),
+                 "expect": {"acpOverall": "orchid 13 of 24", "acpCategories": "orchid: continuous-delivery 4 of 8, architecture 1 of 2, product-and-process 2 of 4, lean-management-and-monitoring 3 of 5, cultural 3 of 5", "acpAdded": "no second date given"}},
             ],
             "panel_title": "The capabilities a team added in a quarter",
             "panel_intro": _PANEL_INTRO,
@@ -1109,14 +1101,14 @@ LESSONS = [
         "quiz": [
             {"q": "According to the Bells, what did ING's managers do first, before "
                   "developing new routines?",
-             "a": ["They logged their own time use, day by day, for several "
-                   "weeks",
-                   "They hired a large consulting firm to implement a new "
+             "a": ["They hired a large consulting firm to implement a new "
                    "methodology",
+                   "They logged their own time use, day by day, for several "
+                   "weeks",
                    "They copied the routines of another company's leaders",
                    "They surveyed their teams with the items for Westrum's "
                    "culture"],
-             "c": 0,
+             "c": 1,
              "why": "The first exercise was to find out where their days went, "
                     "which they found uncomfortable; they then shared "
                     "what they learned and developed new ways of working. The "
@@ -1124,13 +1116,13 @@ LESSONS = [
                     "copying another company."},
             {"q": "What does the chapter say about Figure 16.4, its table of "
                   "behaviors and practices?",
-             "a": ["It is a distillation or general guidelines, not a checklist; an "
+             "a": ["It is a checklist of the 24 capabilities, to be adopted in order",
+                   "Every practice in it is shown to cause high performance",
+                   "It is a distillation or general guidelines, not a checklist; an "
                    "asterisk marks the practices that research has linked to high "
                    "performance",
-                   "It is a checklist of the 24 capabilities, to be adopted in order",
-                   "Every practice in it is shown to cause high performance",
                    "It reports the statistical results of the survey"],
-             "c": 0,
+             "c": 2,
              "why": "The Bells say the table is not a checklist, and that the "
                     "starred practices are those research shows to correlate with "
                     "high performance, in the hope that research will explore the "
@@ -1139,11 +1131,11 @@ LESSONS = [
             {"q": "In the exercise, which category did Pine gain most in, and "
                   "how many of its capabilities does Pine have there at the "
                   "end?",
-             "a": ["Product and process, 3 of 4",
-                   "Continuous delivery, 4 of 8",
+             "a": ["Continuous delivery, 4 of 8",
                    "Lean management and monitoring, 2 of 5",
-                   "Product and process, 2 of 4"],
-             "c": 0,
+                   "Product and process, 2 of 4",
+                   "Product and process, 3 of 4"],
+             "c": 3,
              "why": "Pine added one continuous delivery capability, two product and "
                     "process ones (small batches and team experimentation) and one "
                     "lean management and monitoring one. Product and process went "
@@ -1164,8 +1156,8 @@ LESSONS = [
             ("Treating the table of practices as a checklist",
              "The Bells say plainly that Figure 16.4 is not a checklist and that "
              "there is no playbook. Some of its practices are starred as "
-             "correlating with high performance in the research and the rest "
-             "are untested. It is a distillation to develop your own behaviors "
+             "correlating with high performance in the research; the rest are "
+             "not ones the research has shown to go with it. It is a distillation to develop your own behaviors "
              "from."),
             ("Hiring a firm to implement the new way of working",
              "The Bells' advice is not to contract out the change, because teams "
@@ -1273,9 +1265,9 @@ LESSONS = [
             ("p", "The ask is to leaders and teams alike. The authors hope the "
                   "book has shown the reader where to improve: in technology and "
                   "in business process, in how work feels, and in how "
-                  "improvement is run. They add that this takes sustained "
-                  "effort, investment, focus and time. This is the same message, from the other end, "
-                  "as the Bells' warning that a culture cannot be implemented: "
+                  "improvement is run. They add that it will take lasting effort and "
+                  "investment over time. This is the same message, from the other "
+                  "end, as the Bells' warning that a culture cannot be implemented: "
                   "what the research gives you is a list of capabilities worth "
                   "developing, not a method of installing them."),
             ("p", "Then comes the sentence a reader may want to look at twice: "
@@ -1293,9 +1285,9 @@ LESSONS = [
                   "the data for it were not there. Chapter 15 names the "
                   "limits of a snowball sample, whose data are strongly "
                   "influenced by the first invitations."),
-            ("p", "So 'unequivocal' is the authors' word for how consistent the "
-                  "results of their survey were over its years, on the "
-                  "relationships they tested. It is not a claim of proven cause, "
+            ("p", "The fairest reading of 'unequivocal' is that the survey's "
+                  "results were consistent over its years, on the "
+                  "relationships it tested. It is not a claim of proven cause, "
                   "and the book does not make one: an endorsement printed before the "
                   "title page speaks of a causal link, and the authors' own account "
                   "of their method does not. A reader who holds both, the strength of "
@@ -1364,13 +1356,13 @@ LESSONS = [
                  "rows": LIKELY_TWICE,
                  "first": "high",
                  "second": "low",
-                 "expect": {"agrShares": "high 6 of 9 ≈ 66.7%; medium 4 of 9 ≈ 44.4%; low 3 of 9 ≈ 33.3%", "agrRatio": "2×", "agrDiff": "≈ +33.3 points", "agrOdds": "4"}},
+                 "expect": {"agrShares": "high 6 of 9 ≈ 66.7%; medium 4 of 9 ≈ 44.4%; low 3 of 9 ≈ 33.3%", "agrRatio": "2.00×", "agrDiff": "≈ +33.3 points", "agrOdds": "4.00"}},
                 {"id": "uneven",
                  "label": "Two groups of different sizes: 8 high and 10 low",
                  "rows": LIKELY_UNEVEN,
                  "first": "high",
                  "second": "low",
-                 "expect": {"agrShares": "high 6 of 8 = 75%; low 5 of 10 = 50%", "agrRatio": "1.50×", "agrDiff": "+25 points", "agrOdds": "3"}},
+                 "expect": {"agrShares": "high 6 of 8 = 75%; low 5 of 10 = 50%", "agrRatio": "1.50×", "agrDiff": "+25 points", "agrOdds": "3.00"}},
             ],
             "panel_title": "Who met their goals, by group",
             "panel_intro": _PANEL_INTRO,
@@ -1415,23 +1407,23 @@ LESSONS = [
         "quiz": [
             {"q": "What does the Conclusion say about a team's route to high "
                   "performance?",
-             "a": ["You cannot buy or copy it; you must develop your own "
+             "a": ["You can buy it with the tools that the capabilities name",
+                   "You cannot buy or copy it; you must develop your own "
                    "capabilities in a way that fits your context",
-                   "You can buy it with the tools that the capabilities name",
                    "You can copy it from the high performers by adopting their "
                    "practices exactly",
                    "You can reach it in a quarter if leadership is strong enough"],
-             "c": 0,
+             "c": 1,
              "why": "The authors say high performance cannot be bought or copied, "
-                    "and that the path takes sustained effort, investment, focus "
-                    "and time. Nothing in the Conclusion promises a quarter."},
+                    "and that the path takes lasting effort and investment "
+                    "over time. Nothing in the Conclusion promises a quarter."},
             {"q": "What does Chapter 12 say about causal analysis in the research?",
-             "a": ["It was not done, because the data it needs, generally from "
-                   "randomized studies, were not available",
-                   "It was done by A/B testing every capability",
+             "a": ["It was done by A/B testing every capability",
                    "It was done with partial least squares regression",
+                   "It was not done, because the data it needs, generally from "
+                   "randomized studies, were not available",
                    "It was done on the 2014 follow-up of publicly traded firms"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter says the final levels of analysis (predictive, "
                     "causal and mechanistic) were not included for lack of the "
                     "data, and that causal analysis generally requires "
@@ -1440,16 +1432,16 @@ LESSONS = [
             {"q": "In the exercise, 8 of 10 high-group teams and 8 of 20 low-group "
                   "teams met their goals. What are the ratio of shares and the "
                   "odds ratio?",
-             "a": ["2 and 6",
-                   "1.00 and 1.00",
+             "a": ["1.00 and 1.00",
                    "2 and 2",
-                   "6 and 2"],
-             "c": 0,
+                   "6 and 2",
+                   "2 and 6"],
+             "c": 3,
              "why": "The shares are 80 and 40 percent, a ratio of 2 and a gap "
                     "of 40 points. The odds are 8 to 2, which is 4, and 8 to 12, "
                     "which is 2/3; 4 divided by 2/3 is 6. Equal counts of 8 "
-                    "tempt the answer 1.00, which ignores the group sizes; the "
-                    "last option swaps the two."},
+                    "tempt the answer 1.00, which ignores the group sizes; 6 and "
+                    "2 swaps the two."},
             {"q": "On the preset <code>twice</code> the lab prints a ratio of "
                   "shares and an odds ratio for the high group over the low. "
                   "Which pair is right?",
@@ -1465,8 +1457,8 @@ LESSONS = [
         ],
         "mistakes": [
             ("Reading 'our research is unequivocal' as proof of cause",
-             "The authors' word is about how consistent their survey's results "
-             "were. The book itself says its impact claims use inferential "
+             "Read fairly, the word is about how consistent the survey's "
+             "results were. The book itself says its impact claims use inferential "
              "prediction, that causal analysis was not done for want of data, "
              "and Fowler's foreword asks for confirmation by other teams using "
              "other methods. Strong and consistent is not the same as proved."),
@@ -1557,9 +1549,8 @@ LESSONS = [
                   "appendices that end the book. Appendix A is the list of "
                   "capabilities, each followed by the chapter that treats it. Appendix B is the statistical summary. Appendix C, on the "
                   "methods, is read in Surveys, Data and Statistical Methods."),
-            ("p", "Appendix A says the research found 24 key capabilities that "
-                  "drive better software delivery performance, at a level of "
-                  "statistical significance, and sorts them into five "
+            ("p", "Appendix A lists 24 capabilities that the analysis tied to "
+                  "better delivery performance, and sorts them into five "
                   "categories, in no particular order within each. "
                   "Continuous delivery has eight, all read in Chapter 4: version "
                   "control, deployment automation, continuous integration, "
@@ -1615,7 +1606,8 @@ LESSONS = [
             ("p", "The appendix is also candid in a way that a list of results "
                   "rarely is. It reports that teams with the strongest "
                   "transformational leaders were no more likely, and perhaps less, "
-                  "to be high performers, and, for software delivery performance, that "
+                  "to be high performers than the survey's teams as a whole, and, for "
+                  "software delivery performance, that "
                   "the construct is made from three of the four measures, with "
                   "change fail rate highly correlated with it and left out. Those "
                   "are reasons not to read the capabilities as a recipe, or "
@@ -1623,14 +1615,17 @@ LESSONS = [
             ("p", "Now the lab, which uses Appendix A as its frame. Six teams of "
                   "one invented organization each list the capabilities they have "
                   "in place. On the preset <code>six-teams</code> the teams have "
-                  "18, 14, 8, 13, 7 and 11 of the 24, 71 of the 144 possible. By "
-                  "category the organization has 26 of 48 continuous delivery "
-                  "capabilities in place, 5 of 12 in architecture, 10 of 24 in "
-                  "product and process, 11 of 30 in lean management and "
-                  "monitoring and 19 of 30 in cultural ones. Three categories "
-                  "are below half, lean management and monitoring lowest at "
-                  "36.7 percent. One capability, team experimentation, is in "
-                  "place in none of the six teams."),
+                  "18, 14, 8, 13, 7 and 11 of the 24, and prints each team's "
+                  "count in each category. Add a category's six counts by hand "
+                  "and divide by its size times six, and the organization has 26 "
+                  "of 48 continuous delivery capabilities in place, 5 of 12 in "
+                  "architecture, 10 of 24 in product and process, 11 of 30 in "
+                  "lean management and monitoring and 19 of 30 in cultural ones; "
+                  "71 of the 144 possible in all. Three categories are below half, "
+                  "lean management and monitoring lowest at 36.7 percent. These "
+                  "organization-wide figures are summed by hand from the lab's "
+                  "table, not printed by it. The lab's last tile shows team "
+                  "experimentation in place in none of the six teams."),
             ("p", "The lab's other view is a team. On the preset "
                   "<code>same-total</code> two teams have 13 capabilities each: "
                   "Orchid, from the previous lesson, and Elm. Orchid is spread: "
@@ -1675,7 +1670,7 @@ LESSONS = [
                  "teams": SAME_TOTAL,
                  "expect": {"acpOverall": "orchid 13 of 24; elm 13 of 24", "acpCategories": "orchid: continuous-delivery 4 of 8, architecture 1 of 2, product-and-process 2 of 4, lean-management-and-monitoring 3 of 5, cultural 3 of 5; elm: continuous-delivery 6 of 8, architecture 1 of 2, product-and-process 1 of 4, lean-management-and-monitoring 1 of 5, cultural 4 of 5"}},
             ],
-            "panel_title": "Which categories are thin across the teams",
+            "panel_title": "Six teams' capabilities, by category",
             "panel_intro": _PANEL_INTRO,
         }),
         "steps_title": "Profiling an organization",
@@ -1721,31 +1716,31 @@ LESSONS = [
         "quiz": [
             {"q": "How many capabilities does Appendix A list, and in how many "
                   "categories?",
-             "a": ["24, in five categories",
-                   "24, in four categories",
+             "a": ["24, in four categories",
+                   "24, in five categories",
                    "20, in five categories",
                    "25, in six categories"],
-             "c": 0,
+             "c": 1,
              "why": "Appendix A lists 24 key capabilities in five categories: "
                     "continuous delivery, architecture, product and process, "
                     "lean management and monitoring, and cultural."},
             {"q": "What does Appendix B say a correlation does not tell us?",
-             "a": ["Whether either variable predicts or causes the other",
-                   "Whether two variables move together at all",
+             "a": ["Whether two variables move together at all",
                    "Whether the two variables were measured by survey",
+                   "Whether either variable predicts or causes the other",
                    "How large the sample was"],
-             "c": 0,
+             "c": 2,
              "why": "Correlation shows how closely two variables move together; "
                     "it does not tell us whether one predicts or causes the other, "
                     "since a third variable or chance can produce the same "
                     "movement. Whether they move together is what it does tell us."},
             {"q": "In the exercise, which category of Willow's has none in place "
                   "and which has every capability in place?",
-             "a": ["None in lean management and monitoring; all in architecture",
-                   "None in architecture; all in lean management and monitoring",
+             "a": ["None in architecture; all in lean management and monitoring",
                    "None in cultural; all in continuous delivery",
-                   "None in product and process; all in cultural"],
-             "c": 0,
+                   "None in product and process; all in cultural",
+                   "None in lean management and monitoring; all in architecture"],
+             "c": 3,
              "why": "Willow has 4 of 8 in continuous delivery, 2 of 2 in "
                     "architecture, 2 of 4 in product and process, 0 of 5 in "
                     "lean management and monitoring and 2 of 5 in cultural. "

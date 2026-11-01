@@ -153,7 +153,7 @@ LESSONS = [
             "review every major feature, without delay",
             "infosec joins design, demos and tests",
             "preapproved, easy-to-use libraries and tools",
-            "high performers fixed less, in less time",
+            "high performers: half the time fixing",
             "rugged: everybody's responsibility",
         ],
         "key_label": "Shifting left on security in six lines",
@@ -208,7 +208,7 @@ LESSONS = [
             ("p", "Their answer is to shift left. The chapter lists three parts to "
                   "it. Every major feature gets a security review, arranged so "
                   "that development does not slow down. Security takes part in "
-                  "the whole lifecycle, from design through operations: the "
+                  "the whole lifecycle, from development through operations: the "
                   "infosec experts help design applications, come to "
                   "demonstrations and comment, and see that security features "
                   "are covered by the automated tests. And the secure route is "
@@ -362,17 +362,18 @@ LESSONS = [
         "quiz": [
             {"q": "In the exercise, how many hours do the ten findings cost the late "
                   "team and the early team, and how many hours are freed?",
-             "a": ["282 and 105, freeing 177",
-                   "282 and 105, freeing 387",
+             "a": ["282 and 105, freeing 387",
                    "225 and 45, freeing 180",
-                   "387 and 282, freeing 105"],
-             "c": 0,
+                   "387 and 282, freeing 105",
+                   "282 and 105, freeing 177"],
+             "c": 3,
              "why": "Late: 2 at build is 12 hours, 3 at test is 45, 5 after release "
                     "is 225: 282. Early: 4 at design is 12, 3 at build is 18, 2 at "
                     "test is 30, 1 after release is 45: 105. The difference is "
-                    "177. The second option adds the other work's 150 hours to "
-                    "the late total before subtracting; the third compares only "
-                    "the after-release rows; the fourth adds the two totals."},
+                    "177. Freeing 387 gives the sum of the two totals as the "
+                    "hours freed; 225 and 45 compares only the after-release "
+                    "rows; 387 and 282 takes the sum as the late figure and the "
+                    "early total as the hours freed."},
             {"q": "In Chapter 6, how does the time that high performers spent "
                   "remediating security issues compare with low performers'?",
              "a": ["High performers spent 50 percent less time",
@@ -408,11 +409,11 @@ LESSONS = [
             {"q": "In the chapter, what ratio of infosec people to infrastructure "
                   "people to developers does James Wickett cite for large "
                   "companies?",
-             "a": ["1 to 10 to 100",
-                   "1 to 100 to 10",
+             "a": ["1 to 100 to 10",
                    "10 to 100 to 1",
+                   "1 to 10 to 100",
                    "1 to 10 to 10"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter cites one infosec person for every ten "
                     "infrastructure people and every hundred developers, from "
                     "Wickett in 2014, as a sign of how thinly security teams are "
@@ -495,7 +496,7 @@ LESSONS = [
              "A board, storyboard or dashboard that shows the current status of "
              "the work and key quality and productivity measures, including "
              "defects, to engineers and leaders. The authors look at what is "
-             "shown, how broadly it is shared, and how easy it is to reach."),
+             "shown, to whom, and how easily it can be had."),
             ("Little's law",
              "For a steady flow, the average number of items in the system equals "
              "the throughput times the average time an item spends in it. So "
@@ -533,21 +534,18 @@ LESSONS = [
                   "are combined with visual displays and a feedback loop from "
                   "production monitoring back to the delivery teams or the "
                   "business do the authors see a strong effect, and with the "
-                  "three together the positive effect on software delivery "
-                  "performance is much stronger. The practices are well known in "
-                  "the Lean community, they write: they keep teams from being "
-                  "overburdened, which can lengthen lead times, and they expose "
-                  "obstacles to flow."),
+                  "three together the effect on delivery is far larger. Limits "
+                  "and displays are familiar in the Lean community, they write, "
+                  "as ways to spare teams overload and to bring blockages "
+                  "to light."),
             ("p", "How the authors measured it explains the result. For WIP, the "
                   "survey did not only ask whether a team is good at limiting WIP "
                   "and has processes for it; it asked whether the limits bring "
                   "the obstacles to flow into view, and whether the team clears "
                   "them by improving the process, so that throughput rises. A limit that nobody acts on is not what they "
-                  "measured. For visual displays it asked whether dashboards share "
-                  "information, whether teams use kanban or storyboards, whether "
-                  "quality and productivity information is readily available, and "
-                  "whether failures and defect rates are shown publicly. Visibility "
-                  "and the communication it enables are, they say, key."),
+                  "measured. For visual displays it asked what is shown, to whom, and "
+                  "how easily it can be had. Visibility, and the communication "
+                  "it enables, are in their words the key."),
             ("p", "The chapter adds what the practices go with. The authors "
                   "hypothesized that in combination they raise delivery "
                   "performance, and report that they do; they also report positive "
@@ -604,7 +602,7 @@ LESSONS = [
                  "label": "Two items a day, with 18 in progress and then 6",
                  "throughput": WIP_THROUGHPUT,
                  "wip": WIP_LEVELS,
-                 "expect": {"aflThru": "2 items a day", "aflLeadAt": "WIP 18: 9 days; WIP 6: 3 days", "aflChange": "1/3 ≈ 0.3× the lead time (9 → 3 days)"}},
+                 "expect": {"aflThru": "2 items a day", "aflLeadAt": "WIP 18: 9 days; WIP 6: 3 days", "aflChange": "≈ 0.33× the lead time (9 → 3 days)"}},
                 {"id": "board",
                  "label": "A board of six items over eight days",
                  "throughput": "-",
@@ -657,11 +655,11 @@ LESSONS = [
         "quiz": [
             {"q": "In the exercise's board, watched from day 0 to day 6, what is the "
                   "average lead time of the six items?",
-             "a": ["7/3 of a day, about 2.33 days",
-                   "14 days",
+             "a": ["14 days",
                    "1 day",
-                   "3 days"],
-             "c": 0,
+                   "3 days",
+                   "7/3 of a day, about 2.33 days"],
+             "c": 3,
              "why": "The lead times are 3, 1, 4, 2, 3 and 1 days, 14 item-days. "
                     "Divided by the 6 items that is 7/3. The average work in "
                     "progress is 14 over 6, also 7/3, and the throughput is 1 a "
@@ -680,29 +678,29 @@ LESSONS = [
                     "progress; 6 is the work in progress itself. The result "
                     "depends on throughput holding, which the lab assumes."},
             {"q": "What does Chapter 7 report about WIP limits on their own?",
-             "a": ["They do not strongly predict delivery performance; with visual "
+             "a": ["They strongly predict delivery performance whatever else the "
+                   "team does",
+                   "They do not strongly predict delivery performance; with visual "
                    "displays and a feedback loop from production monitoring the "
                    "effect is strong",
-                   "They strongly predict delivery performance whatever else the "
-                   "team does",
                    "They predict delivery performance only for teams above a "
                    "certain size",
                    "They lower delivery performance, because they slow the team "
                    "down"],
-             "c": 0,
+             "c": 1,
              "why": "The authors say the effect is strong only when limits are "
                     "combined with visual displays and a feedback loop from "
                     "production monitoring back to the teams or the business. "
                     "They report no size threshold, and no negative effect."},
             {"q": "Besides whether a team limits its WIP, what does the survey "
                   "behind Chapter 7 ask about WIP?",
-             "a": ["Whether the limits make obstacles to flow visible, and whether "
-                   "the team removes them through process improvement",
-                   "Whether managers, not the team, set the limit",
+             "a": ["Whether managers, not the team, set the limit",
                    "Whether work is measured in story points",
+                   "Whether the limits make obstacles to flow visible, and whether "
+                   "the team removes them through process improvement",
                    "Whether the limit is equal to the number of people on the "
                    "team"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter says that WIP limits are no good if they do not "
                     "lead to improvements that increase flow, so the survey asked "
                     "about obstacles made visible and removed. It does not say "
@@ -722,9 +720,9 @@ LESSONS = [
              "team that cuts its work in progress may finish more or fewer items "
              "in a day; the figure is arithmetic on the sample stated."),
             ("Treating a board as visual management whatever is on it",
-             "The authors look at what is shown, how broadly it is shared and how "
-             "easy it is to reach: quality and productivity measures and defect "
-             "rates, available to engineers and leaders alike. A board that "
+             "The authors look at what is shown, to whom, and how easily it "
+             "can be had: quality and productivity measures and defect "
+             "rates, open to engineers and leaders alike. A board that "
              "shows status to one manager does not meet that description."),
         ],
         "standard": (
@@ -747,7 +745,7 @@ LESSONS = [
     # Segregation of Duties? (pp. 116-117), why external approval is
     # problematic (p. 117).
     # Quotes: PDF p. 115 of the operator's copy, 21 words, quotes.py OK;
-    # PDF p. 117, 3 words, quotes.py OK. Lesson total: 24 words.
+    # PDF p. 117, 3 words, quotes.py OK. Lesson total: 26 words.
     {
         "slug": "lightweight-change-management",
         "title": "A Lightweight Change Management Process",
@@ -812,9 +810,9 @@ LESSONS = [
                   "review, or with no approval step, did better on it. And "
                   "teams that sent every change to an outside body did worse."),
             ("p", "They then asked whether external approval at least buys "
-                  "stability. &ldquo;Approval by an external body (such as a "
-                  "manager or CAB) simply doesn&rsquo;t work to increase the "
-                  "stability of production systems,&rdquo; they conclude: it "
+                  "stability. They conclude that &ldquo;approval by an external body "
+                  "(such as a manager or CAB) simply doesn&rsquo;t work to "
+                  "increase the stability of production systems&rdquo;: it "
                   "did not help time to restore service, it showed no "
                   "correlation with change fail rate, and it slowed delivery down. "
                   "In the authors' view it is worse than having no approval "
@@ -848,9 +846,9 @@ LESSONS = [
                   "engineers; they call the practice &ldquo;risk management "
                   "theater&rdquo;, checking boxes so that one can say the process "
                   "was followed. They see a place for people outside teams, in a "
-                  "governance role: monitoring delivery performance and helping "
-                  "teams adopt practices known to improve stability, quality and "
-                  "speed, not inspecting changes."),
+                  "governance role: watching how delivery is going and helping "
+                  "teams take up the practices the book describes, not "
+                  "inspecting changes."),
             ("p", "Now the count, on twelve invented changes, six by peer review "
                   "and six by a CAB. A change is a name, a route, the hours it "
                   "waited for approval and whether it failed. The peer-reviewed "
@@ -948,11 +946,11 @@ LESSONS = [
         "quiz": [
             {"q": "In the exercise, what is the mean wait of the CAB changes minus "
                   "the mean wait of the peer-reviewed ones?",
-             "a": ["58.25 hours",
-                   "60 hours",
+             "a": ["60 hours",
                    "233 hours",
-                   "58.5 hours"],
-             "c": 0,
+                   "58.5 hours",
+                   "58.25 hours"],
+             "c": 3,
              "why": "The CAB waits are 24, 48, 72 and 96: 240 over 4, a mean of 60. "
                     "The peer waits are 2, 1, 3 and 1: 7 over 4, 1.75. The "
                     "difference is 58.25 hours. Sixty ignores the peer wait; 233 "
@@ -965,31 +963,32 @@ LESSONS = [
                    "1 in 6, 16.7 percent",
                    "2 in 6, 16.7 percent"],
              "c": 0,
-             "why": "Two of the six CAB changes failed. The second option divides by "
+             "why": "Two of the six CAB changes failed. 2 in 12 divides by "
                     "all twelve changes, which is the overall rate and not the "
-                    "route's; the third is the preset before the second failure; "
-                    "the fourth is the right count with the wrong percentage."},
+                    "route's; 1 in 6 is the preset before the second failure; "
+                    "2 in 6 at 16.7 percent is the right count with the wrong "
+                    "percentage."},
             {"q": "Which approval scenario did the authors find was not correlated "
                   "with software delivery performance?",
-             "a": ["Approval only for high-risk changes, such as database "
+             "a": ["Approval of every change by an external body",
+                   "Approval only for high-risk changes, such as database "
                    "changes",
-                   "Approval of every change by an external body",
                    "Reliance on peer review",
                    "No change approval process"],
-             "c": 0,
+             "c": 1,
              "why": "The authors report that approval limited to risky changes "
                     "showed no correlation with delivery performance. Teams with no "
                     "approval process or with peer review did better, and teams "
                     "requiring approval by an external body did worse."},
             {"q": "According to the chapter's box on segregation of duties, how can "
                   "the requirement be met without a CAB?",
-             "a": ["Someone who did not write the change reviews and approves it in "
+             "a": ["The author of the change signs it off in the pipeline tool",
+                   "A separate operations team applies each change by hand",
+                   "Someone who did not write the change reviews and approves it in "
                    "a system of record, and changes reach production only through "
                    "an automated pipeline",
-                   "The author of the change signs it off in the pipeline tool",
-                   "A separate operations team applies each change by hand",
                    "The requirement cannot be met without external approval"],
-             "c": 0,
+             "c": 2,
              "why": "The authors name two mechanisms: review by somebody not "
                     "involved in authoring the change, recorded in a system such "
                     "as a pull request, and a fully automated deployment pipeline "
@@ -1086,7 +1085,8 @@ LESSONS = [
                   "authors say Agile has largely won the argument over methods, "
                   "but a good deal of what organizations have adopted is faux "
                   "Agile: some of the practices without the culture and processes "
-                  "around them. They give three signs: months spent on "
+                  "around them. In larger companies, they say, three signs "
+                  "are common: months spent on "
                   "budgets, analysis and requirements before work begins; work "
                   "gathered into large projects that ship rarely; and "
                   "customer feedback treated as an afterthought. Against that they "
@@ -1102,15 +1102,10 @@ LESSONS = [
                   "authors measure as productivity, market share and profitability. "
                   "They examined four capabilities that make up their model of a "
                   "Lean approach."),
-            ("p", "The four are these. Teams cut products and features into "
-                  "small batches, each finishable within a week and shipped "
-                  "often, with MVPs among the means. Teams understand how work "
-                  "flows from the business to customers and can see it, "
-                  "including where each product and feature stands. The "
-                  "organization asks customers for feedback, regularly, and "
-                  "builds it into design. And teams can write and change "
-                  "specifications as they go, on their own authority. The "
-                  "last gets a lesson of its own."),
+            ("p", "The four are these. Small batches, with MVPs among the means. "
+                  "Visibility of the flow of work to customers. Customer "
+                  "feedback built into design. And team authority over "
+                  "specifications. The last gets a lesson of its own."),
             ("p", "What they found: the factors were statistically significant "
                   "predictors of higher software delivery performance and of "
                   "organizational performance, and also of a better "
@@ -1131,10 +1126,9 @@ LESSONS = [
                   "testing, and that an experimental style of product work goes "
                   "closely with the technical practices behind continuous "
                   "delivery. Customer feedback, as they use the term, covers "
-                  "collecting satisfaction metrics, asking customers how good the "
-                  "products and features are, and using the answers in "
-                  "design; whether teams have the authority to respond turns "
-                  "out to matter too."),
+                  "several practices, from gathering satisfaction metrics to "
+                  "feeding what customers say into design; whether teams have "
+                  "the authority to respond turns out to matter too."),
             ("p", "Now the count. The lab takes a number of work items, the "
                   "size of a batch, the time each item takes and the fixed time "
                   "each release costs, and says when the first batch is out, when "
@@ -1151,15 +1145,17 @@ LESSONS = [
                   "batches wait 5, 10, 15 and 20 days, which averages to "
                   "that), and the first feedback comes 14/5, about 2.8 times "
                   "sooner."),
-            ("p", "The numbers show a cost as well as a gain, and the chapter does "
-                  "not hide it: small batches finish later in total when each "
-                  "release is costly. The preset <code>automated</code> makes the "
+            ("p", "The numbers show a cost as well as a gain, which the "
+                  "chapter does not discuss: small batches finish later in "
+                  "total when each release is costly. The preset <code>automated</code> makes the "
                   "release cost half a day, as a deployment pipeline would. One "
                   "batch of 12 now arrives on day 12.5. Four batches of 3 bring the "
                   "first feedback on day 3.5, the last on day 14, with 2 days of "
-                  "release time. This is why the authors link small batches to the "
-                  "technical practices of Chapters 4 and 5: they cut the price of "
-                  "a release, which makes small batches affordable."),
+                  "release time. The authors report that experimenting with a "
+                  "product is highly correlated with the technical "
+                  "practices behind continuous delivery; the arithmetic "
+                  "shows one way the two could fit together, since a cheaper "
+                  "release makes small batches affordable."),
             ("h3", "Exercise"),
             ("ul", [
                 "Ten items of one day each; a release costs 3 days.",
@@ -1186,14 +1182,14 @@ LESSONS = [
                  "batch": "12, 3",
                  "per_item": "1",
                  "release_cost": "2",
-                 "expect": {"aflBatches": "1 of 12 → 4 of 3", "aflFirst": "14 days → 5 days", "aflLast": "14 days → 20 days", "aflWait": "14 days → 25/2 = 12.50 days", "aflOverhead": "2 days → 8 days", "aflRatio": "14/5 ≈ 2.8×"}},
+                 "expect": {"aflBatches": "1 of 12 → 4 of 3", "aflFirst": "14 days → 5 days", "aflLast": "14 days → 20 days", "aflWait": "14 days → 25/2 = 12.50 days", "aflOverhead": "2 days → 8 days", "aflRatio": "2.80×"}},
                 {"id": "automated",
                  "label": "The same work, with a release costing half a day",
                  "work": "12",
                  "batch": "12, 3",
                  "per_item": "1",
                  "release_cost": "1/2",
-                 "expect": {"aflBatches": "1 of 12 → 4 of 3", "aflFirst": "25/2 = 12.50 days → 7/2 = 3.50 days", "aflLast": "25/2 = 12.50 days → 14 days", "aflWait": "25/2 = 12.50 days → 35/4 = 8.75 days", "aflOverhead": "1/2 = 0.50 days → 2 days", "aflRatio": "25/7 ≈ 3.6×"}},
+                 "expect": {"aflBatches": "1 of 12 → 4 of 3", "aflFirst": "25/2 = 12.50 days → 7/2 = 3.50 days", "aflLast": "25/2 = 12.50 days → 14 days", "aflWait": "25/2 = 12.50 days → 35/4 = 8.75 days", "aflOverhead": "1/2 = 0.50 days → 2 days", "aflRatio": "≈ 3.57×"}},
             ],
             "panel_title": "When the first feedback arrives",
             "panel_intro": _PANEL_INTRO,
@@ -1241,11 +1237,11 @@ LESSONS = [
             {"q": "In the exercise, ten items of one day each and a release "
                   "costing 3 days, on which day does the first feedback arrive "
                   "from five batches of 2?",
-             "a": ["Day 5",
-                   "Day 2",
+             "a": ["Day 2",
                    "Day 13",
-                   "Day 25"],
-             "c": 0,
+                   "Day 25",
+                   "Day 5"],
+             "c": 3,
              "why": "One batch is 2 days of work plus a release of 3: day 5. Day 2 "
                     "forgets the release, day 13 is the single batch of 10, and "
                     "day 25 is when the last of the five batches arrives, 5 x 5."},
@@ -1260,21 +1256,21 @@ LESSONS = [
                     "batch's release; 5 is the time to the first feedback; 20 is "
                     "the day the last batch arrives."},
             {"q": "In Chapter 8, how long should a small batch take to complete?",
-             "a": ["Less than a week",
-                   "Less than a day",
+             "a": ["Less than a day",
+                   "Less than a week",
                    "Less than a month",
                    "Whatever the team estimates"],
-             "c": 0,
+             "c": 1,
              "why": "The first capability is about cutting products and features "
                     "into batches small enough to finish within a week and ship "
                     "often, with MVPs among the means."},
             {"q": "How does the chapter define a minimum viable product?",
-             "a": ["A prototype with just enough features to allow validated "
-                   "learning about the product and its business model",
-                   "The first release of a finished product",
+             "a": ["The first release of a finished product",
                    "A feature released behind a switch",
+                   "A prototype with only the features needed to learn, by testing "
+                   "it, whether the product and its business model are sound",
                    "The smallest team that can ship a product"],
-             "c": 0,
+             "c": 2,
              "why": "In the box on small batches the authors describe an MVP as a "
                     "prototype built to test the product and its business model, "
                     "with only the features that takes."},
@@ -1290,8 +1286,9 @@ LESSONS = [
              "The lab's four batches bring the first feedback earlier and the "
              "last later, because each batch carries a release. The gain is in "
              "feedback, not in the total, and it depends on the release being "
-             "cheap, which is why the authors tie the practice to the technical "
-             "practices of continuous delivery."),
+             "cheap, which the lab shows and the chapter does not argue; the "
+             "authors report only that the experimental approach is highly "
+             "correlated with continuous delivery's practices."),
             ("Reading a lab figure as the authors' finding about batch size",
              "The days are arithmetic on invented work, with release costs the "
              "lesson chose. The authors report that the capabilities predict "
@@ -1338,8 +1335,8 @@ LESSONS = [
             "teams may change the specification",
             "experiment with small batches and feedback",
             "predicts profit, productivity, market share",
-            "2016: product practice predicts delivery",
-            "2017: delivery predicts product practice",
+            "first model: product predicts delivery",
+            "next year: delivery predicts product",
             "r is symmetric: it names no direction",
         ],
         "key_label": "Team experimentation in six lines",
@@ -1374,16 +1371,15 @@ LESSONS = [
         "body": [
             ("p", "The first of the chapter's last two sections is about "
                   "autonomy. Many teams in organizations that call themselves Agile "
-                  "still have to follow requirements created by other teams, the "
-                  "authors write, which can produce products that do not delight "
-                  "customers or deliver the expected results. Agile means seeking "
-                  "input from customers throughout, early included; if a team "
-                  "cannot alter what it is building as it learns, without a nod "
-                  "from outside, its capacity to innovate is sharply reduced."),
+                  "still have to build to requirements written by other teams, "
+                  "the authors write, and that can yield products customers do "
+                  "not love. Agile means seeking customers' views from the "
+                  "start; a team that cannot alter what it builds as it learns, "
+                  "without a nod from outside, is hobbled in innovating."),
             ("p", "Their finding: &ldquo;the ability of teams to try out new ideas "
                   "and create and update specifications during the development "
                   "process, without requiring the approval of people outside the "
-                  "team&rdquo;, they write, matters for organizational "
+                  "team&rdquo;, they write, predicts organizational "
                   "performance, measured by profitability, productivity and "
                   "market share. The authors say at once what they do not "
                   "propose: letting developers chase any idea they fancy. "
@@ -1394,9 +1390,9 @@ LESSONS = [
                   "organization."),
             ("p", "The second section is about the order of cause. The authors "
                   "analysed Lean product management over two years, 2016 and "
-                  "2017. In the first model Lean product management practices "
-                  "positively impacted software delivery performance, stimulated a "
-                  "generative culture and decreased burnout. In the following year "
+                  "2017. In the first model, Lean product management practices "
+                  "predicted better delivery performance, a more generative "
+                  "culture and less burnout. In the following year "
                   "they turned the model round and confirmed that delivery "
                   "performance, in its turn, predicts those practices. Combined "
                   "across years it is a reciprocal model, a virtuous cycle, and "
@@ -1508,11 +1504,11 @@ LESSONS = [
         "quiz": [
             {"q": "In the exercise, what is Pearson's r for the five teams, and "
                   "what share of the variation do the scores share?",
-             "a": ["0.8, and 64 percent",
-                   "0.8, and 80 percent",
+             "a": ["0.8, and 80 percent",
                    "0.64, and 64 percent",
-                   "0.5, and 25 percent"],
-             "c": 0,
+                   "0.5, and 25 percent",
+                   "0.8, and 64 percent"],
+             "c": 3,
              "why": "Both means are 3. The sum of products is 8 and each sum of "
                     "squares is 10, so r is 8 over 10, 0.8, and r squared is "
                     "0.64: 64 percent. Eighty percent mistakes r for the share; "
@@ -1530,13 +1526,13 @@ LESSONS = [
                     "least-squares line changes; r does not."},
             {"q": "How did the authors arrive at the reciprocal model of Lean "
                   "product management and delivery performance?",
-             "a": ["One year's model had product practices predict delivery; the "
+             "a": ["A single correlation, which they read in both directions",
+                   "One year's model had product practices predict delivery; the "
                    "following year's flipped model had delivery predict the "
                    "practices; combined, they are reciprocal",
-                   "A single correlation, which they read in both directions",
                    "An experiment that assigned teams to practices at random",
                    "Interviews with teams that had adopted both"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says the analysis ran over two years, 2016 to 2017: "
                     "a first model, then the following year the flipped model, "
                     "and the two combined give the reciprocal model. A single "
@@ -1545,15 +1541,16 @@ LESSONS = [
             {"q": "According to the section on team experimentation, what does "
                   "the ability of teams to change specifications without outside "
                   "approval predict?",
-             "a": ["Organizational performance, measured by profitability, "
-                   "productivity and market share",
-                   "Only a team's own satisfaction",
+             "a": ["Only a team's own satisfaction",
                    "Change fail rate, and nothing else",
+                   "Organizational performance, measured by profitability, "
+                   "productivity and market share",
                    "Nothing, unless a CAB reviews the result"],
-             "c": 0,
-             "why": "The authors say it matters for organizational performance, "
+             "c": 2,
+             "why": "The authors say it predicts organizational performance, "
                     "which they measure by profitability, productivity and market "
-                    "share, when combined with the other capabilities. They do not tie it to change fail rate."},
+                    "share, and they advise combining it with the other "
+                    "capabilities. They do not tie it to change fail rate."},
         ],
         "mistakes": [
             ("Reading the reciprocal model as proof that each practice causes the other",

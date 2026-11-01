@@ -23162,6 +23162,8 @@ console.log('accelerate: acckit family A, six modes');
   eq(ak("[aktPp(R(2n, 15n)), aktPp(R(-1n, 8n)), aktPp(R(1n, 5n)), aktPp(R0), Rtext(aktMedian([R(3n), R(1n), R(2n), R(10n)])), Rtext(aktMedian([R(3n), R(1n), R(2n)])), Rtext(aktMean([R(1n), R(2n)]))].join(' | ')"),
      '≈ +13.3 points | −12.5 points | +20 points | 0 points | 5/2 | 2 | 3/2', 'aktPp and aktMedian: the mean of the two middle values');
 
+  eq(ak("[aktUnit(R1, 'hours'), aktUnit(R(3n, 2n), 'days'), aktUnit(R(-1n), 'items'), aktTimes(R(2n)), aktTimes(R(3n, 2n)), aktTimes(R(22n, 7n)), aktPp(R(1n, 100n)), aktPp(R(-1n, 100n))].join(' | ')"),
+     '1 hour | 3/2 = 1.50 days | −1 item | 2.00× | 1.50× | ≈ 3.14× | +1 point | −1 point', 'aktUnit is singular at exactly 1; aktTimes always two places; one point');
   /* --- delivery (ade) ---------------------------------------------------- */
   const de = akMk(akBlock('a', 'ADE_JS') + akViews('ADE_VIEW_JS', ['metrics', 'cluster']), 'adeCompute');
   const dl = akCall(de, 'delivery'), dt = akTable(de, 'delivery');
@@ -23207,18 +23209,18 @@ console.log('accelerate: acckit family A, six modes');
   const fl = akMk(akBlock('a', 'AFL_JS') + akViews('AFL_VIEW_JS', ['utilization', 'batch', 'wip']), 'aflCompute');
   const f = akCall(fl, 'flow');
   eq(f('utilization', { levels: '50 80 90 95 99' }, 'aflMultiples aflLeads aflHigh aflRatio'),
-     '50%: 1; 80%: 4; 90%: 9; 95%: 19; 99%: 99 | 50%: 2 hours; 80%: 5 hours; 90%: 10 hours; 95%: 20 hours; 99%: 100 hours | 99%: 100× the service time | 50× (50% to 99%)',
+     '50%: 1; 80%: 4; 90%: 9; 95%: 19; 99%: 99 | 50%: 2 hours; 80%: 5 hours; 90%: 10 hours; 95%: 20 hours; 99%: 100 hours | 99%: 100.00× the service time | 50.00× (50% to 99%)',
      'flow/utilization: u/(1 − u) and service/(1 − u)');
   eq(f('utilization', { levels: '60 25', service: '1/2', unit: 'days' }, 'aflMultiples aflLeads aflRatio'),
-     '60%: 3/2 = 1.50; 25%: 1/3 ≈ 0.33 | 60%: 5/4 = 1.25 days; 25%: 2/3 ≈ 0.67 days | 15/8 ≈ 1.9× (25% to 60%)', 'flow/utilization: a rational service time; levels in the order given');
+     '60%: 3/2 = 1.50; 25%: 1/3 ≈ 0.33 | 60%: 5/4 = 1.25 days; 25%: 2/3 ≈ 0.67 days | ≈ 1.88× (25% to 60%)', 'flow/utilization: a rational service time; levels in the order given');
   eq(f('utilization', { levels: '40 100' }, 'aflLevels'), 'REFUSED Utilization levels, entry 2 is 100%: there u/(1 − u) divides by zero, because work arrives as fast as it can be done, so in this model the queue and the wait grow without bound and no lead time exists', 'flow/utilization: 100% refused');
   eq(f('batch', { work: '20', batch: '20 5', per_item: '1', release_cost: '2' }, 'aflBatches aflFirst aflLast aflWait aflOverhead aflRatio'),
-     '1 of 20 → 4 of 5 | 22 hours → 7 hours | 22 hours → 28 hours | 22 hours → 35/2 = 17.50 hours | 2 hours → 8 hours | 22/7 ≈ 3.1×', 'flow/batch: four slices bring the first feedback forward');
+     '1 of 20 → 4 of 5 | 22 hours → 7 hours | 22 hours → 28 hours | 22 hours → 35/2 = 17.50 hours | 2 hours → 8 hours | ≈ 3.14×', 'flow/batch: four slices bring the first feedback forward');
   eq(f('batch', { work: '10', batch: '4', per_item: '1/2', release_cost: '1' }, 'aflBatches aflFirst aflLast aflWait'),
      '3: 2 of 4, the last of 2 | 3 hours | 8 hours | 26/5 = 5.20 hours', 'flow/batch: a short last batch');
   eq(f('batch', { work: '5', batch: '6' }, 'aflFirst'), 'REFUSED Batch sizes, entry 1 is 6, more than the work (5 items)', 'flow/batch: a batch larger than the work');
   eq(f('wip', { throughput: '3/2', wip: '12 6' }, 'aflThru aflLeadAt aflChange'),
-     '3/2 = 1.50 items a day | WIP 12: 8 days; WIP 6: 4 days | 1/2 ≈ 0.5× the lead time (8 → 4 days)', 'flow/wip: Little’s law, lead = WIP / throughput');
+     '3/2 = 1.50 items a day | WIP 12: 8 days; WIP 6: 4 days | 0.50× the lead time (8 → 4 days)', 'flow/wip: Little’s law, lead = WIP / throughput');
   const BOARD = 'w1, 0, 3; w2, 0, 4; w3, 1, 6; w4, 2, 9; w5, 5, -; w6, 7, 10';
   eq(f('wip', { items: BOARD, wip: '4' }, 'aflThru aflAvgWip aflAvgLead aflLittle aflLeadAt'),
      '1/2 = 0.50 items a day | 27/10 = 2.70 items | 22/5 = 4.40 days | differs: average WIP 27/10 = 2.70, throughput × average lead time 11/5 = 2.20, because 1 item is still open at the end (w5) | WIP 4: 8 days',
@@ -23252,10 +23254,12 @@ console.log('accelerate: acckit family A, six modes');
   const r = akCall(rl, 'release');
   const COMP = 'web cart pay ledger search mail', OWN = 'web, shop; cart, shop; pay, money; ledger, money; search, find; mail, ops';
   eq(r('independent', { components: COMP, teams: OWN, ties: 'web, cart; cart, pay; pay, ledger', remove: 'cart, pay' }, 'arlGroups arlLargest arlAlone arlCoord arlRemoved arlAfterGroups arlAfterCoord'),
-     '3: {web, cart, pay, ledger}, {search}, {mail} | 4: web, cart, pay, ledger | 2: search, mail | 1: shop + money for {web, cart, pay, ledger} | removing cart–pay splits a group: 3 → 4 release groups | 4: {web, cart}, {pay, ledger}, {search}, {mail} | 0: none',
+     '3: {web, cart, pay, ledger}, {search}, {mail} | 4: web, cart, pay, ledger | 2: search, mail | 1 group spans more than one team: shop + money for {web, cart, pay, ledger} | removing cart–pay splits a group: 3 → 4 release groups | 4: {web, cart}, {pay, ledger}, {search}, {mail} | none: every release group belongs to one team',
      'release/independent: ties chain; removing one tie frees two teams');
+  eq(r('independent', { components: 'a b c d', teams: 'a, x; b, y; c, x; d, z', ties: 'a, b; c, d' }, 'arlCoord'),
+     '2 groups span more than one team: x + y for {a, b}; x + z for {c, d}', 'release/independent: the count names groups, not teams');
   eq(r('independent', { components: 'a b c', ties: 'a, b; b, c; c, a', remove: 'c, a' }, 'arlRemoved arlAfterGroups arlCoord'),
-     'removing c–a changes no group: c and a are still tied through others | 1: {a, b, c} | no team column given', 'release/independent: a cycle survives one removed tie');
+     'removing c–a changes no group: c and a are still tied through others | 1: {a, b, c} | no teams given', 'release/independent: a cycle survives one removed tie');
   eq(r('independent', { components: 'a b', ties: 'a, b; b, a' }, 'arlGroups'), 'REFUSED Ties, record 2: the tie b–a is given twice', 'release/independent: a tie twice, either way round');
   eq(r('independent', { components: 'a b', teams: 'a, x' }, 'arlGroups'), 'REFUSED Give a team for every component or for none; b has none', 'release/independent: teams for all or none');
   eq(r('scaling', { orgs: 'big, 400, 9600; small, 10, 150; mid, 80, 2000', days: '30' }, 'arlRates arlTrend'),
@@ -23494,12 +23498,12 @@ console.log('accelerate: acckit family B, six modes');
   const gr = abCall(grRun, 'groups'), grS = abStatus(grRun, 'groups');
   /* 18/30 = 0.6, 8/40 = 0.2: 3×, +40 points; odds (18/12)/(8/32) = 6. */
   eq(gr('likely', { rows: 'high, 30, 18; low, 40, 8', first: 'high', second: 'low' }, 'agrShares agrRatio agrDiff agrOdds'),
-     'high 18 of 30 = 60%; low 8 of 40 = 20% | 3× | +40 points | 6', 'groups/likely: times as likely against the odds ratio');
+     'high 18 of 30 = 60%; low 8 of 40 = 20% | 3.00× | +40 points | 6.00', 'groups/likely: times as likely against the odds ratio');
   eq(gr('likely', { rows: 'a, 3, 1; b, 3, 2', first: 'a', second: 'b' }, 'agrRatio agrDiff agrOdds'), '0.50× | ≈ −33.3 points | 0.25', 'groups/likely: a ratio below 1 and a negative difference');
   eq(gr('likely', { rows: 'a, 7, 3; b, 9, 2', first: 'a', second: 'b' }, 'agrRatio agrOdds'), '≈ 1.93× | ≈ 2.63', 'groups/likely: 27/14 and 21/8 to 2 places');
   eq(gr('likely', { rows: 'high, 10, 4; low, 5, 0', first: 'high', second: 'low' }, 'agrRatio agrOdds'),
      'not defined: no one in low met it | not defined: no one in low met it', 'groups/likely: a zero share gives no ratio');
-  eq(gr('likely', { rows: 'high, 4, 4; low, 5, 1', first: 'high', second: 'low' }, 'agrRatio agrOdds'), '5× | not defined: everyone in high met it', 'groups/likely: no odds when everyone met it');
+  eq(gr('likely', { rows: 'high, 4, 4; low, 5, 1', first: 'high', second: 'low' }, 'agrRatio agrOdds'), '5.00× | not defined: everyone in high met it', 'groups/likely: no odds when everyone met it');
   eq(gr('likely', { rows: 'high, 4, 5; low, 5, 1', first: 'high', second: 'low' }, 'agrRatio'),
      'REFUSED Rows, record 1: high has 5 meeting the outcome, more than its n of 4', 'groups/likely: more meeting than n is refused');
   abEnds(grS('likely', { rows: 'high, 30, 18; low, 40, 8', first: 'high', second: 'low' }), 'is a different figure and is not "times as likely"' + CAUT, 'groups/likely: the status ends with the caution');

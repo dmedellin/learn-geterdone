@@ -216,7 +216,7 @@ LESSONS = [
                   "hours later. The preset <code>quarter</code> goes to batches "
                   "of six: 4 releases, the first at hour 8, the last at hour 32, an "
                   "average wait of 20 hours and 8 hours of overhead. The first "
-                  "feedback now arrives in a third of the time, and the last "
+                  "feedback now arrives in under a third of the time, and the last "
                   "change is 6 hours later than in <code>whole</code>."),
             ("p", "That is the trade the authors name when they say small "
                   "batches add overhead, and it is why the principle is paired "
@@ -301,7 +301,7 @@ LESSONS = [
                      "aflFirst": "25/4 = 6.25 hours",
                      "aflLast": "25 hours",
                      "aflWait": "125/8 ≈ 15.63 hours",
-                     "aflOverhead": "1 hours"
+                     "aflOverhead": "1 hour"
                  }},
             ],
             "panel_title": "What a smaller batch does to the wait",
@@ -361,9 +361,9 @@ LESSONS = [
             {"q": "In the preset <code>quarter</code>, what is the last change's "
                   "hour of release, and how does it compare with "
                   "<code>whole</code>?",
-             "a": ["Hour 32, later than 26", "Hour 32, earlier than 26",
+             "a": ["Hour 32, earlier than 26", "Hour 32, later than 26",
                    "Hour 26, the same", "Hour 24, earlier than 26"],
-             "c": 0,
+             "c": 1,
              "why": "Four batches of 8 hours each finish at hour 32, six hours "
                     "after the single batch of <code>whole</code>. The overhead of "
                     "four releases (8 hours) against one (2 hours) is exactly "
@@ -372,11 +372,11 @@ LESSONS = [
             {"q": "Which of the chapter's five principles says that people should "
                   "be freed for work that needs problem-solving, by automating "
                   "regression testing and deployment?",
-             "a": ["Computers perform repetitive tasks; people solve problems",
-                   "Build quality in",
+             "a": ["Build quality in",
                    "Work in small batches",
+                   "Computers perform repetitive tasks; people solve problems",
                    "Everyone is responsible"],
-             "c": 0,
+             "c": 2,
              "why": "That is the third principle as the chapter names it. Building "
                     "quality in is about finding problems quickly; small batches "
                     "are about feedback and the economics of releasing; everyone "
@@ -385,8 +385,8 @@ LESSONS = [
                     "the chapter gives it a principle of its own."},
             {"q": "On the preset <code>automated</code>, the release costs a "
                   "quarter of an hour. What do the 4 releases cost in total?",
-             "a": ["1 hour", "8 hours", "6 hours", "A quarter of an hour"],
-             "c": 0,
+             "a": ["8 hours", "6 hours", "A quarter of an hour", "1 hour"],
+             "c": 3,
              "why": "Four releases at a quarter of an hour each is 1 hour. Eight "
                     "hours is the overhead of <code>quarter</code> at 2 hours a "
                     "release; a quarter of an hour is the cost of one release; "
@@ -518,11 +518,11 @@ LESSONS = [
                   "continuous delivery predicts the more generative culture that "
                   "Chapter 3 measured."),
             ("p", "In 2017 the authors measured continuous delivery directly, "
-                  "as a construct of its own: can a team deploy to production, or "
-                  "to users, on demand through the life of a project, and does "
-                  "everyone get fast feedback on quality and deployability that "
-                  "they treat as their top priority? The capabilities of 2014 to "
-                  "2016 were strongly and significantly associated with that "
+                  "as a construct of its own, covering whether a team can release "
+                  "on demand and whether feedback on quality and deployability "
+                  "reaches everyone and is acted on first. A subset of the capabilities of 2014 to "
+                  "2016, the authors note, was strongly and significantly "
+                  "associated with that "
                   "construct, and so were two new ones: a loosely coupled, "
                   "well-encapsulated architecture and teams that can choose their "
                   "own tools. Both are Chapter 5's, and this course's lessons on "
@@ -572,9 +572,9 @@ LESSONS = [
                   "it saves on new work, which a real team might not; the lab "
                   "says what the arithmetic gives and not what would happen. "
                   "Nor does halving rework say how to halve it. The chapter's "
-                  "answer is the practices it has just listed: tests that catch "
-                  "a fault before release, small batches that expose it sooner, "
-                  "and configuration that can be rebuilt."),
+                  "answer, at the end of the section, is small batches with "
+                  "continuous testing; the next section adds the practices "
+                  "that went with performance."),
             ("h3", "Exercise"),
             ("ul", [
                 "A team's month, in hours: `new, 320; unplanned, 200; rework, 160; "
@@ -674,11 +674,11 @@ LESSONS = [
             {"q": "Besides the change fail rate, the authors tested three proxies "
                   "for quality. Which correlated most strongly with delivery "
                   "performance?",
-             "a": ["The share of time on rework or unplanned work",
-                   "How good the application is, as its own team saw it",
+             "a": ["How good the application is, as its own team saw it",
+                   "The share of time on rework or unplanned work",
                    "The share of time on defects found by end users",
                    "Deployment pain"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says all of the proxies correlated with delivery "
                     "performance and that the strongest was the percentage of time "
                     "on rework or unplanned work. Deployment pain is one of the "
@@ -686,23 +686,23 @@ LESSONS = [
                     "quality proxies."},
             {"q": "On the preset <code>half-rework</code>, how many hours does "
                   "halving the rework free?",
-             "a": ["65", "130", "95", "32.5"],
-             "c": 0,
+             "a": ["130", "95", "65", "32.5"],
+             "c": 2,
              "why": "Half of the 130 rework hours is 65. A figure of 130 would "
                     "remove the rework altogether; 95 is half the unplanned hours "
                     "(190), which the scaling does not touch; 32.5 halves it twice."},
             {"q": "The chapter reports the time that low performers spend on new "
                   "work and on unplanned work or rework. Which pair is theirs?",
-             "a": ["38 percent new, 27 percent unplanned or rework",
-                   "49 percent new, 21 percent unplanned or rework",
+             "a": ["49 percent new, 21 percent unplanned or rework",
                    "27 percent new, 38 percent unplanned or rework",
-                   "38 percent new, 21 percent unplanned or rework"],
-             "c": 0,
+                   "38 percent new, 21 percent unplanned or rework",
+                   "38 percent new, 27 percent unplanned or rework"],
+             "c": 3,
              "why": "Figure 4.4's text gives the high performers 49 and 21 percent "
                     "and the low performers 38 and 27 percent: the survey's "
-                    "figures for its respondents. The third option swaps the "
-                    "low performers' own two figures, and the fourth mixes one "
-                    "from each group."},
+                    "figures for its respondents. The answer of 27 and 38 "
+                    "percent swaps the low performers' own two figures, and 38 "
+                    "and 21 percent mixes one from each group."},
         ],
         "mistakes": [
             ("Thinking the benefit of continuous delivery is only speed",
@@ -911,7 +911,7 @@ LESSONS = [
                      "agrShares": "config-in-version-control 45 of 60 = 75%; config-elsewhere 20 of 40 = 50%",
                      "agrRatio": "1.50×",
                      "agrDiff": "+25 points",
-                     "agrOdds": "3"
+                     "agrOdds": "3.00"
                  }},
             ],
             "panel_title": "How many times as likely",
@@ -967,24 +967,25 @@ LESSONS = [
                     "other way round, QA over developers."},
             {"q": "According to the chapter, which went with delivery performance "
                   "more closely?",
-             "a": ["Keeping system and application configuration in version "
-                   "control, more than keeping application code",
-                   "Keeping application code in version control, more than "
+             "a": ["Keeping application code in version control, more than "
                    "configuration",
+                   "Keeping configuration under version control, more than "
+                   "the application code",
                    "The two were equally correlated",
                    "Neither: version control was uncontroversial and so not tested"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter calls the comprehensive use of version control "
                     "relatively uncontroversial, but it tested it, and found "
-                    "configuration the more highly correlated, a result it calls "
-                    "a corrective to the idea that configuration is secondary."},
+                    "configuration the more highly correlated, a result that, "
+                    "the authors say, shows the idea that configuration is secondary "
+                    "to be a misconception."},
             {"q": "What does the chapter say about automated tests created and "
                   "maintained primarily by a QA team or an outsourced party?",
-             "a": ["That practice was not correlated with IT performance",
-                   "It was negatively correlated with IT performance",
+             "a": ["It was negatively correlated with IT performance",
                    "It was positively correlated, but less than developer tests",
+                   "That practice was not correlated with IT performance",
                    "It was correlated only when the tests ran every day"],
-             "c": 0,
+             "c": 2,
              "why": "The authors report no correlation, not a negative one, and "
                     "they add that testers still have an essential role in manual "
                     "and exploratory work. Reading the finding as harm to "
@@ -992,8 +993,8 @@ LESSONS = [
             {"q": "On the preset <code>config</code> (45 of 60 against 20 of "
                   "40), how many times as likely were teams that keep "
                   "configuration in version control to meet the goal?",
-             "a": ["1.5", "3", "25", "0.75"],
-             "c": 0,
+             "a": ["3", "25", "0.75", "1.5"],
+             "c": 3,
              "why": "75 percent over 50 percent is 1.5. Three is the odds ratio "
                     "(3 to 1 against 1 to 1); 25 is the difference in points; "
                     "0.75 is the first group's share as a fraction, not a ratio."},
@@ -1166,7 +1167,8 @@ LESSONS = [
                   "mean lifetime of the merged branches, which "
                   "branches have lived a day or longer and which are open, then type the "
                   "records in to check. Say which thresholds the sprint meets "
-                  "and which single branch changes the answer."),
+                  "and which branches you would have to change for the lifetime "
+                  "threshold to be met."),
             ("p", "The next lesson, Types of Systems and Deployability, begins "
                   "Chapter 5 and asks what the chapter says about the "
                   "architecture that makes all of these practices possible."),
@@ -1221,8 +1223,8 @@ LESSONS = [
              "merged. The maximum is the largest of these."),
             ("Check the three thresholds",
              "Fewer than three active at once, every merged branch within "
-             "a day, and no freeze day. A branch still open is a "
-             "question, not a pass."),
+             "a day, and no freeze day. An open branch younger than "
+             "a day is not yet decided; one already a day old fails."),
             ("Do it on your own repository",
              "Take a month of your own branch history, list each branch with "
              "the days it lived, and type them into the lab. Write down the "
@@ -1262,24 +1264,24 @@ LESSONS = [
                     "a day or longer; 3 is the number of freeze days."},
             {"q": "What is the mean lifetime of the merged branches in the "
                   "preset <code>long</code>?",
-             "a": ["5 days 17 hours", "4 days 23 hours",
+             "a": ["4 days 23 hours", "5 days 17 hours",
                    "8 days 3 hours", "5 days"],
-             "c": 0,
+             "c": 1,
              "why": "Seven branches were merged and their lifetimes add to 959 "
                     "hours; 959 over 7 is 137 hours. Dividing by 8 counts the "
-                    "open branch f4 as having lifetime 0 and gives about 4 days "
-                    "23 hours; 8 days 3 hours is only f1's lifetime; 5 is the "
+                    "open branch f4 as having lifetime 0 and gives just under "
+                    "5 days; 8 days 3 hours is only f1's lifetime; 5 is the "
                     "number of branches that have lived a day or longer."},
             {"q": "How does Chapter 4 treat the GitHub Flow workflow?",
-             "a": ["Short-lived branches merged at least daily are consistent "
-                   "with continuous integration, and GitHub Flow suits open "
-                   "source projects with part-time contributors",
-                   "As wrong in every setting, because any branching hurts "
+             "a": ["As wrong in every setting, because any branching hurts "
                    "performance",
                    "As equivalent to trunk-based development whatever the "
                    "branch lifetime",
+                   "Short-lived branches merged at least daily are consistent "
+                   "with continuous integration, and GitHub Flow suits open "
+                   "source projects with part-time contributors",
                    "As suitable for any team, provided it uses a pull request"],
-             "c": 0,
+             "c": 2,
              "why": "The authors accept short-lived branches merged at least daily, "
                     "found that teams whose branches and integration periods "
                     "last under a day did better than teams with longer ones, "
@@ -1310,7 +1312,7 @@ LESSONS = [
             "three conditions the log meets."
         ),
         "note": (
-            "The lab counts branches from a log you type, by whole days. It "
+            "The lab counts branches from a log you type, to the minute. It "
             "cannot say why a branch lived, whether trunk is kept releasable, "
             "or whether short branches are the cause of anything: the authors "
             "report a correlation with delivery performance and offer a "
@@ -1356,8 +1358,8 @@ LESSONS = [
              "environment, which the authors define as one where many separate "
              "services run side by side, a staging environment for example."),
             ("Deployability",
-             "Being able to deploy or release an application independently of the "
-             "other applications and services it depends on."),
+             "Being able to release your own application without waiting for, or "
+             "releasing with, the services it relies on."),
             ("Release group",
              "A set of components joined by ties that say they must be released "
              "together, directly or through others. The lab finds the groups, "
@@ -1403,22 +1405,21 @@ LESSONS = [
                   "affects organizational performance, as Chapter 2 argued, "
                   "the capability to build the core, strategic products should "
                   "be brought in-house."),
-            ("p", "The next section names the characteristics. Two ideas were "
-                  "more common among the high performers: that most testing can "
-                  "be done without an integrated environment, and that the team "
-                  "deploys or releases independently of the services it "
-                  "depends on. The authors call them testability and "
+            ("p", "The next section names the characteristics. Two properties were "
+                  "more common among the high performers: teams could test most "
+                  "of their work without a shared integrated environment, and "
+                  "could release on their own without lock-step with the services "
+                  "they use. The authors call them testability and "
                   "deployability and say they follow from systems that are "
                   "loosely coupled, meaning they can be changed and validated "
                   "independently. The 2017 survey tested a loosely coupled, "
                   "well-encapsulated architecture directly, and it turned out to "
                   "be the biggest contributor to continuous delivery in "
                   "that analysis, bigger than test and deployment automation. It "
-                  "was gauged by whether a team can make large changes to its "
-                  "design, and complete its work, without outside permission or "
-                  "coordination; deploy on demand whatever it depends on; test on "
-                  "demand without an integrated environment; and deploy in normal "
-                  "business hours with negligible downtime."),
+                  "was gauged by six questions that come to this: whether a team "
+                  "can change its design, finish its work, test and deploy "
+                  "without asking or waiting for other teams, and deploy in "
+                  "working hours without an outage."),
             ("p", "The authors add that service-oriented architecture and "
                   "microservices are supposed to deliver these properties, but "
                   "in practice many so-called service-oriented architectures do "
@@ -1457,7 +1458,7 @@ LESSONS = [
             ]),
             ("p", "Find the release groups by hand, say how many components can "
                   "be released alone and how large the largest group is, then "
-                  "type them in. Then choose the one tie whose removal would "
+                  "type them in. Then choose a tie whose removal would "
                   "make the largest group smaller and say what the clinic would "
                   "need to change for it to go."),
             ("p", "The next lesson, A Loosely Coupled Architecture Enables "
@@ -1540,8 +1541,8 @@ LESSONS = [
         "quiz": [
             {"q": "In the preset <code>shop</code> before the removal, how many "
                   "components can be released alone?",
-             "a": ["2", "3", "6", "8"],
-             "c": 0,
+             "a": ["3", "6", "8", "2"],
+             "c": 3,
              "why": "Email and reviews have no ties. Three is the number of "
                     "groups, which counts the group of six as well; six is the "
                     "size of the largest group; eight is every component."},
@@ -1550,18 +1551,18 @@ LESSONS = [
              "a": ["3", "5", "6", "4"],
              "c": 0,
              "why": "The six-service group splits into cart, checkout and payments "
-                    "(3) and pricing, catalog and search (3). Five assumes the "
-                    "removal takes away only one service; six is the largest "
+                    "(3) and pricing, catalog and search (3). Four is the number of groups after the "
+                    "removal, not a size; five assumes it takes away only one service; six is the largest "
                     "group before the removal."},
             {"q": "Which two kinds of system did the chapter find low performers "
                   "more likely to report?",
-             "a": ["Custom software developed by another company, and mainframe "
+             "a": ["Embedded software, and packaged commercial software",
+                   "Custom software developed by another company, and mainframe "
                    "systems",
-                   "Embedded software, and packaged commercial software",
                    "Systems of record, and systems of engagement",
                    "Software that integrates against a mainframe, and new "
                    "systems not yet released"],
-             "c": 0,
+             "c": 1,
              "why": "The authors found those two, outsourced custom software and "
                     "mainframe systems, and no significant correlation for most "
                     "other kinds, including embedded and packaged software, which "
@@ -1569,13 +1570,13 @@ LESSONS = [
                     "mainframe was not significantly correlated."},
             {"q": "Which statement does the chapter make about microservices and "
                   "service-oriented architecture?",
-             "a": ["They are supposed to give testability and deployability, but "
+             "a": ["They guarantee higher performance on any platform",
+                   "They are required for continuous delivery",
+                   "They are supposed to give testability and deployability, but "
                    "many service-oriented architectures do not let services be "
                    "tested and deployed independently",
-                   "They guarantee higher performance on any platform",
-                   "They are required for continuous delivery",
                    "They matter only on systems of engagement"],
-             "c": 0,
+             "c": 2,
              "why": "The chapter says the latest architecture is no guarantee of "
                     "higher performance if the characteristics are ignored, and "
                     "that many so-called service-oriented architectures will not "

@@ -109,8 +109,8 @@ LESSONS = [
                   "So a regression in the book is a test of a predicted relationship, "
                   "and neither a discovery of cause nor a fishing trip; Inferential "
                   "Predictive Analysis explains the distinction."),
-            ("p", "Correlation is a mutual relationship or connection between "
-                  "constructs, and the authors use Pearson's, the kind most used in "
+            ("p", "Correlation says how two constructs vary together, "
+                  "and the authors use Pearson's, the kind most used in "
                   "business. It is a value between −1 and 1: 1 if the variables move "
                   "together exactly, −1 if in exactly opposite directions, 0 if not "
                   "correlated at all. The word to hold on to is linear. Computed from "
@@ -268,8 +268,8 @@ LESSONS = [
         "quiz_title": "Correlation, the line and the appendix",
         "quiz": [
             {"q": "In the exercise, what is Pearson's r?",
-             "a": ["0.25", "1.00", "0.025", "0.50"],
-             "c": 3,
+             "a": ["0.25", "0.50", "1.00", "0.025"],
+             "c": 1,
              "why": "The means are 6 and 3, Sxx is 40, Syy is 10 and Sxy is 10, so r = "
                     "10 / √400 = 0.5. The 0.25 is r squared, and also the slope, "
                     "Sxy / Sxx. The 1.00 divides Sxy by Syy. The 0.025 forgets the "
@@ -288,21 +288,21 @@ LESSONS = [
             {"q": "At what level do the authors say differences between clusters were "
                   "counted as significant when they compared group means with "
                   "Tukey's test?",
-             "a": ["p below 0.10",
-                   "p below 0.05",
+             "a": ["p below 0.05",
                    "p below 0.01",
-                   "p below 0.001"],
-             "c": 0,
+                   "p below 0.001",
+                   "p below 0.10"],
+             "c": 3,
              "why": "Appendix C gives p below 0.10 for their research. The other three "
                     "are common conventions in other work, and none is the appendix's "
                     "figure."},
             {"q": "On the preset a-curve, r is 0. What does that show?",
-             "a": ["x and y are unrelated",
-                   "Pearson's r sees straight-line association only, and these "
+             "a": ["Pearson's r sees straight-line association only, and these "
                    "points follow a curve",
+                   "x and y are unrelated",
                    "The data must contain an error",
                    "x has no effect on y, a causal statement"],
-             "c": 1,
+             "c": 0,
              "why": "Every y is determined by its x, as the curve 1 plus the square "
                     "of x less 3. Pearson's r measures a linear relationship, and "
                     "the points fall as high, low, low, low, high around a flat "

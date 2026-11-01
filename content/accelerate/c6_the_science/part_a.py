@@ -218,7 +218,7 @@ LESSONS = [
             ("p", "Descriptive analysis is the first rung. The data is summarised "
                   "and reported, as in a census, and the work takes the least effort. "
                   "It is often the first step of a longer analysis, to help a team "
-                  "understand its dataset and, by extension, its sample; a report "
+                  "understand the data in hand and the sample behind it; a report "
                   "may also stop there. Two words matter before you read any "
                   "summary. The population is the whole group you want to learn "
                   "about, and the sample is the carefully defined portion of it "
@@ -349,15 +349,15 @@ LESSONS = [
         "quiz_title": "Research types and summaries",
         "quiz": [
             {"q": "How does Chapter 12 classify the authors' own research?",
-             "a": ["Primary and quantitative: the authors collected new data, using "
-                   "a Likert-type survey",
-                   "Secondary and quantitative: the survey answers were summaries "
+             "a": ["Secondary and quantitative: the survey answers were summaries "
                    "of existing reports",
+                   "Primary and quantitative: the authors collected new data, using "
+                   "a Likert-type survey",
                    "Primary and qualitative: surveys are always qualitative because "
                    "they do not come from computer systems",
                    "Secondary and qualitative: the authors interpreted other "
                    "people's interviews"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter puts the book and the State of DevOps reports in "
                     "the primary class, because the team collected the data, and "
                     "quantitative, because the survey asked for answers on a "
@@ -366,15 +366,15 @@ LESSONS = [
                     "depends on what the questions ask."},
             {"q": "In the exercise, you change the 1 in 1, 5, 5, 5, 6, 6, 6, 6 to a "
                   "5. What happens to the summaries?",
-             "a": ["The mean rises from 5 to 5.5, the median stays at 5.5 and the "
-                   "range falls from 6 to 1",
-                   "The mean stays at 5, the median stays at 5.5 and only the range "
+             "a": ["The mean stays at 5, the median stays at 5.5 and only the range "
                    "falls",
                    "The mean and the median both rise by half a point and the "
-                   "range falls from 6 to 1",
+                   "range falls from 5 to 1",
+                   "The mean rises from 5 to 5.5, the median stays at 5.5 and the "
+                   "range falls from 5 to 1",
                    "The mean rises from 5 to 5.5, the median falls to 5 and the "
-                   "range falls from 6 to 1"],
-             "c": 0,
+                   "range falls from 5 to 1"],
+             "c": 2,
              "why": "The first set sums to 40, so its mean is 5; its fourth and fifth "
                     "values are 5 and 6, so its median is 5.5. After the change the "
                     "sum is 44, so the mean is 5.5, the values 5, 5, 5, 5, 6, 6, 6, "
@@ -382,7 +382,8 @@ LESSONS = [
                     "and the range is 6 − 5 = 1. The one low answer pulled the mean "
                     "down and left the median alone, which is the point of the "
                     "exercise. The mode also changes: 6 appears four times in the "
-                    "first set, and 5 and 6 tie at four times each in the second."},
+                    "first set; in the second, 5 and 6 each appear four times, which "
+                    "the lab reports as no mode, since every value occurs equally often."},
             {"q": "Both invented teams have a mean of 5, a median of 5.5 and a mode of "
                   "6. Which of these four summaries differs between them?",
              "a": ["The mean", "The median", "The mode", "The range"],
@@ -517,7 +518,7 @@ LESSONS = [
                   "authors report everywhere in the book is Pearson's r, which "
                   "their footnote describes as the strength of a linear "
                   "relationship, running from −1 through 0 to 1. The value is not "
-                  "a percentage of anything. A scatter of points close to a rising "
+                  "a percentage of anything, although the book itself writes the 0.9471 below as 94.71 percent. A scatter of points close to a rising "
                   "line gives r near 1, close to a falling line gives r near −1, "
                   "and a shapeless cloud gives r near 0."),
             ("math", [
@@ -536,9 +537,9 @@ LESSONS = [
                   "that common sense tells us are neither predictive nor causal. "
                   "Their Figure 12.1 shows per capita cheese consumption against "
                   "deaths by tangling in bedsheets, with r = 0.9471. Nobody "
-                  "believes the one drives the other. Yet, the authors warn, when "
-                  "we fish in the data our minds fill in a story, because "
-                  "datasets that are related so often make sense. Hence the "
+                  "believes the one drives the other. Yet the authors warn that a "
+                  "reader who goes looking through data for patterns will "
+                  "find a story to tell about whatever turns up. Hence the "
                   "chapter's conclusion for this rung: report the correlations, "
                   "then go on to analyses that ask more."),
             ("p", "You can see one way such a correlation arises on a sample "
@@ -604,7 +605,7 @@ LESSONS = [
                 {"id": "shared-growth",
                  "label": "Eight invented years: deploys per week and café coffees per day",
                  "series": GROWTH,
-                 "expect": {"astN": "8", "astRLevels": "≈ 0.994", "astRDiffs": "0", "astCompare": "smaller in size, one of them 0"}},
+                 "expect": {"astN": "8", "astRLevels": "≈ 0.994", "astRDiffs": "0", "astCompare": "smaller in size, no sign to compare, since one r is 0"}},
                 {"id": "moving-together",
                  "label": "Deploys beside merged pull requests, whose changes also keep step",
                  "series": TOGETHER,
@@ -662,12 +663,12 @@ LESSONS = [
         "quiz_title": "Correlation and its limits",
         "quiz": [
             {"q": "What does Pearson's r measure, as the chapter's footnote has it?",
-             "a": ["The strength of a linear relationship, from −1 to 1, with 0 "
+             "a": ["The percentage of one variable's movement that the other causes",
+                   "The strength of a linear relationship, from −1 to 1, with 0 "
                    "meaning not correlated at all",
-                   "The percentage of one variable's movement that the other causes",
                    "The strength of any relationship, linear or not, from 0 to 1",
                    "The probability that the relationship arose by chance"],
-             "c": 0,
+             "c": 1,
              "why": "The footnote describes it as the strength of a linear "
                     "relationship taking a value between −1 and 1, with 1 for "
                     "variables that move together exactly, −1 for exactly "
@@ -676,14 +677,14 @@ LESSONS = [
             {"q": "In the exercise, the levels of the test suite and the bookings "
                   "give r = 611/614 ≈ 0.995, and their year-on-year changes give "
                   "r = −1. What do the two figures show?",
-             "a": ["The series share a steady climb, and their yearly changes "
-                   "move in exactly opposite directions",
-                   "The bookings are caused by the tests, and the changes only "
+             "a": ["The bookings are caused by the tests, and the changes only "
                    "confirm it",
                    "The correlation of the levels is wrong, because the changes "
                    "disagree with it",
+                   "The series share a steady climb, and their yearly changes "
+                   "move in exactly opposite directions",
                    "The changes cannot be correlated, because there are only four"],
-             "c": 0,
+             "c": 2,
              "why": "The changes in tests are 4, 3, 4, 3 and the changes in "
                     "bookings are 3, 4, 3, 4: when one is above its mean the "
                     "other is below, so the changes are perfectly negatively "
@@ -694,13 +695,13 @@ LESSONS = [
             {"q": "On shared-growth the lab reports r = 0.994 for the levels and "
                   "r = 0 for the changes. What is the most the authors' "
                   "argument lets you conclude?",
-             "a": ["The two series share a trend; nothing in the correlation says "
-                   "that either drives the other",
-                   "The deploys drive the coffee sales, because r is close to 1",
+             "a": ["The deploys drive the coffee sales, because r is close to 1",
                    "The coffee sales drive the deploys, because the changes are "
                    "not correlated",
-                   "Neither series means anything, because r of the changes is 0"],
-             "c": 0,
+                   "Neither series means anything, because r of the changes is 0",
+                   "The two series share a trend; nothing in the correlation says "
+                   "that either drives the other"],
+             "c": 3,
              "why": "The chapter's position is that correlation says how closely "
                     "two variables move together and nothing about why. A shared "
                     "trend explains this pair's 0.994 without any link between "
@@ -825,20 +826,20 @@ LESSONS = [
                   "things like the effects of HR policies, motivation, and how "
                   "technology affects satisfaction, efficiency and organisational "
                   "performance, in settings where a purely experimental design is "
-                  "not possible. Companies do not give up profit to fit into the "
-                  "control groups a research team defines, and the data is "
-                  "collected in complex organisations and not in a laboratory."),
-            ("p", "Their safeguard against fishing in the data, the habit that "
+                  "not possible. A company will not sacrifice earnings so that a researcher "
+                  "can have a tidy control group, and the data comes from "
+                  "working organisations, not from a laboratory."),
+            ("p", "Their safeguard against hunting for patterns, the habit that "
                   "produced the spurious pair of the last lesson, is that "
-                  "hypotheses are driven by theory. A hypothesis has to rest on a "
+                  "theory comes first and drives the hypotheses. A hypothesis has to rest on a "
                   "theory that is mature and has good support before the data is "
                   "touched. The authors anticipate the objection that this invites "
                   "confirmation bias, and answer that it is how science is done, "
                   "with a qualification: science is not simply confirming what the "
                   "team hoped to find, but stating hypotheses, designing the "
-                  "research to test them, collecting the data and testing. The "
-                  "more evidence that supports a hypothesis, the more confidence "
-                  "we can place in it."),
+                  "research to test them, collecting the data and testing. Each "
+                  "further piece of supporting evidence earns the hypothesis a "
+                  "little more trust."),
             ("p", "Their examples are the book's main claims: that continuous "
                   "delivery and architecture practices drive software delivery "
                   "performance, that software delivery performance positively "
@@ -893,9 +894,9 @@ LESSONS = [
                 "where Sxx = Σ(x − mean of x)², Syy = Σ(y − mean of y)²,",
                 "and Sxy = Σ(x − mean of x)·(y − mean of y)",
             ]),
-            ("p", "What the drop shows is that most of the association between "
-                  "comments and days runs through size. Large changes draw more "
-                  "comments and also take longer, and the difference between the "
+            ("p", "What the drop shows is that most of the correlation between "
+                  "comments and days comes from the differences between the sizes. "
+                  "Large changes have more comments and also take longer, and the difference between the "
                   "three sizes carries almost all of the 0.964. That is what a "
                   "third variable doing the work looks like. It is not a "
                   "finding that size causes either; it is a reason to ask what "
@@ -905,7 +906,8 @@ LESSONS = [
                   "nothing</code> the lab takes twelve changes from three "
                   "repositories, each with a mix of small and large ones. All "
                   "the rows give r = 0.967 and the pooled within-repository r is "
-                  "also 0.967. Holding the repository fixed changes nothing, so "
+                  "also 0.967. Holding the repository fixed barely changes it (the "
+                  "last tile still calls it smaller, in the fourth decimal), so "
                   "whatever ties comments to days here, the repository is not "
                   "it. That does not make the association causal; it says only "
                   "that this third variable is not the explanation."),
@@ -922,8 +924,7 @@ LESSONS = [
                   "what the sign does between the first answer and the other two, "
                   "and what a manager reading only the first would be tempted to "
                   "ask for."),
-            ("p", "The same scheme of hypothesis and test also serves for "
-                  "grouping teams without a hypothesis. The next lesson, "
+            ("p", "Not every analysis in the book starts from a hypothesis. The next lesson, "
                   "Classification Analysis, reads how the authors sorted teams into "
                   "high, medium and low performers."),
         ],
@@ -992,12 +993,12 @@ LESSONS = [
         "quiz": [
             {"q": "Which type of analysis does Chapter 12 say lies behind the "
                   "book's statements that practices drive or impact performance?",
-             "a": ["Inferential predictive analysis, with theory-driven "
+             "a": ["Causal analysis, with randomised studies of teams",
+                   "Inferential predictive analysis, with theory-driven "
                    "hypotheses tested on survey data",
-                   "Causal analysis, with randomised studies of teams",
                    "Mechanistic analysis, with exact changes to variables",
                    "Descriptive analysis, since the book reports summaries"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says that whenever the book talks about impacting "
                     "or driving results, the design was this third type. It names "
                     "causal analysis as the gold standard that generally needs "
@@ -1007,14 +1008,14 @@ LESSONS = [
             {"q": "In the exercise, which result do you get for the six changes in "
                   "two repositories?",
              "a": ["r over all rows is 25/29 ≈ 0.862; within each repository "
-                   "r = −1; pooled within r = −1",
-                   "r over all rows is 25/29 ≈ 0.862; within each repository "
                    "r = 1; pooled within r = 1",
                    "r over all rows is −1; within each repository r is 0.862; "
                    "pooled within r is 0.862",
+                   "r over all rows is 25/29 ≈ 0.862; within each repository "
+                   "r = −1; pooled within r = −1",
                    "r over all rows is 0; within each repository r = −1; "
                    "pooled within r = 0"],
-             "c": 0,
+             "c": 2,
              "why": "Over all six rows the means are both 5, Sxx = Syy = 58 and "
                     "Sxy = 50, so r = 50/58 = 25/29 ≈ 0.862. Within north the "
                     "comments rise 1, 2, 3 while the days fall 3, 2, 1, and within "
@@ -1027,13 +1028,13 @@ LESSONS = [
             {"q": "On size-explains the lab reports r = 0.964 over all rows and a "
                   "pooled within-size r of 0.167. Which statement do the two "
                   "figures support?",
-             "a": ["Most of the association between comments and days runs through "
-                   "differences between the sizes",
-                   "Size causes both the comments and the days",
+             "a": ["Size causes both the comments and the days",
                    "Comments have no effect on days to merge",
                    "The pooled figure is wrong, because the groups have different "
-                   "means"],
-             "c": 0,
+                   "means",
+                   "Most of the correlation over all rows comes from the "
+                   "differences between the three sizes' averages"],
+             "c": 3,
              "why": "Holding size fixed removes the differences between the "
                     "groups' means, and the correlation falls from 0.964 to "
                     "0.167, so most of the first figure came from those "
@@ -1067,8 +1068,8 @@ LESSONS = [
             ("Fishing in the data and then writing the theory",
              "The authors' safeguard is the order: theory, then hypothesis, then "
              "data. A correlation noticed first and explained afterwards belongs "
-             "to the exploratory rung, where our minds fill in a story because "
-             "related datasets so often make sense."),
+             "to the exploratory rung, where it is easy to invent a story for "
+             "any pair that happens to move together."),
             ("Thinking that holding one variable fixed settles the question",
              "The lab's fall from 0.964 to 0.167 shows that size carried most of "
              "that association in those twelve changes. It does not show that "
@@ -1094,8 +1095,8 @@ LESSONS = [
     # Chapter 2 on cluster analysis (pp. 51-52) and Appendix C, Tests for
     # Classification (pp. 272-273) for Ward's method and the fusion
     # coefficients.
-    # Quote: PDF p. 180 of the operator's copy, 14 words, quotes.py OK.
-    # Lesson total: 14 words.
+    # Quote: PDF p. 180 of the operator's copy, 13 words, quotes.py OK.
+    # Lesson total: 13 words.
     {
         "slug": "classification-analysis",
         "title": "Classification Analysis",
@@ -1199,13 +1200,13 @@ LESSONS = [
                 "merge cost(A, B)  =  (nA · nB) / (nA + nB)  ·  Σ over measures of (a − b)²",
                 "where a and b are the two groups' average codes on each measure",
             ]),
-            ("p", "The cost is always increasing, which is why the merges can be "
+            ("p", "The cost never decreases, which is why the merges can be "
                   "read as a list: cheap merges join teams that are already alike, "
                   "and a sudden expensive one joins groups that are not. The "
                   "lab uses nine invented teams, each coded 1 to 6 on the four "
-                  "measures. In these presets the book's first option on each "
-                  "scale (on demand, less than one hour, 0&ndash;15 percent) is "
-                  "coded 6, so a high code is the better answer; the clustering "
+                  "measures. In these presets the best answer on each scale (on "
+                  "demand, less than one hour, and the lowest fail-rate band, "
+                  "0&ndash;15 percent) is coded 6, so a high code is the better answer; the clustering "
                   "never looks at which end is better."),
             ("math", [
                 "team  deploy  lead  restore  fail",
@@ -1234,19 +1235,21 @@ LESSONS = [
                   "first six costs added up."),
             ("p", "The three groups are T1, T5 and T6; T2, T7 and T8; and T3, T4 "
                   "and T9. By median code on deploy, lead, restore and fail the "
-                  "first is 6, 6, 5, 6, which the lab reads in the book's words as "
+                  "first is 6, 6, 5, 6, which the lab reads as "
                   "on demand, less than one hour, less than one day and 0&ndash;15 "
-                  "percent; the second is 2, 1, 2, 1, which is between once a "
+                  "percent; the second is 2, 1, 2, 1, which reads as between once a "
                   "month and once every six months, more than six months, "
-                  "between one month and six months and 76&ndash;100 percent; and "
+                  "between one month and six months and 76&ndash;100 percent, the "
+                  "last a band the lab adds beyond the ranges the book reports; and "
                   "the third is 4, 3, 4, 4, in between. A researcher would now "
                   "call the three groups high, low and medium, and would be doing "
                   "the naming, not the algorithm. The presets "
                   "<code>two-groups</code> and <code>four-groups</code> are the "
                   "same merges cut later or earlier. Two groups put T1, T3, T4, "
                   "T5, T6 and T9 together against T2, T7 and T8, and a group of "
-                  "six with an even count has medians that fall between two "
-                  "codes, which the lab shows as both neighbours; four groups "
+                  "six has medians that are means of two middle codes: the fail "
+                  "median, 4.5, prints both neighbours, and the lead median, 5, is "
+                  "an answer no team in the group gave; four groups "
                   "split T7 off from T2 and T8, leaving a group of one. The "
                   "authors excluded solutions with few individuals in a cluster, "
                   "and the group of one is why."),
@@ -1344,8 +1347,8 @@ LESSONS = [
         "quiz": [
             {"q": "Under Ward's method as the lab defines it, merging T2 = (2,1,1,1) "
                   "and T8 = (2,1,3,1), two single-team groups, costs what?",
-             "a": ["2", "4", "1", "1/2"],
-             "c": 0,
+             "a": ["4", "2", "1", "1/2"],
+             "c": 1,
              "why": "The two teams differ only on restore, by 2, so the squared "
                     "distance is 4. The cost multiplies it by n·n/(n+n) = "
                     "1·1/2, which is 2. A cost of 4 is the squared distance "
@@ -1353,11 +1356,11 @@ LESSONS = [
                     "twice; and 1/2 is the cost of the first merge, T1 with T5."},
             {"q": "In the exercise, what are the three merge costs, in order, and "
                   "which teams make up the two-group solution?",
-             "a": ["1/2, 3 and 273/4; the groups are A, B and C, D",
-                   "1/2, 3 and 273/4; the groups are A, B, C and D alone",
+             "a": ["1/2, 3 and 273/4; the groups are A, B, C and D alone",
                    "1, 6 and 273/2; the groups are A, B and C, D",
+                   "1/2, 3 and 273/4; the groups are A, B and C, D",
                    "1/2, 3 and 68; the groups are A, B, C and D alone"],
-             "c": 0,
+             "c": 2,
              "why": "A and B differ by 1 on one measure, so the cost is 1/2. C and "
                     "D differ by 1, 1, 0 and 2, a squared distance of 6, so the "
                     "cost is 6/2 = 3. The averages (1.5,1,1,1) and (5.5,5.5,5,5) "
@@ -1366,13 +1369,13 @@ LESSONS = [
                     "are what is left before that last merge: A, B and C, D."},
             {"q": "Why did the authors prefer hierarchical clustering to k-means, "
                   "according to Chapter 12?",
-             "a": ["They had no prior idea how many groups to expect, wanted to "
-                   "see parent and child groups, and their dataset was not huge",
-                   "K-means cannot be run on survey data at all",
+             "a": ["K-means cannot be run on survey data at all",
                    "Hierarchical clustering gives p-values for every merge",
                    "They wanted exactly three groups, high, medium and low, and "
-                   "hierarchical clustering guarantees three"],
-             "c": 0,
+                   "hierarchical clustering guarantees three",
+                   "They had no prior idea how many groups to expect, wanted to "
+                   "see parent and child groups, and their dataset was not huge"],
+             "c": 3,
              "why": "The chapter's box gives three reasons: no theoretical idea of "
                     "the number of groups, parent and child relationships for "
                     "interpretation, and a dataset small enough for the cost not "
@@ -1409,7 +1412,7 @@ LESSONS = [
              "The groups, the codes and the costs belong to nine invented teams. "
              "The book's finding is that its survey's respondents formed high, "
              "medium and low groups that differed significantly on all four "
-             "measures, in each year it checked, as Chapter 2 reports."),
+             "measures, in each year it checked (Appendix C notes one exception, 2016, which Chapter 2 discusses), as Chapter 2 reports."),
         ],
         "standard": (
             "Finish when you can follow a hierarchical clustering.",
@@ -1429,8 +1432,8 @@ LESSONS = [
     # 187; the table's six aspect names only); Latent Constructs Help Us Think
     # Carefully (pp. 189-190); the seven culture items are not reproduced
     # (p. 192) and the footnote on items (p. 196) is paraphrased.
-    # Quote: PDF p. 186 of the operator's copy, 14 words, quotes.py OK.
-    # Lesson total: 14 words.
+    # Quote: PDF p. 186 of the operator's copy, 13 words, quotes.py OK.
+    # Lesson total: 13 words.
     {
         "slug": "latent-constructs",
         "title": "Latent Constructs",
@@ -1661,8 +1664,8 @@ LESSONS = [
         "quiz": [
             {"q": "A person answers 2 on a seven-point scale to an item marked "
                   "reverse-coded. What value goes into their average?",
-             "a": ["6", "5", "2", "4"],
-             "c": 0,
+             "a": ["5", "6", "2", "4"],
+             "c": 1,
              "why": "On a seven-point scale the reversed value is 8 minus the "
                     "answer, so 8 − 2 = 6; a 1 becomes 7 and a 7 becomes 1. 5 is "
                     "7 − 2, an off-by-one answer that would map 1 to 6 and 7 to "
@@ -1671,11 +1674,11 @@ LESSONS = [
             {"q": "In the exercise, what are the construct mean with the second "
                   "item reversed and without, and how many people are above 4 each "
                   "way?",
-             "a": ["13/3 ≈ 4.333 and 11/3 ≈ 3.667; two people and one",
-                   "11/3 ≈ 3.667 and 13/3 ≈ 4.333; one person and two",
+             "a": ["11/3 ≈ 3.667 and 13/3 ≈ 4.333; one person and two",
                    "13/3 ≈ 4.333 and 13/3 ≈ 4.333; two people and two",
+                   "13/3 ≈ 4.333 and 11/3 ≈ 3.667; two people and one",
                    "5 and 4; three people and two"],
-             "c": 0,
+             "c": 2,
              "why": "Reversed, A scores (6,6,5) = 17/3, B (3,5,3) = 11/3, C "
                     "(5,7,5) = 17/3 and D (2,2,3) = 7/3, which sum to 52/3 and "
                     "average 13/3; A and C are above 4. Unreversed, A is "
@@ -1683,19 +1686,19 @@ LESSONS = [
                     "which sum to 44/3 and average 11/3; only A is above 4. "
                     "Forgetting the reversal here lowers the mean by two thirds "
                     "of a point and moves C below the line."},
-            {"q": "Which of the authors' four common survey weaknesses does "
-                  "&ldquo;Are releases quick and safe?&rdquo; show?",
-             "a": ["Multiple questions in one",
-                   "A leading question",
+            {"q": "Which survey weakness does &ldquo;Are releases quick and safe?&rdquo; "
+                  "show?",
+             "a": ["A leading question",
                    "A loaded question",
-                   "A push poll"],
-             "c": 0,
-             "why": "It asks about two things at once, speed and safety, so a "
-                    "respondent who finds releases quick but not safe has no honest "
-                    "answer and the reader cannot tell which half was answered. It "
-                    "does not steer toward an answer, force an untrue one, or "
-                    "try to persuade the respondent of something, which would "
-                    "make it leading, loaded or a push poll."},
+                   "A rating scale with too few points",
+                   "Multiple questions in one"],
+             "c": 3,
+             "why": "It asks about two things at once, speed and safety, so the "
+                    "reader cannot tell which half a yes or a no was about. A "
+                    "loaded question presumes something about the respondent that "
+                    "may be false, as the chapter's example of asking where someone "
+                    "took an exam does; this one presumes nothing. It does not steer "
+                    "toward an answer, and it is not trying to persuade."},
             {"q": "On the preset four-items the construct mean is 107/24 ≈ 4.458 and "
                   "on without-clarity it is 13/3 ≈ 4.333. What else changes?",
              "a": ["R3 moves from above the line at 4 to below it, so the split "

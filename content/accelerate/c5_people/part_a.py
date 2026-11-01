@@ -194,15 +194,8 @@ LESSONS = [
                   "The teams whose deployment pain fell were those that had put in place comprehensive test and deployment automation, continuous integration (trunk-based development included), shift left on security, effective test data management, loosely coupled architectures, the ability to work independently, and version control of everything needed to reproduce production environments. Those "
                   "are the technical practices of Chapters 4 and 5; the authors "
                   "point out that the same practices that improve speed and "
-                  "stability also reduce the stress of pushing code. The second finding is a correlation: where deployments hurt more, IT performance, organizational performance and culture are all lower. The text says <em>correlated</em> and <em>predicts</em>, "
-                  "and the lesson keeps to those words."),
-            ("p", "The chapter adds one story from industry. A Microsoft engineering "
-                  "lead, Thiago Almeida, spoke of the benefits that continuous "
-                  "delivery brought to his own team, and reported that engineers on "
-                  "the Bing team scored their work/life balance satisfaction at 38 "
-                  "percent before the practices and 75 percent after. It is one "
-                  "team's report in a talk that the authors quote, not a figure "
-                  "from their survey, and the lesson uses it only as an "
+                  "stability also reduce the stress of pushing code. The second finding is a correlation: where deployments hurt more, IT performance, organizational performance and culture are all lower. The text calls it a high correlation, and the lesson keeps to that word."),
+            ("p", "The chapter adds one story from industry. A box quotes Thiago Almeida, a Microsoft engineering lead, on the benefits continuous delivery brought inside his company, and reports that engineers on the Bing team scored their work/life balance satisfaction at 38 percent before the practices and 75 percent after. It is one team's account, not a figure from the authors' survey, and the lesson uses it only as an "
                   "illustration of what a lower-pain deployment means to the people "
                   "who do it."),
             ("p", "The authors name three reasons a deployment becomes complex and "
@@ -335,11 +328,11 @@ LESSONS = [
             {"q": "For the five teams of the exercise, the sum of products of "
                   "distances is 220, the sum of squared distances in the share is "
                   "4000 and in the pain score 14. What is r squared?",
-             "a": ["About 0.864, or 121/140",
-                   "About 0.930",
+             "a": ["About 0.930",
                    "About 0.055",
-                   "About 0.136"],
-             "c": 0,
+                   "About 0.136",
+                   "About 0.864, or 121/140"],
+             "c": 3,
              "why": "r squared is 220 times 220 over (4000 times 14), which is 48400/56000, "
                     "or 121/140, about 0.864. About 0.930 is r itself, the square "
                     "root of that fraction. About 0.055 is 220 over 4000, the slope "
@@ -347,11 +340,11 @@ LESSONS = [
                     "r squared, the part the line does not account for."},
             {"q": "In which survey years does Chapter 9 say the authors asked "
                   "respondents about deployment pain?",
-             "a": ["2014, 2015, 2016 and 2017",
-                   "2015, 2016 and 2017",
+             "a": ["2015, 2016 and 2017",
+                   "2014, 2015, 2016 and 2017",
                    "2017 only",
                    "2016 only, when the Lean questions were added"],
-             "c": 1,
+             "c": 0,
              "why": "The chapter says deployment pain was included in the research "
                     "in 2015, 2016 and 2017. The 2014 survey, the first, is not "
                     "among them, and the question was not confined to one year."},
@@ -371,10 +364,10 @@ LESSONS = [
             {"q": "A team answers, \"I don&rsquo;t know; I have never thought about "
                   "deployments.\" How does the chapter read that answer?",
              "a": ["As the best result: deployment is so smooth nobody notices it",
-                   "As a warning that barriers may be hiding the work from them",
                    "As a sign the respondent should be left out of the survey",
+                   "As a warning that barriers may be hiding the work from them",
                    "As a measure of low burnout"],
-             "c": 1,
+             "c": 2,
              "why": "The authors say that when developers or testers cannot say what deployments are like, something is probably keeping the work out of their sight, which is a warning that delivery performance could be low."},
         ],
         "mistakes": [
@@ -443,8 +436,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Burnout",
-             "The chapter's description: a state of bodily, mental or emotional exhaustion that overwork or stress brings on, and that goes beyond being busy or under strain. It shows as exhaustion, cynicism and a feeling of being "
-             "ineffective, and it can make once-loved work seem dull."),
+             "Exhaustion that overwork or stress brings on, and more than being busy: it shows as exhaustion, cynicism and a feeling of being ineffective."),
             ("Organizational risk factor",
              "A condition of the workplace, not of the person, that predicts burnout. "
              "The chapter takes Maslach's six: work overload, lack of control, "
@@ -467,9 +459,7 @@ LESSONS = [
                   "managers, often try to fix the person while ignoring the work "
                   "environment&rdquo;: that sentence from the Burnout section of "
                   "Chapter 9 carries its whole argument. The section is also "
-                  "careful to say what burnout is. It is exhaustion of the body, the mind or the feelings, brought on by overwork or stress, but the authors insist it is more than that: it can make what you "
-                  "once loved about work seem dull, it often shows as "
-                  "helplessness, and it goes with pathological cultures and wasteful "
+                  "careful to say what burnout is. The authors insist it is more than being overworked: it can make what you once loved about work seem dull, it often shows as helplessness, and it goes with pathological cultures and wasteful "
                   "work. Its symptoms are feeling exhausted, cynical or ineffective, "
                   "little sense of accomplishment, and work that spills into the "
                   "rest of life."),
@@ -480,8 +470,7 @@ LESSONS = [
                   "disability and turnover, attributed to Maslach in 2014. Those "
                   "are other researchers' figures, which the book reports, not "
                   "results from its own survey. From them the authors draw an "
-                  "obligation: employers have a duty of care and a financial "
-                  "interest in preventing it."),
+                  "obligation: employers have a duty of care and a fiduciary obligation to prevent it."),
             ("p", "Where should a manager look? The authors rely on Christina "
                   "Maslach, a psychology professor at the University of California "
                   "at Berkeley who pioneered the study of job burnout, and on "
@@ -642,23 +631,23 @@ LESSONS = [
         "quiz": [
             {"q": "For the exercise, with the third item reversed on a 5-point "
                   "scale, what is the team mean?",
-             "a": ["3.00",
-                   "3.22, the mean with nothing reversed",
+             "a": ["3.22, the mean with nothing reversed",
                    "2.78, the mean with all three items reversed",
-                   "2.67, from reversing with 5 minus the answer"],
-             "c": 0,
+                   "2.67, from reversing with 5 minus the answer",
+                   "3"],
+             "c": 3,
              "why": "The reversed third answers are 4, 1 and 3, so the totals are "
                     "13, 4 and 10 and the team total is 27 over nine answers, "
-                    "which is 3.00. With nothing reversed the total is 29 and the "
+                    "which is 3. With nothing reversed the total is 29 and the "
                     "mean 3.22. Reversing all three would give 25 over 9, or 2.78. "
                     "Reversing with 5 minus the answer, which forgets that the "
                     "scale starts at 1, gives 24 over 9, or 2.67."},
             {"q": "According to Chapter 9, what do Maslach&rsquo;s six factors have in common?",
-             "a": ["They are traits of the individual employee that screening can find",
-                   "They are conditions that management and the organization have the power to change",
+             "a": ["They are conditions that management and the organization have the power to change",
+                   "They are traits of the individual employee that screening can find",
                    "They were each measured in the authors&rsquo; own survey",
                    "They apply only to technology work"],
-             "c": 1,
+             "c": 0,
              "why": "The chapter says all of the risk factors are things that "
                     "management and organizations can change. They are from "
                     "Leiter and Maslach (2008), not measured one by one in the "
@@ -675,10 +664,10 @@ LESSONS = [
                     "but whose last two are reversed from 6 to 2, is 2.0."},
             {"q": "Which sentence matches the chapter&rsquo;s own advice on where to act?",
              "a": ["Concentrate on helping individuals cope; the environment changes slowly",
-                   "Change the work environment; fixing the person alone is less likely to succeed",
                    "Remove burned-out people from critical systems",
+                   "Change the work environment; fixing the person alone is less likely to succeed",
                    "Wait for the survey to show a high mean before acting"],
-             "c": 1,
+             "c": 2,
              "why": "The authors write that managers often fix the person while "
                     "ignoring the environment, and that changing the environment "
                     "is far more important for long-term success; Maslach&rsquo;s "
@@ -756,7 +745,7 @@ LESSONS = [
              "who are detractors. It runs from minus 100 to 100, and passives are "
              "counted in the total but not in the subtraction."),
             ("A band edge",
-             "The step between two answers that falls in different bands, 6 to 7 "
+             "The step between two answers that fall in different bands, 6 to 7 "
              "or 8 to 9. The lab lists the answers that sit one step below an "
              "edge, because moving them changes the score."),
         ],
@@ -918,11 +907,11 @@ LESSONS = [
         "quiz_title": "Bands, arithmetic and the chapter's comparison",
         "quiz": [
             {"q": "For the exercise answers, what is the employee Net Promoter Score?",
-             "a": ["Minus 10",
-                   "Plus 20, the percentage of promoters alone",
+             "a": ["Plus 20, the percentage of promoters alone",
                    "Minus 20, dividing by only the promoters and detractors",
-                   "Minus 30, the percentage of detractors alone"],
-             "c": 0,
+                   "Minus 30, the percentage of detractors alone",
+                   "Minus 10"],
+             "c": 3,
              "why": "Two answers (10 and 9) are promoters, five (8, 8, 7, 7, 7) are "
                     "passive and three (6, 5, 4) are detractors, out of ten. "
                     "20 percent minus 30 percent is minus 10. Plus 20 leaves out the "
@@ -931,11 +920,11 @@ LESSONS = [
                     "the promoters."},
             {"q": "On the preset <code>team</code>, one respondent who answered 6 "
                   "changes to 7. What happens to the score?",
-             "a": ["It stays at 10, because 6 and 7 are neighbours",
-                   "It rises to 20, because a detractor becomes a passive",
+             "a": ["It rises to 20, because a detractor becomes a passive",
+                   "It stays at 10, because 6 and 7 are neighbours",
                    "It rises to 20, because a detractor becomes a promoter",
                    "It rises to 11, in proportion to the change in the mean"],
-             "c": 1,
+             "c": 0,
              "why": "6 is the highest detractor answer and 7 the lowest passive "
                     "one, so the move crosses an edge: detractors fall from 3 to "
                     "2, giving 40 minus 20, which is 20. It does not reach the "
@@ -1034,7 +1023,7 @@ LESSONS = [
             "claims, then scores them on teams of its own."
         ),
         "body": [
-            ("p", "&ldquo;People who feel supported by their employers, who have the "
+            ("p", "&ldquo;[P]eople who feel supported by their employers, who have the "
                   "tools and resources to do their work, and who feel their "
                   "judgment is valued, turn out better work.&rdquo; The sentence is "
                   "from the section of Chapter 10 on how job satisfaction affects "
@@ -1045,11 +1034,7 @@ LESSONS = [
                   "identity and job satisfaction."),
             ("p", "The authors added identity, they say, because they expected teams that practice "
                   "continuous delivery and take an experimental approach to "
-                  "product development to build better products and to feel closer to the rest of the organization. They asked "
-                  "respondents how far they agreed with statements about being "
-                  "glad to work there, speaking well of the organization, "
-                  "extra effort, shared values, shared goals and feeling cared "
-                  "about, adapting statements from a published scale. They used "
+                  "product development to build better products and to feel closer to the rest of the organization. They asked respondents how far they agreed with six statements adapted from Kankanhalli and colleagues (2005), on being glad to work there, sharing the organization's values and goals, and the like. They used "
                   "Likert-type agreement scales, and the items passed the "
                   "statistical conditions for measuring a construct, so a "
                   "person&rsquo;s identity can be taken as the average of the item "
@@ -1057,7 +1042,7 @@ LESSONS = [
                   "(The chapter lists six statements and says &lsquo;five item "
                   "scores&rsquo;, so check the count in your own copy before "
                   "borrowing the scale.)"),
-            ("p", "What identity was found to go with: the more people identified with their organization, the more it predicted a generative, performance-oriented culture and better organizational performance, measured as productivity, market share and profitability. The authors connect it back to burnout, since "
+            ("p", "Identity predicted both a generative culture and organizational performance (productivity, market share, profitability). The authors connect it back to burnout, since "
                   "identity includes the matching of personal and organizational "
                   "values that the last lesson saw is a risk factor, and set it "
                   "against the way many companies still work, handing requirements "
@@ -1079,13 +1064,7 @@ LESSONS = [
                   "and deciding; practices such as proactive monitoring and "
                   "test and deployment automation, which put people in a feedback "
                   "loop, correlated strongly with it."),
-            ("p", "The chain, then, runs like this in the authors&rsquo; "
-                  "words. Technical and Lean practices predict identity and job "
-                  "satisfaction; those predict better work, which raises software "
-                  "delivery performance, which in turn predicts organizational "
-                  "performance; and delivery performance gives teams faster "
-                  "validation of their ideas, which feeds satisfaction again. They "
-                  "call it a virtuous circle. Chapter 12 will explain what "
+            ("p", "The chain, then, runs like this. Technical and Lean practices were found to predict identity and job satisfaction. For satisfaction the chapter argues that supported people turn out better work, which results in higher delivery performance and in turn higher organizational performance, and that faster delivery lets teams validate ideas sooner, which raises satisfaction again. The authors call it a virtuous circle. Chapter 12 will explain what "
                   "&lsquo;predict&rsquo; means in their statistics: a prediction, "
                   "not a proof of cause."),
             ("p", "Now compute both constructs. The lab takes six invented items, "
@@ -1097,9 +1076,9 @@ LESSONS = [
                   "the first answers 6, 6, 5 on identity, a sum of 17 and a mean of "
                   "5.667, and 5, 6, 6 on satisfaction, also 17. Over all four "
                   "respondents the identity mean is 63 over 12 answers, which is "
-                  "5.25, and the satisfaction mean is 60 over 12, which is 5.00."),
+                  "5.25, and the satisfaction mean is 60 over 12, which is 5."),
             ("p", "The preset <code>birch</code> is a second invented team of four "
-                  "whose satisfaction answers also add to 60, a mean of 5.00; its "
+                  "whose satisfaction answers also add to 60, a mean of 5; its "
                   "identity answers add to 39, a mean of 3.25. Two teams are "
                   "equally satisfied and one identifies much less. That is the "
                   "reason the chapter treats them as two constructs, each "
@@ -1180,9 +1159,9 @@ LESSONS = [
             ],
             "lines": [
                 "Identity sums: 17, 14, 19, 13; total 63; 63/12 = 5.25",
-                "Satisfaction sums: 17, 13, 19, 11; total 60; 60/12 = 5.00",
+                "Satisfaction sums: 17, 13, 19, 11; total 60; 60/12 = 5",
                 "Birch identity sums: 10, 8, 13, 8; total 39; 39/12 = 3.25",
-                "Birch satisfaction sums: 16, 13, 17, 14; total 60; 60/12 = 5.00",
+                "Birch satisfaction sums: 16, 13, 17, 14; total 60; 60/12 = 5",
             ],
             "after": [
                 "Every figure is a sum of the answers divided by their count. "
@@ -1193,32 +1172,30 @@ LESSONS = [
         "quiz_title": "Two constructs and the chapter's claims",
         "quiz": [
             {"q": "For the exercise team, what are the identity and satisfaction means?",
-             "a": ["Identity 5.33 and satisfaction 3.83",
-                   "Identity 3.83 and satisfaction 5.33",
+             "a": ["Identity 3.83 and satisfaction 5.33",
                    "Identity 5.33 and satisfaction 4.17",
+                   "Identity 5.33 and satisfaction 3.83",
                    "Identity 4.58 and satisfaction 4.58, the grand mean of both"],
-             "c": 0,
+             "c": 2,
              "why": "Identity answers are 6, 6, 5, 7, 4, 4, which add to 32; over "
                     "six answers that is 5.33. Satisfaction answers are 3, 4, 2, "
-                    "3, 5, 6, which add to 23, a mean of 3.83. The second option "
-                    "swaps the columns, and the last pools two constructs that the "
-                    "chapter treats as different."},
+                    "3, 5, 6, which add to 23, a mean of 3.83. Swapping the columns gives the other pair, and pooling both gives one mean for two constructs that the chapter treats as different."},
             {"q": "On the presets, how do Alder and Birch differ?",
              "a": ["Birch has the lower satisfaction mean",
-                   "Birch has the lower identity mean, 3.25 against 5.25",
                    "Both constructs are lower for Birch",
-                   "They are the same on both"],
-             "c": 1,
+                   "They are the same on both",
+                   "Birch has the lower identity mean, 3.25 against 5.25"],
+             "c": 3,
              "why": "Both teams have satisfaction totals of 60 over 12 answers, "
-                    "5.00, so they are alike on that; identity totals are 63 and "
+                    "5, so they are alike on that; identity totals are 63 and "
                     "39, means of 5.25 and 3.25."},
             {"q": "Which three things does the chapter say its job satisfaction "
                   "measure looks at?",
-             "a": ["Pay, title and length of service",
-                   "Being satisfied in your work, having the tools and resources, and having your skills well used",
+             "a": ["Being satisfied in your work, having the tools and resources, and having your skills well used",
+                   "Pay, title and length of service",
                    "How often you deploy, how long a change takes, and how quickly you recover",
                    "Whether you would recommend your team, your organization and your manager"],
-             "c": 1,
+             "c": 0,
              "why": "The chapter names satisfaction with the work, the tools and "
                     "resources to do it, and the use made of skills and abilities. "
                     "The delivery measures are the subject of Chapter 2, and the "
@@ -1293,8 +1270,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Inclusion",
-             "The chapter&rsquo;s word, after Smith and Lindsay, for an organization in which every member feels welcomed and valued as themselves and has a strong sense of belonging. The authors write that it must "
-             "be present for diversity to take hold."),
+             "The chapter&rsquo;s word, after Smith and Lindsay, for an organization where every member is welcomed and belongs; the authors say diversity does not last without it."),
             ("Underrepresented minority",
              "In the survey, a respondent&rsquo;s own answer to whether they "
              "identify as underrepresented. The authors explain that because the "
@@ -1321,9 +1297,7 @@ LESSONS = [
                   "underrepresented minorities are smarter, achieve better team "
                   "performance and better business outcomes. The limit is on their "
                   "own data, in which few teams are diverse. They recommend that "
-                  "teams who want high performance recruit and retain more women "
-                  "and underrepresented minorities, and work on other kinds of "
-                  "diversity, for example including people with disabilities. "
+                  "teams who want high performance hire and keep more women and members of underrepresented groups, and work on other kinds of diversity, for example including people with disabilities. "
                   "They then add &ldquo;diversity is not enough. Teams and "
                   "organizations must also be inclusive.&rdquo;"),
             ("p", "Note whose findings these are. The benefits of diversity are "
@@ -1337,11 +1311,7 @@ LESSONS = [
                   "chapter gives."),
             ("p", "On gender, the authors began asking in 2015. Of all respondents, "
                   "5 percent identified as female in 2015, 6 percent in 2016 and "
-                  "6.5 percent in 2017. They say the figures were much lower than "
-                  "they expected, because they cite about 7 percent of women in "
-                  "systems administration in 2011, down from 13 percent in 2008, and "
-                  "27 percent in computer and information management in a report "
-                  "from 2013. Among the survey respondents, 33 percent reported a team with no women on it, 56 percent a team under 10 percent female and 81 percent a team under 25 percent female; the passage does not name a year for these three "
+                  "6.5 percent in 2017. They say the figures were much lower than they expected, given outside figures of about 7 percent women in systems administration in 2011 (13 percent in 2008) and 27 percent in computer and information management, per Diaz and King in 2013. The chapter gives 6.5 percent for 2017 in one place and 6 percent in its 2017 breakdown, and does not reconcile them. Among the survey respondents, 33 percent reported a team with no women on it, 56 percent a team under 10 percent female and 81 percent a team under 25 percent female; the passage does not name a year for these three "
                   "figures. For the 2017 study alone the authors report 91 "
                   "percent male, 6 percent female and 3 percent non-binary or "
                   "other. They say they started with binary gender in order to "
@@ -1363,19 +1333,14 @@ LESSONS = [
                   "there is no significant difference between men and women in "
                   "ability or aptitude in the STEM fields; and women are "
                   "leaving tech at a 45 percent higher rate than men, a figure they "
-                  "attribute to a 2017 source. The authors suggest the answer to "
-                  "what keeps women and others out could be nothing more than the widespread belief that some men have an innate brilliance for technical work, and cite reports of harassment, "
+                  "attribute to a 2017 source. Citing Leslie and colleagues (2015), they suggest that a widespread belief in some men&rsquo;s innate gift for technical work may keep women and others out; a footnote says that study covered only women and African Americans. They also cite reports of harassment, "
                   "microaggressions and unequal pay. These are the authors&rsquo; "
                   "reading of other people&rsquo;s studies. They end with "
                   "resources, among them the Anita Borg Institute, Geek Feminism "
                   "and Project Include, and with the call for all of us to "
                   "prioritize diversity and inclusive environments."),
             ("p", "Now the count, and a caution about reading a share. The authors "
-                  "write that the numbers they found were lower than they "
-                  "expected. A number like 6.5 percent of respondents is a share "
-                  "of the people who answered, not a share of the industry, and "
-                  "the two can differ for reasons of how the survey was "
-                  "distributed, as the sampling chapter says. In Chapter 15 the "
+                  "read the low figures as a real shortfall, and the team figures point the same way. Even so, 6.5 percent of respondents is a share of the people who answered, not a measured share of the industry, and the two can differ for reasons of how the survey was distributed. Nothing in the book says which way, if at all, its share differs from the field&rsquo;s; the field cannot be counted (Chapter 15), so the lab below assumes a known field only to show the mechanism. In Chapter 15 the "
                   "authors explain that their invitations came from several "
                   "mailing lists, referrals and reaching out to underrepresented "
                   "groups through their own lists, and they name the limits of "
@@ -1386,19 +1351,17 @@ LESSONS = [
                   "group that the invitations reach less well. In the preset "
                   "<code>first-wave</code> 240 of Group A answer and 30 of Group "
                   "B. The lab reports the shares that answered as 30 percent and "
-                  "15 percent, a ratio of 2.00 (Group A is twice as likely to "
+                  "15 percent, a ratio of 2 (Group A is twice as likely to "
                   "answer) and a gap of 15 percentage points. Work out the "
                   "composition of the sample by hand: 30 of the 270 answers are "
                   "Group B, 11.1 percent, against 20 percent of the field."),
             ("p", "In <code>second-wave</code> an invitation is added through "
                   "a list that Group B uses, and 60 of its 200 answer. Both groups "
-                  "now answer at 30 percent, the ratio is 1.00 and the gap is 0, "
+                  "now answer at 30 percent, the ratio is 1 and the gap is 0, "
                   "and Group B is 60 of the 300 answers, 20 percent, the "
                   "same as its share of the field. The respondent shares matched "
                   "the field, in this invented case, only because the answering "
-                  "rates did. Notice also that the lab prints a ratio and an "
-                  "odds ratio separately. The ratio, 2.00 in the first wave, "
-                  "is what the chapter means by &lsquo;times as likely&rsquo;; "
+                  "rates did. Notice also that the lab prints a ratio and an odds ratio separately. The ratio, 2 in the first wave, is what the book means by &lsquo;times as likely&rsquo;, as in Chapter 10&rsquo;s loyalty finding; "
                   "the odds ratio, 2.43, is a different number."),
             ("h3", "Exercise"),
             ("ul", [
@@ -1408,8 +1371,7 @@ LESSONS = [
             ]),
             ("p", "Find each group's share that answered, the ratio of P to Q "
                   "and the gap in percentage points. Then find Q's share of the "
-                  "answers and compare it with its share of the 1,000. Type the "
-                  "rows in to check."),
+                  "answers and compare it with its share of the 1,000. Type the rows in to check the shares, ratio and gap; the share of the answers is by hand."),
             ("p", "These counts say something about how a sample was drawn, and "
                   "nothing about why people leave or stay, which the authors "
                   "attribute to the cultures they work in and the studies they "
@@ -1426,7 +1388,7 @@ LESSONS = [
                  "rows": SURVEY_FIRST, "first": "Group-A", "second": "Group-B",
                  "expect": {
                     "agrShares": "Group-A 240 of 800 = 30%; Group-B 30 of 200 = 15%",
-                    "agrRatio": "2×",
+                    "agrRatio": "2.00×",
                     "agrDiff": "+15 points",
                     "agrOdds": "≈ 2.43",
                  }},
@@ -1435,9 +1397,9 @@ LESSONS = [
                  "rows": SURVEY_SECOND, "first": "Group-A", "second": "Group-B",
                  "expect": {
                     "agrShares": "Group-A 240 of 800 = 30%; Group-B 60 of 200 = 30%",
-                    "agrRatio": "1×",
+                    "agrRatio": "1.00×",
                     "agrDiff": "0 points",
-                    "agrOdds": "1",
+                    "agrOdds": "1.00",
                  }},
             ],
             "panel_title": "Who answered, group by group",
@@ -1476,25 +1438,25 @@ LESSONS = [
             "lines": [
                 "Group A answered: 240/800 = 30%",
                 "Group B answered: 30/200 = 15%",
-                "Ratio A to B: 30/15 = 2.00; gap: 15 percentage points",
+                "Ratio A to B: 30/15 = 2; gap: 15 percentage points",
                 "Answers in all: 240 + 30 = 270",
                 "Group B in the sample: 30/270 = 11.1%",
                 "Group B in the field: 200/1000 = 20%",
             ],
             "after": [
                 "Group A's odds of answering are 240 to 560, Group B's 30 to 170. "
-                "Their ratio, 2.43, is not the ratio of shares, 2.00.",
+                "Their ratio, 2.43, is not the ratio of shares, 2.",
             ],
         },
         "quiz_title": "What the chapter reports, and what a share shows",
         "quiz": [
             {"q": "Which gives the chapter&rsquo;s shares of respondents who "
                   "identified as female in 2015, 2016 and 2017?",
-             "a": ["5%, 6% and 6.5%",
-                   "6.5%, 6% and 5%",
+             "a": ["6.5%, 6% and 5%",
+                   "5%, 6% and 6.5%",
                    "7%, 13% and 27%",
                    "33%, 56% and 81%"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter reports 5 percent in 2015, 6 percent in 2016 and "
                     "6.5 percent in 2017. The reversed order would mean the share "
                     "was falling. 7, 13 and 27 are figures from other sources for "
@@ -1503,11 +1465,11 @@ LESSONS = [
                     "respondents on teams with no women, under 10 percent and "
                     "under 25 percent."},
             {"q": "For the exercise, what is Group Q&rsquo;s share of the answers?",
-             "a": ["30.8%, which is 80 of 260",
-                   "20%, which is 80 of 400",
+             "a": ["20%, which is 80 of 400",
                    "40%, which is 400 of 1000",
+                   "30.8%, which is 80 of 260",
                    "50%, which is the gap in the shares"],
-             "c": 0,
+             "c": 2,
              "why": "Together 180 and 80 answered, 260 answers, and Q&rsquo;s 80 "
                     "are 30.8 percent of them. 20 percent is the share of Q that "
                     "answered; 40 percent is Q&rsquo;s share of the field, and "
@@ -1515,23 +1477,22 @@ LESSONS = [
             {"q": "According to Chapter 10, whose research shows that diversity "
                   "improves team performance?",
              "a": ["The authors&rsquo; own survey, in each year it was run",
-                   "Other researchers, whom the authors cite",
                    "Both the authors&rsquo; survey and other researchers, at the same strength",
-                   "No one; the chapter only recommends it"],
-             "c": 1,
+                   "No one; the chapter only recommends it",
+                   "Other researchers, whom the authors cite"],
+             "c": 3,
              "why": "The authors cite other research on the benefits and report "
                     "that few teams in their own sample are diverse; they "
-                    "recommend that teams recruit and retain more women and "
-                    "underrepresented minorities. They did not report testing the "
+                    "recommend that teams hire and keep more women and members of underrepresented groups. They did not report testing the "
                     "benefit in their data."},
-            {"q": "On <code>second-wave</code>, the lab reports a ratio of 1.00. "
+            {"q": "On <code>second-wave</code>, the lab reports a ratio of 1. "
                   "What does that mean?",
-             "a": ["The groups are the same size",
-                   "The two groups answered at the same share, 30%",
+             "a": ["The two groups answered at the same share, 30%",
+                   "The groups are the same size",
                    "Group B is now over-represented in the sample",
                    "The odds ratio is 2.43"],
-             "c": 1,
-             "why": "A ratio of shares is 1.00 when the shares are equal; here "
+             "c": 0,
+             "why": "A ratio of shares is 1 when the shares are equal; here "
                     "both groups answered at 30 percent. The groups are still 800 "
                     "and 200, and the sample shares now match the field."},
         ],
@@ -1546,7 +1507,7 @@ LESSONS = [
              "cite; what the chapter adds is who answered and how few teams are "
              "diverse."),
             ("Thinking diversity alone is the goal",
-             "The chapter says that a diverse team is only the start: it must also be inclusive, and without inclusion diversity does not take hold."),
+             "The chapter says a diverse team is only the start: it must also be inclusive, or the diversity does not last."),
         ],
         "standard": (
             "Finish when you can say what a share of respondents does and does not show.",

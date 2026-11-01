@@ -1480,7 +1480,7 @@ odds ratio: (7/3) / (2/3) = 3.5</div><p>Both ratios are exact. 1.75 and 3.5 desc
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "In the preset <code>tests<\/code>, by what ratio were the teams whose developers own the acceptance tests more likely than the teams with a separate QA team to meet the goal?", "a": ["1.75", "3.5", "30", "0.57"], "c": 0, "why": "The shares are 70 and 40 percent, and 70 over 40 is 1.75. 3.5 is the odds ratio, which the lab shows separately; 30 is the difference in percentage points; 0.57 is the ratio the other way round, QA over developers."}, {"q": "According to the chapter, which went with delivery performance more closely?", "a": ["Keeping system and application configuration in version control, more than keeping application code", "Keeping application code in version control, more than configuration", "The two were equally correlated", "Neither: version control was uncontroversial and so not tested"], "c": 0, "why": "The chapter calls the comprehensive use of version control relatively uncontroversial, but it tested it, and found configuration the more highly correlated, a result it calls a corrective to the idea that configuration is secondary."}, {"q": "What does the chapter say about automated tests created and maintained primarily by a QA team or an outsourced party?", "a": ["That practice was not correlated with IT performance", "It was negatively correlated with IT performance", "It was positively correlated, but less than developer tests", "It was correlated only when the tests ran every day"], "c": 0, "why": "The authors report no correlation, not a negative one, and they add that testers still have an essential role in manual and exploratory work. Reading the finding as harm to performance adds to what the page says."}, {"q": "On the preset <code>config<\/code> (45 of 60 against 20 of 40), how many times as likely were teams that keep configuration in version control to meet the goal?", "a": ["1.5", "3", "25", "0.75"], "c": 0, "why": "75 percent over 50 percent is 1.5. Three is the odds ratio (3 to 1 against 1 to 1); 25 is the difference in points; 0.75 is the first group's share as a fraction, not a ratio."}];
+  var QUIZ = [{"q": "In the preset <code>tests<\/code>, by what ratio were the teams whose developers own the acceptance tests more likely than the teams with a separate QA team to meet the goal?", "a": ["1.75", "3.5", "30", "0.57"], "c": 0, "why": "The shares are 70 and 40 percent, and 70 over 40 is 1.75. 3.5 is the odds ratio, which the lab shows separately; 30 is the difference in percentage points; 0.57 is the ratio the other way round, QA over developers."}, {"q": "According to the chapter, which went with delivery performance more closely?", "a": ["Keeping application code in version control, more than configuration", "Keeping configuration under version control, more than the application code", "The two were equally correlated", "Neither: version control was uncontroversial and so not tested"], "c": 1, "why": "The chapter calls the comprehensive use of version control relatively uncontroversial, but it tested it, and found configuration the more highly correlated, a result that, the authors say, shows the idea that configuration is secondary to be a misconception."}, {"q": "What does the chapter say about automated tests created and maintained primarily by a QA team or an outsourced party?", "a": ["It was negatively correlated with IT performance", "It was positively correlated, but less than developer tests", "That practice was not correlated with IT performance", "It was correlated only when the tests ran every day"], "c": 2, "why": "The authors report no correlation, not a negative one, and they add that testers still have an essential role in manual and exploratory work. Reading the finding as harm to performance adds to what the page says."}, {"q": "On the preset <code>config<\/code> (45 of 60 against 20 of 40), how many times as likely were teams that keep configuration in version control to meet the goal?", "a": ["3", "25", "0.75", "1.5"], "c": 3, "why": "75 percent over 50 percent is 1.5. Three is the odds ratio (3 to 1 against 1 to 1); 25 is the difference in points; 0.75 is the first group's share as a fraction, not a ratio."}];
 
   (function () {
 
@@ -1832,9 +1832,12 @@ odds ratio: (7/3) / (2/3) = 3.5</div><p>Both ratios are exact. 1.75 and 3.5 desc
   }
   function aktPp(r) {
     var p = Rmul(r, R(100n)), sign = p.n > 0n ? '+' : '';
-    if (Rint(p)) return sign + eaInt(p.n) + ' points';
+    if (Rint(p)) return sign + eaInt(p.n) + (p.n === 1n || p.n === -1n ? ' point' : ' points');
     return (eaExactAt(p, 1) ? '' : '≈ ') + sign + eaFixed(p, 1) + ' points';
   }
+  function aktUnit(r, word) { return eaNum(r) + ' ' + (Requ(Rabs(r), R1) ? word.replace(/s$/, '') : word); }
+  function aktTwo(r) { return (eaExactAt(r, 2) ? '' : '≈ ') + eaFixed(r, 2); }
+  function aktTimes(r) { return aktTwo(r) + '×'; }
   function aktBound(r, f, what, s) {
     if (f.gt !== undefined && Rcmp(r, Rparse(f.gt)) <= 0) throw new Error(what + ' must be more than ' + eaNum(Rparse(f.gt)) + ', and it is ' + s);
     if (f.min !== undefined && Rcmp(r, Rparse(f.min)) < 0) throw new Error(what + ' cannot be less than ' + eaNum(Rparse(f.min)) + ', and it is ' + s);
@@ -1894,7 +1897,7 @@ odds ratio: (7/3) / (2/3) = 3.5</div><p>Both ratios are exact. 1.75 and 3.5 desc
   var AGR_VIEW = {};
   function agrCompute(view, inst, opts) { return eaRun(AGR_VIEW[view], inst, opts); }
   function agrShare(m, n) { var t = eaPct(R(BigInt(m), BigInt(n))); return eaInt(m) + ' of ' + eaInt(n) + t.slice(t.search(/ [=≈] /)); }
-  function agrTwo(r) { return Rint(r) ? eaInt(r.n) : (eaExactAt(r, 2) ? '' : '≈ ') + eaFixed(r, 2); }
+  function agrTwo(r) { return aktTwo(r); }
   function agrThree(r) {
     if (Rint(r)) return eaInt(r.n);
     if (eaBig(r)) return eaSci(r);
@@ -1917,7 +1920,7 @@ odds ratio: (7/3) / (2/3) = 3.5</div><p>Both ratios are exact. 1.75 and 3.5 desc
     if (inst.first === inst.second) eaRefuse('The two groups compared are the same group, ' + inst.first);
     var a = of[inst.first], b = of[inst.second];
     var sa = Rdiv(a.met, a.n), sb = Rdiv(b.met, b.n);
-    var ratio = Rzero(sb) ? 'not defined: no one in ' + b.group + ' met it' : agrTwo(Rdiv(sa, sb)) + '×';
+    var ratio = Rzero(sb) ? 'not defined: no one in ' + b.group + ' met it' : aktTimes(Rdiv(sa, sb));
     var am = a.met.n, an = a.n.n - a.met.n, bm = b.met.n, bn = b.n.n - b.met.n, odds;
     if (an === 0n) odds = 'not defined: everyone in ' + a.group + ' met it';
     else if (bm === 0n) odds = 'not defined: no one in ' + b.group + ' met it';
@@ -1929,7 +1932,7 @@ odds ratio: (7/3) / (2/3) = 3.5</div><p>Both ratios are exact. 1.75 and 3.5 desc
         + ' (' + aktPp(Rsub(sa, sb)) + '); the odds ratio, ' + odds + ', is a different figure and is not "times as likely".'),
       table: { caption: 'Each group: n, those meeting the outcome, the share and the odds',
         head: ['group', 'n', 'met', 'share', 'odds (met : not)'],
-        rows: rows.map(function (r) { var no = r.n.n - r.met.n; return [r.group, eaInt(r.n.n), eaInt(r.met.n), agrShare(r.met.n, r.n.n).replace(/^.* of \S+ /, ''), no === 0n ? 'no one missed it' : agrShow(R(r.met.n, no))]; }) }
+        rows: rows.map(function (r) { var no = r.n.n - r.met.n; return [r.group, eaInt(r.n.n), eaInt(r.met.n), eaPct(R(r.met.n, r.n.n)), no === 0n ? 'no one missed it' : agrShow(R(r.met.n, no))]; }) }
     };
   };
   var PRESETS = {"tests": {"rows": "developers-own, 40, 28; separate-qa, 50, 20", "first": "developers-own", "second": "separate-qa"}, "config": {"rows": "config-in-version-control, 60, 45; config-elsewhere, 40, 20", "first": "config-in-version-control", "second": "config-elsewhere"}};

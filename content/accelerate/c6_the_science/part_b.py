@@ -103,9 +103,9 @@ LESSONS = [
         "concepts": [
             ("Convergent and discriminant validity",
              "Two tests that the items of a construct measure one thing. "
-             "Convergent validity asks that items which are supposed to be "
-             "related are in fact related; discriminant validity asks that items "
-             "which are not supposed to be related are in fact unrelated. "
+             "Convergent validity asks whether items meant to go together do "
+             "correlate; discriminant validity asks whether items meant to be "
+             "separate fail to. "
              "Appendix C reads them with principal components, average variance "
              "extracted and a ceiling on cross-construct correlations."),
             ("Reliability (internal consistency)",
@@ -306,11 +306,11 @@ LESSONS = [
         "quiz": [
             {"q": "In Chapter 13, what does a discriminant validity test make sure "
                   "of?",
-             "a": ["That items which are not supposed to be related are unrelated",
-                   "That items which are supposed to be related are related",
+             "a": ["That items which are supposed to be related are related",
+                   "That items which are not supposed to be related are unrelated",
                    "That the people who answer read and interpret the items alike",
                    "That the findings hold in a sample of a different population"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter pairs discriminant and convergent validity. "
                     "Discriminant is the test that unrelated items are unrelated; "
                     "convergent is the test that related items are related. "
@@ -319,22 +319,22 @@ LESSONS = [
                     "which neither validity test answers."},
             {"q": "In the exercise, which item does the lab list, and with which "
                   "averages?",
-             "a": ["P3: 0.575 with its own construct, 0.625 with the other",
-                   "Q1: 0.6 with its own construct, 0.317 with the other",
+             "a": ["Q1: 0.6 with its own construct, 0.317 with the other",
                    "P3: 0.625 with its own construct, 0.575 with the other",
+                   "P3: 0.575 with its own construct, 0.625 with the other",
                    "No item: every item correlates more with its own construct"],
-             "c": 0,
+             "c": 2,
              "why": "P3 averages (0.60 + 0.55)/2 = 0.575 with P1 and P2 and "
                     "(0.60 + 0.65)/2 = 0.625 with Q1 and Q2, so its cross average "
                     "is the larger and it is listed. Q1 averages 0.600 with Q2 and "
                     "(0.15 + 0.20 + 0.60)/3 = 0.317 with P1, P2, P3, which is the "
-                    "ordinary pattern. The third option swaps the two figures, and "
-                    "the last ignores P3."},
+                    "ordinary pattern. P3 at 0.625 with its own construct swaps "
+                    "the two figures, and no item ignores P3."},
             {"q": "On the preset reassigned, the first construct has the items A1, "
                   "A2, A3 and B3. What is the average correlation among its own "
                   "items?",
-             "a": ["0.602", "0.68", "0.523", "0.3"],
-             "c": 0,
+             "a": ["0.68", "0.523", "0.3", "0.602"],
+             "c": 3,
              "why": "Four items give six pairs: 0.72, 0.68, 0.64, 0.55, 0.50 and "
                     "0.52, which sum to 3.61 and average 0.602. 0.68 is the "
                     "average of the three original items before the move, 0.523 is "
@@ -352,7 +352,7 @@ LESSONS = [
              "why": "The chapter says the pilot items loaded together but the "
                     "final tests did not confirm one construct and revealed two, "
                     "one for notifications from outside automated processes and "
-                    "one for notifications from systems. The authors kept both "
+                    "one for notifications from systems. The authors report both "
                     "and found the second predictive of software delivery "
                     "performance, so the construct was split rather than dropped."},
         ],
@@ -425,7 +425,7 @@ LESSONS = [
              "time stands in for a system's performance, as an item's answer "
              "stands in for part of a team's culture."),
             ("Cronbach's alpha",
-             "A figure from 0 up to 1 for how well a set of items measure "
+             "A figure of at most 1, and below 0 when items move against each other, for how well a set of items measure "
              "together, which Appendix C calls a measure of internal "
              "consistency, with an acceptable cutoff of 0.70. It is high when "
              "the items vary together and low when each varies on its own."),
@@ -461,8 +461,8 @@ LESSONS = [
             ("p", "The risk of a single measure is concrete. A change to the "
                   "code that collects a metric can alter that one measure, and "
                   "if it is the only one you have, the chance of noticing is "
-                  "low. With several, a change in one has a better chance of "
-                  "being detected. The authors add the same caution as before, "
+                  "low. With several, a shift in one stands out against the rest "
+                  "and is likelier to be caught. The authors add the same caution as before, "
                   "that measures which pass checks today should still be "
                   "checked from time to time, because they can change."),
             ("p", "How would you know the several measures agree? Chapter 13 "
@@ -528,8 +528,9 @@ LESSONS = [
                   "daily traffic would agree whether or not they measure strain. "
                   "It does not catch every failure either: if the fourth "
                   "collector froze at 4 from day 5 on, alpha in this sample "
-                  "would be 0.924, because a signal that does not vary adds "
-                  "nothing to the sum of variances. And eight days is a very "
+                  "would be 0.924, because the frozen readings sit in the middle of the "
+                  "others' range and its one low day, day 1, still agrees with them; "
+                  "a stuck signal that contradicts nothing does not pull alpha down. And eight days is a very "
                   "small sample."),
             ("h3", "Exercise"),
             ("ul", [
@@ -612,15 +613,15 @@ LESSONS = [
         "quiz_title": "Alpha, proxies and the 0.70 cutoff",
         "quiz": [
             {"q": "What does Appendix C say about Cronbach's alpha?",
-             "a": ["It measures internal consistency, has an acceptable cutoff of "
+             "a": ["It measures validity, with a cutoff of 0.85, and is biased in "
+                   "favour of small scales",
+                   "It measures internal consistency, has an acceptable cutoff of "
                    "0.70, and is biased against scales with few items, so "
                    "composite reliability was run too",
-                   "It measures validity, with a cutoff of 0.85, and is biased in "
-                   "favour of small scales",
                    "It measures how well the survey represents its population, "
                    "with a cutoff of 0.50",
                    "It is unbiased at any size, so no second figure is needed"],
-             "c": 0,
+             "c": 1,
              "why": "Appendix C calls alpha a measure of internal consistency, with "
                     "an acceptable cutoff of 0.70, and warns that it runs "
                     "unfairly low on scales with few items, so both alpha and composite "
@@ -630,12 +631,12 @@ LESSONS = [
                     "extracted."},
             {"q": "In the exercise, what is alpha for the three signals, and what "
                   "happens when signal 2 is left out?",
-             "a": ["171/250 = 0.684, which misses 0.70; without signal 2 it is "
-                   "76/83 ≈ 0.916",
-                   "0.684, which meets 0.70; without signal 2 it falls to 0.478",
+             "a": ["0.684, which meets 0.70; without signal 2 it falls to 0.478",
                    "0.916, which meets 0.70; without signal 2 it falls to 0.684",
-                   "0.684, which misses 0.70; without signal 2 it is 0.139"],
-             "c": 0,
+                   "171/250 = 0.684, which misses 0.70; without signal 2 it is "
+                   "76/83 ≈ 0.916",
+                   "0.684, which misses 0.70; without signal 2 it is 0.140"],
+             "c": 2,
              "why": "With n = 5 the signals' spreads are 5·142 − 26² = 34, "
                     "5·38 − 12² = 46 and 5·157 − 27² = 56, which sum to 136; the "
                     "daily totals 15, 11, 17, 14, 8 give 5·895 − 65² = 250. Alpha "
@@ -647,9 +648,9 @@ LESSONS = [
                     "two."},
             {"q": "On collector-changed, alpha is 0.610. Which signal's removal "
                   "brings it back above 0.70?",
-             "a": ["Signal 4, giving 0.923", "Signal 1, giving 0.245",
-                   "Signal 2, giving 0.448", "Signal 3, giving 0.320"],
-             "c": 0,
+             "a": ["Signal 1, giving 0.245", "Signal 2, giving 0.448",
+                   "Signal 3, giving 0.320", "Signal 4, giving 0.923"],
+             "c": 3,
              "why": "Removing signal 4 leaves the three untouched signals, whose "
                     "alpha is 927/1004 ≈ 0.923. Removing any of the others leaves "
                     "the changed signal in, and alpha falls, to 0.245, 0.448 or "
@@ -677,7 +678,7 @@ LESSONS = [
             ("Expecting alpha to raise the alarm for every broken signal",
              "A signal whose collector changed so that its readings jump about "
              "pulls alpha down, as the second preset shows. One that freezes "
-             "does not: in this sample alpha stays at 0.924. Alpha is one test "
+             "does not: in this sample alpha is 0.924, slightly higher. Alpha is one test "
              "among several, and the chapter's advice to check the measures "
              "periodically stands."),
             ("Judging a short scale by alpha alone",

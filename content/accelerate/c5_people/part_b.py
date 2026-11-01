@@ -149,7 +149,7 @@ LESSONS = [
             ("p", "Measuring needs a model. The authors adopted five dimensions "
                   "from Rafferty and Griffin (2004). Vision is knowing where the organization is heading and where it ought to stand in five years. Inspirational communication speaks in a way that lifts people, including when the ground is shifting. Intellectual stimulation pushes people to look at problems afresh. Supportive leadership shows regard for people&rsquo;s personal needs and feelings. Personal recognition means praising achievement and better quality of work, in person. They contrast the model with servant leadership, which "
                   "focuses on followers&rsquo; development and performance; "
-                  "transformational leadership aims to bring followers to identify with the organization and to work for its objectives. "
+                  "transformational leaders aim at followers&rsquo; commitment to the organization&rsquo;s goals. "
                   "They chose it because, in other settings, it predicts "
                   "performance outcomes better."),
             ("p", "The measure itself is a set of questions, adapted from "
@@ -189,7 +189,7 @@ LESSONS = [
                   "Over the six reports, the vision answers add to 73 over 12, a "
                   "mean of 6.083; communication 64 over 12, 5.333; stimulation "
                   "57 over 12, 4.75; support 67 over 12, 5.583; recognition 36 "
-                  "over 12, 3.00. The lowest dimension is personal recognition."),
+                  "over 12, 3. The lowest dimension is personal recognition."),
             ("p", "In <code>later</code> the same six reports answer a while "
                   "afterwards, and only the two recognition items have changed: "
                   "their answers now add to 49 over 12, a mean of 4.083. "
@@ -273,10 +273,10 @@ LESSONS = [
                 "Communication: 11 + 12 + 9 + 11 + 9 + 12 = 64; 64/12 = 5.333",
                 "Stimulation: 9 + 10 + 8 + 11 + 9 + 10 = 57; 57/12 = 4.75",
                 "Support: 11 + 11 + 12 + 10 + 12 + 11 = 67; 67/12 = 5.583",
-                "Recognition: 6 + 5 + 7 + 7 + 4 + 7 = 36; 36/12 = 3.00",
+                "Recognition: 6 + 5 + 7 + 7 + 4 + 7 = 36; 36/12 = 3",
             ],
             "after": [
-                "The lowest is recognition at 3.00, and the highest vision at 6.083, "
+                "The lowest is recognition at 3, and the highest vision at 6.083, "
                 "a gap of 3.083. The lab prints each of these, and the same sums "
                 "for each report.",
             ],
@@ -285,11 +285,11 @@ LESSONS = [
         "quiz": [
             {"q": "For the exercise leader, which dimension has the lowest mean, "
                   "and what is it?",
-             "a": ["Intellectual stimulation, 4.00",
-                   "Personal recognition, 4.25",
+             "a": ["Personal recognition, 4.25",
+                   "Intellectual stimulation, 4.00",
                    "Intellectual stimulation, 48",
                    "Supportive leadership, 5.25"],
-             "c": 0,
+             "c": 1,
              "why": "Dividing each total by 12 gives vision 5.5, communication 5.0, "
                     "stimulation 4.0, support 5.25 and recognition 4.25. The "
                     "lowest is intellectual stimulation, 4.00. Personal recognition "
@@ -297,27 +297,27 @@ LESSONS = [
             {"q": "According to Chapter 11, how likely were teams whose reported "
                   "leadership was in the bottom third to be high performers?",
              "a": ["Twice as likely",
-                   "Half as likely",
                    "Exactly as likely",
+                   "Half as likely",
                    "One third as likely"],
-             "c": 1,
+             "c": 2,
              "why": "The chapter says teams whose leadership ratings fall in the bottom third have half the chance of being high performers. It reports the top 10 percent separately."},
             {"q": "What did the chapter find for teams with the top 10 percent of "
                   "reported transformational leadership?",
              "a": ["They were more than twice as likely to be high performers",
-                   "They were equally or even less likely to be high performers than the whole population",
                    "They were always high performers",
-                   "They could not be compared, because there were too few"],
-             "c": 1,
+                   "They could not be compared, because there were too few",
+                   "They were no more likely, and possibly less likely, to be high performers than teams overall"],
+             "c": 3,
              "why": "The authors report that the teams with the strongest leaders "
                     "were no more likely, and possibly less, to be high performers than teams in the survey as a whole, and conclude that leaders alone cannot achieve high outcomes."},
             {"q": "Which of these is NOT one of the five dimensions in the model "
                   "the authors used?",
-             "a": ["Vision",
+             "a": ["Technical authority",
+                   "Vision",
                    "Intellectual stimulation",
-                   "Personal recognition",
-                   "Technical authority"],
-             "c": 3,
+                   "Personal recognition"],
+             "c": 0,
              "why": "The five are vision, inspirational communication, "
                     "intellectual stimulation, supportive leadership and personal "
                     "recognition. Technical authority is not among them."},
@@ -331,7 +331,7 @@ LESSONS = [
              "report to you; leadership is about inspiring and motivating those "
              "around you."),
             ("Treating the lowest dimension as a verdict on the leader",
-             "On the lab&rsquo;s ratings recognition is lowest at 3.00, and "
+             "On the lab&rsquo;s ratings recognition is lowest at 3, and "
              "that is six invented reports&rsquo; perception of one invented "
              "leader. It is a question to ask them, and the lab never grades a "
              "leader."),
@@ -478,7 +478,7 @@ LESSONS = [
                   "are 16, of which 4 did. Both groups with obstacles removed "
                   "met the goal at 75 percent, whether or not they had a budget, "
                   "and both without at 25 percent. Within each level of the third "
-                  "factor the ratio is 1.00. The 1.86 came from the budget teams "
+                  "factor the ratio is 1. The 1.86 came from the budget teams "
                   "being mostly the teams whose managers remove obstacles."),
             ("p", "That is a pattern that invented data can show; it is not a "
                   "claim about real teams, and the chapter does not say that "
@@ -524,9 +524,9 @@ LESSONS = [
                  "rows": BUDGET_SPLIT, "first": "Budget-cleared", "second": "No-budget-cleared",
                  "expect": {
                     "agrShares": "Budget-cleared 12 of 16 = 75%; Budget-not-cleared 1 of 4 = 25%; No-budget-cleared 3 of 4 = 75%; No-budget-not-cleared 4 of 16 = 25%",
-                    "agrRatio": "1×",
+                    "agrRatio": "1.00×",
                     "agrDiff": "0 points",
-                    "agrOdds": "1",
+                    "agrOdds": "1.00",
                  }},
             ],
             "panel_title": "How many times as likely, and why that is not an effect",
@@ -568,46 +568,46 @@ LESSONS = [
             "after": [
                 "Only the ratio of shares answers &lsquo;how many times as "
                 "likely&rsquo;. In <code>by-obstacles</code> the four shares are "
-                "75, 25, 75 and 25 percent, and each within-level ratio is 1.00.",
+                "75, 25, 75 and 25 percent, and each within-level ratio is 1.",
             ],
         },
         "quiz_title": "A ratio of shares, and the chapter's advice",
         "quiz": [
             {"q": "For the exercise, how many times as likely to meet the goal "
                   "were the teams whose metrics are visible?",
-             "a": ["3.00",
-                   "6.00",
+             "a": ["6",
+                   "3",
                    "40",
                    "0.33"],
-             "c": 0,
+             "c": 1,
              "why": "Nine of 15 is 60 percent and three of 15 is 20 percent, so "
-                    "the ratio is 3.00. 6.00 is the ratio of odds, 9/6 over 3/12. "
+                    "the ratio is 3. 6 is the ratio of odds, 9/6 over 3/12. "
                     "40 is the gap in percentage points, and 0.33 is the ratio "
                     "the wrong way round."},
             {"q": "In <code>by-obstacles</code>, what is the ratio of budget teams "
                   "to no-budget teams within the teams whose managers remove "
                   "obstacles?",
              "a": ["1.86, as in the whole sample",
-                   "3.00",
-                   "1.00",
+                   "3",
+                   "1",
                    "0.25"],
              "c": 2,
              "why": "Twelve of 16 and three of 4 are both 75 percent, so the ratio "
-                    "is 1.00. The 1.86 is the ratio over all forty, and it came "
+                    "is 1. The 1.86 is the ratio over all forty, and it came "
                     "from the budget teams being mostly those with obstacles "
                     "removed."},
             {"q": "Under which three headings does Chapter 11 gather its tips for a strong team culture?",
-             "a": ["Cross-functional collaboration, a climate for learning and tools",
-                   "Team size, a training budget and monitoring",
+             "a": ["Team size, a training budget and monitoring",
                    "Trust, a vision and a release schedule",
-                   "Hack days, game days and conferences"],
-             "c": 0,
+                   "Hack days, game days and conferences",
+                   "Cross-functional collaboration, a climate for learning and tools"],
+             "c": 3,
              "why": "The tips are grouped under collaboration across functions, a climate for learning and tools. Hack days, "
                     "game days and conferences are examples under them, and a "
                     "training budget belongs under learning."},
             {"q": "How does the chapter describe the relationship between "
                   "investment in DevOps and software delivery performance?",
-             "a": ["Investment in DevOps is highly correlated with software delivery performance",
+             "a": ["The two are highly correlated",
                    "Investment in DevOps has been shown to cause higher delivery performance",
                    "Investment in DevOps has no relation to delivery performance, only to culture",
                    "Investment in DevOps predicts only burnout"],
@@ -618,7 +618,7 @@ LESSONS = [
         "mistakes": [
             ("Reading '1.86 times as likely' as the effect of the budget",
              "The ratio describes the forty teams in front of you. On the lab&rsquo;s "
-             "split it falls to 1.00 within each level of a third factor, so a "
+             "split it falls to 1 within each level of a third factor, so a "
              "ratio between groups cannot be read as what the budget does."),
             ("Funding training and leaving no time to use it",
              "The chapter pairs the training budget with latitude to choose the "

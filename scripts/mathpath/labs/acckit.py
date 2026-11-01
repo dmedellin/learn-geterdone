@@ -158,9 +158,15 @@ AKT_CORE_JS = r"""
   /* A difference of two shares in signed percentage points, one place. */
   function aktPp(r) {
     var p = Rmul(r, R(100n)), sign = p.n > 0n ? '+' : '';
-    if (Rint(p)) return sign + eaInt(p.n) + ' points';
+    if (Rint(p)) return sign + eaInt(p.n) + (p.n === 1n || p.n === -1n ? ' point' : ' points');
     return (eaExactAt(p, 1) ? '' : '≈ ') + sign + eaFixed(p, 1) + ' points';
   }
+  /* A figure and its unit, the unit singular when the figure is exactly 1 ("1 day", "3/2 = 1.50 days"). */
+  function aktUnit(r, word) { return eaNum(r) + ' ' + (Requ(Rabs(r), R1) ? word.replace(/s$/, '') : word); }
+  /* Two places always: "2.00", "1.50", "≈ 3.14" (≈ when two places are not exact). */
+  function aktTwo(r) { return (eaExactAt(r, 2) ? '' : '≈ ') + eaFixed(r, 2); }
+  /* A ratio "times": "2.00×", "≈ 3.14×". */
+  function aktTimes(r) { return aktTwo(r) + '×'; }
   /* --- acckit's field kinds (kit-contract.md section 4) ------------------- */
   function aktBound(r, f, what, s) {
     if (f.gt !== undefined && Rcmp(r, Rparse(f.gt)) <= 0) throw new Error(what + ' must be more than ' + eaNum(Rparse(f.gt)) + ', and it is ' + s);
@@ -355,12 +361,35 @@ def median(values):
     return s[(n - 1) // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
 
 
+def _fixed(fr, places):
+    """eaFixed: exactly `places` decimals, half away from zero, grouped."""
+    fr = Fraction(fr)
+    q = (abs(fr.numerator) * 10 ** places * 2 // fr.denominator + 1) // 2
+    t = str(q).rjust(places + 1, "0")
+    whole = "{:,}".format(int(t[:len(t) - places]))
+    return (MINUS if fr < 0 and q else "") + whole + ("." + t[len(t) - places:] if places else "")
+
+
+def num_text(fr):
+    """eaNum, for figures below 30 digits: "4", "3/2 = 1.50", "2/7 ≈ 0.29"."""
+    fr = Fraction(fr)
+    if fr.denominator == 1:
+        return ea.grp(fr.numerator)
+    exact = (fr * 100).denominator == 1
+    return "%s/%s%s%s" % (ea.grp(fr.numerator), ea.grp(fr.denominator), " = " if exact else " ≈ ", _fixed(fr, 2))
+
+
+def unit_text(fr, word):
+    """aktUnit: the figure and its unit, singular when the figure is exactly 1 or −1."""
+    return num_text(fr) + " " + (word[:-1] if abs(Fraction(fr)) == 1 and word.endswith("s") else word)
+
+
 def pp_text(fr):
     """aktPp: signed percentage points, one place."""
     p = Fraction(fr) * 100
     sign = "+" if p > 0 else ""
     if p.denominator == 1:
-        return sign + ea.grp(p.numerator) + " points"
+        return sign + ea.grp(p.numerator) + (" point" if abs(p.numerator) == 1 else " points")
     exact = (p * 10).denominator == 1
     q = (abs(p.numerator) * 10 * 2 // p.denominator + 1) // 2
     t = "%s%d.%d" % (MINUS if p < 0 and q else "", q // 10, q % 10)
@@ -924,26 +953,26 @@ AFL_VIEW_JS = {}
 
 AFL_VIEW_JS["utilization"] = r"""
   AFL_VIEW.utilization = function (inst) {
-    var unit = ' ' + inst.unit, rows = [], mult = [], leads = [], hi = null, lo = null;
+    var unit = inst.unit, rows = [], mult = [], leads = [], hi = null, lo = null;
     inst.levels.forEach(function (l, i) {
       if (Rcmp(l, R(100n)) >= 0) eaRefuse('Utilization levels, entry ' + (i + 1) + ' is 100%: there u/(1 − u) divides by zero, because work arrives as fast as it can be done, so in this model the queue and the wait grow without bound and no lead time exists');
     });
     inst.levels.forEach(function (l) {
       var u = Rdiv(l, R(100n)), idle = Rsub(R1, u), q = Rdiv(u, idle), lead = Rdiv(inst.service, idle);
       mult.push(aflPct(l) + ': ' + eaNum(q));
-      leads.push(aflPct(l) + ': ' + eaNum(lead) + unit);
-      rows.push([aflPct(l), eaNum(q), eaNum(lead) + unit, eaTimes(Rinv(idle))]);
+      leads.push(aflPct(l) + ': ' + aktUnit(lead, unit));
+      rows.push([aflPct(l), eaNum(q), aktUnit(lead, unit), aktTimes(Rinv(idle))]);
       if (hi === null || Rcmp(l, hi.l) > 0) hi = { l: l, lead: lead, x: Rinv(idle) };
       if (lo === null || Rcmp(l, lo.l) < 0) lo = { l: l, lead: lead };
     });
     return {
       tiles: {
         aflLevels: eaCount(inst.levels.map(aflPct)), aflMultiples: mult.join('; '), aflLeads: leads.join('; '),
-        aflHigh: aflPct(hi.l) + ': ' + eaTimes(hi.x) + ' the service time',
-        aflRatio: Requ(hi.l, lo.l) ? 'one level only' : eaTimes(Rdiv(hi.lead, lo.lead)) + ' (' + aflPct(lo.l) + ' to ' + aflPct(hi.l) + ')'
+        aflHigh: aflPct(hi.l) + ': ' + aktTimes(hi.x) + ' the service time',
+        aflRatio: Requ(hi.l, lo.l) ? 'one level only' : aktTimes(Rdiv(hi.lead, lo.lead)) + ' (' + aflPct(lo.l) + ' to ' + aflPct(hi.l) + ')'
       },
-      status: aktStatus('With a service time of ' + eaNum(inst.service) + unit + ', the lead time at ' + aflPct(hi.l)
-        + ' utilization is ' + eaNum(hi.lead) + unit + ', ' + eaTimes(hi.x) + ' the service time, in the simple queueing model'),
+      status: aktStatus('With a service time of ' + aktUnit(inst.service, unit) + ', the lead time at ' + aflPct(hi.l)
+        + ' utilization is ' + aktUnit(hi.lead, unit) + ', ' + aktTimes(hi.x) + ' the service time, in the simple queueing model'),
       table: { caption: 'Each utilization level: the queueing multiple u/(1 − u) and the lead time service/(1 − u)',
                head: ['utilization', 'u/(1 − u)', 'lead time', 'lead ÷ service'], rows: rows }
     };
@@ -967,13 +996,13 @@ AFL_VIEW_JS["batch"] = r"""
     return out;
   }
   AFL_VIEW.batch = function (inst) {
-    var work = inst.work.n, u = ' ' + inst.unit;
+    var work = inst.work.n, u = inst.unit;
     inst.batch.forEach(function (b, i) {
-      if (b.n > work) eaRefuse('Batch sizes, entry ' + (i + 1) + ' is ' + eaInt(b.n) + ', more than the work (' + eaInt(work) + ' items)');
+      if (b.n > work) eaRefuse('Batch sizes, entry ' + (i + 1) + ' is ' + eaInt(b.n) + ', more than the work (' + eaPlural(work, 'item', 'items') + ')');
     });
     var runs = inst.batch.map(function (b) { return aflRun(work, b.n, inst.per_item, inst.release_cost); });
     var two = runs.length === 2, both = function (f) { return runs.map(f).join(' → '); };
-    var tm = function (r) { return eaNum(r) + u; };
+    var tm = function (r) { return aktUnit(r, u); };
     var rows = [], most = runs.reduce(function (m, r) { return r.rel.length > m ? r.rel.length : m; }, 0), i;
     for (i = 0; i < Math.min(most, 40); i += 1) {
       var row = [String(i + 1)];
@@ -989,11 +1018,11 @@ AFL_VIEW_JS["batch"] = r"""
         aflLast: both(function (r) { return tm(r.last); }),
         aflWait: both(function (r) { return tm(r.wait); }),
         aflOverhead: both(function (r) { return tm(r.over); }),
-        aflRatio: two ? eaTimes(Rdiv(runs[0].first, runs[1].first)) : 'one batch size only'
+        aflRatio: two ? aktTimes(Rdiv(runs[0].first, runs[1].first)) : 'one batch size only'
       },
-      status: aktStatus(eaPlural(work, 'item', 'items') + ' at ' + eaNum(inst.per_item) + u + ' each, '
-        + eaNum(inst.release_cost) + u + ' per release: the first feedback comes at ' + both(function (r) { return tm(r.first); })
-        + (two ? ' as the batch goes from ' + eaInt(inst.batch[0].n) + ' to ' + eaInt(inst.batch[1].n) + ' items' : '')),
+      status: aktStatus(eaPlural(work, 'item', 'items') + ' at ' + tm(inst.per_item) + ' each, '
+        + tm(inst.release_cost) + ' per release: the first feedback comes at ' + both(function (r) { return tm(r.first); })
+        + (two ? ' as the batch goes from ' + eaInt(inst.batch[0].n) + ' to ' + eaPlural(inst.batch[1].n, 'item', 'items') : '')),
       table: { caption: 'Each batch, when it is released' + (most > 40 ? ' (the first 40 of ' + most + ')' : ''), head: head, rows: rows }
     };
   };
@@ -1023,8 +1052,8 @@ AFL_VIEW_JS["wip"] = r"""
       });
       var L = Rdiv(inProc, end), lw = Rdiv(leadSum, end);
       thru = R(BigInt(done), D.n);
-      tiles.aflAvgWip = eaNum(L) + ' items';
-      tiles.aflAvgLead = done ? eaNum(Rdiv(leadSum, R(BigInt(done)))) + ' days' : 'no item done';
+      tiles.aflAvgWip = aktUnit(L, 'items');
+      tiles.aflAvgLead = done ? aktUnit(Rdiv(leadSum, R(BigInt(done))), 'days') : 'no item done';
       tiles.aflLittle = done === 0 ? 'no item done, so no lead time to check' : (Requ(L, lw)
         ? 'holds: average WIP ' + eaNum(L) + ' = throughput × average lead time'
         : 'differs: average WIP ' + eaNum(L) + ', throughput × average lead time ' + eaNum(lw) + ', because '
@@ -1033,14 +1062,14 @@ AFL_VIEW_JS["wip"] = r"""
     } else {
       thru = inst.throughput;
       tiles.aflAvgWip = 'no board log'; tiles.aflAvgLead = 'no board log'; tiles.aflLittle = 'no board log';
-      say = 'At a throughput of ' + eaNum(thru) + ' items a day';
+      say = 'At a throughput of ' + aktUnit(thru, 'items') + ' a day';
     }
-    tiles.aflThru = eaNum(thru) + ' items a day';
+    tiles.aflThru = aktUnit(thru, 'items') + ' a day';
     if (inst.wip.length && thru.n === 0n) eaRefuse('No item is done in the window, so the throughput is 0 and Little’s law gives no lead time for a work in process');
     var leads = inst.wip.map(function (w) { return Rdiv(w, thru); });
-    tiles.aflLeadAt = inst.wip.length ? inst.wip.map(function (w, i) { return 'WIP ' + aktDec(w) + ': ' + eaNum(leads[i]) + ' days'; }).join('; ') : 'no work in process given';
-    tiles.aflChange = inst.wip.length === 2 ? eaTimes(Rdiv(leads[1], leads[0])) + ' the lead time (' + eaNum(leads[0]) + ' → ' + eaNum(leads[1]) + ' days)' : 'one value only';
-    if (inst.wip.length) say += '; lead time = WIP / throughput is ' + leads.map(function (l) { return eaNum(l); }).join(' → ') + ' days';
+    tiles.aflLeadAt = inst.wip.length ? inst.wip.map(function (w, i) { return 'WIP ' + aktDec(w) + ': ' + aktUnit(leads[i], 'days'); }).join('; ') : 'no work in process given';
+    tiles.aflChange = inst.wip.length === 2 ? aktTimes(Rdiv(leads[1], leads[0])) + ' the lead time (' + eaNum(leads[0]) + ' → ' + aktUnit(leads[1], 'days') + ')' : 'one value only';
+    if (inst.wip.length) say += '; lead time = WIP / throughput is ' + leads.map(function (l) { return eaNum(l); }).join(' → ') + (leads.length === 1 && Requ(leads[0], R1) ? ' day' : ' days');
     if (!log.length) rows = inst.wip.map(function (w, i) { return [aktDec(w), eaNum(thru), eaNum(leads[i])]; });
     return {
       tiles: tiles, status: aktStatus(say),
@@ -1342,7 +1371,7 @@ ARL_VIEW_JS["independent"] = r"""
         if (ts.length > 1) coord.push(ts.join(' + ') + ' for ' + show(g));
       });
       return { groups: aktListed(groups.length, groups.map(show)), big: eaInt(big.length) + ': ' + big.join(', '), alone: eaCount(alone),
-               coord: withTeam ? aktListed(coord.length, coord, '; ') : 'no team column given', n: groups.length };
+               coord: !withTeam ? 'no teams given' : (coord.length === 0 ? 'none: every release group belongs to one team' : eaInt(coord.length) + (coord.length === 1 ? ' group spans' : ' groups span') + ' more than one team: ' + coord.join('; ')), n: groups.length };
     };
     var g0 = arlGroupsOf(names, inst.ties), s0 = sum(g0), s1 = null, change = 'no tie removed';
     if (rm) {
@@ -1600,7 +1629,7 @@ AWK_VIEW_JS["split"] = r"""
       freed = Rsub(h[sc.kind], after[sc.kind]);
       if (move) {
         after[nw] = Radd(after[nw], freed);
-        if (Rsign(after[nw]) < 0) eaRefuse('Scaling ' + sc.kind + ' by ' + aktDec(sc.factor) + ' adds ' + eaNum(Rneg(freed)) + ' hours, more than the new work’s ' + eaNum(h[nw]) + ' hours');
+        if (Rsign(after[nw]) < 0) eaRefuse('Scaling ' + sc.kind + ' by ' + aktDec(sc.factor) + ' adds ' + aktUnit(Rneg(freed), 'hours') + ', more than the new work’s ' + aktUnit(h[nw], 'hours'));
       }
     }
     var total2 = move ? total : Rsub(total, freed);
@@ -1613,13 +1642,13 @@ AWK_VIEW_JS["split"] = r"""
     return {
       tiles: {
         awkStages: stages.length ? stages.map(function (x) { return x + ' ' + eaNum(st[x]); }).join('; ') : 'no stages given',
-        awkTotal: eaNum(total) + ' hours', awkHours: list(function (k) { return eaNum(h[k]); }),
+        awkTotal: aktUnit(total, 'hours'), awkHours: list(function (k) { return eaNum(h[k]); }),
         awkShares: list(function (k) { return eaPct(share(h[k], total)); }), awkNew: eaPct(share(h[nw], total)),
-        awkFreed: sc ? eaNum(freed) + ' hours (' + sc.kind + ' ' + eaNum(h[sc.kind]) + ' → ' + eaNum(after[sc.kind]) + ')' + (move ? ', to ' + nw : ', total ' + eaNum(total2)) : none,
+        awkFreed: sc ? aktUnit(freed, 'hours') + ' (' + sc.kind + ' ' + eaNum(h[sc.kind]) + ' → ' + eaNum(after[sc.kind]) + ')' + (move ? ', to ' + nw : ', total ' + eaNum(total2)) : none,
         awkAfter: sc ? list(function (k) { return eaPct(share(after[k], total2)); }) : none,
         awkNewAfter: sc ? eaPct(share(after[nw], total2)) : none
       },
-      status: aktStatus(eaNum(total) + ' hours, ' + eaPct(share(h[nw], total)) + ' of them ' + nw
+      status: aktStatus(aktUnit(total, 'hours') + ', ' + eaPct(share(h[nw], total)) + ' of them ' + nw
         + (sc ? '; with ' + sc.kind + ' × ' + aktDec(sc.factor) + ', ' + nw + ' is ' + eaPct(share(after[nw], total2)) : '')),
       table: { caption: 'Hours and share by kind of work' + (sc ? ', before and after the scaling' : ''),
                head: ['kind', 'hours', 'share'].concat(sc ? ['hours after', 'share after'] : []), rows: rows }
@@ -1647,8 +1676,8 @@ def _check_split(inst, fixed):
                              "to go to new work to no")
         freed = h[sc["kind"]] - h[sc["kind"]] * sc["factor"]
         if move and h[nw] + freed < 0:
-            raise ValueError("Scaling %s by %s adds %s hours, more than the new work’s %s hours"
-                             % (sc["kind"], dec_text(sc["factor"]), ea.ftext(-freed), ea.ftext(h[nw])))
+            raise ValueError("Scaling %s by %s adds %s, more than the new work’s %s"
+                             % (sc["kind"], dec_text(sc["factor"]), unit_text(-freed, "hours"), unit_text(h[nw], "hours")))
 
 
 WORK = {

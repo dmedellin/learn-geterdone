@@ -52,7 +52,8 @@ LESSONS = [
     # 99-102): deploys per developer per day (pp. 100-101, Figure 5.1 in
     # prose), the three trends (p. 101).
     # Quote: PDF p. 98 of the operator's copy, 19 words (Conway 1968, as
-    # the authors quote him), quotes.py OK.
+    # the authors quote him), quotes.py LOOSE only for the ellipsis the
+    # authors themselves print.
     # Lesson total: 19 words.
     {
         "slug": "loosely-coupled-architecture-enables-scaling",
@@ -103,10 +104,11 @@ LESSONS = [
             "argument and then works the one measure the chapter uses."
         ),
         "body": [
-            ("p", "&ldquo;Organizations which design systems . . . are "
+            ("p", "Melvin Conway wrote in 1968 that &ldquo;organizations which "
+                  "design systems . . . are "
                   "constrained to produce designs which are copies of the "
-                  "communication structures of these organizations.&rdquo; "
-                  "That is Melvin Conway, in 1968, as Forsgren, Humble and Kim "
+                  "communication structures of these organizations,&rdquo; as "
+                  "Forsgren, Humble and Kim "
                   "quote him in Chapter 5, and it is the bridge in their "
                   "argument from architecture to organization. They ask what "
                   "sort of architecture a team needs in order to deliver without "
@@ -274,8 +276,8 @@ LESSONS = [
             {"q": "In the preset <code>rising</code>, how many deploys per "
                   "developer per day does the medium organization (20 developers, "
                   "190 deploys, 20 days) make?",
-             "a": ["0.475", "9.5", "0.95", "4.75"],
-             "c": 0,
+             "a": ["9.5", "0.95", "4.75", "0.475"],
+             "c": 3,
              "why": "190 over 20 developers over 20 days is 190/400, which is 0.475. "
                     "9.5 divides by 20 once (deploys per day for the whole "
                     "organization, or per developer for the whole period); 0.95 "
@@ -290,22 +292,22 @@ LESSONS = [
             {"q": "In Figure 5.1's trends, how do the authors say medium "
                   "performers' deploys per developer change as the number of "
                   "developers rises?",
-             "a": ["They stay at a constant frequency",
-                   "They decrease",
+             "a": ["They decrease",
+                   "They stay at a constant frequency",
                    "They increase significantly",
                    "The authors give no trend for them"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter gives all three: low performers decreasing, "
                     "medium performers constant, high performers significantly "
-                    "increasing. The second option is the low performers' trend "
-                    "and the third the high performers'."},
+                    "increasing. Decreasing is the low performers' trend and "
+                    "increasing significantly the high performers'."},
             {"q": "What does the chapter say the inverse Conway maneuver advises?",
-             "a": ["Evolving the team and organizational structure to achieve "
-                   "the desired architecture",
-                   "Redesigning the architecture to copy the current org chart",
+             "a": ["Redesigning the architecture to copy the current org chart",
                    "Keeping teams from communicating with one another",
+                   "Changing how teams and the organization are structured so "
+                   "as to get the architecture wanted",
                    "Merging all teams into one so that the system is one"],
-             "c": 0,
+             "c": 2,
              "why": "Conway's law describes the structure shaping the design; the "
                     "inverse maneuver uses that on purpose, changing the structure "
                     "to get the design wanted. The chapter says loose coupling "
@@ -349,7 +351,8 @@ LESSONS = [
     # Allow Teams to Choose Their Own Tools (PDF pp. 102-103 of the
     # operator's copy); Architects Should Focus on Engineers and Outcomes,
     # Not Tools or Technologies (pp. 103-104).
-    # Quote: PDF p. 104 of the operator's copy, 18 words, quotes.py OK.
+    # Quote: PDF p. 104 of the operator's copy, 18 words, quotes.py LOOSE only for the comma the book prints after
+    # "them", where the quotation stops.
     # Lesson total: 18 words.
     {
         "slug": "tools-and-architects",
@@ -389,9 +392,10 @@ LESSONS = [
              "for it, around the architecture and configuration of "
              "infrastructure."),
             ("Teams that must coordinate",
-             "The teams that own the components of the largest release group. "
-             "The lab lists them when each component has a team. Fewer means "
-             "fewer people who must agree before anything ships."),
+             "The teams that own the components of a release group spanning more "
+             "than one team. The lab's tile counts such groups and names each "
+             "group's teams; a group owned by one team is not listed. Fewer "
+             "means fewer people who must agree before anything ships."),
         ],
         "read_title": "The chapter's argument, then the count",
         "read_intro": (
@@ -401,9 +405,9 @@ LESSONS = [
             "counts the teams a tie draws together."),
         "body": [
             ("p", "&ldquo;What tools or technologies you use is irrelevant if the "
-                  "people who must use them hate using them.&rdquo; That is "
-                  "Forsgren, Humble and Kim in the last section of Chapter 5, and "
-                  "it comes at the end of a short argument about who should "
+                  "people who must use them hate using them&rdquo;, the authors write in the last section of "
+                  "Chapter 5, going on to say that the tools must also achieve the "
+                  "outcomes wanted. It comes at the end of a short argument about who should "
                   "choose. In many organizations engineers must use an approved "
                   "list of tools and frameworks. The authors give the usual "
                   "reasons fairly: a simpler environment, the skills to "
@@ -458,10 +462,13 @@ LESSONS = [
                   "<code>lockstep</code> those six ties make one group of 7: all "
                   "seven services, no component deployable alone, and 4 teams "
                   "that must coordinate every release."),
-            ("p", "Remove one tie, the one between signup and reports, and the "
-                  "group splits in two. The largest has 4 services and spans 2 "
-                  "teams. The lab shows the same figures after the removal on "
-                  "the same preset. In the preset <code>pinned</code> the "
+            ("p", "Suppose signup and reports could take the new library version at "
+                  "different times, say through a compatibility shim, and remove "
+                  "that one tie. The group splits in two. The larger has 4 "
+                  "services owned by payments and growth, the other 3 services "
+                  "owned by data and platform. The lab's after tile reads 2: two "
+                  "groups that still need two teams each, so all four teams still "
+                  "coordinate, but in pairs. In the preset <code>pinned</code> the "
                   "shared library is pinned by version, so each service upgrades "
                   "when its own team chooses and those three ties vanish. "
                   "There are 4 groups, the largest has 2, 1 component (the "
@@ -506,8 +513,8 @@ LESSONS = [
                      "arlGroups": "1: {billing, invoices, signup, referrals, reports, export, gateway}",
                      "arlLargest": "7: billing, invoices, signup, referrals, reports, export, gateway",
                      "arlAlone": "0: none",
-                     "arlCoord": "1: payments + growth + data + platform for {billing, invoices, signup, referrals, reports, export, gateway}",
-                     "arlAfterCoord": "2: payments + growth for {billing, invoices, signup, referrals}; data + platform for {reports, export, gateway}"
+                     "arlCoord": "1 group spans more than one team: payments + growth + data + platform for {billing, invoices, signup, referrals, reports, export, gateway}",
+                     "arlAfterCoord": "2 groups span more than one team: payments + growth for {billing, invoices, signup, referrals}; data + platform for {reports, export, gateway}"
                  }},
                 {"id": "pinned",
                  "label": "The same services, with the library pinned by version",
@@ -518,7 +525,7 @@ LESSONS = [
                      "arlGroups": "4: {billing, invoices}, {signup, referrals}, {reports, export}, {gateway}",
                      "arlLargest": "2: billing, invoices",
                      "arlAlone": "1: gateway",
-                     "arlCoord": "0: none"
+                     "arlCoord": "none: every release group belongs to one team"
                  }},
             ],
             "panel_title": "Which teams must coordinate a release",
@@ -558,21 +565,22 @@ LESSONS = [
                 "reports, export, gateway: 3 services, 2 teams",
             ],
             "after": [
-                "After the split the largest group has 4 services and 2 teams, "
-                "so the lab reports 2 teams. The other group has 3 services and "
-                "2 teams of its own: the removal helped both.",
+                "After the split the larger group has 4 services and 2 teams, and "
+                "the lab's after tile reads 2 because two groups still span "
+                "two teams each; the teams it names are four. Each group needs "
+                "fewer people to agree than before.",
             ],
         },
         "quiz_title": "Tools, ties and architects",
         "quiz": [
             {"q": "In the preset <code>lockstep</code>, how many teams must "
                   "coordinate every release?",
-             "a": ["4", "2", "6", "7"],
-             "c": 0,
+             "a": ["2", "6", "7", "4"],
+             "c": 3,
              "why": "All seven services are in one group, and they are owned by "
                     "payments, growth, data and platform: four teams. Seven is "
                     "the number of services and six the number of ties; two is the "
-                    "figure after the signup-reports tie is removed."},
+                    "number of teams in each group after the signup-reports tie is removed."},
             {"q": "On <code>lockstep</code>, once the tie between signup and "
                   "reports is removed, how many services are in the largest group?",
              "a": ["4", "3", "6", "7"],
@@ -583,26 +591,26 @@ LESSONS = [
                     "is the smaller group."},
             {"q": "According to the chapter, what is the effect when teams choose "
                   "their own tools?",
-             "a": ["It contributes to software delivery performance, and through "
-                   "it to organizational performance",
-                   "It lowers performance until a standard is chosen",
+             "a": ["It lowers performance until a standard is chosen",
+                   "It contributes to software delivery performance, and so "
+                   "to organizational performance",
                    "It makes no difference to delivery, but raises morale",
                    "It matters only for security tooling"],
-             "c": 0,
+             "c": 1,
              "why": "The authors report a contribution to software delivery "
-                    "performance and, in turn, to organizational performance. "
+                    "performance and, so, to the organization's. "
                     "They also keep a place for standardization around "
                     "infrastructure, and say preapproved security tools get "
                     "used when they make engineers' lives easier."},
             {"q": "What does the chapter call the wrong questions for "
                   "architects to focus on?",
-             "a": ["Which tools, languages, frameworks or architectural styles "
-                   "the organization should adopt",
-                   "Whether teams can change their products without depending on "
+             "a": ["Whether teams can change their products without depending on "
                    "other teams",
                    "How closely architects should work with engineers",
+                   "Which tools, languages, frameworks or architectural styles "
+                   "the organization should adopt",
                    "Whether engineers like the tools they use"],
-             "c": 0,
+             "c": 2,
              "why": "The authors say the discussion should not turn on whether "
                     "to adopt microservices or serverless, or which CI server "
                     "or language. The other options are what they say matters: "

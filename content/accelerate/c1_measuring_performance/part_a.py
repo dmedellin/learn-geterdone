@@ -268,11 +268,7 @@ LESSONS = [
                   "much healthcare and workplace research. Keep that in view. "
                   "Martin Fowler's foreword, written by a reader who says he is "
                   "usually sceptical of such reports, gives the strongest reasons "
-                  "to trust the book and the plainest cautions. These are surveys "
-                  "that capture subjective perceptions, he notes, and he wonders "
-                  "how well the sample reflects the IT world; he would feel more "
-                  "confident when other teams, using other approaches, confirm the "
-                  "reasoning; and the book covers the journey from commit to "
+                  "to trust the book and the plainest cautions. The answers are people's perceptions, he notes; he is unsure how representative the respondents are; he wants independent work by other methods to confirm the results; and the book covers the journey from commit to "
                   "production, not all of software development. Every lesson in "
                   "this course inherits those cautions."),
             ("p", "Chapter 1 begins with the claim that software is at the heart of "
@@ -334,12 +330,12 @@ LESSONS = [
                   "architecture, 2 of 4 in product and process, 3 of 5 in lean "
                   "management and monitoring, and 4 of 5 in culture. It has "
                   "continuous integration and test automation but not trunk-based "
-                  "development, so the ladder puts it at level 1. The lab's tile for what the level hides lists 3 capabilities it has that higher levels ask for: continuous integration, test automation and monitoring. Another 9, among them everything cultural, are on no level of the ladder at all. One missing item at level 2 hides a team that is strong in four categories and ahead on culture."),
+                  "development, so the ladder puts it at level 1. The lab's tile for what the level hides lists 3 capabilities it has that higher levels ask for: continuous integration, test automation and monitoring. Another 9, among them everything cultural, are on no level of the ladder at all. One missing item at level 2 hides a team with something in place in every category, and 4 of 5 in culture."),
             ("p", "The preset <code>two-teams</code> adds `Brook`, which has 8 of "
                   "the 24, every one of them in continuous delivery. Brook meets level 2 and misses level 3 on two items, so the ladder puts it above Atlas, though it has fewer capabilities and none in architecture, product and process, lean management or culture; the level hides one of Brook's, continuous delivery. The ladder "
                   "answers which team is higher and not what each should do next: "
                   "for Atlas it is one capability, trunk-based development, and "
-                  "for Brook it is the other four categories. The capability that fewest teams have is the lab's last tile; with two teams it lists the 6 that neither has, from loosely coupled architecture to transformational leadership, so it is only a pointer."),
+                  "for Brook it is the other four categories. The capability that fewest teams have is the lab's last tile; with two teams it names three of the 6 that neither team has and counts the rest, and the table lists all six, from loosely coupled architecture to transformational leadership; so it is only a pointer."),
             ("p", "The preset <code>later</code> is `Atlas` in March and again in September, with three more: trunk-based development, shift left on security and a loosely coupled architecture. That is 17 of 24, and the lab lists the three it gained in its tile for the second date. Typed in as the team, the September list reaches level 2 on the ladder, missing only continuous delivery at level 3. The change in level is one step, the change in the profile is three capabilities in three categories, and neither is a measure of the outcomes the authors care about. The book would want those "
                   "measured too: the four delivery measures of the next lesson."),
             ("h3", "Exercise"),
@@ -448,11 +444,11 @@ LESSONS = [
             {"q": "Chapter 1 lists factors often cited as drivers of performance "
                   "that the research did not find to predict it. Which of these is "
                   "one of them?",
-             "a": ["Whether operations or development staff performed deployments",
-                   "Whether the team practices trunk-based development",
+             "a": ["Whether the team practices trunk-based development",
+                   "Whether operations or development staff performed deployments",
                    "Whether the organization has a Westrum generative culture",
                    "Whether the team keeps its work in version control"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter names three: the age and technology of the "
                     "application, who performed deployments, and whether a change "
                     "approval board was in place. The other three options are "
@@ -463,11 +459,11 @@ LESSONS = [
                   "trunk-based development and monitoring. On the lesson's ladder, "
                   "what level does it reach, and what does the lab list as hidden "
                   "by that level?",
-             "a": ["Level 2, hiding monitoring",
-                   "Level 3, because it has monitoring",
+             "a": ["Level 3, because it has monitoring",
                    "Level 1, hiding continuous integration and test automation",
+                   "Level 2, hiding monitoring",
                    "Level 2, hiding nothing, since it has no other capability"],
-             "c": 0,
+             "c": 2,
              "why": "Cove meets level 1 and level 2, which asks for continuous "
                     "integration, test automation and trunk-based development. "
                     "Level 3 also needs continuous delivery and a loosely coupled "
@@ -476,11 +472,11 @@ LESSONS = [
                     "To reach level 3 it needs the two it lacks."},
             {"q": "In 2017, comparing high performers with low performers, how many "
                   "times more frequent were code deployments, according to Chapter 1?",
-             "a": ["46 times",
-                   "440 times",
+             "a": ["440 times",
                    "170 times",
-                   "5 times"],
-             "c": 0,
+                   "5 times",
+                   "46 times"],
+             "c": 3,
              "why": "The chapter's four comparisons are 46 for deployments, 440 for lead time, 170 for recovery and a fifth for the failure rate. Each of the other options is one of the other three."},
         ],
         "mistakes": [
@@ -500,8 +496,7 @@ LESSONS = [
              "2017, and Fowler's foreword notes that surveys capture perceptions, "
              "that the sample may not mirror the industry and that confirmation "
              "would help. A finding says what tended to go together across "
-             "thousands of responses; it does not say what will happen in a team "
-             "that adopts a capability."),
+             "thousands of responses; it does not say what will happen in a team that adopts a capability. The authors say the findings apply to teams in any organization, having studied many kinds; Fowler's caution is the counterweight, and your own measures are the test."),
         ],
         "standard": (
             "Finish when you can say what a single level hides.",
@@ -601,10 +596,7 @@ LESSONS = [
                   "planning tool and discourages teams from helping one another."),
             ("p", "Utilization is the third. Many organizations treat how busy "
                   "people are as a stand-in for productivity. The authors say that "
-                  "&ldquo;high utilization is only good up to a point&rdquo;: past "
-                  "it, no spare capacity, or slack, remains to absorb unplanned "
-                  "work, changes of plan or improvement work, and lead times "
-                  "lengthen. They cite queue theory, in which lead times approach "
+                  "&ldquo;high utilization is only good up to a point&rdquo;: past it, nothing is left over for the unplanned, for a change of plan or for improving the work, and lead times lengthen. They cite queue theory, in which lead times approach "
                   "infinity as utilization approaches 100 percent, and say that getting anything done then takes teams far longer, in their word exponentially. Lead time is the productivity measure that avoids the faults of the other two, and the authors conclude that utilization has to be managed against it."),
             ("p", "The rule behind that sentence is a few lines of arithmetic, and "
                   "the lab does it. In the simplest queueing model, one worker "
@@ -670,7 +662,7 @@ LESSONS = [
                  "expect": {
                             "aflMultiples": "50%: 1; 80%: 4; 90%: 9; 95%: 19; 99%: 99",
                             "aflLeads": "50%: 4 hours; 80%: 10 hours; 90%: 20 hours; 95%: 40 hours; 99%: 200 hours",
-                            "aflRatio": "50× (50% to 99%)",
+                            "aflRatio": "50.00× (50% to 99%)",
                  }},
                 {"id": "headroom",
                  "label": "A three-hour task at 90 and at 80 percent",
@@ -678,7 +670,7 @@ LESSONS = [
                  "service": "3",
                  "expect": {
                             "aflLeads": "90%: 30 hours; 80%: 15 hours",
-                            "aflRatio": "2× (80% to 90%)",
+                            "aflRatio": "2.00× (80% to 90%)",
                  }},
             ],
             "panel_title": "How the wait grows as slack runs out",
@@ -737,33 +729,33 @@ LESSONS = [
             {"q": "Which of the three measures does Chapter 2 criticise as "
                   "relative and team-dependent, so that teams' figures cannot be "
                   "compared?",
-             "a": ["Velocity",
-                   "Lines of code",
+             "a": ["Lines of code",
+                   "Velocity",
                    "Utilization",
                    "Lead time"],
-             "c": 0,
+             "c": 1,
              "why": "Velocity is the points a team signs off, and the points are the "
                     "team's own estimates in its own context. Lines of code are "
                     "criticised for rewarding bloat, utilization for leaving no "
                     "slack, and lead time is the measure the authors favour."},
             {"q": "In the lab's model, at what utilization is the lead time ten "
                   "times the service time?",
-             "a": ["90 percent",
-                   "99 percent",
+             "a": ["99 percent",
                    "80 percent",
+                   "90 percent",
                    "50 percent"],
-             "c": 0,
+             "c": 2,
              "why": "The lead time is the service time divided by 1 − u, so ten "
                     "times it needs 1 − u = 1/10, which is u = 90 percent. At 99 "
                     "percent it is 100 times, at 80 percent 5 times and at 50 "
                     "percent twice."},
             {"q": "According to the section, what does queue theory say happens to "
                   "lead times as utilization approaches 100 percent?",
-             "a": ["They approach infinity",
-                   "They fall, because nobody is idle",
+             "a": ["They fall, because nobody is idle",
                    "They stay level until 100 percent and then jump",
-                   "They double, whatever the starting level"],
-             "c": 0,
+                   "They double, whatever the starting level",
+                   "They approach infinity"],
+             "c": 3,
              "why": "The authors say that lead times approach infinity, so that "
                     "teams take far longer to get anything done. The lab's "
                     "arithmetic agrees: the wait is u/(1 − u) service times, "
@@ -895,9 +887,7 @@ LESSONS = [
                   "inevitable, so the question becomes how quickly service is "
                   "restored after an incident, answered from the same six options as "
                   "lead time. And the change fail rate: the percentage of changes to "
-                  "production, including releases and configuration changes, that "
-                  "lead to degraded service or need a hotfix, a rollback, a fix "
-                  "forward or a patch. In Lean terms, they note, it is the percent "
+                  "production, including releases and configuration changes, that degrade service or have to be remedied. In Lean terms, they note, it is the percent "
                   "complete and accurate of the delivery process."),
             ("p", "Notice what kind of data these are. In the book, each measure is "
                   "a respondent's answer to a question about their primary "
@@ -914,8 +904,7 @@ LESSONS = [
                   "hours, less than one day; a change fail rate of 1 in 10, 10 "
                   "percent, in the 0 to 15 percent band; and a median time to "
                   "restore of 7.5 hours, from restorations of 3 and 12 hours, less "
-                  "than one day. The longest lead times are 26 and 20 hours, over "
-                  "a weekend and an overnight wait, and the median hides them."),
+                  "than one day. The longest lead times are 26 and 20 hours, two waits that ran overnight, and the median hides them."),
             ("p", "The preset <code>batched</code> is a different team over 28 "
                   "days that gathers its changes and ships them together: seven "
                   "changes in three deployments, committed on days 2 to 26 and released on days 10, 19 and 28. Median lead time is 140 hours, "
@@ -993,7 +982,7 @@ LESSONS = [
              "and restored, and write the decision down."),
             ("Compute the four",
              "For one period, count the deployments, take the median commit-to-deploy "
-             "time, the share of deployments that failed, and the median time to "
+             "time, the share of the changes deployed that failed, and the median time to "
              "restore."),
             ("Read each on the book's scale",
              "Find the answer each figure falls under, and note which of the four "
@@ -1037,11 +1026,11 @@ LESSONS = [
                     "hours; the mean, 8.1 hours, falls under the same answer."},
             {"q": "Why do the authors use deployment frequency in their measure of "
                   "delivery performance?",
-             "a": ["As a proxy for batch size, which is hard to see in software",
-                   "As a measure of how busy developers are",
+             "a": ["As a measure of how busy developers are",
+                   "As a proxy for batch size, which is hard to see in software",
                    "As a measure of the number of features delivered",
                    "As a measure of customers' demand for new releases"],
-             "c": 0,
+             "c": 1,
              "why": "The authors say batch size is a central Lean idea but hard to "
                     "measure where there is no visible inventory, so they take "
                     "deployment frequency, which is easy to report and typically "
@@ -1049,11 +1038,11 @@ LESSONS = [
                     "features, and it is not demand."},
             {"q": "Which two of the four measures does the chapter treat as the "
                   "stability measures?",
-             "a": ["Time to restore service and change fail rate",
-                   "Lead time and change fail rate",
+             "a": ["Lead time and change fail rate",
                    "Deployment frequency and time to restore service",
+                   "Time to restore service and change fail rate",
                    "Lead time and deployment frequency"],
-             "c": 0,
+             "c": 2,
              "why": "Lead time and deployment frequency are the tempo of delivery; "
                     "time to restore service and change fail rate are about the "
                     "stability of the systems a team works on. The question the "
@@ -1062,11 +1051,11 @@ LESSONS = [
             {"q": "In the exercise week, the lead times are 2, 6, 2 and 1 hours and "
                   "one of the four changes failed. What are the median lead time and "
                   "the change fail rate's band?",
-             "a": ["2 hours, and 25 percent, in the 16 to 30 percent band",
-                   "2.75 hours, and 25 percent, in the 16 to 30 percent band",
+             "a": ["2.75 hours, and 25 percent, in the 16 to 30 percent band",
                    "2 hours, and 25 percent, in the 31 to 45 percent band",
-                   "2 hours, and 4 percent, in the 0 to 15 percent band"],
-             "c": 0,
+                   "2 hours, and 4 percent, in the 0 to 15 percent band",
+                   "2 hours, and 25 percent, in the 16 to 30 percent band"],
+             "c": 3,
              "why": "Sorted, the lead times are 1, 2, 2 and 6, and the median of an "
                     "even count is the mean of the middle two: 2 hours. The mean, "
                     "2.75 hours, is a different figure. One failure in four is 25 "
@@ -1161,16 +1150,7 @@ LESSONS = [
         ),
         "body": [
             ("p", "Having chosen four measures, the authors needed a way to say who "
-                  "performs well on them. They use cluster analysis, which they "
-                  "describe as attempting to group responses so that those in a "
-                  "group are more alike than those in different groups. Each "
-                  "measurement is put on its own dimension, and the algorithm tries "
-                  "to keep members of a cluster close and the clusters apart. The "
-                  "feature they stress is that the technique has no understanding of "
-                  "the meaning of the answers; it does not know what counts as a "
-                  "good or a bad response on any measure. That, they say, lets them "
-                  "see trends in the industry without deciding in advance what "
-                  "good looks like."),
+                  "performs well on them. They use cluster analysis, which sorts responses into groups whose members resemble one another more than they resemble anyone outside. The four answers are four axes; the method sees only how far apart responses lie, and cannot know that one answer is better than another. That, they say, lets the industry's groups emerge without a prior view of what good looks like. The coding of answers into numbers and the distance used are the lab's, not the book's."),
             ("p", "Appendix C gives the method. They tried five hierarchical "
                   "methods, Ward's among them, and compared the solutions by the "
                   "change in fusion coefficients, by the number in each cluster "
@@ -1354,32 +1334,31 @@ LESSONS = [
                     "distance: 1/2. Shoal and Tarn are 2 apart and merge second, at 1, and the last merge, of the two pairs, costs 99/4, about 25. Changing Tarn to Quay's codes makes the merges 0, 2/3 and 95/6: Tarn joins Quay for nothing, Ridge joins them cheaply, and Shoal alone is far away."},
             {"q": "What does cluster analysis know about whether an answer, such as "
                   "a lead time of under an hour, is a good one?",
-             "a": ["Nothing: it sees only the distances between responses",
-                   "It knows the shorter option is better and groups accordingly",
+             "a": ["It knows the shorter option is better and groups accordingly",
+                   "Nothing: it sees only the distances between responses",
                    "It is told which end of each scale is better",
                    "It learns it from the organizational performance of the teams"],
-             "c": 0,
+             "c": 1,
              "why": "The chapter says the technique cannot tell what a response means, so it cannot tell a good answer from a bad one, which is why the authors can read "
                     "the groups afterwards. The lab's cfg says which end of a scale "
                     "is better only to word the medians; the clustering ignores it."},
             {"q": "In Appendix C, which of the five clustering methods performed "
                   "best on the authors' criteria?",
-             "a": ["Ward's",
-                   "Centroid",
+             "a": ["Centroid",
                    "Median",
+                   "Ward's",
                    "Between-groups linkage"],
-             "c": 0,
+             "c": 2,
              "why": "The authors compared Ward's method, between-groups linkage, "
                     "within-groups linkage, centroid and median, and report that "
                     "the solution using Ward's performed best and was selected."},
             {"q": "What did the authors report in the Surprise! box about medium and "
                   "low performers in 2016?",
-             "a": ["Medium performers did worse than low performers on change fail "
-                   "rate",
-                   "Low performers deployed more often than high performers",
+             "a": ["Low performers deployed more often than high performers",
                    "Medium performers restored service faster than high performers",
-                   "Low performers had a lower change fail rate than high performers"],
-             "c": 0,
+                   "Low performers had a lower change fail rate than high performers",
+                   "Medium performers had a worse change fail rate than the low group"],
+             "c": 3,
              "why": "In 2016 the medium group's change fail rate was worse than the low group's. The authors do not explain it conclusively "
                     "and offer large rearchitecture work and neglected rework as "
                     "possibilities. The other options describe results the box does "
@@ -1458,7 +1437,7 @@ LESSONS = [
             ("Times as likely",
              "The share of one group meeting a goal divided by the share of "
              "another. If 60 percent of one group and 30 percent of the other "
-             "meet it, the first is twice as likely."),
+             "meet it, the first is twice as likely. The book does not give its computation; this is the plain reading of the phrase."),
             ("Difference and odds ratio",
              "Two other comparisons of the same shares. The difference is the "
              "percentage points between them; the odds ratio divides each group's "
@@ -1485,7 +1464,7 @@ LESSONS = [
                   "can be a competitive advantage."),
             ("p", "Two things about the measure matter for how to hold the finding. "
                   "It is self-reported: the delivery measures and the organizational rating are both survey answers, and Fowler&rsquo;s foreword notes that a survey captures subjective perceptions. And it is relative: respondents place their organization against others, not against a number. The authors answer the first by the validation of the scale and by the longer argument in Part II; the lesson notes it and moves on."),
-            ("p", "In 2017 they added a measure for noncommercial organizations, "
+            ("p", "In 2017 they added a measure of noncommercial goals, which any organization has, "
                   "with a scale also validated before, and found that high performers were again twice as likely to exceed their objectives, across five noncommercial goals that include customer satisfaction and the organization's mission. The chapter&rsquo;s "
                   "Figure 2.4 draws this as arrows from software delivery "
                   "performance to the two kinds of organizational performance, "
@@ -1510,7 +1489,7 @@ LESSONS = [
                   "correlated negatively with both tempo and stability. They invite "
                   "readers to place their own teams in the book&rsquo;s taxonomy "
                   "and to set targets on the four measures. Then comes the "
-                  "caution that ends the chapter. Where fear rules, they say, numbers become a tool of control and information that challenges the rules is hidden, and as Deming said, "
+                  "caution that ends the chapter. In pathological and bureaucratic cultures, runs a passage the authors quote from Humble and colleagues' Lean Enterprise (2014), measurement becomes a means of control and people keep back what would unsettle those in charge; and, in Deming's words as that passage gives them, "
                   "&ldquo;whenever there is fear, you get the wrong numbers&rdquo;. "
                   "Culture first, then, and Chapter 3 is where the book begins."),
             ("p", "Now the arithmetic of the headline. The lab takes groups, how "
@@ -1533,8 +1512,7 @@ LESSONS = [
                   "which the book&rsquo;s sentence does not say, since it gives no underlying shares. Whether the finding is "
                   "big enough to matter is a question about the shares, and the "
                   "lab asks for them."),
-            ("p", "None of these is a cause. The ratio compares two groups drawn by "
-                  "the clustering in one survey; it does not show that moving a "
+            ("p", "None of these is a cause. The ratio compares two groups drawn by the clustering in each year's survey; it does not show that moving a "
                   "team from the low group to the high one would change its "
                   "organization&rsquo;s results. The book&rsquo;s case that it "
                   "would rests on prediction from many years of data and on "
@@ -1565,7 +1543,7 @@ LESSONS = [
                  "second": "low",
                  "expect": {
                             "agrShares": "high 12 of 20 = 60%; low 6 of 20 = 30%",
-                            "agrRatio": "2×",
+                            "agrRatio": "2.00×",
                             "agrDiff": "+30 points",
                             "agrOdds": "3.50",
                  }},
@@ -1576,7 +1554,7 @@ LESSONS = [
                  "second": "low",
                  "expect": {
                             "agrShares": "high 4 of 20 = 20%; low 2 of 20 = 10%",
-                            "agrRatio": "2×",
+                            "agrRatio": "2.00×",
                             "agrDiff": "+10 points",
                             "agrOdds": "2.25",
                  }},
@@ -1636,32 +1614,32 @@ LESSONS = [
                     "the low group's share relative to the high group's, the "
                     "inverse, which answers a different question."},
             {"q": "Which of these did the chapter's noncommercial measure cover?",
-             "a": ["Customer satisfaction",
-                   "Profitability",
+             "a": ["Profitability",
+                   "Customer satisfaction",
                    "Market share",
-                   "Productivity"],
-             "c": 0,
-             "why": "Customer satisfaction is one of the five noncommercial goals, with the mission among them. Profitability, market share and productivity are the commercial measure."},
+                   "Revenue growth"],
+             "c": 1,
+             "why": "Customer satisfaction is one of the five noncommercial goals, with the mission among them. Profitability, market share and productivity are the commercial measure, and the book says this one goes beyond profit and revenue; revenue growth is not among its goals."},
             {"q": "On the presets <code>half-the-teams</code> and "
                   "<code>rare-goal</code>, what is the same and what differs?",
-             "a": ["The ratio is 2.00 on both; the difference in points is 30 on "
-                   "one and 10 on the other",
-                   "The difference in points is 30 on both; the ratio is 2.00 on one "
+             "a": ["The difference in points is 30 on both; the ratio is 2.00 on one "
                    "and 1.50 on the other",
                    "The odds ratio is 3.50 on both; the ratio is 2.00 on one and "
                    "2.25 on the other",
+                   "The ratio is 2.00 on both; the difference in points is 30 on "
+                   "one and 10 on the other",
                    "Everything is the same, since the two groups are the same"],
-             "c": 0,
+             "c": 2,
              "why": "Both have a ratio of 2.00; the differences are 30 and 10 "
                     "points, and the odds ratios 3.50 and 2.25. The groups are the "
                     "same size but a different goal was met by different numbers."},
             {"q": "What does the chapter say about change approval boards, in its "
                   "Driving Change section?",
-             "a": ["They are negatively correlated with tempo and stability",
-                   "They improve stability at some cost to tempo",
+             "a": ["They improve stability at some cost to tempo",
                    "They are positively correlated with change fail rate being low",
-                   "They are not mentioned in the chapter"],
-             "c": 0,
+                   "They are not mentioned in the chapter",
+                   "Their correlation with both tempo and stability is negative"],
+             "c": 3,
              "why": "The authors answer their own question, whether change "
                     "management boards improve delivery performance, with a "
                     "spoiler: they do not, and the correlation with tempo and with stability is negative."},
@@ -1673,9 +1651,7 @@ LESSONS = [
              "percent, with differences of 30 and 10 points. It says nothing of "
              "how far the goal was exceeded."),
             ("Using the measures to rank and reward teams",
-             "The chapter ends on the warning that where people fear the "
-             "measurement, they hide what challenges the rules, and the numbers "
-             "are wrong. The four measures are for a team to learn from and to set "
+             "The chapter ends on a warning it quotes: in a pathological or bureaucratic culture, people fear the measurement and keep back what challenges those in charge, and the numbers are wrong. The four measures are for a team to learn from and to set "
              "its own targets against."),
             ("Treating the arrows as proof of cause",
              "The authors say their arrows are predictive relationships, going "

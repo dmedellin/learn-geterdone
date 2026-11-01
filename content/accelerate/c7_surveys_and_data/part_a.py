@@ -249,11 +249,11 @@ LESSONS = [
                   "them a comparison of early and late responders, which Appendix C "
                   "describes and the lesson Tests for Bias works."),
             ("p", "The second reason is that system data is rarely exhaustive, even "
-                  "when it is good. The authors tell of one of them, earlier a "
-                  "performance engineer on enterprise disk storage systems. Her team "
-                  "had instrumented every level of the machine and had the numbers "
-                  "to show it performed well, yet customers kept reporting that it was "
-                  "slow, and for the first reports the logs were taken as the answer. "
+                  "when it is good. One of the authors tells of an earlier job, tuning the "
+                  "performance of large disk storage machines. Her team measured "
+                  "every layer inside the machine and had figures showing it ran "
+                  "well, yet customers kept saying it was slow, and the first "
+                  "reports were set aside because the logs said otherwise. "
                   "The reports formed a pattern. The machine was fast. What the team "
                   "had not measured was the interface, the way customers used the box, "
                   "which introduced the slowness. People's reports were less precise "
@@ -274,22 +274,23 @@ LESSONS = [
                   "commit to deploy with its answer option on the book's six-option "
                   "scale, the change fail rate with its band, and the median time to "
                   "restore. On the preset <code>pipeline-log</code> it counts 8 "
-                  "deployments, 4 a week, a median lead time of 37 hours, which is "
-                  "between one day and one week, and a change fail rate of 0 percent, in the "
+                  "deployments, 4 a week, a median lead time of 37 hours (the lab prints "
+                  "1 d 13 h), which is between one day and one week, and a change fail rate of 0 percent, in the "
                   "book's lowest band, 0 to 15 percent, "
                   "because the pipeline marks a deploy failed only when the pipeline "
                   "itself fails. Two incidents, from the on-call tracker, lasted 3 and "
-                  "2 hours, a median time to restore of 2.5 hours."),
+                  "2 hours, a median time to restore of 2.5 hours, which the lab prints as "
+                  "2 h 30 min."),
             ("p", "The preset <code>with-hotfixes</code> adds the two emergency "
                   "deploys the log missed, made 2 and 1.5 hours after their commits, "
                   "and records the truth the pipeline did not: the two deploys that "
                   "caused those incidents had failed. The lab now counts 10 "
-                  "deployments, 5 a week, a median lead time of 26 hours, still "
+                  "deployments, 5 a week, a median lead time of 26 hours (1 d 2 h), still "
                   "between one day and one week, and a change fail rate of 20 "
                   "percent, two failed of ten, which falls in the 16 to 30 percent band. The median time to restore is "
                   "unchanged at 2.5 hours, since the incidents came from a separate "
                   "record. The log was exact about what it covered. It missed a fifth "
-                  "of the deploys, gave a lead time 11 hours too long, and showed no "
+                  "of the deploys, gave a median lead time 11 hours too long, and showed no "
                   "failures where the team had two."),
             ("p", "Read the figures as the authors would, as a reason to look "
                   "elsewhere too. Neither list is the verdict on the team, and the "
@@ -314,7 +315,8 @@ LESSONS = [
                   "median lead time and the change fail rate from the log alone, and "
                   "again with the two hand deploys and the failure of <code>e1</code>. "
                   "Then type both versions into the lab to check your count. Find the "
-                  "measure the log gets right and the measure it gets most wrong."),
+                  "measure the log gets most wrong, and the answer options that stay "
+                  "the same."),
             ("p", "Surveys are quick and see across the boundary of any one system. "
                   "The authors also claim that survey data can be trusted, a claim "
                   "many engineers resist. The next lesson, You Can Trust Survey Data, "
@@ -395,9 +397,10 @@ LESSONS = [
              "c": 1,
              "why": "The six lead times are 20, 30, 40, 50, 3 and 5 hours, which sort to "
                     "3, 5, 20, 30, 40, 50. The middle two are 20 and 30, so the median "
-                    "is 25. The 35 hours is the log's median, (30 + 40) / 2. The "
-                    "24.7 hours is the mean, 148 / 6, which is a different statistic "
-                    "and not the one the book's lead-time question asks for."},
+                    "is 25 hours, which the lab prints as 1 d 1 h. The 35 hours is the "
+                    "log's median, (30 + 40) / 2, printed 1 d 11 h. The 24.7 hours is "
+                    "the mean, 148 / 6, which is a different statistic; the question "
+                    "asks for the median."},
             {"q": "In the exercise, what is the change fail rate once the hand deploys "
                   "and the failure of e1 are counted?",
              "a": ["0 percent, as the log says",
@@ -413,10 +416,10 @@ LESSONS = [
                   "machine was fast while customers reported it slow?",
              "a": ["The logs had been altered by someone with root access",
                    "Customers hoped for discounts under their service agreements",
+                   "The logs were too coarse to show slow responses",
                    "The logs recorded everything inside the box, but not the way "
-                   "customers used its interface",
-                   "The logs were too coarse to show slow responses"],
-             "c": 2,
+                   "customers used its interface"],
+             "c": 3,
              "why": "The logs were accurate about the box. The slowness came from the "
                     "interface, which nothing had instrumented. The authors do note that "
                     "customers could have had an incentive to exaggerate, but the "
@@ -424,11 +427,11 @@ LESSONS = [
                     "less precise than the logs and still pointed to where to look."},
             {"q": "How does the chapter describe the collection of the data in the "
                   "book?",
-             "a": ["Once, over a full year",
-                   "Four times, each over four to six weeks, from around the world",
+             "a": ["Four times, each over four to six weeks, from around the world",
+                   "Once, over a full year",
                    "Every month for four years, from one company's teams",
                    "Four times, each over a single weekend"],
-             "c": 1,
+             "c": 0,
              "why": "The chapter says the data was gathered in four separate rounds, each "
                     "lasting four to six weeks, drawing thousands of respondents who "
                     "worked at thousands of organizations around the world. That "
@@ -540,7 +543,7 @@ LESSONS = [
                   "authors take version control. A team can say whether every "
                   "production artifact is under it, because the team sees all of its "
                   "work. A system can count the files that were checked in, but it "
-                  "does not know how many files were not, so it cannot give the "
+                  "cannot know how many files never were, so it cannot give the "
                   "percentage that matters. People lack perfect knowledge too, the "
                   "authors add, but ignoring what the professionals perceive loses an "
                   "important view."),
@@ -549,24 +552,22 @@ LESSONS = [
                   "Few trust survey data. More trust their system or log data, because "
                   "it feels untampered with. Then almost everyone admits having seen "
                   "bad data come out of a system, since people build systems and make "
-                  "mistakes, and since it takes only one bad actor to write code that "
-                  "gives erroneous data. Engineers trust logs because they understand "
-                  "how systems work and expect to spot the errors; survey methods feel "
-                  "foreign. The authors point to Part II for the steps that make survey "
-                  "data reliable: carefully identified measures, latent constructs, "
-                  "and statistical tests of validity and reliability."),
-            ("p", "Then the comparison on which the lesson turns. In a log, one "
-                  "or a few people can change what is reported, a highly motivated "
-                  "bad actor with high access or a developer whose mistake no review "
-                  "caught, and the business probably watches only one or a few data "
-                  "points, so the damage is large and may go unnoticed for months or "
-                  "years. In survey data, a few motivated respondents can lie, but "
-                  "their effect depends on the size of the group. The authors report "
-                  "over 23,000 pooled respondents and say it would take several "
-                  "hundred of them lying in a coordinated way, on every item of a "
-                  "construct, to the same degree and in the same direction, to make a "
-                  "noticeable difference. That is their estimate and not a "
-                  "computation they show. They add that responses are anonymous, "
+                  "mistakes, and a single malicious author of code could make a system "
+                  "report false figures. The authors suggest engineers trust logs because they "
+                  "understand how systems work and expect to spot the errors, while "
+                  "survey methods feel foreign. They point to Part II, where the "
+                  "safeguards are measures chosen with care, latent constructs, and "
+                  "statistical checks that the measures are valid and reliable."),
+            ("p", "Then the comparison on which the lesson turns. A log can be bent "
+                  "by a single person, whether on purpose or through a mistake that "
+                  "review did not catch, and because a business usually watches a "
+                  "handful of its numbers, the error can sit there for months or "
+                  "years. A survey's liars are diluted by everyone else who answered; "
+                  "how much they matter depends on how many answered. The authors "
+                  "report over 23,000 pooled respondents and estimate that a "
+                  "noticeable change would need several hundred people lying together, "
+                  "on every item of a construct, equally and in the same direction. "
+                  "That is their estimate and not a computation they show. They add that responses are anonymous, "
                   "items avoid propaganda, constructs pass tests of validity and "
                   "reliability, and the data come from around the world."),
             ("p", "Now the count, on a team of six. The lab's score view takes a "
@@ -606,8 +607,10 @@ LESSONS = [
                   "item can answer 7, 7, 7 and 1. The authors do not rely on this "
                   "device. They rely on numbers, anonymity and many items, and "
                   "the pooled estimate does not reach a bias shared by many "
-                  "respondents, such as being told to answer well. Appendix C's "
-                  "tests for bias, read in Tests for Bias, address that."),
+                  "respondents. Appendix C's tests, read in Tests for Bias, look for two "
+                  "such patterns, early against late answering and common method bias; "
+                  "a survey that tells people to answer well is guarded against only by "
+                  "how it is run, as the chapter's footnote says."),
             ("p", "The fifth reason is that some things can only be measured by asking. "
                   "Culture is the authors' example. Teams want a faster measure than a "
                   "survey, from HR systems, and turnover is the usual stand-in: low "
@@ -723,43 +726,43 @@ LESSONS = [
             {"q": "In the exercise, what is the construct's mean over all five "
                   "respondents, with the fourth item turned round?",
              "a": ["5.375, over s1 to s4 alone",
+                   "4.8",
                    "3.9, leaving the fourth item as it was typed",
-                   "2.5, the score of s5",
-                   "4.8"],
-             "c": 3,
+                   "2.5, the score of s5"],
+             "c": 1,
              "why": "The scores are 5.75, 5, 6.5, 4.25 and 2.5, which sum to 24, and "
                     "24 / 5 = 4.8. The 5.375 is the mean without s5. The 3.9 comes from "
                     "using the raw answers, which treats the reverse-worded item as if "
                     "it pointed the same way. The 2.5 is one respondent's own score."},
             {"q": "What do the authors say it would take for lying respondents to make "
                   "a noticeable difference to their pooled data of over 23,000?",
-             "a": ["Several hundred lying in a coordinated way, on every item of a "
-                   "construct, to the same degree and in the same direction",
-                   "One respondent lying on a single item",
+             "a": ["One respondent lying on a single item",
                    "More than half of all respondents lying on any one item",
+                   "Several hundred lying in a coordinated way, on every item of a "
+                   "construct, to the same degree and in the same direction",
                    "No number: pooled survey data cannot be moved by lying"],
-             "c": 0,
+             "c": 2,
              "why": "That is the chapter's estimate. One respondent does move a mean, as "
                     "the lab shows, by (s − m) / n, which is tiny for a big n. The "
                     "authors do not say half are needed, and they do not say lying "
                     "is impossible; they say the effort required is large."},
             {"q": "On a seven-point scale, a respondent answers 7 to a reverse-coded "
                   "item. What does that answer count as when the construct is scored?",
-             "a": ["7", "6", "1", "0"],
-             "c": 2,
+             "a": ["7", "6", "0", "1"],
+             "c": 3,
              "why": "The turned-round score is 8 minus the answer, so 8 − 7 = 1. Using 0 "
-                    "or 6 are off-by-one errors, from taking 7 minus the answer; "
-                    "that rule sends the scale's top to 0 and the bottom to 6, which "
-                    "is not a seven-point scale. Leaving 7 as typed is the error the "
-                    "lab's un-reversed score shows."},
+                    "comes from taking 7 minus the answer, which sends the scale to 0 "
+                    "through 6; the 6 is one less than the answer with nothing "
+                    "reversed correctly. Leaving 7 as typed is the error the lab's "
+                    "un-reversed score shows."},
             {"q": "Which is one of the authors' reasons that turnover is a poor "
                   "stand-in for culture?",
-             "a": ["HR systems do not record who leaves",
-                   "A strong team culture can itself lead someone to leave, for a "
+             "a": ["A strong team culture can itself lead someone to leave, for a "
                    "different career",
+                   "HR systems do not record who leaves",
                    "Turnover is always caused by pay, never by culture",
                    "Turnover cannot be gamed by managers"],
-             "c": 1,
+             "c": 0,
              "why": "The authors know a case of an employee who left a supportive team "
                     "because it encouraged him to change career, so strong culture "
                     "produced turnover. They do not say HR systems lack the data, "
@@ -778,9 +781,9 @@ LESSONS = [
              "The pooled estimate is about coordinated lying by a few hundred. It "
              "does not address an error that many respondents share, such as being "
              "told to answer positively, which the chapter's footnote warns "
-             "against. That is why Appendix C runs tests for bias between early and "
-             "late responders and for common method bias, and why the authors "
-             "describe the survey as giving a reasonable assurance, not proof."),
+             "against. Appendix C does test for two shared patterns, early against "
+             "late responders and common method bias, and the authors describe the "
+             "survey as giving a reasonable assurance, not proof."),
             ("Using turnover as an objective measure of culture",
              "Turnover is easy to collect and feels free of opinion, which makes it "
              "attractive. The chapter shows it can fall or rise for reasons that have "
@@ -891,8 +894,9 @@ LESSONS = [
                   "the population to be known and to have an equal chance of "
                   "being asked, and no exhaustive list of the world's DevOps "
                   "professionals exists. So the authors invited by email, to their "
-                  "own mailing lists, which included past respondents and people from "
-                  "the marketing databases of Puppet and of two of the authors, and "
+                  "own mailing lists, which included past respondents, Puppet's "
+                  "marketing databases and the databases of Gene Kim's and Jez Humble's "
+                  "readers, and "
                   "to the mailing lists of professional groups, with particular care "
                   "to reach groups of underrepresented people in technology. They "
                   "also posted on social media. Then they asked recipients to "
@@ -920,7 +924,8 @@ LESSONS = [
                   "the design: because responses are not linked from year to year, "
                   "the data cannot be analysed longitudinally, and the authors say "
                   "they are pursuing that. The lesson Inferential Predictive "
-                  "Analysis returns to what this means for claims of cause."),
+                  "Analysis, in the previous course, discusses what this means for claims "
+                  "of cause."),
             ("p", "Now the count, on twenty invented people. The lab's snowball view "
                   "takes a list of people, who referred each, and the community each "
                   "belongs to, here where they work. A person with no referrer is a "
@@ -1035,10 +1040,10 @@ LESSONS = [
             {"q": "In the exercise, what share of the eight-person sample is reached "
                   "through seed a?",
              "a": ["50 percent, since a is one of two seeds",
-                   "37.5 percent",
                    "62.5 percent",
+                   "37.5 percent",
                    "25 percent"],
-             "c": 2,
+             "c": 1,
              "why": "Seed a's tree is a, c, d, f and g, five of the eight, 62.5 percent. "
                     "The 37.5 percent is seed b's tree, b, e and h. Seeds are counted "
                     "as people, and a's tree is larger, so splitting 50 and 50 "
@@ -1048,10 +1053,10 @@ LESSONS = [
                   "never invited, what share of the remaining sample is in the west "
                   "group?",
              "a": ["37.5 percent, as before",
-                   "0 percent",
                    "12.5 percent",
+                   "0 percent",
                    "100 percent"],
-             "c": 1,
+             "c": 2,
              "why": "Dropping b removes b, e and h, the whole west group, leaving a, c, "
                     "d, f and g, all east: the west is 0 percent and the east 100 "
                     "percent of five. A group with no seed in it can vanish from the "
@@ -1196,11 +1201,12 @@ LESSONS = [
                   "snowball sampling, which Chapter 15 defends and the last lesson "
                   "read."),
             ("p", "The first analysis, once there are data, is a test for bias, and the "
-                  "appendix names three families. Chi-square tests check for "
-                  "differences in variables that take only categorical values, such as "
-                  "gender. T-tests check for differences in variables that take scale "
-                  "values, such as Likert answers, and the authors used them to "
-                  "compare early and late responders. Common method bias is checked "
+                  "appendix names three families. Chi-square tests compare answers "
+                  "that fall into categories, gender being its example. T-tests compare "
+                  "answers on a scale, Likert values being its example, and the authors "
+                  "used them to compare early and late responders. The lab applies the "
+                  "chi-square test, which the appendix lists for categorical answers, "
+                  "to the early and late split; that pairing is the lesson's. Common method bias is checked "
                   "with two tests. Harman's single-factor test looks to see whether one "
                   "factor loads significantly on all the items, which would suggest "
                   "the method and not the constructs is behind the pattern. The "
@@ -1210,9 +1216,9 @@ LESSONS = [
                   "are. The result was no bias between early and late responders and "
                   "no sign that common method bias is a problem in these samples."),
             ("p", "The reasoning behind the early and late comparison is the usual one "
-                  "in survey methods and the appendix does not spell it out. People "
-                  "who answer late are, a little, more like the people who never "
-                  "answered. If early and late respondents give the same picture, the "
+                  "in survey methods and the appendix does not spell it out. The "
+                  "assumption is that people who answer late are, a little, more like "
+                  "the people who never answered. If early and late respondents give the same picture, the "
                   "missing respondents are less likely to change it. The check "
                   "has limits, since it cannot see the people who were never reached "
                   "or never answered, and a snowball sample is not drawn at random "
@@ -1280,8 +1286,8 @@ LESSONS = [
             ]),
             ("p", "By hand, find the four expected counts, the statistic and the "
                   "degrees of freedom, and say whether the statistic is above 3.841. "
-                  "Then type the table into the lab and compare. Say which cell "
-                  "contributes least to the statistic."),
+                  "Then type the table into the lab and compare. Say which cells "
+                  "contribute least to the statistic."),
             ("p", "Bias is only the first screen. Once it is passed, the authors test "
                   "whether their measures are valid and reliable, and the next lesson, "
                   "Tests of the Measurement Model, computes those."),
@@ -1384,10 +1390,10 @@ LESSONS = [
             {"q": "In the preset difference, what is the expected count for large "
                   "organizations among late respondents?",
              "a": ["2, the observed count",
-                   "8",
                    "10, half of 20",
-                   "12"],
-             "c": 1,
+                   "12",
+                   "8"],
+             "c": 3,
              "why": "The row total for large is 20, the late total is 40 and N is 100, so "
                     "E = 20 · 40 / 100 = 8. The 2 is what was observed. Half of 20 "
                     "ignores that late respondents are 40 percent of the sample, "
@@ -1462,7 +1468,7 @@ LESSONS = [
             "The appendix lists the tests a construct must pass before the authors "
             "use it: loadings above 0.60, average variance extracted above 0.50, its "
             "square root above the construct's correlations, correlations below 0.85, "
-            "and reliability above 0.70. Compute the average variance extracted and "
+            "and reliability of at least 0.70. Compute the average variance extracted and "
             "composite reliability of invented constructs from their loadings, and "
             "see which tests each passes."
         ),
@@ -1472,7 +1478,7 @@ LESSONS = [
             "variance extracted above one half",
             "its root must beat its correlations",
             "correlations between constructs below 0.85",
-            "reliability above 0.70; all tests pass",
+            "reliability at least 0.70; all tests pass",
         ],
         "key_label": "The measurement model in six lines",
         "concepts_intro": (
@@ -1483,8 +1489,8 @@ LESSONS = [
             ("Loading",
              "How strongly an item is tied to the construct it is meant to measure; "
              "in the lab, a number from 0 to 1 for each item. The appendix asks that "
-             "items load on their own construct above 0.60 and should not cross-load, "
-             "that is, load strongly on another construct as well."),
+             "items load above 0.60 on their own construct, and not also strongly on "
+             "another, which is called cross-loading."),
             ("Average variance extracted",
              "The appendix describes it as the variance a construct captures against "
              "the variance due to measurement error, to be greater than 0.50. From "
@@ -1517,9 +1523,9 @@ LESSONS = [
                   "dependent variables, helps confirm convergent validity, the "
                   "property that items meant to measure one construct do. The authors "
                   "almost always used the exploratory kind, which finds the structure "
-                  "without imposing one in advance; the confirmatory kind was used "
-                  "once, for transformational leadership, whose items are well "
-                  "established. Items should load on their construct above 0.60 and "
+                  "without imposing one in advance; the notable exception was "
+                  "transformational leadership, whose items are well established, "
+                  "where the confirmatory kind was used. Items should load on their construct above 0.60 and "
                   "not cross-load. The appendix names no threshold for cross-loading."),
             ("p", "The second is the average variance extracted. The appendix does not "
                   "give a formula; the standard one, for standardized loadings, is "
@@ -1574,7 +1580,7 @@ LESSONS = [
                   "is 0.649, below 0.70; and two loadings, 0.60 and 0.55, are not above "
                   "0.60. Its root is 0.620, above 0.30, and 0.30 is below 0.85, so "
                   "the root test and the correlation test pass for a construct "
-                  "that fails three others, and the tests tile reads 10 of 14, naming them. "
+                  "that fails three kinds of test, and the tests tile reads 10 of 14, naming them. "
                   "That is the point of the appendix's rule that all must pass."),
             ("p", "The preset <code>too-close</code> pairs <code>release-confidence</code> "
                   "with <code>release-readiness</code>, loadings 0.85, 0.80, 0.80 and "
@@ -1644,7 +1650,7 @@ LESSONS = [
              "the loadings and divide by that plus the sum of one minus each squared "
              "loading."),
             ("Test each construct against the thresholds",
-             "AVE above 0.50, CR above 0.70. A construct that fails either is not "
+             "AVE above 0.50, CR at least 0.70. A construct that fails either is not "
              "used, whatever else it passes."),
             ("Test each pair",
              "Check that AVE is above r squared for both constructs, which is the "
@@ -1693,39 +1699,40 @@ LESSONS = [
                     "a root of about 0.851."},
             {"q": "A construct has AVE 0.55, composite reliability 0.82, every "
                   "loading above 0.60, and its square root is above each of its "
-                  "correlations with the others, which are all below 0.85. What does "
+                  "correlations with the others, which are all below 0.85, and no item "
+                  "cross-loads. What does "
                   "the appendix say about it?",
-             "a": ["It passes every test listed and may go on to the analysis",
-                   "It fails, because AVE is below 0.60",
+             "a": ["It fails, because AVE is below 0.60",
                    "It fails, because alpha has not been computed",
+                   "It passes every test listed and may go on to the analysis",
                    "It must be rerun with confirmatory factor analysis"],
-             "c": 0,
+             "c": 2,
              "why": "The thresholds are loadings above 0.60, AVE above 0.50, the root above "
-                    "the correlations, correlations below 0.85, and reliability above "
-                    "0.70, by alpha or composite reliability. Nothing in the appendix "
+                    "the correlations, correlations below 0.85, and reliability of at "
+                    "least 0.70, by alpha or composite reliability. Nothing in the appendix "
                     "calls for 0.60 AVE, for both alpha and composite reliability, or for "
-                    "the confirmatory kind of analysis, which it used once."},
+                    "the confirmatory kind of analysis, which it names as an exception."},
             {"q": "What does the appendix say about Cronbach's alpha for a construct "
                   "with few items?",
-             "a": ["It is biased against small scales, so composite reliability is "
-                   "run too",
-                   "It is biased in favor of small scales, so the cutoff is raised",
+             "a": ["It is biased in favor of small scales, so the cutoff is raised",
                    "It cannot be computed for fewer than five items",
-                   "It must be at least 0.85 for small scales"],
-             "c": 0,
-             "why": "The authors say alpha is known to be biased against constructs "
-                    "with a low number of items, which is why they ran both measures. "
+                   "It must be at least 0.85 for small scales",
+                   "It is biased against small scales, so composite reliability is "
+                   "run too"],
+             "c": 3,
+             "why": "The authors call alpha biased against short scales, those with few "
+                    "items, which is why they ran both measures. "
                     "They say nothing of a different cutoff for small scales, and "
                     "0.85 is the correlation limit between constructs."},
             {"q": "On the preset weak-construct, tool-fit passes the root test. What "
                   "follows?",
-             "a": ["It is suitable for the analysis, since it passes a test of "
-                   "validity",
-                   "Nothing for suitability, since it fails AVE, CR and the loading "
+             "a": ["Nothing for suitability, since it fails AVE, CR and the loading "
                    "test and all must pass",
+                   "It is suitable for the analysis, since it passes a test of "
+                   "validity",
                    "The loadings must have been mistyped",
                    "Its root is above 0.30, so its AVE must be above 0.50"],
-             "c": 1,
+             "c": 0,
              "why": "The root test compares a construct with its correlations, and 0.30 "
                     "is a low bar; tool-fit's AVE is 0.384, below 0.50, which a root of "
                     "0.620 does not contradict. Because all the tests must pass for "

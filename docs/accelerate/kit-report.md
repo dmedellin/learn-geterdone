@@ -9,6 +9,19 @@ follows at the end under its own heading. The seam between the two modules is
 section was read off a rendered scratch page with
 `node scripts/labcheck.js --observe`; none was copied from the code.
 
+**Change, 2026-11-01 (tile wording, after review).** Tile ids unchanged;
+these strings changed, and every pinned `expect` in `content/accelerate/` was
+re-pinned: ratios always print two places (`2×` → `2.00×`, `22/7 ≈ 3.1×` →
+`≈ 3.14×`, `1/2 ≈ 0.5×` → `0.50×`), the odds ratio likewise (`3` → `3.00`);
+a figure of exactly 1 takes a singular unit (`1 hours` → `1 hour`, `1 items a
+day` → `1 item a day`, `+1 points` → `+1 point`); arlCoord and arlAfterCoord
+count groups in words (`1: shop + money for {…}` → `1 group spans more than
+one team: shop + money for {…}`; `0: none` → `none: every release group
+belongs to one team`; no teams: `no teams given`); groups/likely's table
+share column prints the share whole (`3/10 = 30%`, was `= 30%`); stats'
+compare tile reads `no sign to compare, since one r is 0` (was `one of them
+0`).
+
 **Field names that differ from, or add to, PLAN §D (family A).** Read these
 before drafting a lab cfg:
 
@@ -144,8 +157,17 @@ lists). acckit adds:
 **Number and duration format.**
 - Counts grouped `1,024`; a list tile is `n: a, b` or `0: none`.
 - A rational is `eaNum`: `2/7 ≈ 0.29`, `1/2 = 0.50`, `4`; a share is
-  `eaPct`: `1/5 = 20%`, `1/3 ≈ 33.3%`; a ratio `eaTimes`: `50×`,
-  `22/7 ≈ 3.1×`; a difference of shares `aktPp`: `≈ +8.3 points`.
+  `eaPct`: `1/5 = 20%`, `1/3 ≈ 33.3%`; a difference of shares `aktPp`:
+  `≈ +8.3 points`, `+1 point`.
+- **Ratios, both families (`aktTimes`):** always exactly two decimal
+  places, `≈` in front only when two places are not exact: `2.00×`,
+  `1.50×`, `50.00×`, `≈ 3.14×`, `0.50×`. No fraction is printed before a
+  ratio. The odds ratio (groups/likely) follows the same rule without the
+  `×`: `3.00`, `≈ 2.43`.
+- **A figure with a unit (`aktUnit`)** takes the singular when the figure is
+  exactly 1: `1 hour`, `1 day`, `1 item a day`, `3/2 = 1.50 days`. A lesson's
+  own `unit` word is singularised by dropping a final `s` (`days` → `day`),
+  so give units as plain plurals.
 - A duration in hours prints `1 d 2 h 30 min`, `45 min`, `0 min`, with `30 s`
   when a median falls on a half minute.
 - A square root (family B: r, standard deviation, √AVE) is printed to the
@@ -294,9 +316,9 @@ sample preset named.
   `5: 50%, 80%, 90%, 95%, 99%`; aflMultiples, Queueing multiple u/(1 − u) at
   each level, `50%: 1; 80%: 4; 90%: 9; 95%: 19; 99%: 99`; aflLeads, Lead time
   at each level, `50%: 2 hours; 80%: 5 hours; 90%: 10 hours; 95%: 20 hours;
-  99%: 100 hours`; aflHigh, Lead time at the highest level, `99%: 100× the
+  99%: 100 hours`; aflHigh, Lead time at the highest level, `99%: 100.00× the
   service time`; aflRatio, Highest level's lead time over the lowest's,
-  `50× (50% to 99%)`. Preset `half-day` (levels `60 25`, service `1/2`, unit
+  `50.00× (50% to 99%)`. Preset `half-day` (levels `60 25`, service `1/2`, unit
   `days`): aflLeads `60%: 5/4 = 1.25 days; 25%: 2/3 ≈ 0.67 days`.
 
   Rules: the single-server queue with random arrivals and service (M/M/1),
@@ -318,7 +340,7 @@ sample preset named.
   Time to last release, `22 days → 28 days`; aflWait, Average wait per item
   (start to release), `22 days → 35/2 = 17.50 days`; aflOverhead, Total
   release overhead, `2 days → 8 days`; aflRatio, First feedback, first size
-  over second, `22/7 ≈ 3.1×`. A short last batch: work 10, batch 4,
+  over second, `≈ 3.14×`. A short last batch: work 10, batch 4,
   per_item `1/2`, release_cost 1 gives aflBatches `3: 2 of 4, the last of 2`.
 
   Rules: one worker, items one after another; batch i is released at (items
@@ -338,7 +360,7 @@ sample preset named.
   aflAvgLead, Average lead time of items done (from the log), `no board
   log`; aflLittle, Little's law on the log, `no board log`; aflLeadAt, Lead
   time at each work in process, `WIP 12: 8 days; WIP 6: 4 days`; aflChange,
-  Second lead time over the first, `1/2 ≈ 0.5× the lead time (8 → 4 days)`.
+  Second lead time over the first, `0.50× the lead time (8 → 4 days)`.
   Preset `board` (items `w1, 0, 3; w2, 0, 4; w3, 1, 6; w4, 2, 9; w5, 5, -;
   w6, 7, 10`, wip 4): aflThru `1/2 = 0.50 items a day`, aflAvgWip
   `27/10 = 2.70 items`, aflAvgLead `22/5 = 4.40 days`, aflLittle `differs:
@@ -402,13 +424,13 @@ sample preset named.
   - arlGroups, Release groups, `3: {web, cart, pay, ledger}, {search}, {mail}`;
   - arlLargest, Largest group, `4: web, cart, pay, ledger`;
   - arlAlone, Deployable alone, `2: search, mail`;
-  - arlCoord, Teams that must coordinate a release, `1: shop + money for {web, cart, pay, ledger}`;
+  - arlCoord, Teams that must coordinate a release, `1 group spans more than one team: shop + money for {web, cart, pay, ledger}` (the count is of groups; with two, `2 groups span more than one team: x + y for {a, b}; x + z for {c, d}`);
   - arlRemoved, The tie removed, `removing cart–pay splits a group: 3 → 4 release groups`;
   - arlAfterGroups, Release groups after, `4: {web, cart}, {pay, ledger}, {search}, {mail}`;
   - arlAfterAlone, Deployable alone after, `2: search, mail`;
-  - arlAfterCoord, Teams that must coordinate after, `0: none`.
+  - arlAfterCoord, Teams that must coordinate after, `none: every release group belongs to one team`.
 
-  Without teams arlCoord reads `no team column given`; without `remove` the
+  Without teams arlCoord reads `no teams given`; without `remove` the
   after tiles read `no tie removed`. A tie inside a cycle changes nothing:
   `removing c–a changes no group: c and a are still tied through others`.
   Groups are connected components, listed by their first component in the
@@ -728,10 +750,10 @@ Fields common to score and westrum: `points` (select `5`/`7`, default `7`;
   `agrInRows`), `first`, `second` (group names, required, different;
   `agrInFirst`, `agrInSecond`). Example rows `high, 30, 18; low, 40, 8`, first
   `high`, second `low`: `agrShares` Share meeting the outcome `high 18 of 30 =
-  60%; low 8 of 40 = 20%`; `agrRatio` Times as likely (share ÷ share) `3×`
-  (2 places otherwise: `≈ 1.93×`, `0.50×`); `agrDiff` Difference in
+  60%; low 8 of 40 = 20%`; `agrRatio` Times as likely (share ÷ share) `3.00×`
+  (always 2 places: `≈ 1.93×`, `0.50×`); `agrDiff` Difference in
   percentage points `+40 points`; `agrOdds` Odds ratio (a different figure)
-  `6`. When the second share is 0: `not defined: no one in low met it`; when
+  `6.00`. The table's share column reads `3/5 = 60%`. When the second share is 0: `not defined: no one in low met it`; when
   everyone in the first met it the odds ratio reads `not defined: everyone in
   high met it`.
 - **enps**. Field `answers` (whole 0–10, ≥ 1; `agrInAnswers`), or with
