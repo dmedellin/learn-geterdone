@@ -220,7 +220,7 @@ LESSONS = [
                   "loadings above 0.60 without cross-loading, average variance "
                   "extracted above 0.50, the square root of that above each "
                   "correlation with another construct, and correlations below "
-                  "0.85, which Course 7 reads and computes. The averages here "
+                  "0.85, which Surveys, Data and Statistical Methods reads and computes. The averages here "
                   "show the pattern those tests look for, with six items and "
                   "no people, and a stray item can hide in an average that "
                   "looks acceptable."),
@@ -541,8 +541,8 @@ LESSONS = [
             ("p", "Use the sums of squares method of the worked example. Say "
                   "which signal you would look at first, and what you would "
                   "want to know about it before you removed it."),
-            ("p", "That ends the first two chapters of Part II. Course 7, "
-                  "Surveys, Data and Statistical Methods, begins with Chapter "
+            ("p", "That ends the first two chapters of Part II. Surveys, Data "
+                  "and Statistical Methods begins with Chapter "
                   "14's case for surveys, in its first lesson, Surveys Allow You "
                   "to Collect and Analyze Data Quickly."),
         ],

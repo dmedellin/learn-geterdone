@@ -119,7 +119,7 @@ COURSE = {
         "small samples could not support one.",
         "The tests of the measurement model, the relationship tests and the "
         "bias tests in full. Chapter 13 and Chapter 12 name them; Appendix C "
-        "defines them, and Course 7 computes them.",
+        "defines them, and Surveys, Data and Statistical Methods computes them.",
         "Queueing and flow, which have other homes in this library; none "
         "appears in these chapters.",
     ],

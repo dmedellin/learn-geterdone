@@ -225,8 +225,6 @@ SPOKEN.update({
         "six with r 6, 29.75 divided by 6 equals 4.958",
     "shift: (5.5 − 4.85) / 6 = 0.108":
         "shift, open bracket, 5.5 minus 4.85, close bracket, divided by 6 equals 0.108",
-    "-":
-        "dash",
     "a, -, east; b, -, west; c, a, east; d, a, east; e, b, west; f, c, east; g, c, east; h, e, west":
         "a, dash, east, b, dash, west, c, a, east, d, a, east, e, b, west, f, c, east, g, c, east, h, e, west",
     "ana's tree: 1 + 3 + 3 + 1 = 8, 8 / 20 = 40 percent":

@@ -486,7 +486,7 @@ LESSONS = [
                   "survey data and from a theory about how these things fit "
                   "together. The lesson&rsquo;s point is narrower: a ratio between "
                   "two groups tells you what happened to the teams in front of "
-                  "you, and a third factor can stand behind it. Course 6 returns "
+                  "you, and a third factor can stand behind it. The Science Behind the Book returns "
                   "to the question of when a relationship in data supports a "
                   "claim about cause."),
             ("h3", "Exercise"),
@@ -640,7 +640,7 @@ LESSONS = [
             "The lab compares the counts you give it. It cannot say which "
             "third factor matters, whether the teams are alike in other ways, "
             "or whether any practice caused any result; the authors argue those "
-            "from many years of survey data, and Course 6 reads how."
+            "from many years of survey data, and The Science Behind the Book reads how."
         ),
     },
 ]

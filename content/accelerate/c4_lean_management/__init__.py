@@ -110,10 +110,10 @@ COURSE = {
         "8.1 and 8.2. The findings they draw are stated in the lessons' own words; "
         "the figures are better read in the book.",
         "The survey items behind each practice. The lessons describe what was "
-        "asked at the level the chapters do, and Course 7 reads how the survey "
+        "asked at the level the chapters do, and Surveys, Data and Statistical Methods reads how the survey "
         "was built.",
         "The statistics behind the words &ldquo;predict&rdquo; and "
-        "&ldquo;correlated&rdquo;. They are Chapter 12, read in Course 6, The "
+        "&ldquo;correlated&rdquo;. They are Chapter 12, read in The "
         "Science Behind the Book; this course states the claims at the strength "
         "the chapters give them.",
         "The technical practices that the change-management chapter leans on, the "

@@ -403,7 +403,7 @@ LESSONS = [
             "The lab computes a correlation on the invented teams you give it. It "
             "cannot say whether the pain scores are honest, whether a third thing "
             "drives both columns, or which way any cause runs; the authors argue "
-            "those from their model, and Course 6 reads how."
+            "those from their model, and The Science Behind the Book reads how."
         ),
     },
     # ---------------------------------------------------------------- 02
@@ -1247,7 +1247,7 @@ LESSONS = [
         ),
         "note": (
             "The lab averages the items you assign. It cannot say whether the "
-            "items form a good construct (Course 7 reads the checks), whether "
+            "items form a good construct (Surveys, Data and Statistical Methods reads the checks), whether "
             "either mean is high or low in general, or what produced it."
         ),
     },

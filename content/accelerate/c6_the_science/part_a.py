@@ -732,7 +732,7 @@ LESSONS = [
              "Pearson's r is a coefficient between −1 and 1, not a share of "
              "anything. An r of 0.5 is not half of a perfect relationship in any "
              "sense you can act on. Squaring it gives the share of variance a "
-             "straight line accounts for, which the last lesson of Course 7 "
+             "straight line accounts for, which the last lesson of Surveys, Data and Statistical Methods "
              "takes up."),
             ("Taking a zero correlation to mean nothing is going on",
              "Pearson's r measures a linear relationship only. A pair that moves "
@@ -844,7 +844,7 @@ LESSONS = [
                   "performance, that software delivery performance positively "
                   "affects organisational performance, and that organisational "
                   "culture positively affects both. The statistical methods were "
-                  "multiple linear regression or partial least squares, which Appendix C describes and Course 7 reads. "
+                  "multiple linear regression or partial least squares, which Appendix C describes and Surveys, Data and Statistical Methods reads. "
                   "Appendix C adds the matching rule: where no supporting theory "
                   "suggests a predictive relationship, the authors report only the "
                   "correlation."),
@@ -1057,7 +1057,7 @@ LESSONS = [
                     "use of causal analysis where randomised data can be had."},
         ],
         "mistakes": [
-            ("Reading &ldquo;drives&rdquo; as proof of cause",
+            ("Reading “drives” as proof of cause",
              "In Chapter 12 the word has a stated meaning: a theory-based "
              "hypothesis tested on survey data under inferential predictive "
              "design. The authors call causal analysis the gold standard and "
@@ -1155,8 +1155,8 @@ LESSONS = [
                   "how Chapter 12, in its section on Classification Analysis, "
                   "describes the process in one line. The book's most quoted "
                   "result, that there are high, medium and low performers, comes "
-                  "from it. Chapter 2 reports the groups, and Course 1's lesson "
-                  "High, Medium and Low Performers reads them; this lesson reads "
+                  "from it. Chapter 2 reports the groups, and the lesson High, "
+                  "Medium and Low Performers reads them; this lesson reads "
                   "the method."),
             ("p", "Classification is not one of Leek's six, and the authors say "
                   "so: depending on the context, design and methods, it may count "
@@ -1534,7 +1534,7 @@ LESSONS = [
                   "organisational culture temperature of sorts. Chapter 13 "
                   "says that statistical tests can then confirm that the items "
                   "do measure the same underlying idea; the next lesson reads "
-                  "those tests, and Course 2's lesson Measuring Culture scores "
+                  "those tests, and Measuring and Changing Culture's lesson Measuring Culture scores "
                   "the authors' own culture construct."),
             ("p", "Now score a construct. The lab's sample is invented for the "
                   "lesson: confidence in releasing, measured by four items. Three "

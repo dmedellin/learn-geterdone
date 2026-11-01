@@ -1409,7 +1409,7 @@ LESSONS = [
                   "reciprocal relationship is suggested by the literature; what "
                   "carries the claim is two years of analysis, which the number "
                   "from a single correlation cannot. "
-                  "Chapter 12 and Course 6 take up what the book argues about "
+                  "Chapter 12 and The Science Behind the Book take up what the book argues about "
                   "cause."),
             ("p", "Now the count. The lab takes a name and two scores for each "
                   "team and computes Pearson's r. The sample is eight invented "

@@ -400,7 +400,7 @@ LESSONS = [
              "a convenience with cut-points the lesson chose, and a person "
              "whose mean is 4.9 and one whose mean is 5.1 are not in different "
              "worlds."),
-            ("Reading &ldquo;bureaucratic&rdquo; as an insult",
+            ("Reading “bureaucratic” as an insult",
              "The authors take care to say bureaucracy is not necessarily bad. "
              "Its goal, in the words they quote, is to treat every case alike "
              "and to keep the best rules the organization has learned. The "
@@ -994,7 +994,7 @@ LESSONS = [
                     "other options are not what the chapter reports."},
         ],
         "mistakes": [
-            ("Reading &ldquo;predicts&rdquo; as &ldquo;causes&rdquo;",
+            ("Reading “predicts” as “causes”",
              "The chapter hypothesized that culture would predict delivery "
              "performance, organizational performance and job satisfaction from "
              "theory and earlier research, and found data consistent with it. "
