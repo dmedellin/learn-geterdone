@@ -2007,11 +2007,87 @@ DDD_COURSES = (
 DDD_PATH_COURSE_COUNT = 9
 DDD_UPCOMING_COURSES = ()
 
+# The Design Patterns path: six courses, all published.
+# Generated from content/design_patterns/ so these cannot disagree with
+# what is built.
+GOF_PATH_PAGE = "/paths/design-patterns/"
+
+GOF_COURSE_1_HOME = "/gof-introduction/"
+GOF_COURSE_1_LESSONS = (
+    "what-is-a-design-pattern",
+    "describing-and-organizing-the-catalog",
+    "objects-interfaces-and-implementations",
+    "inheritance-versus-composition",
+    "designing-for-change",
+    "selecting-and-using-a-pattern",
+)
+GOF_COURSE_2_HOME = "/gof-document-editor/"
+GOF_COURSE_2_LESSONS = (
+    "document-structure",
+    "formatting",
+    "embellishing-the-interface",
+    "look-and-feel",
+    "window-systems",
+    "user-operations",
+    "spelling-and-hyphenation",
+)
+GOF_COURSE_3_HOME = "/gof-creational/"
+GOF_COURSE_3_LESSONS = (
+    "abstract-factory",
+    "builder",
+    "factory-method",
+    "prototype",
+    "singleton",
+    "creational-discussion",
+)
+GOF_COURSE_4_HOME = "/gof-structural/"
+GOF_COURSE_4_LESSONS = (
+    "adapter",
+    "bridge",
+    "composite",
+    "decorator",
+    "facade",
+    "flyweight",
+    "proxy",
+    "structural-discussion",
+)
+GOF_COURSE_5_HOME = "/gof-behavioral-requests/"
+GOF_COURSE_5_LESSONS = (
+    "chain-of-responsibility",
+    "command",
+    "interpreter",
+    "iterator",
+    "mediator",
+    "memento",
+)
+GOF_COURSE_6_HOME = "/gof-behavioral-objects/"
+GOF_COURSE_6_LESSONS = (
+    "observer",
+    "state",
+    "strategy",
+    "template-method",
+    "visitor",
+    "behavioral-discussion",
+    "conclusion",
+)
+
+GOF_COURSES = (
+    ("What Design Patterns Are", GOF_COURSE_1_HOME, GOF_COURSE_1_LESSONS),
+    ("A Case Study: Designing a Document Editor", GOF_COURSE_2_HOME, GOF_COURSE_2_LESSONS),
+    ("Creational Patterns", GOF_COURSE_3_HOME, GOF_COURSE_3_LESSONS),
+    ("Structural Patterns", GOF_COURSE_4_HOME, GOF_COURSE_4_LESSONS),
+    ("Behavioral Patterns I: Requests, Languages and Traversal", GOF_COURSE_5_HOME, GOF_COURSE_5_LESSONS),
+    ("Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion", GOF_COURSE_6_HOME, GOF_COURSE_6_LESSONS),
+)
+
+GOF_PATH_COURSE_COUNT = 6
+GOF_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
                + READ_COURSES + CC_COURSES + EAA_COURSES
-               + ITA_COURSES + DDD_COURSES)
+               + ITA_COURSES + DDD_COURSES + GOF_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -2134,7 +2210,7 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
                        CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE,
-                       DDD_PATH_PAGE)
+                       DDD_PATH_PAGE, GOF_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -2171,6 +2247,8 @@ PATHS = (
      ITA_COURSES, ITA_PATH_COURSE_COUNT, ITA_UPCOMING_COURSES),
     ("Domain-Driven Design, Read Along", DDD_PATH_PAGE,
      DDD_COURSES, DDD_PATH_COURSE_COUNT, DDD_UPCOMING_COURSES),
+    ("Design Patterns, Read Along", GOF_PATH_PAGE,
+     GOF_COURSES, GOF_PATH_COURSE_COUNT, GOF_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2406,6 +2484,12 @@ ITA_DISCLAIMER_RE = re.compile(
 # modelling choice, not a verdict on it. The clause after the second em dash.
 DDD_DISCLAIMER_RE = re.compile(
     r"(?i)one consequence of one modelling choice")
+# Design Patterns promises that every figure is counted from the small design
+# a lesson states, and warns that a count shows one consequence of applying a
+# pattern or not, not a verdict on the pattern. The clause after the second
+# em dash.
+GOF_DISCLAIMER_RE = re.compile(
+    r"(?i)one consequence of applying a pattern or not")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2438,6 +2522,8 @@ PATH_MATERIAL_DISCLAIMER = {
                     ITA_DISCLAIMER_RE),
     DDD_PATH_PAGE: ("the one-consequence-of-one-modelling-choice disclaimer",
                     DDD_DISCLAIMER_RE),
+    GOF_PATH_PAGE: ("the one-consequence-of-applying-a-pattern-or-not disclaimer",
+                    GOF_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2797,12 +2883,17 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(DDD_COURSES)
             + sum(len(slugs) for _t, _h, slugs in DDD_COURSES)
         )
+        gof_tree = (
+            1  # the Design Patterns path page
+            + len(GOF_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in GOF_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
                        + cc_tree + eaa_tree + ita_tree
-                       + ddd_tree)  # 1 for the index
+                       + ddd_tree + gof_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -2900,9 +2991,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 63 pages, got %d" % ddd_tree,
         )
         self.assertEqual(
-            1460,
+            47,
+            gof_tree,
+            "the Design Patterns path is 1 + 6 + 6 + 7 + 6 + 8 + 6 + 7 "
+            "= 47 pages, got %d" % gof_tree,
+        )
+        self.assertEqual(
+            1507,
             course_tree,
-            "the site index plus all sixteen path trees is 1460 pages, got %d" % course_tree,
+            "the site index plus all seventeen path trees is 1507 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -2913,9 +3010,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1464,
+            1511,
             expected,
-            "1460 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1464, "
+            "1507 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1511, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -3137,6 +3234,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "enterprise_patterns": getattr(smoke, "EAA_COURSES", ()),
             "intro_algorithms": getattr(smoke, "ITA_COURSES", ()),
             "domain_driven_design": getattr(smoke, "DDD_COURSES", ()),
+            "design_patterns": getattr(smoke, "GOF_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3549,9 +3647,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1443,
+            1489,
             len(course_pages),
-            "one hundred and forty-four course homes and 1299 lessons carry a material "
+            "one hundred and fifty course homes and 1339 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4544,7 +4642,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(144, checked, "every published course must be checked")
+        self.assertEqual(150, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -4849,6 +4947,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
             from intro_algorithms import PATH as INTRO_ALGORITHMS
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
+            from design_patterns import PATH as DESIGN_PATTERNS
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -4866,6 +4965,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("enterprise patterns", EAA_COURSES, EAA_PATH_PAGE, ENTERPRISE_PATTERNS),
             ("intro algorithms", ITA_COURSES, ITA_PATH_PAGE, INTRO_ALGORITHMS),
             ("domain-driven design", DDD_COURSES, DDD_PATH_PAGE, DOMAIN_DRIVEN_DESIGN),
+            ("design patterns", GOF_COURSES, GOF_PATH_PAGE, DESIGN_PATTERNS),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -5005,13 +5105,14 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
             from intro_algorithms import PATH as INTRO_ALGORITHMS
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
+            from design_patterns import PATH as DESIGN_PATTERNS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
-                     DOMAIN_DRIVEN_DESIGN):
+                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -5201,6 +5302,7 @@ class TestEveryLabBuilds(unittest.TestCase):
             from enterprise_patterns import PATH as ENTERPRISE_PATTERNS
             from intro_algorithms import PATH as INTRO_ALGORITHMS
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
+            from design_patterns import PATH as DESIGN_PATTERNS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
@@ -5208,7 +5310,7 @@ class TestEveryLabBuilds(unittest.TestCase):
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
-                     DOMAIN_DRIVEN_DESIGN):
+                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]
