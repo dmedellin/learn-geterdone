@@ -23,6 +23,7 @@ const PAGES = [
   ['generated', '/intro-algorithms-foundations/insertion-sort-and-loop-invariants/'],
   ['generated', '/ddd-putting-the-model-to-work/ubiquitous-language/'],
   ['generated', '/gof-behavioral-objects/observer/'],
+  ['generated', '/accelerate-measuring-performance/the-four-measures/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];

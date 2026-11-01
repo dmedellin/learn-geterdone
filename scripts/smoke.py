@@ -2447,6 +2447,101 @@ GOF_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Accelerate, same shape.
+ACC_PATH_PAGE_PATH = "/paths/accelerate/"
+ACC_MATERIAL_MARKER = "shows what one measure says about that sample"
+ACC_COURSES = (
+    ("accelerate-measuring-performance", "Accelerate and Measuring Performance", (
+        "capabilities-not-maturity",
+        "the-flaws-in-previous-measures",
+        "the-four-measures",
+        "high-medium-and-low-performers",
+        "delivery-and-organizational-performance",
+    )),
+    ("accelerate-culture", "Measuring and Changing Culture", (
+        "modeling-culture",
+        "likert-type-questions",
+        "what-westrum-culture-predicts",
+        "how-do-we-change-culture",
+    )),
+    ("accelerate-technical-practices", "Technical Practices and Architecture", (
+        "what-is-continuous-delivery",
+        "the-impact-of-continuous-delivery",
+        "version-control-and-test-automation",
+        "trunk-based-development",
+        "deployability-and-testability",
+        "loosely-coupled-architecture-enables-scaling",
+        "tools-and-architects",
+    )),
+    ("accelerate-lean-management", "Security, Lean Management and Product Development", (
+        "shifting-left-on-security",
+        "lean-management-practices",
+        "lightweight-change-management",
+        "lean-product-development",
+        "team-experimentation-and-product-management",
+    )),
+    ("accelerate-people", "Sustainable Work, Satisfaction and Leadership", (
+        "deployment-pain",
+        "burnout",
+        "employee-loyalty-and-nps",
+        "identity-and-job-satisfaction",
+        "diversity-in-tech",
+        "transformational-leadership",
+        "the-role-of-managers",
+    )),
+    ("accelerate-the-science", "The Science Behind the Book", (
+        "primary-secondary-qualitative-quantitative",
+        "descriptive-and-exploratory-analysis",
+        "inferential-predictive-analysis",
+        "classification-analysis",
+        "latent-constructs",
+        "several-views-and-rogue-data",
+        "latent-constructs-and-system-data",
+    )),
+    ("accelerate-surveys-and-data", "Surveys, Data and Statistical Methods", (
+        "surveys-collect-data-quickly",
+        "you-can-trust-survey-data",
+        "the-data-for-the-project",
+        "tests-for-bias",
+        "tests-of-the-measurement-model",
+        "tests-for-relationships-and-classification",
+    )),
+    ("accelerate-transformation", "Transformation", (
+        "a-high-performing-management-framework",
+        "stand-ups-catchball-and-kata",
+        "transforming-leadership-and-team-practices",
+        "conclusion",
+        "capabilities-and-the-stats",
+    )),
+)
+
+ACC_PATH_PAGE_MARKERS = (
+    canonical_marker(ACC_PATH_PAGE_PATH),
+    html.escape(ACC_COURSES[0][1]),
+    html.escape(ACC_COURSES[-1][1]),
+    'href="../../%s/"' % ACC_COURSES[-1][0],
+)
+
+ACC_COURSE_HOMES = tuple(
+    (
+        "acc-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, ACC_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(ACC_COURSES, start=1)
+)
+
+ACC_COURSE_LESSONS = tuple(
+    (
+        "acc-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), ACC_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(ACC_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2551,6 +2646,7 @@ def path_page_targets(args):
         ("ita-path", ITA_PATH_PAGE_PATH, ITA_PATH_PAGE_MARKERS),
         ("ddd-path", DDD_PATH_PAGE_PATH, DDD_PATH_PAGE_MARKERS),
         ("gof-path", GOF_PATH_PAGE_PATH, GOF_PATH_PAGE_MARKERS),
+        ("acc-path", ACC_PATH_PAGE_PATH, ACC_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2582,7 +2678,8 @@ def course_home_targets(args):
                                     + EAA_COURSE_HOMES
                                     + ITA_COURSE_HOMES
                                     + DDD_COURSE_HOMES
-                                    + GOF_COURSE_HOMES):
+                                    + GOF_COURSE_HOMES
+                                    + ACC_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2629,6 +2726,7 @@ def lesson_targets(args):
         + ITA_COURSE_LESSONS
         + DDD_COURSE_LESSONS
         + GOF_COURSE_LESSONS
+        + ACC_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

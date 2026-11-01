@@ -3,7 +3,7 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
-## 0. Nothing is inert any more: all seventeen Subjects publish
+## 0. Nothing is inert any more: all eighteen Subjects publish
 
 `content/system_design/`, `content/algorithms/` and `content/operations_research/`
 were in the tree for months publishing nothing. All three are now in
@@ -25,11 +25,12 @@ were in the tree for months publishing nothing. All three are now in
 | Introduction to Algorithms | **published** — 8 courses, 61 lessons, 70 pages, wired 2026-10-31 (1,331 pages became 1,401); its package is `content/intro_algorithms/`, its path slug `intro-algorithms`, its kit `itakit` (with the Algorithms Subject's kits) |
 | Domain-Driven Design | **published** — 9 courses, 53 lessons, 63 pages, wired 2026-11-01 (1,401 pages became 1,464); its package is `content/domain_driven_design/`, its path slug `domain-driven-design`, its kit `dddkit` (with `cckit`'s and `eakit`'s modes) |
 | Design Patterns | **published** — 6 courses, 40 lessons, 47 pages, wired 2026-11-01 (1,464 pages became 1,511); its package is `content/design_patterns/`, its path slug `design-patterns`, its kit `gofkit` (with `dddkit`'s and `cckit`'s views) |
+| Accelerate | **published** — 8 courses, 46 lessons, 55 pages, wired 2026-11-01 (1,511 pages became 1,566); its package is `content/accelerate/`, its path slug `accelerate`, its kit `acckit` |
 
-211 lab modes are registered (Differential Equations added 22, Capital 17,
+223 lab modes are registered (Differential Equations added 22, Capital 17,
 Phenomenology 15, Reading Faster 8, Code Complete 8, Enterprise Application
-Patterns 8, Introduction to Algorithms 17, Domain-Driven Design 9, Design Patterns 9) and all twenty-eight kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
-pages: `node scripts/labcheck.js --generated` executes 1,379 generated pages, 787
+Patterns 8, Introduction to Algorithms 17, Domain-Driven Design 9, Design Patterns 9, Accelerate 12) and all twenty-nine kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
+pages: `node scripts/labcheck.js --generated` executes 1,434 generated pages, 833
 of them with pinned figures, and compares every pinned tile string against what
 the page prints. Philosophy's two kits, `argkit` and `choicekit`, account for 98
 of those pages, English's `english` kit for 41, Differential Equations' `calckit`
@@ -42,7 +43,8 @@ Algorithms Subject's kits (`graphkit`, `sortkit`, `hash`, `greedy` and thirteen
 more), some of which are not in `KITS_WITH_EXPECTATIONS`. Domain-Driven
 Design's `dddkit` serves 47 of its 53 lessons; five reuse `cckit` and one
 `eakit`. Design Patterns' `gofkit` serves 29 of its 40 lessons; seven reuse
-`dddkit` and four `cckit`. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
+`dddkit` and four `cckit`. Accelerate's `acckit` serves all 46 of its
+lessons. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
 directly by `scripts/mathcheck.js`, one case per function, each seen to fail
 when its function was broken on purpose.
 Before the last two Subjects were wired it said "0 with pinned figures" — those
@@ -78,7 +80,7 @@ and the one that wired these two:
   index. Group notes and card text are home-page copy and obey its copy rules;
 - new course slugs carry the Subject's short name as a prefix (`capital-`,
   `perception-`, `reading-`, `code-complete-`, `enterprise-patterns-`,
-  `intro-algorithms-`, `ddd-`, `gof-`) so that a generic title cannot collide in the flat
+  `intro-algorithms-`, `ddd-`, `gof-`, `accelerate-`) so that a generic title cannot collide in the flat
   course namespace. The older Subjects predate the rule and are NOT renamed:
   a published URL is never moved;
 - `content/spoken/<package>.py`, ONE file named for the Subject's package:
@@ -95,7 +97,7 @@ and the one that wired these two:
   and `TestEveryLabBuilds`, whose import lists name Discrete Mathematics,
   Algebra, Philosophy, English, Differential Equations, Capital, Phenomenology,
   Reading Faster, Code Complete, Enterprise Application Patterns,
-  Introduction to Algorithms, Domain-Driven Design and Design Patterns. Philosophy was added
+  Introduction to Algorithms, Domain-Driven Design, Design Patterns and Accelerate. Philosophy was added
   on wiring and the escaped-field check immediately found thirteen mistake
   titles showing `&ldquo;` literally; System Design, Algorithms and Operations
   Research are still not in those lists;
@@ -124,10 +126,10 @@ Five things that have each cost a day:
    `release/contract.schema.json` and by a test. `algebra-course6-lesson-`
    `quadratic-equations-and-the-zero-product-property` is exactly 72. The check
    id prefixes are short for that reason: `math`, `algebra`, `sysdesign`,
-   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`, `cc`, `eaa`, `ita`, `ddd`, `gof`. Differential
+   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`, `cc`, `eaa`, `ita`, `ddd`, `gof`, `acc`. Differential
    Equations' longest is 64, Capital's 66, Phenomenology's 62, Reading
    Faster's 52, Code Complete's 58, Enterprise Application Patterns' 58,
-   Introduction to Algorithms' 63, Domain-Driven Design's 65, Design Patterns' 57.
+   Introduction to Algorithms' 63, Domain-Driven Design's 65, Design Patterns' 57, Accelerate's 63.
 
 `tests/test_site_invariants.py` checks a Subject's tagline and description
 against its own course and lesson counts. Those sentences are written when a
@@ -152,7 +154,7 @@ and that is written down rather than engineered around.
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
 
 The site is a subject-agnostic LIBRARY OF PATHS. A path is an ordered sequence of
-courses on one subject. There are seventeen: **Trading** (8 courses, 118 lessons,
+courses on one subject. There are eighteen: **Trading** (8 courses, 118 lessons,
 hand-authored and normalized at intake), **Discrete Mathematics** (8 courses, 106
 lessons), **Algebra** (9 courses, 112 lessons), **System Design** (10 courses,
 114 lessons), **Algorithms** (9 courses, 112 lessons), **Operations Research**
@@ -163,17 +165,18 @@ lessons), **Reading Faster** (8 courses, 42 lessons), **Code Complete, Read
 Along** (7 courses, 41 lessons), **Patterns of Enterprise Application
 Architecture, Read Along** (7 courses, 44 lessons), **Introduction to
 Algorithms, Read Along** (8 courses, 61 lessons), **Domain-Driven Design,
-Read Along** (9 courses, 53 lessons) and **Design Patterns, Read Along** (6
-courses, 40 lessons) — the last sixteen GENERATED
-from `content/<subject>/`. 150 courses and 1,339 lessons in all. The
+Read Along** (9 courses, 53 lessons), **Design Patterns, Read Along** (6
+courses, 40 lessons) and **Accelerate, Read Along** (8 courses, 46 lessons)
+— the last seventeen GENERATED
+from `content/<subject>/`. 158 courses and 1,385 lessons in all. The
 published URL space:
 
 | URL | Served from |
 | --- | --- |
 | `learn.geterdone.io/` | `site/index.html` — the site index: the paths, plus course search |
-| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete`, `enterprise-patterns`, `intro-algorithms`, `domain-driven-design`, `design-patterns` |
-| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 150 course homes |
-| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,339 lessons |
+| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete`, `enterprise-patterns`, `intro-algorithms`, `domain-driven-design`, `design-patterns`, `accelerate` |
+| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 158 course homes |
+| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,385 lessons |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -184,7 +187,7 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 1,511-page map (plus eight published JSON assets) is in
+The full 1,566-page map (plus eight published JSON assets) is in
 [README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json` (and in
@@ -231,7 +234,7 @@ The apex `geterdone.io` is a **separate, live GitHub Pages site that this reposi
 does not control**. Do not deploy to it, reconfigure it, or write anything that
 implies we own its records. Linking to it is fine; changing it is out of scope.
 
-## 1a. One path is authored, sixteen are generated
+## 1a. One path is authored, seventeen are generated
 
 The paths are built in opposite directions and must be edited differently.
 
@@ -240,14 +243,14 @@ the library's conventions by `scripts/intake_course.py`. Its pages are the sourc
 of truth. Edit them directly.
 
 **Discrete Mathematics**, **Algebra**, **System Design**, **Algorithms**,
-**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology**, **Reading Faster**, **Code Complete**, **Enterprise Application Patterns**, **Introduction to Algorithms**, **Domain-Driven Design** and **Design Patterns** are generated. `content/<subject>/` holds each of them as
+**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology**, **Reading Faster**, **Code Complete**, **Enterprise Application Patterns**, **Introduction to Algorithms**, **Domain-Driven Design**, **Design Patterns** and **Accelerate** are generated. `content/<subject>/` holds each of them as
 data — one Python module per course, with the lessons as dicts — and
-`scripts/build_paths.py` renders all 1,379 of their pages from `scripts/mathpath/`
+`scripts/build_paths.py` renders all 1,434 of their pages from `scripts/mathpath/`
 (one stylesheet, one chrome renderer, one lab kit per subject area). **Never
 edit a page under one of those course slugs by hand**: the next build reverts it,
 so the change appears to work and then vanishes.
 
-    python3 scripts/build_paths.py                     # rebuild all sixteen
+    python3 scripts/build_paths.py                     # rebuild all seventeen
     python3 scripts/build_paths.py --check             # fail if any page is stale
     node scripts/mathcheck.js                          # check the arithmetic itself
     node scripts/labcheck.js --generated               # execute every lab
@@ -419,6 +422,15 @@ the seven `dddkit` pages are 34.1 KB median and the four `cckit` pages 32.4
 KB. The heaviest course is Behavioral Patterns I (34.1 KB median gzipped);
 the heaviest page is Behavioral Patterns II's `strategy` (`cckit` code) at
 37.7 KB; the lightest course is Structural Patterns at 33.3 KB. The ceiling
+below is unchanged.
+
+Re-measured 2026-11-01 when Accelerate was wired, with its first drafts and
+before the per-course reviews. Its 46 lessons, all `acckit` pages, are 128 KB /
+140 KB raw and 34 KB / 36 KB gzipped (median / max), in Code Complete's range,
+so they have no row of their own. The heaviest course is Transformation (34.6
+KB median gzipped); the heaviest page is Accelerate and Measuring
+Performance's `capabilities-not-maturity` at 35.8 KB; the lightest course is
+Security, Lean Management and Product Development at 33.0 KB. The ceiling
 below is unchanged.
 
 Re-derive them rather than trusting them; they go stale every time a lab grows:
