@@ -367,7 +367,7 @@ LESSONS = [
                  "expect": {
                             "acpOverall": "Atlas 14 of 24",
                             "acpCategories": "Atlas: continuous-delivery 4 of 8, architecture 1 of 2, product-and-process 2 of 4, lean-management-and-monitoring 3 of 5, cultural 4 of 5",
-                            "acpLevel": "Atlas 1",
+                            "acpLevel": "Atlas 1 (level 1 of 3)",
                             "acpHidden": "Atlas 3: continuous-integration, test-automation, monitoring",
                  }},
                 {"id": "two-teams",
@@ -377,9 +377,9 @@ LESSONS = [
                  "levels": LADDER,
                  "expect": {
                             "acpOverall": "Atlas 14 of 24; Brook 8 of 24",
-                            "acpLevel": "Atlas 1; Brook 2",
+                            "acpLevel": "Atlas 1 (level 1 of 3); Brook 2 (level 2 of 3)",
                             "acpHidden": "Atlas 3: continuous-integration, test-automation, monitoring; Brook 1: continuous-delivery",
-                            "acpFewest": "0 of 2 teams: loosely-coupled-architecture, value-stream, team-experimentation, change-approval-processes, proactive-notification, transformational-leadership",
+                            "acpFewest": "0 of 2 teams: loosely-coupled-architecture, value-stream, team-experimentation and 3 more (the table lists all)",
                  }},
                 {"id": "later",
                  "label": "Atlas in March and in September",
