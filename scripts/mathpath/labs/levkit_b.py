@@ -89,7 +89,7 @@ LAS_VIEW_JS["voices"] = r"""
     return {
       tiles: { lasYes: eaInt(y), lasNo: eaInt(x), lasAbstain: eaInt(ab.length), lasDecision: dec,
         lasMargin: eaSigned(y - x), lasNeeded: need, lasLiable: liable, lasExcused: excused },
-      status: lvkStatus('The motion ' + (verdict === 'mute' ? 'is lost: the assembly is mute' : verdict)
+      status: lvkStatus((verdict === 'mute' ? 'The assembly is mute: nothing is decreed' : 'The motion ' + verdict)
         + ' on the rule of ' + ruleText + (liableOn && verdict === 'passes' ? '; only those who voted for the decree are answerable for it' : '')),
       table: { caption: 'Each member\'s voice', head: liableOn ? ['member', 'voice', 'for the decree'] : ['member', 'voice'], rows: rows }
     };
@@ -388,7 +388,8 @@ LLW_VIEW_JS["deter"] = r"""
     return {
       tiles: { llwExpected: eaNum(e), llwNet: (net.n > 0n ? '+' : '') + eaNum(net), llwDeters: deters, llwLeast: least, llwHostility: host, llwPrice: price },
       status: lvkStatus('At a certainty of ' + lvkPct(c) + ' a penalty of ' + eaNum(p) + ' is expected to cost ' + eaNum(e) + ' against a gain of ' + eaNum(g)
-        + (k > 0 ? ': on this model the crime does not pay' : ': on this model the hope of impunity makes the crime pay') + ' (deterrence here is a stated model, the expected penalty against the gain)'),
+        + (k > 0 ? ': on this model the crime does not pay' : Rcmp(c, R1) < 0 ? ': on this model the hope of impunity makes the crime pay'
+          : ': the penalty is certain but not more than the gain, so it is rather the price of the crime') + ' (deterrence here is a stated model, the expected penalty against the gain)'),
       table: null
     };
   };
@@ -592,7 +593,7 @@ ASSEMBLY = {
             "rules": "Each member gives one voice: yes, no or abstain. On the rule greater, the motion passes when the "
                      "yes voices are more than the no voices given; on the rule absolute, when the yes voices are more "
                      "than half of all the members, abstainers counted. On either rule, when the yes and no voices are "
-                     "equal (none at all included) the assembly is mute and the motion is lost (Chapter 16). With "
+                     "equal (none at all included) the assembly is mute and nothing is decreed (Chapter 16). With "
                      "answerable shown, a decree that passes binds as its authors only the members who voted yes; "
                      "those who voted no or abstained are excused (Chapter 22). Members go in the order given.",
             "js": LAS_VIEW_JS["voices"],

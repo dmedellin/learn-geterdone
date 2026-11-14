@@ -82,8 +82,8 @@ COURSE = {
         "Use the labs to change one thing at a time. Each preset changes a single figure "
         "against the one before, a chance, a penalty, a payoff, a rate, and the point of "
         "the lesson is in what moves and what does not.",
-        "Expect the argument lessons to be short on numbers. “Of Civil Laws” and “The "
-        "Kingdom of God by Nature” test an argument's form, which tells you what "
+        "Expect the argument lessons to be short on numbers. <em>Of Civil Laws</em> and <em>The "
+        "Kingdom of God by Nature</em> test an argument's form, which tells you what "
         "follows if the premises are granted and nothing about whether they are.",
         "Keep the definitions apart from the verdict. Every figure is computed from "
         "the definitions the chapter gives and from examples written for these "

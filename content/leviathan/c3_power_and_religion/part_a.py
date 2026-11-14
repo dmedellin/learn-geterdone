@@ -55,7 +55,7 @@ POWER_AND_WORTH = {
         "later, is quoted in the middle of the lesson, where it is needed."
     ),
     "body": [
-        ("p", "<strong>Chapter 10.</strong> &ldquo;The Power of a Man, (to take it "
+        ("p", "<strong>Chapter 10.</strong> &ldquo;The POWER of a Man, (to take it "
               "Universally,) is his present means, to obtain some future apparent Good. "
               "And is either Originall, or Instrumentall.&rdquo;"),
         ("p", "Think of the last time you were asked what you could do. A job interview "
@@ -92,9 +92,9 @@ POWER_AND_WORTH = {
               "protection. Eloquence is power because it is seeming prudence, and the "
               "sciences are only &ldquo;small Power&rdquo;, since few can recognise them. "
               "The greatest human power is &ldquo;compounded of the Powers of most men, "
-              "united by consent, in one person&rdquo;: a commonwealth. Hobbes wrote this "
-              "in Paris, an exile from the English Civil War, and he had watched what "
-              "united strengths could do to a king."),
+              "united by consent, in one person&rdquo;: a commonwealth, or a faction. Hobbes "
+              "had left England in 1640 and watched the Civil War from Paris, so he had "
+              "seen what united strengths could do to a king."),
         ("p", "Now the definition of worth, which is the part this lesson computes. "
               "<strong>Chapter 10.</strong> &ldquo;The Value, or WORTH of a man, is as of "
               "all other things, his Price; that is to say, so much as would be given for "
@@ -133,13 +133,13 @@ POWER_AND_WORTH = {
               "one-buyer preset leaves only the war buyer, and shows what an ordinary "
               "ranking looks like when there is just one set of needs: perfectly "
               "definite, and for that buyer alone."),
-        ("p", "There is a fair objection to the whole idea, and the next lesson meets "
-              "its best form. Immanuel Kant wrote in 1785 that whatever has a price can "
-              "be replaced by an equivalent, while a person has a dignity above all price. "
-              "Hobbes does not deny that people matter. He is defining a word, worth, "
-              "that he thinks does the work in everyday talk, and then, in the sentences "
-              "that follow, defining a different word, dignity, for what the commonwealth "
-              "sets. The next lesson, &ldquo;Honour, Dignity and Worthiness&rdquo;, "
+        ("p", "There is a fair objection to the whole idea, and the next lesson takes it "
+              "up. Immanuel Kant wrote in 1785 that whatever has a price can be replaced "
+              "by an equivalent, while a person has a dignity above all price. To price "
+              "a person, on that view, treats as replaceable what has no equivalent. "
+              "Hobbes defines worth as price and then, in the sentences that follow, "
+              "defines a different word, dignity, for what the commonwealth sets. The "
+              "next lesson, <em>Honour, Dignity and Worthiness</em>, "
               "takes up what honour is and how the commonwealth's valuation can differ "
               "from every buyer's."),
     ],
@@ -268,8 +268,8 @@ POWER_AND_WORTH = {
          "c": 1,
          "why": "The general tops the war buyer's list, the judge the peace buyer's and "
                 "the orator the faction's, so no one is first for all three. The "
-                "merchant is never lowest for the war or peace buyer (the orator and "
-                "the general are), and the buyers set the prices by their needs, so there "
+                "merchant is never lowest (the orator is for war, the general for peace "
+                "and for the faction), and the buyers set the prices by their needs, so there "
                 "is no mistake to find."},
     ],
     "mistakes": [
@@ -279,8 +279,8 @@ POWER_AND_WORTH = {
          "buying, and the general is worth 37 to one buyer and 16 to another. Nothing "
          "about either man changed."),
         ("Counting only strength and skill as power",
-         "Hobbes's list of instrumental powers is as long as his list of natural ones, "
-         "and he spends most of the chapter on it: riches (with liberality), reputation, "
+         "Hobbes's list of what counts as power runs well past strength and skill: "
+         "riches (with liberality), reputation, "
          "friends, popularity, good success, affability. In the lab, the merchant's riches "
          "are what make him worth 24 to a faction hunting for support, though no one "
          "would call him strong."),
@@ -367,7 +367,8 @@ HONOUR_AND_DIGNITY = {
               "one else's need would give him, and can set it by a stroke of the pen. "
               "Think of a title or a rank: it costs the man nothing to be addressed by it "
               "and it changes what everyone around him does. That is why Hobbes "
-              "puts dignity in the list next to worth and not as one of its kinds."),
+              "calls dignity a man's <em>public</em> worth: a worth, but one set by a single "
+              "buyer whose valuation binds everyone."),
         ("p", "Before it, though, he has defined honour, and the order matters. "
               "&ldquo;The manifestation of the Value we set on one another, is that "
               "which is commonly called Honouring, and Dishonouring.&rdquo; Honour is "
@@ -390,8 +391,8 @@ HONOUR_AND_DIGNITY = {
               "with justice. &ldquo;Nor does it alter the case of Honour, whether an action "
               "(so it be great and difficult, and consequently a signe of much power,) be "
               "just or unjust: for Honour consisteth onely in the opinion of Power.&rdquo; "
-              "His examples are the adulteries of Jupiter, the piracy of the early "
-              "Greeks, and the duel in his own day. It is among the harder passages of the "
+              "His examples are the adulteries of Jupiter, piracy, a lawful trade "
+              "among the Greeks and other nations before great commonwealths, and the duel in his own day. It is among the harder passages of the "
               "chapter, and it is worth noticing that he describes what men honour, "
               "not what they should."),
         ("p", "Then the commonwealth's own honours, and his best scene. &ldquo;The King "
@@ -412,8 +413,8 @@ HONOUR_AND_DIGNITY = {
               "for the judge; 10 for the orator, who holds no office; 15 for the merchant. "
               "These are invented figures, as the prices were. The titles preset puts them "
               "beside the three prices of each man. The general's dignity is above every "
-              "buyer's price for him; so is the judge's, though it equals exactly what "
-              "the peace buyer would give; the orator's and the merchant's are below. "
+              "buyer's price for him; the judge's is above two and equal to the third, "
+              "the peace buyer's 34; the orator's and the merchant's are below. "
               "Everyone's dignity but the judge's differs from all three prices."),
         ("p", "The raised-orator preset has the commonwealth raise the orator to 30. "
               "That equals what the faction would give for him, and is above the "
@@ -433,15 +434,18 @@ HONOUR_AND_DIGNITY = {
               "chapters on contracts. So there are four things: what a buyer would pay, "
               "what the sovereign has declared, what the man is fit for, and what he is "
               "owed. A single table cannot show the last two, and the lab does not try."),
-        ("p", "Earlier objections to pricing persons come back here, with a fair "
-              "reply from Hobbes's side. Kant's word for what a person has that a thing "
-              "does not is also dignity, and he means by it a worth that no price or "
+        ("p", "The objection from the last lesson comes back here. Kant objects to "
+              "worth as price: to price a person is to treat as replaceable what has no "
+              "equivalent, and what a person has instead is a dignity that no price or "
               "title can add to or take away. Hobbes uses the word for nearly the "
-              "reverse: a public valuation that the sovereign can raise or lower at "
-              "will. They are not disagreeing about one thing; they are using one word "
-              "for two."),
-        ("p", "Chapter 10 ends there. The next lesson, &ldquo;The Difference of "
-              "Manners&rdquo;, moves to Chapter 11, where Hobbes asks what all this "
+              "reverse, a public valuation that the sovereign can raise or lower at "
+              "will. The reply open to him, and the one his chapter bears out, is that "
+              "he describes how men value one another, and says that honour consists "
+              "only in the opinion of power; he does not say how they ought to. Whether "
+              "a person can be priced at all is the question between them, and the "
+              "lab cannot answer it."),
+        ("p", "Chapter 10 ends there. The next lesson, <em>The Difference of "
+              "Manners</em>, moves to Chapter 11, where Hobbes asks what all this "
               "reckoning of power does to the desires of the men who do it."),
     ],
     "lab": ("levkit", {
@@ -630,11 +634,11 @@ RESTLESS_DESIRE = {
     "slug": "a-restless-desire-of-power",
     "title": "The Difference of Manners",
     "module": "Chapter 11 · Of the difference of Manners",
-    "one_line": "Hobbes says every man wants power after power, not out of greed but because he cannot be sure of what he has without more.",
+    "one_line": "Hobbes says every man wants power after power, not always out of greed, but because he cannot be sure of what he has without more.",
     "summary": (
         "Chapter 11 sets out what Hobbes means by manners, the qualities that concern "
         "men living together in peace, and finds at the root of them a restless "
-        "desire of power after power. Its cause, he says, is not that men cannot be "
+        "desire of power after power. Its cause, he says, is not always that men cannot be "
         "content with a moderate power but that they cannot assure what they have. Play "
         "that reasoning as a table for two neighbours who may hold or add to their means "
         "and see what the equilibria are."
@@ -658,7 +662,7 @@ RESTLESS_DESIRE = {
          "only the way to the next."),
         ("Power after power",
          "So he puts for a general inclination of all mankind a perpetual and restless "
-         "desire of power after power that ceases only in death. The cause is not that a "
+         "desire of power after power that ceases only in death. The cause is not always that a "
          "man hopes for a greater delight, or cannot be content with moderate power, but "
          "that he cannot assure the power he has without acquiring more."),
         ("Manners that follow",
@@ -719,9 +723,9 @@ RESTLESS_DESIRE = {
               "hold, and both add. Fear alone, with no greed, is enough to make "
               "the second one stable. Which of the two a pair reaches the table "
               "does not say."),
-        ("p", "The one-greedy preset joins the two: the row neighbour is moderate, "
-              "the column neighbour greedy, as in the first table. The column neighbour "
-              "adds whatever the row does. Given that, the row neighbour does better "
+        ("p", "The one-greedy preset pairs the two kinds: the row neighbour is moderate, "
+              "the column neighbour greedy, one who prefers to add whatever the "
+              "row does. Given that, the row neighbour does better "
               "to add, and the only equilibrium is both adding. One greedy neighbour "
               "is enough to drag the moderate man with him. This is the "
               "reasoning Chapter 13 will turn into the three causes of quarrel, "
@@ -733,8 +737,9 @@ RESTLESS_DESIRE = {
               "of Ease, and sensuall Delight, disposeth men to obey a common Power&rdquo;, "
               "and &ldquo;Fear of Death, and Wounds, disposeth to the same&rdquo;. So "
               "the same restless creature is drawn both ways, and the manners of a "
-              "society depend on which desires prevail. Military men, he adds, are "
-              "inclined to stir up trouble, &ldquo;for there is no honour Military but "
+              "society depend on which desires prevail. Needy and hardy men, he adds, "
+              "and all who are ambitious of military command, are inclined to stir up "
+              "trouble, &ldquo;for there is no honour Military but "
               "by warre; nor any such hope to mend an ill game, as by causing a new "
               "shuffle&rdquo;."),
         ("p", "Hobbes has an eye for the small cruelties of obligation. &ldquo;For "
@@ -757,7 +762,7 @@ RESTLESS_DESIRE = {
               "conflicted with a ruler's interest, he writes, books of geometry "
               "would be burned."),
         ("p", "The chapter ends, as the next begins, on the cause of causes, and the "
-              "next lesson, &ldquo;The Natural Seeds of Religion&rdquo;, picks it "
+              "next lesson, <em>The Natural Seeds of Religion</em>, picks it "
               "up: what an anxious creature who cannot see causes does with the "
               "future."),
     ],
@@ -875,7 +880,7 @@ RESTLESS_DESIRE = {
         ("Taking the tables as Hobbes's own argument for war",
          "They show one clause of Chapter 11 as a payoff table with invented numbers. "
          "Chapter 13 gives the three causes of quarrel, and the Philosophy lesson "
-         "&ldquo;Hobbes and the State of Nature&rdquo; works its games. These "
+         "<em>Hobbes and the State of Nature</em> works its games. These "
          "tables do not stand in for either."),
         ("Thinking the equilibrium is what the neighbours want",
          "In the greedy and moderate presets (Add, Add) pays 1 each and (Hold, Hold) "
@@ -975,11 +980,15 @@ SEEDS_OF_RELIGION = {
         ("p", "He then goes through the seeds in turn: the thought that invisible "
               "agents are spirits, thin bodies like the dream-image or the face in "
               "the looking-glass; the ignorance of second causes, which makes "
-              "men attribute fortune to a stander by, a lucky place or words spoken; "
-              "and the worship men give, which can be no more than what they would "
-              "show to men, gifts, petitions, thanks and submission. The last is the "
-              "one the lab takes up. Where, he asks, do men think these powers "
-              "foretell the future?"),
+              "men attribute fortune to a stander by, a lucky place or words spoken, and "
+              "leaves them guessing at causes by what they have seen go before like "
+              "effects. So the Athenians, for their war at Lepanto, asked for &ldquo;another "
+              "Phormio&rdquo;, and the Pompeians for another Scipio; they &ldquo;expect the "
+              "like things to come; and hope for good or evill luck, superstitiously, from "
+              "things that have no part at all in the causing of it&rdquo;. Third comes the "
+              "worship men give, which can be no more than what they would show to men, "
+              "gifts, petitions, thanks and submission. The fourth is the one the lab "
+              "takes up. Where, he asks, do men think these powers foretell the future?"),
         ("p", "<strong>Chapter 12.</strong> &ldquo;Lastly, concerning how these "
               "Invisible Powers declare to men the things which shall hereafter come to "
               "passe&rdquo;, men are at a stand &ldquo;save that using to conjecture of "
@@ -989,12 +998,7 @@ SEEDS_OF_RELIGION = {
               "other men, of whom they have once conceived a good opinion.&rdquo;"),
         ("p", "That is an observation about evidence, and a sharp one. Men use the "
               "past to guess the future, which is just what he called prudence in "
-              "Chapter 3, and they do it from too few cases. He gives the "
-              "Athenians who, for their war at Lepanto, asked for &ldquo;another "
-              "Phormio&rdquo; after the first had won, and the Pompeians who wanted "
-              "another Scipio. They &ldquo;expect the like things to come; and hope for "
-              "good or evill luck, superstitiously, from things that have no part at all "
-              "in the causing of it&rdquo;."),
+              "Chapter 3, and they do it from too few cases."),
         ("p", "The lab asks how far one or two cases should move a prudent man. Let "
               "the sign be something you notice before an event, a crow on the roof "
               "before news. Two hypotheses: the sign foretells the event, or it is "
@@ -1024,7 +1028,7 @@ SEEDS_OF_RELIGION = {
               "this mistake. Hobbes says the seed has other roots, and when he comes to "
               "the founders of religions in the next lesson he is careful to treat "
               "revealed religion separately."),
-        ("p", "The next lesson, &ldquo;Religion and Policy&rdquo;, turns from where "
+        ("p", "The next lesson, <em>Religion and Policy</em>, turns from where "
               "religion comes from to what men have done with it: the two sorts of "
               "men who cultivated the seeds, and what makes a religion lose its hold."),
     ],
@@ -1255,7 +1259,7 @@ RELIGION_AND_POLICY = {
               "Religion&rdquo;, and the distinction of temporal and spiritual domination "
               "has no place. Hobbes says he will speak of that later, and in Part III he "
               "does."),
-        ("p", "It is a delicate subject in 1651, and the lesson should say so. Hobbes "
+        ("p", "It was a delicate subject in 1651. Hobbes "
               "is not saying that Christianity was invented by a lawgiver; he puts "
               "Abraham, Moses and Christ in the second class and says their religion "
               "contains divine precepts. But the account of the first class, with "
@@ -1280,29 +1284,24 @@ RELIGION_AND_POLICY = {
               "detected of private ends&rdquo;. And the testimony of a divine calling "
               "&ldquo;can be no other, than the operation of Miracles; or true "
               "Prophecy, (which also is a Miracle;) or extraordinary Felicity&rdquo;."),
-        ("p", "The first cause is an argument, and the lab sets it out. Let `c` be "
-              "&ldquo;the founder or his priests enjoin belief of contradictories&rdquo;, "
-              "`g` &ldquo;his ignorance is detected&rdquo; and `d` &ldquo;he is discredited "
-              "in all else he proposes as revelation&rdquo;. Hobbes's reasoning is: "
+        ("p", "The first cause is an argument, and the lab sets it out. Let `c` stand for: the "
+              "founder enjoins belief of contradictories; `g`: his ignorance is detected; "
+              "`d`: he is discredited in all else he propounds as revelation. "
+              "Hobbes's reasoning is: "
               "if `c`, then `g`; and if `g`, then `d`; so if `c`, then `d`. The chain "
               "preset has exactly those two premises and that conclusion, and the lab "
               "finds it valid: of the eight possible cases, none makes both premises "
               "true and the conclusion false. That is a hypothetical syllogism."),
-        ("p", "Which premise does the work? The first, that enjoining contradictories "
-              "shows ignorance, is easy to grant if you grant that the doctrine is a "
-              "contradiction, and the whole dispute is then over that, since a "
-              "mystery above reason is not a contradiction. The second does more "
-              "than it seems: it carries one detected error into &ldquo;all things "
-              "else&rdquo;. Drop it, as the missing-link preset does, leaving only "
-              "`c -> g`, and the lab finds one case in which the premise is true "
-              "and the conclusion false: a founder who is shown ignorant yet is still "
-              "believed on the rest. The second premise is what Hobbes argues for, and "
-              "its opponents deny: a Catholic or Anglican defender of the doctrine of "
-              "the Trinity, say, could grant the chain and deny that it applies, "
-              "on the ground that it is above reason and not against it. Hobbes's own "
-              "sentence grants the principle, &ldquo;of many things above, but of "
-              "nothing against naturall reason&rdquo;, and the quarrel is over which "
-              "side of the line a doctrine lies."),
+        ("p", "Both links are needed. The second carries one detected error into "
+              "&ldquo;all things else&rdquo;: drop it, leaving only `c -> g`, as the "
+              "missing-link preset does, and the lab finds a case with the premise true "
+              "and the conclusion false, a founder shown ignorant yet still believed "
+              "on the rest. Drop the first instead and a counterexample opens too. "
+              "The defender of a mystery attacks neither link. A Catholic or Anglican "
+              "defender of the Trinity, say, grants the chain and denies `c`, because the "
+              "doctrine is above reason and not against it. Hobbes's own sentence grants "
+              "that line, &ldquo;of many things above, but of nothing against naturall "
+              "reason&rdquo;, and the quarrel is over which side of it a doctrine lies."),
         ("p", "One more preset shows what the argument does not say. In the "
               "run-backwards preset the premises are the chain and the fact that "
               "the founder is discredited, and the conclusion is that he enjoined "
@@ -1321,7 +1320,7 @@ RELIGION_AND_POLICY = {
               "Fraudulent intention&rdquo;. That is a controversial thing to say, "
               "and it was meant to be."),
         ("p", "That closes Part I's account of manners and religion. The next "
-              "course, &ldquo;The Natural Condition and the Laws of Nature&rdquo;, "
+              "course, <em>The Natural Condition and the Laws of Nature</em>, "
               "begins with Chapter 13 and the claim for which the whole of Part I has been "
               "preparing the ground: what men would be like with no common power over "
               "them."),
@@ -1354,13 +1353,14 @@ RELIGION_AND_POLICY = {
          "detected, the teacher is discredited in all else."),
         ("Write the premises as conditionals",
          "Hobbes's &ldquo;and therefore&rdquo; and &ldquo;which&rdquo; become "
-         "&ldquo;if&rdquo; links in a chain. State each link on its own."),
+         "<em>if</em> links in a chain. State each link on its own."),
         ("Run the lab",
          "A row where all premises are true and the conclusion false is a counterexample. "
          "No such row means the conclusion follows."),
         ("Ask which premise carries the weight",
-         "Delete each in turn. The one whose removal opens a counterexample is the one "
-         "doing the work, and the one an opponent will deny."),
+         "Delete each in turn: each deletion opens a counterexample, so the argument "
+         "needs both. Then ask what an opponent denies, a premise or the claim that "
+         "`c` is true of his doctrine."),
     ],
     "worked": {
         "title": "Why the second link matters",
@@ -1378,8 +1378,8 @@ RELIGION_AND_POLICY = {
         "after": [
             "The case is a teacher who has been shown ignorant and is still believed on "
             "everything else. The added premise, that detected ignorance discredits in "
-            "all things, is exactly what rules it out, and it is the premise the "
-            "argument's critics have most reason to question.",
+            "all things, is exactly what rules it out. A defender of a mystery need not "
+            "deny it, only that his doctrine is a contradiction.",
         ],
     },
     "quiz_title": "A teacher who contradicts himself",
@@ -1446,11 +1446,10 @@ RELIGION_AND_POLICY = {
          "dispute, and no table settles it."),
     ],
     "standard": (
-        "Finish when you can set out a chain of conditionals and find the premise that "
-        "matters.",
+        "Finish when you can set out a chain of conditionals and show what it needs.",
         "Given Hobbes's argument that enjoining contradictories discredits a teacher, "
-        "write it as premises and a conclusion, say whether it is valid, and name the "
-        "premise whose removal makes it invalid."
+        "write it as premises and a conclusion, say whether it is valid, show that it "
+        "needs both premises, and say where a defender of a mystery resists it."
     ),
     "note": (
         "The lab checks the form of the chain and nothing else. It cannot say whether "

@@ -126,8 +126,8 @@ LESSONS = [
                   "heart is hidden by dissembling. To read another from his actions "
                   "without comparing them with your own is &ldquo;to decypher without a "
                   "key&rdquo;."),
-            ("p", "Set the rule out as an argument. Let `p` be &ldquo;the passions are "
-                  "the same in all men&rdquo;, `q` be <em>a man looks into himself and "
+            ("p", "Set the rule out as an argument. Let `p` be <em>the passions are "
+                  "the same in all men</em>, `q` be <em>a man looks into himself and "
                   "considers what he does when he thinks and hopes and fears</em>, and "
                   "`r` be <em>he thereby reads the passions of other men on like "
                   "occasions</em>. In the bare preset the premises are `p` and `q` and "
@@ -182,7 +182,7 @@ LESSONS = [
             ),
         }),
         "steps_title": "Finding the premise an argument leans on",
-        "steps_intro": "Four moves, for any passage that says &ldquo;whosoever does this will find that&rdquo;.",
+        "steps_intro": "Four moves, for any passage that says that whoever does one thing will find another.",
         "steps": [
             ("Find the conclusion",
              "Ask what the passage says you will end up able to do or know. Here "
@@ -696,7 +696,8 @@ LESSONS = [
                   "to man and beast. In the other, imagining anything, we seek all the "
                   "possible effects, what we can do with it; and Hobbes says he has "
                   "&ldquo;not at any time seen any signe, but in man onely&rdquo;. "
-                  "He calls it seeking, and likens it to a man sweeping a room for a "
+                  "He calls it seeking, and when a man knows the place within which to "
+                  "seek, he likens it to sweeping a room for a "
                   "jewel, &ldquo;as a Spaniel ranges the field, till he finds a "
                   "sent&rdquo;."),
             ("p", "Now the case the lesson computes. A man wants to know what will "
@@ -1070,13 +1071,14 @@ LESSONS += [
                   "living-creature and rational; horse is living-creature and neighs; "
                   "Peter is man and peter-self, a part only he has; just is man and "
                   "observes-laws."),
-            ("p", "The vocab preset states six affirmations. Man is a living-creature, "
+            ("p", "The vocab preset states seven affirmations. Man is a living-creature, "
                   "true, because body, living and sensible are all in man. Peter is a "
                   "man, true. Man is Peter, false, for man lacks peter-self; a common "
                   "name does not name one thing. Horse is a man, false. Just is rational, "
                   "true, since a just man is a man and a man is rational. Man is just, "
-                  "false, since not every man observes the laws. Three are true and "
-                  "three false. The breadth preset reads the same pairs the other way "
+                  "false, since not every man observes the laws. Peter is just, false, "
+                  "since this Peter is only a man with peter-self and does not observe "
+                  "the laws. Three are true and four false. The breadth preset reads the same pairs the other way "
                   "about: man is body is true and body is man is false, which is what "
                   "Hobbes means by a larger name comprehending the less large. "
                   "The compound preset defines Peter as a just man and checks that "
@@ -1110,8 +1112,9 @@ LESSONS += [
                      ["c3", "man", "peter"],
                      ["c4", "horse", "man"],
                      ["c5", "just", "rational"],
-                     ["c6", "man", "just"]],
-                 "expect": {"lrkVerdicts": "c1 true; c2 true; c3 false; c4 false; c5 true; c6 false", "lrkCounts": "3 true, 3 false, 0 absurd, 0 insignificant"}},
+                     ["c6", "man", "just"],
+                     ["c7", "peter", "just"]],
+                 "expect": {"lrkVerdicts": "c1 true; c2 true; c3 false; c4 false; c5 true; c6 false; c7 false", "lrkCounts": "3 true, 4 false, 0 absurd, 0 insignificant"}},
                 {"id": "breadth", "label": "A larger name and a smaller",
                  "simple": _VOCAB_SIMPLE, "defs": _VOCAB_DEFS, "opposed": [],
                  "claims": [
@@ -1178,8 +1181,8 @@ LESSONS += [
                    "Man is a living-creature",
                    "Man is Peter"],
              "c": 3,
-             "why": "Man lacks peter-self, which is a part of Peter, so every part of "
-                    "Peter is not in man. The other three are true: Peter contains all of "
+             "why": "Man lacks peter-self, which is a part of Peter, so not every part of "
+                    "Peter is in man. The other three are true: Peter contains all of "
                     "man, a just man is a man and so rational, and man contains "
                     "living-creature."},
             {"q": "What does Hobbes say is universal?",
@@ -1200,8 +1203,9 @@ LESSONS += [
              "c": 1,
              "why": "The third use is &ldquo;to make known to others our wills, and "
                     "purposes, that we may have the mutuall help of one another&rdquo;. "
-                    "Declaring a will one does not have is the third abuse, not a "
-                    "use, and the other two options are not in his list."},
+                    "Concealing one's thoughts is nearest the third abuse, declaring a will "
+                    "one does not have; raising a likeness and proving existence are not "
+                    "in his list."},
             {"q": "In the breadth preset, which pair of verdicts is right?",
              "a": ["Body is man: true; man is body: false",
                    "Man is body: true; body is man: false",
@@ -1262,8 +1266,8 @@ LESSONS += [
             "true and false belong to speech, not things",
             "definitions first; errors multiply",
             "words are wise men's counters",
-            "absurd: names that cannot be added",
-            "insignificant: a name that names nothing",
+            "insignificant: undefined or contradictory",
+            "a false affirmation: its compound is empty",
         ],
         "key_label": "The rest of Chapter 4 in five lines",
         "concepts_intro": (
@@ -1331,9 +1335,11 @@ LESSONS += [
                   "but a man.&rdquo; This was an attack on a way of teaching. In the "
                   "universities of 1651 philosophy meant, to a great extent, the reading "
                   "of Aristotle and the commentators on him."),
-            ("p", "The lab's bad-definition preset makes the point in one line. "
-                  "Take the vocabulary of the last lesson and define man as "
-                  "living-creature alone, forgetting rational. Man is rational "
+            ("p", "The lab's good-definition and bad-definition presets make the point in "
+                  "a pair. In good-definition man is living-creature and rational, and "
+                  "man is rational, Peter is rational and just is rational are all "
+                  "true. In bad-definition man is living-creature alone, forgetting "
+                  "rational, and man is rational "
                   "flips from true to false. Peter is defined from man, so Peter is "
                   "rational flips too, and just, defined from man, so just is rational "
                   "flips as well. Three affirmations change because of one error, and "
@@ -1360,22 +1366,29 @@ LESSONS += [
             ("p", "&ldquo;All other Names, are but insignificant sounds&rdquo;, he says, "
                   "and of two sorts. One is a new name whose meaning is not explained by "
                   "definition, of which the schoolmen and puzzled philosophers have coined "
-                  "an abundance, and he names &ldquo;Entity, Intentionality, Quiddity, and "
+                  "an abundance, and earlier in the chapter he had named &ldquo;Entity, Intentionality, Quiddity, and "
                   "other insignificant words of the School&rdquo;. The other is a name "
                   "made of two names whose significations contradict: &ldquo;an "
                   "incorporeall body, or (which is all one) an incorporeall "
                   "substance&rdquo;, or a &ldquo;round quadrangle&rdquo;, which is &ldquo;a "
-                  "meere sound&rdquo;. The lab keeps these apart. In the "
-                  "absurd-and-empty preset round and quadrangle are declared opposed, so "
-                  "that they cannot be added, and the affirmation round-quadrangle is "
-                  "man is absurd; and quiddity is a name with no definition and "
-                  "not simple, so quiddity is man is insignificant. They are not "
-                  "false, and they differ from one another: the first adds names that "
-                  "cannot be added and the second has a name that stands for nothing. Hobbes "
-                  "himself says that when an affirmation is false the two names put "
-                  "together signify nothing. The lab does not go as far as that: it "
-                  "keeps three verdicts apart, true or false by the parts, absurd, and "
-                  "insignificant, as the lesson's own distinction."),
+                  "meere sound&rdquo;. Both, for Hobbes, are insignificant "
+                  "sounds, and he ties the second sort to falsehood: if it is false that a "
+                  "quadrangle is round, then round quadrangle &ldquo;signifies nothing&rdquo;. "
+                  "The lab gives the two sorts different labels, and the labels are the "
+                  "lab's own sorting, not Hobbes's. In the absurd-and-empty preset round and "
+                  "quadrangle are declared opposed, and so are body and incorporeal, so "
+                  "that the names cannot be added. Round-quadrangle is man is marked "
+                  "absurd, and so is incorporeal body is living-creature, with the two names "
+                  "added: the lab's word for Hobbes's second sort, a name "
+                  "made of names that cannot be added. Quiddity has no definition and is "
+                  "not simple, so quiddity is man is marked insignificant, his first "
+                  "sort. Keeping these apart from false is the lab's sorting. Hobbes makes "
+                  "the empty name follow from the false affirmation, and he says that "
+                  "of absurd and false universal affirmations alike there can be no "
+                  "understanding; in Chapter 5 he calls a false general inference an "
+                  "absurdity. So the lab's false universal claims, man is a horse, would "
+                  "be absurd for him too. What the lab's absurd marks is narrower: a "
+                  "contradiction among the stated names."),
             ("p", "The stakes were not only in the schools. To say that an "
                   "&ldquo;incorporeall substance&rdquo; is a contradiction in terms is "
                   "to deny the existence of immaterial spirits, as Hobbes's "
@@ -1383,13 +1396,14 @@ LESSONS += [
                   "debated freedom with him in Paris and answered <em>Leviathan</em> "
                   "in 1658, read it as a step towards atheism, and Hobbes in later "
                   "chapters says carefully what he means by spirit. The lab can "
-                  "say only what follows once the pair is declared opposed. The "
+                  "say only what follows once the pair is declared opposed, as body and "
+                  "incorporeal are in the absurd-and-empty preset. The "
                   "objection is that the names were not contradictory to begin with: "
                   "those who hold that there are immaterial substances deny that "
                   "incorporeal and substance cannot be added. That is a dispute about "
                   "the definitions, not a result of the lab."),
             ("p", "Last, the names of the passions. &ldquo;For one man calleth "
-                  "Wisedome, what another calleth feare; and one cruelty, what another "
+                  "Wisdome, what another calleth feare; and one cruelty, what another "
                   "justice; one prodigality, what another magnanimity; and one gravity, "
                   "what another stupidity.&rdquo; Such names have a signification of the "
                   "speaker's nature and interest, and so &ldquo;can never be true grounds "
@@ -1399,10 +1413,10 @@ LESSONS += [
                   "is man and yields-to-the-strongest, Peter is the same man, and Peter "
                   "is just is false. The words are the same, the man is the same, "
                   "and the verdict is opposite. Understanding, Hobbes adds, is "
-                  "&ldquo;conception caused by Speech&rdquo;, so of absurd universal "
-                  "affirmations &ldquo;there can be no Understanding; though many think "
-                  "they understand, then, when they do but repeat the words "
-                  "softly&rdquo;."),
+                  "&ldquo;conception caused by Speech&rdquo;, so &ldquo;of absurd and false "
+                  "affirmations, in case they be universall, there can be no Understanding; "
+                  "though many think they understand, then, when they do but repeat the "
+                  "words softly&rdquo;."),
             ("p", "Chapter 4 ends the first course. The next, Reason, Science and the "
                   "Passions, begins with Chapter 5, where reason is defined as exactly the "
                   "reckoning this chapter prepared."),
@@ -1410,8 +1424,21 @@ LESSONS += [
         "lab": ("levkit", {
             "mode": "reckon",
             "view": "names",
-            "preset": "bad-definition",
+            "preset": "good-definition",
             "presets": [
+                {"id": "good-definition", "label": "Man defined with rational",
+                 "simple": _VOCAB_SIMPLE,
+                 "defs": [["living-creature", "body living sensible"],
+                          ["man", "living-creature rational"],
+                          ["peter", "man peter-self"],
+                          ["just", "man observes-laws"]],
+                 "opposed": [],
+                 "claims": [
+                     ["c1", "man", "living-creature"],
+                     ["c2", "man", "rational"],
+                     ["c3", "peter", "rational"],
+                     ["c4", "just", "rational"]],
+                 "expect": {"lrkVerdicts": "c1 true; c2 true; c3 true; c4 true", "lrkCounts": "4 true, 0 false, 0 absurd, 0 insignificant"}},
                 {"id": "bad-definition", "label": "Man defined without rational",
                  "simple": _VOCAB_SIMPLE,
                  "defs": [["living-creature", "body living sensible"],
@@ -1426,15 +1453,16 @@ LESSONS += [
                      ["c4", "just", "rational"]],
                  "expect": {"lrkVerdicts": "c1 true; c2 false; c3 false; c4 false", "lrkCounts": "1 true, 3 false, 0 absurd, 0 insignificant"}},
                 {"id": "absurd-and-empty", "label": "A round quadrangle and a quiddity",
-                 "simple": _VOCAB_SIMPLE + ["round", "quadrangle"],
+                 "simple": _VOCAB_SIMPLE + ["round", "quadrangle", "incorporeal"],
                  "defs": _VOCAB_DEFS + [["round-quadrangle", "round quadrangle"]],
-                 "opposed": [["round", "quadrangle"]],
+                 "opposed": [["round", "quadrangle"], ["body", "incorporeal"]],
                  "claims": [
                      ["c1", "man", "living-creature"],
                      ["c2", "man", "horse"],
                      ["c3", "round-quadrangle", "man"],
-                     ["c4", "quiddity", "man"]],
-                 "expect": {"lrkVerdicts": "c1 true; c2 false; c3 absurd; c4 insignificant", "lrkCounts": "1 true, 1 false, 1 absurd, 1 insignificant"}},
+                     ["c4", "quiddity", "man"],
+                     ["c5", "incorporeal body", "living-creature"]],
+                 "expect": {"lrkVerdicts": "c1 true; c2 false; c3 absurd; c4 insignificant; c5 absurd", "lrkCounts": "1 true, 1 false, 2 absurd, 1 insignificant"}},
                 {"id": "just-by-law", "label": "Just as Hobbes's keeper of the laws",
                  "simple": _VOCAB_SIMPLE,
                  "defs": [["living-creature", "body living sensible"],
@@ -1486,8 +1514,8 @@ LESSONS += [
                 "peter = body, living, sensible, peter-self",
                 "just = body, living, sensible, observes-laws",
                 "man is living-creature: true (unchanged)",
-                "man is rational: false (was true)",
-                "peter is rational, just is rational: false (were true)",
+                "man is rational: false (true in good-definition)",
+                "peter is rational, just is rational: false (true there too)",
             ],
             "after": [
                 "One omitted part changes three of four verdicts, and all three "
@@ -1511,13 +1539,14 @@ LESSONS += [
                    "Because it has a name with no definition",
                    "Because round and quadrangle are declared opposed and cannot be added "
                    "into one name",
-                   "Because Hobbes says every false affirmation is absurd"],
+                   "Because round-quadrangle is not one of the simple names"],
              "c": 2,
              "why": "The lab marks an affirmation absurd when an expansion contains a pair "
                     "declared opposed, as round and quadrangle are. The second option "
                     "describes the other verdict, insignificant, which is quiddity is man; "
-                    "and Hobbes says a false affirmation makes its names signify nothing, "
-                    "not that it is absurd."},
+                    "the last is wrong, since round-quadrangle is defined, as round and "
+                    "quadrangle. The lab's word absurd is its own sorting: Hobbes ties the "
+                    "empty name to a false affirmation."},
             {"q": "What does Hobbes say true and false are attributes of?",
              "a": ["Things, which are true or false copies of their ideas",
                    "Thoughts, which are true or false as they match their objects",
@@ -1542,18 +1571,20 @@ LESSONS += [
                     "passions: one calls cruelty what another calls justice."},
         ],
         "mistakes": [
-            ("Thinking an absurd affirmation is just a false one",
-             "A false affirmation can be sensible: man is a horse is false, and one "
-             "could understand it. An absurd one adds names that cannot be added, "
-             "as round and quadrangle, and an insignificant one has a name that "
-             "stands for nothing. The lab keeps the three apart."),
+            ("Thinking the lab's three verdicts are Hobbes's three kinds",
+             "The lab keeps false, absurd and insignificant apart, and that is the lesson's "
+             "way of sorting them. Hobbes does not sort them that way. For him a "
+             "contradictory name such as round quadrangle signifies nothing because the "
+             "affirmation that a quadrangle is round is false, and of absurd and false "
+             "universal affirmations alike he says there can be no understanding. In "
+             "Chapter 5 he calls a false general inference an absurdity."),
             ("Taking an error in a definition for one error",
              "Hobbes says the errors of definitions multiply as the reckoning proceeds. "
              "In the bad-definition preset one omitted part changes three verdicts, "
              "because every name defined from man inherits the omission."),
             ("Concluding that the lab shows there are no incorporeal substances",
-             "It shows that if incorporeal and body are declared opposed, then a "
-             "name joining them is absurd. Whether they are opposed is what "
+             "It shows that if incorporeal and body are declared opposed, as in the "
+             "absurd-and-empty preset, then a name joining them is absurd. Whether they are opposed is what "
              "defenders of immaterial substances deny, and Hobbes argues it "
              "in later chapters."),
         ],

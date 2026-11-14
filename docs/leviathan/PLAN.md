@@ -75,6 +75,16 @@ interests. The reader computes:
    mentions; who benefits from a set of doctrines; a prophet's credentials as a
    Bayesian update on a stated base rate (Chapters 32, 33, 36, 37, 47).
 
+**A caution on `reckon/names` (from the Course 1 review).** The lab's four
+verdicts (true, false, absurd, insignificant) are the lab's own sorting, not
+Hobbes's. Hobbes holds that a false *universal* affirmation is itself absurd
+and cannot be understood (Chapter 4, "of absurd and false affirmations, in case
+they be universall, there can be no Understanding"; Chapter 5 calls a false
+general inference an absurdity), and that undefined and contradictory names
+alike are "insignificant sounds". Every lesson that uses the lab says this:
+its "absurd" marks only a contradiction among the stated names, and Hobbes
+would call its "false" universal claims absurd too.
+
 **What the lab never does** is decide whether Hobbes is right. Every figure is
 computed from the names, payoffs and numbers the lesson states, on Hobbes's
 definitions as the lesson states them. Whether men are as Hobbes describes

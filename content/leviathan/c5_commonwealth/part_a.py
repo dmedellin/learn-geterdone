@@ -103,30 +103,36 @@ LESSONS = [
                   "the author, and the covenant stands against the actor. Hobbes sums it up: "
                   "when the authority is evident the covenant obliges the author, not the "
                   "actor, and when the authority is feigned it obliges the actor only."),
-            ("p", "The lab turns this into three small arguments. Let `p` be &ldquo;the "
-                  "actor had authority&rdquo;, `q` be &ldquo;the covenant was within his "
-                  "commission&rdquo; and `r` be &ldquo;the author is bound&rdquo;. The first "
+            ("p", "The lab turns this into three small arguments. Let `p` be <em>the "
+                  "actor had authority</em>, `q` be <em>the covenant was within his "
+                  "commission</em> and `r` be <em>the author is bound</em>. The first "
                   "premise in every argument is Hobbes's rule, <em>if authority and "
                   "within commission, then bound</em>. In the preset <em>full</em> the "
                   "other premises are `p` and `q`, and the conclusion `r` follows: the lab "
                   "finds no row in which the premises are true and the conclusion false. In "
                   "<em>no-authority</em> the actor had none, `p` is false, and the lab finds "
                   "exactly one such row, the case in which `q` is true and `r` false: the "
-                  "covenant is within what a commission would have covered, and the author "
-                  "is not bound, because there was no commission. In <em>beyond-commission</em> "
+                  "rule alone cannot make the author bound, because there was no "
+                  "commission. In <em>beyond-commission</em> "
                   "the authority was real and the covenant went past it, so `q` is false, and "
-                  "again there is exactly one row in which the conclusion fails."),
+                  "again there is exactly one row in which the conclusion fails. These two "
+                  "presets show only that the rule cannot make him bound. That he is "
+                  "<em>not</em> bound needs Hobbes's other sentence, that no man is "
+                  "obliged by a covenant of which he is not author, written `r -> p & q`. "
+                  "In the preset <em>not-author</em> that sentence and `~p` give `~r`, and "
+                  "the lab finds the argument valid."),
             ("p", "Hobbes carries the point one step further, and it is worth noticing why. "
                   "If the actor does something against the law of nature on the author's "
-                  "command, and the author was already obliged to obey him, &ldquo;not he, "
+                  "command, and the actor was already obliged by covenant to obey him, "
+                  "&ldquo;not he, "
                   "but the Author breaketh the Law of Nature&rdquo;: the act is the author's, "
                   "and refusing it would break the covenant that forbids breach. The same "
                   "idea reaches the other end. Things that cannot own an act, such as a "
                   "church, a hospital or a bridge, may be personated by a master or "
                   "overseer, but &ldquo;things Inanimate, cannot be Authors&rdquo;, and so "
                   "the authority comes from their owners or governors. Children and the "
-                  "mad can be represented by guardians, and become authors again when they "
-                  "recover the use of reason. All of that, he adds, has no place before "
+                  "mad can be represented by guardians, but are authors of the guardian's acts only when, "
+                  "recovering reason, &ldquo;they shall judge the same reasonable&rdquo;. All of that, he adds, has no place before "
                   "there is a civil state, &ldquo;because before such estate, there is no "
                   "Dominion of Persons&rdquo;."),
             ("p", "You may wonder what this has to do with a commonwealth. The answer is in "
@@ -159,11 +165,15 @@ LESSONS = [
                 {"id": "beyond-commission", "label": "Authority, but the covenant goes beyond it",
                  "premises": ["p & q -> r", "p", "~q"], "conclusion": "r",
                  "expect": {"vaVerdict": "Invalid", "vaCounter": "1"}},
+                {"id": "not-author", "label": "Hobbes's converse: no man is bound who is not author",
+                 "premises": ["r -> p & q", "~p"], "conclusion": "~r",
+                 "expect": {"vaVerdict": "Valid", "vaCounter": "0"}},
             ],
             "panel_title": "Is the author bound?",
             "panel_intro": (
-                "Premise one is Hobbes's rule, written `p & q -> r`, with the arrow typed "
-                "as a hyphen and a greater-than sign. The other premises state the case. "
+                "Premise one is Hobbes's rule, written `p & q -> r` (the box shows the "
+                "arrow and the wedge, and accepts either spelling). The other premises "
+                "state the case, and in the last preset the rule is turned round. "
                 "Choose each preset and find the row, if there is one, in which every premise "
                 "is true and the conclusion false."
             ),
@@ -268,8 +278,8 @@ LESSONS = [
             ("Thinking that authority has no edge",
              "An actor can bind his author only &ldquo;so far-forth as is in their "
              "Commission, but no farther&rdquo;. In the beyond-commission preset the lab finds "
-             "a row in which the authority is real, the covenant is made, and the author "
-             "is still not bound. A man who deals with an actor without checking is "
+             "a row in which the authority is real, the covenant is made, and the rule "
+             "alone does not bind the author. A man who deals with an actor without checking is "
              "at his own risk."),
             ("Taking &ldquo;person&rdquo; to mean a human being",
              "For Hobbes a person is a role: the one whose words or actions are considered "
@@ -304,9 +314,9 @@ LESSONS = [
         "summary": (
             "Hobbes's multitude is many; it becomes one only in its representer. When the "
             "representer is itself an assembly, its voice is the voice of the greater "
-            "number, and an even assembly can be mute. Compute what a set of voices decides "
-            "and how often an assembly of each size splits evenly if each member is as "
-            "likely to say yes as no, on a model that is not Hobbes's."
+            "number, and an even assembly can be mute. Compute what a set of voices decides, "
+            "and work out by hand how often an assembly of each size splits evenly if each "
+            "member is as likely to say yes as no, on a model that is not Hobbes's."
         ),
         "key": [
             "one person: the unity of the representer",
@@ -349,7 +359,7 @@ LESSONS = [
                   "maketh the Person One.&rdquo;"),
             ("p", "Picture a crowd at a station platform. Ask what the crowd intends and "
                   "you have asked a question with no answer: each person has an errand, and "
-                  "&ldquo;the crowd&rdquo; has none. Hobbes says the same of a multitude. "
+                  "<em>the crowd</em> has none. Hobbes says the same of a multitude. "
                   "Because &ldquo;the Multitude naturally is not One, but Many&rdquo;, it "
                   "cannot be understood as one, and &ldquo;Unity, cannot otherwise be "
                   "understood in Multitude&rdquo; than through someone who bears its "
@@ -361,7 +371,7 @@ LESSONS = [
                   "particular, and owns what he does, &ldquo;in case they give him Authority "
                   "without stint&rdquo;. If they limit him, then &ldquo;none of them owneth "
                   "more, than they gave him commission to Act&rdquo;. That is Chapter 16's "
-                  "first half applied to a crowd, and the second half of the chapter is about "
+                  "first half applied to a crowd, and the rest of this half of the chapter is about "
                   "the case where the representer is not one man but a body of them."),
             ("p", "Then the voices must be counted, and Hobbes's first rule is simple. "
                   "&ldquo;if the Representative consist of many men, the voyce of the greater "
@@ -389,7 +399,7 @@ LESSONS = [
                   "A motion passes only if all three say yes, which happens one time in "
                   "eight, against four in eight under the greater number. The model is "
                   "this lesson's; Hobbes gives no figure."),
-            ("p", "The lab has two views of an assembly. In the voices view each "
+            ("p", "The lab works the voices. Each "
                   "member says yes, no or abstain, and the lab reports the decision under the "
                   "greater-number rule or under a rule that needs more than half of all the "
                   "members. The preset <em>six-even</em> has three yes and three no, and "
@@ -400,7 +410,8 @@ LESSONS = [
                   "of all the members it does not, because three is not more than half of six. "
                   "Hobbes's text counts voices given, and the second rule is the lab's "
                   "addition, to show that a rule has to be chosen."),
-            ("p", "The ties view asks how often. If each member is as likely to say yes as "
+            ("p", "How often? The lab on this page does not compute it, but the count "
+                  "is short, and you can do it by hand. If each member is as likely to say yes as "
                   "no, independently, the chance of an even split in an assembly of "
                   "`n` members, for even `n`, is the number of ways to choose which half say "
                   "yes, divided by all the ways to vote. For `n` equal to 4 that is `6/16`, "
@@ -477,9 +488,9 @@ LESSONS = [
             ],
             "after": [
                 "The first two lines are the preset <em>six-even</em> and the next two are "
-                "<em>seven</em>. The last two lines belong to the ties view, which prices "
+                "<em>seven</em>. The last two lines are worked by hand, not by the lab: they price "
                 "Hobbes's &ldquo;oftentimes&rdquo; for an assembly of six on the coin-"
-                "flipping model: nearly a third of the time.",
+                "flipping model, nearly a third of the time.",
             ],
         },
         "quiz_title": "Counting voices",
@@ -637,9 +648,10 @@ LESSONS = [
                   "enough? Not if each acts on his own judgement, because then &ldquo;they "
                   "do not help, but hinder one another; and reduce their strength by "
                   "mutuall opposition to nothing&rdquo;, and a very few who agree can "
-                  "subdue them. A multitude that all kept the laws of nature without a "
-                  "common power, he says, would be all mankind doing the same, and then "
-                  "&ldquo;there would be Peace without subjection&rdquo;. Is one "
+                  "subdue them. If a great multitude could keep the laws of nature without a "
+                  "common power, he says, we might as well suppose all mankind could, and "
+                  "then there would be no need of government at all, &ldquo;because there "
+                  "would be Peace without subjection&rdquo;. Is one "
                   "judgement for a limited time enough, as in one battle or one war? No: "
                   "when the enemy goes, the differences of interest remain, and they "
                   "fall back into war among themselves."),
@@ -649,7 +661,7 @@ LESSONS = [
                   "cannot mankind? Hobbes gives six answers, and the lesson gives the "
                   "first two and the last. First, &ldquo;men are continually in competition "
                   "for Honour and Dignity&rdquo;, which they are not. Secondly, for them "
-                  "&ldquo;the common Good differeth not from the Private&rdquo;, whereas "
+                  "&ldquo;the Common good differeth not from the Private&rdquo;, whereas "
                   "man, whose joy consists in comparing himself with other men, &ldquo;can "
                   "relish nothing but what is eminent&rdquo;. The middle three are about "
                   "reason, the art of words and the difference between injury and damage. "
@@ -677,7 +689,7 @@ LESSONS = [
                   "machinery is doing the work: each is author of what the one person acts. "
                   "&ldquo;This is more than Consent, or Concord; it is a reall Unitie of "
                   "them all, in one and the same Person, made by Covenant of every man "
-                  "with every man.&rdquo; The multitude so united is called a "
+                  "with every man&rdquo;. The multitude so united is called a "
                   "commonwealth, and this is &ldquo;the Generation of that great "
                   "LEVIATHAN&rdquo;, or, to speak more reverently, of that &ldquo;Mortall "
                   "God&rdquo;, to which we owe, under the Immortal God, our peace and defence."),

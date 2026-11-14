@@ -110,18 +110,18 @@ LESSONS = [
                   "depose the Roman people. That we think otherwise of a monarch, he says, "
                   "comes from the ambition of those who are kinder to the government of an "
                   "assembly, in which they may hope to share, than to monarchy."),
-            ("p", "Write the argument down and it is short. Let `c` be &ldquo;the "
-                  "sovereign is a party to a covenant with his subjects&rdquo;, `b` be "
-                  "&ldquo;the sovereign breaches a covenant with his subjects&rdquo; and "
-                  "`f` be &ldquo;the subjects are freed from subjection by forfeiture&rdquo;. "
+            ("p", "Write the argument down and it is short. Let `c` be <em>the "
+                  "sovereign is a party to a covenant with his subjects</em>, `b` be "
+                  "<em>the sovereign breaches a covenant with his subjects</em> and "
+                  "`f` be <em>the subjects are freed from subjection by forfeiture</em>. "
                   "Hobbes's premises are that the sovereign is a party to no such covenant, "
                   "`~c`; that a breach needs a covenant, `b -> c`; and that forfeiture needs "
                   "a breach, `f -> b`. The conclusion is that no one is freed, `~f`. In the "
                   "preset <em>hobbes</em> the lab finds the argument valid: there is no row "
                   "in which the three premises are true and `~f` is false."),
             ("p", "That is a verdict on the form of the argument, not on the argument. "
-                  "John Locke, writing the Two Treatises of Government after the "
-                  "revolution of 1688, held that those who hold the power of a government "
+                  "John Locke, in the Two Treatises of Government, written in the "
+                  "Exclusion Crisis and published after the revolution of 1688, held that those who hold the power of a government "
                   "hold it in trust, for ends the people set, and that when the trust "
                   "is abused the people may remove them. That puts a covenant, or something "
                   "like it, between the people and the holders of power: `c` is true. The "
@@ -133,8 +133,10 @@ LESSONS = [
                   "such as the sovereign's failing to protect them, and the lab again "
                   "finds one row in which the conclusion fails. Hobbes's own answer to a "
                   "claimed trust is in the passage itself: with no judge between the "
-                  "parties, a trust that can be declared broken by those who hold it is "
-                  "the sword again."),
+                  "parties, a trust that can be declared broken by those who gave it is "
+                  "the sword again. Locke's reply was that the people shall be judge, and "
+                  "that where there is no judge on earth the appeal lies to heaven: he "
+                  "accepted the risk that Hobbes would not."),
             ("p", "The remaining rights are the second right's company. The fourth runs "
                   "on Chapter 16: because every subject is author of what the sovereign "
                   "does, &ldquo;he that complaineth of injury from his Soveraigne, "
@@ -153,13 +155,14 @@ LESSONS = [
                   "been an opinion received of the greatest part of England, that these "
                   "Powers were divided between the King, and the Lords, and the House of "
                   "Commons, the people had never been divided, and fallen into this Civill "
-                  "Warre.&rdquo;"),
+                  "Warre&rdquo;."),
             ("p", "He ends with the objection that subjects of such a power are miserable, "
                   "and answers it by comparison: the greatest that can happen to the "
                   "people in general in any form of government &ldquo;is scarce sensible, "
                   "in respect of the miseries, and horrible calamities, that accompany a "
                   "Civill Warre&rdquo;. A reader may take or leave the comparison; it is "
-                  "the premise on which the whole list rests, and the lab cannot weigh it. "
+                  "the premise on which his answer to the objection rests, and the lab "
+                  "cannot weigh it. "
                   "The next lesson, &ldquo;The Several Kinds of Commonwealth&rdquo;, takes "
                   "Chapter 19 and asks which person it is best to give the rights to."),
         ],
@@ -274,7 +277,7 @@ LESSONS = [
              "The lab finds Hobbes's argument valid, and it finds the trust argument "
              "invalid. That tells you which premise carries the dispute, `c`, and "
              "nothing about which side is right."),
-            ("Reading &ldquo;no injury&rdquo; as &ldquo;no wrong&rdquo;",
+            ("Reading &ldquo;no injury&rdquo; as <em>no wrong</em>",
              "The fourth right says the sovereign cannot do injury to a subject, because "
              "the subject is author of his acts. Hobbes writes in the same sentence that "
              "he may commit iniquity, which is wrong done against the laws of nature, "
@@ -308,8 +311,8 @@ LESSONS = [
             "treats tyranny and oligarchy as names of dislike, and compares monarchy with "
             "assemblies. Hobbes's inconstancy of assemblies is about who happens to be "
             "present; a majority vote can also depend on the order of the questions, which "
-            "a later writer found, and the lab shows both on a stated profile of nine "
-            "voters."
+            "a later writer found, and the lab shows the second on a stated profile of "
+            "nine voters."
         ),
         "key": [
             "kinds: representer one, all, or a part",
@@ -353,8 +356,9 @@ LESSONS = [
             ("p", "The proof is short, and it uses what Chapter 18 has just established. "
                   "If the sovereignty is indivisible, it is held by one man or by more, and "
                   "if by more, by all who may enter or by some only. Aristotle had made "
-                  "six kinds, three good and three bad; Hobbes keeps the three and "
-                  "dismisses the other three: &ldquo;they are not the names of other Formes "
+                  "six kinds, three right and three corrupt; Hobbes keeps three names, "
+                  "monarchy, aristocracy and democracy, and treats tyranny, oligarchy and "
+                  "anarchy as the same three misliked: &ldquo;they are not the names of other Formes "
                   "of Government, but of the same Formes misliked&rdquo;. Those discontented "
                   "under monarchy call it tyranny, and &ldquo;they that are displeased with "
                   "Aristocracy, called it Oligarchy&rdquo;, and those grieved under a "
@@ -393,7 +397,7 @@ LESSONS = [
                   "On Tuesday two of the five are away, and the same motion fails, three to "
                   "four. That is a counting fact about any body that votes."),
             ("p", "The fourth is that &ldquo;a Monarch cannot disagree with himselfe, out "
-                  "of envy or interest; but an Assembly may&rdquo;, to the height of civil "
+                  "of envy, or interest; but an Assembly may&rdquo;, to the height of civil "
                   "war. Here is a different way for an assembly to disagree with itself, "
                   "which Hobbes does not describe, and which the Marquis de Condorcet "
                   "found a century and a third later. Take nine voters on three proposals, "
@@ -412,11 +416,15 @@ LESSONS = [
                   "loses to the fleet. Each proposal wins under one of the three orders, "
                   "and whoever sets the agenda picks the outcome. This is the lab's finding, "
                   "not Hobbes's, and in his chapter the inconstancy is the attendance "
-                  "kind. The preset <em>settled</em> changes two of the nine "
-                  "rankings, and now the fleet beats each of the others and is the "
-                  "winner whatever the order."),
+                  "kind. The preset <em>settled</em> changes the "
+                  "rankings of two of the nine voters, and now the fleet beats each of the "
+                  "others and is the winner whatever the order. The panel's rule menu "
+                  "shows that the rule matters as well: on the cycle profile, plurality "
+                  "gives the wall, with four first places to the fleet's three and the "
+                  "army's two, and the Borda count ties the wall and the fleet at ten "
+                  "points each."),
             ("p", "A reader who prefers assemblies has an answer to each of these points, "
-                  "and republicans of Hobbes's own generation, Milton among them, "
+                  "and republicans of Hobbes's own time, Milton among them, "
                   "gave it: rule by one man leaves a nation at the mercy of one man's "
                   "will, and an assembly of many is the safer trustee. Hobbes's reply is in "
                   "his first point: the passions of men are &ldquo;commonly more potent "
@@ -445,7 +453,7 @@ LESSONS = [
                  "kind": "ranking",
                  "profile": [
                      {"count": 4, "rank": "wall fleet army"},
-                     {"count": 3, "rank": "fleet wall army"},
+                     {"count": 3, "rank": "fleet army wall"},
                      {"count": 2, "rank": "army fleet wall"},
                  ],
                  "expect": {"voWinner": "fleet", "voCondorcet": "fleet"}},
@@ -792,7 +800,9 @@ LESSONS = [
             "after": [
                 "The first four lines are the preset <em>no-testament</em>, the fifth is "
                 "<em>eldest-dead</em>. If the king had named the nephew in writing, the "
-                "list above would not matter: the testament comes first.",
+                "list above would not matter: the testament comes first. The last line "
+                "is not a preset, but you reach it by marking the king's children dead "
+                "in the box.",
             ],
         },
         "quiz_title": "Words, custom and presumption",

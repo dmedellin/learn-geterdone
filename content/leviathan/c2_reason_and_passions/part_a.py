@@ -95,8 +95,8 @@ LESSONS = [
                   "are &ldquo;marking&rdquo; your thoughts, and when you reason with "
                   "others you are &ldquo;signifying&rdquo; them, showing your sums so that "
                   "they can be checked."),
-            ("def", ("Syllogism, as Hobbes counts it",
-                     "Two affirmations added. In <em>All Greeks are men</em> and <em>All "
+            ("def", ("Syllogism, as two affirmations added",
+                     "Hobbes says two affirmations are added; the cancelling of the middle name is the lab's picture of it, not his. In <em>All Greeks are men</em> and <em>All "
                      "men are mortal</em> the name <em>man</em> comes at the end of the "
                      "first and the start of the second; add them and it drops out, and "
                      "what is left is <em>All Greeks are mortal</em>.")),
@@ -119,7 +119,7 @@ LESSONS = [
                   "plainly bad: the lab finds a filling of the diagram in which dogs sit "
                   "outside the cats. In Hobbes's terms the two affirmations share a name, "
                   "<em>mammal</em>, but it stands at the end of both, so there is nothing "
-                  "to cancel and no sum to take. And his remark about subtraction explains "
+                  "to cancel and no sum to take. And his remark about subtraction can be turned to explain "
                   "why the failure tempts people: from a conclusion and one premise a "
                   "logician may &ldquo;substract one Proposition, to finde the other&rdquo;, "
                   "but what the subtraction finds is the premise that would be needed, not "
@@ -166,15 +166,15 @@ LESSONS = [
                   "sound&rdquo; are the ones he calls absurd, insignificant and "
                   "nonsense. He adds a barb about the people who ought to know better. "
                   "Cicero said, and Hobbes agrees, that &ldquo;there can be nothing so "
-                  "absurd, but may be found in the books of Philosophers&rdquo;, because "
-                  "philosophers rarely begin from definitions, as geometers do."),
+                  "absurd, but may be found in the books of Philosophers&rdquo;, because, "
+                  "he says, not one of them begins from definitions, as geometers do."),
             ("p", "A last point makes the arithmetic honest. The master of a family "
                   "who adds up all the bills of expense without checking how each was "
                   "made up, Hobbes says, &ldquo;advantages himself no more, than if he "
                   "allowed the account in grosse&rdquo;. A conclusion is certain only if "
                   "every affirmation under it is, which is why he tells the reader to go "
-                  "back to the definitions. The next lesson, “Absurdity and "
-                  "Science”, lists the seven ways he thinks philosophers lose their "
+                  "back to the definitions. The next lesson, <em>Absurdity and "
+                  "Science</em>, lists the seven ways he thinks philosophers lose their "
                   "footing, and gives you a vocabulary with which to say which names "
                   "cannot be added."),
         ],
@@ -360,8 +360,9 @@ LESSONS = [
              "No definitions to start from; names of bodies given to accidents, or the "
              "reverse; the accidents of things outside us given to our own bodies; names "
              "of bodies given to names; names of accidents given to names; metaphors in "
-             "place of proper words; and names learned by rote that signify nothing. Six "
-             "of the seven are the same fault, a name put where it does not belong."),
+             "place of proper words; and names learned by rote that signify nothing. Four "
+             "of them, the second to the fifth, are the same fault, a name of one kind put "
+             "where a name of another belongs."),
             ("Science",
              "Reason is not born with us, nor got by experience alone, but "
              "&ldquo;attayned by Industry&rdquo;, by imposing names well and proceeding "
@@ -389,7 +390,7 @@ LESSONS = [
             ("p", "Imagine a bookkeeper who is handed a ledger whose columns are headed "
                   "with words he has never been told the meaning of. He can add the "
                   "figures all day and the total will be a number, and it will tell him "
-                  "nothing. Hobbes's first cause is that. Philosophers, he says, rarely "
+                  "nothing. Hobbes's first cause is that. Philosophers, he says, never "
                   "begin from the definitions of the names they use, which is a method "
                   "&ldquo;used onely in Geometry&rdquo; and the reason geometry's "
                   "conclusions are indisputable. He shows how much he thinks it matters "
@@ -423,14 +424,23 @@ LESSONS = [
                   "that cannot be joined. And it is <strong>insignificant</strong> when a "
                   "name in it is neither defined nor admitted, so that it stands for "
                   "nothing at all."),
+            ("p", "One caution before you run it: these four verdicts are the lab's "
+                  "sorting, not Hobbes's. He does not keep false and absurd apart "
+                  "where a general claim is concerned. When we reason in words of "
+                  "general signification and fall upon a general inference that is "
+                  "false, he says, &ldquo;though it be commonly called Error, it is "
+                  "indeed an Absurdity, or senslesse Speech&rdquo;. So on his account "
+                  "<em>an animal is a man</em>, a false general claim, is absurd as "
+                  "well. The lab's <em>absurd</em> marks only one kind, a clash among "
+                  "the stated names, and its <em>false</em> a missing part; the "
+                  "separation lets you see which fault a claim has."),
             ("p", "Run the causes preset. Man is defined as body, living, sensible and "
                   "rational, and animal as the first three, so <em>a man is an "
                   "animal</em> is true and <em>an animal is a man</em> is false: rational "
                   "is missing, but nothing clashes. <em>A circle is a quadrangle</em> is "
                   "Hobbes's round quadrangle, absurd because round and quadrangle are an "
                   "opposed pair. <em>Faith is poured</em>, <em>extension is body</em> and "
-                  "<em>a creature is a genus</em> are his second, fourth and fifth causes "
-                  "in turn: faith is an accident and pouring needs a body, extension is "
+                  "<em>a creature is a genus</em> are his second cause twice and his fourth: faith is an accident and pouring needs a body, extension is "
                   "an accident, and a genus is a name, and body, accident and name are "
                   "three kinds that cannot be added. <em>A substance is immaterial</em> "
                   "is absurd on the definition that substance is body, and "
@@ -453,7 +463,7 @@ LESSONS = [
                   "verdict on <em>a substance is immaterial</em> follows from "
                   "<em>substance</em> meaning body. Descartes, and in England Henry More, "
                   "said a substance is whatever has properties of its own, and that "
-                  "there are two kinds, body and mind; for them the claim is not absurd "
+                  "there are two kinds, body and mind; for them the claim is not a contradiction in names "
                   "but false, since some substances are not bodies. The lab computes what follows from "
                   "Hobbes's definition and cannot say whose definition is right, and "
                   "that is the dispute, put honestly. The seventh is about names that "
@@ -472,11 +482,11 @@ LESSONS = [
                   "Consequences, and dependance of one fact upon another&rdquo;. The lab "
                   "shows the idea in miniature in the science preset. From the "
                   "definitions alone it follows that a man is a creature, that a man is "
-                  "a body, and that an animal is a creature, and that a creature is not "
-                  "a man. None of that is learned by looking at anyone. The "
+                  "a body, and that an animal is a creature, and that a creature is a man "
+                  "does not follow. None of that is learned by looking at anyone. The "
                   "no-definitions preset shows what the first cause costs: take the "
-                  "causes claims, leave pouring and genus undefined, and three of them "
-                  "turn insignificant, like the bookkeeper's total."),
+                  "causes claims, leave pouring and genus undefined, and two more "
+                  "turn insignificant, three in all, like the bookkeeper's total."),
             ("p", "That knowledge is what lets a person plan. Because we see how a "
                   "thing comes about, he says, &ldquo;when the like causes come into our "
                   "power, wee see how to make it produce the like effects&rdquo;. Most "
@@ -498,7 +508,7 @@ LESSONS = [
                   "when he can teach it, when he can demonstrate it to another; "
                   "&ldquo;Signes of prudence are all uncertain&rdquo;, because no one can "
                   "remember every circumstance that might alter the result. The "
-                  "conclusion of the chapter is a line to remember: &ldquo;The Light of "
+                  "line from the chapter to remember: &ldquo;The Light of "
                   "humane minds is Perspicuous Words, but by exact definitions first "
                   "snuffed, and purged from ambiguity&rdquo;."),
             ("p", "Hobbes is hard on his opponents here, and a reader should keep one "
@@ -507,8 +517,8 @@ LESSONS = [
                   "is, and builds the rest of Leviathan on the claim. A critic can reply "
                   "that definitions of <em>justice</em> and <em>power</em> are exactly the "
                   "names that fail his first test, because they are contested in the "
-                  "way a triangle is not. Hobbes had said as much on the page before the "
-                  "chapter begins, of the names of virtues and vices, which one man will "
+                  "way a triangle is not. Hobbes had said as much at the end of "
+                  "Chapter 4, of the names of virtues and vices, which one man will "
                   "use for what another names differently. The next lesson, &ldquo;The "
                   "Passions&rdquo;, takes up where they come from."),
         ],
@@ -637,8 +647,9 @@ LESSONS = [
             "after": [
                 "Notice that the claim was not tested against the facts about faith. "
                 "It fails before that, because the two names cannot be added. Compare "
-                "an animal is a man, which adds without a clash and is simply false, "
-                "since rational is missing.",
+                "an animal is a man, which adds without a clash and is false in the lab's sorting, "
+                "since rational is missing; Hobbes would call a false general claim "
+                "absurd too.",
             ],
         },
         "quiz_title": "Absurd, false and insignificant",
@@ -662,8 +673,8 @@ LESSONS = [
                    "False, because rational is not among the parts of animal"],
              "c": 3,
              "why": "The predicate man has a part, rational, that the subject animal "
-                    "lacks, and no opposed pair is joined, so the claim is false and "
-                    "not absurd. The converse, a man is an animal, is the true one."},
+                    "lacks, and no opposed pair is joined, so the lab's verdict is false and "
+                    "not absurd, though Hobbes would call a false general claim absurd too. The converse, a man is an animal, is the true one."},
             {"q": "On Hobbes's account, what is the difference between science and "
                   "sense and memory?",
              "a": ["Science is knowledge of consequences, sense and memory of fact",
@@ -688,13 +699,14 @@ LESSONS = [
                     "outcome."},
         ],
         "mistakes": [
-            ("Treating absurd as a stronger word for false",
-             "A false claim can be corrected by looking: an animal is a man is false, "
-             "and the lab shows the missing part. An absurd claim cannot be corrected "
-             "that way, because it joins names that cannot be joined and has no "
-             "possible case at all. Hobbes keeps the two apart in Chapter 5: an "
-             "error is a deception about what is past or to come, and an absurdity "
-             "is speech in which &ldquo;we conceive nothing but the sound&rdquo;."),
+            ("Taking the lab's four verdicts for Hobbes's",
+             "In the lab an animal is a man is false, because a part is missing, and a "
+             "circle is a quadrangle is absurd, because two names clash. That sorting "
+             "is the lab's. Hobbes says that a false general inference, though "
+             "commonly called error, &ldquo;is indeed an Absurdity, or senslesse "
+             "Speech&rdquo;, so he would call both claims absurd. What he does keep "
+             "apart is error about what is past or to come, where nothing was "
+             "impossible, and absurdity in general words."),
             ("Reading the sixth cause as a ban on metaphor",
              "Hobbes does not forbid it. He allows that it is &ldquo;lawfull&rdquo; to "
              "say in common speech that the way goes hither or thither; what he "
@@ -719,7 +731,11 @@ LESSONS = [
             "follows from the definitions as stated and cannot say whether the "
             "definitions are right: that a substance is a body, or that an accident "
             "cannot be a body, are the claims his opponents deny. A verdict of "
-            "absurd means only that the definitions given make the claim unsayable."
+            "absurd means only that the definitions given make the claim unsayable. "
+            "The four verdicts are the lab's own sorting. Hobbes uses absurd and "
+            "insignificant for the same fault, and holds that a false general "
+            "affirmation is absurd too; the split between a clash, a missing part and "
+            "an empty name is the lab's, made so that you can see which is which."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -841,7 +857,7 @@ LESSONS = [
                   "sounds odd until you look at what he has put in it. Courage is not "
                   "anger, because suddenness is missing. Confidence is hope, and hope "
                   "is not confidence."),
-            ("p", "And <em>diffidence is hope</em> is absurd, not merely false: "
+            ("p", "And <em>diffidence is hope</em> is absurd in the lab's sense, not merely false: "
                   "diffidence is despair, which is appetite without the opinion of "
                   "attaining, and hope is appetite with it, and no one can have both "
                   "at once about one thing. The ladder also gives jealousy as fear, "
@@ -862,7 +878,7 @@ LESSONS = [
                   "passions at once, then, is not a muddle. Hobbes's names overlap by "
                   "construction, because one is built on another."),
             ("p", "The rest of the list reads best as a cold view of ordinary "
-                  "life. Laughter is &ldquo;Sudden Glory&rdquo;, and &ldquo;much "
+                  "life. Sudden glory is the passion whose grimace is laughter, and &ldquo;much "
                   "Laughter at the defects of others, is a signe of "
                   "Pusillanimity&rdquo;. Pity is grief for another's calamity, "
                   "&ldquo;from the imagination that the like calamity may befall "
@@ -872,8 +888,8 @@ LESSONS = [
                   "it possible&rdquo;. Each of these gives the passion a comparison "
                   "with someone else, a point that returns in Chapter 10, on power "
                   "and honour, and in Chapter 13, on the war of all against all."),
-            ("p", "The standard objection is to the reduction. In 1726 Bishop "
-                  "Joseph Butler preached against the view, which he ascribed to "
+            ("p", "The standard objection is to the reduction. In 1726 Joseph "
+                  "Butler, later a bishop, preached against the view, which he ascribed to "
                   "Hobbes, that pity and benevolence are only disguised self-love, "
                   "arguing that compassion is a real regard for the other person "
                   "and not a fear for oneself. Hobbes's definition says that pity "
@@ -883,7 +899,7 @@ LESSONS = [
                   "the passions up, it cannot say."),
             ("p", "The chapter's second half stays with the same motions but asks "
                   "what happens when appetite and aversion pull in turn about one "
-                  "action. The next lesson, “Deliberation and the Will”, "
+                  "action. The next lesson, <em>Deliberation and the Will</em>, "
                   "defines the will as the last of them."),
         ],
         "lab": ("levkit", {
@@ -1075,7 +1091,9 @@ LESSONS = [
             "hope involves more than appetite and a belief. The lab computes what "
             "follows from the definitions and cannot say whether they cut the passions "
             "at the joints, or whether good is relative as he says. The cases are "
-            "written for this lesson."
+            "written for this lesson. The four verdicts are the lab's own sorting, "
+            "not Hobbes's: he counts a false general affirmation absurd too, and the "
+            "lab's <em>absurd</em> marks only a clash among the names stated."
         ),
     },
     # ---------------------------------------------------------------- 04
@@ -1129,8 +1147,8 @@ LESSONS = [
         ],
         "read_title": "The sum of the alternation",
         "read_intro": (
-            "Hobbes defines deliberation in one long sentence, and the will in the next "
-            "paragraph but one. The lab runs the sentence."
+            "Hobbes defines deliberation in one long sentence, and the will in a few "
+            "paragraphs on. The lab runs the sentence."
         ),
         "body": [
             ("p", "<strong>Chapter 6.</strong> &ldquo;In Deliberation, the last "
@@ -1158,8 +1176,7 @@ LESSONS = [
                   "vain&rdquo;. He derives the word with a flourish: it is called "
                   "deliberation &ldquo;because it is a putting an end to the Liberty we "
                   "had of doing, or omitting, according to our own Appetite, or "
-                  "Aversion&rdquo;. And then comes a sentence that surprised many "
-                  "readers: this succession is no less in "
+                  "Aversion&rdquo;. And then he adds that this succession is no less in "
                   "other creatures, &ldquo;and therefore Beasts also Deliberate&rdquo;."),
             ("p", "The next sentence is the one in the passage. The will is the last "
                   "appetite or aversion adhering to the act or the omission, and Hobbes "
@@ -1168,10 +1185,10 @@ LESSONS = [
                   "it were, then could there be no Voluntary Act against Reason&rdquo;. A "
                   "voluntary act is one that proceeds from the will, so a man who acts "
                   "against his better judgement, as we all do, would have acted "
-                  "involuntarily. He keeps the schools' ordinary thought, that the "
-                  "will is the appetite that results from a deliberation, and strips "
-                  "out the word <em>rational</em>: &ldquo;Will therefore is the last "
-                  "Appetite in Deliberating&rdquo;."),
+                  "involuntarily. He offers a repair: put &ldquo;an Appetite resulting from a "
+                  "precedent Deliberation&rdquo; in place of &ldquo;Rationall "
+                  "Appetite&rdquo;, and the schools' definition becomes his own. "
+                  "&ldquo;Will therefore is the last Appetite in Deliberating&rdquo;."),
             ("p", "So what of the times when you meant to lend? He answers that "
                   "&ldquo;a man had a Will once to do a thing, that neverthelesse he "
                   "forbore to do&rdquo; is said in common talk, &ldquo;yet that is "
@@ -1201,10 +1218,10 @@ LESSONS = [
                   "hope of gratitude last, so the will is to lend and he lends. Nothing "
                   "about the friend or the money has changed, and the will is the "
                   "opposite. That is what &ldquo;last&rdquo; means in his definition, "
-                  "and it is why he can say that the schools' rational appetite makes "
-                  "no difference: what decides is the order in which the passions "
+                  "and it is why the schools' rational appetite has no place in "
+                  "his definition: what decides is the order in which the passions "
                   "come, not which is wiser."),
-            ("p", "The storm preset is his own case about fear. A shipmaster, in "
+            ("p", "The storm preset is a case Hobbes himself uses, though not until Chapter 21. A shipmaster, in "
                   "a gale, deliberates whether to throw the cargo overboard: the "
                   "cargo is his year's profit, the ship may founder, the owners "
                   "will be angry, the next wave is higher. The last step is a fear of "
@@ -1214,7 +1231,7 @@ LESSONS = [
                   "or other Appetites to the thing propounded; but also those that have "
                   "their beginning from Aversion, or Feare of those consequences that "
                   "follow the omission, are voluntary actions&rdquo;. In Chapter 21 he "
-                  "returns to the example: &ldquo;Feare, and Liberty are "
+                  "gives it: &ldquo;Feare, and Liberty are "
                   "consistent&rdquo;, for a man who throws his goods into the sea for "
                   "fear the ship should sink does it &ldquo;very willingly&rdquo;. The "
                   "impossible "
@@ -1249,8 +1266,8 @@ LESSONS = [
                   "of mind while we live, &ldquo;because Life it selfe is but Motion, "
                   "and can never be without Desire, nor without Feare&rdquo;."),
             ("p", "Chapter 7 moves from deliberation about what to do to the search "
-                  "for what is true. The next lesson, “The Ends of "
-                  "Discourse”, shows him treating the two as parallel chains, "
+                  "for what is true. The next lesson, <em>The Ends of "
+                  "Discourse</em>, shows him treating the two as parallel chains, "
                   "the last appetite being the will and the last opinion being the "
                   "judgement."),
         ],

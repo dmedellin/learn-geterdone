@@ -74,7 +74,7 @@ L5 = {
               "which make men wonder at any event&rdquo;: that it is strange, and that "
               "we cannot imagine a natural means for it."),
         ("p", "The examples show how much the definition leaves to the observer. "
-              "&ldquo;If a Horse, or Cow should speak, it were a Miracle&rdquo;, because "
+              "&ldquo;if a Horse, or Cow should speak, it were a Miracle&rdquo;, because "
               "the thing is strange and the natural cause hard to imagine. A man "
               "begetting a man is not, though we know no more how that is done, because "
               "it is usual. A man turned into a stone is a miracle and a piece of wood "
@@ -104,7 +104,7 @@ L5 = {
               "understand them, and then only to signify intentions or passions. So "
               "when a rod seems a serpent, &ldquo;not the Rod, nor the Water, nor any "
               "other thing is enchanted&rdquo;; it is the spectator who is wrought upon. "
-              "&ldquo;All the Miracle consisteth in this, that the Enchanter has "
+              "&ldquo;all the Miracle consisteth in this, that the Enchanter has "
               "deceived a man; which is no Miracle, but a very easie matter to "
               "doe.&rdquo; He lists the means: knowing the course of the stars before "
               "others do, a juggler's trinkets, ventriloquism, the confessions one man "
@@ -114,21 +114,23 @@ L5 = {
               "confederacy. Two men conspiring, one to seem lame and the other to cure "
               "him, deceive many; many conspiring, with the rest to bear witness, "
               "deceive many more."),
-        ("p", "That is where the lab begins. A wonder is reported. Behind the report "
-              "there may be a miracle, a trick or an honest mistake. Give each a share "
-              "of all the reports there are: the lesson supposes, for illustration, one "
-              "in a hundred a miracle, forty-nine in a hundred a trick and half "
-              "mistakes. Now one witness says he saw it. If the three explanations "
-              "would lead a witness to say so about equally often, the report cannot tell "
-              "them apart. The preset 'one-witness' has the miracle and the trick both "
-              "producing a witness nine times in ten, and a mistake producing one "
-              "only one time in ten. The miracle's share rises only from 1/100 to "
-              "9/500: what has been ruled out is the honest mistake, not the trick. Three "
-              "witnesses do the same again, since the trick's witnesses are as many as "
-              "the miracle's; and where the trick is by confederacy and its witnesses "
-              "always say so, the miracle gains nothing at all over the trick. That is "
-              "Hobbes's point about confederacy put as a calculation. None of the "
-              "rates is his, and he gives no probabilities."),
+        ("p", 'That is where the lab begins. A wonder is reported. Behind the '
+              'report there may be a miracle, a trick or an honest mistake. '
+              'Give each a share of all the reports there are: the lesson '
+              'supposes, for illustration, one in a hundred a miracle, '
+              'forty-nine in a hundred a trick and half mistakes. Now one '
+              'witness says he saw it. If the three explanations would lead a '
+              'witness to say so about equally often, the report cannot tell '
+              'them apart. The preset <em>one-witness</em> has the miracle and '
+              'the trick both producing a witness nine times in ten, and a '
+              "mistake producing one only one time in ten. The miracle's share "
+              'rises only from 1/100 to 9/500: what has been ruled out is the '
+              'honest mistake, not the trick. Three witnesses do the same '
+              "again, since the trick's witnesses are as many as the miracle's; "
+              'and where the trick is by confederacy and its witnesses always '
+              "say so, the miracle loses ground to the trick. That is Hobbes's "
+              'point about confederacy put as a calculation. None of the rates '
+              'is his, and he gives no probabilities.'),
         ("p", "Hobbes's advice follows. The caution God prescribed is the one from "
               "Deuteronomy: take for prophets none who teach another religion than the "
               "one that God's lieutenant has established, nor any whose prediction we "
@@ -140,7 +142,9 @@ L5 = {
               "man who says that after certain words a piece of bread is no longer "
               "bread but a God or a man, though it looks as like bread as it ever did, "
               "gives us no reason to think it done, until we inquire of the lieutenant. "
-              "A Catholic reader would say the doctrine concerns what is not "
+              "Hobbes goes on, &ldquo;If he say &rsquo;tis done, then he is not to "
+              "contradict it&rdquo;, so that in a Catholic commonwealth the lieutenant's "
+              "answer settles the matter. A Catholic reader would say the doctrine concerns what is not "
               "perceptible by the senses, and that is a fair statement of the other "
               "side; Hobbes's reply is that the test he gives requires the thing to "
               "be seen."),
@@ -161,9 +165,9 @@ L5 = {
               "unless its being false would be more miraculous than what it reports. "
               "That is a different argument from Hobbes's, and a Bayesian would put "
               "the point in the prior, which in the lab is a number you can change."),
-        ("p", "The next lesson, &ldquo;Eternal Life and the Church&rdquo;, moves from "
-              "what is to be believed about wonders to what Hobbes says Scripture "
-              "means by eternal life and a church."),
+        ("p", 'The next lesson, <em>Eternal Life and the Church</em>, moves '
+              'from what is to be believed about wonders to what Hobbes says '
+              'Scripture means by eternal life and a church.'),
         ("p", 'The presets keep the same three explanations and add witnesses. In one- '
               'witness a single witness says he saw it, and the chance of a miracle is '
               '9/500, or 1.8%, because the trick and the mistake together are so much more '
@@ -338,14 +342,15 @@ L6 = {
     "module": "Chapters 38 and 39 · Of Eternall Life, Hell, Salvation, and of the Word Church",
     "one_line": "Hobbes reads eternal life as life on a restored earth and defines a church as a company of Christians united in one sovereign, so a Christian commonwealth and a church are one thing.",
     "summary": (
-        "Chapter 38 asks what Scripture means by eternal life, hell, salvation and "
-        "redemption, and places them mostly on earth after the resurrection. Chapter 39 "
-        "lists the senses of 'church' and defines one that can act as a person: a "
-        "company of Christians united in one sovereign. Test that definition against "
-        "a table of cases and see which it admits and which formula would fit."
+        'Chapter 38 asks what Scripture means by eternal life, hell, salvation '
+        'and redemption, and places them mostly on earth after the '
+        'resurrection. Chapter 39 lists the senses of church and defines one '
+        'that can act as a person: a company of Christians united in one '
+        'sovereign. Test that definition against a table of cases and see which '
+        'it admits and which formula would fit.'
     ),
     "key": [
-        "church = Christians + one sovereign + warrant",
+        "church = Christians + sovereign + authority",
         "no universal church that all are bound to obey",
         "a church that can act is a commonwealth",
         "eternal life: on earth, after the resurrection",
@@ -413,10 +418,10 @@ L6 = {
               "had not sinned, had had an Eternall Life on Earth&rdquo;. Christ "
               "recovered that life for believers; the texts about Zion, the new "
               "Jerusalem and the reign of Christ place it on earth; the dead wait until "
-              "the resurrection. He observes that the kingdom of God has been the "
-              "subject of &ldquo;that dispute of the sword&rdquo; between the "
-              "authorities who say who may approve doctrine, and he is explicit: he "
-              "proposes it, with submission &ldquo;to the interpretation of the Bible "
+              "the resurrection. He says he only propounds this, maintaining "
+              "nothing, while he waits for the end of &ldquo;that dispute of the "
+              "sword&rdquo; to decide which authority approves doctrine, and he "
+              "submits it &ldquo;to the interpretation of the Bible "
               "authorized by the Common-wealth, whose Subject I am&rdquo;. Of the "
               "wicked he writes that he finds &ldquo;none that affirm there shall bee "
               "an Eternall Life therein of any individuall person&rdquo;: Scripture "
@@ -459,23 +464,23 @@ L6 = {
               "sovereigns do, as the first Christians were a church under pagan emperors."),
         ("p", "The lab takes the definition as a rule with three conditions: the "
               "company professes Christianity (C), all its members are one commonwealth "
-              "under one sovereign (S), and it meets by that sovereign's warrant (W). "
-              "A case table gives the verdict Hobbes's text implies for each case. The "
+              "under one sovereign (S), and it acts by that sovereign's authority (W). "
+              "A case table gives the verdict Hobbes's text implies for each case. A "
+              "congregation that meets against the sovereign's prohibition he still calls "
+              "a church, but an unlawful assembly, so the table does not use it. The "
               "lab checks the definition against it, lists the first case it gets "
               "wrong and says whether it is too broad or too narrow. The case "
               "verdicts are the lesson's readings of the chapter. One of the presets "
               "puts the Roman reading of the universal church in the table, which "
               "shows that the dispute is over the verdicts and not over the logic."),
-        ("p", "The next course, &ldquo;The Kingdom of Darkness, and the Review and "
-              "Conclusion&rdquo;, comes after the lessons on the rights of God's kingdom "
-              "and on power ecclesiastical. The next lesson, &ldquo;The Sovereigns of "
-              "Israel and the Office of Christ&rdquo;, begins with Abraham."),
-        ("p", 'The three presets test the definition against five cases. In hobbes, '
-              "Hobbes's definition agrees with his verdicts in all five, so it is adequate. "
+        ("p", "The next lesson, <em>The Sovereigns of Israel and the Office of Christ</em>, "
+              "begins with Abraham."),
+        ("p", 'The three presets test the definition against four cases. In hobbes, '
+              "Hobbes's definition agrees with his verdicts in all four, so it is adequate. "
               'In any-christians the definition is only that a company are Christians, and '
-              'it agrees in only 2 of the 5: it is too broad, since it admits the '
-              'congregation the sovereign has forbidden to meet. In roman the universal '
-              'church is counted as a church, and the definition then agrees in 4 of the 5 '
+              'it agrees in only 2 of the 4: it is too broad, since it admits the '
+              'crowd acting with no authority from a lawful congregation. In roman the universal '
+              'church is counted as a church, and the definition then agrees in 3 of the 4 '
               'and is too narrow, since a company of all Christians under a pope has no one '
               'sovereign.'),
     ],
@@ -488,40 +493,38 @@ L6 = {
              "conditions": ["C", "S", "W"], "target": "is a church", "definition": "C & S & W",
              "cases": [
                  _case("a Christian commonwealth under its sovereign", [1, 1, 1], 1),
-                 _case("a congregation the sovereign has forbidden to meet", [1, 1, 0], 0),
+                 _case("a crowd of Christians acting with no authority from a lawful congregation", [1, 1, 0], 0),
                  _case("all Christians, under a pope claiming every realm", [1, 0, 0], 0),
                  _case("a heathen commonwealth and its assemblies", [0, 1, 1], 0),
-                 _case("Christians under an infidel sovereign", [1, 1, 0], 0),
              ],
-             "expect": {"anAgree": "5 / 5", "anFail": "none", "anVerdict": "Adequate"}},
+             "expect": {"anAgree": "4 / 4", "anFail": "none", "anVerdict": "Adequate"}},
             {"id": "any-christians", "label": "Any company of Christians",
              "conditions": ["C", "S", "W"], "target": "is a church", "definition": "C",
              "cases": [
                  _case("a Christian commonwealth under its sovereign", [1, 1, 1], 1),
-                 _case("a congregation the sovereign has forbidden to meet", [1, 1, 0], 0),
+                 _case("a crowd of Christians acting with no authority from a lawful congregation", [1, 1, 0], 0),
                  _case("all Christians, under a pope claiming every realm", [1, 0, 0], 0),
                  _case("a heathen commonwealth and its assemblies", [0, 1, 1], 0),
-                 _case("Christians under an infidel sovereign", [1, 1, 0], 0),
              ],
-             "expect": {"anAgree": "2 / 5", "anFail": "a congregation the sovereign has forbidden to meet: too broad", "anVerdict": "Too broad"}},
+             "expect": {"anAgree": "2 / 4", "anFail": "a crowd of Christians acting with no authority from a lawful congregation: too broad", "anVerdict": "Too broad"}},
             {"id": "roman", "label": "The universal church counted as a church",
              "conditions": ["C", "S", "W"], "target": "is a church", "definition": "C & S & W",
              "cases": [
                  _case("a Christian commonwealth under its sovereign", [1, 1, 1], 1),
-                 _case("a congregation the sovereign has forbidden to meet", [1, 1, 0], 0),
+                 _case("a crowd of Christians acting with no authority from a lawful congregation", [1, 1, 0], 0),
                  _case("all Christians, under a pope claiming every realm", [1, 0, 0], 1),
                  _case("a heathen commonwealth and its assemblies", [0, 1, 1], 0),
-                 _case("Christians under an infidel sovereign", [1, 1, 0], 0),
              ],
-             "expect": {"anAgree": "4 / 5", "anFail": "all Christians, under a pope claiming every realm: too narrow", "anVerdict": "Too narrow"}},
+             "expect": {"anAgree": "3 / 4", "anFail": "all Christians, under a pope claiming every realm: too narrow", "anVerdict": "Too narrow"}},
         ],
         "panel_title": "Test the definition of a church",
         "panel_intro": (
-            "C means the company professes Christianity, S that its members are one "
-            "commonwealth under one sovereign, W that it meets by that sovereign's "
-            "warrant. The verdicts in the table are the lesson's readings of Chapter 39. "
-            "Type another formula over C, S and W and the lab reports how many verdicts "
-            "it matches; with 'pairs' it also lists two-letter formulas that fit."
+            'C means the company professes Christianity, S that its members are '
+            'one commonwealth under one sovereign, W that it acts by that '
+            "sovereign's authority. The verdicts in the table are the lesson's "
+            'readings of Chapter 39. Type another formula over C, S and W and '
+            'the lab reports how many verdicts it matches; with pairs it also '
+            'lists two-letter formulas that fit.'
         ),
     }),
     "steps_title": "Testing a definition against cases",
@@ -529,7 +532,7 @@ L6 = {
     "steps": [
         ("Turn each clause into a letter",
          "Write each condition of the definition as a letter: here professing "
-         "Christianity, unity under one sovereign, and meeting by his warrant."),
+         "Christianity, unity under one sovereign, and acting by his authority."),
         ("Fix the verdict for each case first",
          "Write down, from the text, whether each case is or is not a church before "
          "you try the formula. Otherwise the formula marks its own work."),
@@ -538,42 +541,42 @@ L6 = {
          "case the verdict admits and the formula refuses shows it is too narrow."),
         ("Ask what else would fit",
          "More than one formula may fit a small table. A clause that is already "
-         "implied by another, as the warrant implies a sovereign, cannot be tested "
+         "implied by another, as acting by his authority implies a sovereign, cannot be tested "
          "until a case separates them."),
     ],
     "worked": {
-        "title": "Why 'Christians' alone is too broad",
+        "title": 'Why Christians alone is too broad',
         "intro": [
             "Take the second preset. The definition is only that the company professes "
             "Christianity.",
         ],
         "lines": [
             "case 1:  C = 1, verdict 1: agrees",
-            "case 2 (forbidden congregation):  C = 1, verdict 0: too broad",
+            "case 2 (crowd with no authority):  C = 1, verdict 0: too broad",
             "case 3 (all Christians under a pope):  C = 1, verdict 0",
             "case 4 (heathen commonwealth):  C = 0, verdict 0: agrees",
-            "agreement:  2 of 5",
+            "agreement:  2 of 4",
         ],
         "after": [
-            "The first preset's three-clause definition agrees with all five. The "
-            "search also finds that a two-letter formula, C and W, agrees with all five. "
-            "That is because W, a warrant from the sovereign, already presupposes S, so "
+            "The first preset's three-clause definition agrees with all four. The "
+            "search also finds that a two-letter formula, C and W, agrees with all four. "
+            "That is because W, acting by the sovereign's authority, already presupposes S, so "
             "no case in the table can show that S is needed. The roman preset changes "
             "one verdict and the same definition is then too narrow on that case.",
         ],
     },
     "quiz_title": "A definition against its cases",
     "quiz": [
-        {"q": "On the lesson's verdicts, why is 'a company of Christians' alone too "
-              'broad?',
+        {"q": "On the lesson's verdicts, why is a company of Christians alone "
+              'too broad?',
          "a": [
                'It excludes a Christian commonwealth',
                'It admits a heathen commonwealth',
-               'It admits a congregation the sovereign has forbidden to meet',
+               'It admits a crowd of Christians acting with no authority from a lawful congregation',
                'It is too narrow, not too broad',
          ],
          "c": 2,
-         "why": 'The forbidden congregation is a company of Christians, so the formula '
+         "why": 'The crowd is a company of Christians, so the formula '
                 'admits it while the verdict refuses it. It does not exclude the '
                 'commonwealth, and it refuses the heathen one. The last answer is the '
                 "reverse of the lab's verdict."},
@@ -618,7 +621,9 @@ L6 = {
         ("Thinking Hobbes's definition covers any Christian assembly",
          "It covers a company united in one sovereign, who calls it together. The "
          "second preset shows what happens when only Christianity is required: a "
-         "forbidden congregation counts as a church."),
+         "crowd with no lawful authority counts as a church. A congregation that meets "
+         "against the sovereign's prohibition Hobbes still calls a church, but an "
+         "unlawful assembly."),
         ("Reading the hell chapter as a denial that sin is punished",
          "Hobbes says the wicked suffer, bodily and in grief, and then a second death. "
          "What he denies is that Scripture promises them an eternal life of torment. "
@@ -698,7 +703,7 @@ L7 = {
     "body": [
         ("p", "<strong>Chapter 40.</strong> &ldquo;For it could not be the commandement "
               "of God that could oblige them; because God spake not to them immediately, "
-              "but by the mediation of Moses himselfe: And our Saviour saith of himself, "
+              "but by the mediation of Moses himself: And our Saviour saith of himself, "
               "If I bear witnesse of my self, my witnesse is not true; much lesse if "
               "Moses bear witnesse of himselfe, (especially in a claim of Kingly power over "
               "Gods people) ought his testimony to be received. His authority therefore, "
@@ -711,7 +716,7 @@ L7 = {
               "know that God had chosen him, and the only one who said so was Moses. "
               "The argument that follows is a model of how Hobbes reads Scripture "
               "as political history."),
-        ("p", "The chapter begins with Abraham, &ldquo;the Father of the Faithfull, and "
+        ("p", "The chapter begins with Abraham, &ldquo;The Father of the Faithfull, and "
               "first in the Kingdome of God by Covenant&rdquo;. God spoke only to him; his "
               "family's wills were involved in his, and so, Hobbes says, he had lawful "
               "power to make them perform what he covenanted for them. From this three "
@@ -789,21 +794,23 @@ L7 = {
               "&ldquo;tendeth to the diminution of the Civill Right of the Jewes, or of "
               "Caesar&rdquo;. The consequence, drawn in the next chapter, is that his "
               "ministers have no power to command now."),
-        ("p", "The lab turns the Moses argument into premises. R says the people were "
-              "obliged to obey Moses; D that God's direct command obliged them; H that "
-              "they were obliged as heirs to Abraham's right; W that Moses's own "
-              "witness obliged them; C that their consent and promise did. The "
-              "argument is valid; whether it is sound depends on the premise that "
-              "these are the only grounds, which is the one a critic would reject. "
-              "The next lesson, &ldquo;Power Ecclesiastical and What Is Necessary for "
-              "Salvation&rdquo;, takes up what follows for ministers and for subjects."),
+        ("p", 'The lab turns the Moses argument into premises. R says the '
+              "people were obliged to obey Moses; D that God's direct command "
+              "obliged them; H that they were obliged as heirs to Abraham's "
+              "right; W that Moses's own witness obliged them; C that their "
+              'consent and promise did. The argument is valid; whether it is '
+              'sound depends on the premise that these are the only grounds, '
+              'which is the one a critic would reject. The next lesson, '
+              '<em>Power Ecclesiastical and What Is Necessary for '
+              'Salvation</em>, takes up what follows for ministers and for '
+              'subjects.'),
         ("p", 'The three presets are the same argument with its premises changed. In moses, '
               "God did not command it, inheritance gave no title, and Moses's own witness "
               "did not bind, so with the obligation given the people's consent follows: 32 "
               'rows, none a counterexample, valid. In inheritance the premise that excludes '
               'inheritance is dropped, and one row is a counterexample, so the argument is '
-              'invalid. In signs a further ground, signs and wonders, is added to the list, '
-              'and again one row is a counterexample.'),
+              'invalid. In signs a different ground, signs and wonders, takes the place of inheritance '
+              'in the list, and again one row is a counterexample.'),
     ],
     "lab": ("argkit", {
         "mode": "validity",
@@ -928,10 +935,10 @@ L7 = {
          "preset has no counterexample, and the second shows how it fails if "
          "inheritance is allowed. Whether the grounds were exhaustive is the question."),
         ("Thinking Christ's kingdom was here and now",
-         "Hobbes argues from the words 'my kingdom is not of this world' and from "
-         "the time of the preaching, which he calls a regeneration, that the "
-         "kingdom begins when he comes again, and that he therefore took nothing from "
-         "Caesar."),
+         'Hobbes argues from the words <em>my kingdom is not of this world</em> '
+         'and from the time of the preaching, which he calls a regeneration, '
+         'that the kingdom begins when he comes again, and that he therefore '
+         'took nothing from Caesar.'),
     ],
     "standard": (
         "Finish when you can say which premise carries an elimination.",
@@ -949,7 +956,7 @@ L7 = {
 }
 
 # ------------------------------------------------------------------ 08
-# Leviathan ch. 43; PDF p. 499 of the operator's copy.
+# Leviathan ch. 43, 1651 p. 322; PDF p. 499 of the operator's copy.
 L8 = {
     "slug": "power-ecclesiastical-and-salvation",
     "title": "Power Ecclesiastical and What Is Necessary for Salvation",
@@ -978,11 +985,12 @@ L8 = {
     ),
     "concepts": [
         ("The power to teach",
-         "Before kings were Christian the power ecclesiastical was in the apostles and "
-         "those ordained by the laying on of hands. Hobbes argues from the commission "
-         "to preach, teach and baptize that it is a power of proclaiming and persuading: "
-         "Christ's kingdom is not of this world, faith cannot be commanded, and "
-         "Christ's ministers are 'fishers', not 'hunters', of men. After kings become "
+         'Before kings were Christian the power ecclesiastical was in the '
+         'apostles and those ordained by the laying on of hands. Hobbes argues '
+         'from the commission to preach, teach and baptize that it is a power '
+         "of proclaiming and persuading: Christ's kingdom is not of this world, "
+         "faith cannot be commanded, and Christ's ministers are "
+         '<em>fishers</em>, not <em>hunters</em>, of men. After kings become '
          "Christian, the power to order the church is the sovereign's."),
         ("Bellarmine answered",
          "The Jesuit Cardinal Robert Bellarmine had argued that the pope's power is "
@@ -1057,25 +1065,30 @@ L8 = {
               "may disobey on pain of death, so may every private man for any "
               "religion, true or false. The martyrs are those who witness to the "
               "resurrection, and a martyr in the proper sense, he says, can only be "
-              "one who saw Christ risen, or was sent to preach it. This is the passage "
+              "one who saw Christ risen; one sent to preach it who had not seen him is a "
+              "martyr only in a second sense. This is the passage "
               "that most infuriated his opponents, and it should be read as it is: it "
               "does not say conscience is nothing, it says conscience is inward and "
               "the outward act belongs to the one who commands it."),
-        ("p", "The rest of the chapter is Bellarmine. Hobbes takes him as the writer "
-              "by whom the Pope's claim has been &ldquo;maintained chiefly, and I think "
-              "as strongly as is possible&rdquo;, and follows his five books on the "
-              "supreme pontiff, answering the first on the best form of government, "
-              "the second on Peter as monarch of the church and the others in turn. He "
-              "reads the text on which the Peter claim rests, 'thou art Peter, and upon "
-              "this rock', as a play on Peter's name, the rock being the article that "
-              "Jesus is the Christ. And of the argument that a pastor must feed his "
-              "flock and so may compel kings, he says it would make the pope, as pastor "
-              "of Christian men, &ldquo;King of Kings&rdquo;, which Christian kings "
-              "ought either to confess or take upon themselves the supreme pastoral "
-              "charge, each in his own dominion. For Bellarmine's examples he says "
-              "that examples prove nothing. A reader on Bellarmine's side would say "
-              "that Hobbes treats a claim about the order of souls as if it were a claim "
-              "about the order of states, and that is the premise they would deny."),
+        ("p", 'The rest of the chapter is Bellarmine. Hobbes takes him as the '
+              "writer by whom the Pope's claim has been &ldquo;maintained "
+              'chiefly, and I think as strongly as is possible&rdquo;, and '
+              'follows his five books on the supreme pontiff, answering the '
+              'first, on the best form of government and on Peter as monarch of '
+              'the church, the second, on Peter as bishop of Rome and the popes '
+              'as his successors, and the others in turn. He reads the text on '
+              'which the Peter claim rests, <em>thou art Peter, and upon this '
+              "rock</em>, as a play on Peter's name, the rock being the article "
+              'that Jesus is the Christ. And of the argument that a pastor must '
+              'feed his flock and so may compel kings, he says it would make '
+              'the pope, as pastor of Christian men, &ldquo;King of '
+              'Kings&rdquo;, which Christian kings ought either to confess or '
+              'take upon themselves the supreme pastoral charge, each in his '
+              "own dominion. For Bellarmine's examples he says that examples "
+              "prove nothing. A reader on Bellarmine's side would say that "
+              'Hobbes treats a claim about the order of souls as if it were a '
+              'claim about the order of states, and that is the premise they '
+              'would deny.'),
         ("p", "Chapter 43 then gives the answer that the whole of Part III has been "
               "building. Obedience is &ldquo;a serious Endeavour to Obey him&rdquo;, "
               "since God accepts the will for the deed; the laws of God are the laws "
@@ -1104,13 +1117,14 @@ L8 = {
               "disclaimer: that he pretends &ldquo;not to advance any Position of my "
               "own&rdquo;, only to show the consequences that seem deducible from "
               "Scripture."),
-        ("p", "That is the argument the Scottish Covenanters would not accept. For them "
-              "Christ was head of the church and the king bound to him by covenant; "
-              "to obey a king who commanded what the covenant forbade was to sin, and "
-              "faith was not only an inward article. The lab puts the argument in "
-              "premises so that the point of disagreement is visible. The next course, "
-              "&ldquo;The Kingdom of Darkness, and the Review and Conclusion&rdquo;, "
-              "turns to what Hobbes says goes wrong when Scripture is misread."),
+        ("p", 'That is the argument the Scottish Covenanters would not accept. '
+              'For them Christ was head of the church and the king bound to him '
+              'by covenant; to obey a king who commanded what the covenant '
+              'forbade was to sin, and faith was not only an inward article. '
+              'The lab puts the argument in premises so that the point of '
+              'disagreement is visible. The next course, <em>The Kingdom of '
+              'Darkness, and the Review and Conclusion</em>, turns to what '
+              'Hobbes says goes wrong when Scripture is misread.'),
         ("p", 'The four presets set the argument against its critics. In hobbes, salvation '
               'needs faith and obedience, a man has the faith, and so if he obeys he is '
               'saved: 8 rows, no counterexample, valid. In naaman the premise is added that '
@@ -1181,9 +1195,9 @@ L8 = {
         "after": [
             "Without the premise about faith (the third preset), one row survives: "
             "C and G true, F false, S false, which is a man who obeyed the command and "
-            "lost the faith by it. That row is what a Covenanter says happens, "
-            "because on his view to confess before men is part of faith. Hobbes's "
-            "premise says it does not.",
+            "has not the faith; the lab cannot say whether he lost it by obeying or never "
+            "had it. A Covenanter says it is lost, because on his view to confess before "
+            "men is part of faith. Hobbes's premise says it is not.",
         ],
     },
     "quiz_title": "Obedience and salvation",
@@ -1199,7 +1213,7 @@ L8 = {
          "why": 'The third preset keeps the rule, the command and the obedience and '
                 'drops the premise about faith, and then one row has the faith lost. '
                 'The others are all still premises.'},
-        {"q": "What does the 'more articles' preset show?",
+        {"q": 'What does the more articles preset show?',
          "a": [
                'Obedience is never enough',
                'Faith in Christ is not necessary',

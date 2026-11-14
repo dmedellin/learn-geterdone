@@ -10,7 +10,7 @@ and is corrected against docs/leviathan/kit-report.md.
 
 LESSONS = [
     # ---------------------------------------------------------------- 05
-    # Leviathan ch. 28, 1651 pp. 161-162; PDF p. 310 of the operator's copy
+    # Leviathan ch. 28, 1651 p. 161; PDF p. 310 of the operator's copy
     {
         "slug": "punishments-and-rewards",
         "title": "Punishments and Rewards",
@@ -95,7 +95,7 @@ LESSONS = [
                   "right to punish is as wide as the right of nature, limited only by "
                   "natural law. A critic would say this takes the sting out of the word "
                   "right: if he may do whatever he thinks necessary, what is it for?"),
-            ("p", "Then the inferences. I count eleven, beginning with private revenges "
+            ("p", "Then the inferences. There are eleven, beginning with private revenges "
                   "and ending with harm to a declared enemy, and two of them are sums. "
                   "The seventh: &ldquo;If the harm inflicted be lesse than the benefit, or "
                   "contentment that naturally followeth the crime committed, that harm is "
@@ -140,11 +140,11 @@ LESSONS = [
                   "Nerves and Tendons, that move the limbes and joynts of a "
                   "Common-wealth&rdquo;; and Hobbes, having shown the nature of man, whose "
                   "pride compelled him to government, turns to the &ldquo;great power of "
-                  "his Governour, whom I compared to Leviathan&rdquo;, from the close of "
-                  "the book of Job, where God calls that creature King of the Proud. "
+                  "his Governour, whom I compared to Leviathan&rdquo;, from the last two "
+                  "verses of Job 41, where God calls that creature King of the Proud. "
                   "Because the governour is mortal, the next chapter goes on to his "
-                  "diseases, which the next lesson, “The Dissolution of a "
-                  "Commonwealth”, takes up."),
+                  "diseases, which the next lesson, <em>The Dissolution of a "
+                  "Commonwealth</em>, takes up."),
         ],
         "lab": ("levkit", {
             "mode": "law",
@@ -259,10 +259,10 @@ LESSONS = [
              "preset the 150 the law prescribed is punishment and the 250 added after "
              "is hostility."),
             ("Reading <em>hostility</em> as <em>wrong</em>",
-             "Hobbes means a harm that does not fall under the name of punishment "
-             "and so is not done as the commonwealth's act. In declared hostility "
-             "&ldquo;all infliction of evill is lawfull&rdquo;, as against an enemy, "
-             "so the word does not say the act is forbidden."),
+             "Hobbes means a harm that is not punishment. Against a declared enemy "
+             "&ldquo;all infliction of evill is lawfull&rdquo;. Inflicted on a subject "
+             "beyond the law, it falls outside the definition, and the delinquent is "
+             "excused from it."),
         ],
         "standard": (
             "Finish when you can sort a harm into punishment, price or hostility.",
@@ -354,7 +354,7 @@ LESSONS = [
                   "&ldquo;The Senate, and People of Rome&rdquo;, and neither pretended to "
                   "the whole power, which brought the Gracchi, Marius and Sylla, Pompey "
                   "and Caesar. Second, six seditious doctrines. The fourth, that the "
-                  "sovereign is subject to the civil laws, is the one “Of Civil Laws” "
+                  "sovereign is subject to the civil laws, is the one <em>Of Civil Laws</em> "
                   "answers; the sixth is &ldquo;That the Soveraign Power may be "
                   "divided&rdquo;, for what is it, he asks, &ldquo;but to Dissolve "
                   "it? for Powers divided mutually destroy each other&rdquo;."),
@@ -395,17 +395,19 @@ LESSONS = [
                   "or that the equilibrium will be reached, and at the mixed one civil "
                   "war happens with probability `4/9`, the square of two-thirds."),
             ("p", "Now change the rules. In the sword preset the Church's insisting "
-                  "against an insisting Crown costs it 2 and not 0, because there is a "
-                  "sword behind one claim, and the Crown's insisting then dominates: "
-                  "whatever the Church does, the Crown does better to insist, and the Church's "
-                  "best answer is to yield. Hobbes's remedy is exactly that, a single "
+                  "against an insisting Crown costs it 2 and not 0, and the Crown, with a "
+                  "sword behind its claim, gets 4 and not 0. Now the Crown's insisting "
+                  "dominates: against a yielding Church 5 beats 3, against an insisting "
+                  "one 4 beats 1. The Church's best answer to an insisting Crown is to "
+                  "yield, 1 against -2. Hobbes's remedy is exactly that, a single "
                   "sovereign whose will no rival may resist, and the table has one "
                   "equilibrium. In the cheap-war preset the opposite: if civil war costs "
                   "little, 2 each against 3 for both yielding, insisting dominates "
                   "for both and the only equilibrium is war, which is worse for both "
-                  "than peace. That is the dilemma of the factions of <em>mixed "
-                  "government</em>, three independent factions, Hobbes says, though "
-                  "called mixed monarchy."),
+                  "than peace. That is a prisoner's dilemma, and it is the lesson's picture, "
+                  "not Hobbes's. Of mixed government he says only that its three "
+                  "independent factions endanger the commonwealth for want of consent "
+                  "to good laws and, most often, for want of money."),
             ("p", "The rest of the chapter is a physician's list: want of money is an "
                   "ague, monopolies a pleurisy, a popular subject a witchcraft, "
                   "great towns and corporations worms in the entrails, the liberty of "
@@ -413,8 +415,8 @@ LESSONS = [
                   "He ends with the final dissolution, when an enemy's victory leaves "
                   "no protection and every man may protect himself, and adds that the "
                   "obligation of the members, not the right of a sovereign monarch, is "
-                  "what ends. The next lesson, “The Office of the Sovereign "
-                  "Representative”, asks what the sovereign owes the people in "
+                  "what ends. The next lesson, <em>The Office of the Sovereign "
+                  "Representative</em>, asks what the sovereign owes the people in "
                   "return."),
         ],
         "lab": ("choicekit", {
@@ -425,7 +427,7 @@ LESSONS = [
                 {"id": "chicken", "label": "Both yield 3, one insists 5 against 1, both insist 0",
                  "rows": ["Yield", "Insist"], "cols": ["Yield", "Insist"],
                  "payoffs": [[[3, 3], [1, 5]], [[5, 1], [0, 0]]], "expect": {"gaPure": "(Yield, Insist); (Insist, Yield)", "gaMixed": "row Yield: 1/3, col Yield: 1/3"}},
-                {"id": "sword", "label": "A sword behind the Crown: the Church loses 2 if both insist",
+                {"id": "sword", "label": "A sword behind the Crown: if both insist, the Crown gets 4 and the Church -2",
                  "rows": ["Yield", "Insist"], "cols": ["Yield", "Insist"],
                  "payoffs": [[[3, 3], [1, 5]], [[5, 1], [4, -2]]], "expect": {"gaPure": "(Insist, Yield)", "gaDom": "Insist dominates for row"}},
                 {"id": "cheap-war", "label": "War costs little: both insisting pays 2 each",
@@ -484,8 +486,9 @@ LESSONS = [
              "c": 2,
              "why": "At both-yield each power does better by insisting, 5 against 3. At "
                     "both-insist each does better by yielding, 1 against 0. At either "
-                    "mixed cell neither wants to switch: the insister would get 0 and "
-                    "the yielder 3 for 1, so neither gains."},
+                    "cell where one insists and the other yields, neither wants to "
+                    "switch: the insister would get 3 instead of 5, and the yielder 0 "
+                    "instead of 1."},
             {"q": "In the chicken preset's mixed equilibrium, with what chance does each "
                   "power insist?",
              "a": ["1/3", "2/3", "1/2", "1"],
@@ -515,8 +518,8 @@ LESSONS = [
              "c": 0,
              "why": "Insisting beats yielding against either move: 5 against 3, and 2 "
                     "against 1. So both insist, and the 2 each is below the 3 each of both "
-                    "yielding. That is a dilemma, and it is what Hobbes says of "
-                    "factions that can each hope to win."},
+                    "yielding. That is a dilemma, a picture the lesson draws and Hobbes "
+                    "does not."},
         ],
         "mistakes": [
             ("Thinking Hobbes predicts the table's outcome",
@@ -650,9 +653,9 @@ LESSONS = [
                   "on consumption, and the frugal and the lord pay less. In the war preset "
                   "the revenue doubles to 200 and so does every tax; the proportions "
                   "do not change. In the pair preset the labourer, with riches 180 and "
-                  "consumption 30, and the idler, with 20 and 20, raise a revenue of "
+                  "consumption 20, and the idler, with 20 and 30, raise a revenue of "
                   "20: on riches the labourer pays 18 and the idler 2, on consumption "
-                  "12 and 8. That is Hobbes's pair."),
+                  "8 and 12. The man who spares pays less, which is Hobbes's pair."),
             ("p", "The standard objection is also in the figures. The poor man, with "
                   "60 and 60, spends everything he has, so a tax on consumption is a "
                   "charge on all he has: 12 of his 60, against 3 under a rate on riches. "
@@ -672,7 +675,7 @@ LESSONS = [
                   "crimes most dangerous to the public, and lenient to the seduced; rewards "
                   "are for service and never bought from popular men; and counsellors are "
                   "chosen for knowledge, heard apart, and not by birth. The last chapter "
-                  "of the course, “The Kingdom of God by Nature”, closes Part "
+                  "of the course, <em>The Kingdom of God by Nature</em>, closes Part "
                   "II by asking by what right God himself rules."),
         ],
         "lab": ("levkit", {
@@ -689,8 +692,8 @@ LESSONS = [
                              ["poor", 60, 60], ["merchant", 340, 90]],
                  "revenue": 200, "expect": {"ltxRateRiches": "1/10 = 10%", "ltxRateConsumption": "2/5 = 40%", "ltxOnConsumption": "frugal 20; idle 40; lord 80; poor 24; merchant 36"}},
                 {"id": "pair", "label": "A labourer and an idler, a revenue of 20",
-                 "persons": [["labourer", 180, 30], ["idler", 20, 20]],
-                 "revenue": 20, "expect": {"ltxOnRiches": "labourer 18; idler 2", "ltxOnConsumption": "labourer 12; idler 8", "ltxMore": "1: idler"}},
+                 "persons": [["labourer", 180, 20], ["idler", 20, 30]],
+                 "revenue": 20, "expect": {"ltxOnRiches": "labourer 18; idler 2", "ltxOnConsumption": "labourer 8; idler 12", "ltxMore": "1: idler"}},
             ],
             "panel_title": "Raise a revenue two ways",
             "panel_intro": (
@@ -750,11 +753,11 @@ LESSONS = [
                     "Five is his tax on riches. Forty is the lord's tax on consumption "
                     "and ten the frugal man's."},
             {"q": "In the pair preset, how much does the labourer (riches 180, "
-                  "consumption 30) pay on a rate on consumption?",
-             "a": ["18", "2", "8", "12"],
+                  "consumption 20) pay on a rate on consumption?",
+             "a": ["18", "2", "12", "8"],
              "c": 3,
-             "why": "The consumption total is 50, so the rate is `20/50 = 2/5`, and "
-                    "`30 · 2/5 = 12`. Eighteen is his tax on riches; 2 and 8 are the idler's "
+             "why": "The consumption total is 50, so the rate is `2/5`, and "
+                    "`20 · 2/5 = 8`. Eighteen is his tax on riches; 2 and 12 are the idler's "
                     "taxes on riches and consumption."},
             {"q": "What does Hobbes mean by a Good Law?",
              "a": ["One that is just",
@@ -889,10 +892,12 @@ LESSONS = [
                   "required obedience as gratitude for his benefits. A reader who grounds "
                   "the right in creation or in goodness, as many of Hobbes's readers did, "
                   "will grant `p` and deny `p → q`, holding that irresistible power by itself "
-                  "gives no right, only a fact. The mixed preset is that reader: `p` and "
-                  "`c → q`, with the conclusion `q`, has a counterexample with `p` true and "
-                  "`c` and `q` false, and the lab shows the case where God has the "
-                  "power and no right."),
+                  "gives no right, only a fact. That reader's case, God with the power and without the "
+                  "right, is the strip preset's row, `p` true and `q` false. The mixed "
+                  "preset shows the other half of the reader's view: power joined only "
+                  "to the creation link, `p` and `c → q`, does not yield `q`. Its one "
+                  "counterexample has `c` false, so on that view the power does no work "
+                  "and the right rests on creation."),
             ("p", "Hobbes also has the text on his side, which is why the chapter "
                   "carries the example of Job. Job's friends argued from his affliction to "
                   "his sin, and Job defended himself by his innocence. God settled it "
@@ -914,7 +919,8 @@ LESSONS = [
                   "the signification of Philosophicall Truth; but the signification of "
                   "Pious Intention&rdquo;. A commonwealth, being one person, owes God "
                   "one worship, which is why public worship is uniform, and what the "
-                  "sovereign ordains as signs of honour private men must take as such, "
+                  "sovereign ordains as signs of honour, among actions indifferent by "
+                  "nature, private men must take as such, "
                   "so that &ldquo;It is better to obey God than men&rdquo; has its place "
                   "in the kingdom of God by pact, not by nature."),
             ("p", "Part II ends on a note of doubt and hope. Hobbes is &ldquo;at the point "
@@ -925,7 +931,7 @@ LESSONS = [
                   "hope that the writing may fall into the hands of a sovereign who "
                   "will, without any interested interpreter, convert &ldquo;this Truth "
                   "of Speculation, into the Utility of Practice&rdquo;. The next course, "
-                  "“Of a Christian Commonwealth”, begins Part III with the "
+                  "<em>Of a Christian Commonwealth</em>, begins Part III with the "
                   "question this chapter has left open: what the supernatural word of "
                   "God, in Scripture and the prophets, adds to natural reason."),
         ],
@@ -978,9 +984,10 @@ LESSONS = [
                 "p false, any:  p false, no counterexample",
             ],
             "after": [
-                "One row breaks it: God has irresistible power, did not create men in "
-                "this case, and has no right. That is what a reader who grounds the "
-                "right in creation says of Hobbes's argument.",
+                "One row breaks it: `p` true, `c` false, `q` false. With only the creation "
+                "link, power proves nothing unless creation is granted too. The creation "
+                "reader's objection to Hobbes, power without right, is the strip preset's "
+                "row.",
             ],
         },
         "quiz_title": "From power to right",

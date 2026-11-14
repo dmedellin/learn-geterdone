@@ -182,8 +182,8 @@ LESSONS = [
                   "of God is trust in a person or a body, and so open to the question "
                   "the lab asks, whether the second opinion, about that person's "
                   "virtue, is held. What he makes of the Church, and of who "
-                  "speaks for it, is a matter for Part III. The next lesson, “Intellectual "
-                  "Virtues and Madness”, turns from what we know to the minds that do "
+                  "speaks for it, is a matter for Part III. The next lesson, <em>Intellectual "
+                  "Virtues and Madness</em>, turns from what we know to the minds that do "
                   "the knowing."),
         ],
         "lab": ("argkit", {
@@ -407,11 +407,15 @@ LESSONS = [
                   "fancy is paramount, because the design is not truth. And in "
                   "&ldquo;Demonstration, in Councell, and all rigourous search of "
                   "Truth&rdquo; judgement does all, and metaphors are &ldquo;utterly "
-                  "excluded&rdquo;, as Chapter 5 said. His own examples make the "
-                  "lab's wit preset: the historian is judgement, the "
-                  "orator fancy, and the poet both. On the definition that wit is "
-                  "judgement, the historian has wit, the poet has wit, and the "
-                  "orator, fancy alone, does not; and the historian has no fancy."),
+                  "excluded&rdquo;, as Chapter 5 said. His own cases make the "
+                  "lab's wit preset: the counsellor, in whom &ldquo;Judgement does "
+                  "all&rdquo;; the digresser, all fancy and no direction; and the poet, "
+                  "both. On the sentence of the passage, that wit is judgement, the "
+                  "counsellor and the poet have wit and the digresser does not. "
+                  "(Earlier in the chapter he defines natural wit as &ldquo;Celerity of "
+                  "Imagining&rdquo; and &ldquo;steddy direction to some approved "
+                  "end&rdquo;; the lab takes the sentence of the passage, which is the "
+                  "conclusion of one comparison.)"),
             ("p", "Where do the differences come from? Not from the body's "
                   "instruments. If the difference proceeded from the temper of "
                   "the brain and the organs of sense, he argues, &ldquo;there would be "
@@ -432,12 +436,14 @@ LESSONS = [
                   "Giddinesse, and Distraction; and to have stronger, and more vehement "
                   "Passions for any thing, than is ordinarily seen in others, is that "
                   "which men call Madnesse&rdquo;. Madness on this account is the same "
-                  "thing as wit, turned up: not a separate sickness but the passions in "
-                  "excess, and it comes in as many kinds as the passions do. The wit "
-                  "preset shows the scale: dullness, giddiness and madness are three "
-                  "grades of passion, and dullness is madness comes out absurd, since "
-                  "weak and vehement passion cannot be joined, while giddiness is "
-                  "madness is only false, because vehemence is missing."),
+                  "thing as the passions that make wit, turned up: not a separate sickness but the passions in "
+                  "excess, and it comes in as many kinds as the passions do. In the wit "
+                  "preset dullness and madness are weak and vehement passion, and "
+                  "giddiness is passion spread over everything. Dullness is madness "
+                  "comes out absurd, since weak and vehement passion cannot be "
+                  "joined, while giddiness is madness is only false, because "
+                  "vehemence is missing. That sorting is the lab's, not Hobbes's: he "
+                  "counts a false general claim absurd too."),
             ("p", "He applies the account in the way that made it dangerous. The "
                   "passions that make madness are pride, which he calls great "
                   "vain-glory, and great dejection, and an excessive opinion of "
@@ -488,8 +494,9 @@ LESSONS = [
                   "explains the text away."),
             ("p", "The last pages are about the schoolmen, whose speech he "
                   "counts as another madness: speech that, &ldquo;put together, "
-                  "have in them no signification at all&rdquo;. His sample is a "
-                  "sentence from the Jesuit Francisco Suárez, which he translates: "
+                  "have in them no signification at all&rdquo;. His sample is "
+                  "the title of a chapter of the Jesuit Francisco Suárez, which he "
+                  "translates: "
                   "&ldquo;The first cause does not necessarily inflow any thing "
                   "into the second, by force of the Essentiall subordination of "
                   "the second causes, by Which it may help it to worke&rdquo;. "
@@ -522,7 +529,7 @@ LESSONS = [
                   "for a translation into tolerable Latin is to measure them against "
                   "the wrong language. Hobbes's own remark is that &ldquo;common sort of men seldome speak "
                   "Insignificantly&rdquo;, and that they are called idiots by those who do. "
-                  "The next lesson, “The Several Subjects of Knowledge”, "
+                  "The next lesson, <em>The Several Subjects of Knowledge</em>, "
                   "shows what he put in place of the schoolmen's order: a table "
                   "of all the sciences, set out as nested definitions."),
         ],
@@ -539,21 +546,21 @@ LESSONS = [
                      ["dullness", "weak-passion"],
                      ["giddiness", "passion-for-everything"],
                      ["madness", "vehement-passion"],
-                     ["the-historian", "judgement"],
-                     ["the-orator", "fancy"],
+                     ["the-counsellor", "judgement"],
+                     ["the-digresser", "fancy"],
                      ["the-poet", "fancy judgement"],
                  ],
                  "opposed": [["weak-passion", "vehement-passion"]],
                  "claims": [
-                     ["the-historian-has-wit", "the-historian", "wit"],
-                     ["the-orator-has-wit", "the-orator", "wit"],
+                     ["the-counsellor-has-wit", "the-counsellor", "wit"],
+                     ["the-digresser-has-wit", "the-digresser", "wit"],
                      ["the-poet-has-wit", "the-poet", "wit"],
                      ["the-poet-has-fancy", "the-poet", "fancy"],
-                     ["the-historian-has-fancy", "the-historian", "fancy"],
+                     ["the-digresser-has-judgement", "the-digresser", "judgement"],
                      ["dullness-is-madness", "dullness", "madness"],
                      ["giddiness-is-madness", "giddiness", "madness"],
                  ],
-                 "expect": {"lrkCounts": "3 true, 3 false, 1 absurd, 0 insignificant", "lrkVerdicts": "the-historian-has-wit true; the-orator-has-wit false; the-poet-has-wit true; the-poet-has-fancy true; the-historian-has-fancy false; dullness-is-madness absurd; giddiness-is-madness false"}},
+                 "expect": {"lrkCounts": "3 true, 3 false, 1 absurd, 0 insignificant", "lrkVerdicts": "the-counsellor-has-wit true; the-digresser-has-wit false; the-poet-has-wit true; the-poet-has-fancy true; the-digresser-has-judgement false; dullness-is-madness absurd; giddiness-is-madness false"}},
                 {"id": "suarez", "label": "The first cause and the second",
                  "simple": ["cause", "first", "second"],
                  "defs": [
@@ -634,8 +641,8 @@ LESSONS = [
         },
         "quiz_title": "Wit, passion and empty speech",
         "quiz": [
-            {"q": "According to Hobbes, what is wit?",
-             "a": ["Fancy, the noticing of likenesses that others rarely see",
+            {"q": "Which of these does Hobbes say is wit, in the sentence this lesson opens with?",
+             "a": ["Fancy without judgement",
                    "Judgement, with or without fancy",
                    "The vehement passions, in excess",
                    "A slow imagination that keeps close to its end"],
@@ -644,16 +651,16 @@ LESSONS = [
                     "judgement is not. Fancy alone is not a virtue, and with no "
                     "steadiness a great fancy is a kind of madness. A slow imagination "
                     "is the defect he calls dullness."},
-            {"q": "In the wit preset the orator is fancy and wit is judgement. What is "
-                  "the verdict on <em>the orator has wit</em>?",
-             "a": ["True, since fancy is the quality of a good orator",
-                   "False, since judgement is not among the orator's parts and nothing clashes",
+            {"q": "In the wit preset the digresser is fancy and wit is judgement. What is "
+                  "the lab's verdict on <em>the digresser has wit</em>?",
+             "a": ["True, since fancy is the quality of a lively talker",
+                   "False, since judgement is not among the digresser's parts and nothing clashes",
                    "Absurd, since fancy and judgement cannot be added",
-                   "Insignificant, since orator is not a simple name"],
+                   "Insignificant, since digresser is not a simple name"],
              "c": 1,
-             "why": "The predicate wit is judgement, which the orator, defined as fancy "
+             "why": "The predicate wit is judgement, which the digresser, defined as fancy "
                     "alone, does not have. Nothing clashes, since fancy and judgement "
-                    "are not an opposed pair, and the orator is defined, so the claim is "
+                    "are not an opposed pair, and the digresser is defined, so the claim is "
                     "false and not absurd or empty."},
             {"q": "What does Hobbes say is the cause of the differences of wits?",
              "a": ["The temper of the brain and the organs of sense",
@@ -681,14 +688,14 @@ LESSONS = [
             ("Thinking a lively fancy is the same as wit",
              "The table of poem, history and oration is Hobbes's own answer: fancy is "
              "a virtue in a poem and has no place in a history. In the wit preset the "
-             "orator, who is only fancy, has no wit on his definition, and a historian "
-             "has no fancy."),
+             "digresser, who is only fancy, has no wit on the passage's definition, "
+             "and the poet, who has both, has it."),
             ("Reading madness as a separate sickness",
              "In the chapter madness is the same thing as the passions in excess, in "
              "as many kinds as there are passions. He goes further, saying that if "
              "the excesses are madness there is no doubt the passions themselves, "
              "when they tend to evil, are degrees of the same. The wit preset puts "
-             "dullness and madness at opposite ends and giddiness between them."),
+             "dullness and madness at opposite ends, and giddiness off that scale."),
             ("Thinking Hobbes denies that Christ healed the demoniacs",
              "He says nothing of the sort. He says the text does not oblige a "
              "belief that they were possessed, and explains Christ's speaking to the "
@@ -708,7 +715,9 @@ LESSONS = [
             "are his account of them, which they would dispute. It cannot say whether "
             "the passions explain wit and madness, or whether the Gospels' demoniacs "
             "were mad. It also separates absurd from empty, which Hobbes does not: he "
-            "calls both insignificant."
+            "calls both insignificant, and holds that a false general affirmation is "
+            "absurd too, so the lab's false, absurd and insignificant are its own "
+            "sorting and not his."
         ),
     },
     # ---------------------------------------------------------------- 07
@@ -737,7 +746,7 @@ LESSONS = [
         ],
         "key_label": "Chapter 9 in five lines",
         "concepts_intro": (
-            "The chapter is the shortest of the five lessons' sources and the most "
+            "The chapter is the shortest of the five chapters this course reads and the most "
             "diagrammatic: three distinctions, then a tree."
         ),
         "concepts": [
@@ -826,7 +835,7 @@ LESSONS = [
                   "flattened and simplified. Each science is defined as the sum of "
                   "the names of the branches it hangs from, so natural philosophy is "
                   "natural bodies, mathematics is natural philosophy with "
-                  "common accidents and determinate, geometry is mathematics with "
+                  "common accidents, the determined and the branch of figure and number, geometry is mathematics with "
                   "figure, and so on; politics is civil philosophy with the "
                   "rights of the sovereign. Natural and politic bodies are an "
                   "opposed pair, since a branch of the table cannot lie under both. "
@@ -866,11 +875,16 @@ LESSONS = [
                   "of the great parts of the world. Astronomy is mechanics is false. "
                   "Arithmetic is geometry is false, since the figure is missing, and "
                   "navigation is mathematics is false, since it lacks the branch "
-                  "called determined. But politics is natural philosophy, and "
+                  "of figure and number that mathematics hangs from. But politics is natural philosophy, and "
                   "politics is mechanics, are both absurd, since each puts a science "
                   "of politic bodies under natural bodies. The lesson is that placing a science in the table "
                   "is a claim about what it follows from, and can fail in two "
                   "different ways, by missing a part or by clashing with one."),
+            ("p", "One caution. The lab's four verdicts, true, false, absurd and "
+                  "insignificant, are its own sorting, not Hobbes's. He counts a "
+                  "false general affirmation as absurd too, so 'false but not "
+                  "absurd' is a distinction of the lab's, made to show two ways a "
+                  "placement can fail."),
             ("p", "There are two things the table does not say. It does not "
                   "rank the sciences by worth, only by what they are consequences "
                   "of. And it does not claim, when it puts politics under "
@@ -886,7 +900,7 @@ LESSONS = [
             ("p", "With this table the first half of Part I is complete: sense, "
                   "speech, reason and the passions, the machinery that Hobbes "
                   "says every man carries in his head. The next course, "
-                  "“Power, Manners and Religion”, starts with what "
+                  "<em>Power, Manners and Religion</em>, starts with what "
                   "those passions, in company, seek: power, and what it is worth."),
         ],
         "lab": ("levkit", {
@@ -895,7 +909,7 @@ LESSONS = [
             "preset": "table",
             "presets": [
                 {"id": "table", "label": "Part of Hobbes's table, as nested definitions",
-                 "simple": ["bodies-natural", "bodies-politic", "common-accidents", "determined",
+                 "simple": ["bodies-natural", "bodies-politic", "common-accidents", "determined", "figure-or-number",
                             "figure", "number", "great-parts-of-the-world", "heavens", "earth",
                             "special-bodies", "building", "ships", "qualities", "light-seen",
                             "sound-heard", "passions-of-men", "speech", "contracting",
@@ -903,13 +917,13 @@ LESSONS = [
                  "defs": [
                      ["natural-philosophy", "bodies-natural"],
                      ["civil-philosophy", "bodies-politic"],
-                     ["mathematics", "natural-philosophy common-accidents determined"],
+                     ["mathematics", "natural-philosophy common-accidents determined figure-or-number"],
                      ["geometry", "mathematics figure"],
                      ["arithmetic", "mathematics number"],
-                     ["cosmography", "natural-philosophy common-accidents great-parts-of-the-world"],
+                     ["cosmography", "natural-philosophy common-accidents determined great-parts-of-the-world"],
                      ["astronomy", "cosmography heavens"],
                      ["geography", "cosmography earth"],
-                     ["mechanics", "natural-philosophy common-accidents special-bodies"],
+                     ["mechanics", "natural-philosophy common-accidents determined special-bodies"],
                      ["architecture", "mechanics building"],
                      ["navigation", "mechanics ships"],
                      ["physics", "natural-philosophy qualities"],
@@ -934,7 +948,7 @@ LESSONS = [
                  ],
                  "expect": {"lrkCounts": "9 true, 0 false, 1 absurd, 0 insignificant", "lrkVerdicts": "geometry-is-mathematics true; geometry-is-natural-philosophy true; arithmetic-is-mathematics true; astronomy-is-cosmography true; navigation-is-mechanics true; optics-is-physics true; ethics-is-physics true; the-science-of-just-and-unjust-is-physics true; politics-is-civil-philosophy true; ethics-is-civil-philosophy absurd"}},
                 {"id": "misplaced", "label": "Sciences put under the wrong branch",
-                 "simple": ["bodies-natural", "bodies-politic", "common-accidents", "determined",
+                 "simple": ["bodies-natural", "bodies-politic", "common-accidents", "determined", "figure-or-number",
                             "figure", "number", "great-parts-of-the-world", "heavens", "earth",
                             "special-bodies", "building", "ships", "qualities", "light-seen",
                             "sound-heard", "passions-of-men", "speech", "contracting",
@@ -942,12 +956,12 @@ LESSONS = [
                  "defs": [
                      ["natural-philosophy", "bodies-natural"],
                      ["civil-philosophy", "bodies-politic"],
-                     ["mathematics", "natural-philosophy common-accidents determined"],
+                     ["mathematics", "natural-philosophy common-accidents determined figure-or-number"],
                      ["geometry", "mathematics figure"],
                      ["arithmetic", "mathematics number"],
-                     ["cosmography", "natural-philosophy common-accidents great-parts-of-the-world"],
+                     ["cosmography", "natural-philosophy common-accidents determined great-parts-of-the-world"],
                      ["astronomy", "cosmography heavens"],
-                     ["mechanics", "natural-philosophy common-accidents special-bodies"],
+                     ["mechanics", "natural-philosophy common-accidents determined special-bodies"],
                      ["navigation", "mechanics ships"],
                      ["politics", "civil-philosophy rights-of-sovereign"],
                  ],
@@ -1084,7 +1098,9 @@ LESSONS = [
             "for this lesson from the printed table, with branch names shortened and "
             "some sciences left out. It shows what follows from the placements as "
             "written. It cannot say whether the table divides the sciences rightly, "
-            "or whether a science of commonwealths of the kind he means is possible."
+            "or whether a science of commonwealths of the kind he means is possible. "
+            "Its verdicts true, false, absurd and insignificant are the lab's sorting, "
+            "not Hobbes's, who counts a false general affirmation absurd as well."
         ),
     },
 ]

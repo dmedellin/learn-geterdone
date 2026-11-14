@@ -212,10 +212,11 @@ LESSONS = [
                   "will not be forgiven in this world or the next, he writes that it is "
                   "&ldquo;very hardly to bee reconciled with all the Doctrines now "
                   "unanimously received&rdquo;, and adds that it is not &ldquo;any shame, to "
-                  "confesse the profoundnesse of the Scripture&rdquo;. On eternal torment he "
-                  "is as plain as he is on purgatory: he can &ldquo;find no where that any man "
-                  "shall live in torments Everlastingly&rdquo;, and he leaves his own readings "
-                  "to the better scholars."),
+                  "confesse the profoundnesse of the Scripture&rdquo;. He offers his own "
+                  "readings of it only &ldquo;to the consideration of more learned "
+                  "Divines&rdquo;. On eternal torment he is as plain as he is on purgatory: "
+                  "he can &ldquo;find no where that any man shall live in torments "
+                  "Everlastingly&rdquo;."),
             ("p", "The hinge of the whole Part is this. If the church were the kingdom of God, "
                   "the clergy would be its officers and every Christian a subject of two "
                   "governments, and if eternal torment waited on the favour of the priests, "
@@ -223,7 +224,7 @@ LESSONS = [
                   "authority of Scripture, properly read, leaves the civil sovereign as the "
                   "only king on earth. Whether the premise c → s is true is a question about the "
                   "texts, and the lab can only tell you how much hangs on it. The next lesson, "
-                  "“Demonology and the Relics of the Gentiles”, follows the "
+                  "<em>Demonology and the Relics of the Gentiles</em>, follows the "
                   "second of the four causes, the heathen poets' ghosts and demons."),
         ],
         "lab": ("argkit", {
@@ -311,8 +312,8 @@ LESSONS = [
                    "Invalid because it has no premises"],
              "c": 2,
              "why": "With k and c true and s false, k → c and ¬s are both true while ¬k is "
-                    "false, so there is a counterexample. The other three premises still "
-                    "stand, but they say nothing about when the kingdom comes."},
+                    "false, so there is a counterexample. The two premises that remain say "
+                    "nothing about when the kingdom comes."},
             {"q": "According to Hobbes, when did the kingdom of God by pact with the Jews "
                   "end?",
              "a": ["At the death of Moses",
@@ -491,8 +492,20 @@ LEVKIT_LESSONS = [
                   "where a demon is a spirit in the chapter's sense, the demon is a body is "
                   "true, and incorporeal is absurd: three true, two false, three absurd. "
                   "The point to take is Hobbes's about the Gentiles' demon: define it as "
-                  "incorporeal and then say anything bodily of it, and you have not "
-                  "said something false, you have said nothing that can be true."),
+                  "incorporeal and then say anything bodily of it, and the names you have "
+                  "used contradict one another."),
+            ("p", "A caution before you trust the labels. The lab's four verdicts, true, false, "
+                  "absurd and insignificant, are the lab's own sorting, not Hobbes's. He holds "
+                  "that of absurd and false affirmations, if they are universal, there can be "
+                  "no understanding, so a false universal affirmation is itself absurd to "
+                  "him, and he counts both names with no definition and names that contradict "
+                  "one another as insignificant speech. The lab's <em>absurd</em> therefore "
+                  "marks only a contradiction among the names the lesson states, and its "
+                  "<em>false</em> means no more than not borne out by these definitions. "
+                  "A claim it marks false, if it were a universal affirmation, Hobbes would "
+                  "call absurd too. The lesson's definitions are also simpler than his: a "
+                  "phantasm is defined here without dimension, where Hobbes takes it to be "
+                  "a motion in the organs."),
             ("p", "The second half is about worship. Honour, Hobbes says, is to value another's "
                   "power, and is inward and secret; the outward signs are worship, &ldquo;all "
                   "words and actions that betoken Fear to Offend, or Desire to Please&rdquo;. "
@@ -509,10 +522,13 @@ LEVKIT_LESSONS = [
                   "hat off before a throne honours the prince and not the stool. To suppose the "
                   "prince's soul is in the stool, or to petition it, would be divine worship "
                   "and idolatry. And Hobbes adds a point of his own: if a "
-                  "sovereign compels worship by the terror of death, it is &ldquo;no "
-                  "Worship; and therefore no Idolatry&rdquo;, since the act is a sign of fear "
-                  "for oneself and not of inward honour, though a pastor or a man of repute "
-                  "who does it for fear gives scandal, a sin of its own. He does not condemn "
+                  "king compels a man by the terror of death to worship him, it is &ldquo;no "
+                  "Worship; and therefore no Idolatry&rdquo;. The act is a sign of fear for "
+                  "oneself and not of inward honour, and it gives no scandal, since it is the "
+                  "sovereign's act and not the man's. Honour done to an idol for fear is not "
+                  "idolatry either. But a pastor, or a man whose knowledge others follow, who "
+                  "does it without making his fear as plain as the worship gives scandal, a "
+                  "sin of its own. He does not condemn "
                   "pictures: &ldquo;to draw a Picture after a fancy&rdquo; is no sin, "
                   "but to hold it for a representation of God is. A portrait of a dead friend, "
                   "as a monument, is fine. He asks that Christian sovereigns do what Hezekiah "
@@ -529,8 +545,8 @@ LEVKIT_LESSONS = [
                   "lab belongs to the first half, though: Hobbes's argument is that a demon "
                   "is a name for a phantasm, and the rest of the chapter is built on "
                   "that."),
-            ("p", "The third cause of darkness is in the next lesson, “Vain Philosophy "
-                  "and Fabulous Traditions”: the schoolmen's terms, where the names "
+            ("p", "The third cause of darkness is in the next lesson, <em>Vain Philosophy "
+                  "and Fabulous Traditions</em>: the schoolmen's terms, where the names "
                   "themselves are said to signify nothing."),
         ],
         "lab": ("levkit", {
@@ -682,12 +698,13 @@ LEVKIT_LESSONS = [
                     "wholly to Christ."},
         ],
         "mistakes": [
-            ("Taking absurd for false",
-             "A false claim is only not true on the definitions, like a ghost is a body. An "
-             "absurd one adds names that cannot be added, like a demon is a body when demon "
-             "was defined as incorporeal. The lab's counts keep them apart, and "
-             "Hobbes's complaint against the Gentiles is that their demon is absurd, "
-             "not merely wrong."),
+            ("Taking the lab's four verdicts for Hobbes's",
+             "The lab sorts claims into true, false, absurd and insignificant. Its false is "
+             "only not borne out by the definitions, like a ghost is a body. Its absurd is a "
+             "contradiction among the stated names, like a demon is a body when demon was "
+             "defined as incorporeal. Hobbes does not draw the line there: a false universal "
+             "affirmation is absurd to him as well, so the lab's false is not his "
+             "<em>merely wrong</em>."),
             ("Thinking Hobbes denies that there are angels or spirits",
              "He says he finds in Scripture &ldquo;Angels, and Spirits, good and evill&rdquo;. "
              "What he does not find is that they are incorporeal, or that any man's body was "
@@ -713,7 +730,7 @@ LEVKIT_LESSONS = [
         ),
     },
     # ---------------------------------------------------------------- 03
-    # Leviathan ch. 46, 1651 p. 373; PDF p. 561 of the operator's copy (the opening
+    # Leviathan ch. 46, 1651 p. 372; PDF p. 561 of the operator's copy (the opening
     # quotation); ch. 46, 1651 p. 367, PDF p. 554 (the definition of philosophy).
     {
         "slug": "vain-philosophy",
@@ -840,8 +857,15 @@ LEVKIT_LESSONS = [
                   "<em>entity</em>, <em>separated essence</em> and <em>nunc-stans</em> were "
                   "never given a definition. Two true, one false, two absurd, three "
                   "insignificant."),
+            ("p", "A caution first. The lab's four verdicts are the lab's sorting, not Hobbes's. "
+                  "He says that of absurd and false affirmations, if they are universal, there "
+                  "can be no understanding, so for him a false universal affirmation is "
+                  "absurd too, and names with no definition and names that contradict each "
+                  "other are alike insignificant speech. Here <em>absurd</em> marks only a "
+                  "contradiction among the names the lesson states, and <em>false</em> only a "
+                  "claim these definitions do not bear out."),
             ("p", "Now give the soul the schoolmen's definition, life that is incorporeal, "
-                  "in the <em>schoolmen</em> preset. The soul is body is now absurd and "
+                  "in the <em>schoolmen</em> preset. <em>A soul is a body</em> is now absurd and "
                   "not just false, since the soul includes the incorporeal and the body "
                   "includes dimension. Two true, none false, three absurd, three "
                   "insignificant. Hobbes's remark about the soul that is in the whole body and "
@@ -895,7 +919,7 @@ LEVKIT_LESSONS = [
                   "the church. His question to the punishers is a fair one: is it because it is "
                   "contrary to true religion? That cannot be &ldquo;if they be true&rdquo;. "
                   "The next lesson asks the question that all four causes of darkness raise: "
-                  "“Of the Benefit That Proceedeth from Such Darkness”, who gained "
+                  "<em>Of the Benefit That Proceedeth from Such Darkness</em>, who gained "
                   "by it."),
         ],
         "lab": ("levkit", {
@@ -1044,7 +1068,9 @@ LEVKIT_LESSONS = [
              "A false claim says something that the definitions do not bear out, a soul is a "
              "body on Hobbes's reading. An insignificant claim uses a name that stands for "
              "nothing, like a man is an entity, and so has no truth value at all. The lab "
-             "counts them apart, three claims in each of its first two presets."),
+             "counts them apart, with three insignificant claims in each preset. The "
+             "line between its false and its absurd is the lab's own sorting, and Hobbes "
+             "would call a false universal affirmation absurd too."),
             ("Thinking Hobbes rejects philosophy, or all of Aristotle",
              "He gives a definition of philosophy that he is happy to use, accepts "
              "first philosophy as the work of right definitions, and calls Plato the best "
@@ -1180,15 +1206,17 @@ LEVKIT_LESSONS = [
                   "he says serves <em>them</em> or <em>the Clergy</em> goes to "
                   "the Roman clergy, one that he says serves the pope's power goes to the "
                   "pope, and a doctrine that serves both goes to both. Run the "
-                  "<em>all</em> preset: the pope is served by 6 doctrines, the Roman "
-                  "clergy by 9, the Presbytery by 2 and the sovereigns by none. The most "
+                  "<em>all</em> preset: the pope is served by 7 doctrines, the Roman "
+                  "clergy by 9, the Presbytery by 1 and the sovereigns by none. The most "
                   "served is the Roman clergy."),
             ("p", "Change the list and the answer moves. In <em>held</em> the root doctrine "
                   "and its Presbyterian form are left out and only the twelve are counted: "
-                  "pope 5, Roman clergy 8, Presbytery 0, sovereigns 0. In <em>root</em> only "
-                  "the two root doctrines are counted, and the Presbytery is served by both while "
-                  "the pope and the Roman clergy are each served by one. The Presbytery is "
-                  "then the most served, with 2. That is the point of counting by party, and "
+                  "pope 6, Roman clergy 8, Presbytery 0, sovereigns 0. In <em>root</em> only "
+                  "the two root doctrines are counted: Rome's form, which serves the pope and "
+                  "the Roman clergy, and the form kept by the Presbytery, which serves the "
+                  "Presbytery. The three parties tie at 1 each, which is Hobbes's own "
+                  "pairing, &ldquo;the Romane, and the Presbyterian Clergy&rdquo;. That is "
+                  "the point of counting by party, and of counting by party, and "
                   "also its limit. The count weighs a doctrine as one, however large "
                   "its benefit, and it depends on how you code the parties. It cannot tell "
                   "you whether a benefit shows authorship."),
@@ -1200,11 +1228,11 @@ LEVKIT_LESSONS = [
                   "spends the last three chapters on Scripture and reason, and his rule is for "
                   "naming suspects. And a reader may put his question to his own book: "
                   "the doctrine that the civil sovereign is supreme in religion benefits "
-                  "sovereigns. The lab can count that too. Hobbes also spares the "
-                  "sovereigns who let it happen: they &ldquo;may neverthelesse bee "
-                  "esteemed accessaries to their own, and the Publique dammage&rdquo;, for "
-                  "want of foresight, and once the people were possessed there was "
-                  "&ldquo;no humane remedy&rdquo;."),
+                  "sovereigns. The lab can count that too. Hobbes does not spare the "
+                  "sovereigns who let it happen either. They suffered it for want of "
+                  "foresight, but &ldquo;may neverthelesse bee esteemed accessaries to their "
+                  "own, and the Publique dammage&rdquo;, and once the people were possessed "
+                  "there was &ldquo;no humane remedy&rdquo;."),
             ("p", "He then tells how the web was woven and how it unravels, &ldquo;the way is "
                   "the same, but the order is inverted&rdquo;. It began with the apostles, "
                   "obeyed &ldquo;out of Reverence, not by Obligation&rdquo;, whose "
@@ -1241,8 +1269,8 @@ LEVKIT_LESSONS = [
                   "doctrine, in monasteries and churchyards. Fairies cannot be brought to "
                   "answer for the hurt they do, and clergy vanish from the civil tribunals. "
                   "The fairies take cream from the dairies, and the clergy take donations and "
-                  "tithes. He means it as an argument: both have no existence but "
-                  "in the fancies of the ignorant, and the pope's spiritual power outside "
+                  "tithes. He means it as an argument: as the fairies have no existence "
+                  "but in the fancies of ignorant people, so the pope's spiritual power outside "
                   "his own dominion &ldquo;consisteth onely in the Fear that Seduced people "
                   "stand in, of their Excommunication&rdquo;. Whether you take it as satire "
                   "or as a summary of his case, the target is the hierarchy of Rome, and "
@@ -1252,8 +1280,8 @@ LEVKIT_LESSONS = [
                   "a very difficult matter&rdquo;, but it may return, or &ldquo;an Assembly "
                   "of Spirits worse than he&rdquo; may enter &ldquo;this clean swept "
                   "house&rdquo;, for it is not the Roman clergy only that pretends the "
-                  "kingdom of God to be of this world. The next lesson, “A Review, and "
-                  "Conclusion”, is the book's last."),
+                  "kingdom of God to be of this world. The next lesson, <em>A Review, and "
+                  "Conclusion</em>, is the book's last."),
         ],
         "lab": ("levkit", {
             "mode": "canon",
@@ -1263,7 +1291,7 @@ LEVKIT_LESSONS = [
                 {"id": "all",
                  "label": "All fourteen doctrines",
                  "parties": "pope roman-clergy presbytery sovereign",
-                 "doctrines": [{"doctrine": "church-is-kingdom", "benefits": "pope roman-clergy presbytery"},
+                 "doctrines": [{"doctrine": "church-is-kingdom", "benefits": "pope roman-clergy"},
                             {"doctrine": "resurrection-kingdom", "benefits": "presbytery"},
                             {"doctrine": "infallibility", "benefits": "pope"},
                             {"doctrine": "bishops-from-pope", "benefits": "pope"},
@@ -1272,12 +1300,12 @@ LEVKIT_LESSONS = [
                             {"doctrine": "marriage-sacrament", "benefits": "roman-clergy"},
                             {"doctrine": "priests-unmarried", "benefits": "pope"},
                             {"doctrine": "confession", "benefits": "roman-clergy"},
-                            {"doctrine": "canonization", "benefits": "roman-clergy"},
+                            {"doctrine": "canonization", "benefits": "pope roman-clergy"},
                             {"doctrine": "priest-makes-christ", "benefits": "roman-clergy"},
                             {"doctrine": "purgatory-indulgences", "benefits": "roman-clergy"},
                             {"doctrine": "exorcism", "benefits": "roman-clergy"},
                             {"doctrine": "schoolmen", "benefits": "roman-clergy"}],
-                 "expect": {"lcnCounts": "pope 6; roman-clergy 9; presbytery 2; sovereign 0", "lcnMost": "roman-clergy, 9 of 14 doctrines"}},
+                 "expect": {"lcnCounts": "pope 7; roman-clergy 9; presbytery 1; sovereign 0", "lcnMost": "roman-clergy, 9 of 14 doctrines"}},
                 {"id": "held",
                  "label": "The twelve doctrines that keep possession",
                  "parties": "pope roman-clergy presbytery sovereign",
@@ -1288,18 +1316,18 @@ LEVKIT_LESSONS = [
                             {"doctrine": "marriage-sacrament", "benefits": "roman-clergy"},
                             {"doctrine": "priests-unmarried", "benefits": "pope"},
                             {"doctrine": "confession", "benefits": "roman-clergy"},
-                            {"doctrine": "canonization", "benefits": "roman-clergy"},
+                            {"doctrine": "canonization", "benefits": "pope roman-clergy"},
                             {"doctrine": "priest-makes-christ", "benefits": "roman-clergy"},
                             {"doctrine": "purgatory-indulgences", "benefits": "roman-clergy"},
                             {"doctrine": "exorcism", "benefits": "roman-clergy"},
                             {"doctrine": "schoolmen", "benefits": "roman-clergy"}],
-                 "expect": {"lcnCounts": "pope 5; roman-clergy 8; presbytery 0; sovereign 0", "lcnMost": "roman-clergy, 8 of 12 doctrines"}},
+                 "expect": {"lcnCounts": "pope 6; roman-clergy 8; presbytery 0; sovereign 0", "lcnMost": "roman-clergy, 8 of 12 doctrines"}},
                 {"id": "root",
                  "label": "The two doctrines that begin it",
                  "parties": "pope roman-clergy presbytery sovereign",
-                 "doctrines": [{"doctrine": "church-is-kingdom", "benefits": "pope roman-clergy presbytery"},
+                 "doctrines": [{"doctrine": "church-is-kingdom", "benefits": "pope roman-clergy"},
                             {"doctrine": "resurrection-kingdom", "benefits": "presbytery"}],
-                 "expect": {"lcnCounts": "pope 1; roman-clergy 1; presbytery 2; sovereign 0", "lcnMost": "presbytery, 2 of 2 doctrines"}},
+                 "expect": {"lcnCounts": "pope 1; roman-clergy 1; presbytery 1; sovereign 0", "lcnMost": "pope and roman-clergy and presbytery, 1 of 2 doctrines each (a tie)"}},
             ]),
             "panel_title": "Which party do the doctrines serve",
             "panel_intro": (
@@ -1334,15 +1362,17 @@ LEVKIT_LESSONS = [
             ],
             "lines": [
                 "pope: infallibility, bishops, exemption",
-                "pope, continued: sacerdotes, no marriage: 5",
+                "pope, continued: sacerdotes, no marriage, canonization: 6",
                 "clergy: exemption, marriage sacrament: 2",
                 "clergy: confession, canonization, priest makes Christ: 5",
                 "clergy: purgatory, exorcism, schoolmen: 8",
             ],
             "after": [
                 "Exemption of the clergy from the civil laws is counted for both, since "
-                "Hobbes says it serves the clergy and the pope's universal monarchy. "
-                "Twelve doctrines produce thirteen entries for the two parties.",
+                "Hobbes says it serves the clergy and the pope's universal monarchy, and "
+                "so is canonization, which he says assures their power by the pope's "
+                "excommunication. Twelve doctrines produce fourteen entries for the two "
+                "parties.",
             ],
         },
         "quiz_title": "What the count says and does not say",
@@ -1359,20 +1389,18 @@ LEVKIT_LESSONS = [
             {"q": "In the all preset, which party is served by the most doctrines?",
              "a": ["The pope", "The Roman clergy", "The Presbytery", "The sovereigns"],
              "c": 1,
-             "why": "The Roman clergy are served by 9 of the fourteen, the pope by 6, the "
-                    "Presbytery by 2 and the sovereigns by none. The count is on the "
+             "why": "The Roman clergy are served by 9 of the fourteen, the pope by 7, the "
+                    "Presbytery by 1 and the sovereigns by none. The count is on the "
                     "lesson's coding."},
-            {"q": "Why does the root preset name the Presbytery as the party served by "
-                  "the most?",
-             "a": ["Both root doctrines serve it, and each of the others is served by one",
-                   "Because Hobbes thinks the Presbytery worse than Rome",
-                   "Because the sovereigns lose by them",
-                   "Because the pope's doctrines were left out"],
+            {"q": "What does the root preset report?",
+             "a": ["A three-way tie: pope, Roman clergy and Presbytery, 1 each",
+                   "The Presbytery, 2",
+                   "The Roman clergy, 2",
+                   "No party"],
              "c": 0,
-             "why": "The church-is-the-kingdom doctrine serves the pope, the Roman clergy and "
-                    "the Presbytery, and the doctrine that the kingdom began at the "
-                    "Resurrection serves the Presbytery. That makes 2 for the Presbytery "
-                    "and 1 for each of the others. The count is not a judgement."},
+             "why": "Rome's form of the doctrine serves the pope and the Roman clergy, and the "
+                    "form kept by the Presbytery serves the Presbytery. That makes one each, "
+                    "which is Hobbes's pairing of the two clergies."},
             {"q": "Which of Hobbes's three knots was tied last, and so, in his account of "
                   "England, was untied first?",
              "a": ["The presbyters' power to excommunicate",
@@ -1387,11 +1415,11 @@ LEVKIT_LESSONS = [
         "mistakes": [
             ("Treating cui bono as proof of authorship",
              "Hobbes calls benefit a presumption. The count in the lab names who the doctrines "
-             "served, and a doctrine can serve someone and be true. He is also careful "
-             "to say that the sovereigns, who lost by it, let it happen out of want of "
-             "foresight, which is a different charge."),
+             "served, and a doctrine can serve someone and be true. He also blames the "
+             "sovereigns who let it happen, as accessaries, for want of foresight, which "
+             "is a different charge from authorship."),
             ("Thinking the count shows that Hobbes spares the Presbytery",
-             "The Presbytery's count is small in the <em>all</em> preset because the twelve "
+             "The Presbytery's count, 1, is small in the <em>all</em> preset because the twelve "
              "doctrines he lists are Rome's. He names the Presbyterian clergy, with the "
              "Roman, as authors of the darkness, and says the same doctrine of the kingdom "
              "was kept where they took the office."),
@@ -1527,7 +1555,10 @@ LEVKIT_LESSONS = [
                   "That is the case Hobbes treats: &ldquo;he hath no longer Protection from "
                   "him, but is protected by the adverse party for his Contribution&rdquo;. The "
                   "lab does not say he is released, only that obeying has become a cost and "
-                  "nothing more. Hobbes's word is that he has then the liberty to submit."),
+                  "nothing more. Hobbes's word is that he has then the liberty to submit. The "
+                  "sovereign's tiles still show him paying 4 for protection that is worth "
+                  "nothing to the subject: that is the lab's way of saying the first "
+                  "performance has failed, and why the subject's obligation is in question."),
             ("p", "That was the question of the day. Hobbes writes that he finds by many English "
                   "books lately printed that the civil wars &ldquo;have not yet sufficiently "
                   "taught men, in what point of time it is, that a Subject becomes obliged to "
@@ -1561,9 +1592,9 @@ LEVKIT_LESSONS = [
                   "and liberty, and obeying is the cost. The numbers are the lesson's; "
                   "Hobbes's claim is that an obligation made from fear is an obligation."),
             ("p", "He adds two more cautions in the same spirit. Sovereignties, he says, "
-                  "weaken when the conqueror's heirs insist on justifying the war by which "
-                  "their power was gained, because then they justify every later rebellion "
-                  "that is successful: &ldquo;there is scarce a Common-wealth in the world, "
+                  "weaken when their holders rest their right on the justice of the war that "
+                  "won it, and not on possession, or require approval of all they did, because "
+                  "then they justify every later rebellion that is successful: &ldquo;there is scarce a Common-wealth in the world, "
                   "whose beginnings can in conscience be justified&rdquo;. And to tolerate "
                   "a professed hatred of tyranny is to tolerate a hatred of commonwealth in "
                   "general, since tyranny is only the name of sovereignty said by someone "

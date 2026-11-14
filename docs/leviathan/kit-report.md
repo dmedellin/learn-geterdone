@@ -614,8 +614,8 @@ without checking.
   rule greater, the motion passes when the yes voices are more than the no
   voices given; on the rule absolute, when the yes voices are more than half
   of all the members, abstainers counted. On either rule, when the yes and no
-  voices are equal (none at all included) the assembly is mute and the motion
-  is lost (Chapter 16). With answerable shown, a decree that passes binds as
+  voices are equal (none at all included) the assembly is mute and nothing
+  is decreed (Chapter 16). With answerable shown, a decree that passes binds as
   its authors only the members who voted yes; those who voted no or abstained
   are excused (Chapter 22). Members go in the order given."
 - **ties.** Field `sizes` (list of whole numbers 1–60, up to 8, no repeats;
@@ -750,7 +750,10 @@ without checking.
     (`no: the inflicted 15 is within the prescribed 15`; `needs both the prescribed and the inflicted penalty`)
   - `llwPrice` Prescribed below the gain: a price, not a punishment?: `yes: the prescribed 10 is less than the gain 20, rather the price of the crime than a punishment`
     (`no prescribed penalty is given`)
-  No table, no refusals beyond the parser.
+  No table, no refusals beyond the parser. The status says the hope of
+  impunity makes the crime pay only when the certainty is below 1; at
+  certainty 1 with a penalty not above the gain it says the penalty is
+  "rather the price of the crime".
 
 ### canon (`lcn`)
 

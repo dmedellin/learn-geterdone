@@ -113,28 +113,32 @@ L1 = {
               "argument proves too much, since the prophets and apostles were themselves "
               "persons who reported such things. Hobbes's reply is the test that follows: "
               "the Scriptures themselves set out how a true prophet is to be known."),
-        ("p", "The test is brought in by the case that makes it necessary. Of four hundred "
-              "prophets whom the king of Israel consulted before the war at Ramoth Gilead, "
-              "he says, &ldquo;only Micaiah was a true one&rdquo;. And a true prophet, "
-              "shown to be one by two miracles done in his presence, was deceived by an "
-              "old prophet who spoke, as from God, and asked him to a meal. If one prophet deceives another, what certainty is there "
-              "except by reason? Hobbes answers with the passage you read first. The "
-              "first mark is a miracle. The second is teaching nothing but the religion "
-              "already established. He cites Deuteronomy for both: a prophet who works a "
-              "miracle and then says, &lsquo;let us follow strange gods&rsquo;, is to be "
-              "put to death, because the wonder is God testing Israel's constancy. The "
-              "proof that a miracle alone is not enough is in the same book: &ldquo;the "
-              "works of the Egyptian Sorcerers, though not so great as those of Moses, yet "
-              "were great miracles&rdquo;."),
-        ("p", "Hobbes then does something typical of him. He reads the second mark as a "
-              "political one. The words &lsquo;revolt from the Lord your God&rsquo; are, in "
-              "that place, &ldquo;equivalent to revolt from your King&rdquo;, since Israel "
-              "had made God its king by a pact at Sinai and was ruled through Moses. A "
-              "miracle that tends to stir up revolt is to be taken as a trial of allegiance. "
-              "He finds the same pattern in the New Testament, where Christ warns that false "
-              "prophets will do great wonders, and where Paul says an angel from heaven "
-              "preaching another gospel is accursed; the gospel in question, Hobbes says, "
-              "was that Christ is King."),
+        ("p", 'The test is brought in by the case that makes it necessary. Of '
+              'four hundred prophets whom the king of Israel consulted before '
+              'the war at Ramoth Gilead, he says, &ldquo;only Micaiah was a '
+              'true one&rdquo;. And a true prophet, shown to be one by two '
+              'miracles done in his presence, was deceived by an old prophet '
+              'who spoke, as from God, and asked him to a meal. If one prophet '
+              'deceives another, what certainty is there except by reason? '
+              'Hobbes answers with the passage you read first. The first mark '
+              'is a miracle. The second is teaching nothing but the religion '
+              'already established. He cites Deuteronomy for both: a prophet '
+              'who works a miracle and then says, <em>let us follow strange '
+              'gods</em>, is to be put to death, because the wonder is God '
+              "testing Israel's constancy. The proof that a miracle alone is "
+              'not enough comes in the same place: &ldquo;the works of the '
+              'Egyptian Sorcerers, though not so great as those of Moses, yet '
+              'were great miracles&rdquo;.'),
+        ("p", 'Hobbes then does something typical of him. He reads the second '
+              'mark as a political one. The words <em>revolt from the Lord your '
+              'God</em> are, in that place, &ldquo;equivalent to revolt from '
+              'your King&rdquo;, since Israel had made God its king by a pact '
+              'at Sinai and was ruled through Moses. A miracle that tends to '
+              'stir up revolt is to be taken as a trial of allegiance. He finds '
+              'the same pattern in the New Testament, where Christ warns that '
+              'false prophets will do great wonders, and where Paul says an '
+              'angel from heaven preaching another gospel is accursed; the '
+              'gospel in question, Hobbes says, was that Christ is King.'),
         ("p", "The test also cuts the other way. A man who teaches no false doctrine and "
               "shows no miracle is &ldquo;never the more to bee regarded for his "
               "pretence&rdquo;. And a prediction is only a mark if it can be checked: the "
@@ -161,11 +165,12 @@ L1 = {
               "the law as the sovereign prophet Moses delivered it, and for Christians "
               "the one article that Jesus is the Christ, as Chapter 36 will say. Whether "
               "that reply satisfies is what the disputes of the 1640s were about."),
-        ("p", "He closes by saying where the Discourse goes next: the Scripture, from "
-              "which &ldquo;all rules and precepts necessary to the knowledge of our duty "
-              "both to God and man&rdquo; may be deduced. The next lesson, &ldquo;The Books "
-              "of Holy Scripture&rdquo;, asks what Scripture is, who wrote it and what "
-              "gives it the force of law."),
+        ("p", 'He closes by saying where the Discourse goes next: the '
+              'Scripture, from which &ldquo;all rules and precepts necessary to '
+              'the knowledge of our duty both to God and man&rdquo; may be '
+              'deduced. The next lesson, <em>The Books of Holy Scripture</em>, '
+              'asks what Scripture is, who wrote it and what gives it the force '
+              'of law.'),
         ("p", 'The presets run the same rule five ways. In both, the miracle and the '
               'doctrine are given, and the argument is valid with no counterexample. In '
               'miracle-alone only the miracle is given, and in doctrine-alone only the '
@@ -215,9 +220,10 @@ L1 = {
          "he teaches, and the conclusion you are asked to draw, that he is to be "
          "acknowledged as a prophet."),
         ("Write the rule once",
-         "Put both marks in one sentence: acknowledged if and only if the miracle and the "
-         "right doctrine hold. If the rule is only an 'if', it will say what is enough "
-         "but not what is needed; Hobbes says both."),
+         'Put both marks in one sentence: acknowledged if and only if the '
+         'miracle and the right doctrine hold. If the rule is only an '
+         '<em>if</em>, it will say what is enough but not what is needed; '
+         'Hobbes says both.'),
         ("Add what you know of the candidate",
          "Enter only what has been seen or checked: that a miracle was done, or that "
          "he teaches strange gods. A claim to inspiration goes in as nothing, since it "
@@ -243,11 +249,11 @@ L1 = {
             "counterexamples: 0,  verdict: valid",
         ],
         "after": [
-            "Swap the second and third premises for the miracle-alone preset: 'A iff "
-            "(M and D)' and M. Now D is not given. One row, A false, M true and D false, "
+            "Drop the third premise and ask for A instead of not-A, which is the "
+            "miracle-alone preset: A iff (M and D), and M. Now D is not given. One row, A false, M true and D false, "
             "makes the premises true and the conclusion false. That row is the sorcerer "
             "again, and it is why a wonder with no doctrine attached cannot carry you to "
-            "'acknowledge him'.",
+            "acknowledging him.",
         ],
     },
     "quiz_title": "Applying the two marks",
@@ -261,12 +267,13 @@ L1 = {
                'He is to be acknowledged only if he is also the sovereign',
          ],
          "c": 1,
-         "why": 'Both marks hold, so the conjunction holds and the lab marks the '
-                "argument valid. 'Nothing' contradicts the first mark, which is a "
-                "miracle. 'False, because he has asked for belief' is not in the "
-                'chapter: Hobbes does not make a claim to be heard a mark against the '
-                "claimant. 'Only if he is the sovereign' adds a requirement the chapter "
-                'does not state here.'},
+         "why": 'Both marks hold, so the conjunction holds and the lab marks '
+                'the argument valid. <em>Nothing</em> contradicts the first '
+                'mark, which is a miracle. <em>False, because he has asked for '
+                'belief</em> is not in the chapter: Hobbes does not make a '
+                'claim to be heard a mark against the claimant. <em>Only if he '
+                'is the sovereign</em> adds a requirement the chapter does not '
+                'state here.'},
         {"q": 'A man teaches exactly the established religion, but has done no '
               'miracle. What does the chapter say about his claim to speak by '
               'immediate revelation?',
@@ -277,14 +284,16 @@ L1 = {
                'That he is never the more to be regarded for his pretence',
          ],
          "c": 3,
-         "why": 'Hobbes says in so many words that a man who teaches no false doctrine '
-                "but shows no miracle is not to be regarded for his pretence. 'True, "
-                "since his doctrine is sound' ignores the miracle mark, and 'false, "
-                "since he has no miracle' turns an absent proof into a proof of "
-                "falsehood, which the lab's invalid row shows does not follow. 'True if "
-                "he can foretell a distant event' is what Hobbes warns about: a "
+         "why": 'Hobbes says in so many words that a man who teaches no false '
+                'doctrine but shows no miracle is not to be regarded for his '
+                'pretence. <em>True, since his doctrine is sound</em> ignores '
+                'the miracle mark, and <em>false, since he has no miracle</em> '
+                'turns an absent proof into a proof of falsehood, which the '
+                "lab's invalid row shows does not follow. <em>True if he can "
+                'foretell a distant event</em> is what Hobbes warns about: a '
                 'prediction put off beyond a lifetime cannot be checked.'},
-        {"q": "What does the lab show about the fifth preset, 'Miracles have ceased'?",
+        {"q": 'What does the lab show about the fifth preset, Miracles have '
+              'ceased?',
          "a": [
                'Nobody can be acknowledged as a prophet, whatever he teaches',
                'Everyone can be acknowledged, since the first mark is absent',
@@ -292,19 +301,20 @@ L1 = {
                'Only the sovereign can be acknowledged',
          ],
          "c": 0,
-         "why": 'With M false the conjunction is false in every row, so A is false in '
-                "every row: valid, no counterexample. That is Hobbes's 'no sign left'. "
-                "'Everyone can be acknowledged' reverses the rule. 'No counterexample "
-                "either way' misreads a valid argument as an empty one. 'Only the "
-                "sovereign' is a thesis of other chapters, not a result of this "
-                'conjunction.'},
+         "why": 'With M false the conjunction is false in every row, so A is '
+                "false in every row: valid, no counterexample. That is Hobbes's "
+                '&ldquo;no sign left&rdquo;. <em>Everyone can be '
+                'acknowledged</em> reverses the rule. <em>No counterexample '
+                'either way</em> misreads a valid argument as an empty one. '
+                '<em>Only the sovereign</em> is a thesis of other chapters, not '
+                'a result of this conjunction.'},
         {"q": "Which step in the chapter's argument does a critic dispute who says "
               'the apostles themselves taught against the religion established in '
               'their time?',
          "a": [
                'The claim that dreams are mostly natural',
                'The claim that Micaiah was one of four hundred',
-               "The reading of 'established' in the second mark",
+               'The reading of established in the second mark',
                'The claim that reason is a talent to be used',
          ],
          "c": 2,
@@ -316,10 +326,10 @@ L1 = {
     "mistakes": [
         ("Thinking a miracle alone proves the prophet",
          "The sorcerers' works were great miracles, and Deuteronomy tells Israel to put "
-         "a wonder-worker who teaches strange gods to death. In the lab's first two "
-         "presets the same rule and the same miracle give opposite results, depending "
-         "only on the doctrine."),
-        ("Reading 'captivate the understanding' as giving up reason",
+         "a wonder-worker who teaches strange gods to death. In the both and sorcerers "
+         "presets the same rule and the same miracle give opposite conclusions, "
+         "depending only on the doctrine."),
+        ('Reading the captivity of the understanding as giving up reason',
          "Hobbes says the captivity is of the will to obedience, not the intellect, and "
          "that Scripture is above reason but never against it. A reader who takes the "
          "chapter as a call to stop thinking has the opposite of what is written."),
@@ -335,12 +345,13 @@ L1 = {
         "question open."
     ),
     "note": (
-        "The lab treats the two marks as a biconditional, which is the lesson's reading; "
-        "Hobbes says neither is sufficient alone and that together they are the marks, "
-        "and a reader who takes them only as necessary conditions would not get the "
-        "valid results shown. It also cannot decide whether any actual claimant did a "
-        "miracle or taught the established religion, or whether 'established' means what "
-        "Hobbes's chapters take it to mean."
+        "The lab treats the two marks as a biconditional, which is the lesson's "
+        'reading; Hobbes says neither is sufficient alone and that together '
+        'they are the marks, and a reader who takes them only as necessary '
+        'conditions would lose the valid result of the both preset; sorcerers '
+        'and ceased would stay valid. It also cannot decide whether any actual '
+        'claimant did a miracle or taught the established religion, or whether '
+        "<em>established</em> means what Hobbes's chapters take it to mean."
     ),
 }
 
@@ -352,15 +363,16 @@ L2 = {
     "module": "Chapter 33 · Of the Books of Holy Scripture",
     "one_line": "A book cannot have been written before the latest event it mentions, and by that test Hobbes finds Moses, Joshua and Samuel were not the last hands on their books.",
     "summary": (
-        "Chapter 33 asks what the Scriptures are, who wrote them and what makes them law. "
-        "Hobbes answers the second question from the books themselves, by the phrase "
-        "'unto this day' and by the latest event each one mentions, and the third by "
-        "the sovereign's authority. Date a short list of books with that test and see "
-        "which must be later than their traditional authors."
+        'Chapter 33 asks what the Scriptures are, who wrote them and what makes '
+        'them law. Hobbes answers the second question from the books '
+        'themselves, by the phrase unto this day and by the latest event each '
+        "one mentions, and the third by the sovereign's authority. Date a short "
+        'list of books with that test and see which must be later than their '
+        'traditional authors.'
     ),
     "key": [
         "written no earlier than its latest event",
-        "'unto this day': written long after",
+        'unto this day: written long after',
         "after the author's death: not his last hand",
         "titles name a subject as often as a writer",
         "canon = the books the sovereign makes law",
@@ -404,14 +416,15 @@ L2 = {
               "of his sepulcher to this day, that is, to the day wherein those words were "
               "written. It is therefore manifest, that those words were written after his "
               "interrement.&rdquo;"),
-        ("p", "Suppose a friend gives you a letter that says it was written in 1900, and the "
-              "letter says the new bridge 'still stands to this day'. You would look up "
-              "when the bridge was built, then ask how long it had stood. Hobbes does "
-              "with the Bible what you would do with the letter. The chapter begins "
-              "elsewhere, with the question of which books are the canon, and he is "
-              "plain that this is a question of law. But the part you have just read "
-              "answers a different question, who wrote the books, and it is answered "
-              "with no appeal to anyone's authority."),
+        ("p", 'Suppose a friend gives you a letter that says it was written in '
+              '1900, and the letter says the new bridge <em>still stands to '
+              'this day</em>. You would look up when the bridge was built, then '
+              'ask how long it had stood. Hobbes does with the Bible what you '
+              'would do with the letter. The chapter begins elsewhere, with the '
+              'question of which books are the canon, and he is plain that this '
+              'is a question of law. But the part you have just read answers a '
+              'different question, who wrote the books, and it is answered with '
+              "no appeal to anyone's authority."),
         ("p", "His starting points are three. First, no other history tells us who wrote "
               "the books, and &ldquo;History&rdquo;, as he says, is &ldquo;the only proof "
               "of matter of fact&rdquo;. Second, reason will not do it either, because it "
@@ -464,26 +477,29 @@ L2 = {
               "illustrative round figures, counted in years from the death of Moses; "
               "the test uses the order of events, not the size of the gaps, and Hobbes "
               "gives no dates."),
-        ("p", "The second half of the chapter turns to authority, and it is an argument "
-              "with a trap in it for the sovereign's critics. God is the sovereign of "
-              "sovereigns and must be obeyed whatever any prince commands, Hobbes agrees; "
-              "but the question is not of obedience to God but of &ldquo;what God hath said&rdquo;, which a subject "
-              "who has no private revelation can know only by natural reason, that is, by "
-              "obeying his commonwealth. So &ldquo;it is not the Writer, but the "
-              "authority of the Church, that maketh a Book Canonicall&rdquo;, and the "
-              "church, if it is one person, is the commonwealth of Christians. If it "
-              "is not one person, it has no will or voice. If it is one commonwealth "
-              "over all Christendom, every Christian king is its private subject. "
-              "&ldquo;The question truly stated is, By what Authority they are made "
-              "Law.&rdquo; Anyone who answers 'the Pope' or 'the Spirit in me' is saying "
-              "something about who is sovereign, and Hobbes has already argued about "
-              "that."),
-        ("p", "That is the argument at its strongest and at its limit. The dating is open "
-              "to anyone with a Bible, and many readers have accepted it while rejecting "
-              "everything after it. The authority claim is the one the Church of "
-              "Rome and the Presbyterian ministers disputed. The next lesson, &ldquo;Spirit, "
-              "Angel and Inspiration&rdquo;, takes up the words Chapter 34 says must be "
-              "fixed before the Discourse goes on."),
+        ("p", 'The second half of the chapter turns to authority, and it is an '
+              "argument with a trap in it for the sovereign's critics. God is "
+              'the sovereign of sovereigns and must be obeyed whatever any '
+              'prince commands, Hobbes agrees; but the question is not of '
+              'obedience to God but of &ldquo;what God hath said&rdquo;, which '
+              'a subject who has no private revelation can know only by natural '
+              'reason, that is, by obeying his commonwealth. So &ldquo;it is '
+              'not the Writer, but the authority of the Church, that maketh a '
+              'Book Canonicall&rdquo;, and the church, if it is one person, is '
+              'the commonwealth of Christians. If it is not one person, it has '
+              'no will or voice. If it is one commonwealth over all '
+              'Christendom, every Christian king is its private subject. '
+              '&ldquo;The question truly stated is, By what Authority they are '
+              'made Law.&rdquo; Anyone who answers <em>the Pope</em> or <em>the '
+              'Spirit in me</em> is saying something about who is sovereign, '
+              'and Hobbes has already argued about that.'),
+        ("p", 'That is the argument at its strongest and at its limit. The '
+              'dating is open to anyone with a Bible, and many readers have '
+              'accepted it while rejecting everything after it. The authority '
+              'claim is the one the Church of Rome and the Presbyterian '
+              'ministers disputed. The next lesson, <em>Spirit, Angel and '
+              'Inspiration</em>, takes up the words Chapter 34 says must be '
+              'fixed before the Discourse goes on.'),
         ("p", 'The presets show the test in use. In moses-joshua the Pentateuch mentions an '
               "event 30 years after Moses's death, and Joshua mentions the stones standing "
               '&ldquo;unto this day&rdquo;, 200 years in, which is 170 years after Joshua '
@@ -545,9 +561,9 @@ L2 = {
          "one stated scale. Remember Hobbes's caution that a title may mark a subject "
          "and not a writer."),
         ("List what the book mentions",
-         "Collect each event, monument or custom the book refers to as past, with the "
-         "date you give it. 'Unto this day' belongs here: it means the event is far "
-         "behind the writer."),
+         'Collect each event, monument or custom the book refers to as past, '
+         'with the date you give it. <em>Unto this day</em> belongs here: it '
+         'means the event is far behind the writer.'),
         ("Take the latest",
          "A book cannot have been written before the latest thing it mentions. That year "
          "is the earliest the book can have been written, in this form."),
@@ -571,9 +587,11 @@ L2 = {
         ],
         "after": [
             "Both books come out as written after their traditional authors. The "
-            "burial alone, at year 0, would not: it equals the death and so tells "
-            "nothing, which is why Hobbes needs the Canaanite and the "
-            "words &lsquo;unto this day&rsquo;. For a book with no mentions the lab prints no "
+            "burial, dated at year 0, does not trip the lab's test, because the lab only "
+            "compares years. Hobbes's point is sharper: no writer reports his own "
+            "burial and adds that the grave is unknown unto this day, so that verse alone "
+            "shows a later hand. He brings the Canaanite only to answer the reply that "
+            "the last chapter alone is later. For a book with no mentions the lab prints no "
             "test, as it should: a book is not shown to be early by saying nothing of "
             "its own time.",
         ],
@@ -589,14 +607,15 @@ L2 = {
                'It was written in year 200, halfway between',
          ],
          "c": 2,
-         "why": 'A book cannot predate the latest event it mentions, so it dates from '
-                "300 or later. 'Year 100' takes the earliest date for the writing. "
-                "'Written by its author, the later events prophecy' is the reading "
-                'Hobbes calls a strange interpretation when he says Moses did not speak '
-                "of his own sepulchre by prophecy. 'Year 200' is not a result of the "
-                'test.'},
-        {"q": "Why does Hobbes say 'the Book of Ruth' proves nothing about who wrote "
-              'Ruth?',
+         "why": 'A book cannot predate the latest event it mentions, so it '
+                'dates from 300 or later. <em>Year 100</em> takes the earliest '
+                'date for the writing. <em>Written by its author, the later '
+                'events prophecy</em> is the reading Hobbes calls a strange '
+                'interpretation when he says Moses did not speak of his own '
+                'sepulchre by prophecy. <em>Year 200</em> is not a result of '
+                'the test.'},
+        {"q": 'Why does Hobbes say the Book of Ruth proves nothing about who '
+              'wrote Ruth?',
          "a": [
                'Ruth lived long before the Book was written',
                'Hebrew books have no authors',
@@ -604,10 +623,11 @@ L2 = {
                'The title was added by the sovereign',
          ],
          "c": 2,
-         "why": "That is the sentence. 'Ruth lived long before the Book was written' is "
-                'a conclusion some readers would draw but Hobbes does not give it for '
-                "Ruth. Neither 'Hebrew books have no authors' nor 'the sovereign added "
-                "the title' is in the chapter."},
+         "why": 'That is the sentence. <em>Ruth lived long before the Book was '
+                'written</em> is a conclusion some readers would draw but '
+                'Hobbes does not give it for Ruth. Neither <em>Hebrew books '
+                'have no authors</em> nor <em>the sovereign added the '
+                'title</em> is in the chapter.'},
         {"q": 'What does Hobbes say makes a book canonical?',
          "a": [
                'The authority of the lawful power that makes it law',
@@ -655,19 +675,22 @@ L2 = {
 }
 
 # ------------------------------------------------------------------ 03
-# Leviathan ch. 34; PDF p. 366 of the operator's copy.
+# Leviathan ch. 34, 1651 p. 208; PDF p. 366 of the operator's copy.
 L3 = {
     "slug": "spirit-angel-and-inspiration",
     "title": "Spirit, Angel and Inspiration",
     "module": "Chapter 34 · Of the Signification of Spirit, Angel, and Inspiration",
-    "one_line": "Hobbes takes body, substance and spirit as names with definitions, and finds that 'incorporeal substance' adds names that cancel.",
+    "one_line": 'Hobbes takes body, substance and spirit as names with '
+                'definitions, and finds that incorporeal substance adds names '
+                'that cancel.',
     "summary": (
-        "Chapter 34 fixes the meaning of the words Scripture uses before anything is "
-        "inferred from it. Body and substance, Hobbes says, name the same thing, so "
-        "'incorporeal substance' destroys itself; spirit means a thin body or an image "
-        "of the fancy or, figuratively, a disposition; angels are messengers; "
-        "inspiration is a metaphor. Reckon eight claims from those definitions and see "
-        "which are true, false or absurd."
+        'Chapter 34 fixes the meaning of the words Scripture uses before '
+        'anything is inferred from it. Body and substance, Hobbes says, name '
+        'the same thing, so incorporeal substance destroys itself; spirit means '
+        'a thin body or an image of the fancy or, figuratively, a disposition; '
+        'angels are messengers; inspiration is a metaphor. Reckon nine claims '
+        'from those definitions and see which are true, false, absurd or '
+        'insignificant.'
     ),
     "key": [
         "body = what fills some room",
@@ -683,11 +706,11 @@ L3 = {
     ),
     "concepts": [
         ("Body and substance",
-         "Body, in its most general sense, &ldquo;filleth, or occupyeth some certain "
-         "room&rdquo;, and is a real part of the universe. The same thing is called "
-         "substance when we think of it as subject to changes, which are its accidents. "
-         "So substance and body signify one thing, and &lsquo;incorporeal substance&rsquo; is "
-         "like &lsquo;an incorporeal body&rsquo;."),
+         'Body, in its most general sense, &ldquo;filleth, or occupyeth some '
+         'certain room&rdquo;, and is a real part of the universe. The same '
+         'thing is called substance when we think of it as subject to changes, '
+         'which are its accidents. So substance and body signify one thing, and '
+         '<em>incorporeal substance</em> is like <em>an incorporeal body</em>.'),
         ("Spirit, in two senses and some figures",
          "Common speech calls thin things we feel as wind or breath spirits, and "
          "so spirit in its proper sense is either a subtle, fluid, invisible body or a "
@@ -721,23 +744,25 @@ L3 = {
               "in Scripture. He proposes to settle the meaning of body and spirit, which "
               "&ldquo;in the language of the Schools are termed, Substances, Corporeall, "
               "and Incorporeall&rdquo;."),
-        ("p", "He starts with body: &ldquo;that which filleth, or occupyeth some certain "
-              "room, or imagined place&rdquo;, which does not depend on the imagination "
-              "and is a real part of the universe, the aggregate of all bodies. Bodies "
-              "are subject to change, and in that guise they are called substances. "
-              "&ldquo;Substance and Body, signifie the same thing&rdquo;, hence the "
-              "sentence you read first. Hobbes then admits the ordinary use of the word. "
-              "Common people call body only what they can feel resist or see, and "
-              "they call air and breath by the name of spirit, because the Latin "
-              "<em>spiritus</em> means breath. In that vulgar sense, he says, an "
-              "incorporeal substance is not nothing: it is &ldquo;a thin Substance "
-              "Invisible, but that hath the same dimensions that are in grosser "
-              "Bodies&rdquo;. The word is not the trouble; the trouble is a sense of "
-              "&lsquo;incorporeal&rsquo; that means no body at all."),
+        ("p", 'He starts with body: &ldquo;that which filleth, or occupyeth '
+              'some certain room, or imagined place&rdquo;, which does not '
+              'depend on the imagination and is a real part of the universe, '
+              'the aggregate of all bodies. Bodies are subject to change, and '
+              'in that guise they are called substances. &ldquo;Substance and '
+              'Body, signifie the same thing&rdquo;, hence the sentence you '
+              'read first. Hobbes then admits the ordinary use of the word. '
+              'Common people call body only what they can feel resist or see, '
+              'and they call air and breath by the name of spirit, because the '
+              'Latin <em>spiritus</em> means breath. In that vulgar sense, he '
+              'says, an incorporeal substance is not nothing: it is &ldquo;a '
+              'thin Substance Invisible, but that hath the same dimensions that '
+              'are in grosser Bodies&rdquo;. The word is not the trouble; the '
+              'trouble is a sense of <em>incorporeal</em> that means no body at '
+              'all.'),
         ("p", "Spirit has a second meaning, and he insists that the two be kept apart. "
               "Sometimes it is a ghost or other idol of the brain, seen in a dream or in "
               "a looking-glass, of which he says the apostle says they are nothing. "
-              "&ldquo;The proper signification of Spirit in common speech, is either a "
+              "&ldquo;the proper signification of Spirit in common speech, is either a "
               "subtile, fluid, and invisible Body, or a Ghost, or other Idol or Phantasme "
               "of the Imagination.&rdquo; Beyond these there are, he says, many "
               "metaphorical senses: a disposition, a gift of wisdom, an unexpected zeal, "
@@ -772,37 +797,49 @@ L3 = {
               "carryed hither and thither, and to be powred into men, as into "
               "barrels&rdquo;. The same applies to the Holy Ghost at Pentecost, where the "
               "wind is a sign, not the Spirit."),
-        ("p", "It would be easy to read this chapter as a materialist's attack on religion, "
-              "and some of Hobbes's contemporaries did. It reads differently from the "
-              "inside. His account has God a Spirit in a sense we do not understand, for "
-              "God's nature is incomprehensible, and the attributes we give him are "
-              "honours, not descriptions. The target is a philosophical word, "
-              "&lsquo;incorporeal substance&rsquo;, which he says belongs to the Schools and "
-              "comes from the Gentiles' notion of demons, and not any text of Scripture. "
-              "The strongest reply to him comes from the philosophers who took the "
-              "other side. Henry More and the Cambridge Platonists held that a spirit "
-              "may occupy room and yet not be a body, because it is penetrable, which "
-              "bodies are not. If that is allowed, &lsquo;body&rsquo; cannot simply be "
-              "&lsquo;whatever fills room&rsquo;, and the definition from which Hobbes's "
-              "sum is reckoned is the premise in dispute."),
-        ("p", "The lab does the reckoning and leaves that dispute alone. It takes a handful "
-              "of Hobbes's definitions as given, expands each name into the simple names "
-              "that make it up, and gives each claim a verdict. A claim is true if "
-              "everything in the predicate is in the subject, absurd if the two together "
-              "contain names that cannot be added, and insignificant if it uses a name "
-              "that has no definition, which is how the lab says a name stands for "
-              "nothing. The simple names, 'extended' and 'unextended', are the lesson's "
-              "way of writing Hobbes's body and the Schools' incorporeal, and are not "
-              "his own terms."),
-        ("p", "The next lesson, &ldquo;The Kingdom of God and the Word of God&rdquo;, "
-              "takes the chapters in which the fixing of words is put to political use."),
+        ("p", "It would be easy to read this chapter as a materialist's attack "
+              "on religion, and some of Hobbes's contemporaries did. It reads "
+              'differently from the inside. His account has God a Spirit in a '
+              "sense we do not understand, for God's nature is "
+              'incomprehensible, and the attributes we give him are honours, '
+              'not descriptions. The target is a philosophical word, '
+              '<em>incorporeal substance</em>, which he says belongs to the '
+              "Schools and comes from the Gentiles' notion of demons, and not "
+              'any text of Scripture. The strongest reply to him comes from the '
+              'philosophers who took the other side. Henry More and the '
+              'Cambridge Platonists held that a spirit may occupy room and yet '
+              'not be a body, because it is penetrable, which bodies are not. '
+              'If that is allowed, <em>body</em> cannot simply be <em>whatever '
+              "fills room</em>, and the definition from which Hobbes's sum is "
+              'reckoned is the premise in dispute.'),
+        ("p", 'The lab does the reckoning and leaves that dispute alone. It '
+              "takes a handful of Hobbes's definitions as given, expands each "
+              'name into the simple names that make it up, and gives each claim '
+              'a verdict. A claim is true if everything in the predicate is in '
+              'the subject, absurd if the two together contain names that '
+              'cannot be added, and insignificant if it uses a name that has no '
+              'definition, which is how the lab says a name stands for nothing. '
+              'The simple names, <em>extended</em> and <em>unextended</em>, are '
+              "the lesson's way of writing Hobbes's body and the Schools' "
+              'incorporeal, and are not his own terms.'),
+        ("p", 'The next lesson, <em>The Kingdom of God and the Word of '
+              'God</em>, takes the chapters in which the fixing of words is put '
+              'to political use.'),
+        ("p", "A caution about the lab's words. The four verdicts it prints are the "
+              "lab's own sorting, not Hobbes's. For him a false universal affirmation "
+              "is itself absurd and cannot be understood, and an undefined name and a "
+              "contradiction are alike insignificant sounds. So the lab's absurd marks "
+              "only a contradiction among the names the lesson states, and Hobbes "
+              "would call its false universal claims absurd as well. The lab shows the "
+              "difference between a claim that does not follow and one that cancels "
+              "itself; it does not show where Hobbes draws the line."),
         ("p", 'The one preset, hobbes, holds all nine claims at once. On the definitions as '
               'written the lab gives three true, two false, three absurd and one '
               'insignificant: the three that a subtle spirit is a body and a substance, and '
               'that an angel of subtle body is a spirit, are true; that an apparition is a '
               'body, and that a ghost is a body, are false; the three that put incorporeal '
-              'with substance or with a body are absurd; and &ldquo;inspiration is '
-              'infusion&rdquo; is insignificant because neither word is defined or simple.'),
+              'with substance or with a body are absurd; and the claim inspiration-is-infusion is '
+              'insignificant because neither word is defined or simple.'),
     ],
     "lab": ("levkit", {
         "mode": "reckon",
@@ -825,7 +862,7 @@ L3 = {
              "claims": [
                  ["a-subtle-spirit-is-a-body", "subtle-spirit", "body"],
                  ["a-subtle-spirit-is-a-substance", "subtle-spirit", "substance"],
-                 ["an-angel-of-flesh-thin-body-is-a-spirit", "angel-body", "subtle-spirit"],
+                 ["an-angel-of-subtle-body-is-a-spirit", "angel-body", "subtle-spirit"],
                  ["an-angel-that-is-an-apparition-is-a-body", "angel-apparition", "body"],
                  ["a-ghost-is-a-body", "ghost", "body"],
                  ["an-angel-in-a-body-is-incorporeal", "angel-body", "incorporeal"],
@@ -833,7 +870,7 @@ L3 = {
                  ["an-apparition-is-an-incorporeal-substance", "angel-apparition", "incorporeal-substance"],
                  ["inspiration-is-infusion", "inspiration", "infusion"],
              ],
-             "expect": {"lrkCounts": "3 true, 2 false, 3 absurd, 1 insignificant", "lrkTrue": "3: a-subtle-spirit-is-a-body, a-subtle-spirit-is-a-substance, an-angel-of-flesh-thin-body-is-a-spirit", "lrkFalse": "2: an-angel-that-is-an-apparition-is-a-body, a-ghost-is-a-body", "lrkAbsurd": "3: an-angel-in-a-body-is-incorporeal, a-substance-is-incorporeal, an-apparition-is-an-incorporeal-substance", "lrkEmpty": "1: inspiration-is-infusion"}},
+             "expect": {"lrkCounts": "3 true, 2 false, 3 absurd, 1 insignificant", "lrkTrue": "3: a-subtle-spirit-is-a-body, a-subtle-spirit-is-a-substance, an-angel-of-subtle-body-is-a-spirit", "lrkFalse": "2: an-angel-that-is-an-apparition-is-a-body, a-ghost-is-a-body", "lrkAbsurd": "3: an-angel-in-a-body-is-incorporeal, a-substance-is-incorporeal, an-apparition-is-an-incorporeal-substance", "lrkEmpty": "1: inspiration-is-infusion"}},
         ],
         "panel_title": "Reckon what follows from the definitions",
         "panel_intro": (
@@ -853,8 +890,8 @@ L3 = {
          "List the simple names that exclude each other, such as extended and "
          "unextended. The lesson's choice of pair is the premise that matters."),
         ("Expand and compare",
-         "Replace each word by its simple names. A claim of the form 'S is P' is true "
-         "if all of P's simple names are among S's."),
+         'Replace each word by its simple names. A claim of the form <em>S is '
+         "P</em> is true if all of P's simple names are among S's."),
         ("Check for absurdity and emptiness",
          "If S, P or their sum contains an excluded pair, the claim is absurd; if a "
          "name has no definition and is not simple, the claim is insignificant. "
@@ -863,8 +900,9 @@ L3 = {
     "worked": {
         "title": "Why an incorporeal substance cancels",
         "intro": [
-            "Take 'a substance is incorporeal'. Substance is defined as body, and body "
-            "as extended and real; incorporeal is defined as unextended.",
+            'Take <em>a substance is incorporeal</em>. Substance is defined as '
+            'body, and body as extended and real; incorporeal is defined as '
+            'unextended.',
         ],
         "lines": [
             "substance = body = extended + real",
@@ -874,12 +912,13 @@ L3 = {
             "verdict: absurd",
         ],
         "after": [
-            "Compare 'a subtle spirit is a body'. Subtle spirit is body, thin and "
-            "invisible, so every simple name of body is in it, and the claim is true. "
-            "'A ghost is a body' is false and not absurd: a ghost is just 'imagined', "
-            "which lacks extended and real but adds nothing that clashes. Hobbes's "
-            "own verdict on ghosts is harsher, that they are nothing; the lab shows only "
-            "what the lesson's definitions give.",
+            'Compare <em>a subtle spirit is a body</em>. Subtle spirit is body, '
+            'thin and invisible, so every simple name of body is in it, and the '
+            'claim is true. <em>A ghost is a body</em> is false and not absurd: '
+            'a ghost is just <em>imagined</em>, which lacks extended and real '
+            "but adds nothing that clashes. Hobbes's own verdict on ghosts is "
+            'harsher, that they are nothing; the lab shows only what the '
+            "lesson's definitions give.",
         ],
     },
     "quiz_title": "Reading the verdicts",
@@ -892,10 +931,12 @@ L3 = {
                'A subtle spirit is a substance',
          ],
          "c": 3,
-         "why": 'A subtle spirit contains body, and substance is defined as body, so it '
-                "contains all of substance. 'A substance is incorporeal' and 'An angel "
-                "in a body is incorporeal' put extended with unextended and are absurd. "
-                "'A ghost is a body' is false, since a ghost is only imagined."},
+         "why": 'A subtle spirit contains body, and substance is defined as '
+                'body, so it contains all of substance. <em>A substance is '
+                'incorporeal</em> and <em>An angel in a body is '
+                'incorporeal</em> put extended with unextended and are absurd. '
+                '<em>A ghost is a body</em> is false, since a ghost is only '
+                'imagined.'},
         {"q": 'Which of these does the lab call absurd and not merely false?',
          "a": [
                'An apparition is a body',
@@ -904,11 +945,13 @@ L3 = {
                'A body is extended',
          ],
          "c": 1,
-         "why": "'Incorporeal substance' contains both extended and unextended, so any "
-                "claim that uses it is absurd. 'An apparition is a body' and 'A ghost "
-                "is a body' are false but contain no clashing pair. 'A body is "
-                "extended' is true."},
-        {"q": "What does Hobbes allow, in this chapter, about the word 'incorporeal'?",
+         "why": '<em>Incorporeal substance</em> contains both extended and '
+                'unextended, so any claim that uses it is absurd. <em>An '
+                'apparition is a body</em> and <em>A ghost is a body</em> are '
+                'false but contain no clashing pair. <em>A body is '
+                'extended</em> is true.'},
+        {"q": 'What does Hobbes allow, in this chapter, about the word '
+              'incorporeal?',
          "a": [
                'It is always meaningless in Scripture',
                'It means an image of the fancy and nothing else',
@@ -917,9 +960,10 @@ L3 = {
          ],
          "c": 3,
          "why": 'He says that if corporeal is taken for what we perceive by the '
-                'external senses, then incorporeal substance is a thin invisible '
-                'substance with the same dimensions as grosser bodies. What he denies '
-                "is the sense 'not body'. The other answers are not what he says."},
+                'external senses, then incorporeal substance is a thin '
+                'invisible substance with the same dimensions as grosser '
+                'bodies. What he denies is the sense <em>not body</em>. The '
+                'other answers are not what he says.'},
         {"q": "Which premise is the one a reply such as Henry More's would reject?",
          "a": [
                'That angels are messengers',
@@ -934,16 +978,19 @@ L3 = {
     ],
     "mistakes": [
         ("Thinking Hobbes says there are no angels",
-         "He says that angels in the Old Testament are mostly messengers appearing in "
-         "dreams and visions, but that the New Testament, as he reads it, has made him "
-         "believe in angels that are substantial and permanent. What he rejects is that "
-         "they are in no place. The lab's claim 'an angel in a body is incorporeal' is "
-         "absurd for that reason."),
-        ("Calling 'absurd' a verdict that something is false",
-         "In the lab a claim is false when its parts simply fail to match, and absurd when "
-         "it adds names that cannot be added. 'A ghost is a body' is false; 'a substance is "
-         "incorporeal' is absurd. Hobbes's own distinction between a false and an "
-         "insignificant speech is the same kind."),
+         'He says that angels in the Old Testament are mostly messengers '
+         'appearing in dreams and visions, but that the New Testament, as he '
+         'reads it, has made him believe in angels that are substantial and '
+         "permanent. What he rejects is that they are in no place. The lab's "
+         'claim <em>an angel in a body is incorporeal</em> is absurd for that '
+         'reason.'),
+        ("Taking the lab's four verdicts for Hobbes's",
+         "The sorting into true, false, absurd and insignificant is the lab's, not "
+         "Hobbes's. He holds that a false universal affirmation is itself absurd, so "
+         "that no one can understand it, and that undefined names and contradictory "
+         "names alike are insignificant sounds. The lab's absurd marks only a "
+         "contradiction among the stated names. Hobbes would call its false universal "
+         "claims, such as the ghost being a body, absurd too."),
         ("Reading the definitions as the lab's discovery",
          "They are Hobbes's, taken as the lesson states them. The lab computes what "
          "follows, and one definition, that body is what fills room, carries nearly all "
@@ -952,10 +999,11 @@ L3 = {
     "standard": (
         "Finish when you can show why one word-sum cancels.",
         "Given definitions of body, substance and incorporeal, expand a claim into "
-        "simple names and decide whether it is true, false or absurd."
+        "simple names and decide whether the lab calls it true, false, absurd or "
+        "insignificant, and say where Hobbes would differ."
     ),
     "note": (
-        "The lab computes from the lesson's list of definitions and simple names, and "
+        "The lab computes from the lesson's list of definitions and simple names, its four verdicts are its own sorting and not Hobbes's, and "
         "everything depends on that list, above all on counting extension as the mark "
         "of body. It cannot say whether spirits exist, what Scripture means by them, or "
         "whether a critic is right that a thing may fill room without being a body."
@@ -973,12 +1021,12 @@ L4 = {
         "Chapter 35 argues that the kingdom of God in Scripture is, in most places, a "
         "real commonwealth, with God as king by Israel's covenant; Chapter 36 goes through "
         "the senses of the word of God and of prophet, and says every man must examine a "
-        "prophet before he obeys him. Use Hobbes's own count of four hundred false "
-        "prophets and one true one as a prior and see what a fulfilled prophecy does to it."
+        "prophet before he obeys him. Take the story in 1 Kings 22, four hundred prophets and "
+        "Micaiah besides, as a prior and see what a fulfilled prophecy does to it."
     ),
     "key": [
         "the kingdom of God: a civil kingdom",
-        "holy = God's own, as 'public' is the king's",
+        "holy = God's own, as public is the king's",
         "prophet: 1 true in 401, so prior 1/401",
         "Bayes factor = P(sign | true) / P(sign | not)",
         "one sign moves 1/401 to 1/41, not to 1",
@@ -1033,30 +1081,32 @@ L4 = {
               "acquired by their own consent&rdquo;. He finds the reverse in Scripture: "
               "&ldquo;a Kingdome properly so named, constituted by the Votes of the People "
               "of Israel&rdquo;."),
-        ("p", "The evidence is mostly one passage of Exodus, which he reads with care. "
-              "God says that if Israel keeps his covenant they will be a &lsquo;peculiar "
-              "people&rsquo;, a &lsquo;sacerdotal kingdom&rsquo; and a &lsquo;holy "
-              "nation&rsquo;. He argues that the best translation of peculiar is the "
-              "Vulgate's <em>peculium</em>, something set aside, and that the reason "
-              "God gives, that all the earth is his, shows that Israel was his in a "
-              "different way: all nations are his by power, &ldquo;but you shall be mine, "
-              "by your own Consent, and Covenant&rdquo;. The English translations that "
-              "say &lsquo;a kingdom of priests&rsquo; and &lsquo;a precious "
-              "treasure&rsquo; he thinks mistaken, and he adds that they have been "
-              "translated so because the true meaning &ldquo;gives too much light to "
-              "Christian Kings to see their right of Ecclesiasticall Government&rdquo;. "
-              "A reader who knows how the quarrel over episcopacy was fought in the 1640s "
-              "will see why he said it."),
-        ("p", "Two more passages support the point. When the elders of Israel demanded a "
-              "king, the Lord told Samuel, &lsquo;they have not rejected thee, but they "
-              "have rejected me, that I should not reign over them&rsquo;; so God had "
-              "been king. And the Prophets foretell his restoration on Mount Zion, on "
-              "earth. The New Testament says the same: Christ is to have the throne of "
-              "David, and was put to death as a claimant to the title, King of the Jews. "
-              "Hence the prayer: &lsquo;Thy kingdom come&rsquo; would be superfluous if "
-              "the kingdom had never been interrupted. The kingdom of grace is the "
-              "promise of obedience made now; the kingdom of glory is when Christ comes "
-              "in majesty."),
+        ("p", 'The evidence is mostly one passage of Exodus, which he reads '
+              'with care. God says that if Israel keeps his covenant they will '
+              'be a <em>peculiar people</em>, a <em>sacerdotal kingdom</em> and '
+              'a <em>holy nation</em>. He argues that the best translation of '
+              "peculiar is the Vulgate's <em>peculium</em>, something set "
+              'aside, and that the reason God gives, that all the earth is his, '
+              'shows that Israel was his in a different way: all nations are '
+              'his by power, &ldquo;but you shall be mine, by your own Consent, '
+              'and Covenant&rdquo;. The English translations that say <em>a '
+              'kingdom of priests</em> and <em>a precious treasure</em> he '
+              'thinks mistaken. Of the true meaning he says it &ldquo;gives too '
+              'much light to Christian Kings to see their right of '
+              'Ecclesiasticall Government&rdquo;, and gives that as the reason '
+              'it is little noticed. A reader who knows how the quarrel over '
+              'episcopacy was fought in the 1640s will see why he said it.'),
+        ("p", 'Two more passages support the point. When the elders of Israel '
+              'demanded a king, the Lord told Samuel, <em>they have not '
+              'rejected thee, but they have rejected me, that I should not '
+              'reign over them</em>; so God had been king. And the Prophets '
+              'foretell his restoration on Mount Zion, on earth. The New '
+              'Testament says the same: Christ is to have the throne of David, '
+              'and was put to death as a claimant to the title, King of the '
+              'Jews. Hence the prayer: <em>Thy kingdom come</em> would be '
+              'superfluous if the kingdom had never been interrupted. The '
+              'kingdom of grace is the promise of obedience made now; the '
+              'kingdom of glory is when Christ comes in majesty.'),
         ("p", "From the kingdom Hobbes derives holiness. A king is the public person, and "
               "what belongs to the commonwealth is public; so God, king of Israel, is the "
               "holy one of Israel, and the Sabbath, the temple, the tithes and the "
@@ -1087,35 +1137,40 @@ L4 = {
               "the odds are poor, because there have always been more false prophets than "
               "true. Hobbes makes the count: Ahab asked four hundred prophets, and "
               "&ldquo;they were all false Imposters, but onely one Michaiah.&rdquo; "
-              "He adds that before the captivity the prophets were generally liars, citing "
+              "He adds that a little before the time of the Captivity the prophets were generally liars, citing "
               "Jeremiah, and that impostors &ldquo;gain in the opinion of the common "
               "sort of men, a greater reputation of Prophecy, by one casuall event that "
               "may bee but wrested to their purpose, than can be lost again by never so "
               "many failings&rdquo;. Both remarks are about weighing evidence, and that "
               "is the lab."),
-        ("p", "The lab takes Hobbes's count as a base rate: of the prophets consulted, 401 in "
-              "all, one is true. It then asks what the fulfilment of one prophecy does to "
-              "that. A true prophet's word comes to pass, on the lesson's reading of "
-              "Deuteronomy's test. A false prophet's may come to pass by chance, or by "
-              "being wrested, at a rate the lesson sets at one in ten. The Bayes factor is "
-              "the ratio of those two chances, 10, and applied to a prior of 1 in 401 it "
-              "gives 1 in 41. The sign has made a true prophet ten times more likely than "
-              "before and still only one chance in forty-one. If the prophecy is vague, so "
-              "that a false prophet's chance is nine in ten, the factor is barely above 1; "
-              "that is the case of the prophet who foretells that it will come to pass "
-              "&lsquo;one time or other&rsquo;. If it fails, a true prophet is ruled out. "
-              "None of this is Hobbes's arithmetic; it is the lesson's way of showing what "
-              "his two remarks imply."),
-        ("p", "The last step is the rule he draws. Every subject must try a prophet by "
-              "his own natural reason and by the marks, but he must also look to the "
-              "sovereign prophet, and for Christians that is the sovereign. A Christian "
-              "who takes a private prophet over the sovereign must, he says, follow "
-              "his own dreams or a foreign prince. A critic will say that a man who is "
-              "told to test prophets and then to defer to the sovereign has been "
-              "given a freedom that the sovereign can take away; Hobbes would answer "
-              "that the freedom is of the heart, since thought is free, and the "
-              "deference is of the tongue. The next lesson, &ldquo;Miracles and Their "
-              "Use&rdquo;, applies the same test to wonders."),
+        ("p", "The lab takes the lesson's count from the story as a base rate. "
+              'Reading 1 Kings 22 as four hundred prophets and Micaiah besides, '
+              '401 in all, one is true; Chapter 32 counts Micaiah among the '
+              'four hundred, one in 400, and the result barely moves. It then '
+              'asks what the fulfilment of one prophecy does to that. A true '
+              "prophet's word comes to pass, on the lesson's reading of "
+              "Deuteronomy's test. A false prophet's may come to pass by "
+              'chance, or by being wrested, at a rate the lesson sets at one in '
+              'ten. The Bayes factor is the ratio of those two chances, 10, and '
+              'applied to a prior of 1 in 401 it gives 1 in 41. The sign has '
+              'made a true prophet ten times more likely than before and still '
+              'only one chance in forty-one. If the prophecy is vague, so that '
+              "a false prophet's chance is nine in ten, the factor is barely "
+              'above 1; that is the case of the prophet who foretells that it '
+              'will come to pass <em>one time or other</em>. If it fails, a '
+              "true prophet is ruled out. None of this is Hobbes's arithmetic; "
+              "it is the lesson's way of showing what his two remarks imply."),
+        ("p", 'The last step is the rule he draws. Every subject must try a '
+              'prophet by his own natural reason and by the marks, but he must '
+              'also look to the sovereign prophet, and for Christians that is '
+              'the sovereign. A Christian who takes a private prophet over the '
+              'sovereign must, he says, follow his own dreams or a foreign '
+              'prince. A critic will say that a man who is told to test '
+              'prophets and then to defer to the sovereign has been given a '
+              'freedom that the sovereign can take away; Hobbes would answer '
+              'that the freedom is of the heart, since thought is free, and the '
+              'deference is of the tongue. The next lesson, <em>Miracles and '
+              'Their Use</em>, applies the same test to wonders.'),
         ("p", 'The four presets change one thing each. In ahab one of 401 prophets is true '
               'and one fulfilled prophecy leaves the chance that this prophet is true at '
               '1/41, a factor of 10. In two-signs two independent prophecies come true, the '
@@ -1156,7 +1211,7 @@ L4 = {
         ],
         "panel_title": "What a fulfilled prophecy is worth",
         "panel_intro": (
-            "The prior is Hobbes's count: one true prophet among 401 consulted. The "
+            "The prior is the lesson's count from the story: one true prophet among 401 consulted. The "
             "likelihoods are the lesson's: a true prophet's word comes to pass, a false "
             "prophet's does so at the rate in the second row. Change the rate, or the "
             "data, and watch the posterior; the menu at the foot of the controls "
@@ -1167,7 +1222,7 @@ L4 = {
     "steps_intro": "Five steps, the same whatever the sign.",
     "steps": [
         ("Fix the base rate",
-         "Say how many of the prophets one might meet are true. Hobbes's own count is "
+         "Say how many of the prophets one might meet are true. The lesson's count from the story is "
          "one in four hundred and one; any other number is yours."),
         ("Say what a true prophet's sign looks like",
          "On Hobbes's reading of Deuteronomy a true prophet's prediction comes to pass, "
@@ -1214,10 +1269,11 @@ L4 = {
                "Certain, since a true prophet's word always comes to pass",
          ],
          "c": 1,
-         "why": 'The factor is 10 and the prior odds are 1 to 400, so the posterior '
-                "odds are 10 to 400, which is 1 in 41. '1 in 10' uses the false "
-                "prophet's chance as if it were the posterior. '1 in 2' and 'certain' "
-                'ignore the prior.'},
+         "why": 'The factor is 10 and the prior odds are 1 to 400, so the '
+                'posterior odds are 10 to 400, which is 1 in 41. <em>1 in '
+                "10</em> uses the false prophet's chance as if it were the "
+                'posterior. <em>1 in 2</em> and <em>certain</em> ignore the '
+                'prior.'},
         {"q": "What happens to a true prophet's chance when the prophecy fails?",
          "a": [
                'It is halved',
@@ -1226,10 +1282,10 @@ L4 = {
                'It rises, because a hard test is a better test',
          ],
          "c": 2,
-         "why": "On Hobbes's reading of Deuteronomy a true prophet's word does not "
-                "fail, so the chance of 'does not' under that hypothesis is 0 and the "
-                'posterior is 0. The other answers reject that reading, which is the '
-                "lesson's premise."},
+         "why": "On Hobbes's reading of Deuteronomy a true prophet's word does "
+                'not fail, so the chance of <em>does not</em> under that '
+                'hypothesis is 0 and the posterior is 0. The other answers '
+                "reject that reading, which is the lesson's premise."},
         {"q": 'Why does the vague prophecy give a smaller factor?',
          "a": [
                'A false prophet fulfils it almost as often as a true one',
@@ -1238,10 +1294,11 @@ L4 = {
                'The prior changes when the prophecy is vague',
          ],
          "c": 0,
-         "why": 'The factor is 1 divided by 9/10, which is 10/9: the sign is nearly as '
-                'likely from a false prophet as from a true one. The prior in this '
-                "preset is the same, and 'cannot come true' and 'a true prophet would "
-                "never be vague' are not what the numbers say."},
+         "why": 'The factor is 1 divided by 9/10, which is 10/9: the sign is '
+                'nearly as likely from a false prophet as from a true one. The '
+                'prior in this preset is the same, and <em>cannot come '
+                'true</em> and <em>a true prophet would never be vague</em> are '
+                'not what the numbers say.'},
         {"q": "In Hobbes's chapter, who does a Christian turn to when he is told the "
               "prophet's marks cannot settle it?",
          "a": [
@@ -1263,12 +1320,12 @@ L4 = {
          "God, and that it is why Christians pray for the kingdom to come."),
         ("Reading a fulfilled prophecy as proof",
          "On the lesson's numbers, a prophecy that comes true leaves a prophet more "
-         "likely false than true. The mistake is to take a likelihood for a "
-         "probability, which is what Hobbes says the common sort of men do."),
-        ("Reading the base rate as Hobbes's statistic",
-         "He counts four hundred false prophets and one true one in one story and "
-         "says there were many more false than true in general. The lab uses the count "
-         "as a stated assumption; it is not a measured rate."),
+         "likely false than true. The mistake is to weigh one hit above many "
+         "misses, which is what Hobbes says the common sort of men do."),
+        ("Reading the base rate as a statistic",
+         "Chapter 36 has four hundred false prophets and one true one, and Chapter 32 "
+         "counts Micaiah among the four hundred; the 401 is the lesson's reading of "
+         "the story. The lab uses it as a stated assumption; it is not a measured rate."),
     ],
     "standard": (
         "Finish when you can update on a sign.",
@@ -1278,7 +1335,7 @@ L4 = {
     ),
     "note": (
         "The lab computes from the base rate and chances the lesson states. The count of "
-        "401 prophets is Hobbes's but the one-in-ten is not, and the reading of "
+        "401 prophets is the lesson's reading of 1 Kings 22, and the one-in-ten is not Hobbes's either; the reading of "
         "Deuteronomy that makes a true prophet's word certain is the lesson's. It cannot "
         "say whether the kingdom of God is the civil kingdom Hobbes finds in Scripture, "
         "or whether prophets are to be weighed by probabilities at all."

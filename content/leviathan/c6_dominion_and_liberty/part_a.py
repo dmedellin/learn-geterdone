@@ -96,8 +96,8 @@ LESSONS = [
                   "paternal, but it is &ldquo;not so derived from the Generation, as if "
                   "therefore the Parent had Dominion over his Child because he begat "
                   "him&rdquo;. It comes from the child's consent, &ldquo;either expresse, or "
-                  "by other sufficient arguments declared&rdquo;. You can hear who he has "
-                  "in mind. Royalists of his day, Sir Robert Filmer the best known, rooted "
+                  "by other sufficient arguments declared&rdquo;. The view he rejects "
+                  "was held by patriarchal royalists, Sir Robert Filmer the best known, who rooted "
                   "kingship in the fatherhood of Adam, so that a king's power over his "
                   "subjects was a father's power over his children. Hobbes defends "
                   "monarchy as hard as any of them, but not on that ground; he has "
@@ -174,7 +174,7 @@ LESSONS = [
                   "Hobbes's you will meet again in Part III. His own conclusion is "
                   "that sovereign power is &ldquo;as great, as possibly men can be "
                   "imagined to make it&rdquo;, and that the ills of the want of it "
-                  "are much worse. The next lesson, “Liberty and Necessity”, "
+                  "are much worse. The next lesson, <em>Liberty and Necessity</em>, "
                   "asks what is left to a subject under a power that great."),
         ],
         "lab": ("levkit", {
@@ -403,7 +403,7 @@ LESSONS = [
                   "the hand of God the first of all causes&rdquo;."),
             ("p", "The second claim had a history with a person in it. In Paris in the "
                   "mid-1640s, among the royalist exiles, Hobbes debated free will with "
-                  "John Bramhall, a bishop of the Church of England, and the papers "
+                  "John Bramhall, the exiled Bishop of Derry, and the papers "
                   "later circulated in print. Bramhall held that if every act is "
                   "necessitated, praise and blame and the justice of punishment fall "
                   "apart, and God becomes the author of sin. Hobbes's reply in this "
@@ -425,8 +425,8 @@ LESSONS = [
                   "to themselves&rdquo;. His list is ordinary: to buy and sell and contract "
                   "with one another, to choose one's abode, diet and trade, and to bring "
                   "up one's children as one thinks fit."),
-            ("p", "That is what the lab computes. Eight actions, taken from Hobbes's "
-                  "examples, go in, with the laws a commonwealth has made. In "
+            ("p", "That is what the lab computes. Eight actions, seven taken from Hobbes's "
+                  "examples and paying tax added, go in, with the laws a commonwealth has made. In "
                   "<em>england-before</em> a tax law commands paying tax and a "
                   "marriage law forbids many wives; six of the eight are free, 75 percent. "
                   "Hobbes's own example is that there was a time when in England a man "
@@ -466,7 +466,7 @@ LESSONS = [
                   "what is left unregulated; it cannot say whether who makes the "
                   "chains ought to matter."),
             ("p", "That count is the first half of the chapter's political half. The "
-                  "second, “The True Liberty of Subjects”, asks what a subject "
+                  "second, <em>The True Liberty of Subjects</em>, asks what a subject "
                   "may refuse even when the sovereign commands it."),
         ],
         "lab": ("levkit", {
@@ -553,8 +553,8 @@ LESSONS = [
                     "causes does not remove it either, and ownership plays no part."},
             {"q": "In the lab's first preset, how many of the eight actions are free, and "
                   "what share is that?",
-             "a": ["5 of 8, 62.5%", "7 of 8, 87.5%", "6 of 8, 75%", "8 of 8, 100%"],
-             "c": 2,
+             "a": ["6 of 8, 75%", "5 of 8, 62.5%", "7 of 8, 87.5%", "8 of 8, 100%"],
+             "c": 0,
              "why": "One action is commanded and one forbidden, so `8 − 1 − 1 = 6` are "
                     "free, `6/8 = 75%`. Five is the count after the statute against "
                     "forcible entry is added, and seven would leave out one of the laws."},
@@ -611,7 +611,7 @@ LESSONS = [
             "Hobbes's definition of liberty is the right one, which is what the "
             "republicans disputed, or whether acting from necessity can still be "
             "praised or blamed, which is what Bramhall disputed. The eight actions come "
-            "from Hobbes's examples and the laws are invented for the lesson."
+            "from Hobbes's examples (paying tax is added) and the laws are invented for the lesson."
         ),
     },
     # ---------------------------------------------------------------- 03
@@ -649,8 +649,10 @@ LESSONS = [
              "enemy."),
             ("What no covenant can transfer",
              "Covenants not to defend one's own body are void, so a subject may refuse "
-             "an order to kill or wound himself, to abstain from food, air or medicine, "
-             "or to confess his own crime, even if he has been justly condemned."),
+             "an order to kill or wound himself, not to resist those who assault him, or "
+             "to go without food, air or medicine, even if justly condemned; and since "
+             "no one can be obliged to accuse himself, he need not confess his own "
+             "crime without assurance of pardon."),
             ("Obligation lasts as long as protection",
              "The end of obedience is protection. When the sovereign can no longer "
              "protect a subject, the subject's obligation ends, because the right of "
@@ -716,7 +718,8 @@ LESSONS = [
                   "selling, is the only one free: 20 percent. In <em>ordinary-laws</em> "
                   "only the tax law and the muster law are in force, neither command "
                   "touches an inalienable liberty, and no command is refusable on those "
-                  "grounds. The lab is not offering a verdict on the soldier: Hobbes's "
+                  "grounds; killing oneself and confessing are then simply free, so three "
+                  "of the five actions, 60 percent, are. The lab is not offering a verdict on the soldier: Hobbes's "
                   "own account is that he may refuse in some cases and not in others, "
                   "which is why the muster law is not marked inalienable."),
             ("p", "What of the liberties the sovereign grants? Hobbes handles a "
@@ -737,7 +740,11 @@ LESSONS = [
                   "He lists the cases in which a subject is freed: a prisoner who is "
                   "given his life on condition of becoming the captor's subject; a "
                   "monarch who gives up the sovereignty for himself and his heirs; "
-                  "banishment; a monarch who becomes subject to the victor."),
+                  "banishment; a monarch who becomes subject to the victor. The section "
+                  "rests on an image from the Introduction, where sovereignty was the "
+                  "artificial soul: &ldquo;The Soveraignty is the Soule of the "
+                  "Common-wealth; which once departed from the Body, the members doe no "
+                  "more receive their motion from it.&rdquo;"),
             ("p", "Readers on both sides took the principle as a warrant, which is why it "
                   "matters. A royalist could read Chapter 20 as a defence of royal "
                   "power and be unsettled to find that a king who could no longer "
@@ -751,11 +758,8 @@ LESSONS = [
                   "end of Chapter 20: whoever thinks sovereign power too great and "
                   "would make it less &ldquo;must subject himselfe, to the Power, that "
                   "can limit it; that is to say, to a greater&rdquo;."),
-            ("p", "He ends the chapter with a sentence that links back to Chapter 17: "
-                  "&ldquo;The Soveraignty is the Soule of the Common-wealth; which once "
-                  "departed from the Body, the members doe no more receive their motion "
-                  "from it.&rdquo; The next lesson turns from the whole commonwealth to "
-                  "its parts: “Systems Subject and Public Ministers”."),
+            ("p", "The next lesson turns from the whole commonwealth to its parts: "
+                  "<em>Systems Subject and Public Ministers</em>."),
         ],
         "lab": ("levkit", {
             "mode": "law",
@@ -817,8 +821,10 @@ LESSONS = [
             "after": [
                 "In the second preset the same two actions are marked inalienable but "
                 "no law commands them, so no command can be refused on those grounds. "
-                "The lab does not say whether the muster law can be refused by a "
-                "volunteer, because Hobbes does not say that it can.",
+                "The lab does not mark the muster law, because on Hobbes's account a man "
+                "commanded to fight may sometimes refuse, with a sufficient substitute, and "
+                "one who has enrolled may not, and which case holds is a judgement the "
+                "lab does not make.",
             ],
         },
         "quiz_title": "What a subject keeps",
@@ -837,9 +843,9 @@ LESSONS = [
                     "says the man is &ldquo;justly condemned&rdquo;."},
             {"q": "In the lab's first preset, how many actions are commanded and how "
                   "many of those commands may a subject still refuse?",
-             "a": ["Four commanded, none refusable", "Five commanded, two refusable",
-                   "Four commanded, two refusable", "Two commanded, four refusable"],
-             "c": 2,
+             "a": ["Four commanded, none refusable", "Four commanded, two refusable",
+                   "Five commanded, two refusable", "Two commanded, four refusable"],
+             "c": 1,
              "why": "Four laws command four of the five actions, and two of those, "
                     "kill-self and confess-own-crime, are marked inalienable. Only "
                     "buying and selling is left free."},
@@ -867,7 +873,7 @@ LESSONS = [
                     "immortal in the intention of the makers, but not in its nature."},
         ],
         "mistakes": [
-            ("Thinking Hobbes's sovereign has no limits at all on him",
+            ("Thinking a subject must obey every command",
              "The sovereign's power over his subjects is not limited by their rights, "
              "but a subject's obligation has edges. Because no one can covenant away the "
              "defence of his own body, the sovereign cannot oblige a man to kill himself, "
@@ -933,8 +939,10 @@ LESSONS = [
             ("Letters and liability",
              "The power of a body politic's representative is always limited, by its "
              "letters from the sovereign and by the law. What an assembly decrees "
-             "beyond them is the act of those who voted for it, who alone answer for "
-             "the debt, not of dissenters or absentees."),
+             "beyond them is the act of those who voted for it, not of dissenters or "
+             "absentees. A debt to a stranger is owed only by those who voted for the "
+             "borrowing, whatever the letters say, since no letters could make the "
+             "members pay without making the representative sovereign."),
             ("Public ministers",
              "A public minister is employed by the sovereign in affairs with authority "
              "to represent the person of the commonwealth. A counsellor who only "
@@ -980,8 +988,10 @@ LESSONS = [
                   "from the sovereign and the law of the commonwealth. Where one man "
                   "represents the body and acts beyond both, the act is his own: beyond "
                   "his letters &ldquo;he representeth no mans person, but his own&rdquo;. "
-                  "If he borrows from a stranger, he alone owes the debt, out of the "
-                  "common stock if there is one and otherwise out of his own estate."),
+                  "If he borrows from a stranger, he alone owes the debt, since no letters "
+                  "need limit borrowing and letters that let him make the members pay "
+                  "would make him their sovereign; he pays out of the common stock if "
+                  "there is one and otherwise out of his own estate."),
             ("p", "Where the representative is an assembly, the same rule runs by "
                   "votes. A decree not warranted by the letters or the laws is the act "
                   "of the assembly and &ldquo;the act of every one by whose Vote the Decree "
@@ -1002,13 +1012,14 @@ LESSONS = [
                   "120, each of the four is liable to the lender for the whole 120; "
                   "if they settle it between themselves equally, 30 each, which is "
                   "the lesson's example and not Hobbes's. In <em>even-split</em> three "
-                  "members vote yes and three no: the assembly is mute, as in Chapter 16, "
+                  "members vote yes and three no: the assembly is mute, as Chapter 16 says an "
+                  "even assembly oftentimes is, "
                   "nothing is decreed, and nobody is liable. In <em>seven-members</em> "
                   "three say yes, two no and two abstain, and with the greater number "
                   "of voices given the motion passes three to two and three are "
                   "answerable. The lab reads an abstention as not voting for the motion, "
-                  "which is its extension: Hobbes speaks of the member who voted "
-                  "contrary and the member absent. The <em>absolute</em> preset keeps "
+                  "and Hobbes says that those who gave not their vote are innocent; "
+                  "only the counting of a pass among abstentions is the lab's own. The <em>absolute</em> preset keeps "
                   "the same votes but needs more than half of all seven, and "
                   "three of seven is not that, so the motion fails."),
             ("p", "Hobbes draws the working conclusion himself. In a subordinate body "
@@ -1030,8 +1041,10 @@ LESSONS = [
                   "sellers, ill for the people at home and the foreigner abroad, though "
                   "he allows it would profit the commonwealth if the merchants "
                   "were bound together abroad and free at home. Since their end is "
-                  "each adventurer's own gain, every member should sit in the assembly, "
-                  "and a debt to a stranger is then owed by each for the whole."),
+                  "each adventurer's own gain, every member should sit in the assembly; "
+                  "and here Hobbes departs from the general rule: a debt to a stranger "
+                  "falls on every member for the whole, because a stranger takes no "
+                  "notice of their private laws."),
             ("p", "Then the private systems. Families are lawful regular bodies, in "
                   "which the father or master orders the whole and the Law limits "
                   "his power. Corporations of beggars and thieves, and of men who "
@@ -1059,7 +1072,7 @@ LESSONS = [
                   "general administration, like a regent or a viceroy, and of special "
                   "administration: of the treasure, of the militia, of teaching the "
                   "people their duty, of judging, and of executing the judgements, "
-                  "each compared to a part of the body, nerves, hands, the organs of "
+                  "most of them compared to a part of the body, nerves, hands, the organs of "
                   "voice. Abroad, ambassadors and heralds are public ministers."),
             ("p", "Two features of that chapter bear on the argument. A judge, being "
                   "the sovereign's minister, gives the sovereign's sentence, and no "
@@ -1071,8 +1084,8 @@ LESSONS = [
                   "to the sovereign only, &ldquo;whose person cannot in his own "
                   "presence, be represented to him, by another&rdquo;. Counsel, and "
                   "what it requires of the counsellor, is the subject of Chapter 25 "
-                  "in the next course. The next course, “Wealth, Counsel, Law and the "
-                  "Office of the Sovereign”, begins with the commonwealth's nourishment."),
+                  "in the next course. That course, <em>Wealth, Counsel, Law and the "
+                  "Office of the Sovereign</em>, begins with the commonwealth's nourishment."),
         ],
         "lab": ("levkit", {
             "mode": "assembly",
@@ -1124,8 +1137,9 @@ LESSONS = [
              "exceeds no, fails if no exceeds yes, and is mute if they are equal. On "
              "the absolute rule it passes only with more than half of all members."),
             ("Name those who voted for it",
-             "If the motion passes and is beyond the letters, those who voted for it "
-             "are answerable. Dissenters and the absent are excused."),
+             "If the motion passes, those who voted for it are answerable: for a debt to "
+             "a stranger always, and for any other decree when it is beyond the "
+             "letters. Dissenters and the absent are excused."),
             ("Fix what each owes",
              "To a stranger each yes-voter is liable for the whole debt, and one "
              "payment discharges all. To a member, the body alone owes, from its "
@@ -1136,7 +1150,7 @@ LESSONS = [
             "intro": [
                 "Take the first preset. Six members vote on a loan of 120 from a "
                 "stranger. Ashe, Bell, Cole and Dunn vote yes; Eyre and Ford vote no. "
-                "Assume the loan is beyond the body's letters.",
+                "The lender is a stranger to the body.",
             ],
             "lines": [
                 "yes 4, no 2, abstain 0",
@@ -1153,8 +1167,8 @@ LESSONS = [
         },
         "quiz_title": "Who owes what an assembly decreed",
         "quiz": [
-            {"q": "A subordinate assembly votes four to two, with none absent, to borrow "
-                  "from a stranger beyond its letters. Who is answerable for the debt?",
+            {"q": "A town's governing assembly votes four to two, with none absent, to borrow "
+                  "from a stranger. Who is answerable for the debt?",
              "a": ["All six members, since the assembly decreed it",
                    "Only the two who voted against it",
                    "Only the four who voted for it",
@@ -1168,23 +1182,24 @@ LESSONS = [
                   "greater-number rule, what is the decision?",
              "a": ["Passes, because the chairman breaks a tie",
                    "Passes, by the three yes voters' number",
-                   "Fails, because no majority voted for it",
+                   "Fails, because the three no voters outnumber the yes voters",
                    "Mute: an even split decides nothing, and no one is liable"],
              "c": 3,
-             "why": "An even assembly is mute on the greater-number rule, as in Chapter 16. "
-                    "A failed motion would count the tie as a loss, but a mute assembly "
-                    "has passed nothing and failed nothing."},
-            {"q": "One man represents a body politic, and borrows from a stranger beyond "
-                  "his letters. Who owes the debt?",
-             "a": ["Every member, since he acted in the name of the body",
+             "why": "Neither side has the greater number, and the lab calls such an assembly "
+                    "mute, as Chapter 16 does; Hobbes adds that in some questions an even "
+                    "vote still decides (&ldquo;not to condemne, is to absolve&rdquo;). "
+                    "Either way nothing is decreed and no one is liable."},
+            {"q": "One man represents a body politic, and borrows from a stranger. Who owes "
+                  "the debt?",
+             "a": ["The representative himself, out of the common stock or his own estate",
+                   "Every member, since he acted in the name of the body",
                    "The sovereign, who gave him the letters",
-                   "The representative himself, out of the common stock or his own estate",
                    "No one, because the loan is void"],
-             "c": 2,
+             "c": 0,
              "why": "&ldquo;No member therefore is obliged to pay the debt so borrowed, "
-                    "but the Representative himselfe&rdquo;. Beyond his letters he "
-                    "&ldquo;representeth no mans person, but his own&rdquo;. The "
-                    "sovereign is not made liable by letters that do not warrant it."},
+                    "but the Representative himselfe&rdquo;. The lender, "
+                    "&ldquo;being a stranger to the Letters&rdquo;, takes for his debtor "
+                    "only the man who engaged himself."},
             {"q": "Which of these is a public minister, by Chapter 23?",
              "a": ["A steward of the monarch's household",
                    "An usher who waits on a sovereign assembly",
@@ -1222,10 +1237,10 @@ LESSONS = [
         ),
         "note": (
             "The lab counts voices and names those who voted yes. It cannot tell you "
-            "whether a decree is beyond the body's letters, which is a question of "
+            "whether a decree other than a debt is beyond the body's letters, which is a question of "
             "the letters and the law, or whether holding the yes-voters liable is "
             "just, which is what Hobbes argues from the notion of authorship. The "
-            "treatment of abstentions is the lab's own, and the assembly and the "
+            "counting of a pass among abstentions is the lab's own, and the assembly and the "
             "amounts are invented for the lesson."
         ),
     },

@@ -83,7 +83,7 @@ LESSONS = [
                   "Hobbes calls reasonable suspicion, written as a sum."),
             ("p", "Now a sword. &ldquo;But in a civill estate, where there is a Power set up to constrain those that "
                   "would otherwise violate their faith, that feare is no more reasonable; and for that cause, he "
-                  "which by the Covenant is to performe first, is obliged so to do.&rdquo; Add to the buyer's "
+                  "which by the Covenant is to perform first, is obliged so to do.&rdquo; Add to the buyer's "
                   "breaking a penalty that is certain to fall. In the sword preset it is `9`, and breaking now "
                   "pays `9 − 9 = 0`, which is less than `1`, so the buyer keeps and the seller who goes first "
                   "gains `3`. The tie preset gives the smallest sanction that works, `8`, which is the whole price "
@@ -95,7 +95,7 @@ LESSONS = [
                   "performance&rdquo;; the lab adds that force which sometimes misses counts for less."),
             ("p", "Hobbes qualifies the rule with a sentence that is easy to skip. &ldquo;The cause of feare, "
                   "which maketh such a Covenant invalid, must be alwayes something arising after the Covenant "
-                  "made; as some new fact, or other sign of the Will not to performe: else it cannot make the "
+                  "made; as some new fact, or other signe of the Will not to performe: else it cannot make the "
                   "Covenant voyd. For that which could not hinder a man from promising, ought not to be admitted "
                   "as a hindrance of performing.&rdquo; So being in the war is not enough on its own to void "
                   "a covenant of trust that was made knowingly: something must have changed since. How this "
@@ -113,7 +113,7 @@ LESSONS = [
                   "do without Obligation, the same I may lawfully Covenant to do through feare: and what I "
                   "lawfully Covenant, I cannot lawfully break.&rdquo; A reader in 1651 who had been asked to promise "
                   "loyalty to a government he had not chosen had reason to ask what such a promise was worth, and "
-                  "Hobbes's page is about promises of exactly that kind. Notice that the lab does not agree or disagree: "
+                  "could read this page as about promises of exactly that kind. Notice that the lab does not agree or disagree: "
                   "the ransomed prisoner has the same incentive to break as the buyer, and Hobbes is saying that "
                   "it is a different question whether he may."),
             ("p", "Other covenants are void whatever the circumstances. &ldquo;A Covenant not to defend my selfe "
@@ -256,7 +256,7 @@ LESSONS = [
                    "The right to enforce it by force",
                    "A guarantee that the other party will perform first"],
              "c": 1,
-             "why": "&ldquo;The Oath addes nothing to the Obligation.&rdquo; A lawful covenant binds in the sight of "
+             "why": "Hobbes writes that &ldquo;the Oath addes nothing to the Obligation.&rdquo; A lawful covenant binds in the sight of "
                     "God without it. What the oath adds is the fear that the swearer calls on himself."},
         ],
         "mistakes": [
@@ -360,8 +360,8 @@ LESSONS = [
                   "Fool's own calculation turned round. The same power is the beginning of propriety, since the "
                   "schools define justice as &ldquo;the constant Will of giving to every man his own&rdquo;, and "
                   "&ldquo;where there is no Own, that is, no Propriety, there is no Injustice&rdquo;."),
-            ("p", "Then the Fool. He comes from the Psalms, where the fool says in his heart there is no God, and "
-                  "Hobbes puts the two together: &ldquo;the same Foole hath said in his heart there is no "
+            ("p", "Then the Fool. The opening words echo Psalm 14, &ldquo;The fool hath said in his heart, There is no God&rdquo;, and "
+                  "Hobbes makes the link himself: &ldquo;the same Foole hath said in his heart there is no "
                   "God&rdquo;. His case is put with some care. He does not deny that there are covenants, or that "
                   "&ldquo;such breach of them may be called Injustice, and the observance of them Justice&rdquo;. "
                   "What he &ldquo;questioneth&rdquo; is &ldquo;whether Injustice, taking away the feare of God&rdquo; "
@@ -415,10 +415,13 @@ LESSONS = [
                   "preset, with a gain of `100` against a loss of `20`: the threshold is `5`, above any chance, "
                   "and breaking pays even if he is certain to be caught. That is his &ldquo;benefit, as shall put "
                   "a man in a condition, to neglect&rdquo; the power of others."),
-            ("p", "Hobbes's reply does not deny any of this arithmetic. It attacks the inputs. The chance of being "
-                  "cast out is not a figure the Fool may set low because he hopes to be unobserved, since his "
-                  "safety would then rest on others' errors, &ldquo;which he could not foresee, nor reckon "
-                  "upon&rdquo;. And the kingdom's gain is the one Hobbes meets directly: of sovereignty gained by "
+            ("p", "Hobbes's reply does not deny any of this arithmetic. It attacks the inputs. Reason, he says, judges an act by "
+                  "what &ldquo;can be foreseen, and reckoned on&rdquo;; a lucky turn of events does &ldquo;not make "
+                  "it reasonably or wisely done&rdquo;. And the breaker &ldquo;declareth that he thinks he may with "
+                  "reason do so&rdquo;, so he can be kept in society only by others' errors, &ldquo;which errours a "
+                  "man cannot reasonably reckon upon&rdquo;. In the lab's terms the Fool may not count on escaping at "
+                  "all: the breach is itself the declaration, so the chance he may reckon with is `1`, and breaking "
+                  "is worth the gain minus the loss. In the ruin preset that is `10 − 100 = −90`. And the kingdom's gain is the one Hobbes meets directly: of sovereignty gained by "
                   "rebellion he says that &ldquo;because it cannot reasonably be expected, but rather the contrary; "
                   "and because by gaining it so, others are taught to gain the same in like manner, the attempt "
                   "thereof is against reason&rdquo;. As for heaven, to be gained by breach of faith, it is "
@@ -426,14 +429,14 @@ LESSONS = [
                   "therefore, that is to say, Keeping of Covenant, is a Rule of Reason, by which we are forbidden "
                   "to do any thing destructive to our life; and consequently a Law of Nature.&rdquo;"),
             ("p", "The reply has been argued over ever since. David Hume, in the "
-                  "<em>Enquiry concerning the Principles of Morals</em> of 1751, gave the Fool a new name, the "
-                  "sensible knave, and set out his case that a clever man might expect to profit by a breach that "
-                  "went unseen; he answered that such a man loses the inward satisfaction of an honest character, "
-                  "which Hume thought worth more than the gain. "
-                  "Hobbes's own reply leans on two things the lab does not supply, that the confederates are "
-                  "watchful enough to find the breaker out, and that the breaker's gain has no secure ground "
-                  "beneath it. Where those fail, the threshold in the table is not Hobbes's refutation but the "
-                  "Fool's proof."),
+                  "<em>Enquiry concerning the Principles of Morals</em> of 1751, has a sensible knave who is "
+                  "often read beside the Fool, though Hume never mentions Hobbes there: a man who thinks he may "
+                  "profit by a breach that goes unseen. Hume answered that such a man loses the inward satisfaction "
+                  "of an honest character, which Hume thought worth more than the gain. Hobbes's own reply is "
+                  "different in kind. It does not say the breaker will be caught, and it does not rest on "
+                  "character. It says that a man may not reckon on escaping, because that would depend on "
+                  "errors he cannot foresee, and that a gain like a kingdom cannot reasonably be expected. "
+                  "Whether that settles the matter is the point on which readers still divide."),
             ("p", "Hobbes closes the discussion of justice with a distinction that answers the Fool in another "
                   "way. A man is called just, he says, if he takes all the care he can that his actions may be "
                   "just, and does not lose the title by one or a few unjust actions that come from sudden passion "
@@ -451,9 +454,9 @@ LESSONS = [
             "view": "fool",
             "preset": "ruin",
             "presets": [
-                {"id": "ruin", "label": "Gain 10, loss 100: chances from 0 to 1/2",
-                 "gain": 10, "loss": 100, "chances": ["0", "1/20", "1/10", "1/5", "1/2"],
-                 "expect": {"lcvThreshold": "1/10 = 10%", "lcvValues": "0 = 0%: 10; 1/20 = 5%: 5; 1/10 = 10%: 0; 1/5 = 20%: −10; 1/2 = 50%: −40", "lcvBreakAt": "2: 0 = 0%; 1/20 = 5%"}},
+                {"id": "ruin", "label": "Gain 10, loss 100: chances from 0 to 1",
+                 "gain": 10, "loss": 100, "chances": ["0", "1/20", "1/10", "1/5", "1/2", "1"],
+                 "expect": {"lcvThreshold": "1/10 = 10%", "lcvValues": "0 = 0%: 10; 1/20 = 5%: 5; 1/10 = 10%: 0; 1/5 = 20%: −10; 1/2 = 50%: −40; 1 = 100%: −90", "lcvBreakAt": "2: 0 = 0%; 1/20 = 5%"}},
                 {"id": "perish", "label": "Gain 10, loss 1000: being cast out is ruin",
                  "gain": 10, "loss": 1000, "chances": ["0", "1/200", "1/100", "1/20", "1/2"],
                  "expect": {"lcvThreshold": "1/100 = 1%", "lcvBreakAt": "2: 0 = 0%; 1/200 = 0.5%", "lcvKeepAt": "2: 1/20 = 5%; 1/2 = 50%"}},
@@ -481,8 +484,8 @@ LESSONS = [
              "Breaking pays below the chance that is the gain divided by the loss. If the gain exceeds the loss "
              "the threshold is more than one and breaking pays at every chance."),
             ("Ask what the chance can honestly be",
-             "Hobbes's reply is about this step: a man cannot reasonably reckon on others' errors, so the "
-             "chance he may set is not what he hopes."),
+             "Hobbes's reply is that a man may reckon only on what can be foreseen, and others' errors "
+             "cannot be, so the reasonable chance is certainty."),
         ],
         "worked": {
             "title": "Gain ten against a loss of a hundred",
@@ -497,9 +500,9 @@ LESSONS = [
                 "breaking pays only below 1/10",
             ],
             "after": [
-                "The Fool must therefore be more than nine times as sure of escaping as not. Hobbes's reply is "
-                "that no man may honestly be so sure, because his escape would depend on the mistakes of "
-                "others.",
+                "The Fool must therefore be more than nine times as sure of escaping as not. On Hobbes's reply "
+                "he may not count on escaping at all: his breach declares him, and only others' errors could "
+                "keep him in. At chance `1` breaking is worth `10 − 100 = −90`.",
             ],
         },
         "quiz_title": "The Fool's sum and Hobbes's reply",
@@ -511,7 +514,7 @@ LESSONS = [
              "why": "Breaking pays `10 − chance · 100`, which is zero at `10/100 = 1/10` and negative above it. "
                     "At `1/20` it still pays `5`, and at `1/5` it costs `10`. The point of change is the gain over "
                     "the loss."},
-            {"q": "What does the Fool say?",
+            {"q": "What does the Fool say about covenants?",
              "a": ["That covenants do not exist",
                    "That breach of covenant is not called injustice by anyone",
                    "That keeping or not keeping covenants is not against reason when it conduces to one's benefit",
@@ -548,8 +551,8 @@ LESSONS = [
              "about reckoning, not a rebuke."),
             ("Reading the Fool's lab as Hobbes's reply",
              "The table is the Fool's sum, and it shows when breaking pays for a stated gain, loss and chance. "
-             "Hobbes's reply is about the chance: it cannot be set low by hoping for others' mistakes. "
-             "The table cannot say whether he is right."),
+             "Hobbes's reply is that reason may reckon only on what can be foreseen, so the Fool may not count "
+             "on escaping; the table only shows what follows at each chance. It cannot say whether he is right."),
             ("Thinking the sovereign is what makes keeping reasonable",
              "In the reply there is no sovereign. The reason is the confederacy a man needs and the errors he "
              "would have to rely on. The coercive power is what makes promises into covenants and justice possible, "
@@ -563,9 +566,9 @@ LESSONS = [
         ),
         "note": (
             "The lab takes the chance as given and the loss as a number, which is what the Fool does, and "
-            "Hobbes's reply is a claim about what the chance and the gain can honestly be. Whether breakers "
-            "are in fact found out, and whether a society's errors can be counted on, is an empirical question "
-            "and the lab cannot decide it. Hume's sensible knave puts that doubt."
+            "Hobbes's reply is a claim about what the chance and the gain can honestly be reckoned at. Whether "
+            "breakers are in fact found out is an empirical question the lab cannot decide, and the sensible "
+            "knave, read beside the Fool, is the doubt that it matters."
         ),
     },
     # ---------------------------------------------------------------- 07
@@ -676,7 +679,7 @@ LESSONS = [
                   "tournament. The result Hobbes needs is smaller than a winner: that where there will be another "
                   "meeting, reward, pardon and a limit on revenge beat refusing, and where there will not, they do "
                   "not. The always-helper's third place also shows the other half of his claim: in a field of "
-                  "mostly conditional helpers a man who always helps is not preyed upon."),
+                  "mostly conditional helpers a man who always helps is preyed upon only by the two strategies that refuse, and still finishes third."),
             ("p", "The rest of the nineteen are prescriptions for a world of equals and neighbours. The eighth is "
                   "against signs of hatred or contempt, which provoke to fight, and its breach is contumely. The "
                   "ninth is that every man acknowledge another for his equal by nature, and its breach is pride. "
@@ -692,7 +695,7 @@ LESSONS = [
                   "shared, first possession or first birth where it falls to a lot, safe conduct for those who "
                   "mediate, submission to an arbitrator, no man a judge in his own cause or where he profits by "
                   "one side's victory, and witnesses, with a third or fourth to be believed where two disagree."),
-            ("p", "He pauses on justice of actions to revise a school distinction. Writers divide it into "
+            ("p", "Before the fourth law he had paused on justice of actions to revise a school distinction. Writers divide it into "
                   "commutative and distributive, the first in arithmetical proportion and the second in "
                   "geometrical. Hobbes says the value of things contracted for is &ldquo;measured by the Appetite of "
                   "the Contractors: and therefore the just value, is that which they be contented to give&rdquo;. So "

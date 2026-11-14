@@ -151,7 +151,7 @@ LESSONS = [
                   "Roman colonies did and is then a province, a part of the commonwealth "
                   "that sent it. Which of the two it is depends, he says, wholly on the "
                   "licence or letters by which the sovereign authorised it to plant. The "
-                  "next lesson, “Of Counsel”, turns from the body to the mind "
+                  "next lesson, <em>Of Counsel</em>, turns from the body to the mind "
                   "of the artificial man and asks who should be listened to."),
         ],
         "lab": ("levkit", {
@@ -437,7 +437,7 @@ LESSONS = [
                   "vote is not Hobbes's institution: he does not tally votes, he hears "
                   "reasons. The model shows only that his preference for hearing apart "
                   "can be read as a preference for independent evidence, and that is a "
-                  "reading, not his claim. The next lesson, “Of Civil Laws”, "
+                  "reading, not his claim. The next lesson, <em>Of Civil Laws</em>, "
                   "takes up the sovereign's own relation to the laws."),
         ],
         "lab": ("choicekit", {
@@ -694,8 +694,8 @@ LESSONS = [
                   "not know it, and the laws of nature, which every man can know by his "
                   "reason, are the only unwritten laws. Hobbes distinguishes law from "
                   "right in one line: &ldquo;Lex and Jus, are as different as Obligation "
-                  "and Liberty.&rdquo; The next lesson, “Crimes, Excuses and "
-                  "Extenuations”, begins from the same definition and asks what "
+                  "and Liberty.&rdquo; The next lesson, <em>Crimes, Excuses and "
+                  "Extenuations</em>, begins from the same definition and asks what "
                   "follows when a law is broken."),
         ],
         "lab": ("argkit", {
@@ -917,8 +917,8 @@ LESSONS = [
                   "compares &ldquo;the benefit of their Injustice, with the harm of their "
                   "punishment&rdquo;, and chooses what &ldquo;appeareth best&rdquo;. So a "
                   "penalty too small to outweigh the benefit does not deter but "
-                  "&ldquo;is an invitement&rdquo;, and a penalty heavier than the law "
-                  "named is not the offender's responsibility, because &ldquo;it is the "
+                  "&ldquo;is an invitement&rdquo;, and a man is excused any penalty heavier than "
+                  "the law named, because &ldquo;it is the "
                   "Law that tempted, and deceiveth them&rdquo;. A thief who is given a "
                   "choice between a fine below what he will gain and none is not choosing "
                   "wickedness over virtue. He is doing a sum."),
@@ -935,7 +935,7 @@ LESSONS = [
                   "gain, and it pays; the lab's tile for the figure a penalty must "
                   "exceed to deter at that chance reads 200. In the rich preset, for a man who "
                   "can corrupt the court and is caught one time in four, the expected "
-                  "penalty of 150 is only 37.5, and a penalty above 400 would be needed."),
+                  "penalty of 150 is only `75/2`, 37.50, and a penalty above 400 would be needed."),
             ("p", "Hobbes sees this. Of the passions that cause crime the first he names is "
                   "vain-glory, the foolish over-rating of one's own worth, "
                   "from which comes the presumption that the penalties extended to all "
@@ -959,7 +959,7 @@ LESSONS = [
                   "above theft. He admits &ldquo;all Crimes doe equally deserve the name of "
                   "Injustice, as all deviation from a strait line is equally "
                   "crookednesse&rdquo; but they are not all equally unjust. The next "
-                  "lesson, “Punishments and Rewards”, defines punishment and "
+                  "lesson, <em>Punishments and Rewards</em>, defines punishment and "
                   "asks what is not one."),
         ],
         "lab": ("levkit", {

@@ -295,8 +295,9 @@ LESSONS = [
         "concepts": [
             ("Three causes of quarrel",
              "Competition makes men invade for gain, diffidence for safety and glory for reputation. Diffidence is "
-             "the one Hobbes calls reasonable: the best way to secure oneself is anticipation, mastering the "
-             "persons of all the men one can until no other power is great enough to endanger one."),
+             "the cause behind the move Hobbes calls reasonable: from it, the best way to secure oneself is "
+             "anticipation, mastering the persons of all the men one can until no other power is great enough "
+             "to endanger one."),
             ("War is a disposition",
              "War does not consist in battle only. It is a tract of time in which the will to contend by battle is "
              "sufficiently known, as foul weather lies not in a shower or two but in an inclination to rain over many "
@@ -310,8 +311,8 @@ LESSONS = [
         "read_intro": (
             "The lesson reads the sentence that names the condition, then takes the argument in the order Hobbes "
             "gives it. The Philosophy course already has a lesson, &ldquo;Hobbes and the State of Nature&rdquo; in "
-            "Games and the Social Contract, that writes this argument as two tables and a sovereign's fine. This "
-            "one reads the text of the chapter and does not repeat that lesson."
+            "Games and the Social Contract, that writes competition and diffidence as tables and adds a "
+            "sovereign's fine. This lesson takes those tables briefly and adds the third case, the immoderate few."
         ),
         "body": [
             ("p", "<strong>Chapter 13.</strong> &ldquo;Hereby it is manifest, that during the time men live without a "
@@ -320,8 +321,8 @@ LESSONS = [
             ("p", "Most people know this chapter by its last phrase about the life of man, and most take it for a "
                   "picture of the past, a prehistory of brutes. Read in order, it is an argument, and the "
                   "argument has steps. The steps begin before the sentence above, in the paragraph on anticipation, "
-                  "which is where the last lesson's diffidence leads. &ldquo;From this diffidence of one another, "
-                  "there is no way for any man to secure himselfe, so reasonable, as Anticipation&rdquo;, that is, "
+                  "which is where the last lesson's diffidence leads. Hobbes writes that &ldquo;from this "
+                  "diffidence of one another, there is no way for any man to secure himselfe, so reasonable, as Anticipation&rdquo;, that is, "
                   "&ldquo;by force, or wiles, to master the persons of all men he can, so long, till he see no other "
                   "power great enough to endanger him&rdquo;. And Hobbes adds that this &ldquo;is no more than his "
                   "own conservation requireth, and is generally allowed&rdquo;."),
@@ -332,7 +333,7 @@ LESSONS = [
                   "power by invasion. His conclusion is that such augmentation of dominion &ldquo;being necessary "
                   "to a mans conservation, it ought to be allowed him&rdquo;. This is the argument's cleverest "
                   "step: one man who enjoys conquest is enough to make the rest act as he does, whatever they want."),
-            ("p", "Glory has a second form, which is touchier. Every man looks that his companion should value "
+            ("p", "Then glory, which is touchier. Every man looks that his companion should value "
                   "him at the rate he sets on himself, and &ldquo;upon all signes of contempt, or undervaluing, "
                   "naturally endeavours, as far as he dares&rdquo;, to extort a greater value from those who slight "
                   "him. So the chapter names &ldquo;three principall causes of quarrell. First, Competition; "
@@ -377,33 +378,31 @@ LESSONS = [
                   "disposition of men with a long history to the condition of men with none."),
             ("p", "The last consequence is the one the chapter turns on. &ldquo;Where there is no common Power, "
                   "there is no Law: where no Law, no Injustice. Force, and Fraud, are in warre the two Cardinall "
-                  "vertues.&rdquo; Hobbes's reason is a short argument about what justice is. It is not a faculty of "
-                  "body or mind, for if it were it &ldquo;might be in a man that were alone in the world, as well as "
-                  "his Senses, and Passions&rdquo;, but are &ldquo;Qualities, that relate to men in Society, not "
-                  "in Solitude&rdquo;. So there is no propriety, no dominion, and nothing is any man's but "
-                  "&ldquo;that to be every mans, that he can get; and for so long, as he can keep it&rdquo;. The chapter ends on the way out, which is "
+                  "vertues.&rdquo; Hobbes's reason is a short argument about what justice is. Justice and injustice are "
+                  "not faculties of body or mind, for if they were they &ldquo;might be in a man that were alone in "
+                  "the world, as well as his Senses, and Passions&rdquo;; they are &ldquo;Qualities, that relate to "
+                  "men in Society, not in Solitude&rdquo;. So there is no propriety, no dominion, no mine and thine "
+                  "distinct, &ldquo;but onely that to be every mans, that he can get; and for so long, as he can "
+                  "keep it&rdquo;. The chapter ends on the way out, which is "
                   "partly in the passions, &ldquo;Feare of Death&rdquo; among them, and partly in reason, which "
                   "&ldquo;suggesteth convenient Articles of Peace&rdquo;. Those articles, he says, are the laws of "
                   "nature, and the next two chapters take them."),
             ("h3", "Three tables"),
-            ("p", "The lab writes three of the chapter's cases as two-person games, with numbers the lesson chooses. "
-                  "In <strong>competition</strong>, peace with peace pays `4` each, attacking a peaceful man pays "
-                  "`6` and leaves him `0`, and two attackers get `1` each. Attacking pays more whatever the other "
-                  "does, so both attack and each gets `1` where peace would have given `4`. In "
-                  "<strong>diffidence</strong> nobody gains by attacking a peaceful man: peace with peace pays "
-                  "`5` each, a lone attacker takes only `4`, and two attackers get `2`. Attacking now pays more only "
-                  "if the other will probably attack, and the lab's mixed equilibrium figure gives the point of change at `2/3`: "
-                  "peace is worth keeping if the other keeps it with a chance above two in three. The game has "
-                  "two equilibria, peace with peace and attack with attack, which is why a quarrel can start "
-                  "among people who want nothing from one another."),
-            ("p", "The third table, the <strong>pair</strong> preset, is the paragraph on the immoderate few. The "
+            ("p", "The Philosophy lesson already writes competition as a dilemma and diffidence as a stag hunt, and "
+                  "the general account belongs there. The first two presets are those same two shapes with this "
+                  "lesson's figures. In <strong>competition</strong> attacking a peaceful man pays `6` against "
+                  "peace's `4`, so both attack and each gets `1`. In <strong>diffidence</strong> a lone attacker "
+                  "takes only `4` against peace's `5`, and peace is worth keeping if the other keeps it with a "
+                  "chance above `2/3`."),
+            ("p", "The <strong>pair</strong> preset is the new case, from the paragraph on the immoderate few. The "
                   "column player takes pleasure in conquest: attacking a peaceful man pays him `6`, and being "
                   "attacked while at peace pays him `0`. The row player is content: peace with peace pays him `4`, "
                   "attacking first pays him `3`, and meeting an attack pays him `2` if he fights and `0` if he does "
                   "not. Attack is the conqueror's best move whatever the other does, and the content man's best "
                   "reply to an attacker is to attack, so the one equilibrium is attack with attack, though one of "
                   "the two would have kept the peace. This is the chapter's point that a few are enough, and the lab "
-                  "reaches it with a single player for whom attack beats peace. What the tables leave out is "
+                  "reaches it with a single player for whom attack beats peace; the content man needs no "
+                  "diffidence beyond expecting him. What the tables leave out is "
                   "glory over a smile, which has no payoff to attach to it, and the time that makes war a "
                   "disposition: the games are played once."),
             ("p", "The next lesson, &ldquo;The Right and the Law of Nature&rdquo;, reads Chapter 14 and the "
@@ -413,7 +412,7 @@ LESSONS = [
         "lab": ("choicekit", {
             "mode": "game",
             "view": "best",
-            "preset": "competition",
+            "preset": "pair",
             "presets": [
                 {"id": "competition", "label": "Competition: attacking a peaceful man pays 6",
                  "rows": ["Peace", "Attack"], "cols": ["Peace", "Attack"],
@@ -447,22 +446,25 @@ LESSONS = [
              "both less than peace is the lab's picture of the war."),
         ],
         "worked": {
-            "title": "Diffidence and the point of change",
+            "title": "One conqueror and one man who would keep the peace",
             "intro": [
-                "Peace with peace pays `5` each, a lone attacker takes `4` and leaves the other `0`, and two "
-                "attackers get `2` each. Let `q` be the chance one man gives to the other keeping the peace.",
+                "In the pair preset the column player gets `6` for attacking a peaceful man and `2` for meeting "
+                "an attack with an attack; the row player gets `4` for peace with peace, `3` for attacking "
+                "first, `0` for being attacked at peace and `2` for meeting an attack with an attack.",
             ],
             "lines": [
-                "peace pays:  5 · q + 0 · (1 − q) = 5q",
-                "attack pays:  4 · q + 2 · (1 − q) = 2 + 2q",
-                "equal when 5q = 2 + 2q, so q = 2/3",
-                "above 2/3 peace is the better reply;  below, attack",
-                "equilibria:  (peace, peace) and (attack, attack)",
+                "column player, row at peace:  attack 6, peace 4",
+                "column player, row attacks:  attack 2, peace 0",
+                "so attack dominates for the column player",
+                "row player expecting an attack:  attack 2, peace 0",
+                "equilibrium:  (attack, attack), 2 each",
+                "peace with peace would pay 4 each",
             ],
             "after": [
-                "Nothing in the table makes either man greedy. A man who thinks the other will probably attack "
-                "does better to attack first, and the other, thinking the same, does likewise. This is Hobbes's "
-                "diffidence, and it is the cause he calls reasonable.",
+                "Only one player's payoffs are those of a conqueror. The other would have kept the peace, and "
+                "attacks because attacking is his best answer to an attack. This is anticipation, which "
+                "Hobbes says is the reasonable answer to diffidence, and the table shows how one man's pleasure "
+                "in conquest can set it going.",
             ],
         },
         "quiz_title": "Three causes in three tables",
@@ -508,10 +510,10 @@ LESSONS = [
                     "it would then be found in a man alone in the world."},
         ],
         "mistakes": [
-            ("Thinking Hobbes calls men wicked",
-             "He says the opposite: &ldquo;The Desires, and other Passions of man, are in themselves no "
-             "Sin&rdquo;. In the diffidence table nobody gains from attacking, and attack with attack is still an "
-             "equilibrium. In the pair table only one man enjoys conquest, and it is enough."),
+            ("Thinking the war needs a majority of aggressors",
+             "Hobbes's paragraph on the immoderate few says the opposite. In the pair table only one player "
+             "enjoys conquest, and the other, who would keep the peace, attacks too, because attack is his best "
+             "answer to an attack."),
             ("Thinking war means constant fighting",
              "War is &ldquo;the known disposition thereto, during all the time there is no assurance to the "
              "contrary&rdquo;. A town where every door is locked and no blow is struck is in the condition he "
@@ -522,10 +524,10 @@ LESSONS = [
              "that the incentives are as Hobbes says."),
         ],
         "standard": (
-            "Finish when you can say what makes the war an equilibrium in each table.",
-            "Write competition, diffidence and the mixed pair as two-by-two games, find each equilibrium, state "
-            "the chance of the other's peace above which peace is the better reply in the diffidence table, and "
-            "say what the tables leave out of the chapter."
+            "Finish when you can say what makes the war an equilibrium when only one man enjoys conquest.",
+            "Write the mixed pair as a two-by-two game, find its equilibrium, say why the content man attacks, "
+            "state the chance of the other's peace above which peace is the better reply in the diffidence table, "
+            "and say what the tables leave out of the chapter."
         ),
         "note": (
             "The games are played once and by two men, where Hobbes's war lasts over time and is among many. "
@@ -843,7 +845,7 @@ LESSONS = [
         ),
         "body": [
             ("p", "<strong>Chapter 14.</strong> &ldquo;Again, one of the Contractors, may deliver the Thing contracted "
-                  "for on his part, and leave the other to performe his part at some determinate time after, and in "
+                  "for on his part, and leave the other to perform his part at some determinate time after, and in "
                   "the mean time be trusted; and then the Contract on his part, is called Pact, or Covenant: Or both "
                   "parts may contract now, to performe hereafter: in which cases, he that is to performe in time to "
                   "come, being trusted, his performance is called Keeping of Promise, or Faith; and the fayling of "
@@ -1043,9 +1045,10 @@ LESSONS = [
         ),
         "note": (
             "The lab's second party counts only his own gain and looks only at this one covenant. Hobbes "
-            "allows two things that can hold a man to his word besides fear, glory in not needing to break it "
-            "and the fear of what unseen powers will do, and the figures here include neither. The three "
-            "covenants are the lesson's examples and no numbers are Hobbes's."
+            "names two helps to strengthen a covenant, fear of the consequence of breaking it and glory in not "
+            "needing to break it, and calls the second too rare to presume on. The figures here include "
+            "neither: the lab's second party has no fear and no pride. The three covenants are the lesson's "
+            "examples and no numbers are Hobbes's."
         ),
     },
 ]

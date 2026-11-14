@@ -28,7 +28,7 @@ COURSE = {
         "imagination = decaying sense",
         "prudence = presumption from experience",
         "A is B: every part of B is a part of A",
-        "absurd names cannot be added",
+        "contradictory names signify nothing",
     ],
     "assumes_short": "Nothing",
     "assumes_long": "no philosophy and no earlier course is assumed, and the reading is in modern spelling around Hobbes's own",
@@ -54,7 +54,8 @@ COURSE = {
          "model, and say why prudence stays short of certainty."),
         ("Reckon with names",
          "Expand defined names into simple ones, test an affirmation as true or false by "
-         "the parts, and tell an absurd or insignificant affirmation from a false one."),
+         "the parts, and tell a name with no definition, or one made of contradictory "
+         "names, from a sensible one, as Hobbes and the lab each sort them."),
     ],
     "syllabus_intro": (
         "The first lesson reads the Epistle and the Introduction, the second reads "
@@ -67,8 +68,8 @@ COURSE = {
         "Hobbes's text of 1651, in its original spelling, so expect &ldquo;Common-wealth&rdquo; "
         "and &ldquo;warre&rdquo;; the explanations around them are in modern spelling. "
         "The examples and the figures are written for these lessons.",
-        "Use the labs to change one thing at a time. Each preset is a single change "
-        "against the one before it, a premise added, a hanging observed, a definition "
+        "Use the labs to change one thing at a time. Most presets change one thing "
+        "against another, a premise added, a hanging observed, a definition "
         "altered, and the point of the lesson is in what moves and what does not.",
         "Keep the computation apart from the verdict. Each lab shows what follows "
         "from what the lesson states, on Hobbes's definitions as written. Whether "

@@ -76,8 +76,8 @@ COURSE = {
     "not_covered": [
         "Hobbes's physics of the passions. Chapter 10 uses the account of good, appetite "
         "and power that Chapters 1 to 9 build, and this course takes it as given.",
-        "A history of honour, titles and heraldry. Chapter 10 ends with a long digression "
-        "on coats of arms and titles, from the Germans and the Romans; the lessons mention "
+        "A history of honour, titles and heraldry. Chapter 10 closes, just before "
+        "worthiness, with a long digression on coats of arms and titles, from the Germans and the Romans; the lessons mention "
         "it and do not teach it.",
         "Revealed religion. Chapter 12 says the religion of Abraham, Moses and Christ is "
         "divine politics, and leaves the Kingdom of God for later; Course 8 takes it up.",
