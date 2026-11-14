@@ -175,7 +175,7 @@ LESSONS = [
                   "where exorbitant taxes and a farmer's officers sent several hundred people "
                   "to the galleys every year: &ldquo;Those who consider the blood of the people "
                   "as nothing, in comparison with the revenue of the prince, may, perhaps, "
-                  "approve of this method of levying taxes.&rdquo; He closes the chapter "
+                  "approve of this method of levying taxes.&rdquo; Near the end of the chapter he makes "
                   "with a comparison. Britain levies ten millions on less than eight millions of "
                   "people &ldquo;without its being possible to say that any particular order "
                   "is oppressed&rdquo;, while France, with three times the people and better "
@@ -472,9 +472,9 @@ LESSONS = [
                   "is paid off in the 54th year, with nothing borrowed in the meantime. The "
                   "half preset pays only half a million beyond the interest, 4.37, and "
                   "takes 74 years. In the war preset the million of the first preset "
-                  "is paid for five years and then a war adds 100, the sum of Smith's footnote "
-                  "on the war of 1775, in the sixth year. The interest is now more than "
-                  "the whole payment, and the debt grows and is never paid off. That is the "
+                  "is paid for six years and then a war adds 100, the sum of Smith's footnote "
+                  "on the war that began in 1775, at the end of the sixth year. The debt is "
+                  "then about 222.5, and its interest, about 6.68, is more than the whole payment, and the debt grows and is never paid off. That is the "
                   "chapter's argument as a sum: the paying-down is slow and arithmetically "
                   "easy to undo, and the next war is not a matter of whether but when."),
             ("p", "What does funding do to the country? Smith's answer is that the capital lent "
@@ -505,8 +505,9 @@ LESSONS = [
                   "The objection has had a long life. Ricardo, who disliked the funding "
                   "system, argued in his <em>Principles</em> that whether a war is paid by "
                   "taxes or by loan comes to the same thing for the economy, since the "
-                  "loan is paid by taxes on the interest; Robert Barro in 1974 gave this the "
-                  "name of Ricardian equivalence. In the 1940s Abba Lerner argued that a debt "
+                  "taxes that will pay the loan's interest are worth as much as the sum "
+                  "itself, though he doubted that people see it so; Robert Barro revived "
+                  "the argument in 1974, and it has since been called Ricardian equivalence. In the 1940s Abba Lerner argued that a debt "
                   "owed within a nation is owed to ourselves, and that what matters is "
                   "the real resources a government uses. Smith's reply is about who is taxed and "
                   "who receives, and the three do not answer each other; they are different "
@@ -575,7 +576,8 @@ LESSONS = [
                 "debt, end of year 1:  129 − 1 = 128",
                 "interest, year 2:  3/100 · 128 = 3.84",
                 "principal paid, year 2:  4.87 − 3.84 = 1.03",
-                "a 100 war loan in year 6:  interest 3, payment 4.87 no longer covers it",
+                "debt after six payments:  ≈ 122.53",
+                "war loan of 100:  ≈ 222.53, interest ≈ 6.68 > 4.87",
             ],
             "after": [
                 "Each year the interest is a little smaller and the principal a little "
@@ -681,7 +683,7 @@ LESSONS = [
             "figures."
         ),
         "key": [
-            "silver paid = debt × new silver / old silver",
+            "metal paid = debt × new metal / old metal",
             "the creditor loses 1 − new/old",
             "sixpence called a shilling: half the silver",
             "the Roman as, 12 to 2 ounces: one-sixth",
@@ -971,8 +973,8 @@ LESSONS = [
              "need not come to that."),
             ("Taking the last page as a forecast",
              "Smith offers two ways out, a union with fair representation or giving up what "
-             "will not contribute, and says the colonies' cost is a project of the "
-             "imagination. He wrote as the war began and could not know the outcome, "
+             "will not contribute, and says the empire has so far been only the "
+             "project of an empire. He wrote as the war began and could not know the outcome, "
              "and historians do not agree on his costs."),
         ],
         "standard": (

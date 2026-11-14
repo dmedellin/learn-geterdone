@@ -33,7 +33,7 @@ COURSE = {
         "wage needed = old wage / (1 − rate)",
         "revenue = duty × quantity that pays it",
         "debt next year = debt + interest − payment",
-        "silver paid = debt × new silver / old silver",
+        "metal paid = debt × new metal / old metal",
     ],
     "assumes_short": "The courses before it",
     "assumes_long": (

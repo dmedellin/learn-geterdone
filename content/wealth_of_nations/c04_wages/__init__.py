@@ -71,8 +71,8 @@ COURSE = {
         "Money is in Smith's units where a figure is his: twelve pence to a shilling "
         "and twenty shillings to a pound. The first lesson works in pence a week, the "
         "second in pounds a year, and the last in pounds.",
-        "Use the labs to change one thing at a time. Each preset of a lesson varies a "
-        "single figure against the others: the wage, the growth of the fund, the "
+        "Use the labs to change one thing at a time. The presets of a lesson differ in "
+        "a figure or two: the wage, the growth of the fund and of the workers, the "
         "doubling time, the rate of interest, the rise of profit.",
         "Keep the rule apart from the verdict. Every figure is computed from the "
         "chapter's own reasoning. Whether that reasoning describes any economy is "
@@ -89,8 +89,8 @@ COURSE = {
         "French rate of interest and of usury in the Roman provinces is left out.",
         "Wages in different employments and the proportion between them. Chapter 10 "
         "takes that up, and the next course reads it.",
-        "The rent of land. Chapter 11 is its own course, and Chapter 7's idea that rent "
-        "can be an effect of price and not a cause is used there.",
+        "The rent of land. Chapter 11 is its own course, and Smith's idea there that rent "
+        "is an effect of price and not a cause is read in it.",
         "Any modern theory of wages, population or the rate of interest. A later writer "
         "is named where he disagreed with Smith, to say why, and no theory is taught.",
     ],

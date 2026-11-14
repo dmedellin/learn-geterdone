@@ -95,19 +95,20 @@ LESSONS = [
                   "opera-dancers, etc.&rdquo;. What joins the judge and the buffoon is that "
                   "the work of each &ldquo;perishes in the very instant of its "
                   "production&rdquo;. The test is about whether something remains to be "
-                  "exchanged later, and Smith adds that the noblest and the meanest of "
-                  "them have their value &ldquo;regulated by the very same "
-                  "principles&rdquo; as any other labour."),
+                  "exchanged later. Smith adds that the labour of the meanest of them "
+                  "has a value &ldquo;regulated by the very same principles&rdquo; as "
+                  "any other, while that of the noblest and most useful leaves nothing "
+                  "that could later buy an equal quantity of labour."),
             ("p", "Now the two funds, and the arithmetic. All hands are maintained out of "
                   "the same annual produce, which has limits. When it comes from the ground "
                   "or from the hands of the labourers it divides into two. One part "
-                  "replaces a capital. &ldquo;to maintain any but productive hands. It pays "
-                  "the wages of productive labour only&rdquo;, and the owner expects it back "
-                  "with a profit. The other part is a revenue to someone, as profit or "
-                  "as rent. Smith is firm that the capital part &ldquo;never is "
-                  "immediately employed&rdquo; to maintain unproductive hands; "
-                  "it is only the revenue, and what the workmen have spare from their "
-                  "wages, that is spent that way. &ldquo;Unproductive labourers, and those "
+                  "replaces a capital, and the owner expects it back with a profit. Smith "
+                  "is firm that this part &ldquo;never is immediately employed&rdquo; "
+                  "on any but productive hands: &ldquo;It pays the wages of productive "
+                  "labour only.&rdquo; The other part is a revenue to someone, as profit "
+                  "or as rent, and may keep either sort. It is only the revenue, and what "
+                  "the workmen have spare from their wages, that is spent on the "
+                  "unproductive. &ldquo;Unproductive labourers, and those "
                   "who do not labour at all, are all maintained by revenue&rdquo;."),
             ("p", "A man who owns a capital may therefore use what it earns in two ways. "
                   "Put numbers on it, written for this lesson. A capital of £1,000 returns "
@@ -129,10 +130,11 @@ LESSONS = [
                   "prevails; wherever revenue, idleness.&rdquo; In towns where the "
                   "lower ranks &ldquo;are chiefly maintained by the employment of "
                   "capital, they are in general industrious, sober, and thriving&rdquo;, "
-                  "like Glasgow and the Dutch towns; where they live on the spending of "
+                  "as in many English and most Dutch towns; where they live on the spending of "
                   "a court or of courts of justice they are &ldquo;in general idle, "
                   "dissolute, and poor&rdquo;, as in his picture of Versailles and the "
-                  "parliament towns of France. He puts the point as a proverb: &ldquo;It "
+                  "parliament towns of France, and in his comparison of Edinburgh with "
+                  "Glasgow. He puts the point as a proverb: &ldquo;It "
                   "is better, says the proverb, to play for nothing, than to work for "
                   "nothing.&rdquo; Our ancestors, he says, were idle &ldquo;for want of a "
                   "sufficient encouragement to industry&rdquo;, because the funds for "
@@ -303,8 +305,7 @@ LESSONS = [
         ),
         "note": (
             "The lab compounds a capital from a return and a saved share. It cannot say "
-            "which labour is productive: that is Smith's definition, and the next "
-            "chapter's, and the lab takes the shares as given. The ten per cent return "
+            "which labour is productive: that is Smith's definition, and the lab takes the shares as given. The ten per cent return "
             "and the £25 keep are written for this lesson, and the physician and the "
             "player cannot be put in as numbers without deciding the very question the "
             "chapter raises."
@@ -466,8 +467,9 @@ LESSONS = [
                   "betokens a more liberal or generous spirit than the other.&rdquo;"),
             ("p", "Three objections, each stated at the strength its holders gave it. "
                   "Mandeville's <em>Fable of the Bees</em> (1714) had argued that the "
-                  "spending of the vicious supported trade; Smith's answer is that the "
-                  "same pound spent otherwise would have fed productive hands. Malthus "
+                  "spending of the vicious supported trade; Smith does not name him "
+                  "here, but the chapter's answer is that the same pound saved would "
+                  "have fed productive hands. Malthus "
                   "argued in 1820 that saving can outrun the demand that makes it "
                   "profitable, so that capital piles up unemployed, and Keynes in 1936 "
                   "argued that if everyone saves more at once, incomes fall; Smith's "
@@ -515,8 +517,8 @@ LESSONS = [
              "saving to the original capital each time: the saving earns a return too."),
             ("Read a negative share as a prodigal's",
              "A negative share takes capital out and spends it as well as the revenue. "
-             "The factor falls below one and the capital shrinks, at an increasing "
-             "rate in pounds only if the factor is below zero, which it is not here."),
+             "The factor falls below one and the capital shrinks by the same share "
+             "each year, so by fewer pounds each year as it grows smaller."),
             ("Count the hands",
              "Divide each year's capital by the yearly keep of a productive hand. The "
              "difference between the paths, in hands, is Smith's difference between "
@@ -723,8 +725,8 @@ LESSONS = [
                   "employments and for labourers, and &ldquo;Their competition raises "
                   "the wages of labour, and sinks the profits of stock&rdquo;. Interest, "
                   "which can only be paid out of profit, falls with them. So the "
-                  "fall in the rate goes with a rise in wages, which is the "
-                  "other side of Chapter 8 of Book I."),
+                  "fall in the rate goes with a rise in wages, as Chapters 8 and 9 "
+                  "of Book I had argued."),
             ("p", "Smith turns aside to correct three writers by name. Locke, Law and "
                   "Montesquieu, he says, thought the discovery of the Spanish West Indies "
                   "had lowered interest by making gold and silver plentiful. Hume had "
@@ -862,13 +864,14 @@ LESSONS = [
                   "5 per cent. On the rule that the price is the rent times the years' "
                   "purchase, what does it sell for?",
              "a": ["300",
-                   "3,000",
+                   "12",
                    "1,200",
-                   "120"],
+                   "1,500"],
              "c": 2,
              "why": "At 5 per cent the years' purchase is `100/5 = 20`, so the price is "
-                    "`60 · 20 = 1,200`. 300 multiplies by the rate and not by its "
-                    "reciprocal; 3,000 divides by it twice over."},
+                    "`60 · 20 = 1,200`. 300 multiplies the rent by the rate, 12 divides "
+                    "it by the rate, and 1,500 is the price at 4 per cent, twenty-five "
+                    "years' purchase."},
             {"q": "A lends £1,000 to W, who buys goods of that value from B; B lends the "
                   "same pieces to X, who buys from C; C lends them to Y. By Smith's "
                   "account, how much stock have A, B and C lent between them?",
@@ -1002,8 +1005,9 @@ LESSONS = [
                   "other three, or to the general conveniency of the society.&rdquo; Smith "
                   "takes the trouble to defend the last, which he knows is the least "
                   "esteemed. Without retailers every man would be obliged to buy a whole "
-                  "ox or a whole sheep at a time, and a poor workman would have to put "
-                  "into his larder what he needed in his trade. &ldquo;The prejudices of "
+                  "ox or a whole sheep at a time, and a poor workman who had to buy a "
+                  "month's or six months' provisions at once would have to take from his "
+                  "trade the stock that yields him a revenue. &ldquo;The prejudices of "
                   "some political writers against shopkeepers and tradesmen are "
                   "altogether without foundation.&rdquo; Competition, not numbers, is "
                   "the check: with twenty grocers instead of two the chance of their "
@@ -1083,20 +1087,21 @@ LESSONS = [
                   "produce&rdquo;. And China, Egypt and Indostan, the richest countries in "
                   "the world by report, were renowned for agriculture and manufactures "
                   "more than for foreign trade."),
-            ("p", "Now the objections, three of them. Ricardo, writing in 1817, held that "
-                  "rent is not a bounty of Nature that agriculture adds to the world, but "
-                  "the difference between better land and the worst land in use, so "
-                  "that it is no proof that capital in farming employs more labour than "
-                  "capital in a factory. A critic from the other side can point out that "
-                  "manufactures also use natural powers, and Capital's lesson "
-                  "<em>Differential Rent: General Remarks</em> begins with a waterfall "
-                  "that drives a factory. And the idea that a country should take its "
-                  "capitals in an order is the one that Friedrich List's later "
-                  "<em>National System</em> reversed: he held that a young country must "
-                  "build manufactures first, with protection, and then be rich enough "
-                  "for the rest. Smith's own caution is that the order is not a law of "
-                  "nature: it is what private profit and the policy of Europe happen to "
-                  "have made of it, which the next lesson and Book III take up."),
+            ("p", "Now the objections. Ricardo, in his <em>Principles</em> of 1817, "
+                  "answered this passage directly. Rent, he held, is paid not because "
+                  "Nature is bountiful in agriculture but because good land is scarce: "
+                  "it is the difference between better land and the worst land in use, "
+                  "so it is no proof that capital in farming adds more than capital in a "
+                  "factory. And Nature, he asked, does nothing for man in manufactures? "
+                  "Wind and water work there too; Capital's lesson <em>Differential Rent: "
+                  "General Remarks</em> begins with a waterfall that drives a factory. "
+                  "The idea that a country should take its capitals in an order is the "
+                  "one that Friedrich List's <em>National System of Political "
+                  "Economy</em> (1841) reversed: he held that a young country must build "
+                  "manufactures first, with protection, and then be rich enough for the "
+                  "rest. Smith, for his part, calls the order the natural one and says "
+                  "that in Europe it has been in many respects inverted, which Book III "
+                  "takes up."),
             ("p", "The next lesson, <em>The Home, the Foreign and the Carrying Trade</em>, "
                   "ranks the three branches of wholesale trade the same way."),
         ],
@@ -1195,12 +1200,13 @@ LESSONS = [
                   "hands it directly employs, once a year, and a hand costs 25 a year to "
                   "keep. How many hands does it set going?",
              "a": ["25",
-                   "12.5",
-                   "2",
+                   "12,500",
+                   "475",
                    "20"],
              "c": 3,
-             "why": "`500 / 25 = 20`. Dividing by 40 gives 12.5, and 25 is the keep itself, "
-                    "not a count of hands."},
+             "why": "`500 / 25 = 20`. 12,500 multiplies the wages by the keep instead of "
+                    "dividing, 475 subtracts it, and 25 is the keep itself, not a count "
+                    "of hands."},
             {"q": "What does Smith say of the multiplication of retailers?",
              "a": ["It can hurt the retailers themselves through competition, but cannot "
                    "hurt the public, who buy cheaper",
@@ -1211,8 +1217,9 @@ LESSONS = [
              "why": "&ldquo;So far is it from being necessary either to tax them, or to "
                     "restrict their numbers&rdquo;, and competition tends to make them "
                     "&ldquo;both sell cheaper and buy dearer&rdquo; than a monopoly would. "
-                    "On alehouses he says the disposition to drink gives employment "
-                    "to the alehouses, not the other way round."},
+                    "Retailers do add to the produce: the retailer's profit is the "
+                    "value his capital adds. On alehouses he says the disposition to "
+                    "drink gives employment to the alehouses, not the other way round."},
         ],
         "mistakes": [
             ("Reading the ranking as a count of workers on the payroll",
@@ -1244,7 +1251,7 @@ LESSONS = [
             "The lab turns stated wage shares into hands and cannot say what the shares "
             "were. Smith's ranking is argued from the nature of each employment and not "
             "from measurement, and the figures in both presets are written for this "
-            "lesson. The ranking's critics, Ricardo, List, Marx, are disputing either the "
+            "lesson. The ranking's critics, Ricardo and List among them, dispute either the "
             "premise about Nature's share or the use to which the order is put."
         ),
     },
@@ -1337,7 +1344,8 @@ LESSONS = [
                   "£2,000, the foreign trade of £1,000 as £1,000. The returns a year are "
                   "4 for the home trade and 1/3 for the foreign. At a keep of £25 a hand "
                   "the home trade supports 320 and the foreign trade about 13.3, and the "
-                  "ratio is 24. The figures of 4 and 1/3 are Smith's own and the capital "
+                  "ratio is 24. The figures of 4 and 1/3 are the ends of Smith's own "
+                  "ranges, and the capital "
                   "of £1,000 and the keep are written for this lesson. In the second "
                   "preset the foreign trade returns once a year, and the ratio falls to 8."),
             ("p", "The round-about trade, where the foreign goods are bought with other "
@@ -1364,7 +1372,8 @@ LESSONS = [
                   "three together, with the carrying trade's home capital entered at a "
                   "£100 of freight and profit, written for this lesson: 320 hands for the "
                   "home trade, 40 for the foreign trade at one return a year, and 4 for "
-                  "the carrying trade."),
+                  "the carrying trade, so that the first supports 80 times as many as "
+                  "the last."),
             ("p", "Smith does not say that the remoter trades are bad. The tobacco case "
                   "is his proof. &ldquo;About 96,000 hogsheads of tobacco&rdquo; a year "
                   "are bought in Virginia and Maryland with British goods, but &ldquo;the "
@@ -1378,8 +1387,8 @@ LESSONS = [
                   "the country, and the value of its annual produce, as the most "
                   "direct.&rdquo; And the carrying trade is &ldquo;the natural effect and "
                   "symptom of great national wealth; but it does not seem to be the natural "
-                  "cause of it&rdquo;, which Holland, the richest country in Europe for "
-                  "its size, and also the greatest carrier, illustrates. Statesmen who "
+                  "cause of it&rdquo;, which Holland, by far the richest country in Europe "
+                  "for its land and people and also the greatest carrier, illustrates. Statesmen who "
                   "favour it have &ldquo;mistaken the effect and symptom for the "
                   "cause&rdquo;. The argument that the carrying trade breeds sailors "
                   "fares no better. The coal trade from Newcastle to London &ldquo;employs "
@@ -1410,10 +1419,10 @@ LESSONS = [
                   "why a merchant prefers the support of domestic to foreign industry, "
                   "and historians have noted how little weight it had for Smith "
                   "compared with the fame it earned later."),
-            ("p", "Smith's critics here are three. Ricardo argued, in 1817, that trade "
-                  "gains do not depend on how often the capital returns but on the "
-                  "difference in costs between countries, so that even the slowest foreign "
-                  "trade may enrich both. List argued that Smith's order took no account "
+            ("p", "Smith's critics here are three. Ricardo's <em>Principles</em> (1817) "
+                  "measured the gain from foreign trade by the difference in comparative "
+                  "costs between countries, not by the home labour a capital keeps "
+                  "employed, so that even a slow foreign trade may enrich both. List argued that Smith's order took no account "
                   "of the power of producing wealth, which an infant industry needs "
                   "protection to build. And Capital's lesson <em>Turnover Time and the "
                   "Number of Turnovers</em> takes up the arithmetic of returns, which "
@@ -1513,12 +1522,12 @@ LESSONS = [
              "a": ["Twelve times",
                    "Twenty-four times",
                    "Six times",
-                   "Thirty-six times"],
+                   "Fourteen times"],
              "c": 1,
              "why": "Twelve times the returns and twice the home capitals replaced make "
                     "`12 · 2 = 24`. Twelve leaves out the doubling; six divides by it "
-                    "instead of multiplying, and thirty-six is not a product of anything "
-                    "in the passage."},
+                    "instead of multiplying, and fourteen adds the two factors instead of "
+                    "multiplying them."},
             {"q": "Smith says about 96,000 hogsheads of tobacco are bought a year in "
                   "Virginia and Maryland with British goods and Great Britain needs, "
                   "perhaps, 14,000. How many must be sent abroad again, or the importation "
@@ -1550,8 +1559,8 @@ LESSONS = [
             ("Reading the twenty-four as a measure of how much better the home trade is",
              "It is a product of two assumptions: that the home capital returns four "
              "times a year against one in three years, and that the home trade replaces "
-             "two home capitals where the foreign trade replaces one. Change the second "
-             "preset's returns to once a year and the ratio is eight. The twenty-four "
+             "two home capitals where the foreign trade replaces one. In the second "
+             "preset the foreign trade returns once a year and the ratio is eight. The twenty-four "
              "follows from the chosen returns and is not a constant."),
             ("Thinking Smith wants the foreign and carrying trades discouraged",
              "He says each branch is &ldquo;not only advantageous, but necessary and "

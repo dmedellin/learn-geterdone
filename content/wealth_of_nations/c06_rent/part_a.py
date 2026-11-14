@@ -13,7 +13,8 @@ shilling, twenty shillings to the pound); the labs here take decimals and fracti
 
 LESSONS = [
     # ---------------------------------------------------------------- 01
-    # PSU text l. 4730-4744 (the definition of rent); l. 4755-4767 (kelp);
+    # PSU text l. 4730-4744 (the definition of rent); l. 4745-4754 (the objection
+    # about improvements); l. 4755-4767 (kelp);
     # l. 4768-4775 (Shetland); l. 4776-4778 (a monopoly price); l. 4779-4786 (what
     # can afford a rent); l. 4793-4800 (cause and effect).
     {
@@ -111,10 +112,10 @@ LESSONS = [
                   "landlord may have laid out upon the improvement of the land, or to "
                   "what he can afford to take, but to what the farmer can afford to "
                   "give.&rdquo; The phrase has had a long career. David Ricardo, "
-                  "writing in 1817, held that it misdescribes what happens: on his "
-                  "account rent is the surplus that better land yields over the poorest "
-                  "land in use, and since that poorest land pays no rent, no combination "
-                  "of landlords could raise the price of corn by asking more. Smith "
+                  "writing in 1817, gave a different account of where rent comes from: "
+                  "on his account rent is the surplus that better land yields over the "
+                  "poorest land in use, and since that poorest land pays no rent, rent "
+                  "is no part of what regulates the price of corn. Smith "
                   "cannot answer him, having died in 1790, but the chapter does say, "
                   "a page on, that a produce affords rent only if its price rises above "
                   "its outlay and ordinary profit, and that whether it does so "
@@ -155,7 +156,7 @@ LESSONS = [
                   "to £10, and the poor farm's produce is worth only £82.50 against a "
                   "£110 that has to be covered, so it pays no rent and would not be "
                   "farmed at all if the tenant had any choice. Total rent falls from "
-                  "£140 to £50. A quarter off the price took away more than "
+                  "£140 to £50. A quarter off the price took away nearly "
                   "two-thirds of the rent, which is what it means for rent to be the "
                   "remainder: the whole change in price lands on it, because the "
                   "outlay does not move."),
@@ -315,10 +316,14 @@ LESSONS = [
         ),
     },
     # ---------------------------------------------------------------- 02
-    # PSU text l. 4813-4829 (food always affords rent); l. 4840-4855 (fertility and
-    # situation); l. 4856-4870 (roads); l. 4917-4920 (bread and butcher's meat);
-    # l. 4914-4916 (Highland cattle); l. 5271-5283 (rice and potatoes); l. 5296-5316
-    # (potatoes); l. 5221 (Cochin China sugar).
+    # PSU text l. 4813-4829 (food always affords rent); l. 4830-4839 (moors, goodness
+    # of the pasture); l. 4840-4855 (fertility and situation); l. 4856-4870 (roads and
+    # the turnpike petition); l. 4871-4930 (corn and pasture, bread and butcher's meat;
+    # Highland cattle at 4911-4917); l. 5042-5095 (gardens, vineyards, the ancient
+    # writers); l. 5132-5172 (land too small for the demand; fine wines); l. 5173-5190
+    # (Cochin China sugar, from Poivre); l. 5212-5243 (tobacco); l. 5244-5269 (food land
+    # regulates the rest; a more productive staple); l. 5270-5286 (rice); l. 5287-5333
+    # (potatoes, and the difficulty of storing them).
     {
         "slug": "produce-which-always-affords-rent",
         "title": "Produce Which Always Affords Rent",
@@ -442,9 +447,9 @@ LESSONS = [
                   "vineyards, which need more expense at the start or each year and so "
                   "pay a greater rent and a greater profit, but &ldquo;seldom&rdquo; "
                   "more than &ldquo;a reasonable interest or compensation for this "
-                  "superior expense&rdquo;. Smith spends several pages on the ancient "
-                  "writers, Columella, Democritus, Cato and Varro, to show that the "
-                  "arguments about whether to plant a vineyard are old, and that "
+                  "superior expense&rdquo;. Smith turns to the ancient writers on "
+                  "husbandry, Democritus, Columella, Varro and Palladius, to show that the "
+                  "arguments about the kitchen garden and the vineyard are old, and that "
                   "comparisons between the profit and expense of new projects are, in his "
                   "words, &ldquo;commonly very fallacious&rdquo;."),
             ("p", "The exception is a crop whose land is too small for the demand. "
@@ -467,7 +472,7 @@ LESSONS = [
                   "more food from an acre. His answer, in effect, is that the surplus "
                   "after feeding the labourers would be much greater, and with it, as Smith puts it, &ldquo;The real value of his rent, his real "
                   "power and authority&rdquo;. "
-                  "Rice gives two crops a year of thirty to sixty bushels each, he says. "
+                  "Rice gives two crops a year of thirty to sixty bushels each, he reports. "
                   "On potatoes, &ldquo;Twelve thousand weight of potatoes from an acre "
                   "of land is not a greater produce than two thousand weight of "
                   "wheat&rdquo;, but allowing half the weight of the root for water, the "
@@ -637,10 +642,14 @@ LESSONS = [
         ),
     },
     # ---------------------------------------------------------------- 03
-    # PSU text l. 5336-5342 (the second class); l. 5400-5420 (coal mines that pay no
-    # rent); l. 5440-5465 (the most fertile coal mine regulates the price); l. 5466-5475
-    # (a fifth, a tenth, years' purchase); l. 5505-5530 (Cornwall and Peru, thirteen to
-    # twelve); l. 5594-5602 (price of the precious metals).
+    # PSU text l. 5336-5338 (the second class); l. 5342-5412 (clothing and lodging,
+    # hides, wool, London paving); l. 5413-5462 (populous in proportion to food; the
+    # stomach; the bowels of the earth); l. 5472-5495 (coal mines: fertility, barren
+    # mines, mines with no rent); l. 5541-5550 (the most fertile coal mine regulates the
+    # price); l. 5561-5569 (a third, a fifth, a tenth, years' purchase); l. 5573-5606
+    # (metals compete across the world); l. 5607-5638 (Cornwall and Peru, thirteen to
+    # twelve); l. 5726-5776 (precious stones, Golconda, relative fertility); l.
+    # 5785-5797 (Cuba and St. Domingo).
     {
         "slug": "produce-which-sometimes-affords-rent",
         "title": "Produce Which Sometimes Affords Rent",
@@ -754,11 +763,12 @@ LESSONS = [
                   "diminishes, and sometimes takes away altogether, both their rent and "
                   "their profit.&rdquo; Note the order of cause again: the price is set "
                   "where the best mine can profit by setting it, and the lesser mines "
-                  "take it. A reader who knows Ricardo will recognise something in "
-                  "this, since his rent is the surplus of better land over the poorest "
-                  "in use. Smith states it here for coal; for corn land, in the previous "
-                  "part, he reasons from the demand for food and does not name the "
-                  "poorest land as the regulator. Capital's "
+                  "take it. A reader who knows Ricardo will notice that he turned this "
+                  "round. In his <em>Principles</em> it is the least productive mine "
+                  "or land in use, the one that pays no rent, that regulates the price, "
+                  "and the better ones' rents are their surplus over it. For corn land, "
+                  "in the previous part, Smith reasons from the demand for food and "
+                  "names no land as the regulator. Capital's "
                   "<em>Differential Rent I</em> gives the later arithmetic of rent "
                   "by grade of land."),
             ("p", "The lab has four coal mines, written for the lesson, with every mine "
@@ -774,8 +784,9 @@ LESSONS = [
                   "bringing the price to £3/4 a ton, in the fertile-undersells "
                   "preset. The middling mine's rent shrinks to £2.50 and the fertile "
                   "mine's to £40; the second mine now loses £27.50 and the barren "
-                  "mine £57. Rent has dropped from £130 to £42.50, and two mines are "
-                  "worked at a loss."),
+                  "mine £57. Rent has dropped from £130 to £42.50, and two mines could be "
+                  "worked only at a loss, which is Smith's &ldquo;Some works are "
+                  "abandoned altogether&rdquo;."),
             ("p", "Smith gives a rule of thumb for how large a share rent is. &ldquo;The "
                   "rent of an estate above ground, commonly amounts to what is supposed "
                   "to be a third of the gross produce&rdquo;, and is generally certain. "

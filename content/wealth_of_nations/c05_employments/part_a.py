@@ -133,8 +133,8 @@ LESSONS = [
                   "half a crown where eighteen pence is common labour's wage; in small towns "
                   "they scarcely equal it. And where hard, dirty work is also irregular, as "
                   "with the London coal-heavers, whose work depends on the arrival of coal "
-                  "ships, Smith finds earnings of six to ten shillings a day, about four times "
-                  "common labour in London, and says it ought not to seem unreasonable, since "
+                  "ships, an inquiry Smith cites found earnings of six to ten shillings a day, "
+                  "and six shillings alone is about four times common labour in London. He says it ought not to seem unreasonable, since "
                   "if the pay exceeded what the disagreeableness required, &ldquo;there would "
                   "soon be so great a number of competitors&rdquo; that it would fall."),
             ("p", "Fourth, trust. Goldsmiths and jewellers are paid more than workmen of equal "
@@ -249,7 +249,7 @@ LESSONS = [
         "quiz_title": "Why one trade pays more than another",
         "quiz": [
             {"q": "On Smith's account, why can London coal-heavers earn four or five times the "
-                  "wages of common labour when colliers earn about double?",
+                  "wages of common labour when colliers earn double or triple?",
              "a": ["Their work is as dirty and hard as the collier's, and the arrival of the "
                    "coal ships also makes it very inconstant",
                    "They need a longer apprenticeship than colliers",
@@ -281,12 +281,12 @@ LESSONS = [
                     "leaves out the profit Smith says the machine must earn; forty alone "
                     "leaves out the replacement."},
             {"q": "How does Smith describe a man trained at length to a skilled trade?",
-             "a": ["As a machine whose work must replace the cost of his education with at "
-                   "least the ordinary profits of an equally valuable capital",
-                   "As a lottery ticket whose price is the cost of his education",
+             "a": ["As a lottery ticket whose price is the cost of his education",
                    "As a debtor whose master is owed seven years' service",
+                   "As a machine whose work must replace the cost of his education with at "
+                   "least the ordinary profits of an equally valuable capital",
                    "As the owner of a monopoly that he bought with his apprenticeship"],
-             "c": 0,
+             "c": 2,
              "why": "The comparison is to &ldquo;one of those expensive machines&rdquo;. "
                     "The lottery is the fifth circumstance, probability of success, and "
                     "the monopoly belongs to the policy of Europe in Part II."},
@@ -322,9 +322,9 @@ LESSONS = [
             "dirt, danger or honour, so the lab asks you for one, and the equality in the "
             "first preset is built in by choosing the numbers. What the arithmetic cannot "
             "settle is whether free choice does level the whole of the advantages. John "
-            "Stuart Mill argued in 1848 that the wage differences between grades of "
-            "labour are larger than compensation explains, and J. E. Cairnes in 1874 "
-            "that labour falls into non-competing groups between which people do not move "
+            "Stuart Mill argued in 1848 that the hardest and most disagreeable work is "
+            "often the worst paid, the reverse of compensation, because those who do it "
+            "have no choice, and J. E. Cairnes in 1874 that labour falls into non-competing groups between which people do not move "
             "freely, so that the pay of one grade is not held down by the supply of "
             "another. Capital's lesson <em>The Twofold Character of Labour</em> "
             "meets the pay of skilled work from a different side. Smith's own answer, in "
@@ -454,8 +454,8 @@ LESSONS = [
             ("p", "Then the soldiers and sailors. The common soldier's pay is less than a "
                   "labourer's and his fatigues greater, and young men enlist most readily "
                   "at the start of a war: &ldquo;These romantic hopes make the whole price "
-                  "of their blood.&rdquo; The sea is a better lottery than the army. Because "
-                  "the great prizes are smaller, &ldquo;the smaller ones must be more "
+                  "of their blood.&rdquo; The sea is a different lottery from the army. "
+                  "Because its great prizes are smaller, &ldquo;the smaller ones must be more "
                   "numerous&rdquo;, and common sailors more often get some fortune. Even so a "
                   "London sailor's pay in peace, from a guinea to about seven-and-twenty "
                   "shillings the calendar month, is below what a London labourer at nine or "
@@ -582,14 +582,14 @@ LESSONS = [
              "a": ["Every profession is protected by a corporation that keeps wages up",
                    "They overvalue their own chance of gain, and the reputation counts "
                    "as part of the reward",
-                   "The tickets are paid for by the state",
+                   "The law obliges each family to put one son to a profession",
                    "The sums are better than they look because losers earn the same as winners"],
              "c": 1,
              "why": "He gives two causes: the desire of reputation and &ldquo;the natural "
                     "confidence which every man has&rdquo; in his own abilities and fortune. "
-                    "Corporations belong to Part II, public education to the second way the "
-                    "policy of Europe works, and the losers' earnings are exactly what "
-                    "Smith says is too small."},
+                    "Corporations belong to Part II, Smith names no law that sends sons to "
+                    "the professions, and the losers' earnings are exactly what Smith says "
+                    "are too small."},
             {"q": "How does Smith explain why the profit of stock does not rise in "
                   "proportion to the risk of a trade?",
              "a": ["Insurers set profits by law",
@@ -878,13 +878,13 @@ LESSONS = [
              "a": ["Only two of the five circumstances, agreeableness and risk, affect "
                    "the profits of stock",
                    "Profits are fixed by law in every trade",
-                   "Stock moves freely between trades and labour does not",
+                   "Every trade employs about the same amount of stock",
                    "Capitalists are more skilled than workmen at judging employments"],
              "c": 0,
-             "why": "He says &ldquo;two only affect the profits of stock&rdquo;. The "
-                    "difficulty of moving labour comes in Part II, and in this part he "
-                    "assumes freedom; he says nothing about the skills of capitalists, and "
-                    "profits are not fixed by law."},
+             "why": "He says &ldquo;two only affect the profits of stock&rdquo;. His own "
+                    "grocer and wholesale merchant employ a hundred pounds and ten thousand; "
+                    "he says nothing about the skills of capitalists, and profits are not "
+                    "fixed by law."},
             {"q": "What does Smith say a trade must be for the whole of its advantages to "
                   "tend to equality with others?",
              "a": ["Protected by a corporation, in a large town, and of long standing",
@@ -937,7 +937,8 @@ LESSONS = [
             "wage; it cannot say what the wage should be, and the answer depends on "
             "it entirely. Smith gives the grocer's figure, not the apothecary's. The "
             "argument that profit tends to a common rate is one Ricardo and Marx later "
-            "build on, and Capital's course on average profit takes it up; whether "
+            "build on, and the Capital lesson <em>The General Rate of Profit and Prices "
+            "of Production</em> takes it up; whether "
             "profits in fact level, and over what time, is an empirical question the "
             "chapter answers with observation, not figures. The lesson treats each "
             "preset as a sum on the stated numbers."
@@ -1065,8 +1066,10 @@ LESSONS = [
                   "with the pay rise the cap brings put at 20 percent, a figure written for "
                   "this lesson. The cutler's wage goes from 1.01 to about 1.21 shillings a "
                   "day, and his net advantage from 300 to 360.60, which is 60.60 above the "
-                  "labourer's. Smith's claim is that the cap does this; the 20 percent is "
-                  "only a way of showing its size."),
+                  "labourer's. The capped preset's other tiles show the trade before the cap, "
+                  "the weeks preset again, so its spread there is still nothing; the limit "
+                  "tile and the ranking under it show the trade after. Smith's claim is that "
+                  "the cap does this; the 20 percent is only a way of showing its size."),
             ("def", ("A cap on entry (this lab's term)",
                      "A limit on how many may enter a trade, with a stated rise in its pay "
                      "that the limit is supposed to bring. The rise is the lesson's "
@@ -1145,8 +1148,8 @@ LESSONS = [
             ],
             "panel_title": "What a long apprenticeship and a cap on entry do to pay",
             "panel_intro": (
-                "The same labourer and cutler as in the first lesson, now with the cost "
-                "of learning pushed up by a long apprenticeship, or with entry capped. Watch "
+                "A labourer and a cutler, netted as the trades of the first lesson were, "
+                "with the cost of learning pushed up by a long apprenticeship, or with entry capped. Watch "
                 "the cutler's yearly learning charge in the second preset and his net "
                 "advantage in the third."
             ),
@@ -1186,8 +1189,8 @@ LESSONS = [
             "after": [
                 "The weeks preset needs only 303 a year for the same net: 3 for the "
                 "learning and 300 to match the labourer. The seven years add 102 shillings "
-                "to the wage bill of a trade whose work, Smith says, needed a few weeks of "
-                "teaching, and the buyer of the work pays them.",
+                "to the wage bill of a trade whose work, Smith says, needs a few weeks of "
+                "teaching at most, and the buyer of the work pays them.",
             ],
         },
         "quiz_title": "Who pays for restraining entry",
@@ -1242,7 +1245,7 @@ LESSONS = [
             ("Reading Smith as saying all training is waste",
              "Part I says skilled labour must replace the cost of its education, and the "
              "preset gives the craftsman a wage that does. What Part II attacks is a "
-             "term set by law at more than the trade needs, which he says is a few weeks "
+             "term set by law at more than the trade needs, which he says is a few days "
              "in a common mechanic trade. He grants that dexterity of hand needs practice."),
             ("Taking the quote about conspiracy as a call to ban meetings",
              "He says no law could prevent such meetings consistent with liberty and "
@@ -1533,12 +1536,12 @@ LESSONS = [
             {"q": "Why does Smith say corporation laws obstruct the movement of labour "
                   "more than that of stock?",
              "a": ["Stock cannot move at all",
+                   "Merchants are exempt from every corporation law",
+                   "Labour is cheaper to carry",
                    "It is everywhere much easier for a wealthy merchant to obtain the "
                    "privilege of trading in a town-corporate than for a poor artificer to "
-                   "obtain that of working in it",
-                   "Merchants are exempt from every corporation law",
-                   "Labour is cheaper to carry"],
-             "c": 1,
+                   "obtain that of working in it"],
+             "c": 3,
              "why": "That is his sentence. Stock can move, so the other options are "
                     "wrong about what he says: merchants are not exempt, only better "
                     "placed to get a privilege."},
@@ -1570,12 +1573,13 @@ LESSONS = [
         "note": (
             "A spread is a gap in the figures; whether it is caused by the law of "
             "settlements is Smith's inference, which the lab neither supports nor "
-            "refutes. Historians of the poor law have argued that settlement in "
-            "practice moved less labour than Smith's account suggests, and that removals "
-            "were rarer than the statutes allowed, while others find the barrier real. "
-            "The lesson's wages are written for it. The first lesson quotes "
-            "Smith's weekly wages of common labour in different places: four or five "
-            "shillings, six, and nine or ten in London."
+            "refutes. Historians of the poor law have disputed how far the settlement "
+            "laws in practice obstructed movement, some finding removals rarer than the "
+            "statutes allowed and others the barrier real. The lesson's wages are written "
+            "for it. Smith's own figures for common labour at no great distance are in "
+            "Chapter 8: eighteen pence a day in London and fourteen or fifteen a few miles "
+            "off, a difference he says is not always enough to move a man from one parish "
+            "to another."
         ),
     },
 ]

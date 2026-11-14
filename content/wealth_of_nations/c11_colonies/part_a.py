@@ -95,7 +95,7 @@ LESSONS = [
                      "The two words name the two institutions he has just described.")),
             ("p", "Then the American case. The Venetians had a profitable trade in spices "
                   "from the East; the Portuguese, who had been feeling their way down the "
-                  "coast of Africa for a century, reached India round the Cape in 1497; and "
+                  "coast of Africa for a century, sailed for India round the Cape in 1497; and "
                   "a Genoese pilot, Columbus, reasoned that the longer the way was by the "
                   "east the shorter it would be by the west. He sailed from Palos in August "
                   "1492 with the backing of Isabella of Castile. What he found was not the "
@@ -148,10 +148,10 @@ LESSONS = [
                   "profit&rdquo;, and so a prudent lawgiver who wanted to increase his "
                   "nation's capital would least encourage them. His explanation of why men "
                   "go in anyway is the &ldquo;absurd confidence which almost all men have in "
-                  "their own good fortune&rdquo;, the same thing that makes a man buy a "
-                  "ticket in a lottery with one prize in twenty. The lesson on the "
-                  "professions in Book I, <em>The Lottery of the Professions</em>, "
-                  "meets that confidence in the law and the army. Here it meets the "
+                  "their own good fortune&rdquo;, which sends too great a share of capital "
+                  "to such projects of its own accord. The lesson on the professions in "
+                  "Book I, <em>The Lottery of the Professions</em>, meets the same "
+                  "confidence in the law, where twenty fail for one that succeeds. Here it meets the "
                   "metals, whose value has &ldquo;arisen chiefly from their scarcity&rdquo;, "
                   "which in turn arises from the labour and expense needed to get at small "
                   "quantities in hard rock. Men have dreamed of veins as large as those of "
@@ -536,8 +536,10 @@ LESSONS = [
             ("p", "The Part also contains Smith's account of slavery in the sugar colonies, "
                   "and it should be read exactly. &ldquo;In all European colonies, the "
                   "culture of the sugar-cane is carried on by negro slaves.&rdquo; He says "
-                  "the French sugar colonies did as well as the English, and that the "
-                  "difference is in the management of slaves: as the profit of cultivation "
+                  "the French sugar colonies had done at least as well as most of the "
+                  "English, perhaps better, and gives two reasons: they were not "
+                  "discouraged from refining their own sugar, and, of greater importance, "
+                  "their slaves were better managed. As the profit of cultivation "
                   "by cattle depends on good management of the cattle, &ldquo;so the profit "
                   "and success of that which is carried on by slaves must depend equally "
                   "upon the good management of those slaves&rdquo;. Wherever &ldquo;the "
@@ -545,7 +547,9 @@ LESSONS = [
                   "who protects the slave interferes with a master's property, and in a "
                   "free colony the master may be a member of the assembly or an elector of "
                   "one, so the magistrate &ldquo;dares not do this but with the greatest "
-                  "caution&rdquo;. Under an arbitrary government it is easier, and Smith "
+                  "caution&rdquo;. Where government is in a great measure arbitrary, the "
+                  "magistrate can more easily give the slave some protection, &ldquo;and "
+                  "common humanity naturally disposes him to do so&rdquo;, and Smith "
                   "concludes that &ldquo;the condition of a slave is better under an "
                   "arbitrary than under a free government&rdquo;. His example is from Rome: "
                   "when Vidius Pollio ordered a slave, for a slight fault, &ldquo;to be cut "
@@ -553,16 +557,22 @@ LESSONS = [
                   "fishes&rdquo;, Augustus ordered him to free that slave and all the others."),
             ("p", "Three things are plain in this passage. Smith treats slavery as a "
                   "condition that law and government make better or worse for the "
-                  "enslaved person, and he does it in the vocabulary of profit and "
-                  "management, comparing slaves to cattle. He does not argue here for "
-                  "abolition, and he does not say slavery is just. And the same book "
-                  "makes an economic argument against it elsewhere: in Book III, Chapter "
-                  "2, which the course on the progress of opulence reads, he says that "
-                  "&ldquo;the work done by slaves, though it appears to cost only their "
-                  "maintenance, is in the end the dearest of any&rdquo;. Historians since "
-                  "have disagreed sharply about how far the sugar and slave economy of the "
-                  "Atlantic added to Britain's wealth. Eric Williams argued in 1944 that "
-                  "it was very great; others have argued it was small. Smith's own claim in "
+                  "enslaved person. He argues partly from humanity and partly from profit, "
+                  "drawing his comparison from the management of cattle, and he adds that "
+                  "gentle usage makes the slave more faithful and more intelligent, and so "
+                  "more useful. He does not argue here for abolition, and he does not say "
+                  "slavery is just. And the same book makes an economic argument against it "
+                  "elsewhere: in Book III, Chapter 2, which the course on the progress of "
+                  "opulence reads, he says that &ldquo;the work done by slaves, though it "
+                  "appears to cost only their maintenance, is in the end the dearest of "
+                  "any&rdquo;, and explains why masters keep it anyway: &ldquo;The pride of "
+                  "man makes him love to domineer&rdquo;, and &ldquo;The planting of sugar "
+                  "and tobacco can afford the expense of slave cultivation.&rdquo; "
+                  "Historians since have disagreed sharply about how far the sugar and "
+                  "slave economy of the Atlantic added to Britain's wealth. Eric Williams "
+                  "argued in <em>Capitalism and Slavery</em> (1944) that its profits did "
+                  "much to finance British industry; others have argued that their share "
+                  "was small. Smith's own claim in "
                   "Part 3, read next, is that the monopoly of the colony trade did harm. "
                   "None of this is computed in the lab."),
             ("p", "Smith closes the Part with a judgment on the policy of Europe, and his "
@@ -668,8 +678,8 @@ LESSONS = [
             ],
             "after": [
                 "The first line agrees with Smith's total of £64,700. The per-head figure "
-                "is only roughly his: it leaves out Maryland and North Carolina, whose "
-                "cost he could not get, and it spreads the cost over all three "
+                "is the lesson's, not Smith's: it leaves out Maryland and North Carolina, "
+                "of which he says no exact account had been got, and it spreads the cost over all three "
                 "millions. The second sum is the doubling rate stated as arithmetic, and "
                 "nothing more.",
             ],
@@ -711,13 +721,13 @@ LESSONS = [
                     "faithful, but more intelligent&rdquo;, so more useful."},
             {"q": "What does Smith say of the prohibitions on colonial manufactures of "
                   "steel and woollen goods?",
-             "a": ["They were justified because colonies should buy from the mother country",
-                   "They had ruined the colonies' industries completely",
-                   "They violated the most sacred rights of mankind but, in the "
+             "a": ["They violated the most sacred rights of mankind but, in the "
                    "colonies' present state, were only impertinent badges of "
                    "slavery that might become oppressive later",
+                   "They were justified because colonies should buy from the mother country",
+                   "They had ruined the colonies' industries completely",
                    "They were repealed in 1763"],
-             "c": 2,
+             "c": 0,
              "why": "He says both: a &ldquo;manifest violation of the most sacred rights "
                     "of mankind&rdquo;, and not very hurtful yet, because land is cheap "
                     "and labour dear. Nothing in the Part says they were repealed or "
@@ -800,7 +810,7 @@ LESSONS = [
              "A merchant's profit may be as great in the slow trade, but the country "
              "keeps less labour at work."),
             ("A nation of shopkeepers",
-             "Smith uses the phrase once, and not as praise. He says that founding an "
+             "Smith uses the phrase in one passage only, and not as praise. He says that founding an "
              "empire to raise up a people of customers is a project &ldquo;altogether "
              "unfit for a nation of shopkeepers&rdquo;, and fit for a nation whose "
              "government is influenced by them."),
@@ -942,9 +952,8 @@ LESSONS = [
                   "enabled to commit with impunity every sort of injustice in those remote "
                   "countries&rdquo;. He hopes that the natives may grow stronger or the "
                   "Europeans weaker, and that mutual communication may bring an equality "
-                  "of force. A modern reader will want to say how little a hope for a "
-                  "balance of force does for those who died, and Smith's own sentence is "
-                  "the plainest account of what it was he was describing."),
+                  "of force. The hope looks forward; the sentence before it is his account "
+                  "of what had already happened, and the lesson leaves it in his words."),
             ("p", "Economic historians have argued with Smith about the burden of the "
                   "Navigation Acts. In 1965 Robert Paul Thomas estimated that the net cost "
                   "to the North American colonies was small, and others have disputed his "
@@ -956,8 +965,9 @@ LESSONS = [
                   "accumulation in <em>Genesis of the Industrial Capitalist</em>; "
                   "this lesson does not repeat that argument."),
             ("p", "The lab is Smith's thousand pounds. In the smiths-thousand-pounds "
-                  "preset the same 1,000 returns once a year in a near trade, twice a year "
-                  "in a foreign trade, and once in five years in the American. Over a "
+                  "preset the same 1,000 returns once a year, as in Smith's foreign trade "
+                  "of consumption, twice a year, which he also supposes, and once in five "
+                  "years, as in the American trade at its slowest. Over a "
                   "year the first keeps 1,000 pounds' worth of labour at work, the second "
                   "2,000 and the third 200; the fastest trade keeps ten times what the "
                   "slowest does. In the direct-and-round-about preset the 1,000 returns "
@@ -977,15 +987,15 @@ LESSONS = [
                 {"id": "smiths-thousand-pounds",
                  "label": "Smith's thousand pounds, returned once, twice and once in five years",
                  "trades": [
-                     ["near-trade", 1000, 1],
-                     ["foreign-trade", 1000, 2],
+                     ["once-a-year", 1000, 1],
+                     ["twice-a-year", 1000, 2],
                      ["america-five-years", 1000, "1/5"]],
                  "expect": {
-                     "wstWork": "near-trade £1,000; foreign-trade £2,000; america-five-years £200",
+                     "wstWork": "once-a-year £1,000; twice-a-year £2,000; america-five-years £200",
                      "wstTotal": "£3,200",
                      "wstLabour": "no wage given",
-                     "wstOrder": "foreign-trade, near-trade, america-five-years",
-                     "wstRatio": "10.00× (foreign-trade against america-five-years)",
+                     "wstOrder": "twice-a-year, once-a-year, america-five-years",
+                     "wstRatio": "10.00× (twice-a-year against america-five-years)",
                  }},
                 {"id": "direct-and-round-about",
                  "label": "Smith's direct and round-about American trades",
@@ -1036,14 +1046,14 @@ LESSONS = [
             "lines": [
                 "sent to Britain:  96,000 hogsheads;  used there:  14,000",
                 "re-exported:  96,000 − 14,000 = 82,000",
-                "near trade:  1,000 × 1 = 1,000",
-                "foreign trade:  1,000 × 2 = 2,000",
+                "once a year:  1,000 × 1 = 1,000",
+                "twice a year:  1,000 × 2 = 2,000",
                 "American trade:  1,000 × 1/5 = 200",
                 "ratio of fastest to slowest:  2,000 / 200 = 10",
             ],
             "after": [
                 "Smith says upwards of 96,000 and upwards of 82,000, so the first line is "
-                "a round figure. The ten-to-one ratio compares the foreign trade of the "
+                "a round figure. The ten-to-one ratio compares the twice-yearly trade of the "
                 "preset with the slowest; Smith himself compares each with the yearly "
                 "return and gets a fifth.",
             ],
@@ -1284,8 +1294,9 @@ LESSONS = [
                   "then to now. The modern argument for protecting a country's own jobs "
                   "or its supply in time of war is of the same kind. Smith's answer is in "
                   "the passage: that the consumer is the end, and that the system's "
-                  "regulations were chosen by the producers who gained, and he allows the "
-                  "single exception of defence, argued in Chapter 2."),
+                  "regulations were chosen by the producers who gained; and the exceptions "
+                  "he allows, in Chapter 2, are defence and an equal duty to match a tax at "
+                  "home."),
             ("p", "He ends with the largest case. &ldquo;A great empire has been "
                   "established for the sole purpose of raising up a nation of customers, "
                   "who should be obliged to buy, from the shops of our different producers, "
@@ -1665,9 +1676,11 @@ LESSONS = [
                   "1/240 of a pound, and consumes the rest, 7,199/240 of a pound: net "
                   "product 0. That split is the lesson's, because Smith gives only the "
                   "£30, the penny and the two years. In the artificers-who-save "
-                  "preset the artificers produce 450 against the same 200 and 200, so "
-                  "their net product is 50, which is Smith's point that a saving "
-                  "class adds to wealth."),
+                  "preset the artificers produce the same 400 and advance the same 200 "
+                  "but consume only 150, so their net product is 400 − 150 − 200 = 50. "
+                  "That is the system's own route for such a class, &ldquo;parsimony and "
+                  "privation&rdquo;, and it is Smith's fourth point too: farmers and "
+                  "artificers alike add to the stock by saving."),
             ("p", "The remaining pages look at other countries, in outline. Smith says "
                   "China, ancient Egypt and Indostan favoured agriculture, in each case "
                   "because the sovereign's revenue came from a land tax. And he gives a "
@@ -1740,10 +1753,10 @@ LESSONS = [
                      "wsyTotal": "+£200",
                  }},
                 {"id": "artificers-who-save",
-                 "label": "The same artificers producing 450 (written for this lesson)",
+                 "label": "The same artificers consuming only 150 (written for this lesson)",
                  "classes": [
                      ["cultivators", 1000, 400, 400],
-                     ["artificers", 450, 200, 200]],
+                     ["artificers", 400, 150, 200]],
                  "expect": {
                      "wsyNet": "cultivators +£200; artificers +£50",
                      "wsyProductive": "2: cultivators, artificers",

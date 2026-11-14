@@ -121,14 +121,17 @@ LESSONS = [
                   "well be expected to sell at forty, fifty, or sixty years purchase&rdquo;. Run "
                   "the improved case first. Take an estate that rents for £1,000 a year; at "
                   "thirty years' purchase, a rate of `10/3` per cent, it sells for £30,000. "
-                  "That is the improved preset. The crown's own estate is a different sum, "
+                  "That is the improved preset, which also prices the same rent at forty "
+                  "years' purchase, £40,000, to show what ten more years' purchase does to a "
+                  "price. The crown's own estate is a different sum, "
                   "because the crown draws little from it: in the crown-sale preset it yields "
                   "£250 a year, and at forty years' purchase (`5/2` per cent) the price is "
-                  "£10,000, at sixty (`5/3` per cent) £15,000."),
+                  "£10,000, which is forty years of what the crown draws, and at sixty (`5/3` "
+                  "per cent) £15,000."),
             ("p", "Now what would the crown do with the price? Smith says: pay off debts, and "
                   "&ldquo;deliver from mortgage a much greater revenue&rdquo; than the lands "
-                  "ever afforded. £10,000 of debt at 3 per cent, the rate to which the public "
-                  "funds had by then fallen, costs £300 a year in interest; so selling an "
+                  "ever afforded. £10,000 of debt at 3 per cent, the rate at which Smith's Bank of "
+                  "England example supposes the government could borrow, costs £300 a year in interest; so selling an "
                   "estate that yielded £250 would leave the crown £50 better off, and every "
                   "extra year's purchase widens the gap. In the improved preset the same "
                   "land, in private hands at four times the crown's rent, is worth £30,000, "
@@ -170,10 +173,10 @@ LESSONS = [
             "money_unit": "£",
             "preset": "improved",
             "presets": [
-                {"id": "improved", "label": "Improved land at thirty years' purchase, written for this lesson on Smith's rate",
-                 "rent": 1000, "rate": "10/3", "yield": 250, "expect": {"witYp": "30 years’ purchase at 10/3 ≈ 3.33%", "witPrice": "£30,000", "witFetches": "£30,000, 120 years of its present yield of £250"}},
+                {"id": "improved", "label": "Improved land renting £1,000 at Smith's thirty years' purchase, and at forty (the rent and the crown's £250 written for this lesson)",
+                 "rent": 1000, "rate": "10/3", "rate2": "5/2", "yield": 250, "expect": {"witYp": "30 years’ purchase at 10/3 ≈ 3.33%", "witPrice": "£30,000", "witPrice2": "£40,000 (+£10,000, +1/3 ≈ +33.3%)", "witFetches": "£30,000, 120 years of its present yield of £250"}},
                 {"id": "crown-sale", "label": "A crown estate yielding £250, written for this lesson, at Smith's forty and sixty years' purchase",
-                 "rent": 250, "rate": "5/2", "rate2": "5/3", "expect": {"witYp": "40 years’ purchase at 2.5%", "witPrice": "£10,000", "witPrice2": "£15,000 (+£5,000, +1/2 = +50%)"}},
+                 "rent": 250, "rate": "5/2", "rate2": "5/3", "yield": 250, "expect": {"witYp": "40 years’ purchase at 2.5%", "witPrice": "£10,000", "witPrice2": "£15,000 (+£5,000, +1/2 = +50%)", "witFetches": "£10,000, 40 years of its present yield of £250"}},
             ],
             "panel_title": "What a rent is worth as a price",
             "panel_intro": (
@@ -204,7 +207,8 @@ LESSONS = [
             "title": "A crown estate sold to pay a debt",
             "intro": [
                 "An estate yields the crown £250 a year. Smith expects it to sell at forty "
-                "years' purchase, and public debt then cost 3 per cent. What does the sale "
+                "years' purchase, and suppose the debt it pays off bears 3 per cent, "
+                "the rate in Smith's Bank of England example. What does the sale "
                 "free, and what does the Bank of England sum look like beside it?",
             ],
             "lines": [
@@ -274,7 +278,7 @@ LESSONS = [
              "It &ldquo;appears to cost nothing to individuals&rdquo;, but Smith's measure "
              "is the produce of the land and not the rent, and rent is a third of it at most. "
              "In the example the proprietors' loss is ten million and the produce lost is "
-             "thirty, so the cost to the country is three times the revenue."),
+             "thirty, so the people lose three times what the proprietors do."),
         ],
         "standard": (
             "Finish when you can price an estate from its rent and the years' purchase.",
@@ -397,8 +401,8 @@ LESSONS = [
                   "ordinary principles of justice, first creates the temptation, and then "
                   "punishes those who yield to it&rdquo;."),
             ("p", "Now a tax to try them on. Smith's first example is the land tax of Great "
-                  "Britain, assessed on each district at a fixed valuation, so that &ldquo;which "
-                  "valuation is not afterwards to be altered&rdquo;. He gives it a "
+                  "Britain, assessed on each district at a fixed valuation, one that &ldquo;is "
+                  "not afterwards to be altered&rdquo;. He gives it a "
                   "report on each maxim. It is perfectly certain. It is paid with the rent, "
                   "&ldquo;the tax is commonly advanced by the tenant&rdquo; although the landlord is "
                   "the real contributor, and collected by fewer officers than any other tax "
@@ -424,8 +428,9 @@ LESSONS = [
             ("p", "This is the shape of the whole Part. A tax is judged by each maxim in turn, "
                   "and it rarely passes all four. Two comments from later writers belong "
                   "here. John Stuart Mill, writing in 1848, took the first maxim to mean "
-                  "equality of sacrifice and not equality of proportion, which leads to a "
-                  "heavier rate on the rich; Smith himself says of house-rent that it is not "
+                  "equality of sacrifice; later writers took that rule to justify a "
+                  "heavier rate on the rich, though Mill himself asked only that a minimum "
+                  "income go untaxed and the rest pay in proportion; Smith himself says of house-rent that it is not "
                   "unreasonable for the rich to pay &ldquo;something more than in that "
                   "proportion&rdquo;. Others, who start from what people receive from the state "
                   "and not what they can bear, take the sentence's second clause, &ldquo;under "
@@ -721,8 +726,8 @@ LESSONS = [
                   "got for the use of his ground&rdquo;, and they are &ldquo;altogether owing to "
                   "the good government of the sovereign&rdquo;. The taxes actually laid on "
                   "houses are poor by comparison, and the window tax has &ldquo;an inequality of "
-                  "the worst kind&rdquo;: a £10 house in a country town may have more windows than a "
-                  "£500 house in London."),
+                  "the worst kind&rdquo;: a house of £10 rent in a country town may have more windows than "
+                  "one of £500 rent in London."),
             ("p", "Article II turns to profit, and the argument is mostly about whether it can "
                   "be taxed directly. Profit has two parts: the interest, which belongs to the "
                   "owner of the stock, and the surplus that pays for risk and trouble, which the "
@@ -1055,7 +1060,7 @@ LESSONS = [
             "presets": [
                 {"id": "smith", "label": "Smith's ten shillings a week and a tax of a fifth",
                  "wage": 10, "rate": 20, "expect": {"wtxWage": "12.5 s", "wtxRise": "25% (+2.5 s)", "wtxTax": "2.5 s"}},
-                {"id": "tenth", "label": "Smith's tax of a tenth on the same ten shillings (he says the rise is one-eighth)",
+                {"id": "tenth", "label": "Smith's tax of a tenth on the same ten shillings (he says one-eighth, a slip: his rule gives one-ninth)",
                  "wage": 10, "rate": 10, "expect": {"wtxWage": "100/9 s ≈ 11.11 s", "wtxRise": "≈ 11.11% (+10/9 s ≈ 1.11 s)", "wtxOver": "the rise exceeds the rate by ≈ 1.11 points"}},
                 {"id": "half", "label": "Ten shillings a week and a tax of a half, written for this lesson",
                  "wage": 10, "rate": 50, "expect": {"wtxWage": "20 s", "wtxRise": "100% (+10 s)", "wtxOver": "the rise exceeds the rate by 50 points"}},

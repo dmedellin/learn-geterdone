@@ -155,11 +155,12 @@ LESSONS = [
             ("p", "Smith's account is not without opponents. In the mercantile view the "
                   "carrying trade deserved a drawback for itself, since it brought in "
                   "freight and silver, and Smith's reply is that it should be left free and "
-                  "not encouraged. Alexander Hamilton, in his 1791 Report on Manufactures, "
-                  "wrote in the opposite direction, of drawbacks and bounties as two of the "
-                  "means by which a government could encourage a new manufacture, and "
-                  "preferred bounties to duties. Smith had died the year before and could "
-                  "not have answered. Modern trade agreements keep Smith's line: they "
+                  "not encouraged. Alexander Hamilton, in his Report on Manufactures of "
+                  "1791, counted among the means by which a government could encourage a new "
+                  "manufacture both drawbacks of the duties on its materials and bounties, "
+                  "which Smith condemns, and he argued that bounties had some advantages "
+                  "over protecting duties. Smith had died the year before and could not "
+                  "have answered. Modern trade agreements keep Smith's line: they "
                   "allow the refund of import duties on goods exported again and treat a "
                   "refund of more than the duty as an export subsidy. The next lesson takes "
                   "up what Smith calls a bounty, and how it differs from a drawback: &ldquo;What "
@@ -460,14 +461,14 @@ LESSONS = [
             ("p", "Who gains? &ldquo;There is, perhaps, but one set of men in the whole "
                   "commonwealth to whom the bounty either was or could be essentially "
                   "serviceable. These were the corn merchants, the exporters and importers "
-                  "of corn.&rdquo; He had noticed that these, rather than the country "
-                  "gentlemen and farmers, were the people most anxious for it. He adds "
+                  "of corn.&rdquo; It was in them, he says, that he had observed the greatest "
+                  "zeal for keeping the bounty. He adds "
                   "that a bounty on production would operate more directly than one on "
                   "exportation, and would impose only one tax, and says it has rarely "
                   "been given because the system teaches that wealth comes from export. "
                   "His comment on one bounty paid on tonnage is a good sample of his "
-                  "temper: the herring-buss bounty of 30 shillings a ton led to vessels "
-                  "being fitted out, he feared, &ldquo;for the sole purpose of catching, not "
+                  "temper: the herring-buss bounty, paid by the ton of the ship and not by "
+                  "its catch, had led vessels, he was afraid, to fit out &ldquo;for the sole purpose of catching, not "
                   "the fish but the bounty&rdquo;. In 1759, he says, at fifty shillings a ton "
                   "the whole Scottish buss fishery brought in four barrels. The accounts "
                   "are given at the end of Book IV and are not worked here."),
@@ -518,8 +519,8 @@ LESSONS = [
                   "moral economy, with older rules of fair dealing which they expected "
                   "magistrates to enforce, and that the political economy of Smith's day "
                   "was a replacement of it, not a plain correction. Amartya Sen argued "
-                  "in 1981 that famines occur in years when the food supply is not "
-                  "unusually short, when some groups lose the means to buy it, so that "
+                  "in 1981 that famines can occur when the food supply is not unusually "
+                  "short, because some groups lose the means to buy food, so that "
                   "the supply in the market does not settle the matter. Smith's own "
                   "example is the drought in Bengal &ldquo;a few years ago&rdquo;, turned into "
                   "a famine, he thinks, by restraints on the rice trade, and Sen's chief "
@@ -535,17 +536,18 @@ LESSONS = [
                   "That of the merchant-exporter may, and in fact sometimes is.&rdquo; The "
                   "carrier, who imports in order to export, helps the home market too, "
                   "since he will sell part at home to save the cost of reshipping. He gives "
-                  "two ratios from the Tracts, imports one part in 570 of consumption and "
-                  "exports one part in 30, so that the home trade is `570` times as "
-                  "important as the import trade and `30` times as important as the export "
-                  "trade, and then disarms them: &ldquo;I have no great faith in political "
+                  "two ratios from the Tracts: grain imported is one part in 570 of the "
+                  "grain consumed, and grain exported one part in thirty-one of the annual "
+                  "produce, from which he puts the importance of the inland trade at 570 to "
+                  "one against the import trade and thirty to one against the export trade. "
+                  "Then he disarms them: &ldquo;I have no great faith in political "
                   "arithmetic, and I mean not to warrant the exactness of either of these "
                   "computations.&rdquo;"),
             ("p", "Smith closes with candour. &ldquo;The laws concerning corn may "
                   "everywhere be compared to the laws concerning religion.&rdquo; People "
                   "care so much about their subsistence that government must yield to "
-                  "their prejudices. He credits the thirteenth year of George III's statute "
-                  "with improving the old system in some respects and worsening it in others, "
+                  "their prejudices. He credits the statute of the thirteenth year of George "
+                  "III with improving the old system in some respects and worsening it in others, "
                   "and says of it what was said of the laws of Solon: &ldquo;though not the "
                   "best in itself, it is the best which the interest, prejudices, and temper "
                   "of the times, would admit of&rdquo;. The history of the corn statutes "
@@ -683,7 +685,8 @@ LESSONS = [
         "mistakes": [
             ("Taking the 4s. rise as a measurement",
              "It is a supposition, in Smith's words &ldquo;Let us suppose&rdquo;, and the "
-             "one-in-thirty-one ratio is from an author he says he places little faith in. "
+             "one-in-thirty-one ratio is from the Tracts, whose computations he says he "
+             "does not warrant. "
              "The lab shows what the reasoning implies for those figures and not what the "
              "bounty did."),
             ("Treating the money price of corn as its real price",
@@ -821,6 +824,25 @@ LESSONS = [
                   "is `10,000 − 1,000 = 9,000`, which is the extra price paid to Portugal. "
                   "That is Smith's reading in numbers: the cheapness of one thing is the "
                   "dearness of another."),
+            ("p", "The lab also prices the alternative of Chapter 2, making the wine at "
+                  "home. Each preset gives a tun made in Britain a cost of £600, thirty "
+                  "times the French price, which is the ratio Smith gives for wine from "
+                  "Scottish hot-walls; the pounds are written for the lesson. The tile for "
+                  "the cost of making all at home reads £580,000 a year in "
+                  "<em>french-equal-duty</em>, `1,000 × (600 − 20) = 580,000`, £578,000 in "
+                  "<em>portuguese-two-thirds</em> and £571,000 in "
+                  "<em>portuguese-dearer</em>. Set beside the 9,000, it shows the line "
+                  "Smith draws in the chapter's first paragraph, that a preference's cost "
+                  "&ldquo;can scarce amount to any positive loss, but only to a lessening of "
+                  "the gain which it might otherwise make&rdquo;, where a prohibition is a "
+                  "loss outright. In every preset the buyer pays the whole duty on wine "
+                  "bought abroad, so the tile for what buyers pay above the cheaper price "
+                  "equals the duty collected, £30,000 or £20,000, and the tile for what is "
+                  "paid and not collected as duty reads £0. That £0 in "
+                  "<em>portuguese-dearer</em> deserves a second look: the extra £7 a tun "
+                  "to the favoured merchants is inside the foreign price, where a tile "
+                  "that watches the duty cannot see it, and the 9,000 appears only when "
+                  "you compare two presets."),
             ("p", "The case for the treaty was gold. Portugal gets from Brazil more gold "
                   "than it can use, and a large share of it comes to England. &ldquo;Mr "
                   "Barretti was informed, that the weekly packet-boat from Lisbon brings, "
@@ -833,7 +855,11 @@ LESSONS = [
                   "the gold must be sent out again for goods, and buying the goods directly "
                   "with English produce would be better than buying gold with it and goods "
                   "with the gold. If Britain were shut out of the Portugal trade, gold, "
-                  "like every other commodity, would be got somewhere else."),
+                  "like every other commodity, would be got somewhere else. He does "
+                  "allow the trade one advantage: gold is the most convenient thing to "
+                  "carry on the round-about trades, and in that, he says, consists "
+                  "&ldquo;the principal advantage of the Portugal trade; and though it is "
+                  "not a capital advantage, it is, no doubt, a considerable one&rdquo;."),
             ("p", "He adds a point that returns to Chapter 3: the more gold we import from "
                   "one country, the less we need from others, so that &ldquo;the balance of "
                   "trade, appears to be in our favour with some particular countries, the more "
@@ -903,33 +929,33 @@ LESSONS = [
             "presets": [
                 {"id": "french-equal-duty",
                  "label": "French wine at £20 with a £30 duty, written for this lesson",
-                 "goods": [{"good": "wine", "quantity": 1000, "home": 900, "foreign": 20, "duty": 30}],
+                 "goods": [{"good": "wine", "quantity": 1000, "home": 600, "foreign": 20, "duty": 30}],
                  "expect": {
                     "wtrAbroad": "wine £50",
                     "wtrCheaper": "wine abroad",
-                    "wtrProhibit": "£880,000 a year",
+                    "wtrProhibit": "£580,000 a year",
                     "wtrDuty": "£30,000 a year",
                     "wtrBuyers": "£30,000 a year",
                     "wtrLoss": "£0 a year",
                  }},
                 {"id": "portuguese-two-thirds",
                  "label": "Portuguese wine at £22 with two-thirds of the duty (the ratio is Smith's)",
-                 "goods": [{"good": "wine", "quantity": 1000, "home": 900, "foreign": 22, "duty": 20}],
+                 "goods": [{"good": "wine", "quantity": 1000, "home": 600, "foreign": 22, "duty": 20}],
                  "expect": {
                     "wtrAbroad": "wine £42",
                     "wtrCheaper": "wine abroad",
-                    "wtrProhibit": "£878,000 a year",
+                    "wtrProhibit": "£578,000 a year",
                     "wtrDuty": "£20,000 a year",
                     "wtrBuyers": "£20,000 a year",
                     "wtrLoss": "£0 a year",
                  }},
                 {"id": "portuguese-dearer",
                  "label": "The favoured merchants raise their price to £29, written for this lesson",
-                 "goods": [{"good": "wine", "quantity": 1000, "home": 900, "foreign": 29, "duty": 20}],
+                 "goods": [{"good": "wine", "quantity": 1000, "home": 600, "foreign": 29, "duty": 20}],
                  "expect": {
                     "wtrAbroad": "wine £49",
                     "wtrCheaper": "wine abroad",
-                    "wtrProhibit": "£871,000 a year",
+                    "wtrProhibit": "£571,000 a year",
                     "wtrDuty": "£20,000 a year",
                     "wtrBuyers": "£20,000 a year",
                     "wtrLoss": "£0 a year",
@@ -937,10 +963,12 @@ LESSONS = [
             ],
             "panel_title": "What a preferential duty does to the price of wine",
             "panel_intro": (
-                "Each preset prices one source of wine: the foreign price, the duty and the "
-                "cost of making it at home, which is held very high, so that the lab "
-                "always buys abroad and its tiles for making at home can be ignored. The lab prints what each source costs the buyer and "
-                "what the treasury collects. Compare the three: the preference changes "
+                "Each preset prices one source of wine to the British buyer: its price "
+                "delivered, the duty, and the cost of a tun made in Britain, set at £600, "
+                "thirty times the French price, which is the ratio Smith gives for Scottish "
+                "wine in Chapter 2. The lab prints what the wine costs the buyer, what the "
+                "treasury collects, and what a prohibition would cost the country. Compare "
+                "the three: the preference changes "
                 "who is cheapest to the buyer, and the third shows what the favoured "
                 "merchants' monopoly can do to the price."
             ),
@@ -976,11 +1004,14 @@ LESSONS = [
                 "treasury:  30,000 against 20,000",
                 "sent abroad:  20,000 against 29,000",
                 "country's loss:  (30,000 − 20,000) − (50,000 − 49,000) = 9,000",
+                "a prohibition instead:  1,000 · (600 − 20) = 580,000",
             ],
             "after": [
                 "Buyers pay 1,000 less, the treasury takes 10,000 less, and 9,000 more "
                 "goes to Portugal for the same wine. The favoured merchants gain what "
-                "the country loses, which is Smith's account of a preference.",
+                "the country loses, which is Smith's account of a preference. A "
+                "prohibition, at Smith's thirtyfold home cost, would cost the country "
+                "£580,000: a preference lessens the gain, and a prohibition removes it.",
             ],
         },
         "quiz_title": "Preferences and coin",
@@ -1053,7 +1084,8 @@ LESSONS = [
             "so it cannot say how much trade a preference moves, how favoured merchants "
             "set their price, or whether a larger market compensates the buyers. The "
             "two-thirds is Smith's and every pound in the presets was written for the "
-            "lesson, so the 9,000 is what the arithmetic implies for them. Ricardo's "
+            "lesson, with the £600 home cost borrowing Smith's thirtyfold ratio from "
+            "Chapter 2, so the 9,000 is what the arithmetic implies for them. Ricardo's "
             "figures are his and not Smith's. Whether the Methuen treaty did Portugal good "
             "or harm in the long run is argued over by historians of both countries, "
             "and no figure here decides it."

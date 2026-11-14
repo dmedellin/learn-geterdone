@@ -58,7 +58,8 @@ LESSONS = [
             "is needed, and takes it away from the weaver one sentence at a time."
         ),
         "body": [
-            ("p", "<strong>Book II, Introduction.</strong> &ldquo;in which there is no "
+            ("p", "<strong>Book II, Introduction.</strong> In that rude state of "
+                  "society, Smith begins, &ldquo;in which there is no "
                   "division of labour, in which exchanges are seldom made, and in which "
                   "every man provides every thing for himself, it is not necessary that "
                   "any stock should be accumulated, or stored up beforehand, in order to "
@@ -84,17 +85,22 @@ LESSONS = [
                   "person, a stock sufficient to maintain him, and to supply him with the "
                   "materials and tools of his work, till he has not only completed, but "
                   "sold his web.&rdquo; Three things are in that stock, and the lab sorts "
-                  "them. The food that keeps him while he weaves is circulating stock, "
-                  "because it goes from him in the keeping. The yarn is circulating too, "
-                  "because it goes from him in the web. The loom stays with him, and so "
-                  "it is fixed. Whatever he owns that is kept for his own use, clothes "
-                  "and household goods, is a third portion that earns nothing. The next "
+                  "them as Chapter 1 will. The yarn is circulating, because it goes from "
+                  "him in the web and comes back in its price. The loom stays with him "
+                  "and earns by staying, so it is fixed. The food that keeps him until "
+                  "the web is sold earns him nothing: it is what a man reserves, in "
+                  "Chapter 1's words, for &ldquo;his immediate consumption&rdquo;, and "
+                  "his clothes and household goods sit with it in a third portion. (Had "
+                  "a master advanced the same food to him as wages, it would be "
+                  "circulating capital to the master, as a farmer's servants' wages are "
+                  "in Chapter 1: the sorting is always from the owner's side.) The next "
                   "lesson gives the three portions their names and their reasons; here "
-                  "you are only counting them. In the first preset, written for this "
+                  "you are only counting them. In the weaver preset, written for this "
                   "lesson, the weaver holds a loom and tools worth £20, yarn worth £30, "
                   "food for the weeks until the web is sold worth £40, and clothes and "
-                  "furniture worth £10. That is £100 in all, of which £90 is the stock "
-                  "he works with."),
+                  "furniture worth £10. That is £100 in all, of which £50, the loom and "
+                  "the yarn, is the capital he works with, and £50 is what he lives on "
+                  "while he waits."),
             ("p", "Smith's conclusion is about order: &ldquo;This accumulation must "
                   "evidently be previous to his applying his industry for so long a time "
                   "to such a peculiar business.&rdquo; He does not say that the stock must "
@@ -111,10 +117,14 @@ LESSONS = [
                   "Smith's words, &ldquo;a greater stock of materials and tools than what "
                   "would have been necessary in a ruder state of things&rdquo;. Take the "
                   "same weaver's workshop after the work is divided and the same number of "
-                  "people are still to be fed. The second preset keeps the food at £40 "
+                  "people are still to be fed. The divided preset keeps the food at £40 "
                   "and the clothes at £10, and triples the tools to £60 and the yarn to "
                   "£90. The stock is now £200, and the part of it that is capital has "
-                  "gone from nine tenths to nineteen twentieths."),
+                  "gone from a half to three quarters. The long-wait preset changes "
+                  "something else: the first weaver waits twice as long for his sale, "
+                  "so his food doubles to £80, his stock is £140, and the capital he "
+                  "works with is still £50, now only about 36% of it. A longer wait "
+                  "asks for more stock without adding any capital."),
             ("p", "Then the motive, which turns the argument round. &ldquo;The person who "
                   "employs his stock in maintaining labour, necessarily wishes to employ it "
                   "in such a manner as to produce as great a quantity of work as "
@@ -162,21 +172,21 @@ LESSONS = [
                 {"id": "weaver", "label": "A weaver's stock, written for this lesson",
                  "parts": [{"part": "loom-and-tools", "amount": 20, "kind": "fixed"},
                            {"part": "yarn", "amount": 30, "kind": "circulating"},
-                           {"part": "food-until-the-web-is-sold", "amount": 40, "kind": "circulating"},
+                           {"part": "food-until-the-web-is-sold", "amount": 40, "kind": "consumption"},
                            {"part": "clothes-and-furniture", "amount": 10, "kind": "consumption"}],
-                 "expect": {"wstWhole": "£100", "wstConsumption": "£10 (10%)", "wstFixed": "£20 (20%)", "wstCirculating": "£70 (70%)", "wstCapital": "£90 of £100 (90%)"}},
+                 "expect": {"wstWhole": "£100", "wstConsumption": "£50 (50%)", "wstFixed": "£20 (20%)", "wstCirculating": "£30 (30%)", "wstCapital": "£50 of £100 (50%)"}},
                 {"id": "divided", "label": "The same workmen after more division, written for this lesson",
                  "parts": [{"part": "looms-and-tools", "amount": 60, "kind": "fixed"},
                            {"part": "yarn", "amount": 90, "kind": "circulating"},
-                           {"part": "food-until-the-web-is-sold", "amount": 40, "kind": "circulating"},
+                           {"part": "food-until-the-web-is-sold", "amount": 40, "kind": "consumption"},
                            {"part": "clothes-and-furniture", "amount": 10, "kind": "consumption"}],
-                 "expect": {"wstWhole": "£200", "wstConsumption": "£10 (5%)", "wstFixed": "£60 (30%)", "wstCirculating": "£130 (65%)", "wstCapital": "£190 of £200 (95%)"}},
+                 "expect": {"wstWhole": "£200", "wstConsumption": "£50 (25%)", "wstFixed": "£60 (30%)", "wstCirculating": "£90 (45%)", "wstCapital": "£150 of £200 (75%)"}},
                 {"id": "long-wait", "label": "The first weaver, waiting twice as long for his sale, written for this lesson",
                  "parts": [{"part": "loom-and-tools", "amount": 20, "kind": "fixed"},
                            {"part": "yarn", "amount": 30, "kind": "circulating"},
-                           {"part": "food-until-the-web-is-sold", "amount": 80, "kind": "circulating"},
+                           {"part": "food-until-the-web-is-sold", "amount": 80, "kind": "consumption"},
                            {"part": "clothes-and-furniture", "amount": 10, "kind": "consumption"}],
-                 "expect": {"wstWhole": "£140", "wstConsumption": "£10 (≈ 7.14%)", "wstFixed": "£20 (≈ 14.29%)", "wstCirculating": "£110 (≈ 78.57%)", "wstCapital": "£130 of £140 (≈ 92.86%)"}},
+                 "expect": {"wstWhole": "£140", "wstConsumption": "£90 (≈ 64.29%)", "wstFixed": "£20 (≈ 14.29%)", "wstCirculating": "£30 (≈ 21.43%)", "wstCapital": "£50 of £140 (≈ 35.71%)"}},
             ],
             "panel_title": "A weaver's stock before the web is sold",
             "panel_intro": (
@@ -216,17 +226,18 @@ LESSONS = [
             ],
             "lines": [
                 "before:  20 + 30 + 40 + 10 = 100",
-                "capital before:  20 + 30 + 40 = 90, and 90 / 100 = 9/10",
+                "capital before:  20 + 30 = 50, and 50 / 100 = 1/2",
                 "after:  60 + 90 + 40 + 10 = 200",
-                "capital after:  60 + 90 + 40 = 190, and 190 / 200 = 19/20",
+                "capital after:  60 + 90 = 150, and 150 / 200 = 3/4",
                 "food and clothes:  40 and 10, unchanged",
             ],
             "after": [
                 "The stock doubled and the food did not move: the whole increase is in "
                 "tools and materials, which is Smith's &ldquo;equal stock of "
                 "provisions&rdquo; and &ldquo;a greater stock of materials and "
-                "tools&rdquo;. In the third preset only the wait has changed, and the "
-                "food rises to £80 while the tools and yarn stay put.",
+                "tools&rdquo;. In the third preset only the wait has changed: the "
+                "food rises to £80 while the tools and yarn stay put, and the capital "
+                "share falls to 50/140, about 36%.",
             ],
         },
         "quiz_title": "What a weaver must have first",
@@ -255,18 +266,19 @@ LESSONS = [
                     "greater stock of materials and tools&rdquo; must be accumulated, for "
                     "the same number of workmen. The number of workmen generally grows "
                     "too, but that is a separate effect."},
-            {"q": "A stock holds a loom worth £15, yarn worth £30, food worth £30 and "
-                  "furniture worth £25. What share of the whole is capital, on the lab's "
-                  "sorting?",
+            {"q": "A weaver holds a loom worth £15, yarn worth £30, food for his own "
+                  "table worth £30 and furniture worth £25. What share of the whole is "
+                  "capital, on the lab's sorting?",
              "a": ["Three fifths",
                    "Nine twentieths",
                    "One quarter",
                    "Three quarters"],
-             "c": 3,
-             "why": "The whole is `15 + 30 + 30 + 25 = 100`. The furniture is kept for "
-                    "the owner's use and is not capital. The loom, yarn and food are "
-                    "`15 + 30 + 30 = 75`, so capital is `75/100`, three quarters. Three "
-                    "fifths is the circulating share alone."},
+             "c": 1,
+             "why": "The whole is `15 + 30 + 30 + 25 = 100`. His food and furniture are "
+                    "kept for his own use and are not capital. The loom and yarn are "
+                    "`15 + 30 = 45`, so capital is `45/100`, nine twentieths. Three "
+                    "quarters counts his food as capital, three fifths is the yarn and "
+                    "food together, and one quarter is the furniture alone."},
             {"q": "What does Smith say about the connection running the other way, from "
                   "stock to the division of labour?",
              "a": ["Whoever lays out a stock to employ labour wants as much work from it "
@@ -294,10 +306,11 @@ LESSONS = [
              "weaver's stock for him. What Smith insists on is that it exists beforehand, "
              "not that it belongs to the specialist."),
             ("Counting everything the weaver owns as capital",
-             "Only the part he expects to give him a revenue is capital. His clothes and "
-             "furniture are kept for his own use and are part of the whole stock without "
-             "being capital. In the first preset £10 of the £100 is of that kind, which is "
-             "why the capital share is nine tenths and not the whole."),
+             "Only the part he expects to give him a revenue is capital. His food until "
+             "the sale, his clothes and his furniture are kept for his own use and are "
+             "part of the whole stock without being capital. In the first preset £50 of "
+             "the £100 is of that kind, which is why the capital share is a half and not "
+             "the whole."),
         ],
         "standard": (
             "Finish when you can sort a stock and say what division adds to it.",
@@ -401,7 +414,7 @@ LESSONS = [
                   "fixed capital. Though it goes backwards and forwards between the "
                   "ground and the granary, it never changes masters, and therefore does "
                   "not properly circulate.&rdquo; The test asks about owners and sales, "
-                  "not about whether the thing moves. The second preset sorts a farm "
+                  "not about whether the thing moves. The farmer preset sorts a farm "
                   "this way, with kinds from Smith and sums written for the lesson, and "
                   "the farmer's capital comes to £340 of a £400 stock."),
             ("p", "Then the society. &ldquo;The general stock of any country or society "
@@ -429,7 +442,7 @@ LESSONS = [
                   "which the others are circulated; the provisions in the hands of "
                   "butchers, farmers and brewers; the materials not yet made up; and the "
                   "finished work still in the shops of the smith and the cabinet-maker. "
-                  "The first preset puts all ten of these holdings into one parish, with "
+                  "The parish preset puts all ten of these holdings into one parish, with "
                   "sums written for this lesson: £400 for immediate consumption, £600 "
                   "fixed and £250 circulating, which makes the capital £850 of a £1,250 "
                   "stock."),
@@ -438,12 +451,12 @@ LESSONS = [
                   "best machine produces nothing without materials to work on and "
                   "maintenance for the workmen, and land, however improved, yields no "
                   "revenue without a circulating capital to keep its labourers. And "
-                  "both exist for the first portion. Their purpose is &ldquo;the sole end "
-                  "and purpose both of the fixed and circulating capitals&rdquo; to "
-                  "maintain and augment the stock for immediate consumption: &ldquo;It is "
-                  "this stock which feeds, clothes, and lodges the people.&rdquo; Hold "
-                  "the three preset farms next to each other and you see the "
-                  "proportions vary by trade. The third preset, an iron-work with "
+                  "both exist for the first portion: to maintain and augment the stock "
+                  "for immediate consumption is, Smith says, &ldquo;the sole end and "
+                  "purpose both of the fixed and circulating capitals&rdquo;, and "
+                  "&ldquo;It is this stock which feeds, clothes, and lodges the "
+                  "people.&rdquo; Hold the three presets next to each other and you see "
+                  "the proportions vary by trade. The iron-work preset, with "
                   "figures written for the lesson, is £600 fixed of £1,000, and the "
                   "farmer's is under half."),
             ("p", "The chapter ends with a remark whose first half is plain Smith. "
@@ -726,13 +739,14 @@ LESSONS = [
                   "hundred in purchasing an additional quantity of materials, to be wrought "
                   "up by an additional number of workmen.&rdquo; The thousand and the five "
                   "hundred are Smith's; the works' yearly produce of £10,000 in the "
-                  "lab's first two presets is written for the lesson. The net revenue "
+                  "lab's undertaker and cheaper-machinery presets is written for the lesson. The net revenue "
                   "rises from £9,000 to £9,500, and the five hundred is back at work."),
             ("p", "The second deduction is subtler, because a society's circulating "
                   "capital is not like a man's. A man's circulating capital is wholly "
                   "excluded from his net revenue, which consists of his profits. But the "
-                  "goods in a merchant's shop, Smith says, &ldquo;may in that of other "
-                  "people, who, from a revenue derived from other funds, may regularly "
+                  "goods in a merchant's shop, though no part of his own stock for "
+                  "consumption, may go into the stock of other people, who, in Smith's "
+                  "words, &ldquo;from a revenue derived from other funds, may regularly "
                   "replace their value to him, together with its profits&rdquo;: "
                   "they are withdrawn into other people's consumption and stay in the "
                   "society's net revenue. So, &ldquo;Money, therefore, is the only part "
@@ -746,7 +760,7 @@ LESSONS = [
                   "it helps to distribute. &ldquo;The great wheel of circulation is "
                   "altogether different from the goods which are circulated by means of "
                   "it. The revenue of the society consists altogether in those goods, and "
-                  "not in the wheel which circulates them.&rdquo; In the lab's third "
+                  "not in the wheel which circulates them.&rdquo; In the lab's country "
                   "preset a country has a gross of £10,000,000, a fixed capital whose "
                   "upkeep is £2,000,000 and a stock of money whose yearly upkeep is "
                   "£500,000, all written for the lesson. The net revenue is £7,500,000, "
@@ -757,10 +771,11 @@ LESSONS = [
                   "millions, we mean only to express the amount of the metal pieces&rdquo;. "
                   "But when we say a man is worth a hundred pounds a year we mean the goods "
                   "his money buys, so his weekly revenue is &ldquo;to the guinea's worth "
-                  "rather than to the guinea&rdquo;. And a note on a bankrupt, like a "
-                  "guinea no one will take, is worth nothing. Smith has the same thought "
-                  "on his side: &ldquo;It is the ambiguity of language only which can make "
-                  "this proposition appear either doubtful or paradoxical.&rdquo;"),
+                  "rather than to the guinea&rdquo;. A guinea that could be exchanged for "
+                  "nothing would be, like a bill upon a bankrupt, worth no more than "
+                  "waste paper. Smith thinks the whole difficulty a verbal one: "
+                  "&ldquo;It is the ambiguity of language only which can make this "
+                  "proposition appear either doubtful or paradoxical.&rdquo;"),
             ("p", "Then the argument for a society. &ldquo;As the same guinea which pays "
                   "the weekly pension of one man to-day, may pay that of another "
                   "to-morrow, and that of a third the day thereafter, the amount of the "
@@ -776,7 +791,7 @@ LESSONS = [
                   "which consists in money&rdquo;. If upkeep is the whole of the money's "
                   "claim on the net revenue, then replacing gold by something cheaper "
                   "that circulates as well would be an improvement of exactly the same "
-                  "kind. In the fourth preset a country does it: the upkeep of its money "
+                  "kind. In the paper preset a country does it: the upkeep of its money "
                   "falls from £500,000 to £100,000, a saving of £400,000, and the net "
                   "revenue rises to £7,900,000. Smith's own name for that something "
                   "cheaper is paper money, and it is the subject of the next lesson."),
@@ -945,8 +960,8 @@ LESSONS = [
     # PSU text l. 9399-9990 (Book II, Chapter 2, second part). l. 9406-9434
     # (the banker's notes; a fifth); l. 9435-9492 (the million); l. 9493-9510
     # (where the gold goes); l. 9531-9559 (paper added to the wheel; a fifth);
-    # l. 9560-9607 (Scotland); l. 9627-9683 (cash accounts; London and Edinburgh);
-    # l. 9684-9708 (paper cannot exceed the gold); l. 9717-9754 (forty and forty-four
+    # l. 9560-9607 (Scotland; Glasgow); l. 9612-9683 (cash accounts; London and Edinburgh);
+    # l. 9684-9708 (paper cannot exceed the gold); l. 9740-9754 (forty and forty-four
     # thousand); l. 10454-10472 (highway and waggon-way); l. 10580-10586 (note
     # equal in value to gold); l. 10533-10579 (small notes; party walls).
     {
@@ -1006,7 +1021,7 @@ LESSONS = [
                   "silver, therefore, can in this manner be spared from the circulation "
                   "of the country&rdquo;. If many banks do the same, the whole circulation "
                   "may be carried on with a fifth of the gold and silver it needed."),
-            ("p", "That is the first preset, with a reserve of one fifth. Take it slowly, "
+            ("p", "That is the banker preset, with a reserve of one fifth. Take it slowly, "
                   "because the rest of the chapter follows from it. The banker's notes "
                   "carry a hundred thousand pounds of payments. A reserve of twenty "
                   "thousand in coin sits in his coffers, and it is the one thing that "
@@ -1031,7 +1046,7 @@ LESSONS = [
                   "distance from the banks which issue it, and from the country in which "
                   "payment of it can be exacted by law, it will not be received in common "
                   "payments. Gold and silver, therefore, to the amount of eight hundred "
-                  "thousand pounds, will be sent abroad&rdquo;. The second preset runs "
+                  "thousand pounds, will be sent abroad&rdquo;. The million preset runs "
                   "this: a circulation of 1,000,000, notes of 1,000,000, a reserve of one "
                   "fifth. The coin kept is 200,000 and the coin set free is 800,000. "
                   "Smith adds that it does not go &ldquo;for nothing&rdquo;: its owners "
@@ -1059,9 +1074,11 @@ LESSONS = [
                   "occasional demands&rdquo;: he draws on his cash account with the bank "
                   "and repays it piecemeal from his sales. Cash accounts, credits of "
                   "two or three thousand pounds to anyone who could find two sureties of "
-                  "good landed estate, with repayment in small sums and interest "
-                  "discounted on each, were a Scottish peculiarity. Smith thought they "
-                  "were the main cause of the benefit the banks did. He is careful about "
+                  "good landed estate, were granted, Smith believed, by banks in all "
+                  "parts of the world; what was peculiar to the Scottish banks was the "
+                  "easy repayment, in small sums with the interest discounted on each, "
+                  "and he thought it had perhaps been the principal cause both of their "
+                  "trade and of the benefit the country drew from it. He is careful about "
                   "the evidence: he says he has heard that the trade of Glasgow doubled in "
                   "fifteen years of banking, but &ldquo;I do not pretend to know&rdquo;, "
                   "and that if so it would be &ldquo;an effect too great to be accounted "
@@ -1073,11 +1090,12 @@ LESSONS = [
                   "the excess could neither be sent abroad nor be employed in the "
                   "circulation of the country, it must immediately return upon the banks, "
                   "to be exchanged for gold and silver.&rdquo; Then comes the case the lab "
-                  "was built for. &ldquo;circulation of the country can easily absorb and "
+                  "was built for. Suppose, he says, that all the paper of a particular "
+                  "bank which the &ldquo;circulation of the country can easily absorb and "
                   "employ, amounts exactly to forty thousand pounds, and that, for "
                   "answering occasional demands, this bank is obliged to keep at all times "
                   "in its coffers ten thousand pounds in gold and silver.&rdquo; That is "
-                  "the third preset: notes of 40,000, a reserve of a quarter, coin kept "
+                  "the forty preset: notes of 40,000, a reserve of a quarter, coin kept "
                   "of 10,000."),
             ("p", "Now let the bank issue four thousand more. &ldquo;Should this bank "
                   "attempt to circulate forty-four thousand pounds, the four thousand "
@@ -1085,7 +1103,7 @@ LESSONS = [
                   "and employ, will return upon it almost as fast as they are issued. For "
                   "answering occasional demands, therefore, this bank ought to keep at all "
                   "times in its coffers, not eleven thousand pounds only, but fourteen "
-                  "thousand pounds.&rdquo; The fourth preset enters 44,000 of notes on the "
+                  "thousand pounds.&rdquo; The forty-four preset enters 44,000 of notes on the "
                   "same circulation of 40,000: the quarter that Smith's bank held "
                   "against its notes is eleven thousand, and the four thousand of excess "
                   "has to be held in coin as well, since those notes go straight back "
@@ -1103,9 +1121,9 @@ LESSONS = [
                   "&ldquo;the solid ground of gold and silver&rdquo;."),
             ("p", "He therefore recommends rules, and they are worth setting beside his "
                   "praise of liberty. Banks should be restrained from issuing notes under "
-                  "a certain sum, &ldquo;no bank notes were issued in any part of the "
-                  "kingdom for a smaller sum than £5&rdquo;, so that paper stays in the "
-                  "trade between dealers, and bound to pay on demand without conditions. "
+                  "a certain sum: &ldquo;It were better, perhaps, that no bank notes were "
+                  "issued in any part of the kingdom for a smaller sum than £5&rdquo;, so "
+                  "that paper stays in the trade between dealers, and bound to pay on demand without conditions. "
                   "The objection is that this violates natural liberty, and Smith's "
                   "answer is that liberty has always been restrained where its use "
                   "&ldquo;might endanger the security of the whole society&rdquo;: "
@@ -1173,7 +1191,7 @@ LESSONS = [
         "worked": {
             "title": "Smith's million, and his bank of forty thousand",
             "intro": [
-                "Take the second and the third and fourth presets. Smith supposes a "
+                "Take the million, forty and forty-four presets. Smith supposes a "
                 "country whose circulation takes a million in gold and silver, notes of "
                 "a million and a fifth of them held in coin. Then a bank whose notes of "
                 "40,000 take a quarter in coin and then issue 4,000 too many.",
@@ -1189,9 +1207,9 @@ LESSONS = [
                 "In the first case the same exchanges are made with a fifth of the gold. In "
                 "the second Smith's point is that the extra notes bring no extra business "
                 "and do bring extra costs, because they come straight back and the coin "
-                "that goes out to meet them has to be collected again. The lab's reserve "
-                "tile for the third and fourth presets should be read against his fourteen "
-                "thousand.",
+                "that goes out to meet them has to be collected again. The lab's tile for "
+                "the coin the bank needs prints his fourteen thousand for the forty-four "
+                "preset, £3,000 more than the quarter it keeps.",
             ],
         },
         "quiz_title": "What paper does to a circulation",
@@ -1291,7 +1309,8 @@ LESSONS = [
     # (over-trading; the shift); l. 10022-10076 (A and B; interest and commission);
     # l. 10077-10088 (profits of six to ten per cent); l. 10089-10124 (note);
     # l. 10125-10202 (circulating bills; the banks and the projectors); l. 10203-10284
-    # (the new bank, six hundred thousand, eight per cent); l. 9829-9877
+    # (the new bank, six hundred thousand, eight per cent); l. 10036-10053 (the
+    # privileges of a bill; the weary traveller); l. 9829-9877
     # (real bills; the water-pond); l. 9936-9981 (what a bank can advance; fixed
     # capital); l. 10747-10764 (free trade in banking).
     {
@@ -1356,8 +1375,9 @@ LESSONS = [
                   "privileges: money is advanced on it more readily than on any other "
                   "obligation, and if the acceptor does not pay when it is presented he is "
                   "&ldquo;from that moment a bankrupt&rdquo;. Short dates add security. "
-                  "His image is of a traveller who thinks the inn is rotten but "
-                  "&ldquo;it is a chance if it falls to-night&rdquo;."),
+                  "His image is of a weary traveller who thinks the house he has come "
+                  "to is crazy and will not stand very long, &ldquo;but it is a chance "
+                  "if it falls to-night&rdquo;."),
             ("p", "Now A and B. A in Edinburgh draws a bill on B in London, payable in two "
                   "months. &ldquo;In reality B in London owes nothing to A in "
                   "Edinburgh&rdquo;. B accepts on condition that before it falls due he "
@@ -1376,7 +1396,7 @@ LESSONS = [
                   "cost him something more than eight per cent. in the year and sometimes "
                   "a great deal more, when either the price of the commission happened to "
                   "rise, or when he was obliged to pay compound interest&rdquo; upon the "
-                  "interest and commission of former bills. The lab's first preset "
+                  "interest and commission of former bills. The lab's two-months preset "
                   "is this: £10,000 raised on two-month bills at five per cent interest "
                   "and a half per cent commission. Interest five, commission six halves "
                   "makes three, and the simple cost is eight per cent, £800 a year. Counted "
@@ -1391,9 +1411,9 @@ LESSONS = [
                   "was thus borrowed for carrying it on, but afford, besides, a good "
                   "surplus profit to the projector.&rdquo; The projectors, he adds, had "
                   "&ldquo;in their golden dreams the most distinct vision of this great "
-                  "profit&rdquo; and, on waking, very seldom found it. Eight per cent is "
-                  "at or above the ordinary profit before a project has earned a "
-                  "penny for its projector."),
+                  "profit&rdquo; and, on waking, very seldom found it. Eight per cent "
+                  "would take most or all of an ordinary profit of six to ten per cent "
+                  "before a project had earned its projector a penny."),
             ("p", "The harm to the banks is the point of the passage. The bank that "
                   "discounted such a bill advanced, in its notes, a value that never came "
                   "back. &ldquo;This payment, therefore, was altogether fictitious. The "
@@ -1437,7 +1457,7 @@ LESSONS = [
                   "continually drawing bills of exchange upon London, it was paying, in "
                   "the way of interest and commission, upwards of eight per cent. and was "
                   "consequently losing more than three per cent. upon more than three "
-                  "fourths of all its dealings.&rdquo; The second preset enters his round "
+                  "fourths of all its dealings.&rdquo; The ayr-bank preset enters his round "
                   "figures: 600,000 on two-month bills at five per cent and a half "
                   "per cent. The yearly cost is eight per cent, £48,000. Against the five "
                   "per cent the bank was earning, that is a loss of three per cent, "
@@ -1460,7 +1480,7 @@ LESSONS = [
                   "people as propose to live upon the interest of their money&rdquo;. A "
                   "bank would be &ldquo;a very convenient creditor&rdquo; to such traders, "
                   "and they &ldquo;most inconvenient debtors to such a bank&rdquo;. The "
-                  "third preset is a mild case, written for this lesson: three-month "
+                  "three-months preset is a mild case, written for this lesson: three-month "
                   "bills, so four draws a year, which cost seven per cent."),
             ("p", "Three points for the other side of the ledger. Later writers, Thornton "
                   "among them, doubted that discounting only real bills limits issue, "
@@ -1537,7 +1557,7 @@ LESSONS = [
             "after": [
                 "Those are Smith's own words in figures: &ldquo;upwards of eight per "
                 "cent&rdquo; paid, five received, &ldquo;losing more than three per "
-                "cent&rdquo;. With a month longer on every bill, in the third preset, the "
+                "cent&rdquo;. With a month longer on every bill, in the three-months preset, the "
                 "draws fall to four and the cost to seven per cent, since the interest is "
                 "still the same five and the commission is paid two fewer times.",
             ],
@@ -1550,12 +1570,12 @@ LESSONS = [
              "a": ["7 per cent",
                    "6 per cent",
                    "12 per cent",
-                   "18 per cent"],
+                   "42 per cent"],
              "c": 2,
              "why": "There are `12/2 = 6` draws, so commission is `6 · 1 = 6` per cent, and "
                     "with interest of 6 per cent the cost is `6 + 6 = 12` per cent. Seven "
-                    "counts the commission once, six leaves it out, and eighteen counts "
-                    "the interest on every draw."},
+                    "counts the commission once, six leaves it out, and forty-two charges "
+                    "the whole year's interest again at every draw."},
             {"q": "Why does Smith call the payment of a redrawn bill fictitious?",
              "a": ["Because the signatures on the bills were forged",
                    "Because before each bill fell due another was drawn, and its "
@@ -1609,9 +1629,10 @@ LESSONS = [
             ("Reading Smith as saying banks should lend only to rich men",
              "His rule is about what is lent, not to whom. Real bills and cash "
              "accounts are good business; the whole capital of a trader, and above all "
-             "fixed capital, is not, whatever the borrower's fortune. And the sober "
-             "borrowers of private lenders are preferred because the money goes to "
-             "undertakings &ldquo;proportioned to their capitals&rdquo;."),
+             "fixed capital, is not, whatever the borrower's fortune. Money for fixed "
+             "capital, he says, ought to be borrowed &ldquo;upon bond or mortgage, of "
+             "such private people as propose to live upon the interest of their "
+             "money&rdquo;, who can wait for slow returns."),
         ],
         "standard": (
             "Finish when you can price a year of renewals and say why the bank loses.",

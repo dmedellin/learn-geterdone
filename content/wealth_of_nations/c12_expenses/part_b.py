@@ -99,8 +99,9 @@ LESSONS = [
                   "which can ever justly be bestowed upon a regulated company&rdquo;. His "
                   "reason is a general one. Established traders &ldquo;naturally combine to "
                   "raise profits&rdquo;, and a fine, even of twenty pounds, can keep out the "
-                  "speculative merchant who would hazard one voyage. The African company, "
-                  "which parliament charged with the forts, drew about £13,000 a year from "
+                  "speculative merchant who would hazard one voyage. The company of merchants "
+                  "trading to Africa, a regulated company set up in 1750 and charged with "
+                  "the forts, drew about £13,000 a year from "
                   "parliament to keep them and was accused, Smith writes, of sending out "
                   "bricks of such quality that the walls had to be rebuilt."),
             ("def", ("Joint-stock company",
@@ -148,12 +149,17 @@ LESSONS = [
                   "dividend is £192,000, a rate of 6 per cent. on the £3,200,000. In "
                   "dividend-10 it is £320,000, 10 per cent., and in dividend-12-5 it is "
                   "£400,000, 12.5 per cent. The lab calls it &lsquo;apparent profit&rsquo;, "
-                  "which here is only the dividend. That is arithmetic on Smith's figures. It is not the company's profit of trade, which he "
+                  "which here is only the dividend. Its other tiles take off the wages of "
+                  "the trader's own labour, and here there is none to take off: the "
+                  "proprietors, who seldom pretend to understand the business, give it no "
+                  "labour, so the &lsquo;true profit&rsquo; is the whole dividend and the "
+                  "share that is wages is nothing, the reverse of Book I's apothecary, "
+                  "whose profit was mostly wages. That is arithmetic on Smith's figures. It is not the company's profit of trade, which he "
                   "also gives, at £400,000 to £500,000 a year in 1769; it is the "
                   "dividend alone, and the lab can show no profit that a company without "
                   "its monopoly would have earned, because the chapter gives none. Smith's "
-                  "own claim about that is a verdict, not a number: the disorderly conduct "
-                  "of the Company's servants, he says, &ldquo;seldom allows the dividend of the company to exceed the ordinary rate "
+                  "own claim about that is a verdict, not a number: under a perpetual "
+                  "monopoly the disorderly conduct of a company's servants, he says, &ldquo;seldom allows the dividend of the company to exceed the ordinary rate "
                   "of profit in trades which are altogether free, and very frequently makes a "
                   "fall even a good deal short of that rate&rdquo;."),
             ("p", "Smith's judgment of the Company as a government is sharper still. Its "
@@ -188,8 +194,8 @@ LESSONS = [
                   "adventurer could not supply; and historians since, such as Philip Stern, "
                   "have argued that the East India Company was a political body from the "
                   "start, so that to call it a failed merchant misses what it was. On the "
-                  "other side, John Stuart Mill, writing in 1848, thought experience had "
-                  "since shown the joint-stock form suited to more trades than Smith's "
+                  "other side, events have gone past his list: the joint-stock form, made general by the limited-liability laws "
+                  "of the next century, has since carried on far more trades than Smith's "
                   "four, and economists in the twentieth century made the 'other people's "
                   "money' problem into the theory of agency costs without deciding that it "
                   "cannot be managed. Capital takes up the joint-stock company in Volume "
@@ -523,12 +529,15 @@ LESSONS = [
                   "reserve, modesty, chastity and economy among the purposes. It "
                   "is a remark in support of his argument against public institutions, not a "
                   "programme for girls. Mary Wollstonecraft's <em>Vindication of the Rights of "
-                  "Woman</em> of 1792, which came after he died, objected that what "
-                  "parents judged useful for girls was itself the problem."),
+                  "Woman</em> of 1792, which came after he died, objected that an "
+                  "education aimed at pleasing was itself the trouble, and asked for "
+                  "national day schools where girls and boys would be taught together."),
             ("p", "His critics on the main argument are fair ones. A salary and a "
                   "fee reward different things: fees can reward a popular teacher as well as "
-                  "a good one. And the parish schools he praises were supported in Scotland "
-                  "by a legal charge on the landowners, which the chapter does not mention. "
+                  "a good one. And the parish schools he praises were kept up, under the "
+                  "Scottish Act of 1696 for settling schools, by a charge laid on the "
+                  "landowners of each parish, so the public's share in his own example "
+                  "was a compulsory levy, a point the chapter passes over. "
                   "Smith's reply is that where masters really do their duty, young men "
                   "attend without being forced, so that the pupils are a check of their "
                   "own."),
@@ -794,9 +803,10 @@ LESSONS = [
                   "diligence in a clergy is dangerous, and Smith's is a claim about "
                   "numbers, that interested diligence is harmless when no one sect can "
                   "win. Sociologists who reviewed the evidence on religious "
-                  "competition, such as Mark Chaves and Philip Gorski around 2001, found "
-                  "no consistent result that more sects meant more religion or more "
-                  "peace, which is where the evidence stands as they read it. Smith's argument is better read as a proposal about "
+                  "competition, such as Mark Chaves and Philip Gorski in 2001, found "
+                  "no consistent evidence that more sects meant more religious "
+                  "participation, though that is a later question than Smith's, which "
+                  "is about peace and moderation. Smith's argument is better read as a proposal about "
                   "government than as a measurement."),
             ("def", ("Established church",
                      "A church whose clergy are maintained by a fund the law provides: "
@@ -822,18 +832,20 @@ LESSONS = [
                   "1755, with its glebes and the rent of the manses, &ldquo;amounted only to "
                   "£68,514:1:5 1/12d&rdquo;, which supported nine hundred and forty-four "
                   "ministers. Divide it: £68,514 over 944 ministers is `34257/472` of a "
-                  "pound each, about £72 11s, which is the lab's scotland preset. And "
+                  "pound each, about £72 11s, the first row of the lab's scotland preset. And "
                   "&ldquo;The most opulent church in Christendom does not maintain better the "
                   "uniformity of faith, the fervour of devotion, the spirit of order, "
                   "regularity, and austere morals, in the great body of the people, than "
                   "this very poorly endowed church of Scotland.&rdquo;"),
-            ("p", "The lab's other preset, three-clergies, shows the pay in Smith's three "
-                  "cases with figures written for the lesson: an established minister on "
-                  "a salary of £70 whose hearers add nothing, a parish priest on £40 with "
+            ("p", "The same preset sets that average beside the other two of Smith's "
+                  "three cases, with figures written for the lesson: a parish priest on £40 with "
                   "200 hearers giving two shillings each, so that £20 of his £60 is "
                   "offerings, and a friar on nothing with 300 hearers giving the same, so "
-                  "that all his £30 depends on them. The tiles give each man's share from "
-                  "gifts and what one more hearer is worth to him. Smith's own rule "
+                  "that all his £30 depends on them. The Scottish minister's £72.58 is the "
+                  "largest living of the three and none of it depends on his hearers, "
+                  "while one more hearer is worth two shillings to each of the others. "
+                  "The tiles give each man's share from gifts and what one more hearer "
+                  "is worth to him. Smith's own rule "
                   "for the pay is a general one: &ldquo;If any service is very much "
                   "underpaid, it is very apt to suffer by the meanness and incapacity of "
                   "the greater part of those who are employed in it. If it is very much "
@@ -880,23 +892,13 @@ LESSONS = [
             "preset": "scotland",
             "presets": [
                 {"id": "scotland",
-                 "label": "The average minister of the church of Scotland in 1755: Smith's £68,514 over his 944 ministers",
-                 "people": "scottish-minister, 34257/472, 0, 0",
+                 "label": "Smith's average minister of the church of Scotland in 1755 (£68,514 over his 944 ministers), beside a parish priest and a friar written for this lesson",
+                 "people": "scottish-minister, 34257/472, 0, 0; parish-priest, 40, 200, 1/10; friar, 0, 300, 1/10",
                  "expect": {
-                    "wpbFees": "scottish-minister £0",
-                    "wpbIncome": "scottish-minister £34,257/472 ≈ £72.58",
-                    "wpbShare": "scottish-minister 0%",
-                    "wpbMore": "scottish-minister £0",
-                    "wpbMost": "scottish-minister (0% from fees)",
-                }},
-                {"id": "three-clergies",
-                 "label": "An established minister, a parish priest and a friar (written for this lesson)",
-                 "people": "established-minister, 70, 0, 0; parish-priest, 40, 200, 1/10; friar, 0, 300, 1/10",
-                 "expect": {
-                    "wpbFees": "established-minister £0; parish-priest £20; friar £30",
-                    "wpbIncome": "established-minister £70; parish-priest £60; friar £30",
-                    "wpbShare": "established-minister 0%; parish-priest ≈ 33.33%; friar 100%",
-                    "wpbMore": "established-minister £0; parish-priest +£0.1; friar +£0.1",
+                    "wpbFees": "scottish-minister £0; parish-priest £20; friar £30",
+                    "wpbIncome": "scottish-minister £34,257/472 ≈ £72.58; parish-priest £60; friar £30",
+                    "wpbShare": "scottish-minister 0%; parish-priest ≈ 33.33%; friar 100%",
+                    "wpbMore": "scottish-minister £0; parish-priest +£0.1; friar +£0.1",
                     "wpbMost": "friar (100% from fees)",
                 }},
             ],
@@ -904,8 +906,8 @@ LESSONS = [
             "panel_intro": (
                 "Each row is a clergyman: a salary or stipend, a number of hearers and "
                 "what each gives. The lab shows the income, the share that depends on "
-                "the hearers and what one more hearer is worth. The first preset is "
-                "Smith's figure divided by his count; the second is written for the lesson."
+                "the hearers and what one more hearer is worth. The first row is "
+                "Smith's figure divided by his count; the other two are written for the lesson."
             ),
         }),
         "steps_title": "Pricing a church",
@@ -1017,7 +1019,7 @@ LESSONS = [
             "cannot tell you whether many sects bring peace, whether the Scottish church "
             "kept order better or worse than richer ones, or whether Smith's ranking of who "
             "should pay for what is the right one. The Scottish figure is his, divided by "
-            "his own count, and the three clergymen are written for the lesson."
+            "his own count, and the priest and the friar are written for the lesson."
         ),
     },
 ]

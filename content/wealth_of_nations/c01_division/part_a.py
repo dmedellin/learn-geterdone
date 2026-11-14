@@ -54,8 +54,8 @@ LESSONS = [
             ("Two circumstances regulate the proportion",
              "First the skill, dexterity and judgment with which labour is applied; "
              "second the proportion between those employed in useful labour and those who "
-             "are not. Smith says the first seems to matter more, and the whole of Book I "
-             "is spent on it."),
+             "are not. Smith says the first seems to matter more, and Book I opens with "
+             "it."),
         ],
         "read_title": "The opening sentence, then the contrast between nations",
         "read_intro": (
@@ -93,8 +93,10 @@ LESSONS = [
                   "Those two are the two factors on the right-hand side of "
                   "`produce per head = share at work × output per worker`, which you get by "
                   "writing the produce as workers times output and dividing by the whole "
-                  "population. The first factor is the fraction of the people at useful "
-                  "work. The second is how much each of them turns out in the year."),
+                  "population. Mind the order, because it is the reverse of Smith's. His "
+                  "first circumstance, skill, is the second factor: how much each worker "
+                  "turns out in the year. His second circumstance is the first factor: the "
+                  "fraction of the people at useful work."),
             ("def", ("Useful labour",
                      "The Introduction's word for work that supplies the nation's necessaries "
                      "and conveniencies, set against the work of those who &ldquo;are not so "
@@ -105,7 +107,8 @@ LESSONS = [
             ("p", "Now the portraits. &ldquo;Among the savage nations of hunters and "
                   "fishers, every individual who is able to work is more or less employed in "
                   "useful labour&rdquo;, and yet Smith says such nations are so poor that they "
-                  "are sometimes driven to abandon their infants and their old people. "
+                  "are often driven, or think themselves driven, to abandon their infants "
+                  "and their old people. "
                   "&ldquo;Among civilized and thriving nations, on the contrary, though a "
                   "great number of people do not labour at all, many of whom consume the "
                   "produce of ten times, frequently of a hundred times, more labour than the "
@@ -120,21 +123,23 @@ LESSONS = [
                   "person, with a third fewer at work. Take the second preset, "
                   "<code>few-at-work</code>, and let only 20 of the 100 work: the produce "
                   "falls to 240 and `12/5` a head, and the civilized people are still "
-                  "twice as well supplied as the hunters. That is Smith's claim in "
-                  "arithmetic, and it is why he says the first circumstance seems to matter "
-                  "more than the second."),
+                  "twice as well supplied as the hunters. That is Smith's claim that the "
+                  "first circumstance seems to matter more than the second, put into "
+                  "figures of the lesson's own."),
             ("p", "The third preset, <code>same-skill</code>, shows the other half, and "
                   "Smith does not deny it. Give both nations the same output of 2 a worker "
                   "and the nation with more at work wins: the hunters' 120 units against "
-                  "the other's 80. The share at work does matter. It is only that a "
-                  "difference in skill can be of any size, while the share at work is a "
-                  "fraction and cannot exceed one."),
+                  "the other's 80. The share at work does matter. One way to see why Smith "
+                  "ranks it second, though he does not put it so: a difference in skill can "
+                  "be of any size, while the share at work is a fraction and cannot exceed "
+                  "one."),
             ("p", "The portrait of the &ldquo;savage&rdquo; deserves a second look, because it "
                   "is the weakest part of the passage and Smith's readers have said so. It is "
                   "a conjecture built from travellers' reports, one stage in a story he "
                   "tells of societies passing from hunting to herding, farming and commerce. "
-                  "The anthropologist Marshall Sahlins argued in 1972, from field studies of "
-                  "present-day hunting peoples, that they often worked few hours and wanted "
+                  "The anthropologist Marshall Sahlins argued in 1972, drawing on other "
+                  "scholars' field studies of present-day hunting peoples, that they often "
+                  "worked few hours and wanted "
                   "little, so that poverty is not the right word for how they lived. Others "
                   "answered that small present-day groups cannot stand for all the past. The "
                   "lab does not decide between them. It takes Smith's contrast as a stated "
@@ -148,15 +153,21 @@ LESSONS = [
                   "round that policy. The fifth is about the revenue of the sovereign. This "
                   "Subject follows him through all five."),
             ("def", ("Money and measures, once",
-                     "Smith's sums are in the money of his day. Twelve pence (written d, "
-                     "from the Latin denarius) make a shilling (s), and twenty shillings make "
-                     "a pound (£), so a pound is two hundred and forty pence. A farthing is a "
-                     "quarter of a penny. Corn is sold by the quarter, which is eight "
-                     "bushels. Ounces and pounds of silver are weights. The lessons repeat a "
-                     "unit where a figure needs it, and the labs say which unit they use.")),
+                     "This lesson counts in plain units, but the rest of the book is in the "
+                     "money of Smith's day. Twelve pence (written d, from the Latin "
+                     "denarius) make a shilling (s), and twenty shillings make a pound (£), "
+                     "so a pound is two hundred and forty pence. A farthing is a quarter of a "
+                     "penny. A sum such as £2 3s 6d is read two pounds, three shillings and "
+                     "sixpence, and comes to 522 pence. The pound of money took its name "
+                     "from a pound weight of silver, and the two are different things: when "
+                     "Smith speaks of ounces or a pound weight of silver he means a weight "
+                     "of metal, and the second course works out how far the money pound "
+                     "drifted from it. Corn is sold by the quarter, which is eight bushels. "
+                     "The lessons repeat a unit where a figure needs it, and the labs say "
+                     "which unit they use.")),
             ("p", "That is the whole Introduction: one sentence that says what to measure, "
                   "one that says what moves it, and a map of the road. The next lesson goes "
-                  "straight to Smith's own answer to the second factor, with the most famous "
+                  "straight to Smith's account of his first circumstance, skill, with the most famous "
                   "factory in economics, a workshop of ten men making pins."),
         ],
         "lab": ("wonkit", {
@@ -699,9 +710,9 @@ LESSONS = [
                   "though very slow and gradual, consequence of a certain propensity in "
                   "human nature, which has in view no such extensive utility; the "
                   "propensity to truck, barter, and exchange one thing for another.&rdquo; "
-                  "Whether this propensity is an original principle or the consequence of "
-                  "reason and speech, he says, it does not belong to the present subject "
-                  "to inquire, and he moves on to what is plain: it is found in men and in "
+                  "Whether this propensity is an original principle or, as he thinks more "
+                  "probable, the consequence of reason and speech, he says, it does not "
+                  "belong to the present subject to inquire, and he moves on to what is plain: it is found in men and in "
                   "no other animal. &ldquo;Nobody ever saw a dog make a fair and deliberate "
                   "exchange of one bone for another with another dog.&rdquo;"),
             ("p", "Then the reason it matters. An animal grown up is independent, but man "
@@ -752,10 +763,12 @@ LESSONS = [
                   "venison, a gain of 22 bows and 17 of venison. And in "
                   "<code>slight-difference</code>, where the armourer takes 4 and 5 hours "
                   "and the hunter 5 and 4, each with 90 hours, the gain is only 2.5 of each "
-                  "(20 become 22.5). That is the point of Smith's next paragraph: the "
-                  "smaller the natural difference between people, the smaller the gain "
-                  "from sorting them, so a division of labour that grows large must have "
-                  "grown its own differences."),
+                  "(20 become 22.5). The lab's arithmetic is about differences people "
+                  "already have: with little difference, little gain. Smith's next "
+                  "paragraph turns that round. In his account most of the difference is "
+                  "made by the division, through the dexterity of the last lesson, so the "
+                  "gain does not wait on natural differences. A lab with fixed hours a "
+                  "unit cannot show that, and the lesson does not pretend it does."),
             ("p", "He says exactly that. &ldquo;The difference between the most dissimilar "
                   "characters, between a philosopher and a common street porter, for "
                   "example, seems to arise not so much from nature, as from habit, custom, "
@@ -866,9 +879,9 @@ LESSONS = [
             "after": [
                 "Each has the same hours, and between them they have 24 more bows and 24 "
                 "more units of venison. Make the two nearly equal at both jobs, as in the "
-                "third preset, and 20 of each becomes only 22.5 of each: the gain depends on "
-                "a difference, and Smith's argument is that the difference follows the "
-                "division, not the other way.",
+                "third preset, and 20 of each becomes only 22.5 of each: in the lab the gain "
+                "depends on a difference already there, while Smith's argument is that "
+                "the difference mostly follows the division.",
             ],
         },
         "quiz_title": "Interest and exchange",
@@ -929,8 +942,8 @@ LESSONS = [
              "Smith says the difference is &ldquo;much less than we are aware of&rdquo; and "
              "that at six or eight years old the two were &ldquo;perhaps&rdquo; very much "
              "alike. He is making a claim about degree, and he qualifies it. The lab's "
-             "<code>slight-difference</code> preset is the claim in arithmetic: a small "
-             "difference gives a small gain."),
+             "<code>slight-difference</code> preset is not that claim: it shows only "
+             "that, with fixed hours, a small difference gives a small gain."),
             ("Taking the lab's gain as Smith's calculation",
              "Smith gives no hours and no quantities. The producers, the hours and the "
              "baseline of equal quantities are written for the lesson, and the rule that "
@@ -948,7 +961,7 @@ LESSONS = [
             "than making them in equal quantities, for the hours it is given. It cannot "
             "show that people exchange because they are disposed to, which is Smith's "
             "thesis and is a claim about human nature, or that a market will take the "
-            "surplus. Smith's examples are a tribe of hunters and a village; the "
+            "surplus. Smith's example is a tribe of hunters or shepherds; the "
             "chapter's hours and rates are not his, and the choice of equal quantities "
             "as the baseline flatters the gain."
         ),
@@ -964,8 +977,8 @@ LESSONS = [
         "one_line": "A trade can exist only where there is enough demand to keep one man at it, and water carriage widens the market more than any road.",
         "summary": (
             "Chapter 3 gives the division of labour its limit. Take Smith's nailer, who "
-            "could make three hundred thousand nails a year but could sell a thousand in "
-            "the Highlands, and compute how many specialists a place's demand can keep. "
+            "could make three hundred thousand nails a year but could not sell even a "
+            "thousand in the Highlands, and compute how many specialists a place's demand can keep. "
             "Then weigh the wagon against the ship, in Smith's own figures, and see why he "
             "thought industry began on the coasts."
         ),
@@ -1027,11 +1040,12 @@ LESSONS = [
                   "rate of a thousand nails a day, and three hundred working days in a year, "
                   "will make three hundred thousand nails. But in a remote Highland "
                   "district, &ldquo;it would be impossible to dispose of one thousand, that "
-                  "is, of one day's work in the year.&rdquo; The lab's first preset, "
-                  "<code>highlands</code>, is exactly this: a demand of 1,000 nails a year "
-                  "and a nailer who makes 300,000. The place keeps no whole nailer, "
-                  "`1000/300000 = 1/300` of one man's year, and a nailer who tried to live "
-                  "there would be idle on all but a day in three hundred."),
+                  "is, of one day's work in the year.&rdquo; The district would not take "
+                  "even a thousand, so the lab's first preset, <code>highlands</code>, "
+                  "gives it Smith's bound as its demand: 1,000 nails a year, against a "
+                  "nailer who makes 300,000. Even at the bound the place keeps no whole "
+                  "nailer, `1000/300000 = 1/300` of one man's year, and a nailer who tried "
+                  "to live there would be idle on all but a day in three hundred."),
             ("def", ("Specialists a demand keeps",
                      "The number of whole men a place's yearly demand for a good can keep "
                      "at it, taking each man's yearly output as given: the demand divided "
@@ -1045,7 +1059,7 @@ LESSONS = [
                   "nailer, the market town a half, the port three nailers, the city ten. "
                   "Only in the port does the trade first stand on its own. Smith's "
                   "remark that a country smith's trade is &ldquo;still more various&rdquo; "
-                  "than the carpenter's is what the first four places look like in "
+                  "than the carpenter's is what the first three places look like in "
                   "practice: the man who cannot live by nails alone makes everything "
                   "iron."),
             ("p", "The third preset, <code>by-water</code>, written for the lesson, is the "
@@ -1065,9 +1079,9 @@ LESSONS = [
                   "fifty wagons mean a hundred men and four hundred horses, which are "
                   "Smith's figures. By land that is two tons a man; by sea it is between "
                   "twenty-five and thirty-three, so a man on the ship does roughly the "
-                  "work of twelve to seventeen on the road. The goods that bear a price in "
-                  "proportion to their weight are the only ones the wagons can move, and "
-                  "Smith asks what goods could bear the expense of land carriage between "
+                  "work of twelve to seventeen on the road. By land alone, Smith says, only "
+                  "goods whose price was very considerable in proportion to their weight "
+                  "could bear the carriage, and he asks what goods could bear the expense of land carriage between "
                   "London and Calcutta."),
             ("p", "Hence his geography. Because water carriage opens a wider market, "
                   "&ldquo;it is upon the sea-coast, and along the banks of navigable "
@@ -1075,18 +1089,19 @@ LESSONS = [
                   "improve itself&rdquo;, and only much later in the inland parts. The "
                   "nations that were first civilized dwelt round the Mediterranean, a "
                   "sea without tides and with many islands, so that sailors who dared not "
-                  "lose sight of the coast could still cross it. Egypt was the first "
-                  "country improved because the Nile and its canals gave water carriage "
-                  "to nearly every village, and Smith says the same of Bengal and the "
-                  "eastern provinces of China, though he says their antiquity is "
+                  "lose sight of the coast could still cross it. Egypt seems to him the "
+                  "first improved, and the Nile and its canals, which gave water carriage "
+                  "to nearly every village, &ldquo;probably one of the principal causes&rdquo;; "
+                  "he says the like of Bengal and the eastern provinces of China, though "
+                  "he says the great extent of their antiquity is "
                   "&ldquo;not authenticated by any histories of whose authority we, in this "
                   "part of the world, are well assured&rdquo;. And where there is no water "
                   "carriage, in the interior of Africa and in what he calls Tartary and "
                   "Siberia, he finds none of the improvement."),
             ("p", "That last sweep is the weakest part of the chapter, and Smith's "
                   "readers have said so. It rests on what a European knew in 1776, it "
-                  "passes over the caravan routes that historians of Asia and Africa have "
-                  "since described, and it "
+                  "says nothing of the overland caravan trade across Asia and Africa, "
+                  "and it "
                   "takes the coast as the cause of the civilisation when the coast might "
                   "be a consequence of it. The core of the chapter does not stand or fall "
                   "with it. The economist Allyn Young added a point in 1928 that Smith's "
@@ -1101,7 +1116,7 @@ LESSONS = [
                   "what it does, why it arises and what limits it. In the next course the "
                   "exchange it depends on gets its instrument. Chapter 4 asks what happens "
                   "when the butcher has more meat than he can eat and the baker has no "
-                  "need for any, and why every society has ended by choosing a metal."),
+                  "need for any, and why people settled at last on a metal."),
         ],
         "lab": ("wonkit", {
             "mode": "division",
@@ -1154,7 +1169,8 @@ LESSONS = [
              "300 days make 300,000 nails a year."),
             ("State the place's demand",
              "How many of the same good the place will take in a year, from every customer "
-             "within reach. Smith's Highland figure is a thousand."),
+             "within reach. Smith says a Highland district would not take even a "
+             "thousand, so a thousand is a bound."),
             ("Divide",
              "The demand over one man's yearly output is the share of a man's year the "
              "place takes. Anything under one is a part-time trade; the whole number "
@@ -1234,8 +1250,8 @@ LESSONS = [
              "also enlarges the market, so that one does not simply wait for the other."),
             ("Taking the geography for a proof",
              "The cases of Egypt, Bengal, China and Africa are illustrations with the "
-             "evidence of 1776, and Smith himself calls the antiquity of Bengal and China "
-             "unauthenticated. The nailer and the wagon are arithmetic, the coasts and "
+             "evidence of 1776, and Smith himself says the great extent of the antiquity "
+             "of Bengal and China is not authenticated. The nailer and the wagon are arithmetic, the coasts and "
              "rivers are history, and they differ in how much can be checked."),
         ],
         "standard": (
@@ -1247,7 +1263,8 @@ LESSONS = [
         ),
         "note": (
             "The lab divides demand by output, and the figure that matters is the demand, "
-            "which Smith does not measure: the 1,000 nails is a reasoned guess, and the "
+            "which Smith does not measure: the 1,000 nails is a bound he says the "
+            "district would not reach, and the "
             "villages and towns of the <code>ladder</code> preset are the lesson's. The "
             "arithmetic cannot say whether the Highlands really lacked a nailer, whether "
             "demand grows with the market or the market with demand, or whether the "

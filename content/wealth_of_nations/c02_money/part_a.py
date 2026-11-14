@@ -96,7 +96,12 @@ LESSONS = [
                   "as the measure, each of the others needs only a price in it, which is "
                   "`n − 1`, so 2. In the preset <code>market-town</code>, with twelve goods "
                   "in a town's market, that is 66 ratios without a measure and 11 with "
-                  "one. The lab counts the measure as one of the goods, as cattle were; if "
+                  "one. Its six traders, written for the lesson, show all three cases at "
+                  "once: the weaver and the shepherd want each other's cloth and wool and "
+                  "can trade directly; the butcher, the shoemaker and the tanner are a "
+                  "ring like the one described next and can trade only through a money; and the "
+                  "smith's iron is wanted by none of them, so he has no buyer here at "
+                  "all. The lab counts the measure as one of the goods, as cattle were; if "
                   "money is a thirteenth thing outside the list, each of the twelve goods "
                   "has one price in it, and that is twelve."),
             ("p", "The same lab can say who can trade with whom, with traders written for "
@@ -107,8 +112,8 @@ LESSONS = [
                   "traders, three goods, and no exchange. All three can trade through a "
                   "money, because each has something that someone wants. Change one wish, as "
                   "in <code>one-match</code>, so the butcher wants bread and the baker wants "
-                  "meat, and those two can trade directly, while the brewer is still left "
-                  "out."),
+                  "meat, and those two can trade directly, while the brewer is left out: "
+                  "no one of the three wants his beer."),
             ("def", ("A common measure",
                      "A commodity in which every other good is priced, so that the rates of "
                      "exchange among many goods can be read off from a few. In this chapter "
@@ -149,9 +154,11 @@ LESSONS = [
                   "weight, of silver of a known fineness&rdquo;. English, French and Scots "
                   "pennies &ldquo;contained all of them originally a real penny-weight of "
                   "silver&rdquo;, which he says was the twentieth part of an ounce and the "
-                  "two hundred and fortieth part of a pound. That is why twelve pence make a shilling and "
-                  "twenty shillings a pound, and why a pound of silver was two hundred "
-                  "and forty pence. Then comes the sentence that the next lessons use: "
+                  "two hundred and fortieth part of a pound. That is why a pound was two "
+                  "hundred and forty pence. The shilling, he says, was first a weight too, "
+                  "but the pence in it varied, five at one time among the Saxons, until "
+                  "from William the Conqueror's time the proportion of pound, shilling and "
+                  "penny was the twenty and twelve it still is. Then comes the sentence that the next lessons use: "
                   "&ldquo;the avarice and injustice of princes and sovereign states, "
                   "abusing the confidence of their subjects, have by degrees diminished "
                   "the real quantity of metal, which had been originally contained in "
@@ -181,9 +188,9 @@ LESSONS = [
                   "differ from the natural price. This course takes the first of them, in "
                   "Chapter 5, and the next course the second and third. The story Smith "
                   "tells of money's origin is a conjecture, and the anthropologist "
-                  "Caroline Humphrey, in 1985, found no example of a society that lived "
-                  "by barter alone, and David Graeber, in 2011, drawing on her and on "
-                  "others, argued that credit and debt came before coin, a thing the "
+                  "Caroline Humphrey wrote in 1985 that no economy run on barter alone had "
+                  "ever been described, and David Graeber, in 2011, drawing on her and on "
+                  "others, argued that credit and debt came before coin, which the "
                   "economists' story leaves out. The lab counts what the story implies for a market of "
                   "stated size, and takes no side on that."),
         ],
@@ -217,16 +224,16 @@ LESSONS = [
                           "wmoNoBuyer": "1: brewer",
                          }},
                 {"id": "market-town",
-                 "label": "Twelve goods in a town's market, written for this lesson",
+                 "label": "Twelve goods and six traders in a town's market, written for this lesson",
                  "goods": "meat beer bread salt cloth shoes candles leather iron timber wool cheese",
-                 "traders": "",
+                 "traders": "butcher, meat, shoes; shoemaker, shoes, leather; tanner, leather, meat; weaver, cloth, wool; shepherd, wool, cloth; smith, iron, timber",
                  "expect": {
                           "wmoWithout": "66 ratios",
                           "wmoWith": "11 prices",
                           "wmoFewer": "55 quotations fewer",
-                          "wmoDirect": "no traders given",
-                          "wmoViaMoney": "no traders given",
-                          "wmoNoBuyer": "no traders given",
+                          "wmoDirect": "1: weaver–shepherd",
+                          "wmoViaMoney": "3: butcher, shoemaker, tanner",
+                          "wmoNoBuyer": "1: smith",
                          }},
             ],
             "panel_title": "What exchange costs without a common measure",
@@ -745,7 +752,7 @@ LESSONS = [
                   "the money two-thirds bring, so near 80 shillings, which for the same 4 "
                   "quarters means 20 shillings a quarter: corn four times as dear. The "
                   "money two-thirds are still 40 shillings, and the lab shows what they "
-                  "buy: 8 quarters at the first price, 2 at the second, a change of "
+                  "buy: 8 quarters at the first price, 2 at the second, "
                   "a fall of 75 per cent, so the money rent is worth `1/4` of what it was, "
                   "Smith's fourth. The proportion between the corn third and the money "
                   "two-thirds is Blackstone's as Smith reports it, and the fourfold rise in "
@@ -798,8 +805,9 @@ LESSONS = [
                      "corn.&rdquo;")),
             ("p", "Two things limit the advice. First, Smith himself says that for ordinary "
                   "buying and selling the distinction is of no use. Second, a single "
-                  "commodity is only a stand-in. Later economists replaced it with a "
-                  "basket: the index number, which W. S. Jevons used in 1863 to measure the "
+                  "commodity is only a stand-in. The other answer is a basket of goods: the "
+                  "index number, which had forerunners in the eighteenth century and which "
+                  "W. S. Jevons used in 1863 to measure the "
                   "fall in the value of gold after the Californian and Australian "
                   "discoveries. A basket answers some of Smith's difficulties and has its own, "
                   "since it needs a choice of what goes in it and in what proportion. "
@@ -834,7 +842,7 @@ LESSONS = [
                           "wprWay": "not the same way: the money price held and the real price fell",
                          }},
                 {"id": "dear-year",
-                 "label": "A money rent of 250s against corn at Smith's 25s and 50s the quarter",
+                 "label": "A money rent of 250s against corn at Smith's 25s and 50s the quarter (the rent is written for this lesson)",
                  "years": "ordinary-year, 250, 25; dear-year, 250, 50",
                  "expect": {
                           "wprReal": "ordinary-year 10 quarters of corn; dear-year 5 quarters of corn",
@@ -934,8 +942,10 @@ LESSONS = [
             ("Thinking a corn rent is fixed in value",
              "Smith says corn is better over centuries, and he adds that it is not exact, "
              "since the labourer's subsistence differs between a growing and a stagnant "
-             "society. From year to year a corn rent's worth in labour can double, as the "
-             "<code>dear-year</code> preset shows."),
+             "society. From year to year a corn rent's worth in labour can double: the "
+             "<code>dear-year</code> preset shows the other side of it, a money rent "
+             "that halves in corn, so ten quarters of corn rent are worth twice the "
+             "money, and with the wage steady twice the labour."),
             ("Taking one measure to be the right one for all periods",
              "Corn serves for the century and silver for the year, and Smith says it in "
              "so many words. Choosing the measure is part of the problem, and the "
@@ -1065,8 +1075,8 @@ LESSONS = [
                   "standard weight, &ldquo;there would in this case, be a profit in "
                   "melting it down&rdquo;, since a guinea would buy more silver in coin than "
                   "in bullion. Later economists named this kind of tendency, in which the "
-                  "overrated metal drives the other out, Gresham's law, a name given in 1858 "
-                  "by H. D. Macleod. Smith also reports that Locke blamed the high price "
+                  "overrated metal drives the other out, Gresham's law, a name H. D. Macleod "
+                  "gave it in the 1850s. Smith also reports that Locke blamed the high price "
                   "of silver bullion on the permission to export bullion, and replies that "
                   "gold had the same permission and its price had fallen below the mint "
                   "price. The reader can take the details as his argument that a coin's "

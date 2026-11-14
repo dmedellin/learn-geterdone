@@ -150,8 +150,8 @@ LESSONS = [
             ("p", "He draws it out. &ldquo;According to the natural course of things, "
                   "therefore, the greater part of the capital of every growing society is, "
                   "first, directed to agriculture, afterwards to manufactures, and, last of "
-                  "all, to foreign commerce.&rdquo; Foreign commerce, by this account, matters "
-                  "less than it seems whose capital carries it. If a society has not enough "
+                  "all, to foreign commerce.&rdquo; On this account it matters less than it "
+                  "seems whose capital carries a country's foreign commerce. If a society has not enough "
                   "stock to cultivate all its land and manufacture its produce, there is "
                   "&ldquo;even a considerable advantage&rdquo; in a foreign capital carrying "
                   "the rude produce abroad, so that the society's own stock can be put to "
@@ -170,8 +170,11 @@ LESSONS = [
             ("p", "A reader should hold Smith's word &ldquo;natural&rdquo; at arm's length. "
                   "It is partly a claim about what people would choose and partly a story "
                   "of what happened in a few places, and economic historians since have "
-                  "asked how much of Europe's history it fits. Smith himself says Italy, "
-                  "cultivated through foreign commerce, was the exception. The lab does not "
+                  "asked how much of Europe's history it fits. Smith himself says, at the "
+                  "end of Book III, that Italy is the only great country of Europe that "
+                  "seems to have been improved in every part by foreign commerce and "
+                  "manufactures for distant sale: the inverted order at its most "
+                  "successful. The lab does not "
                   "decide the question. It shows only that a farmer and a weaver with "
                   "different skills each get more by trading, which is the part of the "
                   "argument that does not depend on the order. The next lesson reads how "
@@ -372,7 +375,7 @@ LESSONS = [
              "the inclination, nor the habit of small savings and gains."),
             ("Who bears the cost, who gets the return",
              "A slave acquires nothing but his maintenance; a metayer keeps half the "
-             "produce, and the landlord, who lays out nothing, takes the other half; a "
+             "produce, and the landlord, who lays out nothing on an improvement, takes the other half of what it yields; a "
              "tenant farmer on a lease keeps all the produce for the term but pays "
              "the cost of improving. Each holder's reason to improve is what he gets "
              "back from it."),
@@ -417,8 +420,9 @@ LESSONS = [
                   "country, are at present supposed to be under strict entail&rdquo;."),
             ("p", "What follows is the economic point. &ldquo;It seldom happens, however, "
                   "that a great proprietor is a great improver.&rdquo; In disorderly times "
-                  "he had no leisure, and later no inclination and &ldquo;almost always "
-                  "the requisite abilities&rdquo;. To improve land profitably &ldquo;like "
+                  "he had no leisure; when law and order gave him leisure, he often wanted "
+                  "the inclination, &ldquo;and almost always the requisite "
+                  "abilities&rdquo;. To improve land profitably &ldquo;like "
                   "all other commercial projects, requires an exact attention to small "
                   "savings and small gains, of which a man born to a great fortune, even "
                   "though naturally frugal, is very seldom capable&rdquo;. He embellishes "
@@ -438,7 +442,7 @@ LESSONS = [
                   "statement about what the planters of the 1770s found profitable and "
                   "not a defence of it; he adds that the pride of man makes him love to "
                   "domineer, and prefer slaves wherever the law and the work allow."),
-            ("p", "The next occupier is the metayer, the coloni partiarii of the Latin "
+            ("p", "The next occupier is the metayer, the <em>coloni partiarii</em> of the Latin "
                   "authors. The proprietor supplied the seed, cattle and instruments, "
                   "the produce was divided equally after the stock was made good, and the "
                   "metayer, being a freeman, had &ldquo;a plain interest that the whole "
@@ -599,18 +603,18 @@ LESSONS = [
             {"q": "On the same figures, a metayer keeps half the added produce and bears the "
                   "whole cost. How many years must he hold the land for the improvement to "
                   "repay him?",
-             "a": ["6 years", "12 years", "9 years", "18 years"],
-             "c": 1,
+             "a": ["6 years", "9 years", "18 years", "12 years"],
+             "c": 3,
              "why": "He keeps `(1/2) × 15 = 7.5` a year, so `90 / 7.5 = 12`. Six years is "
                     "what the full-share farmer needs; 18 would be a third of the "
                     "produce."},
             {"q": "Why does Smith say the work of slaves is in the end the dearest of any?",
              "a": ["Slaves must be bought, and prices of slaves rise",
+                   "Slaves are less skilled than freemen at every task",
                    "A person who can acquire no property has no interest but to eat as much "
                    "and labour as little as possible",
-                   "Slaves are less skilled than freemen at every task",
                    "Slave owners are prevented by law from improving their land"],
-             "c": 1,
+             "c": 2,
              "why": "That is his reason, in his words. He says nothing in the passage "
                     "about the price of slaves or about the skill of the enslaved, and the "
                     "owners' power over the land is the opposite of a restraint."},
@@ -756,7 +760,7 @@ LESSONS = [
                   "more to be augmented, that branch of their revenue, which was, "
                   "perhaps, of all others, the most likely to be improved by the natural "
                   "course of things, without either expense or attention of their own.&rdquo; "
-                  "He gives two reasons. A sovereign who could not protect the weak "
+                  "He gives the reasons. A sovereign who could not protect the weak "
                   "from the great lords needed allies, and the lords hated the burghers: "
                   "&ldquo;The lords despised the burghers, whom they considered not only as "
                   "a different order, but as a parcel of emancipated slaves.&rdquo; So "
@@ -819,9 +823,9 @@ LESSONS = [
             ("p", "He ends by sorting manufactures for distant sale into two kinds. Some "
                   "are the offspring of foreign commerce, imitations established by "
                   "particular merchants' stock, in imported materials: the silk of Lucca, "
-                  "which in 1310 drove nine hundred families into exile and so sent "
-                  "thirty-one to Venice to begin the manufacture with three hundred "
-                  "workmen, the fine cloths of Flanders, the silk of Lyons and "
+                  "carried to Venice when in 1310 nine hundred families were driven out "
+                  "of Lucca by its tyrant and thirty-one of them began the manufacture "
+                  "there with three hundred workmen, the fine cloths of Flanders, the silk of Lyons and "
                   "Spitalfields. Others grow up naturally, by the gradual refinement of "
                   "household manufactures upon the produce of the country, in inland places "
                   "where a fertile soil gives a surplus of provisions that is hard to "
@@ -902,7 +906,7 @@ LESSONS = [
                 "the declining town, year 100:  100 / 60 = 166.67%; 40 over",
             ],
             "after": [
-                "The same fixed 100 is a third of the dues in one town and more than all "
+                "The same fixed 100 is less than a third of the dues in one town and more than all "
                 "of them in another. Smith's wonder is at the first sort of town, whose "
                 "natural growth the king gave away, and the second is the risk the "
                 "burghers took in being jointly answerable.",
@@ -965,8 +969,8 @@ LESSONS = [
             ("Reading the farm as a gift to the towns alone",
              "The farm was a bargain, the burghers paying a rent and taking on the "
              "collection and a joint liability. In the declining preset they would be "
-             "worse off. Smith's wonder is at what the king gave away on one side of "
-             "a bargain whose terms he had every reason to think fair."),
+             "worse off. Smith's wonder is at what the king gave away on his side of "
+             "the bargain, and his explanation is the alliance it bought."),
             ("Supposing Smith says towns made the country poor",
              "He says the opposite in Chapter 1 and again at the end of Chapter 3: the "
              "manufactures that are the offspring of agriculture improved the land. "
@@ -1234,7 +1238,7 @@ LESSONS = [
             ("Turn it into a share of maintenance",
              "Divide that payment by one person's yearly maintenance. A share of 1 is a "
              "wholly dependent maker; a share of 1/100 is one who lives almost "
-             "entirely on someone else."),
+             "entirely on his other customers."),
             ("Ask who is wholly dependent",
              "If no purchase has a share of 1 the lord commands no one's livelihood; "
              "the number of makers partly maintained, added up, shows how much wider "
@@ -1337,7 +1341,7 @@ LESSONS = [
             "lords it explains, with taxation, firearms and royal courts competing as "
             "causes, and Capital's lesson <em>Expropriation of the Agricultural "
             "Population</em> reads the breaking up of the retainers' bands as the first "
-            "stage of driving the peasantry off the land, where Smith traces the loss of "
+            "stage in driving the peasantry off the land; Smith reads it as the end of "
             "the lords' power."
         ),
     },

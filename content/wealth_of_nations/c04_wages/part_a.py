@@ -64,15 +64,15 @@ LESSONS = [
         ],
         "read_title": "The deductions, the bargain and the floor",
         "read_intro": (
-            "Chapter 8 is the longest in Book I. This lesson reads its first third, up "
-            "to the sentence that names the lowest rate consistent with common humanity."
+            "Chapter 8 is long, and this lesson reads its first third, up to the "
+            "sentence that names the lowest rate consistent with common humanity."
         ),
         "body": [
             ("p", "<strong>Book I, Chapter 8.</strong> &ldquo;In that original state of "
                   "things which precedes both the appropriation of land and the accumulation "
                   "of stock, the whole produce of labour belongs to the labourer. He has "
                   "neither landlord nor master to share with him.&rdquo;"),
-            ("p", "The chapter's first heading says that the produce of labour &ldquo;"
+            ("p", "The chapter's first sentence says that the produce of labour &ldquo;"
                   "constitutes the natural recompence or wages of labour&rdquo;, and the "
                   "first thing Smith does with the idea is to say it has not lasted. Had "
                   "it continued, wages would have risen with every improvement the division "
@@ -162,11 +162,13 @@ LESSONS = [
                   "and against Cantillon's minimum of 40 it is 4 pence short. On the lowland "
                   "wage of 48 the family is short by 72 and Cantillon's minimum is covered "
                   "with 8 to spare. On the london wage of 108 the family is short by only "
-                  "12 and the minimum is covered by 68. The lab says nothing of the "
-                  "length of Smith's working week or what it did for a household; "
-                  "the three wages are figures that Smith gives for different "
-                  "places, not a series, and the lesson should not be read as a "
-                  "comparison of regions."),
+                  "12 and the minimum is covered by 68. Two cautions. Hales wrote in the "
+                  "time of Charles II, and Smith says that both the income and the expense "
+                  "of such families have increased considerably since, so his 120 pence is "
+                  "an older figure set against wages of the 1770s. And the same family's "
+                  "needs are used in all three places, which the lab does not price "
+                  "separately: the presets compare each wage with one stated need, not the "
+                  "cost of living in the Highlands, the Lowlands and London."),
             ("p", "Later economists made the floor into something firmer than Smith "
                   "does. Ricardo, in 1817, held that the natural price of labour is the "
                   "price that enables labourers to subsist and to perpetuate their race, "
@@ -296,7 +298,7 @@ LESSONS = [
                    "few workmen could subsist a month",
                    "The masters are paid in coin and the workmen in goods",
                    "Workmen are forbidden to work for another master",
-                   "Masters are always richer than the workmen's own funds"],
+                   "The masters own the cottages the workmen live in"],
              "c": 0,
              "why": "&ldquo;A landlord, a farmer, a master manufacturer, or merchant, though "
                     "they did not employ a single workman, could generally live a year or "
@@ -436,8 +438,9 @@ LESSONS = [
                   "mortality, would immediately prevail in that class&rdquo; until the "
                   "number of the people is reduced to what the remaining revenue and stock "
                   "can maintain. &ldquo;This, perhaps, is nearly the present state of Bengal&rdquo;, "
-                  "where &ldquo;three or four hundred thousand people die of hunger in one "
-                  "year&rdquo;. He puts the difference between North America and Bengal down "
+                  "and he adds that in a fertile country where &ldquo;three or four hundred "
+                  "thousand people die of hunger in one year&rdquo; the funds for the labouring "
+                  "poor must be fast decaying. He puts the difference between North America and Bengal down "
                   "to the government of each, the British constitution against the mercantile "
                   "company that &ldquo;oppresses and domineers in the East Indies&rdquo;. "
                   "&ldquo;The liberal reward of labour, therefore, as it is the necessary "
@@ -456,9 +459,12 @@ LESSONS = [
                   "thirty years the wage is about £10.68, above the rich country's £10. "
                   "In the crowded preset the fund stays at £1,000 and the 100 workers grow "
                   "two per cent a year: after ten years the wage is about £8.20. In the "
-                  "declining preset the fund falls four per cent a year with 100 workers "
-                  "unchanged and after ten years the wage is about £6.65. All four are "
-                  "written for the lesson, and nothing here is Smith's figure."),
+                  "declining preset the fund of £1,000 falls four per cent a year while "
+                  "the 100 workers still grow one per cent, as a people goes on multiplying "
+                  "for a time after the funds begin to decay and the lowest class fills "
+                  "with the overflow of the others: after ten years the fund is about "
+                  "£664.83 and the wage about £6.02. All four are written for the lesson, "
+                  "and nothing here is Smith's figure."),
             ("p", "What the lab leaves out matters. Smith's wage is not a quotient. He says "
                   "the demand for labour determines what the masters have to offer, as "
                   "when they bid against each other, and in the stationary case the "
@@ -513,11 +519,11 @@ LESSONS = [
                     "wwgTrend": "the wage falls every year: the workers grow faster than the fund",
                     "wwgFundLast": "£1,000",
                  }},
-                {"id": "declining", "label": "A fund falling four per cent a year, written for this lesson",
-                 "fund": 1000, "workers": 100, "fund_growth": -4, "worker_growth": 0,
+                {"id": "declining", "label": "A fund falling four per cent a year while the workers still grow one, written for this lesson",
+                 "fund": 1000, "workers": 100, "fund_growth": -4, "worker_growth": 1,
                  "years": 10, "expect": {
                     "wwgWageFirst": "£10 a worker",
-                    "wwgWageLast": "≈ £6.65 a worker (year 10)",
+                    "wwgWageLast": "≈ £6.02 a worker (year 10)",
                     "wwgTrend": "the wage falls every year: the workers grow faster than the fund",
                     "wwgFundLast": "≈ £664.83",
                  }},
@@ -625,8 +631,8 @@ LESSONS = [
              "lab's way of showing the direction. It has no floor, no bargaining and "
              "no time lag, and a later school made it a doctrine that Mill himself gave up."),
             ("Reading China and Bengal as measured facts",
-             "They are Smith's accounts from travellers and from the East India Company's "
-             "records, and later historians have disputed the first and said more about "
+             "China is Smith's from travellers' accounts and Bengal from the reports of his "
+             "own day, which he does not cite, and later historians have disputed the first and said more about "
              "the second. The lesson reports the argument Smith builds on them."),
         ],
         "standard": (
@@ -802,9 +808,10 @@ LESSONS = [
                   "industrious in dear years than in cheap ones. He says it is "
                   "commended by masters, who make better bargains in dear years, and by "
                   "landlords and farmers, whose rents and profits rise with the price of "
-                  "provisions. He examines the registers of the French author Messance, "
-                  "which seem to support it, and finds nothing like it in the growing "
-                  "manufactures of Scotland and Yorkshire. The lesson passes this over: "
+                  "provisions. He cites the French author Messance, whose figures from the "
+                  "registers of three stationary French manufactures show more goods made in "
+                  "cheap years than in dear, and finds no sensible connection either way in "
+                  "the growing manufactures of Scotland and Yorkshire. The lesson passes this over: "
                   "it is evidence for a question the lab does not take, and the full "
                   "argument is on the pages."),
             ("p", "The chapter ends by joining wages back to prices. The money price of "
@@ -815,9 +822,9 @@ LESSONS = [
                   "through divisions of employment and better machinery, so that many "
                   "commodities come to be produced by so much less labour that &ldquo;the "
                   "increase of its price is more than compensated by the diminution of its "
-                  "quantity&rdquo;. The next chapter takes up profit, and the one after "
-                  "the lesson on it takes up Smith's claim that a rise of profit raises "
-                  "prices more than a rise of wages."),
+                  "quantity&rdquo;. Chapter 9 takes up profit, and its last pages take up "
+                  "Smith's claim that a rise of profit raises prices more than a rise of "
+                  "wages, which is the fifth lesson of this course."),
             ("p", "The next lesson, <em>The Profits of Stock</em>, reads Chapter 9, "
                   "which asks the same questions of profit that this chapter asked of "
                   "wages."),
@@ -1035,7 +1042,7 @@ LESSONS = [
                   "have been advancing faster and faster, and the wages of labour have "
                   "risen while in the greater part of the different branches of trade and "
                   "manufactures &ldquo;the profits of stock have been diminishing&rdquo;. The reason is "
-                  "the one in the third concept above: the competition of larger and "
+                  "the one in the second concept above: the competition of larger and "
                   "larger stocks. He sees it between town and country too, where a great "
                   "town needs a greater stock to carry on any trade, and the wages are "
                   "higher and the profit lower than in a remote village."),
@@ -1085,9 +1092,14 @@ LESSONS = [
                   "profit is eight or ten per cent. it may be reasonable that one half of it "
                   "should go to interest&rdquo;, since the borrower runs the risk and takes "
                   "the trouble, and four or five per cent may be enough for both. The "
-                  "half preset has those two cases, interest 4 against a profit of 8, and "
-                  "interest 5 against a profit of 10, and leaves 4 and 5 per cent for the "
-                  "borrower. He adds at once that the proportion &ldquo;might not be the "
+                  "half preset has those two cases, interest 5 against a profit of 10 and "
+                  "interest 4 against a profit of 8, and leaves 5 and 4 per cent for the "
+                  "borrower. The lesson puts them in that order, as one country whose clear "
+                  "profit falls from ten to eight per cent as its stock grows, so the "
+                  "first-to-last tile reads interest 5% → 4% (−1 point) against implied "
+                  "profit 10% → 8% (−2 points): with half to the lender, interest falls by "
+                  "half as many points as profit. The order is the lesson's; Smith gives "
+                  "the two rates as alternatives. He adds at once that the proportion &ldquo;might not be the "
                   "same in countries where the ordinary rate of profit was either a good deal "
                   "lower, or a good deal higher.&rdquo; Bengal, at forty per cent interest, is "
                   "not a case of double interest."),
@@ -1123,13 +1135,13 @@ LESSONS = [
                     "witImplied": "Henry-VIII 10% × 2 = 20%; James-I 8% × 2 = 16%; after-the-Restoration 6% × 2 = 12%; Queen-Anne 5% × 2 = 10%",
                     "witFall": "interest 10% → 5% (−5 points); implied profit 20% → 10% (−10 points)",
                  }},
-                {"id": "half", "label": "Smith's eight or ten per cent profit with half to interest",
-                 "rows": [["profit-eight-per-cent", 4, 2, 8],
-                          ["profit-ten-per-cent", 5, 2, 10]],
+                {"id": "half", "label": "Smith's ten or eight per cent profit with half to interest, taken as a fall (the order written for this lesson)",
+                 "rows": [["profit-ten-per-cent", 5, 2, 10],
+                          ["profit-eight-per-cent", 4, 2, 8]],
                  "expect": {
-                    "witImplied": "profit-eight-per-cent 4% × 2 = 8%; profit-ten-per-cent 5% × 2 = 10%",
-                    "witLeft": "profit-eight-per-cent 8% − 4% = 4%; profit-ten-per-cent 10% − 5% = 5%",
-                    "witFall": "interest 4% → 5% (+1 point); implied profit 8% → 10% (+2 points)",
+                    "witImplied": "profit-ten-per-cent 5% × 2 = 10%; profit-eight-per-cent 4% × 2 = 8%",
+                    "witLeft": "profit-ten-per-cent 10% − 5% = 5%; profit-eight-per-cent 8% − 4% = 4%",
+                    "witFall": "interest 5% → 4% (−1 point); implied profit 10% → 8% (−2 points)",
                  }},
             ],
             "panel_title": "What interest implies about profit",
@@ -1343,7 +1355,7 @@ LESSONS = [
                   "sentence about arithmetical proportion is about the wages part only, "
                   "so it holds on the lab's own figures: £28 added once. But it leaves "
                   "open what a wage rise does to the whole price."),
-            ("p", "He ends the chapter with the point about interest. &ldquo;Our merchants "
+            ("p", "He ends the chapter with the merchants. &ldquo;Our merchants "
                   "and master manufacturers complain much of the bad effects of high wages "
                   "in raising the price, and thereby lessening the sale of their goods, "
                   "both at home and abroad. They say nothing concerning the bad effects of "
@@ -1414,9 +1426,9 @@ LESSONS = [
             ],
             "panel_title": "A wage rise and a profit rise through the stages",
             "panel_intro": (
-                "The same stages as in the first lesson, with a rise in wages (a "
-                "percentage) and a rise in the rate of profit (points) applied to every "
-                "stage. The lab prints the new price and the rise that each causes."
+                "The stages of a price, as in the lesson Wages, Profit and Rent, here a "
+                "linen chain written for this lesson, with a rise in wages (a percentage) "
+                "and a rise in the rate of profit (points) applied to every stage. The lab prints the new price and the rise that each causes."
             ),
         }),
         "steps_title": "Comparing a wage rise with a profit rise",
@@ -1424,7 +1436,7 @@ LESSONS = [
         "steps": [
             ("Price the chain as it stands",
              "Stage price = (price bought + wages + rent) · (1 + rate), stage by stage, as "
-             "in the first lesson."),
+             "in the lesson Wages, Profit and Rent."),
             ("Raise the wages",
              "Raise every stage's wages by the same percentage and price the chain again. "
              "The wages part rises by that percentage of the wage total."),

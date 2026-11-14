@@ -84,7 +84,8 @@ COURSE = {
         "wheat prices. The lessons take it in two pieces, and the labs average the "
         "prices for you. Smith writes pounds, shillings and pence: twelve pence to the "
         "shilling and twenty shillings to the pound, so a pound is 240 pence, and a quarter "
-        "of corn is eight bushels. The labs keep to pence where the figures need it.",
+        "of corn is eight bushels. The silver labs write a price as a fraction of a pound "
+        "where it needs one (13s 4d is 2/3 of a pound).",
         "Use the labs to change one thing at a time. Each preset changes a single "
         "figure against the one before: a price, a wage, a mine's output. The point "
         "of the lesson is in what moves and what does not.",

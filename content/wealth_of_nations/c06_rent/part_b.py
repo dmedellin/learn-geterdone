@@ -10,8 +10,9 @@ Money. Smith writes pounds, shillings and pence: twelve pence to the shilling, t
 shillings to the pound, so a pound is 240 pence. The Digression's prices are for the
 quarter of eight bushels (the Windsor figures are for the best wheat, in the quarter of
 nine bushels, unless a line says it has been reduced). Every price in these labs is in
-pence of the money of Smith's day, the "present money" of 1776, so that two columns of
-the same lab can be compared.
+pounds, written as decimals or fractions of a pound (13s 4d is 2/3), so that the lab's
+last tile, the corn a pound buys, is a figure a reader can read; the first preset of each
+lesson is in the money of Smith's day, the "present money" of 1776.
 """
 
 LESSONS = [
@@ -20,7 +21,9 @@ LESSONS = [
     # Statute of Labourers); l. 5910-5919 (the feast of 1309); l. 5952-5999 (the
     # silver in 6s 8d); l. 6027-6035 (the opinion Smith opposes); l. 6120-6180
     # (Fleetwood's prices); l. 6181-6211 (cattle and corn); l. 6366-6367 (corn a
-    # necessary); l. 8485-8632 (Fleetwood's table and its seven averages).
+    # necessary); l. 6005-6026 (demand or exhausted mines); l. 6600-6616 (silver risen
+    # rather than corn fallen, said of the years after 1700); l. 8485-8632
+    # (Fleetwood's table and its seven averages).
     {
         "slug": "the-value-of-silver-over-four-centuries",
         "title": "The Value of Silver over Four Centuries",
@@ -124,12 +127,14 @@ LESSONS = [
                   "of his day. So the same nominal price meant a smaller and smaller "
                   "amount of silver, and the legislators saw no reason to change the "
                   "figure because silver had in the meantime grown dearer. The lab's "
-                  "money-and-silver preset has Smith's five prices in pence of "
-                  "the money of 1776: 240 in 1350 (twenty shillings), 160 in 1436 and "
-                  "in 1463 (thirteen and fourpence), 120 in 1512 and in 1562 (ten "
-                  "shillings). Grouped as 1350, then 1436 to 1463, then 1512 to 1562, "
-                  "the ratios to the first are 2/3 and 1/2, and silver buys twice as "
-                  "much corn at the end as at the start."),
+                  "money-and-silver preset has Smith's five prices in pounds of "
+                  "the money of 1776: £1 in 1350 (twenty shillings), 2/3 of a pound in "
+                  "1436 and in 1463 (thirteen and fourpence), £1/2 in 1512 and in 1562 "
+                  "(ten shillings). Grouped as 1350, then 1436 to 1463, then 1512 to "
+                  "1562, the ratios to the first are 2/3 and 1/2, and the last tile "
+                  "turns the prices round: a pound of 1776 money buys 1 quarter of "
+                  "wheat in 1350, 1.50 quarters in the middle period and 2 quarters at "
+                  "the end. Silver buys twice as much corn at the end as at the start."),
             ("p", "Why corn, and not cattle or poultry? Because, Smith argues, "
                   "&ldquo;Labour, it must always be remembered, and not any particular "
                   "commodity, or set of commodities, is the real measure of the value "
@@ -168,11 +173,14 @@ LESSONS = [
                   "College prices of 1598 to 1601. The averages, in pounds, shillings "
                   "and pence of Smith's day: £2 19s 1&frac14;d, £1 18s 8d, "
                   "£1 5s 9&frac12;d, £1 1s 3&#8531;d, 14s 1d, 10s 0&frac12;d, and for "
-                  "the last division £2 7s 5&frac12;d. In pence that is 709.25, 464, "
-                  "309.5, 766/3, 169, 120.5 and 569.5, which the "
-                  "fleetwood-divisions preset sets out. The fall is steady to the "
-                  "sixth division, which is under a fifth of the first, and then "
-                  "the rise Smith expects. But he does not claim much for it: "
+                  "the last division £2 7s 5&frac12;d. The fleetwood-divisions preset "
+                  "sets them out as fractions of a pound (£2 19s 1&frac14;d is "
+                  "709&frac14; pence, 2837/960 of a pound), and prints the averages "
+                  "as about £2.96, £1.93, £1.29, £1.06, £0.70, £0.50 and £2.37. The "
+                  "fall is steady to the sixth division, which is under a fifth of "
+                  "the first, and then comes the rise Smith expects. Read the other "
+                  "way, a pound bought about 0.34 of a quarter in the first division "
+                  "and almost 2 quarters in the sixth. But he does not claim much for it: "
                   "&ldquo;The prices, indeed, which Fleetwood has been able to collect, seem "
                   "to have been those chiefly which were remarkable for extraordinary "
                   "dearness or cheapness; and I do not pretend that any very certain "
@@ -182,7 +190,8 @@ LESSONS = [
                   "silver fell, silver became dearer in corn. After "
                   "America's mines were found, corn rose to three and four times its "
                   "money price, and everyone ascribed that to a fall in the value of "
-                  "silver. Equally, when the money price falls, he says, "
+                  "silver. Equally, he says of the smaller fall in the price of corn "
+                  "after 1700, which the next lesson reads, "
                   "&ldquo;It would be more proper, perhaps, to consider this variation "
                   "in the average money price of corn as the effect rather of some "
                   "gradual rise in the real value of silver in the European market, "
@@ -211,27 +220,26 @@ LESSONS = [
         "lab": ("wonkit", {
             "mode": "rent",
             "view": "silver",
-            "money_unit": "d",
+            "money_unit": "£",
             "preset": "money-and-silver",
             "presets": [
                 {"id": "money-and-silver", "label": "Smith's wheat in the silver of 1776: 20s in 1350, 13s 4d in 1436 and 1463, 10s in 1512 and 1562",
-                 "prices": "1350, 240; 1436, 160; 1463, 160; 1512, 120; 1562, 120",
+                 "prices": "1350, 1; 1436, 2/3; 1463, 2/3; 1512, 1/2; 1562, 1/2",
                  "periods": "1350, 1350, 1350; 1436-1463, 1436, 1463; 1512-1562, 1512, 1562",
-                 "expect": {"wreAverage": "1350 240d; 1436-1463 160d; 1512-1562 120d", "wreRatio": "1350 1×; 1436-1463 2/3 ≈ 0.67×; 1512-1562 1/2 = 0.50×"}},
-                {"id": "fleetwood-divisions", "label": "Fleetwood's seven divisions as Smith prints their averages, in pence of 1776",
-                 "prices": "1202, 709.25; 1287, 464; 1339, 309.5; 1423, 766/3; 1453, 169; 1499, 120.5; 1561, 569.5",
+                 "expect": {"wreAverage": "1350 £1; 1436-1463 ≈ £0.67; 1512-1562 £0.50", "wreRatio": "1350 1×; 1436-1463 2/3 ≈ 0.67×; 1512-1562 1/2 = 0.50×", "wreCorn": "1350 1 quarter for £1; 1436-1463 3/2 = 1.50 quarters for £1; 1512-1562 2 quarters for £1"}},
+                {"id": "fleetwood-divisions", "label": "Fleetwood's seven divisions as Smith prints their averages, in pounds of 1776",
+                 "prices": "1202, 2837/960; 1287, 29/15; 1339, 619/480; 1423, 383/360; 1453, 169/240; 1499, 241/480; 1561, 1139/480",
                  "periods": "1202-1286, 1202, 1286; 1287-1338, 1287, 1338; 1339-1416, 1339, 1416; 1423-1451, 1423, 1451; 1453-1497, 1453, 1497; 1499-1560, 1499, 1560; 1561-1601, 1561, 1601",
-                 "expect": {"wreAverage": "1202-1286 709.25d; 1287-1338 464d; 1339-1416 309.50d; 1423-1451 ≈ 255.33d; 1453-1497 169d; 1499-1560 120.50d; 1561-1601 569.50d", "wreRatio": "1202-1286 1×; 1287-1338 1,856/2,837 ≈ 0.65×; 1339-1416 1,238/2,837 ≈ 0.44×; 1423-1451 3,064/8,511 ≈ 0.36×; 1453-1497 676/2,837 ≈ 0.24×; 1499-1560 482/2,837 ≈ 0.17×; 1561-1601 2,278/2,837 ≈ 0.80×"}},
+                 "expect": {"wreAverage": "1202-1286 ≈ £2.96; 1287-1338 ≈ £1.93; 1339-1416 ≈ £1.29; 1423-1451 ≈ £1.06; 1453-1497 ≈ £0.70; 1499-1560 ≈ £0.50; 1561-1601 ≈ £2.37", "wreCorn": "1202-1286 960/2,837 ≈ 0.34 quarters for £1; 1287-1338 15/29 ≈ 0.52 quarters for £1; 1339-1416 480/619 ≈ 0.78 quarters for £1; 1423-1451 360/383 ≈ 0.94 quarters for £1; 1453-1497 240/169 ≈ 1.42 quarters for £1; 1499-1560 480/241 ≈ 1.99 quarters for £1; 1561-1601 480/1,139 ≈ 0.42 quarters for £1", "wreRatio": "1202-1286 1×; 1287-1338 1,856/2,837 ≈ 0.65×; 1339-1416 1,238/2,837 ≈ 0.44×; 1423-1451 3,064/8,511 ≈ 0.36×; 1453-1497 676/2,837 ≈ 0.24×; 1499-1560 482/2,837 ≈ 0.17×; 1561-1601 2,278/2,837 ≈ 0.80×"}},
             ],
             "panel_title": "Wheat in silver, period by period",
             "panel_intro": (
-                "Each price is a quarter of wheat in pence of the money of 1776, entered "
+                "Each price is a quarter of wheat in pounds of the money of 1776, written "
+                "as a fraction of a pound where it is less (13s 4d is 2/3), entered "
                 "against a year; periods group the years. The lab averages each period, "
-                "compares it with the first and prints how much wheat a unit of "
-                "silver buys, which at this scale is a hundredth of a quarter or less, so "
-                "read the averages and the ratios. In both presets each record is "
-                "Smith's own figure for its period, so the average of a period is that "
-                "figure."
+                "compares it with the first and prints how many quarters of wheat a "
+                "pound of that money buys. In both presets each record is Smith's own "
+                "figure for its period, so the average of a period is that figure."
             ),
         }),
         "steps_title": "Reading a price of corn as the value of silver",
@@ -297,9 +305,10 @@ LESSONS = [
                   "price?",
              "a": ["1202 to 1286", "1453 to 1497", "1561 to 1601", "1499 to 1560"],
              "c": 3,
-             "why": "The averages are 709.25, 464, 309.5, about 255.3, 169, 120.5 and "
-                    "569.5 pence. The lowest, 120.5d or 10s 0&frac12;d, belongs to 1499 to 1560. "
-                    "1453 to 1497 comes next, at 169 pence."},
+             "why": "The lab prints the averages as about £2.96, £1.93, £1.29, £1.06, "
+                    "£0.70, £0.50 and £2.37. The lowest, 10s 0&frac12;d, about £0.50, "
+                    "belongs to 1499 to 1560, where a pound buys almost 2 quarters. "
+                    "1453 to 1497 comes next, at 14s 1d, about £0.70."},
             {"q": "On Smith's account, what does a fall in the money price of corn, over a "
                   "period when it takes much the same labour to raise, most likely show?",
              "a": ["Silver has become dearer in corn",
@@ -338,7 +347,7 @@ LESSONS = [
         ),
         "note": (
             "The lab only averages and divides. It cannot tell whether corn is a steady "
-            "measure of labour, which Ricardo and Malthus doubted, or whether the "
+            "measure of labour, which Ricardo doubted, or whether the "
             "prices Fleetwood collected were typical, which Smith doubted himself. "
             "Smith's table is of prices he did not collect, many second-hand, "
             "and the table the lab uses is the seven averages Smith prints, not the "
@@ -347,10 +356,13 @@ LESSONS = [
         ),
     },
     # ---------------------------------------------------------------- 05
-    # PSU text l. 6377-6426 (second and third periods); l. 6427-6453 (the civil war);
-    # l. 6472-6532 (clipped coin and the present century); l. 6533-6535 (silver risen);
-    # l. 6866-6887 (silver to India); l. 6921-6968 (Cadiz and Lisbon, Meggens);
-    # l. 7023-7105 (gold and silver); l. 7185-7186 (the suspicion).
+    # PSU text l. 6377-6426 (second and third periods); l. 6427-6455 (the civil war);
+    # l. 6456-6468 (the bounty); l. 6469-6532 (clipped coin and the present century);
+    # l. 6533-6535 (silver risen); l. 6617-6635 (the seasons, 1741-1750); l. 6884-6890
+    # (silver to India); l. 6921-6989 (Cadiz and Lisbon, Meggens, Birmingham); l.
+    # 7023-7075 (gold and silver, the ox and the lamb); l. 7181-7186 (scarce a belief);
+    # l. 6274-6284 (coin "from necessity"); l. 8036-8062 (Poland, Spain and Portugal);
+    # l. 8637-8827 (the Windsor table and its averages).
     {
         "slug": "silver-from-america",
         "title": "Silver from America",
@@ -412,20 +424,23 @@ LESSONS = [
                   "mines of America."),
             ("p", "He gives the Windsor figures from the accounts of Eton College, and "
                   "the windsor-1595-1636 preset has every year of them for the best "
-                  "wheat, in the quarter of nine bushels, from 1595 to 1636, in "
-                  "pence. The 26 prices from 1595 to 1620 average 25,933/52, which is "
-                  "498.71 pence, or £2 1s 6.7d. Smith's text gives £2 1s 6 9/13d and "
+                  "wheat, in the quarter of nine bushels, from 1595 to 1636, as "
+                  "fractions of a pound. The lab prints the average of the 26 prices "
+                  "from 1595 to 1620 as about £2.08; worked exactly it is 25,933/52 "
+                  "pence, which is 498.71 pence, or £2 1s 6.7d. Smith's text gives £2 1s 6 9/13d and "
                   "his table £2 1s 6&frac34;d, and the three agree to within a "
                   "farthing. To get the quarter of eight bushels he takes off a ninth, "
                   "and to get middle wheat, a ninth again, ending at about £1 12s "
                   "8 8/9d, &ldquo;or about six ounces and one-third of an ounce of "
                   "silver&rdquo;, at his figure of sixty-two shillings the pound troy, "
-                  "which is 62 pence the ounce. The 16 prices from 1621 to 1636 average exactly 600 "
-                  "pence, £2 10s, which by the same two steps is £1 19s 6d, about "
+                  "which is 62 pence the ounce. The 16 prices from 1621 to 1636 average exactly "
+                  "£2.50, £2 10s, which by the same two steps is £1 19s 6d, about "
                   "seven and two-thirds ounces. The lab's silver-falls preset puts in "
-                  "pence of 1776 money the 120 pence of the earlier period, 3536/9 pence "
-                  "(£1 12s 8 8/9d) for 1595 to 1620 and 474 for 1621 to 1636. "
-                  "An ounce of silver buys about a third as much corn as in the first "
+                  "pounds of 1776 money the ten shillings, £1/2, of the earlier period, "
+                  "£1 12s 8 8/9d (221/135 of a pound, about £1.64) for 1595 to 1620 and "
+                  "£1 19s 6d (£1.975, about £1.98) for 1621 to 1636. A pound that "
+                  "bought 2 quarters before 1570 buys about 0.61 of a quarter, and then "
+                  "about 0.51: silver buys about a third as much corn as in the first "
                   "period, and then about a quarter."),
             ("p", "The third period begins at once: &ldquo;Between 1630 and 1640, or "
                   "about 1636, the effect of the discovery of the mines of America, in "
@@ -445,7 +460,7 @@ LESSONS = [
                   "is (1,020 − 600) + (960 − 600) = 780 pence, £3 5s, and 780 "
                   "pence over sixty-four years is about 12.2 pence a year, against the "
                   "12&frac13; pence by which the average exceeds the earlier one."),
-            ("p", "For 1701 to 1764 the Windsor average is £2 0s 6&frac34;d, "
+            ("p", "For 1701 to 1764 the Windsor average in Smith's table is £2 0s 6&frac34;d, "
                   "&ldquo;about ten shillings and sixpence, or more than five-and-twenty "
                   "percent. cheaper&rdquo; than the last sixty-four years of the old "
                   "century. Check the percentage. The gap is 125.6 pence, which is 25.8% "
@@ -453,19 +468,21 @@ LESSONS = [
                   "five-and-twenty is the gap measured against the "
                   "later, lower price, or, equivalently, the earlier price is 25.8% "
                   "dearer. The lab's windsor-averages preset sets Smith's four "
-                  "printed averages side by side: 498.75, 600, 612&frac13; and 486.75 pence, since "
-                  "the 64 years of each of the last two periods are more than the lab takes. Silver in the third "
-                  "period is about back where it was in the first of the four: the "
-                  "last ratio to the first is 0.976. From this Smith draws a belief, "
+                  "printed averages side by side, which it prints as about £2.08, £2.50, "
+                  "£2.55 and £2.03, since the 64 years of each of the last two periods "
+                  "are more than the lab takes. Silver in the third period is about "
+                  "back where it was in the first of the four: the last ratio to the "
+                  "first is about 0.98, and a pound buys about 0.49 of a quarter "
+                  "against 0.48. From this Smith draws a belief, "
                   "or rather less: &ldquo;The value of silver, therefore, seems to have "
                   "risen somewhat in proportion to that of corn during the course of the "
                   "present century&rdquo; and he says of his own opinion that it "
                   "&ldquo;scarce, perhaps, deserves the name of belief&rdquo;. A "
-                  "low decade, 1741 to 1750, at £1 13s 9&frac34;d, and the dear years "
+                  "low decade, 1741 to 1750, at £1 13s 9 4/5d, and the dear years "
                   "after, he puts down to the seasons, since a change "
                   "&ldquo;in the value of silver, which is always slow and "
                   "gradual&rdquo; cannot be so sudden. (The two figures he gives "
-                  "for the decade and the half-century differ by about 6s 8d, where the "
+                  "for the decade and the sixty-four years differ by about 6s 9d, where the "
                   "text says nearly 6s 3d: a slip somewhere on the page, and nothing "
                   "turns on it)."),
             ("p", "Why should silver have grown dearer when more was coming in? "
@@ -513,9 +530,12 @@ LESSONS = [
                   "Hamilton's study of Spanish treasure in 1934, has weighed American "
                   "silver against a growing population and debased coinages; Smith had "
                   "no tables of population to weigh it with. The Digression "
-                  "also ends with a warning. The low price of corn in times past is no "
-                  "proof of barbarism, nor a high price of silver of poverty. Poland "
-                  "and Spain, he says, have plenty of silver and are poor."),
+                  "also ends with a warning. A high value of silver, or a low money "
+                  "price of corn, in times past is no proof of poverty and "
+                  "barbarism, and a low value of silver no proof of wealth: Poland, "
+                  "where silver has lost value as elsewhere, and Spain and Portugal, "
+                  "where it is cheapest, are on his account the most beggarly "
+                  "countries in Europe."),
             ("p", "The next lesson, <em>Improvement and the Three Great Orders</em>, "
                   "goes back to the main line of the chapter, the sorts of rude "
                   "produce whose price rises as improvement spreads, and to what Smith "
@@ -524,31 +544,31 @@ LESSONS = [
         "lab": ("wonkit", {
             "mode": "rent",
             "view": "silver",
-            "money_unit": "d",
+            "money_unit": "£",
             "preset": "silver-falls",
             "presets": [
                 {"id": "silver-falls", "label": "Smith's wheat in the silver of 1776: 10s about 1512, then middle wheat at Windsor 1595 to 1620 and 1621 to 1636",
-                 "prices": "1512, 120; 1595, 3536/9; 1621, 474",
+                 "prices": "1512, 1/2; 1595, 221/135; 1621, 1.975",
                  "periods": "to-1570, 1512, 1570; 1595-1620, 1595, 1620; 1621-1636, 1621, 1636",
-                 "expect": {"wreAverage": "to-1570 120d; 1595-1620 ≈ 392.89d; 1621-1636 474d", "wreRatio": "to-1570 1×; 1595-1620 442/135 ≈ 3.27×; 1621-1636 79/20 = 3.95×"}},
-                {"id": "windsor-1595-1636", "label": "Windsor best wheat, the quarter of nine bushels, each year from 1595 to 1636 (Smith's table, in pence)",
+                 "expect": {"wreAverage": "to-1570 £0.50; 1595-1620 ≈ £1.64; 1621-1636 ≈ £1.98", "wreRatio": "to-1570 1×; 1595-1620 442/135 ≈ 3.27×; 1621-1636 79/20 = 3.95×", "wreCorn": "to-1570 2 quarters for £1; 1595-1620 135/221 ≈ 0.61 quarters for £1; 1621-1636 40/79 ≈ 0.51 quarters for £1"}},
+                {"id": "windsor-1595-1636", "label": "Windsor best wheat, the quarter of nine bushels, each year from 1595 to 1636 (Smith's table, in pounds)",
                  "prices": (
-                     "1595, 480; 1596, 576; 1597, 834; 1598, 680; 1599, 470; 1600, 452; 1601, 418; 1602, 352; 1603, 424; 1604, 368; 1605, 430; 1606, 396; 1607, 440; 1608, 680; 1609, 600; 1610, 430; 1611, 464; 1612, 508; 1613, 584; 1614, 500.5; 1615, 464; 1616, 484; 1617, 584; 1618, 560; 1619, 424; 1620, 364; 1621, 364; 1622, 704; 1623, 624; 1624, 576; 1625, 624; 1626, 592; 1627, 432; 1628, 336; 1629, 504; 1630, 668; 1631, 816; 1632, 640; 1633, 696; 1634, 672; 1635, 672; 1636, 680"
+                     "1595, 2; 1596, 2.4; 1597, 3.475; 1598, 17/6; 1599, 47/24; 1600, 113/60; 1601, 209/120; 1602, 22/15; 1603, 53/30; 1604, 23/15; 1605, 43/24; 1606, 1.65; 1607, 11/6; 1608, 17/6; 1609, 2.5; 1610, 43/24; 1611, 29/15; 1612, 127/60; 1613, 73/30; 1614, 1001/480; 1615, 29/15; 1616, 121/60; 1617, 73/30; 1618, 7/3; 1619, 53/30; 1620, 91/60; 1621, 91/60; 1622, 44/15; 1623, 2.6; 1624, 2.4; 1625, 2.6; 1626, 37/15; 1627, 1.8; 1628, 1.4; 1629, 2.1; 1630, 167/60; 1631, 3.4; 1632, 8/3; 1633, 2.9; 1634, 2.8; 1635, 2.8; 1636, 17/6"
                  ),
                  "periods": "1595-1620, 1595, 1620; 1621-1636, 1621, 1636",
-                 "expect": {"wreYears": "1595-1620 26 years; 1621-1636 16 years", "wreAverage": "1595-1620 ≈ 498.71d; 1621-1636 600d", "wreRatio": "1595-1620 1×; 1621-1636 31,200/25,933 ≈ 1.20×"}},
-                {"id": "windsor-averages", "label": "Windsor best wheat: Smith's four averages from 1595 to 1764, in pence",
-                 "prices": "1595, 498.75; 1621, 600; 1637, 1837/3; 1701, 486.75",
+                 "expect": {"wreYears": "1595-1620 26 years; 1621-1636 16 years", "wreAverage": "1595-1620 ≈ £2.08; 1621-1636 £2.50", "wreRatio": "1595-1620 1×; 1621-1636 31,200/25,933 ≈ 1.20×", "wreCorn": "1595-1620 12,480/25,933 ≈ 0.48 quarters for £1; 1621-1636 2/5 = 0.40 quarters for £1"}},
+                {"id": "windsor-averages", "label": "Windsor best wheat: Smith's four averages from 1595 to 1764, in pounds",
+                 "prices": "1595, 133/64; 1621, 2.5; 1637, 1837/720; 1701, 649/320",
                  "periods": "1595-1620, 1595, 1620; 1621-1636, 1621, 1636; 1637-1700, 1637, 1700; 1701-1764, 1701, 1764",
-                 "expect": {"wreAverage": "1595-1620 498.75d; 1621-1636 600d; 1637-1700 ≈ 612.33d; 1701-1764 486.75d", "wreRatio": "1595-1620 1×; 1621-1636 160/133 ≈ 1.20×; 1637-1700 7,348/5,985 ≈ 1.23×; 1701-1764 649/665 ≈ 0.98×"}},
+                 "expect": {"wreAverage": "1595-1620 ≈ £2.08; 1621-1636 £2.50; 1637-1700 ≈ £2.55; 1701-1764 ≈ £2.03", "wreRatio": "1595-1620 1×; 1621-1636 160/133 ≈ 1.20×; 1637-1700 7,348/5,985 ≈ 1.23×; 1701-1764 649/665 ≈ 0.98×", "wreCorn": "1595-1620 64/133 ≈ 0.48 quarters for £1; 1621-1636 2/5 = 0.40 quarters for £1; 1637-1700 720/1,837 ≈ 0.39 quarters for £1; 1701-1764 320/649 ≈ 0.49 quarters for £1"}},
             ],
             "panel_title": "Wheat in silver after America",
             "panel_intro": (
-                "Prices are pence for a quarter of wheat, in the money of 1776 in the first "
-                "preset and the nominal money of each year at Windsor in the others. "
-                "The lab averages each period's years, compares each average with the "
-                "first period's and prints how much wheat a penny buys, a tiny figure that "
-                "rounds toward nothing, so read the averages and the ratios."
+                "Prices are pounds for a quarter of wheat, written as decimals or "
+                "fractions of a pound, in the money of 1776 in the first preset and the "
+                "nominal money of each year at Windsor in the others. The lab averages "
+                "each period's years, compares each average with the first period's and "
+                "prints how many quarters of wheat a pound buys."
             ),
         }),
         "steps_title": "Testing a period's average",
@@ -616,8 +636,8 @@ LESSONS = [
                   "price of best wheat?",
              "a": ["1595 to 1620", "1621 to 1636", "1701 to 1764", "1637 to 1700"],
              "c": 3,
-             "why": "The averages are 498.75, 600, about 612.3 and 486.75 pence, so 1637 to "
-                    "1700 is the highest and 1701 to 1764 the lowest."},
+             "why": "The lab prints the averages as about £2.08, £2.50, £2.55 and £2.03, "
+                    "so 1637 to 1700 is the highest and 1701 to 1764 the lowest."},
             {"q": "Meggens found that silver was imported into Spain and Portugal at "
                   "about 22 times the weight of gold, and reasoned that gold should be "
                   "worth about 22 ounces of silver. What is Smith's reply?",
@@ -670,8 +690,11 @@ LESSONS = [
     # PSU text l. 5802-5866 (Part 3's opening); l. 7241-7255 (the three sorts); l.
     # 7269-7272 (woodcocks); l. 7330-7331 (cattle cannot go higher); l. 7434-7436
     # (Scotland and the Union); l. 7505-7508 (poultry); l. 7643-7652 (the rise a
-    # forerunner); l. 7743-7763 (wool); l. 8193-8211 (manufactures); l. 8357-8484 (the
-    # conclusion and the three orders).
+    # forerunner); l. 7400-7436 (lowland husbandry before the Union); l. 7555-7562
+    # (cottagers); l. 7700-7712 (Hume's two-fifths; hides in Spanish America); l.
+    # 7743-7775 (wool); l. 7855-7880 (a country of pasture); l. 7903-7940 (fish and
+    # metals); l. 8193-8267 (manufactures, the watch, the scarlet cloth of 1487); l.
+    # 8357-8484 (the conclusion and the three orders).
     {
         "slug": "improvement-and-the-three-orders",
         "title": "Improvement and the Three Great Orders",
@@ -816,13 +839,15 @@ LESSONS = [
                   "In an improved country the carcase's price rises to make up, "
                   "and the landlords lose little. The preset's prices are written for "
                   "the lesson."),
-            ("p", "Fish and the metals are the other cases, and Smith calls the first "
-                  "limited, since the sea is a given, and the second uncertain, "
-                  "since new mines are a matter of chance. Then he turns to manufactures. "
+            ("p", "Fish and the metals are the other cases. Industry's power over the "
+                  "fish brought to market, Smith says, is both limited, by the "
+                  "country's situation and waters, and uncertain; over the metals it "
+                  "is not limited but altogether uncertain, since new mines are a "
+                  "matter of chance. Then he turns to manufactures. "
                   "&ldquo;It is the natural effect of improvement, however, to diminish "
-                  "gradually the real price of almost all manufactures.&rdquo; A watch "
-                  "movement that cost £20 in the middle of the last century may now be "
-                  "had for twenty shillings. A yard of the finest scarlet cloth was "
+                  "gradually the real price of almost all manufactures.&rdquo; A better "
+                  "watch movement than £20 bought in the middle of the last century may "
+                  "now, he says, perhaps be had for twenty shillings. A yard of the finest scarlet cloth was "
                   "reckoned in 1487 at sixteen shillings; at six shillings and eightpence "
                   "a quarter of wheat that is two quarters and three bushels or more, "
                   "and at twenty-eight shillings a quarter, at least £3 6s 6d of Smith's "
@@ -1008,7 +1033,7 @@ LESSONS = [
              "Smith says the landlords' interest is joined to the society's, and then "
              "says they are too often ignorant and incapable of understanding the "
              "consequence of a regulation. He says labourers cannot understand "
-             "theirs, and dealers understand their own and mean something else. All "
+             "theirs, and dealers know their own interest better than the public's. All "
              "three orders are described, none is flattered."),
         ],
         "standard": (

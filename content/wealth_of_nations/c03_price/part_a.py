@@ -113,12 +113,16 @@ LESSONS = [
                   "overseeing is paid by wages that bear no regular proportion to the "
                   "capital he oversees, while the owner, &ldquo;though he is thus discharged "
                   "of almost all labour, still expects that his profit should bear a regular "
-                  "proportion to his capital&rdquo;. The lab's two Smith presets, the "
-                  "coarse and the fine, run his figures: wages of "
+                  "proportion to his capital&rdquo;. The lab's two Smith presets, "
+                  "<code>coarse</code> and <code>fine</code>, run his figures: wages of "
                   "£300 and the same labour in both, profits of £100 and £730, and a price of "
-                  "£1,100 against £8,030. (The materials are entered as a first stage, "
-                  "because the lab has no separate column for them, so the wage and share "
-                  "tiles in those two presets are not Smith's. Read the profit tile.)"),
+                  "£1,100 against £8,030. The lab has no column for materials, so each "
+                  "preset enters them as a first stage, the earlier hands who made them, "
+                  "and counts their £700 or £7,000 as those hands' wages with no rent or "
+                  "profit. That is the lab's assumption, not Smith's, and it is why the wage "
+                  "tile reads £1,000 and £7,300: the owner's £300 and the earlier hands' "
+                  "materials together. The whole profit is the owner's, so the profit tile "
+                  "is Smith's comparison exactly."),
             ("p", "The third state brings in the landlord. &ldquo;As soon as the land of "
                   "any country has all become private property, the landlords, like all "
                   "other men, love to reap where they never sowed, and demand a rent even "
@@ -177,8 +181,11 @@ LESSONS = [
                   "four chapters after it, are about the rates. And later economists read it "
                   "differently. Ricardo, in 1817, held that labour still regulates "
                   "exchange after stock and land arrive, with profit and wage changes "
-                  "modifying the ratios; Marx argued that adding up the parts hides "
-                  "where they come from. Smith died in 1790 and said nothing to either. "
+                  "modifying the ratios, and that rent is not a part of the price of "
+                  "corn at all, since that price is set on land that pays none. Marx "
+                  "argued that the resolution loses the part of the price that replaces "
+                  "the means of production used up, the very fourth part that Smith's "
+                  "horse was meant to dispose of. Smith died in 1790 and said nothing to either. "
                   "A fair complaint from any side is that a price made of three components "
                   "is not yet an explanation of the price, because each component is itself "
                   "a price."),
@@ -213,17 +220,19 @@ LESSONS = [
                     "wprFinal": "£20",
                     "wprResolved": "wages £20, rent £0, profit £0",
                  }},
-                {"id": "coarse", "label": "Smith's manufactory on £700 of materials",
-                 "stages": [["materials-bought-in", 700, 0, 0],
+                {"id": "coarse", "label": "Smith's manufactory on £700 of materials (the materials counted as earlier wages, the lab's assumption)",
+                 "stages": [["earlier-hands", 700, 0, 0],
                             ["twenty-workmen", 300, 0, 10]],
                  "expect": {
+                    "wprStages": "earlier-hands £700; twenty-workmen £1,100",
                     "wprFinal": "£1,100",
                     "wprResolved": "wages £1,000, rent £0, profit £100",
                  }},
-                {"id": "fine", "label": "Smith's manufactory on £7,000 of materials",
-                 "stages": [["materials-bought-in", 7000, 0, 0],
+                {"id": "fine", "label": "Smith's manufactory on £7,000 of materials (the materials counted as earlier wages, the lab's assumption)",
+                 "stages": [["earlier-hands", 7000, 0, 0],
                             ["twenty-workmen", 300, 0, 10]],
                  "expect": {
+                    "wprStages": "earlier-hands £7,000; twenty-workmen £8,030",
                     "wprFinal": "£8,030",
                     "wprResolved": "wages £7,300, rent £0, profit £730",
                  }},
@@ -232,8 +241,8 @@ LESSONS = [
             "panel_intro": (
                 "Each stage's wages, rent and rate of profit go in. The lab adds each "
                 "stage's wages and rent to the price it bought, adds the stage's profit "
-                "on all of that, and reports the final price and how it divides. Choose "
-                "the coarse and fine presets and read the profit tile."
+                "on all of that, and reports the final price and how it divides. The "
+                "coarse and fine presets compare Smith's two manufactories."
             ),
         }),
         "steps_title": "Resolving a price stage by stage",
@@ -458,7 +467,8 @@ LESSONS = [
                   "the sellers receive 3,200 shillings more than the natural price would "
                   "have brought for those 800 yards. In the glut preset 1,300 "
                   "are brought, the only listed price at which buyers take them all is 8, and "
-                  "the market price falls two shillings below the natural price on all 1,300. "
+                  "the market price falls two shillings below the natural price on all 1,300, "
+                  "2,600 shillings in all. "
                   "In the match preset 1,000 are brought and the price is 10: "
                   "&ldquo;The competition of the different dealers obliges them all to accept "
                   "of this price, but does not oblige them to accept of less.&rdquo;"),
@@ -521,7 +531,7 @@ LESSONS = [
                     "wprUnitGap": "+4s a unit above the natural price",
                     "wprAllGap": "+3,200s over the 800 yards brought",
                  }},
-                {"id": "match", "label": "1,000 yards brought, the effectual demand",
+                {"id": "match", "label": "1,000 yards brought, the effectual demand, schedule written for the lesson",
                  "natural": 10, "effectual": 1000, "brought": 1000,
                  "buyers": [[8, 1300], [10, 1000],
                             [12, 900], [14, 800],
@@ -533,7 +543,7 @@ LESSONS = [
                     "wprUnitGap": "0s a unit at the natural price",
                     "wprAllGap": "0s over the 1,000 yards brought",
                  }},
-                {"id": "glut", "label": "1,300 yards brought, a glut",
+                {"id": "glut", "label": "1,300 yards brought, a glut, schedule written for the lesson",
                  "natural": 10, "effectual": 1000, "brought": 1300,
                  "buyers": [[8, 1300], [10, 1000],
                             [12, 900], [14, 800],
@@ -646,7 +656,7 @@ LESSONS = [
         "mistakes": [
             ("Taking natural to mean fair or just",
              "Smith's natural rates are the ordinary or average rates of a time and place. A "
-             "natural price may sit on starvation wages if those are the going wages, and "
+             "natural price may sit on low wages if those are the going wages, and "
              "he says nothing in this chapter to praise it."),
             ("Taking every want for demand",
              "Effectual demand is the demand of those willing to pay the whole natural price, "
@@ -823,7 +833,7 @@ LESSONS = [
             "qty_unit": "yards",
             "preset": "m500",
             "presets": [
-                {"id": "free", "label": "1,000 yards brought, free competition",
+                {"id": "free", "label": "1,000 yards brought, free competition, schedule written for the lesson",
                  "natural": 10, "effectual": 1000, "brought": 1000,
                  "buyers": [[8, 1300], [10, 1000],
                             [12, 900], [14, 800],
@@ -845,7 +855,7 @@ LESSONS = [
                     "wprUnitGap": "+4s a unit above the natural price",
                     "wprAllGap": "+3,200s over the 800 yards brought",
                  }},
-                {"id": "m500", "label": "A monopolist brings 500",
+                {"id": "m500", "label": "A monopolist brings 500, schedule written for the lesson",
                  "natural": 10, "effectual": 1000, "brought": 500,
                  "buyers": [[8, 1300], [10, 1000],
                             [12, 900], [14, 800],
@@ -856,7 +866,7 @@ LESSONS = [
                     "wprUnitGap": "+10s a unit above the natural price",
                     "wprAllGap": "+5,000s over the 500 yards brought",
                  }},
-                {"id": "m400", "label": "A monopolist brings 400",
+                {"id": "m400", "label": "A monopolist brings 400, schedule written for the lesson",
                  "natural": 10, "effectual": 1000, "brought": 400,
                  "buyers": [[8, 1300], [10, 1000],
                             [12, 900], [14, 800],
@@ -950,7 +960,7 @@ LESSONS = [
                     "yards are sold."},
         ],
         "mistakes": [
-            ("Thinking Smith says monopoly sells at some limit price",
+            ("Reading &ldquo;the highest which can be got&rdquo; as the monopolist's best choice",
              "&ldquo;the highest which can be got&rdquo; is the highest for the quantity "
              "brought. The lab shows that a still smaller quantity gets a higher price and "
              "can bring a smaller total excess. Smith's sentence is about what a "

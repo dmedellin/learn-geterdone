@@ -87,7 +87,7 @@ LESSONS = [
                   "take the field after seedtime and be home for harvest, because &ldquo;Nature "
                   "does herself the greater part of the work&rdquo; of the farm in the meantime; "
                   "so a short campaign costs the sovereign little. The Greeks served this way "
-                  "until the Persian wars, and Rome until the siege of Veii. Then two causes "
+                  "until after the second Persian war, and the Romans until the siege of Veii. Then two causes "
                   "make it impossible, Smith says: the progress of manufactures and the "
                   "improvement of the art of war."),
             ("p", "The first is the smith or the weaver. &ldquo;Nature does nothing for him; "
@@ -111,7 +111,8 @@ LESSONS = [
                   "any country can be employed as soldiers, without ruin to the country which "
                   "pays the expense of their service&rdquo;. Take a state of 100,000 people "
                   "(a number written for the lesson). At `1/5` that is 20,000 soldiers, the "
-                  "Greek preset. A country of 1,000,000 at `1/100` supports 10,000, the "
+                  "Greek preset, which leaves the cost blank because a citizen of such a "
+                  "state served without pay in a short campaign. A country of 1,000,000 at `1/100` supports 10,000, the "
                   "modern preset. Put a yearly cost on each, which Smith does not give, "
                   "and the figure is the budget: at £20 a head, a number written for "
                   "this lesson, those 10,000 cost £200,000 a year, or four shillings for "
@@ -148,7 +149,7 @@ LESSONS = [
             ("p", "The standing army had a critic in Smith's own day, and the objection "
                   "deserves a hearing. Men of republican principles, Smith concedes, "
                   "&ldquo;have been jealous of a standing army, as dangerous to liberty&rdquo;, "
-                  "and he does not deny Caesar's or Cromwell's: it is dangerous wherever the "
+                  "and he grants the examples of Caesar and Cromwell: it is dangerous wherever the "
                   "generals' interest is not tied to the constitution. His friend Adam "
                   "Ferguson argued for a citizen militia, on the ground of civic liberty, and "
                   "Smith's answer, that where the sovereign is himself the general and the "
@@ -307,7 +308,7 @@ LESSONS = [
              "Smith's claim is narrower: a militia exercised once a week cannot match men "
              "exercised daily, but a militia kept in the field for several campaigns "
              "&ldquo;becomes in every respect a standing army&rdquo;. He ranks the Tartar "
-             "militia, following chiefs they obey every day, as the best of all."),
+             "militia, which goes to war under the chiefs it obeys in peace, as the best of all."),
             ("Taking Smith's hunters and shepherds for field reports",
              "His account of North American hunters and Asian shepherds is second-hand and "
              "serves the stages of his argument, from hunting to pasture, to farming and "
@@ -472,17 +473,16 @@ LESSONS = [
                   "judges earn the same £6.55 whatever they decide, so one more case "
                   "adds nothing to any of them. In the fees-only preset two judges have no "
                   "salary and get £60 and £4, all of it from fees, so that each is "
-                  "100 per cent. dependent on the cases. Pay of that "
-                  "kind is closer to what Smith says of English schoolmasters in Part "
-                  "III than to any judge he describes. The tiles show each person's income, the share from "
+                  "100 per cent. dependent on the cases. The tiles show each person's income, the share from "
                   "fees, and the gain from one more case, which is simply the fee."),
             ("p", "Smith's proposal has opponents. Fees paid by the litigants put a price on "
                   "the very thing the state is there to give, and the price falls most "
                   "heavily on those least able to pay; Smith's own list of abuses, "
                   "from presents to the multiplying of words by clerks paid by the page, "
-                  "shows how fees invite delay and swelling. Jeremy Bentham, writing in the "
-                  "generation after Smith, argued in his writings on judicial reform that a "
-                  "court which charges for its own use is taxing justice. Smith's defence is "
+                  "shows how fees invite delay and swelling. Jeremy Bentham, in his "
+                  "<em>Protest against Law Taxes</em> of the 1790s, argued that charges on "
+                  "going to law fall hardest on the poor and can shut them out of justice."
+                  " Smith's defence is "
                   "in the Conclusion, where he says fees may be paid by those who give "
                   "occasion to the expense, by their injustice, or by those it restores to "
                   "their rights, and that only criminals without means need the general "
@@ -709,7 +709,7 @@ LESSONS = [
              "raises it, so the consumer gains. Smith adds a tilt: tax coaches somewhat "
              "higher than carts, and the vanity of the rich relieves the poor."),
             ("Why not make it a general revenue",
-             "Some ministers saw the turnpike tolls as a source of a half a million for "
+             "Some ministers saw the turnpike tolls as a source of half a million for "
              "the state. Smith has three objections: the tolls would be raised until they "
              "choked inland trade; a toll by weight falls on coarse and bulky goods, so "
              "the poor would pay; and a government with the money would care less about "
@@ -790,7 +790,7 @@ LESSONS = [
             ("p", "Then he takes up a proposal in the air. Ministers had thought that "
                   "government, working the turnpikes itself and using soldiers for labour, "
                   "could gain &ldquo;half a million, perhaps&rdquo;; in a note added after "
-                  "the first editions, he writes that he has &ldquo;good reasons to believe "
+                  "the first two editions, he writes that he has &ldquo;good reasons to believe "
                   "that all the turnpike tolls levied in Great Britain do not produce a neat "
                   "revenue that amounts to half a million&rdquo;. His three objections "
                   "follow. First, a revenue is something to raise, and the tolls would "
@@ -895,8 +895,8 @@ LESSONS = [
              "The road's revenue is the sum over every carriage. Per ton it is "
              "always the toll, which is what a toll by weight means."),
             ("Find who bears most",
-             "Divide each carriage's toll by the total: the heaviest user pays the "
-             "largest share. Smith's second objection is that this falls on bulky goods."),
+             "Divide each carriage's toll by the total: whoever moves the most tons "
+             "pays the largest share. Smith's second objection is that this falls on bulky goods."),
         ],
         "worked": {
             "title": "A coach and a waggon on the turnpike",

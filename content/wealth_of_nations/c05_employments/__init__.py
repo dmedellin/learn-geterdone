@@ -20,7 +20,7 @@ COURSE = {
         "what apprenticeship, corporations and the law of settlements do to the equality."
     ),
     "blurb": (
-        "Read the longest chapter of Book I with the arithmetic beside it. Net a trade's "
+        "Read one of the longest chapters of Book I with the arithmetic beside it. Net a trade's "
         "pay against what it costs to learn and what it makes you put up with, test "
         "whether a profession's prizes repay its tickets, take a trader's wages out of his "
         "profit, and price what a long apprenticeship adds to a wage."
