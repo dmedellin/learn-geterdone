@@ -960,7 +960,7 @@ LESSONS = [
                     "yards are sold."},
         ],
         "mistakes": [
-            ("Reading &ldquo;the highest which can be got&rdquo; as the monopolist's best choice",
+            ("Reading “the highest which can be got” as the monopolist's best choice",
              "&ldquo;the highest which can be got&rdquo; is the highest for the quantity "
              "brought. The lab shows that a still smaller quantity gets a higher price and "
              "can bring a smaller total excess. Smith's sentence is about what a "

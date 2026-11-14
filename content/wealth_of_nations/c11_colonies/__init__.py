@@ -34,7 +34,7 @@ COURSE = {
         "net product = produce − consumption − advances",
         "consumption is the sole end of production",
     ],
-    "assumes_short": "Courses 1 to 10",
+    "assumes_short": "Books I to IV, in outline",
     "assumes_long": (
         "school arithmetic and the earlier courses help: the lessons on wages and "
         "profit, on a capital's returns in Book II, and on bounties and the mercantile "

@@ -334,7 +334,7 @@ LESSONS = [
              "outside the list of goods, the goods need one price each, which is as many "
              "as there are goods. The saving comes from replacing pairs with one common "
              "term, and the exact figure depends on whether that term is counted."),
-            ("Reading &ldquo;little or no value in exchange&rdquo; as &ldquo;worth little&rdquo;",
+            ("Reading “little or no value in exchange” as “worth little”",
              "Smith's water has the greatest value in use. He is distinguishing two "
              "senses of value, and the puzzle he raises is why they come apart. He "
              "does not say water is unimportant, and he does not solve the puzzle here."),

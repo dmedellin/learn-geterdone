@@ -965,7 +965,7 @@ LESSONS = [
              "same kind. If much richer mines were found, Smith says, the value of "
              "silver might fall so far that even Potosi was not worth the working, "
              "though its output was unchanged."),
-            ("Reading &ldquo;thirteen to twelve&rdquo; as a comparison of the rents' "
+            ("Reading “thirteen to twelve” as a comparison of the rents' "
              "sizes in money",
              "It is a comparison of shares of each mine's gross produce, not of "
              "amounts. A mine with a large produce and a small share can pay a greater "

@@ -33,7 +33,7 @@ COURSE = {
         "labour set going = capital × returns / wage",
         "home trade: quick returns, two replaced",
     ],
-    "assumes_short": "Course 7, in outline",
+    "assumes_short": "Stock, Money and Banks, in outline",
     "assumes_long": (
         "no economics beyond what the earlier courses give, and school arithmetic is "
         "enough: the lessons use compound growth for a few years and percentages, and "

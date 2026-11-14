@@ -351,7 +351,7 @@ LESSONS = [
                     "of the council of Spain."},
         ],
         "mistakes": [
-            ("Reading the verdict as <em>no mine ever paid</em>",
+            ("Reading the verdict as “no mine ever paid”",
              "Smith says the reverse about Mexico and Peru. His claim concerns the whole "
              "run of tickets: a few prizes and many blanks, where the prizes bear &ldquo;"
              "the least proportion&rdquo; to the losses. The richer-vein preset shows the "
@@ -734,7 +734,7 @@ LESSONS = [
                     "that they ruined colonial industry."},
         ],
         "mistakes": [
-            ("Reading &ldquo;waste country&rdquo; as the whole of the story",
+            ("Reading “waste country” as the whole of the story",
              "Smith's sentence builds in the condition that the land is empty or the "
              "natives &ldquo;easily give place&rdquo;. His own pages on Mexico, Peru and "
              "St. Domingo say what that meant, and the cheapness of land that drives his "
@@ -1110,7 +1110,7 @@ LESSONS = [
              "A merchant can earn a large profit in a slow trade. Smith's point is that "
              "the quantity of labour the capital keeps at work at home is less, and the "
              "lab computes that and not the profit."),
-            ("Taking &ldquo;nation of shopkeepers&rdquo; as Smith's praise",
+            ("Taking “nation of shopkeepers” as Smith's praise",
              "In the sentence, the project is &ldquo;altogether unfit for a nation of "
              "shopkeepers&rdquo;. It is fit for a government that the shopkeepers "
              "influence, which is the criticism."),
@@ -1472,7 +1472,7 @@ LESSONS = [
              "Smith argues the quantity of wool was little affected, because the "
              "farmer's profit comes more from the carcase than from the fleece. What "
              "he says was hurt was the growers' interest, and justice."),
-            ("Treating &ldquo;the still greater tax&rdquo; as arithmetic",
+            ("Treating “the still greater tax” as arithmetic",
              "The a-smaller-rise preset shows a bounty where the second payment is "
              "the smaller. Smith's claim that it is greater is about how far a bounty "
              "raises the home price, which the lab takes as given."),
@@ -1848,7 +1848,7 @@ LESSONS = [
                     "and 1,800 is the product multiplied by the use."},
         ],
         "mistakes": [
-            ("Taking &ldquo;barren&rdquo; to mean useless",
+            ("Taking “barren” to mean useless",
              "The economists meant that the class leaves no net product beyond "
              "replacing its costs; Smith himself reports that they admit it to be "
              "&ldquo;not only useful, but greatly useful&rdquo;. The word is a claim about "

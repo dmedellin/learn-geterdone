@@ -909,7 +909,7 @@ LESSONS = [
                   "in the passage; on Ricardo's account the outlay on the margin "
                   "rises as worse land is cultivated, so the assumption is the point "
                   "in dispute."),
-            ("p", "That ends Course 6. The next course, <em>Stock, Money and Banks</em>, "
+            ("p", "That ends <em>The Rent of Land</em>. The next course, <em>Stock, Money and Banks</em>, "
                   "turns to Book II: what a stock is, how it is divided, and why Smith "
                   "begins the book by calling the accumulation of stock a necessary "
                   "step before there is any division of labour."),

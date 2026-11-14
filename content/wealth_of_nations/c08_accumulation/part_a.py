@@ -606,7 +606,7 @@ LESSONS = [
              "impoverished by private, though they sometimes are by public prodigality and misconduct&rdquo;. What can impoverish one is "
              "public prodigality, and even that, he says, England's history shows the "
              "effort of private people can outweigh for a long time."),
-            ("Reading &ldquo;Parsimony, and not industry&rdquo; as saying industry does not "
+            ("Reading “Parsimony, and not industry” as saying industry does not "
              "matter",
              "In the same sentence, &ldquo;Industry, indeed, provides the subject which "
              "parsimony accumulates&rdquo;. The claim is about the last step, which is "
@@ -1232,7 +1232,7 @@ LESSONS = [
              "factory or a large fleet in the wholesale trade reverses two of the places in "
              "the second preset. Smith's ranking is a claim about the shares, and "
              "history, not the lab, has to say what they were."),
-            ("Reading &ldquo;most advantageous to society&rdquo; as advice to farm",
+            ("Reading “most advantageous to society” as advice to farm",
              "Smith says plainly that owners choose by profit alone: the "
              "&ldquo;different quantities of productive labour which it may put into motion&rdquo; "
              "(and the values they add) &ldquo;never enter into his thoughts&rdquo;, and that in Europe agriculture's "
