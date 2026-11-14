@@ -851,7 +851,7 @@ LESSONS = [
                   "come, being trusted, his performance is called Keeping of Promise, or Faith; and the fayling of "
                   "performance (if it be voluntary) Violation of Faith.&rdquo;"),
             ("p", "Think of buying a concert ticket months ahead, or paying a deposit on a room. You hand over your "
-                  "money now, and the other party's side of the bargain is still to come. You are being trusted "
+                  "money now, and the other party's side of the bargain is not yet done. You are being trusted "
                   "less than you are trusting, and you know it: it is the position the chapter is about. Hobbes "
                   "begins one step earlier. &ldquo;The mutuall transferring of Right, is that which men call "
                   "Contract.&rdquo; And a contract can be done with two different time-tables, since there is a "

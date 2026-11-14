@@ -29,8 +29,8 @@ COURSE = {
         "no covenant gives up defence of one's body",
         "answerable = those who voted yes",
     ],
-    "assumes_short": "Courses 4 and 5",
-    "assumes_long": "the covenants and persons of Courses 4 and 5; Chapter 14's void covenants and Chapter 16's authors and actors come back here",
+    "assumes_short": "The two courses before it",
+    "assumes_long": "the covenants and persons of The Natural Condition and the Laws of Nature and Persons and the Generation of a Commonwealth; Chapter 14's void covenants and Chapter 16's authors and actors come back here",
     "outcomes_intro": (
         "By the end you can state what Hobbes argues in Chapters 20 to 23 and work "
         "each argument as a short calculation on figures a lesson gives."

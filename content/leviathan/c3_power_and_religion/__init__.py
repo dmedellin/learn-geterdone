@@ -80,7 +80,7 @@ COURSE = {
         "worthiness, with a long digression on coats of arms and titles, from the Germans and the Romans; the lessons mention "
         "it and do not teach it.",
         "Revealed religion. Chapter 12 says the religion of Abraham, Moses and Christ is "
-        "divine politics, and leaves the Kingdom of God for later; Course 8 takes it up.",
+        "divine politics, and leaves the Kingdom of God for later; Of a Christian Commonwealth takes it up.",
         "The Gentile religions in detail. The long list of gods and divinations in "
         "Chapter 12 is read once, as evidence for Hobbes's point, and not catalogued.",
     ],

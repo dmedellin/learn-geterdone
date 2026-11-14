@@ -87,7 +87,7 @@ COURSE = {
         "course uses their account of sense, imagination and names without repeating it.",
         "The theology and Scripture in these chapters. Chapters 7 and 8 reach the nature "
         "of faith and of possession by spirits, and the lessons say what Hobbes argues, "
-        "briefly, and leave his Scripture to Course 8.",
+        "briefly, and leave his Scripture to the course Of a Christian Commonwealth.",
         "Hobbes's physics and his mechanical account of the heart. The lessons use his "
         "language of motion and endeavour as definitions, and take no side on whether the "
         "passions are, in fact, motions of the body.",

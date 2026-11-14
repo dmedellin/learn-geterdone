@@ -429,7 +429,7 @@ LESSONS = [
                   "we say memory: &ldquo;So that Imagination and Memory, are but one thing, "
                   "which for divers considerations hath divers names.&rdquo; Then: "
                   "&ldquo;Much memory, or memory of many things, is called Experience.&rdquo; "
-                  "Lesson 3 will put that to work."),
+                  "The Train of Imaginations, two lessons on, puts that to work."),
             ("p", "Dreams come next. Hobbes says the brain and nerves are benumbed in "
                   "sleep, so only the body's inward motions can start an image, and "
                   "&ldquo;lying cold breedeth Dreams of Feare&rdquo;. He then answers a "
@@ -1218,7 +1218,7 @@ LESSONS += [
                     "that &ldquo;comprehendeth&rdquo; a smaller one."},
         ],
         "mistakes": [
-            ("Reading <em>A is B</em> as symmetrical",
+            ("Reading A is B as symmetrical",
              "Man is a living-creature does not mean living-creature is a man. The "
              "lab tests the parts of B against the parts of A, in that order, "
              "and reversing the order changes the verdict, as the breadth preset "

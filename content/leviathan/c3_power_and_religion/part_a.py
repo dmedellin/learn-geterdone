@@ -1072,7 +1072,7 @@ SEEDS_OF_RELIGION = {
         ("Read the Bayes factor",
          "The ratio of the two likelihoods is how much a case moves the odds. If "
          "it is 1, the case tells you nothing."),
-        ("Compare the credence with &ldquo;ever after&rdquo;",
+        ("Compare the credence with ever after",
          "A credence of 1 would be certainty. How far one or two cases bring you "
          "from your starting point is what the lab computes."),
     ],

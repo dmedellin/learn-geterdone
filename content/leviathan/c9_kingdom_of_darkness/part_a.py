@@ -431,8 +431,8 @@ LEVKIT_LESSONS = [
                   "every way determined: And therefore there can bee no Image of God; nor of the "
                   "Soule of Man; nor of Spirits; but onely of Bodies Visible, that is, Bodies "
                   "that have light in themselves, or are by such enlightened.&rdquo;"),
-            ("p", "The chapter opens on something you may remember from the first lesson of "
-                  "Course 1: press your eye hard and a light appears outside it, before you, "
+            ("p", "The chapter opens on something you may remember from the lesson "
+                  "Sense and Imagination: press your eye hard and a light appears outside it, before you, "
                   "which nobody else can see, because &ldquo;there is indeed no such thing "
                   "without him, but onely a motion in the interiour organs&rdquo;. That is "
                   "sight in miniature. Light from bodies reaches the eye, and what it makes in "

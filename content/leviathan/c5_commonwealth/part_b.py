@@ -277,7 +277,7 @@ LESSONS = [
              "The lab finds Hobbes's argument valid, and it finds the trust argument "
              "invalid. That tells you which premise carries the dispute, `c`, and "
              "nothing about which side is right."),
-            ("Reading &ldquo;no injury&rdquo; as <em>no wrong</em>",
+            ("Reading no injury as no wrong",
              "The fourth right says the sovereign cannot do injury to a subject, because "
              "the subject is author of his acts. Hobbes writes in the same sentence that "
              "he may commit iniquity, which is wrong done against the laws of nature, "

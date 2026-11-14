@@ -281,7 +281,7 @@ LESSONS = [
              "a row in which the authority is real, the covenant is made, and the rule "
              "alone does not bind the author. A man who deals with an actor without checking is "
              "at his own risk."),
-            ("Taking &ldquo;person&rdquo; to mean a human being",
+            ("Taking a person to mean a human being",
              "For Hobbes a person is a role: the one whose words or actions are considered "
              "as his own or as another's. A man may bear his own person, another's, or "
              "several, and a thing that is not a man may be personated, though it cannot "

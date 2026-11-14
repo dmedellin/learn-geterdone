@@ -70,7 +70,7 @@ COURSE = {
         "lessons choose, and they show what follows on Hobbes's definitions as written there. Whether men are "
         "as he describes them is what the chapters argue, and each lesson says where the strongest objections "
         "come from.",
-        "Take the chapters in order. Chapter 13's war is the question, Chapter 14's right and law are the first "
+        "The chapters build on one another. Chapter 13's war is the question, Chapter 14's right and law are the first "
         "answer, and Chapter 15's covenants and Fool are where the answer is tested. A lesson that seems to "
         "leave a question open usually hands it to the next.",
         "Use the labs to change one thing at a time. Each preset changes a single figure against the one "

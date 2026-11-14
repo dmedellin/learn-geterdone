@@ -63,7 +63,7 @@ COURSE = {
          "when protection fails."),
     ],
     "syllabus_intro": (
-        "Four lessons take the four chapters of Part IV in order, one chapter each: the "
+        "Four lessons take the four chapters of Part IV, one chapter each: the "
         "misreading of Scripture, the demonology of the Gentiles, vain philosophy, and who "
         "benefited. The last reads the Review and Conclusion and ends the book."
     ),
@@ -75,7 +75,7 @@ COURSE = {
         "Quotations are from Hobbes's text of 1651, in its original spelling, and the "
         "examples are written for these lessons.",
         "This is the last course and it leans on the first. The labs on images and on the "
-        "schoolmen reuse the names-and-definitions lab from Courses 1 and 2; if "
+        "schoolmen reuse the names-and-definitions lab from Sense, Imagination and Speech and Reason, Science and the Passions; if "
         "&ldquo;insignificant&rdquo; or &ldquo;absurd&rdquo; is unfamiliar, read "
         "&ldquo;Of Speech&rdquo; and &ldquo;Absurdity and Science&rdquo; again.",
         "Use the labs to change one thing at a time. Each preset changes a single premise, "

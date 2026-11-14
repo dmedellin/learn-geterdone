@@ -39,7 +39,7 @@ COURSE = {
     "assumes_short": "The first six courses",
     "assumes_long": (
         "the earlier courses are assumed, above all the definitions of sovereign, "
-        "covenant and the laws of nature in Courses 4 to 6, and school arithmetic is "
+        "covenant and the laws of nature in the three courses before this one, and school arithmetic is "
         "enough for the labs"
     ),
     "outcomes_intro": (

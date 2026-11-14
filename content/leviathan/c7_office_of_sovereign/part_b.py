@@ -258,7 +258,7 @@ LESSONS = [
              "Hobbes says the excess is not punishment but hostility. In the excess "
              "preset the 150 the law prescribed is punishment and the 250 added after "
              "is hostility."),
-            ("Reading <em>hostility</em> as <em>wrong</em>",
+            ("Reading hostility as wrong",
              "Hobbes means a harm that is not punishment. Against a declared enemy "
              "&ldquo;all infliction of evill is lawfull&rdquo;. Inflicted on a subject "
              "beyond the law, it falls outside the definition, and the delinquent is "

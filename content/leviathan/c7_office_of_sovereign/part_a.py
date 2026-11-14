@@ -276,7 +276,7 @@ LESSONS = [
              "worked out, and the twelve portions share what is left, so the whole "
              "thing is one distribution made by one will. It is not an agreement among "
              "equals."),
-            ("Reading <em>arbitrary</em> as <em>unjust</em>",
+            ("Reading arbitrary as unjust",
              "Hobbes calls the division of Canaan arbitrary because it followed the "
              "discretion of Eleazar and Joshua and not the judgement of any subject. He "
              "says the sovereign distributes &ldquo;agreeable to Equity, and the Common "
@@ -806,8 +806,8 @@ LESSONS = [
              "Hobbes's argument, and that is all it finds. The coke preset shows how "
              "easily the conclusion fails when the first premise is not granted. The "
              "dispute between Hobbes and the lawyers lives in that premise."),
-            ("Reading <em>not subject to the civil laws</em> as <em>above all "
-                  "law</em>",
+            ("Reading not subject to the civil laws as above all "
+                  "law",
              "Hobbes keeps the sovereign under the laws of nature, which &ldquo;be "
              "Divine, and cannot by any man, or Common-wealth be abrogated&rdquo; "
              "(Chapter 29). The conclusion is about the civil laws only, the laws "
@@ -1063,7 +1063,7 @@ LESSONS = [
              "The chance is what the offender believes, and Hobbes says those who "
              "believe they will go unseen deceive themselves. The lab computes with the "
              "chance it is given, and cannot say whether the belief is true."),
-            ("Reading <em>crime</em> as <em>a sin that is also a harm</em>",
+            ("Reading crime as a sin that is also a harm",
              "Hobbes defines a crime by the civil law forbidding it, not by the harm: "
              "where the civil law ceases, crimes cease, though the sin does not. The "
              "lab's gain and penalty say nothing about whether the act is a crime."),
