@@ -20,6 +20,7 @@ from . import (
     gofkit,
     acckit,
     wonkit,
+    levkit,
     argkit,
     choicekit,
     algebra_equations,
@@ -185,6 +186,7 @@ REGISTRY = {
     "gofkit": gofkit.gofkit_lab,
     "acckit": acckit.acckit_lab,
     "wonkit": wonkit.wonkit_lab,
+    "levkit": levkit.levkit_lab,
 }
 
 

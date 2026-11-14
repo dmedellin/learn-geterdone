@@ -2666,6 +2666,112 @@ WON_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# Leviathan, same shape.
+LEV_PATH_PAGE_PATH = "/paths/leviathan/"
+LEV_MATERIAL_MARKER = "what follows from them on Hobbes"
+LEV_COURSES = (
+    ("leviathan-sense-and-speech", "Sense, Imagination and Speech", (
+        "the-artificial-man",
+        "sense-and-imagination",
+        "the-train-of-imaginations",
+        "speech-and-names",
+        "truth-and-definitions",
+    )),
+    ("leviathan-reason-and-passions", "Reason, Science and the Passions", (
+        "reason-is-reckoning",
+        "absurdity-and-science",
+        "the-passions",
+        "deliberation-and-will",
+        "discourse-belief-and-faith",
+        "wit-and-madness",
+        "the-subjects-of-knowledge",
+    )),
+    ("leviathan-power-manners-religion", "Power, Manners and Religion", (
+        "power-and-worth",
+        "honour-and-dignity",
+        "a-restless-desire-of-power",
+        "the-seeds-of-religion",
+        "religion-and-policy",
+    )),
+    ("leviathan-natural-condition", "The Natural Condition and the Laws of Nature", (
+        "equality-of-ability",
+        "the-war-of-every-man",
+        "right-and-law-of-nature",
+        "contracts-and-covenants",
+        "covenants-and-the-sword",
+        "justice-and-the-fool",
+        "the-other-laws-of-nature",
+    )),
+    ("leviathan-generation-of-commonwealth", "Persons and the Generation of a Commonwealth", (
+        "persons-authors-and-actors",
+        "one-person-by-consent",
+        "the-generation-of-a-commonwealth",
+        "the-rights-of-sovereigns",
+        "kinds-of-commonwealth",
+        "the-right-of-succession",
+    )),
+    ("leviathan-dominion-and-liberty", "Dominion, Liberty and the Parts of a Commonwealth", (
+        "dominion-paternal-and-despotical",
+        "liberty-and-necessity",
+        "the-true-liberties-of-subjects",
+        "systems-and-public-ministers",
+    )),
+    ("leviathan-office-of-sovereign", "Wealth, Counsel, Law and the Office of the Sovereign", (
+        "nutrition-and-procreation",
+        "counsel",
+        "civil-laws",
+        "crimes-excuses-and-extenuations",
+        "punishments-and-rewards",
+        "the-diseases-of-a-commonwealth",
+        "the-office-of-the-sovereign",
+        "the-kingdom-of-god-by-nature",
+    )),
+    ("leviathan-christian-commonwealth", "Of a Christian Commonwealth", (
+        "the-principles-of-christian-politics",
+        "the-books-of-scripture",
+        "spirit-angel-and-inspiration",
+        "the-kingdom-of-god-and-the-word",
+        "miracles-and-their-use",
+        "eternal-life-and-the-church",
+        "the-sovereigns-of-israel-and-christ",
+        "power-ecclesiastical-and-salvation",
+    )),
+    ("leviathan-kingdom-of-darkness", "The Kingdom of Darkness, and the Review and Conclusion", (
+        "spiritual-darkness",
+        "demonology-and-images",
+        "vain-philosophy",
+        "who-benefits-from-darkness",
+        "review-and-conclusion",
+    )),
+)
+
+LEV_PATH_PAGE_MARKERS = (
+    canonical_marker(LEV_PATH_PAGE_PATH),
+    html.escape(LEV_COURSES[0][1]),
+    html.escape(LEV_COURSES[-1][1]),
+    'href="../../%s/"' % LEV_COURSES[-1][0],
+)
+
+LEV_COURSE_HOMES = tuple(
+    (
+        "lev-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, LEV_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(LEV_COURSES, start=1)
+)
+
+LEV_COURSE_LESSONS = tuple(
+    (
+        "lev-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), LEV_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(LEV_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2772,6 +2878,7 @@ def path_page_targets(args):
         ("gof-path", GOF_PATH_PAGE_PATH, GOF_PATH_PAGE_MARKERS),
         ("acc-path", ACC_PATH_PAGE_PATH, ACC_PATH_PAGE_MARKERS),
         ("won-path", WON_PATH_PAGE_PATH, WON_PATH_PAGE_MARKERS),
+        ("lev-path", LEV_PATH_PAGE_PATH, LEV_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2805,7 +2912,8 @@ def course_home_targets(args):
                                     + DDD_COURSE_HOMES
                                     + GOF_COURSE_HOMES
                                     + ACC_COURSE_HOMES
-                                    + WON_COURSE_HOMES):
+                                    + WON_COURSE_HOMES
+                                    + LEV_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2854,6 +2962,7 @@ def lesson_targets(args):
         + GOF_COURSE_LESSONS
         + ACC_COURSE_LESSONS
         + WON_COURSE_LESSONS
+        + LEV_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

@@ -24016,6 +24016,458 @@ console.log('wealth of nations: wonkit family B, seven modes');
 }
 // ---- end wonkit family B ----
 
+// ---- levkit (Leviathan), family A ----
+// ==========================================================================
+// Leviathan, Read Along: levkit.py (family A: reckon, deliberate, worth,
+// equality, covenant)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and LVK_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by levkit's own
+// reader (lvkRead) and compared on the exact tile string a reader sees. The
+// figures were worked by hand on the samples stated; every case was seen to
+// FAIL when the line it tests was broken on purpose
+// (docs/leviathan/kit-report.md, "Verification (family A)").
+console.log('leviathan: levkit family A, five modes');
+{
+  const vm = require('vm');
+  const lvFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const lvSrc = { core: fs.readFileSync(lvFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(lvFile('levkit.py'), 'utf8') };
+  const lvBlock = (s, name) => blockFrom(lvSrc[s], name.replace(/[[\]]/g, '\\$&'), 'levkit (' + s + ')');
+  const lvViews = (dict, list) => list.map((v) => lvBlock('a', dict + '["' + v + '"]')).join('');
+  /* Field specs as levkit.py's SPECS declare them. */
+  const LV_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function RAT(o) { return Object.assign({ kind: 'rat', max: LIM }, o || {}); }
+    function LREC(sub, lo, hi, unique, rest, lr, hr, rw) { return { kind: 'lrec', lo: lo, hi: hi, unique: !!unique, sub: sub, rest: rest || { kind: 'name' }, restWhat: rw || 'value', loRest: lr || 0, hiRest: hr || 0 }; }
+    function LLIST(each, lo, hi) { return { kind: 'llist', each: each, lo: lo, hi: hi, things: 'values' }; }
+    function WD() { return { kind: 'word', words: Array.prototype.slice.call(arguments) }; }
+    var NM = { kind: 'name' }, NMS = { kind: 'names' }, AMT = RAT({ min: '0' }), CH = RAT({ min: '0', max: '1' });
+    var SPEC_OF = {
+      'reckon/names': { simple: LLIST(NM, 1, 40), defs: LREC([['name', NM], ['parts', NMS]], 0, 40), opposed: LREC([['a', NM], ['b', NM]], 0, 20),
+        claims: LREC([['claim', NM], ['subject', NMS], ['predicate', NMS]], 1, 30, true) },
+      'deliberate/will': { action: NM, steps: LREC([['step', NM], ['motion', WD('appetite', 'aversion', 'hope', 'fear')], ['toward', WD('do', 'omit')]], 1, 30, true),
+        end: WD('as-last', 'done', 'omitted', 'impossible') },
+      'worth/price': { powers: LLIST(NM, 2, 6), persons: LREC([['person', NM]], 2, 12, true, W(0), 2, 6, 'amount'),
+        buyers: LREC([['buyer', NM]], 1, 6, true, RAT({ min: '0', max: '1000' }), 2, 6, 'need'), dignity: LREC([['person', NM], ['value', AMT]], 0, 12) },
+      'equality/coalition': { persons: LREC([['person', NM], ['strength', W(1)]], 2, 10, true), machination: RAT({ min: '1', max: '1000' }), rule: WD('exceed', 'match') },
+      'covenant/perform': { first: NM, second: NM, cost1: AMT, gain1: AMT, cost2: AMT, gain2: AMT, sanction: AMT, certainty: CH, tie: WD('keep', 'break') },
+      'covenant/fool': { gain: AMT, loss: RAT({ gt: '0' }), chances: LLIST(CH, 1, 8) }
+    };
+    var DEFAULTS = { defs: '', opposed: '', end: 'as-last', dignity: '', machination: '1', rule: 'exceed', first: 'first', second: 'second', sanction: '0', certainty: '1', tie: 'keep' };
+    function RUN(mode, view, raw) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = lvkRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+    function TB(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.table.rows.map(function (r) { return r.join(' / '); }).join(' # '); }
+  `;
+  const lvMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + lvBlock('core', 'EA_CORE_JS') + lvBlock('a', 'LVK_CORE_JS') + code + LV_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'levkit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const lvCall = (run, mode) => (view, raw, ids) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '), ' + JSON.stringify(ids) + ')');
+  const lvStatus = (run, mode) => (view, raw) => run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '))');
+  const lvTable = (run, mode) => (view, raw) => run('TB(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + '))');
+  const LV_CAUT = '; the figure follows from what the lesson states, on Hobbes’s definitions as stated.';
+  const lvEnds = (got, want, label) => eq(String(got).slice(-want.length), want, label);
+
+  /* --- LVK_CORE_JS: shares, parsers, names -------------------------------- */
+  const lv = lvMk('');
+  eq(lv("[lvkPct(R(1n, 4n)), lvkPct(R(1n, 8n)), lvkPct(R(1n, 3n)), lvkPct(R(2n, 3n)), lvkPct(R0), lvkPct(R(1n)), lvkPct(R(1n, 400n)), lvkPct(R(1n, 30000n)), lvkPct(R(5n, 4n)), lvkPct(R(1n, 10n))].join(' | ')"),
+     '1/4 = 25% | 1/8 = 12.5% | 1/3 ≈ 33.33% | 2/3 ≈ 66.67% | 0 = 0% | 1 = 100% | 1/400 = 0.25% | 1/30,000 ≈ 0% | 5/4 = 125% | 1/10 = 10%',
+     'lvkPct: the fraction and at most two places, = only when exact, trailing zeros dropped');
+  eq(lv("[Rtext(lvkParseRat('-3/4', 'x')), Rtext(lvkParseRat('0.125', 'x')), Rtext(lvkParseRat('.5', 'x')), Rtext(lvkParseRat('6/4', 'x')), lvkDec(R(3n, 8n)), lvkDec(R(-7n, 2n)), lvkDec(R(1n, 3n))].join(' | ')"),
+     '-3/4 | 1/8 | 1/2 | 3/2 | 0.375 | −3.5 | 0.333333333333…', 'lvkParseRat and lvkDec: exact rationals');
+  eq(lv("var e = []; ['1/0', 'x', '2.1234567', '123456789/2', ''].forEach(function (s) { try { lvkParseRat(s, 'x'); } catch (err) { e.push(err.message); } }); e.join(' | ')"),
+     'x "1/0" divides by zero | x should be a number such as 3, 0.25 or 1/2, and "x" is not one | x has more than 6 decimal places | x "123456789/2" has more than 8 digits above or below the line | x is empty',
+     'lvkParseRat refuses a zero denominator, a word, a seventh place, nine digits, nothing');
+  eq(lv("try { lvkParseRat('1/123456789', 'x'); } catch (err) { err.message }"), 'x "1/123456789" has more than 8 digits above or below the line', 'lvkParseRat: nine digits below the line');
+  eq(lv("var e = []; ['body body', 'a - b', 'round quadrangle!', '-'].forEach(function (s) { try { lvkNameSeq(s, {}, 'p'); } catch (err) { e.push(err.message); } }); e.push(lvkNameSeq('-', { dash: true }, 'p').length, lvkNameSeq(' round   quadrangle ', {}, 'p').join('|')); e.join(' | ')"),
+     'p names "body" twice | p puts "-" among other names; "-" alone marks none | p "quadrangle!" should be letters, digits, dots, hyphens or underscores (a name of several words takes hyphens: round-quadrangle) | p cannot be "-", which marks none | 0 | round|quadrangle',
+     'lvkNameSeq: names by spaces, no repeats, "-" alone for none where allowed');
+  eq(lv("[lvkStatus('x.'), lvkListed(0, []), lvkListed(2, ['a', 'b'], '; ')].join(' | ')"),
+     'x; the figure follows from what the lesson states, on Hobbes’s definitions as stated. | 0: none | 2: a; b', 'lvkStatus appends the caution; lvkListed');
+
+  /* --- reckon (lrk) ------------------------------------------------------ */
+  const rk = lvMk(lvBlock('a', 'LRK_JS') + lvViews('LRK_VIEW_JS', ['names']), 'lrkCompute');
+  const rc = lvCall(rk, 'reckon'), rcS = lvStatus(rk, 'reckon'), rcT = lvTable(rk, 'reckon');
+  const VOC = { simple: 'body animated rational round quadrangle figure incorporeal',
+    defs: 'animal, body animated; man, animal rational; circle, figure round; square, figure quadrangle', opposed: 'round, quadrangle; body, incorporeal' };
+  const CL = 'c1, man, animal; c2, animal, man; c3, round quadrangle, figure; c4, man, incorporeal; c5, man, centaur; c6, circle, figure';
+  eq(rc('names', Object.assign({ claims: CL }, VOC), 'lrkNames lrkExpand lrkVerdicts lrkCounts lrkTrue lrkFalse lrkAbsurd lrkEmpty'),
+     '7 simple, 4 defined | animal = animated + body; man = animated + body + rational; circle = figure + round; square = figure + quadrangle | c1 true; c2 false; c3 absurd; c4 absurd; c5 insignificant; c6 true | 2 true, 1 false, 2 absurd, 1 insignificant | 2: c1, c6 | 1: c2 | 2: c3, c4 | 1: c5',
+     'reckon/names: expansions through two levels; true, false, absurd, insignificant');
+  eq(rcT('names', Object.assign({ claims: CL }, VOC)).split(' # ').map((r) => r.split(' / ').slice(5).join(': ')).join(' # '),
+     'true: every part of the predicate is in the subject # false: the subject lacks rational # absurd: round and quadrangle cannot be added (in the subject) # absurd: body and incorporeal cannot be added (subject and predicate together) # insignificant: centaur stands for nothing # true: every part of the predicate is in the subject',
+     'reckon/names: each verdict states its reason; a pair met only in subject and predicate together is absurd');
+  eq(rc('names', Object.assign({}, VOC, { claims: 'k1, centaur incorporeal body, figure; k2, round quadrangle, rational; k3, body, quadrangle round; k4, square, round' }), 'lrkVerdicts'),
+     'k1 insignificant; k2 absurd; k3 absurd; k4 absurd', 'reckon/names: insignificant before absurd, absurd before false (k2), a pair in the predicate (k3) and across both (k4)');
+  eq(rcT('names', Object.assign({}, VOC, { claims: 'k3, body, quadrangle round' })).split(' / ')[6], 'round and quadrangle cannot be added (in the predicate)', 'reckon/names: a pair in the predicate is named there');
+  eq(rc('names', { simple: 'body animated incorporeal', defs: 'animal, body animated; spirit, incorporeal substance; ghost, spirit', claims: 'c1, ghost, body; c2, animal, body; c3, round-quadrangle, body' }, 'lrkExpand lrkVerdicts'),
+     'animal = animated + body; spirit = nothing (substance stands for nothing); ghost = nothing (substance stands for nothing) | c1 insignificant; c2 true; c3 insignificant',
+     'reckon/names: a name defined through a name for nothing is empty, through every level; an undefined hyphenated name stands for nothing');
+  eq(rcT('names', { simple: 'body incorporeal', defs: 'spirit, incorporeal substance; ghost, spirit', claims: 'c1, ghost, body' }).split(' / ')[6], 'ghost is defined through substance, which stands for nothing', 'reckon/names: the empty name is traced to its root');
+  eq(rc('names', { simple: 'a b', defs: 'x, a y; y, b z; z, x', claims: 'c, x, a' }, 'lrkNames'),
+     'REFUSED The definitions go round in a circle: x → y → z → x; a name cannot be defined through itself', 'reckon/names: a circle through three definitions is refused, naming it');
+  eq(rc('names', { simple: 'a', defs: 'w, x; x, a y; y, x', claims: 'c, w, a' }, 'lrkNames'), 'REFUSED The definitions go round in a circle: x → y → x; a name cannot be defined through itself', 'reckon/names: the circle is named from where it closes, not from the first name visited');
+  eq(rc('names', { simple: 'a', defs: 'x, c d; c, a; d, x', claims: 'c1, x, a' }, 'lrkNames'), 'REFUSED The definitions go round in a circle: x → d → x; a name cannot be defined through itself', 'reckon/names: a finished branch (c) is not part of the circle');
+  eq(rc('names', { simple: 'a', defs: 'x, a x', claims: 'c, x, a' }, 'lrkNames'), 'REFUSED The definitions go round in a circle: x → x; a name cannot be defined through itself', 'reckon/names: a name defined through itself directly');
+  eq(rc('names', { simple: 'a b', defs: 'x, a; y, b; x, b', claims: 'c, x, a' }, 'lrkNames'),
+     'REFUSED Definitions define x twice (records 1 and 3); a name of inconstant signification cannot be reckoned with, so keep one definition', 'reckon/names: a name defined twice');
+  eq(rc('names', { simple: 'a b', defs: 'b, a', claims: 'c, b, a' }, 'lrkNames'), 'REFUSED b is both a simple name and defined (Definitions, record 1); a name is one or the other', 'reckon/names: simple and defined');
+  eq(rc('names', { simple: 'a b', defs: 'x, a b', opposed: 'a, x', claims: 'c, x, a' }, 'lrkNames'), 'REFUSED Opposed pairs, record 1: x is not one of the simple names', 'reckon/names: an opposed pair of simple names only');
+  eq(rc('names', { simple: 'a b', opposed: 'a, a', claims: 'c, a, a' }, 'lrkNames'), 'REFUSED Opposed pairs, record 1 pairs a with itself', 'reckon/names: a name opposed to itself');
+  eq(rc('names', { simple: 'a b', claims: 'c1, a b, b a; c2, a, a b' }, 'lrkVerdicts lrkExpand'), 'c1 true; c2 false | no definitions given', 'reckon/names: sums on both sides, no definitions');
+  lvEnds(rcS('names', Object.assign({ claims: CL }, VOC)), 'a claim is true when every simple name of the predicate is in the subject' + LV_CAUT, 'reckon/names: the status ends with the caution');
+
+  /* --- deliberate (lde) -------------------------------------------------- */
+  const de = lvMk(lvBlock('a', 'LDE_JS') + lvViews('LDE_VIEW_JS', ['will']), 'ldeCompute');
+  const dw = lvCall(de, 'deliberate'), dwT = lvTable(de, 'deliberate'), dwS = lvStatus(de, 'deliberate');
+  const ST5 = 's1, appetite, do; s2, fear, do; s3, hope, do; s4, aversion, do; s5, appetite, do';
+  eq(dw('will', { action: 'fight', steps: ST5 }, 'ldeSteps ldeAlternations ldeLean ldeWill ldeOutcome ldeWills ldeOpposite'),
+     '5 | 4 | 3 toward doing, 2 toward omitting | to do (s5: appetite toward doing) | fight done | s1 do, s2 omit, s3 do, s4 omit, s5 do | 2 of 4: s2, s4',
+     'deliberate/will: the will is the last motion; hope an appetite, fear an aversion');
+  eq(dw('will', { action: 'fight', steps: 's1, appetite, do; s2, aversion, do; s3, aversion, do; s4, fear, do', end: 'omitted' }, 'ldeAlternations ldeWill ldeOutcome ldeOpposite'),
+     '1 | to omit (s4: fear toward doing, an aversion) | fight omitted | 1 of 3: s1', 'deliberate/will: one change of direction; the majority does not decide');
+  eq(dw('will', { action: 'go', steps: 's1, aversion, omit; s2, appetite, omit; s3, hope, omit; s4, fear, omit' }, 'ldeWills ldeLean'),
+     's1 do, s2 omit, s3 omit, s4 do | 2 toward doing, 2 toward omitting', 'deliberate/will: an aversion toward omitting inclines to doing; an appetite toward omitting to omitting');
+  eq(dw('will', { action: 'go', steps: 's1, appetite, do', end: 'impossible' }, 'ldeOutcome ldeOpposite ldeAlternations'),
+     'go not done: thought impossible | no earlier step | 0', 'deliberate/will: thought impossible; one step only');
+  eq(dw('will', { action: 'fight', steps: ST5, end: 'omitted' }, 'ldeSteps'),
+     'REFUSED The deliberation ends with the action omitted, but its last motion (s5) inclines to do it; on Hobbes’s definition the will is that last motion, so an action omitted follows a last motion toward omitting it',
+     'deliberate/will: an omission after a last appetite to do is refused');
+  eq(dw('will', { action: 'fight', steps: 's1, fear, do', end: 'done' }, 'ldeSteps'),
+     'REFUSED The deliberation ends with the action done, but its last motion (s1) inclines to omit it; on Hobbes’s definition the will is that last motion, so an action done follows a last appetite to do it',
+     'deliberate/will: an action done after a last aversion is refused');
+  eq(dwT('will', { action: 'fight', steps: ST5 }).split(' # ')[1], 's2 / fear / do / omit / the opposite', 'deliberate/will: the table gives the will had it ended at each step');
+  lvEnds(dwS('will', { action: 'fight', steps: ST5 }), 'stopped earlier, 2 of 4 steps would have given the opposite will' + LV_CAUT, 'deliberate/will: the status ends with the caution');
+
+  /* --- worth (lwo) ------------------------------------------------------- */
+  const wo = lvMk(lvBlock('a', 'LWO_JS') + lvViews('LWO_VIEW_JS', ['price']), 'lwoCompute');
+  const wp = lvCall(wo, 'worth'), wpT = lvTable(wo, 'worth');
+  const MEN = { powers: 'strength eloquence riches', persons: 'a, 5, 1, 2; b, 2, 4, 1; c, 1, 1, 6; d, 3, 3, 3', buyers: 'general, 3, 0, 1; lawyer, 0, 3, 1; merchant, 1, 1, 2' };
+  eq(wp('price', MEN, 'lwoPrices lwoRanks lwoTop lwoSame lwoDignity'),
+     'general: a 17, b 7, c 9, d 12; lawyer: a 5, b 13, c 9, d 12; merchant: a 10, b 8, c 14, d 12 | general: a > d > c > b; lawyer: b > d > c > a; merchant: c > d > a > b | general: a; lawyer: b; merchant: c | no: on a and b, general ranks a above b and lawyer ranks b above a | no dignity given',
+     'worth/price: price is the sum of need × amount; each buyer ranks differently');
+  eq(wp('price', Object.assign({}, MEN, { dignity: 'a, 12; b, 13; c, 10; d, 12' }), 'lwoDignity lwoApart'),
+     'a 12: below general, above lawyer, above merchant; b 13: above general, equal to lawyer, above merchant; c 10: above general, above lawyer, below merchant; d 12: equal to general, equal to lawyer, equal to merchant | 2: a, c',
+     'worth/price: dignity against each price; apart from every price');
+  eq(wp('price', { powers: 'strength riches', persons: 'a, 1, 1; b, 2, 0; c, 0, 2; d, 1, 0', buyers: 'x, 1, 1; y, 1/2, 1/2' }, 'lwoPrices lwoRanks lwoTop lwoSame'),
+     'x: a 2, b 2, c 2, d 1; y: a 1, b 1, c 1, d 1/2 = 0.50 | x: a = b = c > d; y: a = b = c > d | x: a, b, c (tied); y: a, b, c (tied) | yes: every buyer ranks a = b = c > d',
+     'worth/price: ties share a place in input order; rational needs; agreement');
+  eq(wp('price', { powers: 'strength riches', persons: 'a, 2, 0; b, 1, 1', buyers: 'x, 1, 1; y, 1, 0; z, 0, 1' }, 'lwoSame'),
+     'no: on a and b, x ranks a equal to b and y ranks a above b', 'worth/price: a tie against an order is a disagreement');
+  eq(wp('price', { powers: 'strength riches', persons: 'a, 2, 0; b, 1, 1', buyers: 'x, 1, 1' }, 'lwoSame'), 'one buyer only: nothing to compare', 'worth/price: one buyer');
+  eq(wp('price', { powers: 'strength riches eloquence', persons: 'a, 2, 0, 1; b, 1, 1', buyers: 'x, 1, 1, 1' }, 'lwoSame'), 'REFUSED Persons, record 2 (b) gives 2 amounts, and there are 3 powers', 'worth/price: one amount per power');
+  eq(wp('price', { powers: 'strength riches', persons: 'a, 2, 0; b, 1, 1', buyers: 'x, 1, 1, 1' }, 'lwoSame'), 'REFUSED Buyers, record 1 (x) gives 3 needs, and there are 2 powers', 'worth/price: one need per power');
+  eq(wp('price', { powers: 'strength riches', persons: 'a, 2, 0; b, 1, 1', buyers: 'x, 1, 1', dignity: 'a, 3' }, 'lwoSame'), 'REFUSED Dignity is given for 1 of the 2 persons; give it for every person, or for none', 'worth/price: dignity for all or none');
+  eq(wp('price', { powers: 'strength riches', persons: 'a, 2, 0; b, 1, 1', buyers: 'x, 1, 1', dignity: 'a, 3; q, 1' }, 'lwoSame'), 'REFUSED Dignity, record 2: q is not one of the persons', 'worth/price: dignity of an unknown person');
+  eq(wpT('price', Object.assign({}, MEN, { dignity: 'a, 12; b, 13; c, 10; d, 12' })).split(' # ')[0], 'a / 17 / 5 / 10 / 12', 'worth/price: the table, one price per buyer and the dignity');
+
+  /* --- equality (leq) ---------------------------------------------------- */
+  const eqk = lvMk(lvBlock('a', 'LEQ_JS') + lvViews('LEQ_VIEW_JS', ['coalition']), 'leqCompute');
+  const co = lvCall(eqk, 'equality'), coT = lvTable(eqk, 'equality'), coS = lvStatus(eqk, 'equality');
+  const SIX = 'a, 2; b, 3; c, 4; d, 5; e, 6; f, 9';
+  eq(co('coalition', { persons: SIX }, 'leqStrongest leqWeakest leqFewest leqBeyond leqWeakAlone leqByTwo'),
+     'f (9) | a (2) | a: 1 (f); b: 1 (f); c: 1 (f); d: 1 (f); e: 1 (f); f: 2 (e + d) | 0: none | no: a, 2, does not exceed f, 9 | 6 of 6',
+     'equality/coalition: others from the strongest down; the strongest overcome by two');
+  eq(co('coalition', { persons: SIX, machination: '5' }, 'leqFewest leqWeakAlone'),
+     'a: 1 (f); b: 1 (f); c: 1 (f); d: 1 (f); e: 1 (f); f: 1 (e) | yes: a, 2 × 5 = 10, exceeds f, 9', 'equality/coalition: the factor multiplies the attackers');
+  eq(co('coalition', { persons: SIX, machination: '9/2' }, 'leqWeakAlone'), 'no: a, 2 × 9/2 = 9, does not exceed f, 9', 'equality/coalition: exactly equal force does not exceed');
+  eq(co('coalition', { persons: SIX, machination: '9/2', rule: 'match' }, 'leqWeakAlone'), 'yes: a, 2 × 9/2 = 9, matches or exceeds f, 9', 'equality/coalition: under match, equal force overcomes');
+  eq(co('coalition', { persons: 'a, 3; b, 3; c, 6' }, 'leqWeakest leqFewest leqBeyond leqByTwo'),
+     'a, b (3) | a: 1 (c); b: 1 (c); c: no coalition | 1: c | 2 of 3', 'equality/coalition: one beyond every coalition under exceed');
+  eq(co('coalition', { persons: 'a, 3; b, 3; c, 6', rule: 'match' }, 'leqFewest leqBeyond leqWeakAlone'),
+     'a: 1 (c); b: 1 (c); c: 2 (a + b) | 0: none | no: a, 3, falls short of c, 6', 'equality/coalition: the same under match');
+  eq(co('coalition', { persons: 'p, 4; q, 4; r, 4' }, 'leqStrongest leqWeakest leqWeakAlone leqFewest'),
+     'p, q, r (4) | p, q, r (4) | no: q, 4, does not exceed p, 4 | p: 2 (q + r); q: 2 (p + r); r: 2 (p + q)', 'equality/coalition: all equal; the weakest is the first other than the strongest; ties in input order');
+  eq(co('coalition', { persons: 'a, 1; b, 5; c, 2; d, 5' }, 'leqFewest'), 'a: 1 (b); b: 2 (d + c); c: 1 (b); d: 2 (b + c)', 'equality/coalition: equal strengths taken in input order');
+  eq(coT('coalition', { persons: SIX, machination: '3/2' }).split(' # ')[5], 'f / 9 / 2 / e + d / 11 × 3/2 = 33/2 = 16.50', 'equality/coalition: the table shows the force; 6 × 3/2 = 9 does not exceed 9');
+  lvEnds(coS('coalition', { persons: SIX }), 'the weakest alone does not exceed the strongest' + LV_CAUT, 'equality/coalition: the status ends with the caution');
+
+  /* --- covenant (lcv) ---------------------------------------------------- */
+  const cv = lvMk(lvBlock('a', 'LCV_JS') + lvViews('LCV_VIEW_JS', ['perform', 'fool']), 'lcvCompute');
+  const cp = lvCall(cv, 'covenant'), cpS = lvStatus(cv, 'covenant'), cpT = lvTable(cv, 'covenant');
+  const BS = { first: 'buyer', second: 'seller', cost1: '10', gain1: '14', cost2: '8', gain2: '10' };
+  const PT = 'lcvCondition lcvKeep lcvBreak lcvExpected lcvChoice lcvFirst lcvReasonable lcvLeast';
+  eq(cp('perform', BS, PT),
+     'mere nature: no sanction | 2 | 10 | 0 | seller breaks: 10 against 2 | −10, since seller breaks | no: −10 against 0 for not performing | 8 (cost2 ÷ certainty)',
+     'covenant/perform: with no sanction the second breaks and the first loses');
+  eq(cp('perform', Object.assign({ sanction: '12', certainty: '3/4' }, BS), PT),
+     'a common power: sanction 12 at certainty 3/4 = 75% | 2 | 1 | 9 | seller keeps: 2 against 1 | 4, since seller keeps | yes: 4 against 0 for not performing | 32/3 ≈ 10.67 (cost2 ÷ certainty)',
+     'covenant/perform: an expected sanction above the cost of keeping');
+  eq(cp('perform', Object.assign({ sanction: '8' }, BS), 'lcvChoice lcvFirst'), 'seller keeps: 2 against 2 (equal; the tie rule keeps) | 4, since seller keeps', 'covenant/perform: a tie keeps by default');
+  eq(cp('perform', Object.assign({ sanction: '8', tie: 'break' }, BS), 'lcvChoice lcvFirst'), 'seller breaks: 2 against 2 (equal; the tie rule breaks) | −10, since seller breaks', 'covenant/perform: the tie rule break');
+  eq(cp('perform', Object.assign({ sanction: '12', certainty: '0' }, BS), 'lcvCondition lcvLeast lcvChoice'), 'a sanction never applied (certainty 0) | none: at certainty 0 no sanction is ever applied | seller breaks: 10 against 2', 'covenant/perform: certainty 0 has no least sanction');
+  eq(cp('perform', Object.assign({}, BS, { cost2: '0', certainty: '0' }), 'lcvLeast lcvChoice'), '0: keeping costs seller nothing | seller keeps: 10 against 10 (equal; the tie rule keeps)', 'covenant/perform: keeping that costs nothing');
+  eq(cp('perform', Object.assign({}, BS, { gain1: '10', sanction: '9' }), 'lcvReasonable'), 'no better: 0 against 0 for not performing', 'covenant/perform: a first performance that gains nothing is no better');
+  eq(cp('perform', Object.assign({}, BS, { second: 'buyer' }), 'lcvKeep'), 'REFUSED The two parties are both named buyer; name them apart', 'covenant/perform: two parties');
+  eq(cpT('perform', BS).split(' # ')[3], 'buyer / performs first, seller breaks / −10 / what follows', 'covenant/perform: the table');
+  lvEnds(cpS('perform', BS), 'In the condition of mere nature (no sanction), seller does better to break, so buyer performing first gets −10; performing first is not reasonable' + LV_CAUT, 'covenant/perform: the status names mere nature');
+  eq(cp('fool', { gain: '3', loss: '12', chances: '1/10 1/4 1/2 0.9' }, 'lcvThreshold lcvValues lcvBreakAt lcvKeepAt'),
+     '1/4 = 25% | 1/10 = 10%: 9/5 = 1.80; 1/4 = 25%: 0; 1/2 = 50%: −3; 9/10 = 90%: −39/5 = −7.80 | 1: 1/10 = 10% | 2: 1/2 = 50%; 9/10 = 90%',
+     'covenant/fool: gain − chance × loss; at the threshold neither');
+  eq(cp('fool', { gain: '5', loss: '4', chances: '0.5 1' }, 'lcvThreshold lcvBreakAt'), '5/4 = 125%, above certainty: breaking pays at every chance | 2: 1/2 = 50%; 1 = 100%', 'covenant/fool: a threshold above 1');
+  eq(cp('fool', { gain: '4', loss: '4', chances: '1' }, 'lcvThreshold lcvBreakAt lcvKeepAt'), '1 = 100% | 0: none | 0: none', 'covenant/fool: a threshold of exactly 1 is not above certainty');
+  eq(cp('fool', { gain: '1', loss: '3', chances: '1/3' }, 'lcvThreshold lcvBreakAt lcvKeepAt'), '1/3 ≈ 33.33% | 0: none | 0: none', 'covenant/fool: a chance exactly at the threshold favours neither');
+  eq(cp('fool', { gain: '1', loss: '0', chances: '1/3' }, 'lcvThreshold'), 'REFUSED loss must be more than 0, and it is 0', 'covenant/fool: the loss must be more than 0');
+  eq(cpT('fool', { gain: '3', loss: '12', chances: '1/4' }), '1/4 = 25% / 0 / 0 / neither (equal)', 'covenant/fool: the table');
+  lvEnds(cpS('fool', { gain: '3', loss: '12', chances: '1/10 1/4' }), 'no one can reasonably count on the errors of others, which this calculation assumes' + LV_CAUT, 'covenant/fool: the status gives Hobbes’s reply and the caution');
+}
+// ---- end levkit family A ----
+
+// ---- levkit (Leviathan), family B ----
+// ==========================================================================
+// Leviathan, Read Along: levkit_b.py (family B: assembly, succession, tax,
+// law, canon)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS and LVK_CORE_JS, then one vm context per mode
+// holding its base block and every one of its view blocks. Each
+// <xx>Compute(view, inst, opts) is called on inputs read by levkit's own
+// reader (lvkRead) and compared on the exact tile string a reader sees. Every
+// figure was worked by hand (C(n, n/2)/2^n also with Python's Fraction and
+// math.comb) and confirmed on a rendered scratch page; every case was seen to
+// FAIL when the line it tests was broken on purpose.
+console.log('leviathan: levkit family B, five modes');
+{
+  const vm = require('vm');
+  const lbFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const lbSrc = { core: fs.readFileSync(lbFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(lbFile('levkit.py'), 'utf8'),
+    b: fs.readFileSync(lbFile('levkit_b.py'), 'utf8') };
+  const lbBlock = (src, name) => blockFrom(lbSrc[src], name.replace(/[[\]]/g, '\\$&'), 'levkit (' + src + ')');
+  const lbViews = (dict, list) => list.map((v) => lbBlock('b', dict + '["' + v + '"]')).join('');
+  /* Field specs as levkit_b.py's mode dicts declare them. */
+  const LB_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function RAT(o) { var f = { kind: 'rat', max: LIM }; o = o || {}; if (o.gt !== undefined) f.gt = String(o.gt); if (o.lo !== undefined) f.min = String(o.lo); if (o.hi !== undefined) f.max = String(o.hi); if (o.dash) f.dash = true; return f; }
+    var NM = { kind: 'name' }, PAR = { kind: 'parent' }, YN = { kind: 'word', words: ['yes', 'no'] };
+    var NMS = { kind: 'names' }, NMD = { kind: 'names', dash: true };
+    function WD() { return { kind: 'word', words: Array.prototype.slice.call(arguments) }; }
+    function REC(sub, lo, hi, unique) { return { kind: 'lrec', sub: sub, rest: NM, restWhat: 'value', loRest: 0, hiRest: 0, lo: lo, hi: hi || 60, unique: !!unique }; }
+    function LIST(each, lo, hi) { return { kind: 'llist', each: each, lo: lo, hi: hi || 60, things: 'values' }; }
+    var YEAR = W('-' + LIM, LIM);
+    var SPEC_OF = {
+      'assembly/voices': { members: REC([['member', NM], ['voice', WD('yes', 'no', 'abstain')]], 1, 60, true), rule: WD('greater', 'absolute'), liable: WD('no', 'yes') },
+      'assembly/ties': { sizes: LIST(W(1, 60), 1, 8) },
+      'succession/heir': { people: REC([['person', NM], ['parent', PAR], ['sex', WD('m', 'f')], ['born', W(0)], ['alive', YN]], 2, 20, true),
+        monarch: NM, named: PAR, custom: WD('none', 'male-line') },
+      'tax/impose': { persons: REC([['person', NM], ['riches', W(0)], ['consumption', W(0)]], 1, 60, true), revenue: RAT({ gt: 0 }) },
+      'tax/shares': { total: RAT({ gt: 0 }), parties: REC([['party', NM], ['weight', RAT({ gt: 0 })]], 1, 60, true),
+        setaside: REC([['party', NM], ['fraction', RAT({ gt: 0, hi: 1 })]], 0, 60, true) },
+      'law/silence': { actions: LIST(NM, 1, 12), laws: REC([['law', NM], ['commands', NMD], ['forbids', NMD]], 1, 60, true),
+        inalienable: REC([['action', NM], ['reason', NMS]], 0, 12, true) },
+      'law/deter': { gain: RAT({ lo: 0 }), penalty: RAT({ lo: 0 }), certainty: RAT({ lo: 0, hi: 1 }), prescribed: RAT({ lo: 0, dash: true }), inflicted: RAT({ lo: 0, dash: true }) },
+      'canon/date': { books: REC([['book', NM], ['author', NM], ['author_death', YEAR]], 1, 30, true), mentions: REC([['book', NM], ['event', NM], ['year', YEAR]], 0, 60) },
+      'canon/benefit': { parties: LIST(NM, 1, 20), doctrines: REC([['doctrine', NM], ['benefits', NMD]], 1, 60, true) }
+    };
+    var DEFAULTS = { rule: 'greater', liable: 'no', named: '-', custom: 'none', setaside: '', inalienable: '', prescribed: '-', inflicted: '-' };
+    function RUN(mode, view, raw, opts) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = lvkRead(s, r); } catch (e) { return { refuse: 'READ ' + e.message }; }
+      return COMPUTE(view, inst, opts || {});
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+  `;
+  const lbMk = (code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + lbBlock('core', 'EA_CORE_JS') + lbBlock('a', 'LVK_CORE_JS') + code + LB_SPECS
+      + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'levkit_b' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const lbCall = (run, mode) => (view, raw, ids) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', {}), ' + JSON.stringify(ids) + ')');
+  const lbStatus = (run, mode) => (view, raw) =>
+    run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', {}))');
+  const lbEnds = (got, want, label) => eq(String(got).slice(-want.length), want, label);
+  const LCAUT = '; the figure follows from what the lesson states, on Hobbes’s definitions as stated.';
+
+  /* --- assembly (las) ---------------------------------------------------- */
+  const asRun = lbMk(lbBlock('b', 'LAS_JS') + lbViews('LAS_VIEW_JS', ['voices', 'ties']), 'lasCompute');
+  const as = lbCall(asRun, 'assembly'), asS = lbStatus(asRun, 'assembly');
+  const SEVEN = 'a, yes; b, yes; c, no; d, abstain; e, yes; f, no; g, abstain';
+  const VT = 'lasYes lasNo lasAbstain lasDecision lasMargin lasNeeded lasLiable lasExcused';
+  eq(as('voices', { members: SEVEN, liable: 'yes' }, VT),
+     '3 | 2 | 2 | passes: 3 to 2 by the greater number of voices given | +1 | 3 yes voices (more than the 2 no) | 3: a, b, e | 4: c, d, f, g',
+     'assembly/voices: the greater number of voices given; only the yes voters answer for the decree');
+  eq(as('voices', { members: SEVEN, rule: 'absolute', liable: 'yes' }, 'lasDecision lasNeeded lasLiable lasExcused'),
+     'fails: 3 of 7 members say yes, not more than half | 4 yes voices (more than half of 7 members) | none: no decree was made | everyone: no decree was made',
+     'assembly/voices: absolute counts abstainers among the members');
+  eq(as('voices', { members: 'a, yes; b, yes; c, yes; d, yes; e, no; f, abstain; g, abstain', rule: 'absolute' }, 'lasDecision'),
+     'passes: 4 of 7 members say yes, more than half', 'assembly/voices: absolute passes on more than half of all');
+  eq(as('voices', { members: 'a, yes; b, yes; c, yes; d, no; e, no; f, abstain', rule: 'absolute' }, 'lasDecision'),
+     'fails: 3 of 6 members say yes, not more than half', 'assembly/voices: exactly half of all is not more than half');
+  eq(as('voices', { members: 'a, yes; b, yes; c, yes; d, no; e, no; f, abstain', rule: 'absolute' }, 'lasNeeded'),
+     '4 yes voices (more than half of 6 members)', 'assembly/voices: more than half of an even number');
+  eq(as('voices', { members: 'a, yes; b, no; c, yes; d, no; e, yes; f, no' }, 'lasDecision lasMargin lasLiable'),
+     'mute: 3 to 3, an even split of the voices | 0 | not shown (liable is no)', 'assembly/voices: an even split is mute');
+  eq(as('voices', { members: 'a, yes; b, no; c, abstain', rule: 'absolute' }, 'lasDecision'),
+     'mute: 1 to 1, an even split of the voices', 'assembly/voices: an even split is mute on the absolute rule too');
+  eq(as('voices', { members: 'a, abstain; b, abstain' }, 'lasDecision'), 'mute: no voice is given (every member abstains)', 'assembly/voices: no voice at all is mute');
+  eq(as('voices', { members: 'a, yes; b, no; c, no' }, 'lasDecision lasMargin'), 'fails: 1 to 2 by the greater number of voices given | −1', 'assembly/voices: more no than yes fails');
+  eq(as('voices', { members: 'a, yes; a, no' }, 'lasYes'), 'REFUSED READ members names "a" twice', 'assembly/voices: a member named twice is refused');
+  lbEnds(asS('voices', { members: 'a, yes; b, no' }), 'The assembly is mute: nothing is decreed on the rule of the greater number of the voices given' + LCAUT, 'assembly/voices: a mute assembly decrees nothing');
+  lbEnds(asS('voices', { members: SEVEN }), 'on the rule of the greater number of the voices given' + LCAUT, 'assembly/voices: the status ends with the caution');
+
+  eq(as('ties', { sizes: '1 2 3 4 6 8' }, 'lasChances lasOdd lasMost lasLeast'),
+     '1: 0 = 0%; 2: 1/2 = 50%; 3: 0 = 0%; 4: 3/8 = 37.5%; 6: 5/16 = 31.25%; 8: 35/128 ≈ 27.34% | 2: 1, 3 | 2 members: 1/2 = 50% | 8 members: 35/128 ≈ 27.34%',
+     'assembly/ties: C(n, n/2) / 2^n, and 0 for odd n');
+  eq(as('ties', { sizes: '60 20' }, 'lasChances lasMost lasLeast'),
+     '60: 7,391,536,347,803,839/72,057,594,037,927,936 ≈ 10.26%; 20: 46,189/262,144 ≈ 17.62% | 20 members: 46,189/262,144 ≈ 17.62% | 60 members: 7,391,536,347,803,839/72,057,594,037,927,936 ≈ 10.26%',
+     'assembly/ties: exact at 60 members (BigInt), most and least whatever the order');
+  eq(as('ties', { sizes: '5 7' }, 'lasOdd lasMost'), '2: 5, 7 | none: every size given is odd', 'assembly/ties: odd sizes only');
+  eq(as('ties', { sizes: '4 6 4' }, 'lasChances'), 'REFUSED Sizes: 4 is given twice', 'assembly/ties: a size given twice is refused');
+  lbEnds(asS('ties', { sizes: '2 3' }), 'Hobbes\'s point is about the even ones' + LCAUT, 'assembly/ties: the status ends with the caution');
+
+  /* --- succession (lsu) -------------------------------------------------- */
+  const suRun = lbMk(lbBlock('b', 'LSU_JS') + lbViews('LSU_VIEW_JS', ['heir']), 'lsuCompute');
+  const su = lbCall(suRun, 'succession'), suS = lbStatus(suRun, 'succession');
+  const FAM = 'king, -, m, 1, no; henry, king, m, 2, yes; arthur, henry, m, 3, no; margaret, henry, f, 4, yes; harry, henry, m, 5, yes; '
+    + 'mary, henry, f, 6, yes; catherine, arthur, f, 7, yes; james, margaret, m, 8, yes; edward, harry, m, 9, yes; uncle, king, m, 10, yes';
+  const HT = 'lsuSuccessor lsuRule lsuLine lsuWithout lsuPresumption lsuIssue lsuNear';
+  /* henry's issue: arthur (dead) is replaced by his issue catherine; then harry and his son, then the daughters and theirs. */
+  eq(su('heir', { people: FAM, monarch: 'henry' }, HT),
+     'catherine | presumption: the monarch\'s own issue | 1 catherine; 2 harry; 3 edward; 4 margaret; 5 james; 6 mary; and 1 more (the table lists all) | catherine (there is no testament) | catherine | 6: catherine, harry, edward, margaret, james, mary | catherine: issue, 2 generations down',
+     'succession/heir: issue in order, male before female, a dead child\'s issue in its place');
+  eq(su('heir', { people: FAM.replace('arthur, henry, m, 3, no', 'arthur, henry, m, 3, yes'), monarch: 'henry' }, 'lsuSuccessor lsuLine'),
+     'arthur | 1 arthur; 2 catherine; 3 harry; 4 edward; 5 margaret; 6 james; and 2 more (the table lists all)', 'succession/heir: the eldest son living succeeds');
+  eq(su('heir', { people: FAM.replace('catherine, arthur', 'catherine, king'), monarch: 'henry' }, 'lsuSuccessor'),
+     'harry', 'succession/heir: the eldest son dead without issue: the next son');
+  eq(su('heir', { people: FAM, monarch: 'henry', named: 'mary' }, 'lsuSuccessor lsuRule lsuLine lsuWithout'),
+     'mary | testament: named by express words | 1 mary; 2 catherine; 3 harry; 4 edward; 5 margaret; 6 james; and 1 more (the table lists all) | catherine',
+     'succession/heir: a testament first, then the presumption');
+  eq(su('heir', { people: FAM, monarch: 'henry', custom: 'male-line' }, 'lsuSuccessor lsuRule lsuLine lsuPresumption'),
+     'harry | custom (male-line): the first male of the blood through males | 1 harry; 2 edward; 3 uncle | catherine',
+     'succession/heir: male-line custom passes over females and those through females');
+  /* edward has no issue: harry 1 step, henry 2, margaret and mary 3, then at 4 males first: james, uncle, then catherine */
+  eq(su('heir', { people: FAM, monarch: 'edward' }, 'lsuSuccessor lsuRule lsuLine lsuNear'),
+     'harry | presumption: no living issue, so the nearest in blood | 1 harry; 2 henry; 3 margaret; 4 mary; 5 james; 6 uncle; and 1 more (the table lists all) | harry: 1 step up (an ancestor)',
+     'succession/heir: no issue: the nearer in blood, then male before female');
+  eq(su('heir', { people: FAM.replace('harry, henry, m, 5, yes', 'harry, henry, m, 5, no'), monarch: 'edward' }, 'lsuSuccessor lsuNear'),
+     'henry | henry: 2 steps up (an ancestor)', 'succession/heir: the dead are passed over');
+  eq(su('heir', { people: FAM, monarch: 'catherine' }, 'lsuLine'),
+     '1 henry; 2 harry; 3 margaret; 4 mary; 5 james; 6 edward; and 1 more (the table lists all)', 'succession/heir: steps count up to the common ancestor and down');
+  eq(su('heir', { people: FAM, monarch: 'edward', custom: 'male-line' }, 'lsuLine'), '1 harry; 2 henry; 3 uncle', 'succession/heir: male-line through the monarch\'s own line');
+  eq(su('heir', { people: FAM, monarch: 'james', custom: 'male-line' }, 'lsuSuccessor lsuLine lsuPresumption'), 'none | none | margaret',
+     'succession/heir: male-line refuses a kinship that runs through the monarch\'s mother');
+  eq(su('heir', { people: 'a, -, m, 1, yes; b, a, f, 2, no', monarch: 'a' }, 'lsuSuccessor lsuRule'),
+     'none | none: no living person of the blood qualifies', 'succession/heir: no one qualifies');
+  eq(su('heir', { people: FAM, monarch: 'henry', named: 'arthur' }, 'lsuSuccessor'),
+     'REFUSED The successor named, arthur, is dead (alive is no), and the dead cannot succeed', 'succession/heir: a dead named successor is refused');
+  eq(su('heir', { people: FAM, monarch: 'henry', named: 'zed' }, 'lsuSuccessor'),
+     'REFUSED The successor named, zed, is not one of the people', 'succession/heir: an unknown named successor is refused');
+  eq(su('heir', { people: FAM, monarch: 'henry', named: 'henry' }, 'lsuSuccessor'), 'REFUSED The successor named, henry, is the monarch', 'succession/heir: the monarch cannot be named');
+  eq(su('heir', { people: FAM, monarch: 'zed' }, 'lsuSuccessor'), 'REFUSED The monarch, zed, is not one of the people', 'succession/heir: an unknown monarch is refused');
+  eq(su('heir', { people: 'a, b, m, 1, yes; b, c, m, 2, yes; c, a, m, 3, yes; d, -, m, 4, yes', monarch: 'd' }, 'lsuSuccessor'),
+     'REFUSED People: a, b, c are one another\'s ancestors in a loop', 'succession/heir: a loop of parents is refused');
+  eq(su('heir', { people: 'a, -, m, 1, yes; b, a, m, 1, yes', monarch: 'a' }, 'lsuSuccessor'),
+     'REFUSED People, record 2 (b) is born 1, as a is: born gives the order of birth, so no two people share it', 'succession/heir: a shared birth order is refused');
+  eq(su('heir', { people: 'a, -, m, 5, yes; b, a, m, 3, yes', monarch: 'a' }, 'lsuSuccessor'),
+     'REFUSED People, record 2 (b) is born 3, not after the parent a (born 5)', 'succession/heir: a child born before its parent is refused');
+  eq(su('heir', { people: 'a, a, m, 1, yes; b, -, m, 2, yes', monarch: 'b' }, 'lsuSuccessor'), 'REFUSED People, record 1 (a) is named as their own parent', 'succession/heir: one\'s own parent is refused');
+  eq(su('heir', { people: 'a, z, m, 1, yes; b, -, m, 2, yes', monarch: 'b' }, 'lsuSuccessor'), 'REFUSED People, record 1 (a): the parent z is not one of the people', 'succession/heir: an unknown parent is refused');
+  lbEnds(suS('heir', { people: FAM, monarch: 'henry' }), 'is the kit\'s reading of Chapter 19, not Hobbes\'s words' + LCAUT, 'succession/heir: the status ends with the caution');
+
+  /* --- tax (ltx) --------------------------------------------------------- */
+  const txRun = lbMk(lbBlock('b', 'LTX_JS') + lbViews('LTX_VIEW_JS', ['impose', 'shares']), 'ltxCompute');
+  const tx = lbCall(txRun, 'tax'), txS = lbStatus(txRun, 'tax');
+  /* riches 200, consumption 80: rates 20/200 = 1/10 and 20/80 = 1/4 */
+  const FIVE = 'ann, 100, 10; ben, 50, 20; cal, 10, 30; dee, 20, 5; eve, 20, 15';
+  eq(tx('impose', { persons: FIVE, revenue: '20' }, 'ltxRateRiches ltxRateConsumption ltxOnRiches ltxOnConsumption ltxDifference ltxMore ltxBurdenRiches ltxBurdenConsumption'),
+     '1/10 = 10% | 1/4 = 25% | ann 10; ben 5; cal 1; dee 2; eve 2 | ann 5/2 = 2.50; ben 5; cal 15/2 = 7.50; dee 5/4 = 1.25; eve 15/4 = 3.75 | ann −15/2 = −7.50; ben 0; cal +13/2 = 6.50; dee −3/4 = −0.75; eve +7/4 = 1.75 | 2: cal, eve | ann 1 = 100%; ben 1/4 = 25%; cal 1/30 ≈ 3.33%; dee 2/5 = 40%; eve 2/15 ≈ 13.33% | ann 1/4 = 25%; ben 1/4 = 25%; cal 1/4 = 25%; dee 1/4 = 25%; eve 1/4 = 25%',
+     'tax/impose: rates, each tax, the difference and the burden on consumption');
+  eq(tx('impose', { persons: 'a, 3, 0; b, 1, 2', revenue: '1/3' }, 'ltxRateRiches ltxOnConsumption ltxBurdenRiches ltxMore'),
+     '1/12 ≈ 8.33% | a 0; b 1/3 ≈ 0.33 | a no consumption; b 1/24 ≈ 4.17% | 1: b', 'tax/impose: a fractional revenue; no consumption has no share');
+  eq(tx('impose', { persons: 'a, 0, 3; b, 0, 4', revenue: '5' }, 'ltxRateRiches'),
+     'REFUSED Persons: every person\'s riches are 0, so no rate on riches can raise the revenue', 'tax/impose: no riches at all is refused');
+  eq(tx('impose', { persons: 'a, 3, 0; b, 1, 0', revenue: '5' }, 'ltxRateRiches'),
+     'REFUSED Persons: every person\'s consumption is 0, so no rate on consumption can raise the revenue', 'tax/impose: no consumption at all is refused');
+  lbEnds(txS('impose', { persons: FIVE, revenue: '20' }), 'on riches the share of what they consume differs' + LCAUT, 'tax/impose: the status ends with the caution');
+
+  eq(tx('shares', { total: '120', parties: 'reuben, 1; simeon, 2; gad, 4', setaside: 'levi, 1/10' }, 'ltxSetAside ltxRemainder ltxWeight ltxShares ltxNotWhole ltxSum'),
+     'levi 1/10 = 0.1 of the total: 12 | 108 | 7 | reuben 108/7; simeon 216/7; gad 432/7 | 3: reuben, simeon, gad | 120, the whole total',
+     'tax/shares: a tenth set apart, the rest by weight, never rounded');
+  eq(tx('shares', { total: '100', parties: 'a, 1; b, 1', setaside: 'a, 1/4' }, 'ltxRemainder ltxShares ltxSum'),
+     '75 | a 75/2 = 37.5; b 75/2 = 37.5 | 100, the whole total', 'tax/shares: a party set apart a portion and given a share');
+  eq(tx('shares', { total: '1', parties: 'a, 1; b, 2' }, 'ltxSetAside ltxShares'), 'none set apart | a 1/3; b 2/3', 'tax/shares: no portion set apart; thirds stay fractions');
+  eq(tx('shares', { total: '10', parties: 'a, 1/2; b, 3/2', setaside: 'x, 1/2; y, 1/2' }, 'ltxRemainder ltxShares'), '0 | a 0; b 0', 'tax/shares: set-asides of the whole leave nothing');
+  eq(tx('shares', { total: '10', parties: 'a, 1', setaside: 'x, 1/2; y, 2/3' }, 'ltxRemainder'), 'REFUSED Set apart: the fractions add to 7/6, more than the whole', 'tax/shares: set-asides beyond the whole are refused');
+  lbEnds(txS('shares', { total: '1', parties: 'a, 1; b, 2' }), 'Every share is exact; none is rounded' + LCAUT, 'tax/shares: the status ends with the caution');
+
+  /* --- law (llw) --------------------------------------------------------- */
+  const lwRun = lbMk(lbBlock('b', 'LLW_JS') + lbViews('LLW_VIEW_JS', ['silence', 'deter']), 'llwCompute');
+  const lw = lbCall(lwRun, 'law'), lwS = lbStatus(lwRun, 'law');
+  const ACTS = 'steal kill fight pray trade marry accuse-oneself';
+  const ST = 'llwCommanded llwForbidden llwFree llwBoth llwRefusable llwShareFree';
+  eq(lw('silence', { actions: ACTS, laws: 'l1, fight pray, steal kill; l2, -, pray; l3, trade, -' }, ST),
+     '3: fight, pray, trade | 3: steal, kill, pray | 2: marry, accuse-oneself | 1: pray (commanded by l1, forbidden by l2) | no inalienable liberty is stated | 2 of 7: 2/7 ≈ 28.57%',
+     'law/silence: commanded, forbidden, free and contradictory');
+  eq(lw('silence', { actions: ACTS, laws: 'l1, fight pray, steal kill; l2, accuse-oneself, -; l3, trade, -', inalienable: 'accuse-oneself, no man is bound to accuse himself; fight, natural timorousness; marry, a liberty' }, 'llwFree llwBoth llwRefusable llwShareFree'),
+     '1: marry | 0: none | 2: fight (natural timorousness), accuse-oneself (no man is bound to accuse himself) | 1 of 7: 1/7 ≈ 14.29%',
+     'law/silence: commands a subject may still refuse (only commanded ones)');
+  eq(lw('silence', { actions: ACTS, laws: 'l1, fly, -' }, 'llwFree'), 'REFUSED Laws, record 1 (l1): it commands fly, which is not one of the actions', 'law/silence: an unknown commanded action is refused');
+  eq(lw('silence', { actions: ACTS, laws: 'l1, -, fly' }, 'llwFree'), 'REFUSED Laws, record 1 (l1): it forbids fly, which is not one of the actions', 'law/silence: an unknown forbidden action is refused');
+  eq(lw('silence', { actions: ACTS, laws: 'l1, kill, -', inalienable: 'fly, why not' }, 'llwFree'), 'REFUSED Inalienable, record 1: fly is not one of the actions', 'law/silence: an unknown inalienable action is refused');
+  lbEnds(lwS('silence', { actions: ACTS, laws: 'l1, kill, -' }), 'left free in the silence of the law, of 7' + LCAUT, 'law/silence: the status ends with the caution');
+
+  const DT = 'llwExpected llwNet llwDeters llwLeast llwHostility llwPrice';
+  eq(lw('deter', { gain: '20', penalty: '30', certainty: '1/2' }, DT),
+     '15 | +5 | no: 15 is less than the gain 20 | more than 40 | needs both the prescribed and the inflicted penalty | no prescribed penalty is given',
+     'law/deter: the expected penalty against the gain');
+  eq(lw('deter', { gain: '20', penalty: '40', certainty: '3/4', prescribed: '10', inflicted: '40' }, DT),
+     '30 | −10 | yes: 30 is more than the gain 20 | more than 80/3 ≈ 26.67 | yes: the excess, 30, is not punishment but an act of hostility | yes: the prescribed 10 is less than the gain 20, rather the price of the crime than a punishment',
+     'law/deter: hostility beyond the prescribed; a prescribed penalty below the gain is a price');
+  eq(lw('deter', { gain: '15', penalty: '30', certainty: '0.5', prescribed: '15', inflicted: '15' }, 'llwDeters llwHostility llwPrice'),
+     'no: 15 equals the gain, and does not exceed it | no: the inflicted 15 is within the prescribed 15 | no: the prescribed 15 is not less than the gain 15',
+     'law/deter: equal does not deter, is not hostility, is not a price');
+  eq(lw('deter', { gain: '20', penalty: '30', certainty: '0' }, 'llwExpected llwLeast'), '0 | none: at certainty 0 the penalty is never inflicted, so no penalty deters', 'law/deter: at certainty 0 no penalty deters');
+  eq(lw('deter', { gain: '20', penalty: '30', certainty: '3/2' }, 'llwExpected'), 'REFUSED READ certainty is at most 1, and it is 3/2', 'law/deter: a certainty above 1 is refused');
+  lbEnds(lwS('deter', { gain: '20', penalty: '30', certainty: '1/2' }), 'the expected penalty against the gain)' + LCAUT, 'law/deter: the status ends with the caution');
+  lbEnds(lwS('deter', { gain: '20', penalty: '30', certainty: '1/2' }).replace(/ \(deterrence[^)]*\)/, ''), 'the hope of impunity makes the crime pay' + LCAUT, 'law/deter: below certainty 1 the status speaks of impunity');
+  lbEnds(lwS('deter', { gain: '20', penalty: '10', certainty: '1' }).replace(/ \(deterrence[^)]*\)/, ''), 'the penalty is certain but not more than the gain, so it is rather the price of the crime' + LCAUT, 'law/deter: at certainty 1 no hope of impunity, a price');
+
+  /* --- canon (lcn) ------------------------------------------------------- */
+  const cnRun = lbMk(lbBlock('b', 'LCN_JS') + lbViews('LCN_VIEW_JS', ['date', 'benefit']), 'lcnCompute');
+  const cn = lbCall(cnRun, 'canon'), cnS = lbStatus(cnRun, 'canon');
+  eq(cn('date', { books: 'first, aaron, 40; second, bezalel, 90; third, caleb, 150', mentions: 'first, well-dug, 30; first, kings-reign, 120; second, city-built, 90; second, flood, -20' }, 'lcnLatest lcnAfter lcnGap lcnPossible lcnNoTest'),
+     'first: kings-reign (120); second: city-built (90); third: no test | 1: first | first 80 years after aaron\'s death; second in the year of bezalel\'s death; third no test | 1: second | 1: third',
+     'canon/date: the latest mention against the author\'s death');
+  eq(cn('date', { books: 'gen, moses, -1200', mentions: 'gen, edom, -1050; gen, x, -1300; gen, y, -1050' }, 'lcnLatest lcnGap lcnAfter'),
+     'gen: edom and y (−1050) | gen 150 years after moses\'s death | 1: gen', 'canon/date: negative years; ties named together');
+  eq(cn('date', { books: 'gen, moses, -1200', mentions: 'gen, x, -1201' }, 'lcnGap lcnPossible'), 'gen 1 year before moses\'s death | 1: gen', 'canon/date: a mention before the death does not rule the author out');
+  eq(cn('date', { books: 'a, x, 3', mentions: 'b, e, 4' }, 'lcnLatest'), 'REFUSED Mentions, record 1: the book b is not one of the books', 'canon/date: an unknown book is refused');
+  lbEnds(cnS('date', { books: 'a, x, 3', mentions: '' }), 'only not ruled out' + LCAUT, 'canon/date: the status ends with the caution');
+
+  const DOCS = 'purgatory, pope clergy; infallibility, pope; celibacy, clergy pope; tithes, clergy; obedience, -';
+  eq(cn('benefit', { parties: 'pope clergy king people', doctrines: DOCS }, 'lcnCounts lcnMost lcnNoOne lcnUnserved'),
+     'pope 3; clergy 3; king 0; people 0 | pope and clergy, 3 of 5 doctrines each (a tie) | 1: obedience | 2: king, people', 'canon/benefit: counts, a tie for the most');
+  eq(cn('benefit', { parties: 'pope clergy king', doctrines: 'a, pope; b, pope king' }, 'lcnMost'), 'pope, 2 of 2 doctrines', 'canon/benefit: one party served by the most');
+  eq(cn('benefit', { parties: 'pope king', doctrines: 'a, -; b, -' }, 'lcnMost lcnNoOne'), 'none: no doctrine benefits any party | 2: a, b', 'canon/benefit: no doctrine benefits anyone');
+  eq(cn('benefit', { parties: 'p q', doctrines: 'd1, p r' }, 'lcnMost'), 'REFUSED Doctrines, record 1 (d1): r is not one of the parties', 'canon/benefit: an unknown party is refused');
+  lbEnds(cnS('benefit', { parties: 'p q', doctrines: 'd1, p' }), 'whether a doctrine is true is not' + LCAUT, 'canon/benefit: the status ends with the caution');
+}
+// ---- end levkit family B ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the
