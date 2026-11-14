@@ -2542,6 +2542,130 @@ ACC_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# The Wealth of Nations, same shape.
+WON_PATH_PAGE_PATH = "/paths/wealth-of-nations/"
+WON_MATERIAL_MARKER = "what the reasoning of the chapter implies for those quantities"
+WON_COURSES = (
+    ("wealth-division-of-labour", "The Division of Labour", (
+        "the-annual-labour-of-every-nation",
+        "the-pin-factory",
+        "the-propensity-to-truck-and-barter",
+        "the-extent-of-the-market",
+    )),
+    ("wealth-money-and-measure", "Money and the Measure of Value", (
+        "the-origin-and-use-of-money",
+        "labour-the-real-measure",
+        "corn-rents-and-money-rents",
+        "gold-silver-and-copper-coin",
+    )),
+    ("wealth-component-parts-of-price", "The Component Parts of Price", (
+        "wages-profit-and-rent",
+        "natural-and-market-price",
+        "monopoly-and-the-natural-price",
+    )),
+    ("wealth-wages-and-profits", "Wages and Profits", (
+        "the-masters-and-the-workmen",
+        "the-funds-destined-for-maintaining-labour",
+        "the-liberal-reward-of-labour",
+        "the-profits-of-stock",
+        "high-profits-raise-prices",
+    )),
+    ("wealth-different-employments", "Wages and Profit in Different Employments", (
+        "the-five-circumstances",
+        "the-lottery-of-the-professions",
+        "the-apothecary-and-the-grocer",
+        "apprenticeship-and-corporations",
+        "the-law-of-settlements",
+    )),
+    ("wealth-rent-of-land", "The Rent of Land", (
+        "rent-as-a-monopoly-price",
+        "produce-which-always-affords-rent",
+        "produce-which-sometimes-affords-rent",
+        "the-value-of-silver-over-four-centuries",
+        "silver-from-america",
+        "improvement-and-the-three-orders",
+    )),
+    ("wealth-stock-and-money", "Stock, Money and Banks", (
+        "stock-must-be-accumulated-first",
+        "fixed-and-circulating-capital",
+        "gross-and-net-revenue",
+        "paper-money-and-the-scottish-banks",
+        "drawing-and-redrawing",
+    )),
+    ("wealth-accumulation", "Accumulation and the Employments of Capital", (
+        "productive-and-unproductive-labour",
+        "parsimony-and-the-prodigal",
+        "stock-lent-at-interest",
+        "the-four-ways-of-employing-capital",
+        "home-foreign-and-carrying-trade",
+    )),
+    ("wealth-progress-of-opulence", "The Progress of Opulence", (
+        "the-natural-progress-of-opulence",
+        "primogeniture-entails-and-tenants",
+        "the-rise-of-towns",
+        "how-commerce-improved-the-country",
+    )),
+    ("wealth-mercantile-system", "The Mercantile System", (
+        "wealth-does-not-consist-in-money",
+        "the-invisible-hand",
+        "the-balance-of-trade-and-banks-of-deposit",
+        "drawbacks",
+        "bounties-and-the-corn-trade",
+        "treaties-of-commerce",
+    )),
+    ("wealth-colonies-and-agricultural-systems", "Colonies and the Agricultural Systems", (
+        "motives-for-new-colonies",
+        "the-prosperity-of-new-colonies",
+        "the-monopoly-of-the-colony-trade",
+        "the-conclusion-of-the-mercantile-system",
+        "the-agricultural-systems",
+    )),
+    ("wealth-expenses-of-the-sovereign", "The Expenses of the Sovereign", (
+        "the-expense-of-defence",
+        "the-expense-of-justice",
+        "public-works-and-tolls",
+        "trading-companies",
+        "the-education-of-youth",
+        "the-instruction-of-people-of-all-ages",
+    )),
+    ("wealth-taxes-and-public-debts", "Taxes and Public Debts", (
+        "the-funds-of-the-sovereign",
+        "the-four-maxims-of-taxation",
+        "taxes-upon-rent-and-profit",
+        "taxes-upon-wages",
+        "taxes-upon-consumable-commodities",
+        "public-debts",
+        "the-debasement-of-the-coin",
+    )),
+)
+
+WON_PATH_PAGE_MARKERS = (
+    canonical_marker(WON_PATH_PAGE_PATH),
+    html.escape(WON_COURSES[0][1]),
+    html.escape(WON_COURSES[-1][1]),
+    'href="../../%s/"' % WON_COURSES[-1][0],
+)
+
+WON_COURSE_HOMES = tuple(
+    (
+        "won-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, WON_MATERIAL_MARKER, html.escape(title)),
+    )
+    for number, (slug, title, _lessons) in enumerate(WON_COURSES, start=1)
+)
+
+WON_COURSE_LESSONS = tuple(
+    (
+        "won-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), WON_MATERIAL_MARKER,
+                               html.escape(title)),
+    )
+    for number, (slug, title, lessons) in enumerate(WON_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -2647,6 +2771,7 @@ def path_page_targets(args):
         ("ddd-path", DDD_PATH_PAGE_PATH, DDD_PATH_PAGE_MARKERS),
         ("gof-path", GOF_PATH_PAGE_PATH, GOF_PATH_PAGE_MARKERS),
         ("acc-path", ACC_PATH_PAGE_PATH, ACC_PATH_PAGE_MARKERS),
+        ("won-path", WON_PATH_PAGE_PATH, WON_PATH_PAGE_MARKERS),
     ]
 
 
@@ -2679,7 +2804,8 @@ def course_home_targets(args):
                                     + ITA_COURSE_HOMES
                                     + DDD_COURSE_HOMES
                                     + GOF_COURSE_HOMES
-                                    + ACC_COURSE_HOMES):
+                                    + ACC_COURSE_HOMES
+                                    + WON_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -2727,6 +2853,7 @@ def lesson_targets(args):
         + DDD_COURSE_LESSONS
         + GOF_COURSE_LESSONS
         + ACC_COURSE_LESSONS
+        + WON_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

@@ -2173,12 +2173,141 @@ ACC_COURSES = (
 ACC_PATH_COURSE_COUNT = 8
 ACC_UPCOMING_COURSES = ()
 
+# The Wealth of Nations path: thirteen courses, all published.
+# Generated from content/wealth_of_nations/ so these cannot disagree with
+# what is built.
+WON_PATH_PAGE = "/paths/wealth-of-nations/"
+
+WON_COURSE_1_HOME = "/wealth-division-of-labour/"
+WON_COURSE_1_LESSONS = (
+    "the-annual-labour-of-every-nation",
+    "the-pin-factory",
+    "the-propensity-to-truck-and-barter",
+    "the-extent-of-the-market",
+)
+WON_COURSE_2_HOME = "/wealth-money-and-measure/"
+WON_COURSE_2_LESSONS = (
+    "the-origin-and-use-of-money",
+    "labour-the-real-measure",
+    "corn-rents-and-money-rents",
+    "gold-silver-and-copper-coin",
+)
+WON_COURSE_3_HOME = "/wealth-component-parts-of-price/"
+WON_COURSE_3_LESSONS = (
+    "wages-profit-and-rent",
+    "natural-and-market-price",
+    "monopoly-and-the-natural-price",
+)
+WON_COURSE_4_HOME = "/wealth-wages-and-profits/"
+WON_COURSE_4_LESSONS = (
+    "the-masters-and-the-workmen",
+    "the-funds-destined-for-maintaining-labour",
+    "the-liberal-reward-of-labour",
+    "the-profits-of-stock",
+    "high-profits-raise-prices",
+)
+WON_COURSE_5_HOME = "/wealth-different-employments/"
+WON_COURSE_5_LESSONS = (
+    "the-five-circumstances",
+    "the-lottery-of-the-professions",
+    "the-apothecary-and-the-grocer",
+    "apprenticeship-and-corporations",
+    "the-law-of-settlements",
+)
+WON_COURSE_6_HOME = "/wealth-rent-of-land/"
+WON_COURSE_6_LESSONS = (
+    "rent-as-a-monopoly-price",
+    "produce-which-always-affords-rent",
+    "produce-which-sometimes-affords-rent",
+    "the-value-of-silver-over-four-centuries",
+    "silver-from-america",
+    "improvement-and-the-three-orders",
+)
+WON_COURSE_7_HOME = "/wealth-stock-and-money/"
+WON_COURSE_7_LESSONS = (
+    "stock-must-be-accumulated-first",
+    "fixed-and-circulating-capital",
+    "gross-and-net-revenue",
+    "paper-money-and-the-scottish-banks",
+    "drawing-and-redrawing",
+)
+WON_COURSE_8_HOME = "/wealth-accumulation/"
+WON_COURSE_8_LESSONS = (
+    "productive-and-unproductive-labour",
+    "parsimony-and-the-prodigal",
+    "stock-lent-at-interest",
+    "the-four-ways-of-employing-capital",
+    "home-foreign-and-carrying-trade",
+)
+WON_COURSE_9_HOME = "/wealth-progress-of-opulence/"
+WON_COURSE_9_LESSONS = (
+    "the-natural-progress-of-opulence",
+    "primogeniture-entails-and-tenants",
+    "the-rise-of-towns",
+    "how-commerce-improved-the-country",
+)
+WON_COURSE_10_HOME = "/wealth-mercantile-system/"
+WON_COURSE_10_LESSONS = (
+    "wealth-does-not-consist-in-money",
+    "the-invisible-hand",
+    "the-balance-of-trade-and-banks-of-deposit",
+    "drawbacks",
+    "bounties-and-the-corn-trade",
+    "treaties-of-commerce",
+)
+WON_COURSE_11_HOME = "/wealth-colonies-and-agricultural-systems/"
+WON_COURSE_11_LESSONS = (
+    "motives-for-new-colonies",
+    "the-prosperity-of-new-colonies",
+    "the-monopoly-of-the-colony-trade",
+    "the-conclusion-of-the-mercantile-system",
+    "the-agricultural-systems",
+)
+WON_COURSE_12_HOME = "/wealth-expenses-of-the-sovereign/"
+WON_COURSE_12_LESSONS = (
+    "the-expense-of-defence",
+    "the-expense-of-justice",
+    "public-works-and-tolls",
+    "trading-companies",
+    "the-education-of-youth",
+    "the-instruction-of-people-of-all-ages",
+)
+WON_COURSE_13_HOME = "/wealth-taxes-and-public-debts/"
+WON_COURSE_13_LESSONS = (
+    "the-funds-of-the-sovereign",
+    "the-four-maxims-of-taxation",
+    "taxes-upon-rent-and-profit",
+    "taxes-upon-wages",
+    "taxes-upon-consumable-commodities",
+    "public-debts",
+    "the-debasement-of-the-coin",
+)
+
+WON_COURSES = (
+    ("The Division of Labour", WON_COURSE_1_HOME, WON_COURSE_1_LESSONS),
+    ("Money and the Measure of Value", WON_COURSE_2_HOME, WON_COURSE_2_LESSONS),
+    ("The Component Parts of Price", WON_COURSE_3_HOME, WON_COURSE_3_LESSONS),
+    ("Wages and Profits", WON_COURSE_4_HOME, WON_COURSE_4_LESSONS),
+    ("Wages and Profit in Different Employments", WON_COURSE_5_HOME, WON_COURSE_5_LESSONS),
+    ("The Rent of Land", WON_COURSE_6_HOME, WON_COURSE_6_LESSONS),
+    ("Stock, Money and Banks", WON_COURSE_7_HOME, WON_COURSE_7_LESSONS),
+    ("Accumulation and the Employments of Capital", WON_COURSE_8_HOME, WON_COURSE_8_LESSONS),
+    ("The Progress of Opulence", WON_COURSE_9_HOME, WON_COURSE_9_LESSONS),
+    ("The Mercantile System", WON_COURSE_10_HOME, WON_COURSE_10_LESSONS),
+    ("Colonies and the Agricultural Systems", WON_COURSE_11_HOME, WON_COURSE_11_LESSONS),
+    ("The Expenses of the Sovereign", WON_COURSE_12_HOME, WON_COURSE_12_LESSONS),
+    ("Taxes and Public Debts", WON_COURSE_13_HOME, WON_COURSE_13_LESSONS),
+)
+
+WON_PATH_COURSE_COUNT = 13
+WON_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
                + READ_COURSES + CC_COURSES + EAA_COURSES
                + ITA_COURSES + DDD_COURSES + GOF_COURSES
-               + ACC_COURSES)
+               + ACC_COURSES + WON_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -2301,7 +2430,8 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        PHIL_PATH_PAGE, ENG_PATH_PAGE, DE_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
                        CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE,
-                       DDD_PATH_PAGE, GOF_PATH_PAGE, ACC_PATH_PAGE)
+                       DDD_PATH_PAGE, GOF_PATH_PAGE, ACC_PATH_PAGE,
+                       WON_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -2342,6 +2472,8 @@ PATHS = (
      GOF_COURSES, GOF_PATH_COURSE_COUNT, GOF_UPCOMING_COURSES),
     ("Accelerate, Read Along", ACC_PATH_PAGE,
      ACC_COURSES, ACC_PATH_COURSE_COUNT, ACC_UPCOMING_COURSES),
+    ("The Wealth of Nations, Read Along", WON_PATH_PAGE,
+     WON_COURSES, WON_PATH_COURSE_COUNT, WON_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2588,6 +2720,11 @@ GOF_DISCLAIMER_RE = re.compile(
 # sample, not a finding about any team. The clause after the second em dash.
 ACC_DISCLAIMER_RE = re.compile(
     r"(?i)shows what one measure says about that sample")
+# The Wealth of Nations promises that every figure is computed from the
+# quantities a lesson states, and warns that it shows what the chapter's
+# reasoning implies, not whether the reasoning is right. Apostrophe-free.
+WON_DISCLAIMER_RE = re.compile(
+    r"(?i)what the reasoning of the chapter implies for those quantities")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2624,6 +2761,8 @@ PATH_MATERIAL_DISCLAIMER = {
                     GOF_DISCLAIMER_RE),
     ACC_PATH_PAGE: ("the what-one-measure-says-about-that-sample disclaimer",
                     ACC_DISCLAIMER_RE),
+    WON_PATH_PAGE: ("the what-the-reasoning-of-the-chapter-implies disclaimer",
+                    WON_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -2993,12 +3132,18 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(ACC_COURSES)
             + sum(len(slugs) for _t, _h, slugs in ACC_COURSES)
         )
+        won_tree = (
+            1  # the Wealth of Nations path page
+            + len(WON_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in WON_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
                        + cc_tree + eaa_tree + ita_tree
-                       + ddd_tree + gof_tree + acc_tree)  # 1 for the index
+                       + ddd_tree + gof_tree + acc_tree
+                       + won_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -3108,9 +3253,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 55 pages, got %d" % acc_tree,
         )
         self.assertEqual(
-            1562,
+            79,
+            won_tree,
+            "the Wealth of Nations path is 1 + 13 + 4 + 4 + 3 + 5 + 5 + 6 + 5 + 5 + 4 + 6 + 5 + 6 + 7 "
+            "= 79 pages, got %d" % won_tree,
+        )
+        self.assertEqual(
+            1641,
             course_tree,
-            "the site index plus all eighteen path trees is 1562 pages, got %d" % course_tree,
+            "the site index plus all nineteen path trees is 1641 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -3121,9 +3272,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1566,
+            1645,
             expected,
-            "1562 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1566, "
+            "1641 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1645, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -3347,6 +3498,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "domain_driven_design": getattr(smoke, "DDD_COURSES", ()),
             "design_patterns": getattr(smoke, "GOF_COURSES", ()),
             "accelerate": getattr(smoke, "ACC_COURSES", ()),
+            "wealth_of_nations": getattr(smoke, "WON_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3759,9 +3911,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1543,
+            1621,
             len(course_pages),
-            "one hundred and fifty-eight course homes and 1385 lessons carry a material "
+            "one hundred and seventy-one course homes and 1450 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4754,7 +4906,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(158, checked, "every published course must be checked")
+        self.assertEqual(171, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -5061,6 +5213,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
             from design_patterns import PATH as DESIGN_PATTERNS
             from accelerate import PATH as ACCELERATE
+            from wealth_of_nations import PATH as WEALTH_OF_NATIONS
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -5080,6 +5233,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("domain-driven design", DDD_COURSES, DDD_PATH_PAGE, DOMAIN_DRIVEN_DESIGN),
             ("design patterns", GOF_COURSES, GOF_PATH_PAGE, DESIGN_PATTERNS),
             ("accelerate", ACC_COURSES, ACC_PATH_PAGE, ACCELERATE),
+            ("wealth of nations", WON_COURSES, WON_PATH_PAGE, WEALTH_OF_NATIONS),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -5221,13 +5375,15 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
             from design_patterns import PATH as DESIGN_PATTERNS
             from accelerate import PATH as ACCELERATE
+            from wealth_of_nations import PATH as WEALTH_OF_NATIONS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
-                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE):
+                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE,
+                     WEALTH_OF_NATIONS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -5419,6 +5575,7 @@ class TestEveryLabBuilds(unittest.TestCase):
             from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN
             from design_patterns import PATH as DESIGN_PATTERNS
             from accelerate import PATH as ACCELERATE
+            from wealth_of_nations import PATH as WEALTH_OF_NATIONS
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
@@ -5426,7 +5583,8 @@ class TestEveryLabBuilds(unittest.TestCase):
         for path in (DISCRETE, ALGEBRA, PHILOSOPHY, ENGLISH, DIFFERENTIAL_EQUATIONS,
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
-                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE):
+                     DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE,
+                     WEALTH_OF_NATIONS):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

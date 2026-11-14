@@ -23563,6 +23563,459 @@ console.log('accelerate: acckit family B, six modes');
 }
 // ---- end acckit family B ----
 
+// ---- wonkit (Wealth of Nations), family A ----
+// ==========================================================================
+// The Wealth of Nations, Read Along: wonkit.py (family A: division, money,
+// price, wages, advantage, rent, interest)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS, AKT_CORE_JS and WNK_CORE_JS, then one vm context
+// per mode holding family A's printers (WNA_JS with the mode's prefix), the
+// mode's base block and every one of its view blocks. Each <xx>Compute(view,
+// inst, opts) is called on inputs read by aktRead with the field specs of
+// wonkit.py and the lesson-level units as opts, and compared on the exact
+// tile string a reader sees. Smith's own figures where the chapter gives them
+// (ten workers, 48,000 pins, 20 alone; 240 and 744 pence from the pound
+// weight; one in twenty in the law; interest at 10, 8, 6 and 5 percent);
+// the others were worked by hand. Every case was seen to FAIL when the line
+// it tests was broken on purpose (docs/wealth-of-nations/kit-report-a.md,
+// "Verification").
+console.log('wealth of nations: wonkit family A, seven modes');
+{
+  const vm = require('vm');
+  const wnFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const wnSrc = { core: fs.readFileSync(wnFile('eakit_core.py'), 'utf8'), acc: fs.readFileSync(wnFile('acckit.py'), 'utf8'),
+                  wcore: fs.readFileSync(wnFile('wonkit_core.py'), 'utf8'), a: fs.readFileSync(wnFile('wonkit.py'), 'utf8') };
+  const wnBlock = (s, name) => blockFrom(wnSrc[s], name.replace(/[[\]]/g, '\\$&'), 'wonkit (' + s + ')');
+  const wnViews = (dict, list) => list.map((v) => wnBlock('a', dict + '["' + v + '"]')).join('');
+  /* Field specs as wonkit.py's SPECS declare them. */
+  const WN_SPECS = String.raw`
+    var LIM = '10000000';
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    function RAT(o) { return Object.assign({ kind: 'rat', max: LIM }, o || {}); }
+    function AREC(sub, lo, hi, unique, rest, lr, hr) { return { kind: 'arec', lo: lo, hi: hi, unique: !!unique, sub: sub, rest: rest || { kind: 'name' }, restWhat: 'value', loRest: lr || 0, hiRest: hr || 0 }; }
+    function ALIST(each, lo, hi) { return { kind: 'alist', each: each, lo: lo, hi: hi, things: 'values' }; }
+    var NM = { kind: 'name' }, SH = RAT({ min: '0', max: '1' });
+    var SPEC_OF = {
+      'division/supply': { nations: AREC([['nation', NM], ['population', W(1)], ['workers', W(0)], ['output', RAT({ min: '0' })]], 1, 12, true) },
+      'division/pins': { workers: W(1, 10000), operations: W(1, 10000), together: RAT({ gt: '0' }), alone: RAT({ min: '0' }) },
+      'division/exchange': { goods: ALIST(NM, 2, 2), producers: AREC([['producer', NM], ['hours', RAT({ gt: '0' })], ['a', RAT({ gt: '0' })], ['b', RAT({ gt: '0' })]], 2, 2, true) },
+      'division/market': { places: AREC([['place', NM], ['demand', RAT({ min: '0' })]], 1, 12, true), output: RAT({ gt: '0' }), days: W(1, 366) },
+      'money/barter': { goods: ALIST(NM, 2, 12), traders: AREC([['trader', NM], ['has', NM], ['wants', NM]], 0, 12, true) },
+      'money/coin': { periods: AREC([['period', NM], ['coined', RAT({ gt: '0' })]], 1, 12, true), sum: RAT({ gt: '0', dash: true }) },
+      'price/real': { years: AREC([['year', NM], ['price', RAT({ gt: '0' })], ['measure', RAT({ gt: '0' })]], 2, 12, true) },
+      'price/parts': { stages: AREC([['stage', NM], ['wages', RAT({ min: '0' })], ['rent', RAT({ min: '0' })], ['rate', RAT({ min: '0', max: '1000' })]], 1, 12, true),
+        wage_rise: RAT({ min: '0', max: '1000' }), profit_rise: RAT({ min: '0', max: '1000' }) },
+      'price/market': { natural: RAT({ gt: '0' }), effectual: RAT({ gt: '0' }), brought: RAT({ min: '0' }), buyers: AREC([['price', RAT({ gt: '0' })], ['quantity', RAT({ min: '0' })]], 0, 12) },
+      'wages/subsistence': { items: AREC([['item', NM], ['cost', RAT({ min: '0' })]], 1, 12, true), wage: RAT({ min: '0' }), maintenance: RAT({ gt: '0', dash: true }), multiple: RAT({ gt: '0', max: '100' }) },
+      'wages/fund': { fund: RAT({ gt: '0' }), workers: RAT({ gt: '0' }), fund_growth: RAT({ gt: '-100', max: '1000' }), worker_growth: RAT({ gt: '-100', max: '1000' }), years: W(0, 50) },
+      'wages/growth': { population: W(1), doubling: W(1, 200), years: W(0, 200), doubling2: W(0, 200) },
+      'advantage/net': { employments: AREC([['employment', NM], ['wage', RAT({ min: '0' })], ['days', RAT({ min: '0', max: '366' })], ['learning', RAT({ min: '0' })], ['years', RAT({ gt: '0', max: '100' })], ['other', RAT({ min: '-10000000' })]], 1, 12, true),
+        profit: RAT({ min: '0', max: '100' }), limit: AREC([['employment', NM], ['entrants', W(0)], ['pay_rise', RAT({ min: '0', max: '1000' })]], 0, 12, true) },
+      'advantage/lottery': { entrants: W(1), succeed: W(0), prize: RAT({ min: '0' }), years: RAT({ gt: '0', max: '100' }), cost: RAT({ min: '0' }) },
+      'advantage/profit': { sales: RAT({ min: '0' }), cost: RAT({ gt: '0' }), wages: RAT({ min: '0' }), stock: RAT({ gt: '0', dash: true }) },
+      'rent/residual': { lands: AREC([['land', NM], ['output', RAT({ gt: '0' })], ['wages', RAT({ min: '0' })], ['stock', RAT({ min: '0' })]], 1, 12, true), price: RAT({ gt: '0' }), rate: RAT({ min: '0', max: '1000' }), price2: RAT({ gt: '0', dash: true }) },
+      'rent/tenure': { cost: RAT({ min: '0' }), added: RAT({ min: '0' }), years: RAT({ gt: '0', max: '200' }), tenures: AREC([['tenure', NM], ['share', SH], ['bears', SH]], 1, 12, true) },
+      'rent/silver': { prices: AREC([['year', W(1, 3000)], ['price', RAT({ gt: '0' })]], 1, 60, true), periods: AREC([['period', NM], ['from', W(1, 3000)], ['to', W(1, 3000)]], 1, 12, true) },
+      'interest/purchase': { rent: RAT({ gt: '0' }), rate: RAT({ gt: '0', max: '100' }), rate2: RAT({ gt: '0', max: '100', dash: true }), 'yield': RAT({ min: '0', dash: true }) },
+      'interest/profit': { rows: AREC([['period', NM], ['interest', RAT({ gt: '0', max: '100' })]], 1, 12, true, RAT({ min: '0', max: '1000', dash: true }), 0, 2) }
+    };
+    var DEFAULTS = { traders: '', sum: '-', wage_rise: '0', profit_rise: '0', buyers: '', maintenance: '-', multiple: '2', fund_growth: '0', worker_growth: '0',
+      doubling: '25', doubling2: '0', profit: '0', limit: '', entrants: '20', succeed: '1', stock: '-', rate: '10', price2: '-', rate2: '-', 'yield': '-',
+      workers: '10', operations: '18', together: '48000', alone: '20', days: '300' };
+    var YEARS_OF = { 'wages/fund': '10', 'wages/growth': '100' };
+    var UNITS = { money_unit: '£', qty_unit: 'units', measure_unit: 'days of labour', period: 'week' };
+    function RUN(mode, view, raw, opts) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) {
+        var d = f.key === 'years' && YEARS_OF[mode + '/' + view] ? YEARS_OF[mode + '/' + view] : (f.key === 'workers' && view === 'fund' ? undefined : DEFAULTS[f.key]);
+        r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (d !== undefined ? d : '');
+      });
+      var inst;
+      try { inst = aktRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, Object.assign({}, UNITS, opts || {}));
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+  `;
+  const wnMk = (prefix, code, fn) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + wnBlock('core', 'EA_CORE_JS') + wnBlock('acc', 'AKT_CORE_JS') + wnBlock('wcore', 'WNK_CORE_JS')
+      + wnBlock('a', 'WNA_JS').replace(/%P%/g, prefix) + code + WN_SPECS + 'var COMPUTE = ' + (fn || 'null') + ';', ctx, { filename: 'wonkit' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const wnMode = (prefix, mode, base, dict, views) => {
+    const run = wnMk(prefix, wnBlock('a', base) + wnViews(dict, views), prefix + 'Compute');
+    const call = (view, raw, ids, opts) => run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '), ' + JSON.stringify(ids) + ')');
+    call.status = (view, raw, opts) => run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '))');
+    call.run = run;
+    return call;
+  };
+  const WCAUT = '; it follows from the figures stated, not from any economy’s records.';
+
+  /* --- family A's printers (WNA_JS) --------------------------------------- */
+  const pr = wnMk('wdv', '');
+  eq(pr("[wdvMoney(R(3n, 2n), '£'), wdvMoney(R(-10n), '£'), wdvMoney(R(4n, 3n), '£'), wdvMoney(R(30n), 's'), wdvMoney(R(7n, 2n), 'd'), wdvMoney(R(5n), 'oz silver'), wdvMoney(R(1n, 3n), 'd', true), wdvMoney(R(-1n, 3n), '£')].join(' | ')"),
+     '£1.50 | −£10 | ≈ £1.33 | 30s | 3.50d | 5 oz silver | ≈ +0.33d | ≈ −£0.33', 'wonkit printers: money in the lesson’s unit, two places, ≈ when not exact, sign before the unit');
+  eq(pr("[wdvRate(R(5n)), wdvRate(R(5n, 2n)), wdvRate(R(10n, 3n)), wdvCh(R(1n, 5n)), wdvCh(R(-2n, 5n)), wdvCh(R0), wdvCh(R(1n, 3n)), wdvUnit(R1, 'pins'), wdvUnit(R1, 'days of labour'), wdvX(R(240n))].join(' | ')"),
+     '5% | 2.5% | 10/3 ≈ 3.33% | +1/5 = +20% | −2/5 = −40% | 0 = 0% | +1/3 ≈ +33.3% | 1 pin | 1 days of labour | 240×', 'wonkit printers: rates, signed changes, units, multiples');
+
+  /* --- division (wdv) ----------------------------------------------------- */
+  const d = wnMode('wdv', 'division', 'WDV_JS', 'WDV_VIEW_JS', ['supply', 'pins', 'exchange', 'market']);
+  eq(d('supply', { nations: 'savage, 1000, 900, 10; civilized, 1000, 500, 40' }, 'wdvShare wdvProduce wdvPerHead wdvBest wdvRatio'),
+     'savage 9/10 = 90%; civilized 1/2 = 50% | savage 9,000 units; civilized 20,000 units | savage 9 units; civilized 20 units | civilized, 20 units a head | 20/9 ≈ 2.22× (civilized over savage)',
+     'division/supply: produce = workers × output; per head over the whole population');
+  eq(d('supply', { nations: 'a, 10, 5, 2; b, 20, 10, 2' }, 'wdvBest wdvRatio'), 'a and b tie at 1 unit a head | 1× (a over b)', 'division/supply: a tie per head');
+  eq(d('supply', { nations: 'a, 10, 11, 1' }, 'wdvShare'), 'REFUSED Nations, record 1 (a): 11 at work is more than the population of 10', 'division/supply: more at work than people');
+  /* I.1: ten workers, eighteen operations, upwards of 48,000 pins a day, certainly not twenty alone */
+  eq(d('pins', {}, 'wdvPerWorker wdvAloneTeam wdvMultiple wdvExtra wdvOpsEach', { qty_unit: 'pins' }),
+     '4,800 pins a day | 200 pins a day | 240× | +47,800 pins a day | 9/5 = 1.80 operations a worker', 'division/pins: Smith’s ten workers, 48,000 pins, 20 alone: 240×');
+  eq(d('pins', { alone: '0' }, 'wdvMultiple', { qty_unit: 'pins' }), 'no finite multiple: alone, a worker makes none', 'division/pins: perhaps not one alone');
+  eq(d('exchange', { goods: 'bows venison', producers: 'maker, 12, 1, 2; hunter, 12, 3, 1' }, 'wdvSelfEach wdvSelfTotal wdvWho wdvSpecTotal wdvGain wdvCase'),
+     'maker 4 of each; hunter 3 of each | bows 7; venison 7 | maker makes bows (relative cost 1/2 = 0.50 against 3); hunter makes venison | bows 12; venison 12 | bows +5; venison +5 | each is better at one good: maker at bows, hunter at venison (Smith’s case)',
+     'division/exchange: hours/(a + b) each; specialised by the lower relative cost');
+  eq(d('exchange', { goods: 'cloth wine', producers: 'england, 12, 1, 2; portugal, 12, 1/2, 1/3' }, 'wdvWho wdvGain wdvCase'),
+     'england makes cloth (relative cost 1/2 = 0.50 against 3/2 = 1.50); portugal makes wine | cloth −32/5 = −6.40; wine +88/5 = 17.60 | not Smith’s case: portugal is better at cloth and also at wine; only the relative-cost rule divides the work',
+     'division/exchange: one better at both, Ricardo’s rule still divides; a gain may be negative');
+  eq(d('exchange', { goods: 'x y', producers: 'p, 1, 1, 2; q, 1, 2, 4' }, 'wdvWho'),
+     'REFUSED The two producers have the same relative cost (1/2 = 0.50 hours of x for an hour of y), so neither has the lower cost of either good and the relative-cost rule names no division', 'division/exchange: equal relative costs refused');
+  eq(d('market', { places: 'village, 50; town, 300; city, 5000', output: '200' }, 'wdvKeeps wdvYearShare wdvLive wdvPerDay'),
+     'village 0; town 1; city 25 | village 1/4 = 25%; town 3/2 = 150%; city 25 = 2,500% | 2 of 3 places: town, city | 2/3 ≈ 0.67 units a day', 'division/market: specialists kept, floored');
+
+  /* --- money (wmo) -------------------------------------------------------- */
+  const m = wnMode('wmo', 'money', 'WMO_JS', 'WMO_VIEW_JS', ['barter', 'coin']);
+  eq(m('barter', { goods: 'meat beer bread salt', traders: 'butcher, meat, beer; brewer, beer, meat; baker, bread, salt' }, 'wmoWithout wmoWith wmoFewer wmoDirect wmoViaMoney wmoNoBuyer'),
+     '6 ratios | 3 prices | 3 quotations fewer | 1: butcher–brewer | 0: none | 1: baker', 'money/barter: n(n − 1)/2 against n − 1; a double coincidence');
+  eq(m('barter', { goods: 'meat beer bread', traders: 'butcher, meat, beer; brewer, beer, bread; baker, bread, meat' }, 'wmoDirect wmoViaMoney'),
+     '0: none | 3: butcher, brewer, baker', 'money/barter: a ring with no double coincidence trades only through money');
+  eq(m('barter', { goods: 'a b', traders: 't, a, a' }, 'wmoDirect'), 'REFUSED Traders, record 1 (t) has and wants the same good, a', 'money/barter: has and wants the same');
+  /* I.5: the pound weight of silver coined into 240 pence, later into 744 */
+  eq(m('coin', { periods: 'edward-i, 240; elizabeth, 744', sum: '240' }, 'wmoSilver wmoPound wmoSumSilver wmoLoss wmoLossSum'),
+     'edward-i 1 = 100%; elizabeth 10/31 ≈ 32.3% | edward-i 240d (£1); elizabeth 744d (£3 2s) | edward-i 1 lb silver; elizabeth 10/31 ≈ 0.32 lb silver | elizabeth 21/31 ≈ 67.7% of the silver | elizabeth 5,040/31 ≈ 162.58d lost, in edward-i’s pence',
+     'money/coin: Smith’s 240 and 744 pence: the first pound is £3 2s later, the creditor loses 21/31');
+  eq(m('coin', { periods: 'a, 744; b, 240' }, 'wmoLoss wmoLossSum'), 'b gains 21/10 = 210% more silver | no sum given', 'money/coin: a stronger coin is a gain');
+
+  /* --- price (wpr) -------------------------------------------------------- */
+  const p = wnMode('wpr', 'price', 'WPR_JS', 'WPR_VIEW_JS', ['real', 'parts', 'market']);
+  eq(p('real', { years: '1700, 10, 1/2; 1750, 12, 1' }, 'wprReal wprMoneyCh wprRealCh wprWay'),
+     '1700 20 days of labour; 1750 12 days of labour | 1700 → 1750: +1/5 = +20% | 1700 → 1750: −2/5 = −40% | not the same way: the money price rose and the real price fell', 'price/real: price over the price of the measure');
+  const ST = 'grower, 10, 4, 10; miller, 3, 0, 10; baker, 5, 0, 10';
+  eq(p('parts', { stages: ST }, 'wprStages wprFinal wprResolved wprShares'),
+     'grower £15.40; miller £20.24; baker ≈ £27.76 | ≈ £27.76 | wages £18, rent £4, profit ≈ £5.76 | wages 4,500/6,941 ≈ 64.8%; rent 1,000/6,941 ≈ 14.4%; profit 131/631 ≈ 20.8%',
+     'price/parts: (previous + wages + rent) × (1 + rate), resolved exactly into the three');
+  eq(p('parts', { stages: ST, wage_rise: '10', profit_rise: '5' }, 'wprWageRise wprProfitRise wprBothRise'),
+     '≈ £27.76 → ≈ £30.01: ≈ +£2.24 (+51/631 ≈ +8.1%); wages paid +£1.80 | ≈ £27.76 → ≈ £31.01: ≈ +£3.25 (+12,983/111,056 ≈ +11.7%); profit on the old advances ≈ +£2.88 | ≈ £27.76 → ≈ £33.50: ≈ +£5.74 (+45,907/222,112 ≈ +20.7%)',
+     'price/parts: a profit rise compounds through the stages (I.9)');
+  eq(p('parts', { stages: 'a, 0, 0, 10' }, 'wprFinal'), 'REFUSED Every stage’s wages and rent are 0, so there is no price to resolve', 'price/parts: nothing to resolve');
+  const BUY = '8, 120; 10, 100; 12, 85; 14, 70';
+  eq(p('market', { natural: '10', effectual: '100', brought: '80', buyers: BUY }, 'wprPosition wprGap wprMarketPrice wprUnitGap wprAllGap'),
+     'above the natural price: less is brought (80) than the effectual demand (100) | shortfall of 20 units | £12 a unit | +£2 a unit above the natural price | +£160 over the 80 units brought',
+     'price/market: the highest listed price at which buyers take the quantity brought');
+  eq(p('market', { natural: '10', effectual: '100', brought: '85', buyers: BUY }, 'wprMarketPrice wprAllGap'), '£12 a unit | +£170 over the 85 units brought', 'price/market: buyers taking exactly the quantity brought clear it');
+  eq(p('market', { natural: '10', effectual: '100', brought: '130', buyers: BUY }, 'wprPosition wprMarketPrice'),
+     'below the natural price: more is brought (130) than the effectual demand (100) | no listed price: at every listed price buyers take less than the 130 brought', 'price/market: more brought than any listed price clears');
+  eq(p('market', { natural: '1', effectual: '1', brought: '1', buyers: '2, 5; 1, 4' }, 'wprGap'),
+     'REFUSED Buyers: at the price 2 buyers take 5, more than the 4 they take at the lower price 1; quantities must not increase as the price rises', 'price/market: a rising schedule refused');
+
+  /* --- wages (wwg) -------------------------------------------------------- */
+  const w = wnMode('wwg', 'wages', 'WWG_JS', 'WWG_VIEW_JS', ['subsistence', 'fund', 'growth']);
+  eq(w('subsistence', { items: 'bread, 3; rent, 1.5; fuel, 1; clothes, 1', wage: '6', maintenance: '2.5' }, 'wwgFamily wwgCover wwgMinimum wwgCoverMin'),
+     '£6.50 a week | falls short by £0.50 | £5 a week (2 × £2.50) | covers it, with £1 over', 'wages/subsistence: the needs summed; Cantillon’s double maintenance');
+  eq(w('subsistence', { items: 'bread, 30', wage: '36' }, 'wwgCover', { money_unit: 'd' }), 'covers it, with 6d over', 'wages/subsistence: in pence');
+  eq(w('fund', { fund: '1000', workers: '100', fund_growth: '3', worker_growth: '2', years: '3' }, 'wwgWageFirst wwgWageLast wwgTrend wwgFactor wwgFundLast wwgWorkersLast'),
+     '£10 a worker | ≈ £10.30 a worker (year 3) | the wage rises every year: the fund grows faster than the workers | 103/102 ≈ 1.01 a year | ≈ £1,092.73 | ≈ 106.12',
+     'wages/fund: the fund and the workers compounded exactly; wage = fund / workers');
+  eq(w('fund', { fund: '5000', workers: '100', fund_growth: '1', worker_growth: '2', years: '2' }, 'wwgWageLast wwgTrend'),
+     '≈ £49.02 a worker (year 2) | the wage falls every year: the workers grow faster than the fund', 'wages/fund: a larger fund growing slower: the wage falls');
+  /* I.8: doubling in twenty or five-and-twenty years */
+  eq(w('growth', { population: '1000000', doubling2: '20' }, 'wwgDoublings wwgAfter wwgTimes wwgCompare'),
+     '4 | 16,000,000 | 16× | in 100 years: every 25 years 16×, every 20 years 32× (32,000,000); the second ends 2× the first', 'wages/growth: 2 to the doublings');
+  eq(w('growth', { population: '10', years: '30' }, 'wwgAfter'), 'REFUSED The years (30) are not a whole number of doublings of 25 years; a part of a doubling needs a root, which the lab does not take', 'wages/growth: a part of a doubling refused');
+
+  /* --- advantage (wad) ---------------------------------------------------- */
+  const a = wnMode('wad', 'advantage', 'WAD_JS', 'WAD_VIEW_JS', ['net', 'lottery', 'profit']);
+  const EMP = 'smith, 1.5, 300, 60, 20, 0; labourer, 1, 300, 0, 20, 0; collier, 1.5, 280, 0, 20, -40';
+  eq(a('net', { employments: EMP, profit: '10', limit: 'smith, 3, 20' }, 'wadAnnual wadLearnYear wadNet wadRank wadSpread wadLimited wadRankAfter'),
+     'smith £450; labourer £300; collier £420 | smith £9; labourer £0; collier £0 | smith £441; labourer £300; collier £380 | smith > collier > labourer | £141 (smith over labourer) | smith (entry capped at 3): wage £1.50 → £1.80 a day, net £441 → £531 | smith > collier > labourer',
+     'advantage/net: wage × days − (learning/years + learning × profit) + other');
+  eq(a('net', { employments: 'a, 1, 100, 0, 1, 0; b, 1, 100, 0, 1, 0' }, 'wadRank wadSpread'), 'a = b | £0: every employment nets the same', 'advantage/net: a tie');
+  eq(a('net', { employments: 'a, 1, 1, 0, 1, 0', limit: 'b, 1, 1' }, 'wadNet'), 'REFUSED Limits, record 1: b is not one of the employments', 'advantage/net: a limit on an unknown employment');
+  /* I.10: in the law perhaps one in twenty succeeds */
+  eq(a('lottery', { prize: '300', years: '30', cost: '1000' }, 'wadChance wadPrizes wadTickets wadExpected wadFair wadNeeded'),
+     '1/20 = 5% | £9,000 | £20,000 | £450 an entrant (against £1,000 a ticket) | short by £11,000: the prizes repay 9/20 = 45% of the tickets | ≈ £666.67 a year (against £300)',
+     'advantage/lottery: one in twenty; prizes against tickets');
+  eq(a('lottery', { succeed: '0', prize: '1', years: '1', cost: '1' }, 'wadNeeded'), 'no prize can repay the tickets: no one succeeds', 'advantage/lottery: no one succeeds');
+  eq(a('lottery', { entrants: '2', succeed: '3', prize: '1', years: '1', cost: '1' }, 'wadChance'), 'REFUSED The successful (3) cannot be more than the entrants (2)', 'advantage/lottery: more winners than entrants');
+  eq(a('profit', { sales: '330', cost: '30', wages: '250' }, 'wadApparent wadApparentRate wadTrue wadTrueRate wadWageShare'),
+     '+£300 | +10 = +1,000% on £30 | +£50 | +5/3 ≈ +166.7% on £30 | 5/6 ≈ 83.3%', 'advantage/profit: the apothecary’s thousand per cent, mostly wages');
+
+  /* --- rent (wre) --------------------------------------------------------- */
+  const r = wnMode('wre', 'rent', 'WRE_JS', 'WRE_VIEW_JS', ['residual', 'tenure', 'silver']);
+  eq(r('residual', { lands: 'rich, 100, 200, 100; middling, 80, 200, 100; poor, 60, 200, 100', price: '5', price2: '6' }, 'wreCosts wreRent wreTotal wreNoRent wreLowest wreRent2 wreTotal2'),
+     'rich £330; middling £330; poor £330 | rich £170; middling £70; poor no rent (a loss of £30) | £240 | 1: poor | rich £3.30 a unit; middling ≈ £4.13 a unit; poor £5.50 a unit | rich £270; middling £150; poor £30 | £450 at £6 a unit',
+     'rent/residual: value − (wages + stock)(1 + rate); only positive rents summed');
+  eq(r('tenure', { cost: '100', added: '20', years: '9', tenures: 'owner, 1, 1; metayer, 1/2, 1; steelbow, 1/2, 1/2' }, 'wreWhole wreGain wreImproves wreLandlord'),
+     '+£80 (£180 added over 9 years, less £100) | owner +£80; metayer −£10; steelbow +£40 | 2: owner, steelbow | owner £0; metayer +£90; steelbow +£40',
+     'rent/tenure: share × added × years − bears × cost');
+  eq(r('silver', { prices: '1595, 40; 1596, 50; 1597, 60; 1598, 30; 1600, 35; 1601, 45', periods: 'first, 1595, 1597; second, 1598, 1601' }, 'wreYears wreAverage wreRatio wreCorn', { money_unit: 's' }),
+     'first 3 years; second 3 years | first 50s; second ≈ 36.67s | first 1×; second 11/15 ≈ 0.73× | first 1/50 = 0.02 quarters for 1s; second 3/110 ≈ 0.03 quarters for 1s',
+     'rent/silver: the mean of the years listed in each period');
+  eq(r('silver', { prices: '1600, 1', periods: 'a, 1700, 1800' }, 'wreYears'), 'REFUSED Periods, record 1 (a): no year from 1700 to 1800 is listed in the prices', 'rent/silver: an empty period refused');
+
+  /* --- interest (wit) ----------------------------------------------------- */
+  const t = wnMode('wit', 'interest', 'WIT_JS', 'WIT_VIEW_JS', ['purchase', 'profit']);
+  eq(t('purchase', { rent: '100', rate: '5', rate2: '4', 'yield': '25' }, 'witYp witPrice witYp2 witPrice2 witFetches'),
+     '20 years’ purchase at 5% | £2,000 | 25 years’ purchase at 4% | £2,500 (+£500, +1/4 = +25%) | £2,000, 80 years of its present yield of £25',
+     'interest/purchase: 100 / rate years’ purchase');
+  eq(t('purchase', { rent: '100', rate: '3', 'yield': '0' }, 'witYp witPrice witFetches'),
+     '100/3 ≈ 33.33 years’ purchase at 3% | ≈ £3,333.33 | ≈ £3,333.33, but it yields nothing now: no number of years of its yield equals the price', 'interest/purchase: a yield of nothing');
+  /* I.9: the legal rates 10, 8, 6 and 5 percent; double interest */
+  eq(t('profit', { rows: 'henry-viii, 10; james-i, 8; charles-ii, 6, -, 15; anne, 5' }, 'witImplied witLeft witFall'),
+     'henry-viii 10% × 2 = 20%; james-i 8% × 2 = 16%; charles-ii 6% × 2 = 12%; anne 5% × 2 = 10% | charles-ii 15% − 6% = 9% | interest 10% → 5% (−5 points); implied profit 20% → 10% (−10 points)',
+     'interest/profit: double interest; a stated profit less interest');
+  eq(t('profit', { rows: 'a, 5, 0' }, 'witImplied'), 'REFUSED Rows, record 1 (a): a multiple of 0 makes profit nothing; give a multiple above 0, or - for 2', 'interest/profit: a zero multiple refused');
+
+  /* every status line ends with the caution, through wnkStatus */
+  [d.status('pins', {}, { qty_unit: 'pins' }), m.status('coin', { periods: 'a, 240' }), p.status('parts', { stages: ST }), w.status('growth', { population: '5' }),
+   a.status('lottery', { prize: '1', years: '1', cost: '1' }), r.status('tenure', { cost: '1', added: '1', years: '1', tenures: 'a, 1, 1' }), t.status('purchase', { rent: '1', rate: '5' })]
+    .forEach((s, i) => { if (!String(s).endsWith(WCAUT)) { fails += 1; console.log('  FAIL wonkit status ' + i + ' does not end with the caution: ' + s); } });
+}
+// ---- end wonkit family A ----
+
+// ---- wonkit (Wealth of Nations), family B ----
+// ==========================================================================
+// The Wealth of Nations, Read Along: wonkit_b.py (family B: stock, bank,
+// trade, tax, debt, public, system)
+// ==========================================================================
+//
+// RATIONAL_JS, EA_CORE_JS, AKT_CORE_JS and WNK_CORE_JS, then one vm context
+// per mode holding family B's printers (WNB_SHARED_JS under the mode's
+// prefix), its base block and every one of its view blocks, exactly as a page
+// ships them. Each <xx>Compute(view, inst, opts) is called on inputs read by
+// acckit's reader (aktRead) and compared on the exact tile string a reader
+// sees. Smith's own figures where the chapter gives them: his million of coin
+// with a fifth kept in reserve (II.2), his circular bills at 5% and 1/2% a
+// draw every two months (II.2), the bounty of 5s. the quarter raising the home
+// price 4s. on 31 quarters consumed for one exported (IV.5), the tax of one
+// fifth on a wage of ten shillings (V.2), one in a hundred under arms (V.1),
+// the Roman as from twelve ounces to two (V.3). Every other figure was worked
+// by hand (docs/wealth-of-nations/kit-report-b.md) and every case was seen to
+// FAIL when the line it tests was broken on purpose.
+console.log('wealth of nations: wonkit family B, seven modes');
+{
+  const vm = require('vm');
+  const wbFile = (f) => path.join(__dirname, 'mathpath', 'labs', f);
+  const wbSrc = { core: fs.readFileSync(wbFile('eakit_core.py'), 'utf8'), a: fs.readFileSync(wbFile('acckit.py'), 'utf8'),
+    w: fs.readFileSync(wbFile('wonkit_core.py'), 'utf8'), b: fs.readFileSync(wbFile('wonkit_b.py'), 'utf8') };
+  const wbBlock = (s, name) => blockFrom(wbSrc[s], name.replace(/[[\]]/g, '\\$&'), 'wonkit (' + s + ')');
+  const wbViews = (dict, list) => list.map((v) => wbBlock('b', dict + '["' + v + '"]')).join('');
+  /* Field specs as wonkit_b.py's mode dicts declare them. */
+  const WB_SPECS = String.raw`
+    var BIG = '10000000000', LIM = '10000000';
+    function RAT(lo, hi, gt, dash) { var f = { kind: 'rat', max: String(hi === undefined ? BIG : hi) }; if (lo !== undefined) f.min = String(lo); if (gt !== undefined) f.gt = String(gt); if (dash) f.dash = true; return f; }
+    function W(lo, hi) { return { kind: 'whole', min: String(lo), max: String(hi === undefined ? LIM : hi) }; }
+    var NM = { kind: 'name' }, M = RAT(0), MP = RAT(undefined, undefined, 0), MD = RAT(undefined, undefined, 0, true), PCT = RAT(0, 100);
+    function REC(sub, lo, unique) { return { kind: 'arec', sub: sub, rest: NM, restWhat: 'value', loRest: 0, hiRest: 0, lo: lo === undefined ? 1 : lo, hi: 12, unique: unique !== false }; }
+    var SPEC_OF = {
+      'stock/division': { parts: REC([['part', NM], ['amount', M], ['kind', { kind: 'word', words: ['consumption', 'fixed', 'circulating'] }]]) },
+      'stock/revenue': { gross: MP, fixed: M, money: M, saving: RAT(0, BIG, undefined, true) },
+      'stock/accumulate': { capital: MP, 'return': PCT, saved: RAT(-100, 100), years: W(0, 50), wage: MD, saved2: RAT(-100, 100, undefined, true) },
+      'stock/turnover': { trades: REC([['trade', NM], ['capital', MP], ['returns', RAT(undefined, 365, 0)]]), wage: MD },
+      'stock/spend': { revenue: MP, maintenance: MP, purchases: REC([['trade', NM], ['amount', MP], ['makers', W(1)]]) },
+      'bank/paper': { circulation: MP, notes: M, reserve: PCT },
+      'bank/redraw': { sum: MP, interest: PCT, commission: PCT, months: W(1, 12), years: W(1, 50) },
+      'trade/make': { goods: REC([['good', NM], ['quantity', MP], ['home', MP], ['foreign', M], ['duty', M]]) },
+      'trade/balance': { countries: REC([['country', NM], ['exports', M], ['imports', M]]) },
+      'trade/bounty': { exported: M, bounty: M, home: M, rise: M },
+      'trade/drawback': { quantity: MP, duty: M, exported: M, share: PCT },
+      'tax/incidence': { wage: MP, rate: RAT(undefined, 100, 0) },
+      'tax/arithmetic': { rows: REC([['duty', M], ['quantity', M]], 2, false) },
+      'tax/land': { valuation: MP, rate: RAT(undefined, 100, 0), rents: REC([['year', W(0, 9999)], ['rent', MP]], 1, false) },
+      'debt/sinking': { debt: MP, interest: PCT, payment: M, years: W(0, 200), borrow: REC([['year', W(1, 200)], ['amount', MP]], 0, false) },
+      'debt/debase': { debt: MP, old: MP, 'new': MP },
+      'public/soldiers': { population: W(1, BIG), share: RAT(undefined, 1, 0), cost: MD },
+      'public/fees': { people: REC([['person', NM], ['salary', M], ['pupils', W(0)], ['fee', M]]) },
+      'public/tolls': { carriages: REC([['carriage', NM], ['weight', MP], ['trips', W(0)]]), toll: M },
+      'system/classes': { classes: REC([['class', NM], ['produce', M], ['consumption', M], ['advances', M]], 2) }
+    };
+    var DEFAULTS = { saving: '-', wage: '-', saved2: '-', share: '100', borrow: '', cost: '-' };
+    var OPTS = { unit: '£', qty: 'units', silver: 'oz', pupils: 'pupils' };
+    function RUN(mode, view, raw, opts) {
+      var spec = SPEC_OF[mode + '/' + view];
+      var s = Object.keys(spec).map(function (k) { return Object.assign({ key: k, what: k }, spec[k]); });
+      var r = {};
+      s.forEach(function (f) { r[f.key] = raw[f.key] !== undefined ? raw[f.key] : (DEFAULTS[f.key] !== undefined ? DEFAULTS[f.key] : ''); });
+      var inst;
+      try { inst = aktRead(s, r); } catch (e) { return { refuse: e.message }; }
+      return COMPUTE(view, inst, Object.assign({}, OPTS, opts || {}));
+    }
+    function T(out, ids) { return out.refuse ? 'REFUSED ' + out.refuse : ids.split(' ').map(function (i) { return out.tiles[i]; }).join(' | '); }
+    function S(out) { return out.refuse ? 'REFUSED ' + out.refuse : out.status; }
+  `;
+  const wbMk = (prefix, base, dict, views) => {
+    const ctx = { console: console };
+    vm.createContext(ctx);
+    vm.runInContext(block('RATIONAL_JS') + wbBlock('core', 'EA_CORE_JS') + wbBlock('a', 'AKT_CORE_JS') + wbBlock('w', 'WNK_CORE_JS')
+      + wbBlock('b', 'WNB_SHARED_JS').replace(/%p%/g, prefix) + wbBlock('b', base) + wbViews(dict, views) + WB_SPECS
+      + 'var COMPUTE = ' + prefix + 'Compute;', ctx, { filename: 'wonkit_b' });
+    return (expr) => { try { return vm.runInContext(expr, ctx); } catch (e) { return 'THREW ' + e.message; } };
+  };
+  const wbCall = (run, mode) => (view, raw, ids, opts) =>
+    run('T(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '), ' + JSON.stringify(ids) + ')');
+  const wbStatus = (run, mode) => (view, raw, opts) =>
+    run('S(RUN(' + JSON.stringify(mode) + ', ' + JSON.stringify(view) + ', ' + JSON.stringify(raw) + ', ' + JSON.stringify(opts || {}) + '))');
+  const WCAUT = '; it follows from the figures stated, not from any economy’s records.';
+  const wbEnds = (got, want, label) => eq(String(got).slice(-want.length), want, label);
+
+  /* --- stock (wst) ------------------------------------------------------- */
+  const stRun = wbMk('wst', 'WST_JS', 'WST_VIEW_JS', ['division', 'revenue', 'accumulate', 'turnover', 'spend']);
+  const st = wbCall(stRun, 'stock'), stS = wbStatus(stRun, 'stock');
+  /* 20 + 30 + 40 + 10 = 100: consumption 20%, fixed 30%, circulating 50%, capital 80. */
+  eq(st('division', { parts: 'food, 20, consumption; loom, 30, fixed; yarn, 40, circulating; cash, 10, circulating' }, 'wstWhole wstConsumption wstFixed wstCirculating wstCapital wstLargest'),
+     '£100 | £20 (20%) | £30 (30%) | £50 (50%) | £80 of £100 (80%) | consumption food £20; fixed loom £30; circulating yarn £40',
+     'stock/division: totals and shares by kind, capital = fixed + circulating');
+  eq(st('division', { parts: 'a, 1, fixed; b, 2, fixed; c, 2, fixed' }, 'wstFixed wstLargest wstConsumption'), '£5 (100%) | consumption none; fixed b £2; circulating none | £0 (0%)',
+     'stock/division: the largest of a kind is the first of equals; a kind with no part is none');
+  eq(st('division', { parts: 'a, 1, fixed; b, 2, consumption' }, 'wstFixed'), '£1 (≈ 33.33%)', 'stock/division: a share rounded to 2 places is marked');
+  eq(st('division', { parts: 'a, 0, fixed' }, 'wstWhole'), 'REFUSED The parts add to nothing, so there is no stock to divide', 'stock/division: an empty stock is refused');
+  wbEnds(stS('division', { parts: 'a, 1, fixed' }), 'which yields none' + WCAUT, 'stock/division: the status ends with the caution');
+  /* 1000 − 120 − 30 = 850; with 25 saved, 875; 25/850 = 2.941...% */
+  eq(st('revenue', { gross: '1000', fixed: '120', money: '30', saving: '25' }, 'wstKeep wstNet wstNetShare wstNew wstGain'),
+     '£150 (15% of the gross) | £850 | 85% | £875 (87.5% of the gross) | +£25 (≈ +2.94% on the net revenue)', 'stock/revenue: net = gross − fixed − money, and the saving added');
+  eq(st('revenue', { gross: '1000', fixed: '120', money: '30' }, 'wstNew'), 'no saving given', 'stock/revenue: no saving');
+  eq(st('revenue', { gross: '100', fixed: '70', money: '40' }, 'wstNet'), 'REFUSED The maintenance of the fixed capital and of the money, £110, is more than the gross revenue, £100', 'stock/revenue: maintenance above the gross is refused');
+  eq(st('revenue', { gross: '100', fixed: '10', money: '5', saving: '6' }, 'wstNet'), 'REFUSED The saving, £6, is more than the maintenance of the money, £5', 'stock/revenue: a saving above the money is refused');
+  /* 1000 × 1.05 = 1050, × 1.05 = 1102.5; at −50%: × 0.95 twice = 902.5; workers 50 → 55.125 */
+  eq(st('accumulate', { capital: '1000', 'return': '10', saved: '50', years: '2', wage: '20', saved2: '-50' }, 'wstFirst wstRate wstAfter wstChange wstLabour wstSecond'),
+     'revenue £100: £50 added to the capital, £50 spent | +5% a year | £1,102.5 after 2 years | +10.25% | 50 → ≈ 55.13 workers | £902.5 at −50% saved (−£200 against the first)',
+     'stock/accumulate: the capital multiplied by 1 + return × saved each year');
+  eq(st('accumulate', { capital: '1000', 'return': '10', saved: '-50', years: '1' }, 'wstFirst wstRate wstAfter wstLabour'),
+     'revenue £100: £150 spent, £50 of it taken from the capital | −5% a year | £950 after 1 year | no wage given', 'stock/accumulate: the prodigal encroaches on his capital');
+  /* 1000 × 1.05^50 = 11,467.3997...: exact, shown to 2 places */
+  eq(st('accumulate', { capital: '1000', 'return': '10', saved: '50', years: '50' }, 'wstAfter'), '≈ £11,467.40 after 50 years', 'stock/accumulate: fifty years exactly, rounded only for print');
+  eq(st('turnover', { trades: 'home, 1000, 4; foreign, 1000, 1; distant, 1000, 1/3', wage: '25' }, 'wstWork wstTotal wstLabour wstOrder wstRatio'),
+     'home £4,000; foreign £1,000; distant £1,000/3 ≈ £333.33 | £16,000/3 ≈ £5,333.33 | home 160; foreign 40; distant ≈ 13.33 | home, foreign, distant | 12.00× (home against distant)',
+     'stock/turnover: stock at work = capital × returns a year');
+  eq(st('turnover', { trades: 'a, 10, 1; b, 5, 2; c, 20, 1/2' }, 'wstOrder wstRatio wstLabour'), 'a, b, c | 1.00× (a against c) | no wage given', 'stock/turnover: ties keep the order given');
+  /* 2000/400/10 = 1/2; 3000/1000/10 = 3/10; 5000/2500/10 = 1/5 */
+  eq(st('spend', { revenue: '10000', maintenance: '10', purchases: 'buckles, 2000, 400; coach, 3000, 1000; claret, 5000, 2500' }, 'wstRetainers wstSpent wstShares wstPeople wstDependent'),
+     '1,000 people | £10,000 of £10,000 (100%) | buckles 50%; coach 30%; claret 20% | 3,900 people | no one: every maker’s share is under one maintenance',
+     'stock/spend: retainers against each maker’s share of a maintenance');
+  eq(st('spend', { revenue: '105', maintenance: '10', purchases: 'a, 100, 5' }, 'wstRetainers wstDependent'), '10.5 people (10 wholly) | 1: a (each maker wholly maintained by the purchase)', 'stock/spend: a share of 1 or more is whole dependence');
+  eq(st('spend', { revenue: '100', maintenance: '10', purchases: 'a, 60, 2; b, 50, 3' }, 'wstSpent'), 'REFUSED The purchases add to £110, more than the revenue, £100', 'stock/spend: purchases above the revenue are refused');
+
+  /* --- bank (wbk) -------------------------------------------------------- */
+  const bkRun = wbMk('wbk', 'WBK_JS', 'WBK_VIEW_JS', ['paper', 'redraw']);
+  const bk = wbCall(bkRun, 'bank'), bkS = wbStatus(bkRun, 'bank');
+  /* Smith II.2: a million of coin, a million of notes, two hundred thousand kept: 1.8 million poured in, 800,000 overflow */
+  eq(bk('paper', { circulation: '1000000', notes: '1000000', reserve: '20' }, 'wbkKept wbkBefore wbkAbroad wbkCoin wbkExcess wbkNeeded'),
+     '£200,000 | £1,800,000 (£1,000,000 of notes, £800,000 of coin) | £800,000 | £0 | none: the notes do not exceed the circulation | £200,000 (the reserve kept)',
+     'bank/paper: Smith’s million, with a reserve of a fifth');
+  eq(bk('paper', { circulation: '1000000', notes: '500000', reserve: '20' }, 'wbkAbroad wbkCoin'), '£400,000 | £500,000', 'bank/paper: notes below the circulation send notes − reserve abroad');
+  eq(bk('paper', { circulation: '1000000', notes: '1200000', reserve: '20' }, 'wbkKept wbkAbroad wbkExcess wbkNeeded'),
+     '£240,000 | not determined: the notes exceed the circulation | £200,000 | £400,000 (£160,000 more than the reserve kept)', 'bank/paper: notes beyond the channel return on the banks');
+  eq(bk('paper', { circulation: '100', notes: '1000', reserve: '50' }, 'wbkKept'), 'REFUSED The reserve, £500, is more than all the gold and silver in circulation, £100, so the banks could not gather it', 'bank/paper: an impossible reserve is refused');
+  /* Smith II.2: 5% + 1/2% × 6 = 8%; compound (1 + 5%/6 + 1/2%)^6 − 1 = (76/75)^6 − 1 = 8.27...% */
+  eq(bk('redraw', { sum: '1000', interest: '5', commission: '0.5', months: '2', years: '3' }, 'wbkDraws wbkSimple wbkCompound wbkTotal wbkExcess'),
+     '6 draws a year | 8% a year, £80 | ≈ 8.27% a year, ≈ £82.71 | simple £240, compound ≈ £269.23 over 3 years | simple +3 points, compound ≈ +3.27 points',
+     'bank/redraw: Smith’s circular bills, simple and compound');
+  eq(bk('redraw', { sum: '100', interest: '12', commission: '0', months: '12', years: '1' }, 'wbkSimple wbkCompound wbkExcess'), '12% a year, £12 | 12% a year, £12 | simple 0 points, compound 0 points', 'bank/redraw: one draw a year with no commission costs the interest');
+  eq(bk('redraw', { sum: '100', interest: '5', commission: '1', months: '5', years: '1' }, 'wbkDraws'), 'REFUSED A bill of 5 months does not go a whole number of times into a year; the lab takes bills of 1, 2, 3, 4, 6 or 12 months', 'bank/redraw: a term that does not divide the year is refused');
+  wbEnds(bkS('redraw', { sum: '1000', interest: '5', commission: '0.5', months: '2', years: '3' }), 'the 5% stated as interest' + WCAUT, 'bank/redraw: the status ends with the caution');
+
+  /* --- trade (wtr) ------------------------------------------------------- */
+  const trRun = wbMk('wtr', 'WTR_JS', 'WTR_VIEW_JS', ['make', 'balance', 'bounty', 'drawback']);
+  const tr = wbCall(trRun, 'trade'), trS = wbStatus(trRun, 'trade');
+  /* wine: 1000 × (30 − 1) = 29,000 forced home; bought abroad at 1.5, duty 500, buyers pay 500 more */
+  eq(tr('make', { goods: 'wine, 1000, 30, 1, 1/2; cloth, 500, 2, 3, 1' }, 'wtrAbroad wtrCheaper wtrProhibit wtrDuty wtrBuyers wtrLoss'),
+     'wine £1.5; cloth £4 | wine abroad; cloth home | £29,000 a year | £500 a year | £500 a year | £0 a year', 'trade/make: a prohibition’s cost and a revenue duty');
+  /* a protective duty: 4 + 2 > 5, bought at home at 5 instead of 4 abroad: buyers pay 100 more, no duty collected */
+  eq(tr('make', { goods: 'x, 100, 5, 4, 2' }, 'wtrCheaper wtrProhibit wtrDuty wtrBuyers wtrLoss'), 'x home | £100 a year | £0 a year | £100 a year | £100 a year', 'trade/make: a duty that keeps the good at home');
+  eq(tr('make', { goods: 'x, 10, 5, 3, 2' }, 'wtrCheaper wtrDuty'), 'x either (the same) | £0 a year', 'trade/make: equal costs are bought at home');
+  eq(tr('balance', { countries: 'france, 200, 500; portugal, 600, 300; holland, 400, 400' }, 'wtrBalances wtrTotal wtrUnfavourable wtrTwoWay'),
+     'france −£300; portugal +£300; holland £0 | £0 | 1: france | £2,400', 'trade/balance: exports − imports, signed');
+  wbEnds(trS('balance', { countries: 'a, 1, 2' }), 'two-way trade is £3' + WCAUT, 'trade/balance: the status ends with the caution');
+  /* Smith IV.5: 5s. on the quarter exported, 4s. on each of 31 consumed at home: 124s. = £6 4s. */
+  eq(tr('bounty', { exported: '1', bounty: '5', home: '31', rise: '4' }, 'wtrTreasury wtrConsumers wtrTotal wtrPerUnit wtrRatio', { unit: 's', qty: 'quarters' }),
+     '5 s | 124 s | 129 s | 129 s a quarter exported | 24.8 paid by home buyers for each 1 paid to the bounty', 'trade/bounty: Smith’s two taxes');
+  eq(tr('bounty', { exported: '0', bounty: '5', home: '10', rise: '1' }, 'wtrPerUnit wtrRatio'), 'nothing is exported | no bounty is paid', 'trade/bounty: nothing exported');
+  eq(tr('drawback', { quantity: '1000', duty: '3', exported: '600', share: '75' }, 'wtrPaid wtrDrawn wtrNet wtrKept', { qty: 'hogsheads' }),
+     '£3,000 | £1,350 | £1,650 | £4.125 a hogshead on 400 hogsheads', 'trade/drawback: duty drawn back on re-exportation');
+  eq(tr('drawback', { quantity: '10', duty: '1', exported: '11' }, 'wtrPaid'), 'REFUSED The quantity re-exported, 11 units, is more than the quantity imported, 10 units', 'trade/drawback: re-exporting more than came in is refused');
+
+  /* --- tax (wtx) --------------------------------------------------------- */
+  const txRun = wbMk('wtx', 'WTX_JS', 'WTX_VIEW_JS', ['incidence', 'arithmetic', 'land']);
+  const tx = wbCall(txRun, 'tax'), txS = wbStatus(txRun, 'tax');
+  /* Smith V.2: ten shillings a week, a tax of one fifth: wages rise to twelve and sixpence, by one fourth */
+  eq(tx('incidence', { wage: '10', rate: '20' }, 'wtxWage wtxRise wtxTax wtxOver', { unit: 's' }),
+     '12.5 s | 25% (+2.5 s) | 2.5 s | the rise exceeds the rate by 5 points', 'tax/incidence: one fifth raises the wage one fourth');
+  /* one tenth raises it one ninth (Smith wrote one eighth) */
+  eq(tx('incidence', { wage: '10', rate: '10' }, 'wtxWage wtxRise', { unit: 's' }), '100/9 s ≈ 11.11 s | ≈ 11.11% (+10/9 s ≈ 1.11 s)', 'tax/incidence: one tenth raises the wage one ninth');
+  eq(tx('incidence', { wage: '10', rate: '100' }, 'wtxWage'), 'REFUSED A tax of 100% of the wage takes all of it, and no wage could leave the worker anything', 'tax/incidence: a tax of 100% is refused');
+  eq(tx('arithmetic', { rows: '1, 1000; 2, 800; 3, 500; 4, 250' }, 'wtxRevenues wtxBest wtxFalls wtxEnds', { unit: 'd' }),
+     '1 d: 1,000 d; 2 d: 1,600 d; 3 d: 1,500 d; 4 d: 1,000 d | 2 d, yielding 1,600 d | 2: 3 d yields 1,500 d, less than the 1,600 d at 2 d; 4 d yields 1,000 d, less than the 1,500 d at 3 d | duty 4× the lowest, revenue 1× the lowest’s',
+     'tax/arithmetic: revenue = duty × quantity, and the duties that yield less');
+  eq(tx('arithmetic', { rows: '1, 60; 2, 30; 3, 20' }, 'wtxBest'), '£1, yielding £60 (as much at £2, £3)', 'tax/arithmetic: equal yields go to the lowest duty');
+  eq(tx('arithmetic', { rows: '1, 10; 1, 20' }, 'wtxBest'), 'REFUSED Rows, record 2: the duty £1 is not above the one before it, £1; list the duties from lowest to highest', 'tax/arithmetic: duties out of order are refused');
+  eq(tx('land', { valuation: '100', rate: '20', rents: '1700, 100; 1730, 150; 1760, 300' }, 'wtxTax wtxShares wtxFollow wtxTotals wtxDifference'),
+     '£20 every year | 1700 20%; 1730 ≈ 13.33%; 1760 ≈ 6.67% | 1700 £20; 1730 £30; 1760 £60 | fixed £60, on the actual rent £110, over 3 years | +£50: the tax on the actual rent raises more',
+     'tax/land: a fixed valuation against the actual rent');
+  eq(tx('land', { valuation: '100', rate: '10', rents: '1700, 100; 1700, 120' }, 'wtxTax'), 'REFUSED Rents, record 2: the year 1700 is not after the one before it, 1700', 'tax/land: years out of order are refused');
+  wbEnds(txS('incidence', { wage: '10', rate: '20' }), 'stay as they were' + WCAUT, 'tax/incidence: the status ends with the caution');
+
+  /* --- debt (wdb) -------------------------------------------------------- */
+  const dbRun = wbMk('wdb', 'WDB_JS', 'WDB_VIEW_JS', ['sinking', 'debase']);
+  const db = wbCall(dbRun, 'debt'), dbS = wbStatus(dbRun, 'debt');
+  /* 100 at 10%, 60 a year: 110 − 60 = 50; then 55 ≤ 60 pays it off in year 2 */
+  eq(db('sinking', { debt: '100', interest: '10', payment: '60', years: '3' }, 'wdbFirst wdbOff wdbEnd wdbInterest wdbPaid wdbBorrowed'),
+     '£10 | in year 2 | £0 after 3 years | £15 | £115 | £0', 'debt/sinking: interest first, the rest to the debt');
+  eq(db('sinking', { debt: '100', interest: '10', payment: '60', years: '3', borrow: '3, 40' }, 'wdbOff wdbEnd wdbBorrowed'), 'not paid off within 3 years | £40 after 3 years | £40', 'debt/sinking: a new loan after it is paid off reopens it');
+  /* checked against an independent Fraction loop: paid off in year 16, interest 398.42 */
+  eq(db('sinking', { debt: '1000', interest: '4', payment: '100', years: '20', borrow: '5, 200' }, 'wdbOff wdbInterest wdbPaid'), 'in year 16 | ≈ £398.42 | ≈ £1,598.42', 'debt/sinking: a sinking fund with a new loan');
+  eq(db('sinking', { debt: '100', interest: '5', payment: '5', years: '200' }, 'wdbOff wdbEnd wdbInterest'), 'not paid off within 200 years | £100 after 200 years | £1,000', 'debt/sinking: a payment equal to the interest never reduces the debt');
+  eq(db('sinking', { debt: '100', interest: '5', payment: '4', years: '5' }, 'wdbOff'), 'REFUSED A payment of £4 a year is less than the interest of the first year, £5, so the debt grows every year', 'debt/sinking: a payment below the interest is refused');
+  eq(db('sinking', { debt: '100', interest: '5', payment: '10', years: '5', borrow: '6, 10' }, 'wdbOff'), 'REFUSED Borrow, record 1: year 6 is beyond the 5 years computed', 'debt/sinking: a loan beyond the years is refused');
+  eq(db('sinking', { debt: '100', interest: '5', payment: '10', years: '5', borrow: '2, 10; 2, 5' }, 'wdbOff'), 'REFUSED Borrow names year 2 twice', 'debt/sinking: two loans in one year are refused');
+  /* Smith V.3: the as from twelve ounces to two: £128,000,000 to £21,333,333 6s. 8d. */
+  eq(db('debase', { debt: '128000000', old: '12', 'new': '2' }, 'wdbOwed wdbSilver wdbLoss wdbPretended', { silver: 'oz copper' }),
+     '1,536,000,000 oz copper | 256,000,000 oz copper | ≈ 83.33% (1,280,000,000 oz copper) | £128,000,000 paid in name, worth £64,000,000/3 ≈ £21,333,333.33 in the old coin',
+     'debt/debase: Smith’s Roman as');
+  eq(db('debase', { debt: '100', old: '1', 'new': '2' }, 'wdbOwed'), 'REFUSED The coin after holds more silver, 2 oz, than before, 1 oz; raising the denomination lowers the silver in a unit', 'debt/debase: a heavier coin is refused');
+  wbEnds(dbS('debase', { debt: '100', old: '2', 'new': '1' }), 'under the name of a full payment' + WCAUT, 'debt/debase: the status ends with the caution');
+
+  /* --- public (wpb) ------------------------------------------------------ */
+  const pbRun = wbMk('wpb', 'WPB_JS', 'WPB_VIEW_JS', ['soldiers', 'fees', 'tolls']);
+  const pb = wbCall(pbRun, 'public'), pbS = wbStatus(pbRun, 'public');
+  /* Smith V.1: not more than one in a hundred */
+  eq(pb('soldiers', { population: '1000000', share: '1/100', cost: '12' }, 'wpbSoldiers wpbOthers wpbCost wpbPerHead'), '10,000 | 99 | £120,000 a year | £0.12 a head a year', 'public/soldiers: one in a hundred');
+  eq(pb('soldiers', { population: '1001', share: '1/100' }, 'wpbSoldiers wpbCost'), '10.01 (10 whole soldiers) | no cost given', 'public/soldiers: a fraction of a soldier is shown as it is');
+  eq(pb('fees', { people: 'endowed, 200, 10, 1; paid, 20, 60, 3; idle, 0, 0, 2' }, 'wpbFees wpbIncome wpbShare wpbMore wpbMost'),
+     'endowed £10; paid £180; idle £0 | endowed £210; paid £200; idle £0 | endowed ≈ 4.76%; paid 90%; idle no income | endowed +£1; paid +£3; idle +£2 | paid (90% from fees)',
+     'public/fees: income by fees and salary');
+  eq(pb('fees', { people: 'a, 0, 1, 1; b, 0, 2, 3' }, 'wpbMost'), 'a, b (100% from fees)', 'public/fees: equal shares are all named');
+  eq(pb('tolls', { carriages: 'coach, 2, 100; waggon, 4, 50; cart, 1, 300', toll: '1/4' }, 'wpbTolls wpbTotal wpbHeaviest wpbTons wpbPerTon'),
+     'coach £50; waggon £50; cart £75 | £175 a year | waggon £50 (≈ 28.57% of the total) | 700 tons | £0.25 a ton', 'public/tolls: tolls by weight');
+  eq(pb('tolls', { carriages: 'a, 2, 0', toll: '1' }, 'wpbHeaviest wpbPerTon'), 'a £0, and no toll is paid | nothing is carried', 'public/tolls: no trips');
+  wbEnds(pbS('soldiers', { population: '100', share: '1/100' }), 'labour of 99 others' + WCAUT, 'public/soldiers: the status ends with the caution');
+
+  /* --- system (wsy) ------------------------------------------------------ */
+  const syRun = wbMk('wsy', 'WSY_JS', 'WSY_VIEW_JS', ['classes']);
+  const sy = wbCall(syRun, 'system'), syS = wbStatus(syRun, 'system');
+  eq(sy('classes', { classes: 'proprietors, 0, 2, 0; cultivators, 5, 2, 1; artificers, 2, 1, 1' }, 'wsyNet wsyProductive wsyBarren wsyShort wsyTotal'),
+     'proprietors −£2; cultivators +£2; artificers £0 | 1: cultivators | 1: artificers | 1: proprietors | £0', 'system/classes: net product = produce − consumption − advances');
+  wbEnds(syS('classes', { classes: 'a, 1, 1, 0; b, 2, 1, 0' }), 'not a measurement' + WCAUT, 'system/classes: the status ends with the caution');
+  eq(sy('classes', { classes: 'a, 1, 1, 0' }, 'wsyNet'), 'REFUSED classes: this lab needs at least 2 records, and there is 1', 'system/classes: one class is refused');
+  /* the reader survives what a reader types */
+  ['', 'banana', '0', '-1', '1/0', 'A>B'].forEach(function (bad) {
+    const got = st('revenue', { gross: bad, fixed: '1', money: '1' }, 'wstNet');
+    eq(/^REFUSED /.test(got), true, 'stock/revenue: gross ' + JSON.stringify(bad) + ' is refused with a sentence (' + got + ')');
+  });
+}
+// ---- end wonkit family B ----
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the

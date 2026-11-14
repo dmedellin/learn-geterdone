@@ -48,7 +48,7 @@ GROUPS = (
     {
         "key": "philosophy",
         "title": "Philosophy and close reading",
-        "note": "None of these assumes another Subject. The two read-alongs go "
+        "note": "None of these assumes another Subject. The three read-alongs go "
                 "through one book chapter by chapter.",
     },
     {
@@ -187,6 +187,15 @@ SUBJECTS = (
         "kind": "Read along",
         "card": "Merleau-Ponty&rsquo;s <em>Phenomenology of Perception</em>, "
                 "section by section, from the Preface to Freedom.",
+    },
+    {
+        "slug": "wealth-of-nations",
+        "group": "philosophy",
+        "short_title": "The Wealth of Nations",
+        "kind": "Read along",
+        "card": "Adam Smith&rsquo;s <em>Wealth of Nations</em>, all five Books in "
+                "his order, with the arithmetic on his pages worked through: the "
+                "division of labour, price, wages, rent, stock, trade and taxes.",
     },
     {
         "slug": "capital",
