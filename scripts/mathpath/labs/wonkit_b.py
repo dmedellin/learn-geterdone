@@ -942,7 +942,7 @@ TAX = {
             "rules": "Smith's rule (Book V, chapter 2, article III): while the demand for labour and the price of "
                      "provisions stay the same, the worker must keep the same wage after the tax, so the wage "
                      "becomes wage ÷ (1 − rate); the rise is rate ÷ (1 − rate), more than the rate (a fifth raises "
-                     "it a fourth, a tenth an eighth). The tax paid is the rate of the new wage, and it is advanced "
+                     "it a fourth; a tenth raises it a ninth, where Smith writes one-eighth by a slip). The tax paid is the rate of the new wage, and it is advanced "
                      "by the employer; who finally pays is not computed. A tax of 100% is refused. " + _MONEY_RULE
                      + _PCT_RULE,
             "js": WTX_VIEW_JS["incidence"],
@@ -1099,15 +1099,15 @@ DEBT = {
         },
         "debase": {
             "fields": [("debt", ea.field("The debt, in %u (its name, in units of coin)", _MP), None),
-                       ("old", ea.field("Silver in a unit of coin before, %s", rat(gt=0, hi=_BIG)), None),
-                       ("new", ea.field("Silver in a unit of coin after the denomination is raised, %s",
+                       ("old", ea.field("Metal in a unit of coin before, %s", rat(gt=0, hi=_BIG)), None),
+                       ("new", ea.field("Metal in a unit of coin after the denomination is raised, %s",
                                         rat(gt=0, hi=_BIG)), None)],
-            "tiles": [("Silver owed", "wdbOwed"), ("Silver paid", "wdbSilver"), ("Lost by the creditor", "wdbLoss"),
+            "tiles": [("Metal owed", "wdbOwed"), ("Metal paid", "wdbSilver"), ("Lost by the creditor", "wdbLoss"),
                       ("The pretended payment", "wdbPretended")],
             "check": _check_debase, "options": _options("silver_unit"),
             "subtitle": "a debt repaid in a coin whose denomination has been raised",
-            "rules": "The debt is owed in coin of the old standard and paid, unit for unit, in the new. Silver owed "
-                     "= debt × silver in the old unit; silver paid = debt × silver in the new; the creditor loses "
+            "rules": "The debt is owed in coin of the old standard and paid, unit for unit, in the new. Metal owed "
+                     "= debt × metal in the old unit; metal paid = debt × metal in the new; the creditor loses "
                      "the difference, as a share of what was owed 1 − new ÷ old. In the old coin the payment is "
                      "worth debt × new ÷ old. Smith calls it a pretended payment (Book V, chapter 3). A new coin "
                      "with more silver than the old is refused. " + _MONEY_RULE + _PCT_RULE,
