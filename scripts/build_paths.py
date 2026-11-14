@@ -100,7 +100,8 @@ KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "copi
                           "dddkit",
                           "gofkit",
                           "acckit",
-                          "wonkit",)
+                          "wonkit",
+                          "levkit",)
 
 
 def path_pages(path):
