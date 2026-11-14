@@ -19,6 +19,7 @@ from . import (
     dddkit,
     gofkit,
     acckit,
+    wonkit,
     argkit,
     choicekit,
     algebra_equations,
@@ -183,6 +184,7 @@ REGISTRY = {
     "dddkit": dddkit.dddkit_lab,
     "gofkit": gofkit.gofkit_lab,
     "acckit": acckit.acckit_lab,
+    "wonkit": wonkit.wonkit_lab,
 }
 
 
