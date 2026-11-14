@@ -25,6 +25,7 @@ const PAGES = [
   ['generated', '/gof-behavioral-objects/observer/'],
   ['generated', '/accelerate-measuring-performance/the-four-measures/'],
   ['generated', '/wealth-division-of-labour/the-pin-factory/'],
+  ['generated', '/leviathan-sense-and-speech/speech-and-names/'],
   ['trading', '/market-structure/market-structure/'],
   ['trading', '/trading-risk-management/risk-of-ruin/'],
 ];

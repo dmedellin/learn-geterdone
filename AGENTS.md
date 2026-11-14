@@ -3,7 +3,7 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
-## 0. Nothing is inert any more: all nineteen Subjects publish
+## 0. Nothing is inert any more: all twenty Subjects publish
 
 `content/system_design/`, `content/algorithms/` and `content/operations_research/`
 were in the tree for months publishing nothing. All three are now in
@@ -27,11 +27,12 @@ were in the tree for months publishing nothing. All three are now in
 | Design Patterns | **published** — 6 courses, 40 lessons, 47 pages, wired 2026-11-01 (1,464 pages became 1,511); its package is `content/design_patterns/`, its path slug `design-patterns`, its kit `gofkit` (with `dddkit`'s and `cckit`'s views) |
 | Accelerate | **published** — 8 courses, 46 lessons, 55 pages, wired 2026-11-01 (1,511 pages became 1,566); its package is `content/accelerate/`, its path slug `accelerate`, its kit `acckit` |
 | The Wealth of Nations | **published** — 13 courses, 65 lessons, 79 pages, wired 2026-11-14 (1,566 pages became 1,645); its package is `content/wealth_of_nations/`, its path slug `wealth-of-nations`, its kit `wonkit` |
+| Leviathan | **published** — 9 courses, 55 lessons, 65 pages, wired 2026-11-14 (1,645 pages became 1,710); its package is `content/leviathan/`, its path slug `leviathan`, its kit `levkit` (with `argkit`'s and `choicekit`'s modes) |
 
-237 lab modes are registered (Differential Equations added 22, Capital 17,
+247 lab modes are registered (Differential Equations added 22, Capital 17,
 Phenomenology 15, Reading Faster 8, Code Complete 8, Enterprise Application
-Patterns 8, Introduction to Algorithms 17, Domain-Driven Design 9, Design Patterns 9, Accelerate 12, The Wealth of Nations 14) and all thirty kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
-pages: `node scripts/labcheck.js --generated` executes 1,513 generated pages, 898
+Patterns 8, Introduction to Algorithms 17, Domain-Driven Design 9, Design Patterns 9, Accelerate 12, The Wealth of Nations 14, Leviathan 10) and all thirty-one kits in `build_paths.KITS_WITH_EXPECTATIONS` now serve published
+pages: `node scripts/labcheck.js --generated` executes 1,578 generated pages, 953
 of them with pinned figures, and compares every pinned tile string against what
 the page prints. Philosophy's two kits, `argkit` and `choicekit`, account for 98
 of those pages, English's `english` kit for 41, Differential Equations' `calckit`
@@ -45,7 +46,7 @@ more), some of which are not in `KITS_WITH_EXPECTATIONS`. Domain-Driven
 Design's `dddkit` serves 47 of its 53 lessons; five reuse `cckit` and one
 `eakit`. Design Patterns' `gofkit` serves 29 of its 40 lessons; seven reuse
 `dddkit` and four `cckit`. Accelerate's `acckit` serves all 46 of its
-lessons, and The Wealth of Nations' `wonkit` all 65 of its. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
+lessons, and The Wealth of Nations' `wonkit` all 65 of its. Leviathan's `levkit` serves 29 of its 55 lessons; 15 reuse `argkit` and 11 `choicekit`. `de_core`, the exact engine under `calckit` and `dekit`, is exercised
 directly by `scripts/mathcheck.js`, one case per function, each seen to fail
 when its function was broken on purpose.
 Before the last two Subjects were wired it said "0 with pinned figures" — those
@@ -81,7 +82,7 @@ and the one that wired these two:
   index. Group notes and card text are home-page copy and obey its copy rules;
 - new course slugs carry the Subject's short name as a prefix (`capital-`,
   `perception-`, `reading-`, `code-complete-`, `enterprise-patterns-`,
-  `intro-algorithms-`, `ddd-`, `gof-`, `accelerate-`, `wealth-`) so that a generic title cannot collide in the flat
+  `intro-algorithms-`, `ddd-`, `gof-`, `accelerate-`, `wealth-`, `leviathan-`) so that a generic title cannot collide in the flat
   course namespace. The older Subjects predate the rule and are NOT renamed:
   a published URL is never moved;
 - `content/spoken/<package>.py`, ONE file named for the Subject's package:
@@ -98,7 +99,7 @@ and the one that wired these two:
   and `TestEveryLabBuilds`, whose import lists name Discrete Mathematics,
   Algebra, Philosophy, English, Differential Equations, Capital, Phenomenology,
   Reading Faster, Code Complete, Enterprise Application Patterns,
-  Introduction to Algorithms, Domain-Driven Design, Design Patterns and Accelerate. Philosophy was added
+  Introduction to Algorithms, Domain-Driven Design, Design Patterns, Accelerate and Leviathan. Philosophy was added
   on wiring and the escaped-field check immediately found thirteen mistake
   titles showing `&ldquo;` literally; System Design, Algorithms and Operations
   Research are still not in those lists;
@@ -127,10 +128,10 @@ Five things that have each cost a day:
    `release/contract.schema.json` and by a test. `algebra-course6-lesson-`
    `quadratic-equations-and-the-zero-product-property` is exactly 72. The check
    id prefixes are short for that reason: `math`, `algebra`, `sysdesign`,
-   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`, `cc`, `eaa`, `ita`, `ddd`, `gof`, `acc`, `won`. Differential
+   `algo`, `or`, `phil`, `eng`, `de`, `cap`, `phen`, `read`, `cc`, `eaa`, `ita`, `ddd`, `gof`, `acc`, `won`, `lev`. Differential
    Equations' longest is 64, Capital's 66, Phenomenology's 62, Reading
    Faster's 52, Code Complete's 58, Enterprise Application Patterns' 58,
-   Introduction to Algorithms' 63, Domain-Driven Design's 65, Design Patterns' 57, Accelerate's 63.
+   Introduction to Algorithms' 63, Domain-Driven Design's 65, Design Patterns' 57, Accelerate's 63, Leviathan's 55.
 
 `tests/test_site_invariants.py` checks a Subject's tagline and description
 against its own course and lesson counts. Those sentences are written when a
@@ -155,7 +156,7 @@ and that is written down rather than engineered around.
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
 
 The site is a subject-agnostic LIBRARY OF PATHS. A path is an ordered sequence of
-courses on one subject. There are nineteen: **Trading** (8 courses, 118 lessons,
+courses on one subject. There are twenty: **Trading** (8 courses, 118 lessons,
 hand-authored and normalized at intake), **Discrete Mathematics** (8 courses, 106
 lessons), **Algebra** (9 courses, 112 lessons), **System Design** (10 courses,
 114 lessons), **Algorithms** (9 courses, 112 lessons), **Operations Research**
@@ -167,18 +168,17 @@ Along** (7 courses, 41 lessons), **Patterns of Enterprise Application
 Architecture, Read Along** (7 courses, 44 lessons), **Introduction to
 Algorithms, Read Along** (8 courses, 61 lessons), **Domain-Driven Design,
 Read Along** (9 courses, 53 lessons), **Design Patterns, Read Along** (6
-courses, 40 lessons), **Accelerate, Read Along** (8 courses, 46 lessons) and
-**The Wealth of Nations, Read Along** (13 courses, 65 lessons)
-— the last eighteen GENERATED
-from `content/<subject>/`. 171 courses and 1,450 lessons in all. The
+courses, 40 lessons), **Accelerate, Read Along** (8 courses, 46 lessons), **The Wealth of Nations, Read Along** (13 courses, 65 lessons) and **Leviathan, Read Along** (9 courses, 55 lessons)
+— the last nineteen GENERATED
+from `content/<subject>/`. 180 courses and 1,505 lessons in all. The
 published URL space:
 
 | URL | Served from |
 | --- | --- |
 | `learn.geterdone.io/` | `site/index.html` — the site index: the paths, plus course search |
-| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete`, `enterprise-patterns`, `intro-algorithms`, `domain-driven-design`, `design-patterns`, `accelerate`, `wealth-of-nations` |
-| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 171 course homes |
-| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,450 lessons |
+| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete`, `enterprise-patterns`, `intro-algorithms`, `domain-driven-design`, `design-patterns`, `accelerate`, `wealth-of-nations`, `leviathan` |
+| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 180 course homes |
+| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,505 lessons |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -189,7 +189,7 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 1,645-page map (plus eight published JSON assets) is in
+The full 1,710-page map (plus eight published JSON assets) is in
 [README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json` (and in
@@ -236,7 +236,7 @@ The apex `geterdone.io` is a **separate, live GitHub Pages site that this reposi
 does not control**. Do not deploy to it, reconfigure it, or write anything that
 implies we own its records. Linking to it is fine; changing it is out of scope.
 
-## 1a. One path is authored, seventeen are generated
+## 1a. One path is authored, nineteen are generated
 
 The paths are built in opposite directions and must be edited differently.
 
@@ -245,14 +245,14 @@ the library's conventions by `scripts/intake_course.py`. Its pages are the sourc
 of truth. Edit them directly.
 
 **Discrete Mathematics**, **Algebra**, **System Design**, **Algorithms**,
-**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology**, **Reading Faster**, **Code Complete**, **Enterprise Application Patterns**, **Introduction to Algorithms**, **Domain-Driven Design**, **Design Patterns** and **Accelerate** are generated. `content/<subject>/` holds each of them as
+**Operations Research**, **Philosophy**, **English**, **Differential Equations**, **Capital**, **Phenomenology**, **Reading Faster**, **Code Complete**, **Enterprise Application Patterns**, **Introduction to Algorithms**, **Domain-Driven Design**, **Design Patterns**, **Accelerate**, **The Wealth of Nations** and **Leviathan** are generated. `content/<subject>/` holds each of them as
 data — one Python module per course, with the lessons as dicts — and
-`scripts/build_paths.py` renders all 1,434 of their pages from `scripts/mathpath/`
+`scripts/build_paths.py` renders all 1,578 of their pages from `scripts/mathpath/`
 (one stylesheet, one chrome renderer, one lab kit per subject area). **Never
 edit a page under one of those course slugs by hand**: the next build reverts it,
 so the change appears to work and then vanishes.
 
-    python3 scripts/build_paths.py                     # rebuild all seventeen
+    python3 scripts/build_paths.py                     # rebuild all nineteen
     python3 scripts/build_paths.py --check             # fail if any page is stale
     node scripts/mathcheck.js                          # check the arithmetic itself
     node scripts/labcheck.js --generated               # execute every lab
@@ -434,6 +434,14 @@ KB median gzipped); the heaviest page is Accelerate and Measuring
 Performance's `capabilities-not-maturity` at 35.8 KB; the lightest course is
 Security, Lean Management and Product Development at 33.0 KB. The ceiling
 below is unchanged.
+
+Re-measured 2026-11-14 when Leviathan was wired, with its first drafts. Its 55
+lessons are 124 KB / 133 KB raw and 33 KB / 36 KB gzipped (median / max). The
+heaviest course is The Kingdom of Darkness, and the Review and Conclusion
+(34.8 KB median gzipped); the heaviest page is Wealth, Counsel, Law and the
+Office of the Sovereign's `counsel` at 36.2 KB; the lightest course is Wealth,
+Counsel, Law and the Office of the Sovereign at 31.8 KB. The ceiling below is
+unchanged.
 
 Re-derive them rather than trusting them; they go stale every time a lab grows:
 

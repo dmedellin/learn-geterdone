@@ -2302,12 +2302,116 @@ WON_COURSES = (
 WON_PATH_COURSE_COUNT = 13
 WON_UPCOMING_COURSES = ()
 
+# The Leviathan path: nine courses, all published.
+# Generated from content/leviathan/ so these cannot disagree with
+# what is built.
+LEV_PATH_PAGE = "/paths/leviathan/"
+
+LEV_COURSE_1_HOME = "/leviathan-sense-and-speech/"
+LEV_COURSE_1_LESSONS = (
+    "the-artificial-man",
+    "sense-and-imagination",
+    "the-train-of-imaginations",
+    "speech-and-names",
+    "truth-and-definitions",
+)
+LEV_COURSE_2_HOME = "/leviathan-reason-and-passions/"
+LEV_COURSE_2_LESSONS = (
+    "reason-is-reckoning",
+    "absurdity-and-science",
+    "the-passions",
+    "deliberation-and-will",
+    "discourse-belief-and-faith",
+    "wit-and-madness",
+    "the-subjects-of-knowledge",
+)
+LEV_COURSE_3_HOME = "/leviathan-power-manners-religion/"
+LEV_COURSE_3_LESSONS = (
+    "power-and-worth",
+    "honour-and-dignity",
+    "a-restless-desire-of-power",
+    "the-seeds-of-religion",
+    "religion-and-policy",
+)
+LEV_COURSE_4_HOME = "/leviathan-natural-condition/"
+LEV_COURSE_4_LESSONS = (
+    "equality-of-ability",
+    "the-war-of-every-man",
+    "right-and-law-of-nature",
+    "contracts-and-covenants",
+    "covenants-and-the-sword",
+    "justice-and-the-fool",
+    "the-other-laws-of-nature",
+)
+LEV_COURSE_5_HOME = "/leviathan-generation-of-commonwealth/"
+LEV_COURSE_5_LESSONS = (
+    "persons-authors-and-actors",
+    "one-person-by-consent",
+    "the-generation-of-a-commonwealth",
+    "the-rights-of-sovereigns",
+    "kinds-of-commonwealth",
+    "the-right-of-succession",
+)
+LEV_COURSE_6_HOME = "/leviathan-dominion-and-liberty/"
+LEV_COURSE_6_LESSONS = (
+    "dominion-paternal-and-despotical",
+    "liberty-and-necessity",
+    "the-true-liberties-of-subjects",
+    "systems-and-public-ministers",
+)
+LEV_COURSE_7_HOME = "/leviathan-office-of-sovereign/"
+LEV_COURSE_7_LESSONS = (
+    "nutrition-and-procreation",
+    "counsel",
+    "civil-laws",
+    "crimes-excuses-and-extenuations",
+    "punishments-and-rewards",
+    "the-diseases-of-a-commonwealth",
+    "the-office-of-the-sovereign",
+    "the-kingdom-of-god-by-nature",
+)
+LEV_COURSE_8_HOME = "/leviathan-christian-commonwealth/"
+LEV_COURSE_8_LESSONS = (
+    "the-principles-of-christian-politics",
+    "the-books-of-scripture",
+    "spirit-angel-and-inspiration",
+    "the-kingdom-of-god-and-the-word",
+    "miracles-and-their-use",
+    "eternal-life-and-the-church",
+    "the-sovereigns-of-israel-and-christ",
+    "power-ecclesiastical-and-salvation",
+)
+LEV_COURSE_9_HOME = "/leviathan-kingdom-of-darkness/"
+LEV_COURSE_9_LESSONS = (
+    "spiritual-darkness",
+    "demonology-and-images",
+    "vain-philosophy",
+    "who-benefits-from-darkness",
+    "review-and-conclusion",
+)
+
+LEV_COURSES = (
+    ("Sense, Imagination and Speech", LEV_COURSE_1_HOME, LEV_COURSE_1_LESSONS),
+    ("Reason, Science and the Passions", LEV_COURSE_2_HOME, LEV_COURSE_2_LESSONS),
+    ("Power, Manners and Religion", LEV_COURSE_3_HOME, LEV_COURSE_3_LESSONS),
+    ("The Natural Condition and the Laws of Nature", LEV_COURSE_4_HOME, LEV_COURSE_4_LESSONS),
+    ("Persons and the Generation of a Commonwealth", LEV_COURSE_5_HOME, LEV_COURSE_5_LESSONS),
+    ("Dominion, Liberty and the Parts of a Commonwealth", LEV_COURSE_6_HOME, LEV_COURSE_6_LESSONS),
+    ("Wealth, Counsel, Law and the Office of the Sovereign", LEV_COURSE_7_HOME, LEV_COURSE_7_LESSONS),
+    ("Of a Christian Commonwealth", LEV_COURSE_8_HOME, LEV_COURSE_8_LESSONS),
+    ("The Kingdom of Darkness, and the Review and Conclusion", LEV_COURSE_9_HOME, LEV_COURSE_9_LESSONS),
+)
+
+LEV_PATH_COURSE_COUNT = 9
+LEV_UPCOMING_COURSES = ()
+
 ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
                + ALGO_COURSES + OR_COURSES + PHIL_COURSES + ENG_COURSES
                + DE_COURSES + CAP_COURSES + PHEN_COURSES
                + READ_COURSES + CC_COURSES + EAA_COURSES
                + ITA_COURSES + DDD_COURSES + GOF_COURSES
-               + ACC_COURSES + WON_COURSES)
+               + ACC_COURSES + WON_COURSES
+               + LEV_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -2431,7 +2535,8 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        CAP_PATH_PAGE, PHEN_PATH_PAGE, READ_PATH_PAGE,
                        CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE,
                        DDD_PATH_PAGE, GOF_PATH_PAGE, ACC_PATH_PAGE,
-                       WON_PATH_PAGE)
+                       WON_PATH_PAGE,
+                       LEV_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -2474,6 +2579,8 @@ PATHS = (
      ACC_COURSES, ACC_PATH_COURSE_COUNT, ACC_UPCOMING_COURSES),
     ("The Wealth of Nations, Read Along", WON_PATH_PAGE,
      WON_COURSES, WON_PATH_COURSE_COUNT, WON_UPCOMING_COURSES),
+    ("Leviathan, Read Along", LEV_PATH_PAGE,
+     LEV_COURSES, LEV_PATH_COURSE_COUNT, LEV_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -2725,6 +2832,11 @@ ACC_DISCLAIMER_RE = re.compile(
 # reasoning implies, not whether the reasoning is right. Apostrophe-free.
 WON_DISCLAIMER_RE = re.compile(
     r"(?i)what the reasoning of the chapter implies for those quantities")
+# Leviathan promises that every figure is computed from the names, payoffs and
+# numbers a lesson states, and warns that it shows what follows from them on
+# Hobbes's definitions, not whether Hobbes is right.
+LEV_DISCLAIMER_RE = re.compile(
+    r"(?i)what follows from them on Hobbes")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -2763,6 +2875,8 @@ PATH_MATERIAL_DISCLAIMER = {
                     ACC_DISCLAIMER_RE),
     WON_PATH_PAGE: ("the what-the-reasoning-of-the-chapter-implies disclaimer",
                     WON_DISCLAIMER_RE),
+    LEV_PATH_PAGE: ("the what-follows-on-Hobbes-definitions disclaimer",
+                    LEV_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -3137,13 +3251,19 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(WON_COURSES)
             + sum(len(slugs) for _t, _h, slugs in WON_COURSES)
         )
+        lev_tree = (
+            1  # the Leviathan path page
+            + len(LEV_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in LEV_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
                        + sysdesign_tree + algo_tree + or_tree
                        + phil_tree + eng_tree + de_tree
                        + cap_tree + phen_tree + read_tree
                        + cc_tree + eaa_tree + ita_tree
                        + ddd_tree + gof_tree + acc_tree
-                       + won_tree)  # 1 for the index
+                       + won_tree
+                       + lev_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -3259,9 +3379,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "= 79 pages, got %d" % won_tree,
         )
         self.assertEqual(
-            1641,
+            65,
+            lev_tree,
+            "the Leviathan path is 1 + 9 + 5 + 7 + 5 + 7 + 6 + 4 + 8 + 8 + 5 "
+            "= 65 pages, got %d" % lev_tree,
+        )
+        self.assertEqual(
+            1706,
             course_tree,
-            "the site index plus all nineteen path trees is 1641 pages, got %d" % course_tree,
+            "the site index plus all twenty path trees is 1706 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -3272,9 +3398,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            1645,
+            1710,
             expected,
-            "1641 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1645, "
+            "1706 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1710, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -3499,6 +3625,7 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "design_patterns": getattr(smoke, "GOF_COURSES", ()),
             "accelerate": getattr(smoke, "ACC_COURSES", ()),
             "wealth_of_nations": getattr(smoke, "WON_COURSES", ()),
+            "leviathan": getattr(smoke, "LEV_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -3911,9 +4038,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            1621,
+            1685,
             len(course_pages),
-            "one hundred and seventy-one course homes and 1450 lessons carry a material "
+            "one hundred and eighty course homes and 1505 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -4906,7 +5033,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(171, checked, "every published course must be checked")
+        self.assertEqual(180, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -5214,6 +5341,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             from design_patterns import PATH as DESIGN_PATTERNS
             from accelerate import PATH as ACCELERATE
             from wealth_of_nations import PATH as WEALTH_OF_NATIONS
+            from leviathan import PATH as LEVIATHAN
         except ImportError as exc:  # pragma: no cover - a missing package is a failure
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         # (declared courses, declared path page, the content package's PATH)
@@ -5234,6 +5362,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             ("design patterns", GOF_COURSES, GOF_PATH_PAGE, DESIGN_PATTERNS),
             ("accelerate", ACC_COURSES, ACC_PATH_PAGE, ACCELERATE),
             ("wealth of nations", WON_COURSES, WON_PATH_PAGE, WEALTH_OF_NATIONS),
+            ("leviathan", LEV_COURSES, LEV_PATH_PAGE, LEVIATHAN),
         )
 
     def test_declared_slugs_match_the_content_package(self):
@@ -5376,6 +5505,7 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
             from design_patterns import PATH as DESIGN_PATTERNS
             from accelerate import PATH as ACCELERATE
             from wealth_of_nations import PATH as WEALTH_OF_NATIONS
+            from leviathan import PATH as LEVIATHAN
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import a content package: %s" % exc)
         cls.lessons = []
@@ -5383,7 +5513,8 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
                      DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE,
-                     WEALTH_OF_NATIONS):
+                     WEALTH_OF_NATIONS,
+                     LEVIATHAN):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     cls.lessons.append(("%s/%s" % (course["slug"], lesson["slug"]), lesson))
@@ -5576,6 +5707,7 @@ class TestEveryLabBuilds(unittest.TestCase):
             from design_patterns import PATH as DESIGN_PATTERNS
             from accelerate import PATH as ACCELERATE
             from wealth_of_nations import PATH as WEALTH_OF_NATIONS
+            from leviathan import PATH as LEVIATHAN
         except ImportError as exc:  # pragma: no cover
             raise unittest.SkipTest("cannot import the lab kit: %s" % exc)
         cls.labs = labs
@@ -5584,7 +5716,8 @@ class TestEveryLabBuilds(unittest.TestCase):
                      CAPITAL, PHENOMENOLOGY, READING, CODE_COMPLETE,
                      ENTERPRISE_PATTERNS, INTRO_ALGORITHMS,
                      DOMAIN_DRIVEN_DESIGN, DESIGN_PATTERNS, ACCELERATE,
-                     WEALTH_OF_NATIONS):
+                     WEALTH_OF_NATIONS,
+                     LEVIATHAN):
             for course in path["courses"]:
                 for lesson in course["lessons"]:
                     key, cfg = lesson["lab"]

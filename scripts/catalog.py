@@ -48,7 +48,7 @@ GROUPS = (
     {
         "key": "philosophy",
         "title": "Philosophy and close reading",
-        "note": "None of these assumes another Subject. The three read-alongs go "
+        "note": "None of these assumes another Subject. The read-alongs each go "
                 "through one book chapter by chapter.",
     },
     {
@@ -204,6 +204,16 @@ SUBJECTS = (
         "kind": "Read along",
         "card": "Marx&rsquo;s <em>Capital</em>, all three volumes, chapter by "
                 "chapter, with the arithmetic done beside the text.",
+    },
+    {
+        "slug": "leviathan",
+        "group": "philosophy",
+        "short_title": "Leviathan",
+        "kind": "Read along",
+        "card": "Hobbes&rsquo;s <em>Leviathan</em>, chapter by chapter, from "
+                "sense and speech to the commonwealth and the kingdom of "
+                "darkness, with each argument worked as a problem you can "
+                "check.",
     },
     {
         "slug": "reading-faster",

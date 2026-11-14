@@ -36,6 +36,7 @@ from domain_driven_design import PATH as DOMAIN_DRIVEN_DESIGN_PATH  # noqa: E402
 from english import PATH as ENGLISH_PATH  # noqa: E402
 from enterprise_patterns import PATH as ENTERPRISE_PATTERNS_PATH  # noqa: E402
 from intro_algorithms import PATH as INTRO_ALGORITHMS_PATH  # noqa: E402
+from leviathan import PATH as LEVIATHAN_PATH  # noqa: E402
 from operations_research import PATH as OPERATIONS_RESEARCH_PATH  # noqa: E402
 from phenomenology import PATH as PHENOMENOLOGY_PATH  # noqa: E402
 from philosophy import PATH as PHILOSOPHY_PATH  # noqa: E402
@@ -50,7 +51,8 @@ GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
                    READING_PATH, CODE_COMPLETE_PATH, ENTERPRISE_PATTERNS_PATH,
                    INTRO_ALGORITHMS_PATH, DOMAIN_DRIVEN_DESIGN_PATH,
                    DESIGN_PATTERNS_PATH, ACCELERATE_PATH,
-                   WEALTH_OF_NATIONS_PATH)
+                   WEALTH_OF_NATIONS_PATH,
+                   LEVIATHAN_PATH)
 
 # The content package each generated path is read from. A path's slug is its
 # URL; its package is its directory under content/ and its file under
