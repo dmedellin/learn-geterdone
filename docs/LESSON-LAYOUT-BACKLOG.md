@@ -15,14 +15,15 @@ read-along passages, which are most of the library.
 
 | release | items | state |
 |---|---|---|
-| 1, trim | L-1 to L-7, C-1, S-1 | implemented on `feat/lesson-reading-mode` |
-| 2, reading mode | L-8 to L-11 | implemented on `feat/lesson-reading-mode-2`, stacked on release 1 |
+| 1, trim | L-1 to L-7, C-1, S-1 | shipped in PR #46 |
+| 2, reading mode | L-8 to L-11 | implemented on `feat/lesson-reading-mode-2`; the top "In brief" from release 1 is gone, its ideas are the recall list at the end |
 | later | L-12 to L-15 | open, only if asked |
 
 Measured after release 1 on the same pages: the reading starts at 809 px on a
 phone (inside the first screen) and 755 px on a laptop, at about 72 characters
 per line. The course page's first lesson is at 1,030 px on a phone and 719 px on
-a laptop; the Subject page's first course at 1,178 px and 767 px.
+a laptop; the Subject page's first course at 1,178 px and 767 px. After release
+2 the reading starts at 641 px on a phone and 589 px on a laptop.
 
 ## What was measured
 
