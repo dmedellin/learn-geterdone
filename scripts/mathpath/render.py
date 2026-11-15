@@ -321,58 +321,41 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         '\n    <main id="main">\n',
     ]
 
-    # -- hero ---------------------------------------------------------------
+    # -- the head: one preview, not four -------------------------------------
+    # docs/LESSON-LAYOUT-BACKLOG.md L-1, L-2. The kicker carries what the
+    # breadcrumb does not (the chapter), the lede is the lesson's authored
+    # one-line description, and the actions row is left for Listen, which
+    # readout.py inserts. The long summary and the key block are not dropped:
+    # they close the lesson in the summary section below.
     parts.append(
-        '    <section class="hero" data-ui="hero">\n'
-        "      <div>\n"
-        '        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>'
-        '<span data-ui="page-kind">Lesson</span> &middot; %s &middot; %s</span>\n'
-        "        <h1>%s</h1>\n"
-        "        <p>%s</p>\n"
-        '        <div class="hero-actions" data-ui="primary-actions">'
-        '<a class="btn primary" href="#lab">Open the interactive lesson</a>'
-        '<a class="btn ghost" href="#practice">Practice</a></div>\n'
-        "      </div>\n"
-        '      <div class="hero-visual">\n'
-        "        %s\n"
-        '        <div class="float-label" style="right:16px;bottom:16px;">%s</div>\n'
-        "      </div>\n"
+        '    <section class="lesson-head" data-ui="hero">\n'
+        '      <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; %s</p>\n'
+        "      <h1>%s</h1>\n"
+        '      <p class="lesson-lede">%s</p>\n'
+        '      <div class="hero-actions" data-ui="primary-actions"></div>\n'
         "    </section>\n"
-        % (
-            esc(course["title"]), esc(lesson["module"]),
-            esc(lesson["title"]), inline(lesson["summary"]),
-            _mathblock(lesson["key"]),
-            esc_inline(lesson.get("key_label", "The statement in symbols")),
-        )
+        % (esc(lesson["module"]), esc(lesson["title"]), esc_inline(lesson["one_line"]))
     )
 
-    # -- concepts -----------------------------------------------------------
-    cards = "".join(
-        '<article class="card concept-card"><div class="icon">%d</div><h3>%s</h3><p>%s</p></article>'
-        % (i + 1, esc_inline(t), inline(body))
-        for i, (t, body) in enumerate(lesson["concepts"])
-    )
+    # -- in brief: the three key ideas by name. Three short lines are the one
+    # advance organizer the reading needs; what each idea says is in the
+    # summary at the end, where it is a recap rather than a fourth preview.
+    brief = "".join("<li>%s</li>" % esc_inline(t) for t, _body in lesson["concepts"])
     parts.append(
-        '    <section class="section">\n'
-        '      <div class="section-head"><div><p class="kicker">Core ideas</p>'
-        "<h2>What this lesson establishes</h2></div><p>%s</p></div>\n"
-        '      <div class="grid-3">%s</div>\n'
-        "    </section>\n" % (inline(lesson.get("concepts_intro", "Three ideas carry the rest.")), cards)
+        '    <section class="section reading-col in-brief" aria-labelledby="inBrief">\n'
+        '      <h2 id="inBrief">In brief</h2>\n'
+        "      <ul>%s</ul>\n"
+        "    </section>\n" % brief
     )
 
     # -- the written material ----------------------------------------------
     body_markup = "".join(_block(kind, payload) for kind, payload in lesson["body"])
     parts.append(
-        '    <section class="section" id="read">\n'
-        '      <div class="section-head"><div><p class="kicker">The material</p>'
-        "<h2>%s</h2></div><p>%s</p></div>\n"
-        '      <article class="card card-pad prose">%s</article>\n'
+        '    <section class="section reading-col" id="read">\n'
+        "      <h2>%s</h2>\n"
+        '      <article class="prose reading">%s</article>\n'
         "    </section>\n"
-        % (
-            esc_inline(lesson.get("read_title", lesson["title"])),
-            inline(lesson.get("read_intro", "Definitions first, then what follows from them.")),
-            body_markup,
-        )
+        % (esc_inline(lesson.get("read_title", lesson["title"])), body_markup)
     )
 
     # -- the lab ------------------------------------------------------------
@@ -453,6 +436,24 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         % (mistakes, esc_inline(standard_head), inline(standard_body), inline(lesson["note"]))
     )
 
+    # -- the summary: the long description, the three key ideas in full and
+    # the key block, after the reader has met the material they summarise ----
+    ideas = "".join(
+        "<li><strong>%s.</strong> %s</li>" % (esc_inline(t).rstrip("."), inline(body))
+        for t, body in lesson["concepts"]
+    )
+    parts.append(
+        '    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">\n'
+        '      <h2 id="lessonSummary">Summary</h2>\n'
+        "      <p>%s</p>\n"
+        "      <h3>Key ideas</h3>\n"
+        '      <ul class="key-ideas">%s</ul>\n'
+        '      <figure class="key-figure">%s<figcaption>%s</figcaption></figure>\n'
+        "    </section>\n"
+        % (inline(lesson["summary"]), ideas, _mathblock(lesson["key"]),
+           esc_inline(lesson.get("key_label", "The statement in symbols")))
+    )
+
     parts.append("    </main>\n")
 
     # -- the pager, in the library's pinned form ----------------------------
@@ -483,13 +484,9 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         "course": esc(plain(course["title"])),
     })
 
-    parts.append(
-        chrome.footer(
-            "<strong>%s.</strong> %s"
-            % (esc(course["title"]), inline(course["footer_lead"])),
-            path["material"],
-        )
-    )
+    # The course lead repeats the licence clause on every lesson; it stays on the
+    # course home (docs/LESSON-LAYOUT-BACKLOG.md L-7).
+    parts.append(chrome.footer(None, path["material"]))
     quiz = [
         {
             "q": inline(item["q"]),
@@ -529,9 +526,8 @@ def course_home(*, course, index, courses, path):
         for i, lesson in enumerate(lessons)
     )
     outcomes = "".join(
-        '<article class="card concept-card"><div class="icon">%d</div><h3>%s</h3><p>%s</p></article>'
-        % (i + 1, esc_inline(t), inline(body))
-        for i, (t, body) in enumerate(course["outcomes"])
+        '<div class="outcome"><h3>%s</h3><p>%s</p></div>' % (esc_inline(t), inline(body))
+        for t, body in course["outcomes"]
     )
 
     # The pager is labelled by dependency, which is what the Subject's course
@@ -572,44 +568,41 @@ def course_home(*, course, index, courses, path):
             (course["title"], None),
         ]),
         '\n    <main id="main">\n',
-        '    <section class="hero" data-ui="hero">\n'
-        "      <div>\n"
-        '        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>'
-        '<span data-ui="page-kind">Course</span> &middot; %s</span>\n'
-        "        <h1>%s</h1>\n"
-        "        <p>%s</p>\n"
-        '        <div class="hero-actions" data-ui="primary-actions">'
-        '<a class="btn primary" href="#syllabus">View lessons</a>'
-        '<a class="btn ghost" href="#background">Recommended background</a></div>\n'
-        "      </div>\n"
-        '      <div class="hero-visual">\n        %s\n'
-        '        <div class="float-label" style="right:16px;bottom:16px;">What this course is about</div>\n'
-        "      </div>\n"
+        # docs/LESSON-LAYOUT-BACKLOG.md C-1: the lessons, which are why a
+        # reader opened this page, come right after a short head. The key card
+        # and the three stat tiles are gone ("Format: Interactive" was true of
+        # every course); the facts are one line inside the head, and the
+        # objectives and background are one tap away below the list.
+        '    <section class="page-head" data-ui="hero">\n'
+        '      <p class="lesson-kind"><span data-ui="page-kind">Course</span> &middot; %s</p>\n'
+        "      <h1>%s</h1>\n"
+        '      <p class="lesson-lede">%s</p>\n'
+        '      <dl class="meta-line" data-ui="metadata">'
+        "<div><dt>Subject</dt><dd>%s</dd></div>"
+        "<div><dt>Lessons</dt><dd>%d</dd></div>"
+        "<div><dt>Level</dt><dd>%s</dd></div></dl>\n"
+        '      <div class="hero-actions" data-ui="primary-actions">'
+        '<a class="btn primary" href="./%s/">Start with %s</a></div>\n'
         "    </section>\n"
         % (
-            esc(path["title"]),
-            esc(course["title"]), inline(course["blurb"]),
-            _mathblock(course["key"]),
+            esc(path["title"]), esc(course["title"]), inline(course["blurb"]),
+            esc(path["title"]), len(lessons), esc(course["level"]),
+            lessons[0]["slug"], esc(lessons[0]["title"]),
         ),
-        '    <section class="section" data-ui="metadata">\n'
-        '      <dl class="stats">\n'
-        "        <div><dt>Subject</dt><dd>%s</dd></div>\n"
-        "        <div><dt>Lessons</dt><dd>%d</dd></div>\n"
-        "        <div><dt>Format</dt><dd>Interactive</dd></div>\n"
-        "      </dl>\n"
-        "    </section>\n" % (esc(path["title"]), len(lessons)),
-        '    <section class="section" data-ui="overview">\n'
-        '      <div class="section-head"><div><p class="kicker">Overview</p>'
-        "<h2>What you will be able to do</h2></div><p>%s</p></div>\n"
-        '      <div class="grid-4">%s</div>\n'
-        "    </section>\n" % (inline(course["outcomes_intro"]), outcomes),
         '    <section class="section" id="syllabus" data-ui="lesson-list">\n'
-        '      <div class="section-head"><div><p class="kicker">Lessons</p>'
-        '<h2>%d lessons</h2>'
-        '<p class="course-progress" id="courseProgress"></p></div><p>%s</p></div>\n'
+        '      <div class="list-head"><h2>%d lessons</h2>'
+        '<p class="course-progress" id="courseProgress"></p><p>%s</p></div>\n'
         '      <div class="syllabus">%s</div>\n'
         "    </section>\n" % (len(lessons), inline(course["syllabus_intro"]), syllabus),
-        '    <section class="section" id="background" data-ui="background">'
+        # Headings keep their levels and the outcomes their h3/p shape: the
+        # copy fixtures in tests/content_preservation.json pin (tag, text).
+        '    <details class="section more" id="about">\n'
+        '      <summary class="more-summary">More about this course</summary>\n',
+        '    <section class="more-part" data-ui="overview">\n'
+        "      <h2>What you will be able to do</h2><p>%s</p>\n"
+        '      <div class="outcomes">%s</div>\n'
+        "    </section>\n" % (inline(course["outcomes_intro"]), outcomes),
+        '    <section class="more-part" id="background" data-ui="background">'
         # First character up, and NOTHING else touched. str.capitalize()
         # lowercases the rest of the string, so every proper noun in this field
         # was destroyed: "Discrete Mathematics" shipped as "discrete
@@ -621,15 +614,16 @@ def course_home(*, course, index, courses, path):
         # shipped its backticks on six Differential Equations course homes
         '<h2>Recommended background</h2><p>%s.</p></section>\n'
         % esc_inline(_first_upper(course["assumes_long"]).rstrip(".")),
-        '    <section class="section">\n'
-        '      <div class="grid-2">\n'
-        '        <article class="card card-pad prose"><h3>Practice suggestions</h3>%s</article>\n'
-        '        <article class="card card-pad prose"><h3>What it does not cover</h3>%s</article>\n'
-        "      </div>\n"
+        '    <section class="more-part">\n'
+        '      <h3>Practice suggestions</h3>%s\n'
+        '      <h3>What it does not cover</h3>%s\n'
+        '      <h3>What this course is about</h3><figure class="key-figure">%s</figure>\n'
         "    </section>\n"
+        "    </details>\n"
         % (
             "".join("<p>%s</p>" % inline(p) for p in course["how_to"]),
             "".join("<p>%s</p>" % inline(p) for p in course["not_covered"]),
+            _mathblock(course["key"]),
         ),
         "    </main>\n",
         '\n    <nav class="path-nav" data-ui="course-navigation" aria-label="Course navigation">\n%s\n      </nav>\n' % "\n".join(nav),
@@ -661,37 +655,40 @@ def path_page(path):
         chrome.topbar(up="../../"),
         chrome.crumbs([("Learn library", "../../"), (path["title"], None)]),
         '<main id="main">\n',
-        '<section class="hero" data-ui="hero"><div>'
-        '<span class="eyebrow"><span data-ui="page-kind">Subject</span> &middot; Learn library</span>'
-        '<h1>%s</h1><p>%s</p>'
-        '<div class="hero-actions" data-ui="primary-actions">'
-        '<a class="btn primary" href="#courses">View courses</a>'
-        '<a class="btn ghost" href="#background">Recommended background</a></div></div>'
-        '<div class="hero-visual">%s</div></section>\n'
-        % (esc(path["title"]), inline(path["tagline"]), _mathblock(path["key"])),
+        # docs/LESSON-LAYOUT-BACKLOG.md S-1: the courses come right after a
+        # short head, in one column so their order reads top to bottom (the
+        # two-column grid read row by row). The four facts are one line in
+        # the head; the overview and the background are one tap below.
+        #
         # `level_note` was declared in every PATH dict and rendered nowhere. It
         # is the one thing a reader browsing Subjects most wants next to a
         # level -- every value is a statement about what is assumed ("no
         # calculus required", "assumes Discrete Mathematics in full") -- so it
-        # is its own stat rather than a parenthetical inside Level, which would
-        # have changed a block other guards pin.
-        '<section class="section" data-ui="metadata"><dl class="stats">'
+        # is its own fact rather than a parenthetical inside Level.
+        '<section class="page-head" data-ui="hero">'
+        '<p class="lesson-kind"><span data-ui="page-kind">Subject</span> &middot; Learn library</p>'
+        '<h1>%s</h1><p class="lesson-lede">%s</p>'
+        '<dl class="meta-line" data-ui="metadata">'
         '<div><dt>Courses</dt><dd>%d</dd></div><div><dt>Lessons</dt><dd>%d</dd></div>'
         '<div><dt>Level</dt><dd>%s</dd></div>'
-        '<div><dt>Assumes</dt><dd>%s</dd></div></dl></section>\n'
-        % (len(courses), total_lessons, esc(path["level"]),
-           esc(path["level_note"])),
-        '<section class="section prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
-        % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
+        '<div><dt>Assumes</dt><dd>%s</dd></div></dl>'
+        '<div class="hero-actions" data-ui="primary-actions">'
+        '<a class="btn primary" href="../../%s/">Start with %s</a></div></section>\n'
+        % (esc(path["title"]), inline(path["tagline"]), len(courses), total_lessons,
+           esc(path["level"]), esc(path["level_note"]),
+           courses[0]["slug"], esc(courses[0]["title"])),
         '<section class="section" id="courses" data-ui="course-list">'
-        # The sequence note sits UNDER the heading. As the section-head's second
-        # column it floated beside "Courses" and, being long on most Subjects,
-        # ended up above it on the right with the heading pushed to the bottom.
-        '<div class="section-head"><div><h2>Courses</h2><p>%s</p></div></div>'
+        '<div class="list-head"><h2>Courses</h2><p>%s</p></div>'
         '<div class="spine">%s</div></section>\n' % (inline(path["sequence_intro"]), cards),
-        '<section class="section prose" id="background" data-ui="background">'
+        '<details class="section more" id="about"><summary class="more-summary">More about this Subject</summary>\n',
+        '<section class="more-part prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
+        % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
+        '<section class="more-part prose" id="background" data-ui="background">'
         '<h2>Recommended background</h2>%s</section>\n'
         % "".join('<p>%s</p>' % inline(p) for p in path["prerequisites"]),
+        '<section class="more-part"><h3>In symbols</h3><figure class="key-figure">%s</figure></section>\n'
+        % _mathblock(path["key"]),
+        '</details>\n',
         '</main>\n',
         chrome.footer(inline(path["footer_lead"]), path["material"]),
         chrome.close(progress.PROGRESS_JS + progress.PATH_JS),

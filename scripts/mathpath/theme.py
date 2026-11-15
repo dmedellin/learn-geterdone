@@ -1214,6 +1214,101 @@ UI_CSS = """
     }
 """
 
+
+# Reading mode: the generated lesson, course and Subject pages built around
+# their content (docs/LESSON-LAYOUT-BACKLOG.md). Appended AFTER UI_CSS so these
+# rules win over the shared hero card at equal specificity. Only stylesheet()
+# carries it: the hand-written Trading pages take UI_CSS through
+# add_progress_marks.py and never see this block.
+#
+# The measure: a 38rem column, which at the 17px reading size holds about 72
+# characters of running prose (WCAG 1.4.8 caps a line at 80; the old card ran
+# ~150 on a laptop). Measured in Chrome, not derived from `ch`, which in this
+# font stack is wider than an average letter. A code listing of the full 80
+# columns scrolls a little inside it, as it already did on a phone.
+READING_CSS = """
+    body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
+    body[data-page-kind] .reading p, body[data-page-kind] .reading li,
+    body[data-page-kind] .in-brief li, body[data-page-kind] .lesson-summary > p {
+      font-size: 1.0625rem; line-height: 1.75;
+    }
+    body[data-page-kind] .reading { padding: 0; border: 0; background: none; }
+    body[data-page-kind] .reading-col > h2 { margin: 0 0 14px; }
+
+    body[data-page-kind="lesson"] [data-ui="hero"].lesson-head {
+      display: block; max-width: 38rem; margin: 6px auto 0; padding: 0;
+      border: 0; border-radius: 0; background: none; box-shadow: none;
+    }
+    body[data-page-kind="lesson"] .lesson-head h1 {
+      font-size: clamp(1.9rem, 3.4vw, 2.8rem); margin: 8px 0 12px; max-width: 26ch;
+    }
+    .lesson-kind { margin: 0; font-size: .85rem; font-weight: 650; color: var(--text); letter-spacing: .01em; }
+    body[data-page-kind="lesson"] .lesson-head .lesson-lede {
+      margin: 0; font-size: 1.15rem; line-height: 1.6; color: var(--text);
+    }
+    body[data-page-kind="lesson"] .lesson-head .hero-actions { margin-top: 16px; }
+    body[data-page-kind="lesson"] .lesson-head .hero-actions:empty { display: none; }
+
+    body[data-page-kind] .in-brief h2, body[data-page-kind] .lesson-summary h2 { font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] .in-brief ul, body[data-page-kind] .key-ideas { margin: 0; padding-left: 1.2em; }
+    body[data-page-kind] .in-brief li { margin-bottom: 4px; }
+    body[data-page-kind] .key-ideas li { margin-bottom: 10px; font-size: 1.0625rem; line-height: 1.75; }
+    body[data-page-kind] .lesson-summary h3 { margin: 22px 0 8px; font-size: 1.05rem; }
+    body[data-page-kind] .key-figure { margin: 18px 0 0; }
+    body[data-page-kind] .key-figure figcaption { margin-top: 8px; font-size: .85rem; color: var(--text); }
+
+    /* Course and Subject pages: a short head, then the list, then "More about"
+       (docs/LESSON-LAYOUT-BACKLOG.md C-1, S-1). One centred column, so the
+       order of the list reads top to bottom. */
+    body[data-page-kind="course"] #main > *, body[data-page-kind="subject"] #main > *,
+    body[data-page-kind="course"] [data-ui="course-navigation"] { max-width: 46rem; margin-inline: auto; }
+    body[data-page-kind] [data-ui="hero"].page-head {
+      display: block; margin-top: 6px; margin-bottom: 0; padding: 0;
+      border: 0; border-radius: 0; background: none; box-shadow: none;
+    }
+    body[data-page-kind] .page-head h1 { font-size: clamp(1.9rem, 3.4vw, 2.8rem); margin: 8px 0 12px; max-width: 26ch; }
+    body[data-page-kind] [data-ui="hero"].page-head > .lesson-lede { margin: 0; font-size: 1.1rem; line-height: 1.6; color: var(--text); }
+    body[data-page-kind] dl.meta-line {
+      display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 14px 0 0; padding: 0;
+    }
+    body[data-page-kind] dl.meta-line > div {
+      display: flex; gap: 6px; align-items: baseline; padding: 0; border: 0; border-radius: 0; background: none;
+    }
+    body[data-page-kind] dl.meta-line dt { font-size: .85rem; color: var(--text); }
+    body[data-page-kind] dl.meta-line dd { margin: 0; font-size: .95rem; font-weight: 700; line-height: 1.4; }
+    body[data-page-kind] .page-head .hero-actions { margin-top: 18px; }
+    body[data-page-kind] .list-head { margin-bottom: 14px; }
+    body[data-page-kind] .list-head h2 { margin: 0 0 6px; }
+    body[data-page-kind] .list-head p { margin: 0; color: var(--muted); font-size: .94rem; }
+    body[data-page-kind] .list-head .course-progress:empty { display: none; }
+    body[data-page-kind="subject"] [data-ui="course-list"] .spine,
+    body[data-page-kind="course"] [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    body[data-page-kind="subject"] [data-ui="course-list"] .spine-item,
+    body[data-page-kind="course"] [data-ui="lesson-list"] .syllabus-item { padding: 16px 18px; }
+    body[data-page-kind] details.more { border-top: 1px solid var(--line); padding-top: 6px; }
+    body[data-page-kind] details.more > summary {
+      display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none;
+    }
+    body[data-page-kind] details.more > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] details.more > summary::before { content: "+"; font-weight: 700; width: 1em; text-align: center; }
+    body[data-page-kind] details.more[open] > summary::before { content: "\\2212"; }
+    body[data-page-kind] details.more > summary { min-height: 48px; font-size: 1.15rem; font-weight: 700; }
+    body[data-page-kind] .more-part { margin-top: 18px; }
+    body[data-page-kind] .more-part h2 { margin: 22px 0 8px; font-size: 1.25rem; }
+    body[data-page-kind] .more-part h3 { margin: 18px 0 8px; font-size: 1.05rem; }
+    body[data-page-kind] .outcome h3 { margin: 16px 0 4px; }
+    body[data-page-kind] .outcome p { margin: 0; }
+    body[data-page-kind] .more-part p { line-height: 1.7; }
+
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson. */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\\2039\\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
+"""
+
 def stylesheet():
     """The stylesheet, with both light paths rendered from LIGHT_TOKENS."""
     return (
@@ -1225,4 +1320,4 @@ def stylesheet():
             + "\n    }",
         )
         .replace("__TOGGLE_LIGHT__", _light_block('[data-theme="light"]', "      "))
-    ) + feedback.CSS + UI_CSS
+    ) + feedback.CSS + UI_CSS + READING_CSS

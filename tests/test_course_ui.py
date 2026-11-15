@@ -73,7 +73,7 @@ def words(node):
 
 class TestPublishedUI(unittest.TestCase):
     def test_every_page_family_exposes_the_shared_contract(self):
-        from test_site_invariants import ALL_COURSES, PATH_PAGES, REQUIRED_PAGES
+        from test_site_invariants import ALL_COURSES, COURSES as TRADING_COURSES, PATH_PAGES, REQUIRED_PAGES
         families = [("/", "library"), ("/progress/", "progress")]
         families += [(url, "subject") for url in PATH_PAGES]
         families += [(url, "course") for _title, url, _lessons in ALL_COURSES]
@@ -81,10 +81,20 @@ class TestPublishedUI(unittest.TestCase):
         self.assertEqual({"library": 1, "subject": 20, "course": 180, "lesson": 1505, "progress": 1},
                          {kind: sum(k == kind for _u, k in families) for _url, kind in families})
         required = {"library": ["hero", "subject-list", "course-search"],
-                    "subject": ["breadcrumbs", "hero", "metadata", "overview", "course-list", "background"],
-                    "course": ["breadcrumbs", "hero", "metadata", "overview", "lesson-list", "background", "course-navigation"],
+                    # The list a reader opened the page for comes before the
+                    # overview and background (docs/LESSON-LAYOUT-BACKLOG.md
+                    # C-1, S-1). Trading's hand-written pages keep the old
+                    # order; their entries are checked as a set below.
+                    "subject": ["breadcrumbs", "hero", "metadata", "course-list", "overview", "background"],
+                    "course": ["breadcrumbs", "hero", "metadata", "lesson-list", "overview", "background", "course-navigation"],
                     "lesson": ["breadcrumbs", "hero", "progress", "lesson-navigation", "feedback"],
                     "progress": ["breadcrumbs", "hero", "metadata", "course-list"]}
+        # Trading's Subject page and course homes are hand-written and keep
+        # the overview before the list (LESSON-LAYOUT-BACKLOG L-12).
+        legacy = {"subject": ["breadcrumbs", "hero", "metadata", "overview", "course-list", "background"],
+                  "course": ["breadcrumbs", "hero", "metadata", "overview", "lesson-list", "background", "course-navigation"]}
+        trading_urls = {"/paths/trading/"} | {url for _t, url, _l in TRADING_COURSES}
+        self.assertEqual(9, len(trading_urls))
         failures = []
         for url, kind in families:
             doc = Elements((SITE / REQUIRED_PAGES[url]).read_text())
@@ -103,7 +113,8 @@ class TestPublishedUI(unittest.TestCase):
             if len(doc.find("a",**{"class":"skip-link","href":"#main"})) != 1:
                 missing.append("skip link")
             order=[n["attrs"].get("data-ui") for n in doc.nodes if n["attrs"].get("data-ui") in required[kind]]
-            if not missing and order != required[kind]:
+            expected = legacy[kind] if url in trading_urls and kind in legacy else required[kind]
+            if not missing and order != expected:
                 missing.append("region order: " + repr(order))
             if missing:
                 failures.append(url + ": " + ", ".join(missing))
@@ -376,8 +387,9 @@ class TestGeneratedCatalogUI(unittest.TestCase):
             self.assertFalse(doc.find(**{"class": "spine-num"}), "subject cards must not number courses")
             self.assertIn("Recommended background", [words(n) for n in doc.find("h2")])
             actions = doc.find(**{"data-ui": "primary-actions"})[0]
-            self.assertEqual("View courses", words(actions["children"][0]))
-            self.assertEqual("#courses", actions["children"][0]["attrs"]["href"])
+            first = subject["courses"][0]
+            self.assertEqual("Start with " + first["title"], words(actions["children"][0]))
+            self.assertEqual("../../%s/" % first["slug"], actions["children"][0]["attrs"]["href"])
             # "the rest of the path" is relative prose: it survives renumbering
             # and states a real dependency. A numbered Course identity, generic
             # framing or a prescribed order does not.
@@ -403,10 +415,13 @@ class TestGeneratedCatalogUI(unittest.TestCase):
                         [words(n) for n in crumb["children"] if n["attrs"].get("aria-hidden") != "true"])
                     self.assertIn("Recommended background", [words(n) for n in doc.find("h2")])
                     actions = doc.find(**{"data-ui": "primary-actions"})[0]
-                    self.assertEqual("#syllabus", actions["children"][0]["attrs"]["href"])
-                    self.assertEqual("View lessons", words(actions["children"][0]))
+                    first = course["lessons"][0]
+                    self.assertEqual("./%s/" % first["slug"], actions["children"][0]["attrs"]["href"])
+                    self.assertEqual("Start with " + first["title"], words(actions["children"][0]))
                     labels = [words(n) for n in doc.find("dt")]
-                    self.assertEqual(["Subject", "Lessons", "Format"], labels)
+                    # "Format: Interactive" was true of every course and said
+                    # nothing (SITE-STRUCTURE-BACKLOG B-18).
+                    self.assertEqual(["Subject", "Lessons", "Level"], labels)
                     if i == len(subject["courses"]) - 1:
                         terminal = doc.find("a", **{"class": "path-move next"})[0]
                         self.assertEqual("All %s courses" % subject["title"], words(terminal))
